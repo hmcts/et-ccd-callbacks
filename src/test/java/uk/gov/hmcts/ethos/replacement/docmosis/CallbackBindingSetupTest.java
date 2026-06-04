@@ -1,31 +1,37 @@
 package uk.gov.hmcts.ethos.replacement.docmosis;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.mockito.Answers;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
-import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.mock.env.MockEnvironment;
 import org.springframework.stereotype.Controller;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 class CallbackBindingSetupTest {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
@@ -34,24 +40,35 @@ class CallbackBindingSetupTest {
     private static final String CONTROLLERS_PACKAGE = "uk.gov.hmcts.ethos.replacement.docmosis.controllers";
     private static final String PRE_HEARING_DEPOSIT = "Pre_Hearing_Deposit";
     private static final String LOCAL_CALLBACK_BASE_URL = "http://localhost:8081";
+    private static final List<String> CALLBACK_URL_FIELDS = List.of(
+        "callback_url_about_to_start_event",
+        "callback_url_about_to_submit_event",
+        "callback_url_submitted_event"
+    );
 
     @Test
     void callbackBindingsFromCcdDefinitionsResolveAgainstEtControllers()
-        throws IOException, ReflectiveOperationException {
-        Map<String, Object> definitions = loadCaseTypeDefinitions();
+        throws Exception {
+        List<String> callbackUrls = loadCallbackUrls();
         List<Class<?>> controllerClasses = discoverControllerClasses();
 
-        assertThat(definitions).isNotEmpty();
+        assertThat(callbackUrls).isNotEmpty();
         assertThat(controllerClasses).isNotEmpty();
 
-        Object callbackDispatchService = createCallbackDispatchService(definitions, controllerClasses);
-        ReflectionTestUtils.invokeMethod(callbackDispatchService, "initialiseHandlerMaps");
+        try (GenericApplicationContext applicationContext = applicationContext(controllerClasses)) {
+            Object callbackRouteRegistry = createCallbackRouteRegistry(applicationContext);
+            Method validate = callbackRouteRegistry.getClass().getDeclaredMethod("validate", String.class);
+            validate.setAccessible(true);
+
+            for (String callbackUrl : callbackUrls) {
+                validateCallback(validate, callbackRouteRegistry, callbackUrl);
+            }
+        }
     }
 
-    private static Map<String, Object> loadCaseTypeDefinitions()
-        throws IOException, ReflectiveOperationException {
-        Map<String, Object> definitions = new LinkedHashMap<>();
-        Class<?> caseTypeDefinitionClass = Class.forName("uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition");
+    private static List<String> loadCallbackUrls()
+        throws IOException {
+        Set<String> callbackUrls = new LinkedHashSet<>();
 
         try (Stream<Path> paths = Files.walk(DEFINITION_SNAPSHOTS_ROOT)) {
             for (Path path : paths
@@ -63,12 +80,19 @@ class CallbackBindingSetupTest {
                 if (PRE_HEARING_DEPOSIT.equals(caseTypeId)) {
                     continue;
                 }
-                Object caseTypeDefinition = OBJECT_MAPPER.readValue(path.toFile(), caseTypeDefinitionClass);
-                definitions.put(caseTypeId, caseTypeDefinition);
+                JsonNode caseTypeDefinition = OBJECT_MAPPER.readTree(path.toFile());
+                for (JsonNode event : caseTypeDefinition.path("events")) {
+                    for (String field : CALLBACK_URL_FIELDS) {
+                        String callbackUrl = event.path(field).asText();
+                        if (!callbackUrl.isBlank() && !"null".equals(callbackUrl)) {
+                            callbackUrls.add(callbackUrl);
+                        }
+                    }
+                }
             }
         }
 
-        return definitions;
+        return List.copyOf(callbackUrls);
     }
 
     private static List<Class<?>> discoverControllerClasses() throws ClassNotFoundException {
@@ -85,43 +109,45 @@ class CallbackBindingSetupTest {
         return controllerClasses;
     }
 
-    @SuppressWarnings("unchecked")
-    private static Object createCallbackDispatchService(
-        Map<String, Object> definitions,
-        List<Class<?>> controllerClasses
-    ) throws ReflectiveOperationException {
-        ListableBeanFactory beanFactory = Mockito.mock(ListableBeanFactory.class);
-        Map<String, Object> restControllers = new LinkedHashMap<>();
-        Map<String, Object> controllers = new LinkedHashMap<>();
+    private static GenericApplicationContext applicationContext(List<Class<?>> controllerClasses) {
+        GenericApplicationContext applicationContext = new GenericApplicationContext();
         for (Class<?> controllerClass : controllerClasses) {
-            Object controllerInstance = Mockito.mock(controllerClass);
-            String beanName = controllerClass.getSimpleName();
-            if (AnnotatedElementUtils.hasAnnotation(controllerClass, RestController.class)) {
-                restControllers.put(beanName, controllerInstance);
-            }
-            if (AnnotatedElementUtils.hasAnnotation(controllerClass, Controller.class)) {
-                controllers.put(beanName, controllerInstance);
-            }
+            RootBeanDefinition beanDefinition = new RootBeanDefinition(controllerClass);
+            beanDefinition.setInstanceSupplier(() -> Mockito.mock(controllerClass));
+            applicationContext.registerBeanDefinition(controllerClass.getName(), beanDefinition);
         }
+        applicationContext.refresh();
+        return applicationContext;
+    }
 
-        Mockito.when(beanFactory.getBeansWithAnnotation(RestController.class)).thenReturn(restControllers);
-        Mockito.when(beanFactory.getBeansWithAnnotation(Controller.class)).thenReturn(controllers);
+    private static Object createCallbackRouteRegistry(GenericApplicationContext applicationContext)
+        throws ReflectiveOperationException {
+        RequestMappingHandlerMapping handlerMapping = new RequestMappingHandlerMapping();
+        handlerMapping.setApplicationContext(applicationContext);
+        handlerMapping.afterPropertiesSet();
 
-        Class<?> callbackDispatchServiceClass = Class.forName("uk.gov.hmcts.ccd.sdk.impl.CallbackDispatchService");
-        Class<?> definitionRegistryClass = Class.forName("uk.gov.hmcts.ccd.sdk.impl.DefinitionRegistry");
-        Constructor<?> constructor = callbackDispatchServiceClass.getConstructor(
-            definitionRegistryClass,
-            ListableBeanFactory.class,
-            ObjectMapper.class
+        Class<?> callbackRouteRegistryClass = Class.forName("uk.gov.hmcts.ccd.sdk.impl.json.JsonCallbackRouteRegistry");
+        Constructor<?> constructor = callbackRouteRegistryClass.getDeclaredConstructor(
+            ApplicationContext.class,
+            ObjectMapper.class,
+            RequestMappingHandlerMapping.class,
+            Environment.class
         );
-        Object definitionRegistry = Mockito.mock((Class<Object>) definitionRegistryClass, invocation -> {
-            if ("loadDefinitions".equals(invocation.getMethod().getName())) {
-                return definitions;
-            }
-            return Answers.RETURNS_DEFAULTS.answer(invocation);
-        });
-        Object service = constructor.newInstance(definitionRegistry, beanFactory, OBJECT_MAPPER);
-        ReflectionTestUtils.setField(service, "localCallbackBaseUrls", LOCAL_CALLBACK_BASE_URL);
-        return service;
+        constructor.setAccessible(true);
+        return constructor.newInstance(
+            applicationContext,
+            OBJECT_MAPPER,
+            handlerMapping,
+            new MockEnvironment().withProperty("decentralisation.local-callback-base-urls", LOCAL_CALLBACK_BASE_URL)
+        );
+    }
+
+    private static void validateCallback(Method validate, Object callbackRouteRegistry, String callbackUrl)
+        throws ReflectiveOperationException {
+        try {
+            validate.invoke(callbackRouteRegistry, callbackUrl);
+        } catch (InvocationTargetException e) {
+            throw new AssertionError("Unresolved local callback " + callbackUrl, e.getTargetException());
+        }
     }
 }

@@ -79,6 +79,10 @@ document_management:
 decentralisation:
   legacy-json-service: true
 
+et:
+  ccd:
+    decentralised: ${ET_CCD_DECENTRALISED:true}
+
 idam:
   s2s-auth:
     # noinspection SpringBootApplicationYaml

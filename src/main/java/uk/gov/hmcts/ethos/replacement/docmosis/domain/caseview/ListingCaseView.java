@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CaseView;
 import uk.gov.hmcts.ccd.sdk.CaseViewRequest;
@@ -12,6 +13,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTIN
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
 @Component
+@ConditionalOnProperty(name = "et.ccd.decentralised", havingValue = "true")
 public class ListingCaseView implements CaseView<ListingData, ListingCaseState> {
     @Override
     public Set<String> caseTypeIds() {

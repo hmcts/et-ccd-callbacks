@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -94,7 +95,7 @@ public final class RespondentRepresentativeUtils {
      *         {@code false} otherwise
      */
     public static boolean isValidRepresentative(RepresentedTypeRItem representative) {
-        return ObjectUtils.isNotEmpty(representative)
+        return representative != null
                 && StringUtils.isNotBlank(representative.getId())
                 && ObjectUtils.isNotEmpty(representative.getValue());
     }
@@ -1212,5 +1213,73 @@ public final class RespondentRepresentativeUtils {
                 }
             }
         }
+    }
+
+    /**
+     * Finds the case user assignments that were manually assigned to the specified representative.
+     *
+     * <p>An assignment is considered manually assigned when the assignment's case role can be
+     * used to find a valid representative in the case data, and that representative has the
+     * same ID as the provided representative.</p>
+     *
+     * <p>Assumptions:</p>
+     * <ul>
+     *     <li>Manually assigned representatives have a corresponding case role in the case data.</li>
+     *     <li>{@code findRepresentativeByRole} can resolve the representative associated with
+     *         a manually assigned case role.</li>
+     *     <li>The representative ID is the reliable value used to compare representatives.</li>
+     *     <li>If {@code caseUserAssignments} is empty, or {@code representative} is invalid, there are
+     *         no manually assigned cases to return.</li>
+     * </ul>
+     *
+     * @param caseData the case data used to resolve representatives by case role
+     * @param caseUserAssignments the list of all case user assignments to search
+     * @param representative the representative whose manually assigned cases should be returned
+     * @return a list of case user assignments manually assigned to the specified representative;
+     *         an empty list if no matching assignments are found or the input is invalid
+     */
+    public static List<CaseUserAssignment> findManualAssignments(CaseData caseData,
+                                                                 List<CaseUserAssignment> caseUserAssignments,
+                                                                 RepresentedTypeRItem representative) {
+        List<CaseUserAssignment> manualAssignments = new ArrayList<>();
+        if (CollectionUtils.isEmpty(caseUserAssignments) || !isValidRepresentative(representative)) {
+            return manualAssignments;
+        }
+        for (CaseUserAssignment caseUserAssignment : caseUserAssignments) {
+            // If a representative is manually assigned, he/she should have a correspondent respondent searched by role
+            RepresentedTypeRItem tmpRepresentative = findRepresentativeByRole(caseData,
+                    caseUserAssignment.getCaseRole());
+            if (isValidRepresentative(tmpRepresentative)
+                    && Strings.CS.equals(representative.getId(), tmpRepresentative.getId())) {
+                manualAssignments.add(caseUserAssignment);
+            }
+        }
+        return manualAssignments;
+    }
+
+    public static List<CaseUserAssignment> findAutoAssignments(RepresentedTypeRItem representative,
+                                                               List<CaseUserAssignment> manualAssignments,
+                                                               List<CaseUserAssignment> caseUserAssignments) {
+        List<CaseUserAssignment> autoAssignments = new ArrayList<>();
+        if (CollectionUtils.isEmpty(caseUserAssignments) || !isValidRepresentative(representative)) {
+            return autoAssignments;
+        }
+        // searching for remaining roles
+        if (CollectionUtils.isNotEmpty(manualAssignments)) {
+            Set<String> manualCaseRoles = manualAssignments.stream()
+                    .map(CaseUserAssignment::getCaseRole)
+                    .collect(Collectors.toSet());
+
+            caseUserAssignments.stream()
+                    .filter(caseUserAssignment ->
+                            manualCaseRoles.contains(caseUserAssignment.getCaseRole()))
+                    .forEach(autoAssignments::add);
+        }
+        String representativeIdamId = representative.getValue().getIdamId();
+        caseUserAssignments.stream()
+                .filter(assignment -> Strings.CS.equals(representativeIdamId, assignment.getUserId()))
+                .filter(assignment -> !autoAssignments.contains(assignment))
+                .forEach(autoAssignments::add);
+        return autoAssignments;
     }
 }

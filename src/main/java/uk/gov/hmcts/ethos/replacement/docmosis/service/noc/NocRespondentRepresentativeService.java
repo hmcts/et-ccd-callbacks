@@ -658,33 +658,37 @@ public class NocRespondentRepresentativeService {
      */
     public RepresentativesCaseAssignments revokeRespondentRepresentatives(
             CaseDetails caseDetails, List<RepresentedTypeRItem> representativesToRevoke) {
-        CaseUserAssignmentData caseUserAssignmentsData = nocCcdService.retrieveCaseUserAssignments(
-                adminUserService.getAdminUserToken(), caseDetails.getCaseId());
         RepresentativesCaseAssignments representativesCaseAssignments = RepresentativesCaseAssignments.builder()
                 .representativesToRemove(new ArrayList<>()).revokedCaseUserAssignments(new ArrayList<>()).build();
+        if (ObjectUtils.isEmpty(caseDetails)
+                || StringUtils.isBlank(caseDetails.getCaseId())
+                || ObjectUtils.isEmpty(caseDetails.getCaseData())
+                || CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())
+                || CollectionUtils.isEmpty(caseDetails.getCaseData().getRespondentCollection())
+                || CollectionUtils.isEmpty(representativesToRevoke)) {
+            return representativesCaseAssignments;
+        }
+        CaseUserAssignmentData caseUserAssignmentsData = nocCcdService.retrieveCaseUserAssignments(
+                adminUserService.getAdminUserToken(), caseDetails.getCaseId());
         if (ObjectUtils.isEmpty(caseUserAssignmentsData)
                 || CollectionUtils.isEmpty(caseUserAssignmentsData.getCaseUserAssignments())) {
             return  representativesCaseAssignments;
         }
-
-        for (CaseUserAssignment caseUserAssignment : caseUserAssignmentsData.getCaseUserAssignments()) {
-            boolean caseUserAssignmentAdded = false;
-            if (!RoleUtils.isRespondentRepresentativeRole(caseUserAssignment.getCaseRole())) {
-                continue;
+        List<CaseUserAssignment> caseUserAssignments =
+                new ArrayList<>(caseUserAssignmentsData.getCaseUserAssignments());
+        List<CaseUserAssignment> manualAssignments = new ArrayList<>();
+        for (RepresentedTypeRItem representative : representativesToRevoke) {
+            manualAssignments.addAll(RespondentRepresentativeUtils.findManualAssignments(
+                    caseDetails.getCaseData(), caseUserAssignments, representative));
+            if (CollectionUtils.isNotEmpty(manualAssignments)) {
+                representativesCaseAssignments.getRevokedCaseUserAssignments().addAll(manualAssignments);
+                representativesCaseAssignments.getRepresentativesToRemove().add(representative);
+                caseUserAssignments.removeAll(manualAssignments);
             }
-            RepresentedTypeRItem representedTypeRItem = RespondentRepresentativeUtils
-                    .findRepresentativeInListByRoleOrRespondentName(caseDetails.getCaseData(),
-                            caseUserAssignment.getCaseRole(), representativesToRevoke);
-            if (ObjectUtils.isNotEmpty(representedTypeRItem)) {
-                representativesCaseAssignments.getRevokedCaseUserAssignments().add(caseUserAssignment);
-                representativesCaseAssignments.getRepresentativesToRemove().add(representedTypeRItem);
-                caseUserAssignmentAdded = true;
-            }
-            RepresentedTypeRItem representative = RespondentRepresentativeUtils.findRepresentativeByIdamIdOrRole(
-                    caseDetails.getCaseData(), caseUserAssignment.getUserId(), caseUserAssignment.getCaseRole());
-            if (!caseUserAssignmentAdded
-                    && !checkRepresentativeAssignment(caseDetails, representative, caseUserAssignment)) {
-                representativesCaseAssignments.getRevokedCaseUserAssignments().add(caseUserAssignment);
+            List<CaseUserAssignment> autoAssignments = RespondentRepresentativeUtils.findAutoAssignments(
+                    representative, manualAssignments, caseUserAssignments);
+            if (CollectionUtils.isNotEmpty(autoAssignments)) {
+                representativesCaseAssignments.getRevokedCaseUserAssignments().addAll(autoAssignments);
             }
         }
         try {
@@ -692,6 +696,9 @@ public class NocRespondentRepresentativeService {
                     representativesCaseAssignments.getRevokedCaseUserAssignments());
         } catch (GenericRuntimeException e) {
             log.error(ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS, caseDetails.getCaseId(), e.getMessage(), e);
+            if (CollectionUtils.isEmpty(manualAssignments)) {
+                representativesCaseAssignments.setRepresentativesToRemove(Collections.emptyList());
+            }
             representativesCaseAssignments.setRevokedCaseUserAssignments(Collections.emptyList());
         }
         return representativesCaseAssignments;
@@ -1040,6 +1047,10 @@ public class NocRespondentRepresentativeService {
             if (userDetails.getUid().equals(caseUserAssignment.getUserId())) {
                 RepresentedTypeRItem representative = RespondentRepresentativeUtils.findRepresentativeByIdamIdOrRole(
                         caseDetails.getCaseData(), caseUserAssignment.getUserId(), caseUserAssignment.getCaseRole());
+                if (!RespondentRepresentativeUtils.isValidRepresentative(representative)) {
+                    continue;
+                }
+                representative.getValue().setIdamId(userDetails.getUid());
                 if (checkRepresentativeAssignment(caseDetails, representative, caseUserAssignment)) {
                     representatives.add(representative);
                 }

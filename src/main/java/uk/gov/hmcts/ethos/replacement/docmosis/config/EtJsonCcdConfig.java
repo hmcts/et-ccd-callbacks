@@ -26,8 +26,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CA
 @ComponentScan("uk.gov.hmcts.ccd.sdk")
 public class EtJsonCcdConfig {
 
-    private static final String ADMIN_JSON_ROOT =
-        "file:ccd-definitions/jurisdictions/admin/json";
     private static final String ENGLAND_WALES_JSON_ROOT =
         "file:ccd-definitions/jurisdictions/england-wales/json";
     private static final String SCOTLAND_JSON_ROOT =
@@ -35,7 +33,12 @@ public class EtJsonCcdConfig {
 
     @Bean
     public TypedCCDConfig<AdminData, AdminCaseState, ?> etAdminJsonCcdConfig(JsonCaseTypeFactory factory) {
-        return factory.build(AdminData.class, AdminCaseState.class, ADMIN_CASE_TYPE_ID, ADMIN_JSON_ROOT);
+        return factory.build(
+            AdminData.class,
+            AdminCaseState.class,
+            ADMIN_CASE_TYPE_ID,
+            "file:ccd-definitions/jurisdictions/admin/json"
+        );
     }
 
     @Bean

@@ -158,6 +158,13 @@ class AcasCaseServiceTest {
                           "gte": "%s"
                         }
                       }
+                    },
+                    {
+                      "range": {
+                        "data.receiptDate": {
+                          "gte": "2026-05-30"
+                        }
+                      }
                     }
                   ],
                   "must_not": [
@@ -282,91 +289,6 @@ class AcasCaseServiceTest {
         List<CaseDocumentAcasResponse> documents = acasCaseService.retrieveAcasDocuments(caseId);
         assertNotNull(documents);
         assertThat(documents).hasSize(4);
-    }
-
-    @Test
-    void retrieveAcasDocuments_removedReceiptDate() {
-        String caseId = EXAMPLE_CASE_ID;
-        testData.getRequestCaseDataListEnglandAcas().getFirst().getData().remove("receiptDate");
-        SearchResult englandWalesSearchResult = SearchResult.builder()
-            .total(1)
-            .cases(testData.getRequestCaseDataListEnglandAcas())
-            .build();
-        SearchResult scotlandSearchResult = SearchResult.builder()
-            .total(0)
-            .cases(null)
-            .build();
-
-        when(ccdApiClient.searchCases(
-            TestConstants.TEST_SERVICE_AUTH_TOKEN,
-            TestConstants.TEST_SERVICE_AUTH_TOKEN,
-            EtSyaConstants.ENGLAND_CASE_TYPE, generateCaseDataEsQuery(Collections.singletonList(caseId))
-        )).thenReturn(englandWalesSearchResult);
-        when(ccdApiClient.searchCases(
-            TestConstants.TEST_SERVICE_AUTH_TOKEN,
-            TestConstants.TEST_SERVICE_AUTH_TOKEN,
-            EtSyaConstants.SCOTLAND_CASE_TYPE, generateCaseDataEsQuery(Collections.singletonList(caseId))
-        )).thenReturn(scotlandSearchResult);
-        List<CaseDocumentAcasResponse> documents = acasCaseService.retrieveAcasDocuments(caseId);
-        assertNotNull(documents);
-        assertThat(documents).isEmpty();
-    }
-
-    @Test
-    void retrieveAcasDocuments_nullReceiptDate() {
-        String caseId = EXAMPLE_CASE_ID;
-        testData.getRequestCaseDataListEnglandAcas().getFirst().getData().put("receiptDate", null);
-        SearchResult englandWalesSearchResult = SearchResult.builder()
-            .total(1)
-            .cases(testData.getRequestCaseDataListEnglandAcas())
-            .build();
-        SearchResult scotlandSearchResult = SearchResult.builder()
-            .total(0)
-            .cases(null)
-            .build();
-
-        when(ccdApiClient.searchCases(
-            TestConstants.TEST_SERVICE_AUTH_TOKEN,
-            TestConstants.TEST_SERVICE_AUTH_TOKEN,
-            EtSyaConstants.ENGLAND_CASE_TYPE, generateCaseDataEsQuery(Collections.singletonList(caseId))
-        )).thenReturn(englandWalesSearchResult);
-        when(ccdApiClient.searchCases(
-            TestConstants.TEST_SERVICE_AUTH_TOKEN,
-            TestConstants.TEST_SERVICE_AUTH_TOKEN,
-            EtSyaConstants.SCOTLAND_CASE_TYPE, generateCaseDataEsQuery(Collections.singletonList(caseId))
-        )).thenReturn(scotlandSearchResult);
-        List<CaseDocumentAcasResponse> documents = acasCaseService.retrieveAcasDocuments(caseId);
-        assertNotNull(documents);
-        assertThat(documents).isEmpty();
-    }
-
-    @Test
-    void retrieveAcasDocuments_pastReceiptDate() {
-        String caseId = EXAMPLE_CASE_ID;
-        testData.getRequestCaseDataListEnglandAcas().getFirst().getData().put("receiptDate",
-            LocalDate.of(2026, 3, 31).toString());
-        SearchResult englandWalesSearchResult = SearchResult.builder()
-            .total(1)
-            .cases(testData.getRequestCaseDataListEnglandAcas())
-            .build();
-        SearchResult scotlandSearchResult = SearchResult.builder()
-            .total(0)
-            .cases(null)
-            .build();
-
-        when(ccdApiClient.searchCases(
-            TestConstants.TEST_SERVICE_AUTH_TOKEN,
-            TestConstants.TEST_SERVICE_AUTH_TOKEN,
-            EtSyaConstants.ENGLAND_CASE_TYPE, generateCaseDataEsQuery(Collections.singletonList(caseId))
-        )).thenReturn(englandWalesSearchResult);
-        when(ccdApiClient.searchCases(
-            TestConstants.TEST_SERVICE_AUTH_TOKEN,
-            TestConstants.TEST_SERVICE_AUTH_TOKEN,
-            EtSyaConstants.SCOTLAND_CASE_TYPE, generateCaseDataEsQuery(Collections.singletonList(caseId))
-        )).thenReturn(scotlandSearchResult);
-        List<CaseDocumentAcasResponse> documents = acasCaseService.retrieveAcasDocuments(caseId);
-        assertNotNull(documents);
-        assertThat(documents).isEmpty();
     }
 
     @Test

@@ -3,8 +3,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import uk.gov.hmcts.ccd.sdk.api.TypedCCDConfig;
-import uk.gov.hmcts.ccd.sdk.json.JsonCaseTypeFactory;
+import uk.gov.hmcts.ccd.sdk.api.CCDConfig;
+import uk.gov.hmcts.ccd.sdk.api.HasRole;
+import uk.gov.hmcts.ccd.sdk.json.JsonBackedCCDConfig;
+import uk.gov.hmcts.ccd.sdk.json.JsonBackedCCDConfigFactory;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -32,62 +34,104 @@ public class EtJsonCcdConfig {
         "file:ccd-definitions/jurisdictions/scotland/json";
 
     @Bean
-    public TypedCCDConfig<AdminData, AdminCaseState, ?> etAdminJsonCcdConfig(JsonCaseTypeFactory factory) {
-        return factory.build(
-            AdminData.class,
-            AdminCaseState.class,
-            ADMIN_CASE_TYPE_ID,
-            "file:ccd-definitions/jurisdictions/admin/json"
-        );
-    }
-
-    @Bean
-    public TypedCCDConfig<CaseData, CaseState, ?> etEnglandWalesJsonCcdConfig(JsonCaseTypeFactory factory) {
-        return factory.build(CaseData.class, CaseState.class, ENGLANDWALES_CASE_TYPE_ID, ENGLAND_WALES_JSON_ROOT);
-    }
-
-    @Bean
-    public TypedCCDConfig<CaseData, CaseState, ?> etScotlandJsonCcdConfig(JsonCaseTypeFactory factory) {
-        return factory.build(CaseData.class, CaseState.class, SCOTLAND_CASE_TYPE_ID, SCOTLAND_JSON_ROOT);
-    }
-
-    @Bean
-    public TypedCCDConfig<ListingData, ListingCaseState, ?> etEnglandWalesListingJsonCcdConfig(
-        JsonCaseTypeFactory factory
+    public CCDConfig<AdminData, AdminCaseState, PlaceholderRole> etAdminJsonCcdConfig(
+        JsonBackedCCDConfigFactory factory
     ) {
-        return factory.build(
-            ListingData.class,
-            ListingCaseState.class,
-            ENGLANDWALES_LISTING_CASE_TYPE_ID,
-            ENGLAND_WALES_JSON_ROOT
-        );
+        return new JsonBackedCCDConfig<>(
+          factory,
+          ADMIN_CASE_TYPE_ID,
+          "file:ccd-definitions/jurisdictions/admin/json"
+        ) {
+        };
     }
 
     @Bean
-    public TypedCCDConfig<ListingData, ListingCaseState, ?> etScotlandListingJsonCcdConfig(
-        JsonCaseTypeFactory factory
+    public CCDConfig<CaseData, CaseState, PlaceholderRole> etEnglandWalesJsonCcdConfig(
+        JsonBackedCCDConfigFactory factory
     ) {
-        return factory.build(ListingData.class, ListingCaseState.class, SCOTLAND_LISTING_CASE_TYPE_ID,
-            SCOTLAND_JSON_ROOT);
+        return new JsonBackedCCDConfig<>(
+          factory,
+          ENGLANDWALES_CASE_TYPE_ID,
+          ENGLAND_WALES_JSON_ROOT
+        ) {
+        };
     }
 
     @Bean
-    public TypedCCDConfig<MultipleData, MultipleCaseState, ?> etEnglandWalesMultipleJsonCcdConfig(
-        JsonCaseTypeFactory factory
+    public CCDConfig<CaseData, CaseState, PlaceholderRole> etScotlandJsonCcdConfig(
+        JsonBackedCCDConfigFactory factory
     ) {
-        return factory.build(
-            MultipleData.class,
-            MultipleCaseState.class,
-            ENGLANDWALES_BULK_CASE_TYPE_ID,
-            ENGLAND_WALES_JSON_ROOT
-        );
+        return new JsonBackedCCDConfig<>(
+          factory,
+          SCOTLAND_CASE_TYPE_ID,
+          SCOTLAND_JSON_ROOT
+        ) {
+        };
     }
 
     @Bean
-    public TypedCCDConfig<MultipleData, MultipleCaseState, ?> etScotlandMultipleJsonCcdConfig(
-        JsonCaseTypeFactory factory
+    public CCDConfig<ListingData, ListingCaseState, PlaceholderRole> etEnglandWalesListingJsonCcdConfig(
+        JsonBackedCCDConfigFactory factory
     ) {
-        return factory.build(MultipleData.class, MultipleCaseState.class, SCOTLAND_BULK_CASE_TYPE_ID,
-            SCOTLAND_JSON_ROOT);
+        return new JsonBackedCCDConfig<>(
+          factory,
+          ENGLANDWALES_LISTING_CASE_TYPE_ID,
+          ENGLAND_WALES_JSON_ROOT
+        ) {
+        };
+    }
+
+    @Bean
+    public CCDConfig<ListingData, ListingCaseState, PlaceholderRole> etScotlandListingJsonCcdConfig(
+        JsonBackedCCDConfigFactory factory
+    ) {
+        return new JsonBackedCCDConfig<>(
+          factory,
+          SCOTLAND_LISTING_CASE_TYPE_ID,
+          SCOTLAND_JSON_ROOT
+        ) {
+        };
+    }
+
+    @Bean
+    public CCDConfig<MultipleData, MultipleCaseState, PlaceholderRole> etEnglandWalesMultipleJsonCcdConfig(
+        JsonBackedCCDConfigFactory factory
+    ) {
+        return new JsonBackedCCDConfig<>(
+          factory,
+          ENGLANDWALES_BULK_CASE_TYPE_ID,
+          ENGLAND_WALES_JSON_ROOT
+        ) {
+        };
+    }
+
+    @Bean
+    public CCDConfig<MultipleData, MultipleCaseState, PlaceholderRole> etScotlandMultipleJsonCcdConfig(
+        JsonBackedCCDConfigFactory factory
+    ) {
+        return new JsonBackedCCDConfig<>(
+          factory,
+          SCOTLAND_BULK_CASE_TYPE_ID,
+          SCOTLAND_JSON_ROOT
+        ) {
+        };
+    }
+
+  /**
+   * If you someday wish to represent your case in Java instead of json, you can define case roles using enums.
+   * This is an inert placeholder.
+   */
+  public enum PlaceholderRole implements HasRole {
+        DUMMY_STATE;
+
+        @Override
+        public String getRole() {
+            return toString();
+        }
+
+        @Override
+        public String getCaseTypePermissions() {
+            return "CRUD";
+        }
     }
 }

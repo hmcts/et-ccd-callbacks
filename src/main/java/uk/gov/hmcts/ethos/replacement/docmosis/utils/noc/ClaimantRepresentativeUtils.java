@@ -281,10 +281,10 @@ public final class ClaimantRepresentativeUtils {
         if (StringUtils.isBlank(claimantRepresentative.getRepresentativeId())) {
             claimantRepresentative.setRepresentativeId(UUID.randomUUID().toString());
         }
-        if (ObjectUtils.isNotEmpty(claimantRepresentative.getMyHmctsOrganisation())
-                && StringUtils.isNotBlank(claimantRepresentative.getMyHmctsOrganisation().getOrganisationID())) {
+        if (hasHmctsOrganisationId(claimantRepresentative)) {
             claimantRepresentative.setOrganisationId(
                     claimantRepresentative.getMyHmctsOrganisation().getOrganisationID());
+            return;
         }
         if (StringUtils.isBlank(claimantRepresentative.getOrganisationId())) {
             claimantRepresentative.setOrganisationId(UUID.randomUUID().toString());

@@ -97,6 +97,8 @@ public final class NOCConstants {
             "We have been unable to assign '%s' access to this case via MyHMCTS. They must check with their "
                     + "organisation administrator to ensure they have a valid MyHMCTS account, who will need to "
                     + "assign the case to them. To continue, please click Ignore and Continue.";
+    public static final String WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL_LOG =
+            "Unable to assign access to this case via MyHMCTS. Representative email not defined for organisation";
     public static final String ERROR_UNABLE_TO_CHECK_REPRESENTATIVE_ACCOUNT_BY_EMAIL =
             "Failed to check representative account by email. Exception is {}";
     public static final String WARNING_MISSING_RESPONDENT_EMAIL_ADDRESS =

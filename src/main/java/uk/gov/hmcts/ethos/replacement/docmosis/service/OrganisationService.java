@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.List;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_CHECK_REPRESENTATIVE_ACCOUNT_BY_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL_LOG;
 
 @Service
 @RequiredArgsConstructor
@@ -72,19 +74,20 @@ public class OrganisationService {
             if (!OrganisationUtils.hasUserIdentifier(userResponse)) {
                 String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
                         representativeName);
-                log.warn(warningMessage);
                 nocWarnings.add(warningMessage);
             }
         } catch (FeignException e) {
             if (e.status() == HttpStatus.NOT_FOUND.value()) {
                 String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
                         representativeName);
-                log.warn(warningMessage);
                 nocWarnings.add(warningMessage);
             } else {
                 log.error(ERROR_UNABLE_TO_CHECK_REPRESENTATIVE_ACCOUNT_BY_EMAIL, e.getMessage());
                 throw new GenericRuntimeException(e);
             }
+        }
+        if (CollectionUtils.isNotEmpty(nocWarnings)) {
+            log.warn(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL_LOG);
         }
         return nocWarnings;
     }

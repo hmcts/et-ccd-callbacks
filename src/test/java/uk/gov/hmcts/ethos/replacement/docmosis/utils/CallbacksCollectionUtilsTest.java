@@ -9,20 +9,20 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CallbacksCollectionUtilsTest {
+final class CallbacksCollectionUtilsTest {
 
-    public static final String DUMMY_RESPONDENT_ID_1 = "dummy_respondent_id_1";
-    public static final String DUMMY_RESPONDENT_ID_2 = "dummy_respondent_id_2";
-    public static final String ROLE_SOLICITOR_A = "[SOLICITORA]";
-    public static final String ROLE_SOLICITOR_B = "[SOLICITORB]";
-    public static final String ROLE_SOLICITOR_C = "[SOLICITORC]";
-    public static final String ROLE_SOLICITOR_D = "[SOLICITORD]";
-    public static final String ROLE_SOLICITOR_E = "[SOLICITORE]";
-    public static final String ROLE_SOLICITOR_F = "[SOLICITORF]";
-    public static final String ROLE_SOLICITOR_G = "[SOLICITORG]";
-    public static final String ROLE_SOLICITOR_H = "[SOLICITORH]";
-    public static final String ROLE_SOLICITOR_I = "[SOLICITORI]";
-    public static final String ROLE_SOLICITOR_J = "[SOLICITORJ]";
+    private static final String DUMMY_RESPONDENT_ID_1 = "dummy_respondent_id_1";
+    private static final String DUMMY_RESPONDENT_ID_2 = "dummy_respondent_id_2";
+    private static final String ROLE_SOLICITOR_A = "[SOLICITORA]";
+    private static final String ROLE_SOLICITOR_B = "[SOLICITORB]";
+    private static final String ROLE_SOLICITOR_C = "[SOLICITORC]";
+    private static final String ROLE_SOLICITOR_D = "[SOLICITORD]";
+    private static final String ROLE_SOLICITOR_E = "[SOLICITORE]";
+    private static final String ROLE_SOLICITOR_F = "[SOLICITORF]";
+    private static final String ROLE_SOLICITOR_G = "[SOLICITORG]";
+    private static final String ROLE_SOLICITOR_H = "[SOLICITORH]";
+    private static final String ROLE_SOLICITOR_I = "[SOLICITORI]";
+    private static final String ROLE_SOLICITOR_J = "[SOLICITORJ]";
 
     @Test
     void theSameByKey() {

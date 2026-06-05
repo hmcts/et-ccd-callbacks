@@ -852,9 +852,7 @@ public class NocRespondentRepresentativeService {
      */
     public void grantRespondentRepresentativesAccess(CaseDetails caseDetails,
                                                      List<RepresentedTypeRItem> representatives) {
-        if (ObjectUtils.isEmpty(caseDetails)
-                || ObjectUtils.isEmpty(caseDetails.getCaseData())
-                || StringUtils.isBlank(caseDetails.getCaseId())
+        if (!CaseDataUtils.areCaseDetailsValid(caseDetails)
                 || CollectionUtils.isEmpty(representatives)) {
             return;
         }

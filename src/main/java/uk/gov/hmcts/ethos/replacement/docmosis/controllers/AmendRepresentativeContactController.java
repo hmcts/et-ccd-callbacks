@@ -141,6 +141,7 @@ public class AmendRepresentativeContactController {
             amendRepresentativeContactService.updateRepresentativeContactDetails(
                     userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
             caseData.setMyHmctsAddressText(null);
+            caseData.setEt3ResponseAddress(null);
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
         }

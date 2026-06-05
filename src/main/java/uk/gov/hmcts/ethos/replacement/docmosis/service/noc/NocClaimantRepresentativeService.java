@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -134,19 +133,16 @@ public class NocClaimantRepresentativeService {
      */
     public String validateClaimantRepresentativeOrganisationMatch(CaseDetails caseDetails) {
         String error = StringUtils.EMPTY;
-        if (ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType())
-                || StringUtils.isBlank(caseDetails.getCaseData().getRepresentativeClaimantType()
-                .getRepresentativeEmailAddress())
-                || ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType()
-                .getMyHmctsOrganisation())
-                || ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType()
-                .getMyHmctsOrganisation().getOrganisationID())) {
+        CaseData caseData = caseDetails.getCaseData();
+        if (!ClaimantRepresentativeUtils.hasRepresentative(caseData.getRepresentativeClaimantType())
+                || !ClaimantRepresentativeUtils.hasRepresentativeEmail(caseData.getRepresentativeClaimantType())
+                || !ClaimantRepresentativeUtils.hasHmctsOrganisationId(caseData.getRepresentativeClaimantType())) {
             return error;
         }
         AccountIdByEmailResponse userResponse;
         OrganisationsResponse organisationsResponse = null;
         boolean isValidUserAndOrganisation = true;
-        RepresentedTypeC representative = caseDetails.getCaseData().getRepresentativeClaimantType();
+        RepresentedTypeC representative = caseData.getRepresentativeClaimantType();
         try {
             String accessToken = adminUserService.getAdminUserToken();
             userResponse = nocService.findUserByEmail(accessToken,

@@ -41,8 +41,7 @@ public class EtJsonCcdConfig {
           factory,
           ADMIN_CASE_TYPE_ID,
           "file:ccd-definitions/jurisdictions/admin/json"
-        ) {
-        };
+        ) { };
     }
 
     @Bean
@@ -53,8 +52,7 @@ public class EtJsonCcdConfig {
           factory,
           ENGLANDWALES_CASE_TYPE_ID,
           ENGLAND_WALES_JSON_ROOT
-        ) {
-        };
+        ) { };
     }
 
     @Bean
@@ -65,8 +63,7 @@ public class EtJsonCcdConfig {
           factory,
           SCOTLAND_CASE_TYPE_ID,
           SCOTLAND_JSON_ROOT
-        ) {
-        };
+        ) { };
     }
 
     @Bean
@@ -77,8 +74,7 @@ public class EtJsonCcdConfig {
           factory,
           ENGLANDWALES_LISTING_CASE_TYPE_ID,
           ENGLAND_WALES_JSON_ROOT
-        ) {
-        };
+        ) { };
     }
 
     @Bean
@@ -89,8 +85,7 @@ public class EtJsonCcdConfig {
           factory,
           SCOTLAND_LISTING_CASE_TYPE_ID,
           SCOTLAND_JSON_ROOT
-        ) {
-        };
+        ) { };
     }
 
     @Bean
@@ -101,8 +96,7 @@ public class EtJsonCcdConfig {
           factory,
           ENGLANDWALES_BULK_CASE_TYPE_ID,
           ENGLAND_WALES_JSON_ROOT
-        ) {
-        };
+        ) { };
     }
 
     @Bean
@@ -113,8 +107,7 @@ public class EtJsonCcdConfig {
           factory,
           SCOTLAND_BULK_CASE_TYPE_ID,
           SCOTLAND_JSON_ROOT
-        ) {
-        };
+        ) { };
     }
 
     /**

@@ -679,11 +679,9 @@ public class NocRespondentRepresentativeService {
      * @throws GenericRuntimeException if an error occurs while communicating with CCD services
      */
     public void resetOrganisationPolicies(CaseDetails caseDetails) {
-        if (ObjectUtils.isEmpty(caseDetails)
-                || ObjectUtils.isEmpty(caseDetails.getCaseData())
+        if (!CaseDataUtils.areCaseDetailsValid(caseDetails)
                 || StringUtils.isBlank(caseDetails.getCaseTypeId())
                 || StringUtils.isBlank(caseDetails.getJurisdiction())
-                || StringUtils.isEmpty(caseDetails.getCaseId())
                 || (CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollectionToAdd())
                 && CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollectionToRemove()))) {
             return;

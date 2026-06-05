@@ -130,7 +130,7 @@ final class NotificationUtilsTest {
     }
 
     @Test
-    void theCanFindOrganisationSuperuserEmail() {
+    void theHasOrganisationSuperuserEmail() {
         // when organisation id is empty should return false
         RetrieveOrgByIdResponse retrieveOrgByIdResponse = RetrieveOrgByIdResponse.builder().build();
         ResponseEntity<RetrieveOrgByIdResponse> orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse,
@@ -186,7 +186,7 @@ final class NotificationUtilsTest {
     }
 
     @Test
-    void theCanFindOrganisationSuperuserEmailWithoutCaseId() {
+    void theHasOrganisationSuperuserEmailWithoutCaseId() {
         // when organisation response is valid should return true
         RetrieveOrgByIdResponse retrieveOrgByIdResponse = RetrieveOrgByIdResponse.builder()
                 .superUser(RetrieveOrgByIdResponse.SuperUser.builder().email(ORGANISATION_EMAIL).build())

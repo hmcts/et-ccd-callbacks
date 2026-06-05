@@ -128,11 +128,7 @@ public final class NotificationUtils {
             return false;
         }
         final String orgType = NOC_TYPE_REMOVAL.equals(nocType) ? OLD_LOWERCASE : NEW_LOWERCASE;
-        if (ObjectUtils.isEmpty(orgResponse)
-                || !orgResponse.getStatusCode().is2xxSuccessful()
-                || ObjectUtils.isEmpty(orgResponse.getBody())
-                || ObjectUtils.isEmpty(orgResponse.getBody().getSuperUser())
-                || StringUtils.isBlank(orgResponse.getBody().getSuperUser().getEmail())) {
+        if (!hasOrganisationSuperuserEmail(orgResponse)) {
             RetrieveOrgByIdResponse body = ObjectUtils.isEmpty(orgResponse) ? null : orgResponse.getBody();
             HttpStatusCode statusCode = ObjectUtils.isEmpty(orgResponse) ? null : orgResponse.getStatusCode();
             log.warn(WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL, orgType, orgId,
@@ -143,7 +139,7 @@ public final class NotificationUtils {
     }
 
     /**
-     * Checks whether the given organisation response contains a valid super user email address.
+     * Checks whether the given organisation response contains a valid superuser email address.
      *
      * <p>This method returns {@code true} only if:
      * <ul>

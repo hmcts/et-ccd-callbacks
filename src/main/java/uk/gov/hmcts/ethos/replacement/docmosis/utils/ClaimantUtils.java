@@ -5,7 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_CLAIMANT_EMAIL_NOT_FOUND;
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_CLAIMANT_NOT_FOUND;
 
 public final class ClaimantUtils {
 
@@ -14,24 +15,33 @@ public final class ClaimantUtils {
     }
 
     /**
-     * Retrieves the claimant email address from the given case data.
-     * <p>
-     * If the claimant email address is not present or is blank, this method returns
-     * an empty string. If the case data or claimant details are missing, a
-     * {@link NotFoundException} is thrown.
-     * </p>
+     * Retrieves the claimant email address from the provided case data.
      *
-     * @param caseData the case data containing claimant details
-     * @return the claimant email address, or an empty string if no email address is provided
-     * @throws NotFoundException if the case data or claimant information is not available
+     * <p>If the case data or claimant type is missing, a {@link NotFoundException}
+     * is thrown. If the claimant email address is {@code null} or empty, an empty
+     * string is returned.</p>
+     *
+     * <p>Assumptions:</p>
+     * <ul>
+     *     <li>The claimant email address is held under {@code caseData.getClaimantType()}.</li>
+     *     <li>A missing {@code CaseData} or claimant type means the claimant details are not available.</li>
+     *     <li>A {@code null} or empty claimant email address is not treated as an exception and is returned as an
+     *     empty string.</li>
+     *     <li>This method only retrieves the email address; it does not validate the email format or check portal
+     *     access.</li>
+     * </ul>
+     *
+     * @param caseData the case data containing claimant information
+     * @return the claimant email address, or an empty string if it is not present
+     * @throws NotFoundException if the case data or claimant type is missing
      */
     public static String getClaimantEmailAddress(CaseData caseData) {
         if (ObjectUtils.isEmpty(caseData)
-                || ObjectUtils.isEmpty(caseData.getClaimantType())
-                || StringUtils.isBlank(caseData.getClaimantType().getClaimantEmailAddress())) {
-            throw new NotFoundException(EXCEPTION_CLAIMANT_EMAIL_NOT_FOUND);
+                || ObjectUtils.isEmpty(caseData.getClaimantType())) {
+            throw new NotFoundException(EXCEPTION_CLAIMANT_NOT_FOUND);
         }
-        return caseData.getClaimantType().getClaimantEmailAddress();
+        String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
+        return isNullOrEmpty(claimantEmailAddress) ? "" : claimantEmailAddress;
     }
 
     public static String getClaimant(CaseData caseData) {

@@ -49,6 +49,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_ADDITION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_CLAIMANT_EMAIL_NOT_FOUND_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_CLAIMANT_NOT_NOTIFIED_FOR_REMOVAL_OF_REPRESENTATIVE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_RESPONDENT;
@@ -61,7 +62,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WAR
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_NEW_REPRESENTATIVE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_TRIBUNAL_FOR_RESPONDENT_REP_UPDATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_CASE_DETAILS_TO_RESOLVE_ORGANISATION_EMAIL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_CLAIMANT_EMAIL_CLAIMANT_NOT_NOTIFIED_FOR_REMOVAL_OF_REPRESENTATIVE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_PARTY_NAME_TO_NOTIFY_NEW_REPRESENTATIVE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_REPRESENTATIVE_TO_RESOLVE_ORGANISATION_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_REP_EMAIL_NOTIFY_NEW_REPRESENTATIVE;
@@ -484,13 +484,15 @@ public class NocNotificationService {
         try {
             claimantEmailAddress = ClaimantUtils.getClaimantEmailAddress(caseDetails.getCaseData());
         } catch (NotFoundException e) {
-            log.warn(WARNING_INVALID_CLAIMANT_EMAIL_CLAIMANT_NOT_NOTIFIED_FOR_REMOVAL_OF_REPRESENTATIVE,
+            log.warn(WARNING_CLAIMANT_NOT_NOTIFIED_FOR_REMOVAL_OF_REPRESENTATIVE,
                     caseDetails.getCaseId(), e.getMessage());
+            return;
+        }
+        if (StringUtils.isBlank(claimantEmailAddress)) {
             return;
         }
         String claimant = StringUtils.isBlank(ClaimantUtils.getClaimant(caseDetails.getCaseData()))
                 ? StringUtils.EMPTY : ClaimantUtils.getClaimant(caseDetails.getCaseData());
-        claimantEmailAddress = StringUtils.isBlank(claimantEmailAddress) ? StringUtils.EMPTY : claimantEmailAddress;
         Map<String, String> personalisation = buildNoCPersonalisation(caseDetails, claimant);
         personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
         try {

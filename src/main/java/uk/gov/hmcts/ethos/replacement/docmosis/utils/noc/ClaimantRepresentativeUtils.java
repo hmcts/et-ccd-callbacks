@@ -52,9 +52,9 @@ public final class ClaimantRepresentativeUtils {
      *         string if no email address is available
      */
     public static String getClaimantNocNotificationEmail(CaseDetails caseDetails) {
+        String caseId = ObjectUtils.isEmpty(caseDetails) ? StringUtils.EMPTY : caseDetails.getCaseId();
         if (ObjectUtils.isEmpty(caseDetails)
                 || ObjectUtils.isEmpty(caseDetails.getCaseData())) {
-            String caseId = ObjectUtils.isEmpty(caseDetails) ? StringUtils.EMPTY : caseDetails.getCaseId();
             log.warn(WARNING_CLAIMANT_EMAIL_NOT_FOUND, caseId);
             return StringUtils.EMPTY;
         }
@@ -63,11 +63,15 @@ public final class ClaimantRepresentativeUtils {
                 .getRepresentativeEmailAddress())) {
             return caseDetails.getCaseData().getRepresentativeClaimantType().getRepresentativeEmailAddress();
         }
-        String email = StringUtils.EMPTY;
+        String email;
         try {
             email = ClaimantUtils.getClaimantEmailAddress(caseDetails.getCaseData());
         } catch (NotFoundException e) {
             log.warn(e.getMessage());
+            return StringUtils.EMPTY;
+        }
+        if (StringUtils.isBlank(email)) {
+            log.warn(WARNING_CLAIMANT_EMAIL_NOT_FOUND, caseId);
         }
         return email;
     }

@@ -76,4 +76,19 @@ final class CaseDataUtilsTest {
         final CaseData caseData = new CaseData();
         assertDoesNotThrow(() -> CaseDataUtils.validateCaseData(caseData, DUMMY_SUBMISSION_REFERENCE));
     }
+
+    @Test
+    void theAreCaseDetailsValid() {
+        // when case details is empty should return false
+        assertThat(CaseDataUtils.areCaseDetailsValid(null)).isFalse();
+        // when case details does not have a valid submission reference should return false
+        CaseDetails caseDetails = new CaseDetails();
+        assertThat(CaseDataUtils.areCaseDetailsValid(caseDetails)).isFalse();
+        // when case details does not have a submission reference should return false
+        caseDetails.setCaseId(DUMMY_SUBMISSION_REFERENCE);
+        assertThat(CaseDataUtils.areCaseDetailsValid(caseDetails)).isFalse();
+        // when case details has case data should return true
+        caseDetails.setCaseData(new CaseData());
+        assertThat(CaseDataUtils.areCaseDetailsValid(caseDetails)).isTrue();
+    }
 }

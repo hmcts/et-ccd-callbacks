@@ -41,6 +41,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.MyHmctsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
@@ -485,9 +486,7 @@ public class NocRespondentRepresentativeService {
      * @param caseDetails the case details containing case data and representative information
      */
     public void revokeRespondentRepresentativesWithSameOrganisationAsClaimant(CaseDetails caseDetails) {
-        if (ObjectUtils.isEmpty(caseDetails)
-                || StringUtils.isEmpty(caseDetails.getCaseId())
-                || ObjectUtils.isEmpty(caseDetails.getCaseData())) {
+        if (!CaseDataUtils.areCaseDetailsValid(caseDetails)) {
             log.error(CASE_DETAILS_OR_CASE_DATA_NOT_FOUND);
             return;
         }

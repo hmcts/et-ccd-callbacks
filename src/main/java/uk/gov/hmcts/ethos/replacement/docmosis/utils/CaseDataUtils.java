@@ -59,6 +59,26 @@ public final class CaseDataUtils {
     }
 
     /**
+     * Checks whether the provided {@link CaseDetails} object contains the required case details.
+     *
+     * <p>A {@code CaseDetails} object is considered valid when:
+     * <ul>
+     *     <li>the object itself is not empty,</li>
+     *     <li>the case ID is not blank, and</li>
+     *     <li>the case data is not empty.</li>
+     * </ul>
+     *
+     * @param caseDetails the case details to validate
+     * @return {@code true} if the case details are present and contain a non-blank case ID
+     *         and non-empty case data; {@code false} otherwise
+     */
+    public static boolean areCaseDetailsValid(CaseDetails caseDetails) {
+        return ObjectUtils.isNotEmpty(caseDetails)
+                && StringUtils.isNotBlank(caseDetails.getCaseId())
+                && ObjectUtils.isNotEmpty(caseDetails.getCaseData());
+    }
+
+    /**
      * Performs structural validation on the provided {@link CCDRequest} to ensure it contains
      * all mandatory components required for further processing. This method validates the
      * presence and integrity of the {@code CCDRequest}, its case details, case ID, and case data.

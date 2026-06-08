@@ -100,6 +100,8 @@ public final class NOCConstants {
             "We have been unable to assign '%s' access to this case via MyHMCTS. They must check with their "
                     + "organisation administrator to ensure they have a valid MyHMCTS account, who will need to "
                     + "assign the case to them. To continue, please click Ignore and Continue.";
+    public static final String WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL_LOG =
+            "Unable to assign access to this case via MyHMCTS. Representative email not defined for organisation";
     public static final String ERROR_UNABLE_TO_CHECK_REPRESENTATIVE_ACCOUNT_BY_EMAIL =
             "Failed to check representative account by email. Exception is {}";
     public static final String ERROR_UNABLE_TO_FIND_REPRESENTATIVE_ACCOUNT_BY_EMAIL =
@@ -145,8 +147,8 @@ public final class NOCConstants {
             "Failed to send email to new representative, case id: {}, error: {}";
     public static final String WARNING_INVALID_CASE_DETAILS_CLAIMANT_NOT_NOTIFIED_OF_REMOVAL_OF_REPRESENTATIVE =
             "Invalid case details. Unable to notify claimant for removal of representative update. Case id: {}.";
-    public static final String WARNING_INVALID_CLAIMANT_EMAIL_CLAIMANT_NOT_NOTIFIED_FOR_REMOVAL_OF_REPRESENTATIVE =
-            "Invalid claimant email. Unable to notify claimant for removal of representative update. Case id: {}. "
+    public static final String WARNING_CLAIMANT_NOT_NOTIFIED_FOR_REMOVAL_OF_REPRESENTATIVE =
+            "Unable to notify claimant for removal of representative. Case id: {}. "
                     + "Exception: {}";
     public static final String WARNING_FAILED_TO_SEND_REMOVAL_OF_REPRESENTATIVE_CLAIMANT =
             "Failed to send email to claimant for removal of representative, case id: {}, error: {}";

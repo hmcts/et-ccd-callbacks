@@ -51,7 +51,7 @@ final class ClaimantRepresentativeUtilsTest {
 
     private static final String EXPECTED_EXCEPTION_CLAIMANT_REPRESENTATIVE_NOT_FOUND =
             "Claimant representative not found.";
-    private static final String EXPECTED_WARNING_CLAIMANT_EMAIL_NOT_FOUND = "Could not find claimant email address.";
+    private static final String EXPECTED_WARNING_CLAIMANT_NOT_FOUND = "Could not find claimant.";
     private static final String EXPECTED_WARNING_WITHOUT_CASE_ID = "Claimant email not found for case ";
     private static final String EXPECTED_WARNING_WITH_CASE_ID = "Claimant email not found for case 1234567890123456";
 
@@ -73,7 +73,7 @@ final class ClaimantRepresentativeUtilsTest {
         // when claimant representative is empty and not able to find claimant's email should log not found warning.
         caseDetails.setCaseData(new CaseData());
         assertThat(ClaimantRepresentativeUtils.getClaimantNocNotificationEmail(caseDetails)).isEmpty();
-        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_THREE, EXPECTED_WARNING_CLAIMANT_EMAIL_NOT_FOUND);
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_THREE, EXPECTED_WARNING_CLAIMANT_NOT_FOUND);
         // when claimant representative is not empty and finds claimant e-mail should return that e-mail address
         ClaimantType claimantType = new ClaimantType();
         claimantType.setClaimantEmailAddress(CLAIMANT_EMAIL_ADDRESS);

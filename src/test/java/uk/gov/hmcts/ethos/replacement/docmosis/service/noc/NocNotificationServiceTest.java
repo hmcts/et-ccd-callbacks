@@ -163,8 +163,8 @@ class NocNotificationServiceTest {
                     + "1234567890123456.";
     public static final String
             EXPECTED_WARNING_INVALID_CLAIMANT_EMAIL_CLAIMANT_NOT_NOTIFIED_FOR_REMOVAL_OF_REPRESENTATIVE =
-            "Invalid claimant email. Unable to notify claimant for removal of representative update. Case id: "
-                    + "1234567890123456. Exception: Could not find claimant email address.";
+            "Unable to notify claimant for removal of representative. Case id: " + CASE_ID + ". Exception: Could not "
+                    + "find claimant.";
     public static final String EXPECTED_WARNING_FAILED_TO_SEND_REMOVAL_OF_REPRESENTATIVE_CLAIMANT =
             "Failed to send email to claimant for removal of representative, case id: 1234567890123456, error: "
                     + "Dummy exception occurred while sending email to respondent";

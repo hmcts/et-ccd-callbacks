@@ -131,9 +131,9 @@ class NocNotificationHelperTest {
     }
 
     @Test
-    void testBuildBasePersonalisation() {
+    void testAddCommonEmailValues() {
         Map<String, String> claimantPersonalisation =
-            NocNotificationHelper.buildBasePersonalisation(caseData);
+            NocNotificationHelper.addCommonEmailValues(caseData);
         assertThat(claimantPersonalisation).hasSize(LoggerTestUtils.INTEGER_THREE);
         for (String value : claimantPersonalisation.values()) {
             assertThat(value).isNotNull();

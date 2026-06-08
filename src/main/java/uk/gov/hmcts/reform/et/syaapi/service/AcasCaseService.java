@@ -87,10 +87,24 @@ public class AcasCaseService {
                       }
                     },
                     {
-                      "range": {
-                        "data.receiptDate": {
-                          "gte": "2026-05-30"
-                        }
+                      "bool": {
+                        "should": [
+                          {
+                            "range": {
+                              "data.receiptDate": {
+                                "gte": "2026-05-30"
+                              }
+                            }
+                          },
+                          {
+                            "range": {
+                              "data.respondentCollection.value.responseReceivedDate": {
+                                "gte": "2026-05-30"
+                              }
+                            }
+                          }
+                        ],
+                        "minimum_should_match": 1
                       }
                     }
                   ],

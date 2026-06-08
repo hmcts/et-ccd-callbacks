@@ -36,6 +36,10 @@ def secrets = [
     secret('cos-system-user-password', 'ET_SYSTEM_USER_PASSWORD'),
     secret('et-staff-user-admin-user-name', 'ET_STAFF_USER_ADMIN_USER_NAME'),
     secret('et-staff-user-admin-user-name-password', 'ET_STAFF_USER_ADMIN_USER_NAME_PASSWORD'),
+    secret('et-cos-postgres-user-v15', 'ET_COS_AAT_DB_USER_NAME'),
+    secret('et-cos-postgres-password-v15', 'ET_COS_AAT_DB_PASSWORD'),
+    secret('et-cos-postgres-host-v15', 'ET_COS_AAT_DB_HOST'),
+    secret('et-cos-postgres-port-v15', 'ET_COS_AAT_DB_PORT'),
     secret('et-legalrep-user-name', 'ET_LEGALREP_USER_NAME'),
     secret('et-legalrep-password', 'ET_LEGALREP_PASSWORD'),
     secret('et-resp-user-name','ET_REPSONDENT_USER_NAME'),
@@ -165,6 +169,12 @@ withPipeline(type, product, component) {
     env.REF_DATA_URL = "https://rd-caseworker-ref-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.ROLE_ASSIGNMENT_URL = "https://am-role-assignment-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.RUNNING_ENV = "aat"
+    env.ET_COS_AAT_DB_NAME = "et_cos"
+    env.ET_COS_PREVIEW_DB_HOST = "et-preview.postgres.database.azure.com"
+    env.ET_COS_PREVIEW_DB_PORT = "5432"
+    env.ET_COS_PREVIEW_DB_NAME = "pr-${CHANGE_ID}-et_cos"
+    env.ET_COS_PREVIEW_DB_USER_NAME = "hmcts"
+    env.ET_COS_PREVIEW_DB_CONN_OPTIONS = "sslmode=require"
 
     before('smoketest:preview') {
       env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
@@ -179,6 +189,10 @@ withPipeline(type, product, component) {
         ./bin/pull-latest-e2e-tests.sh
       cd ccd-definitions && yarn install && yarn setup && yarn scripts:preview ${CHANGE_ID}
       """
+      sh """
+          echo "Importing ET COS reference data"
+          ./bin/preview/import-ref-data.sh ${CHANGE_ID}
+        """
 
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/admin/xlsx/et-admin-ccd-config-preview.xlsx'
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/england-wales/xlsx/et-englandwales-ccd-config-preview.xlsx'

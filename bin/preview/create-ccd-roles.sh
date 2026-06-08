@@ -11,6 +11,7 @@ UTILS_DIR="${SCRIPT_DIR}/../utils"
 
 # Use preview-specific token utilities
 source "${SCRIPT_DIR}/utils/auth-utils.sh"
+source "${SCRIPT_DIR}/utils/definition-store-db-utils.sh"
 
 # Define ET CCD roles that need to be created
 declare -a ET_ROLES=(
@@ -37,6 +38,9 @@ declare -a ET_ROLES=(
     "caseworker-employment-etjudge-leeds"
     "caseworker-employment-leeds"
 )
+
+echo "⏳ Waiting for CCD definition-store schema..."
+wait_for_definition_store_schema
 
 echo "🔐 Getting authentication tokens..."
 echo "Retrieving IDAM user token"
@@ -69,17 +73,28 @@ create_role() {
 
     if [[ "${http_code}" == "201" ]] || [[ "${http_code}" == "200" ]]; then
         echo "    ✅ Role '${role_name}' created/updated successfully"
+        return 0
     elif [[ "${http_code}" == "205" ]]; then
         echo "    ✅ Role '${role_name}' already exists and is up-to-date"
+        return 0
     else
         echo "    ❌ Failed to create role '${role_name}' (HTTP ${http_code})"
         echo "    Response: ${response_body}"
+        return 1
     fi
 }
 
 # Create all roles
+failed_roles=0
 for role in "${ET_ROLES[@]}"; do
-    create_role "${role}"
+    if ! create_role "${role}"; then
+        failed_roles=$((failed_roles + 1))
+    fi
 done
+
+if (( failed_roles > 0 )); then
+    echo "❌ CCD roles creation failed for ${failed_roles} role(s)"
+    exit 1
+fi
 
 echo "✅ CCD roles creation completed!"

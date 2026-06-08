@@ -65,7 +65,7 @@ public class NocRemoveRepresentationEmailService {
             return;
         }
 
-        Map<String, String> personalisation = NocNotificationHelper.buildBasePersonalisation(caseDetails.getCaseData());
+        Map<String, String> personalisation = NocNotificationHelper.addCommonEmailValues(caseDetails.getCaseData());
         personalisation.put(LEGAL_REP_NAME, repName);
 
         try {
@@ -100,7 +100,7 @@ public class NocRemoveRepresentationEmailService {
     public void sendEmailToRemovedLegalRep(CaseDetails caseDetails, String emailToSend) {
         try {
             Map<String, String> personalisation =
-                NocNotificationHelper.buildBasePersonalisation(caseDetails.getCaseData());
+                NocNotificationHelper.addCommonEmailValues(caseDetails.getCaseData());
             emailService.sendEmail(
                 nocLegalRepNoLongerAssignedTemplateId,
                 emailToSend,
@@ -166,7 +166,7 @@ public class NocRemoveRepresentationEmailService {
         String orgName,
         String linkToCitUI
     ) {
-        Map<String, String> personalisation = NocNotificationHelper.buildBasePersonalisation(caseDetails.getCaseData());
+        Map<String, String> personalisation = NocNotificationHelper.addCommonEmailValues(caseDetails.getCaseData());
         personalisation.put(LEGAL_REP_ORG, orgName);
         personalisation.put(LINK_TO_CIT_UI, linkToCitUI);
 
@@ -206,7 +206,7 @@ public class NocRemoveRepresentationEmailService {
         }
 
         // get email personalisation
-        Map<String, String> personalisation = NocNotificationHelper.buildBasePersonalisation(caseData);
+        Map<String, String> personalisation = NocNotificationHelper.addCommonEmailValues(caseData);
         personalisation.put(PARTY_NAME, partyName);
         personalisation.put(LINK_TO_CIT_UI, isClaimantRepresented
             ? emailService.getExuiCaseLink(caseDetails.getCaseId())
@@ -269,7 +269,7 @@ public class NocRemoveRepresentationEmailService {
     ) {
         try {
             Map<String, String> personalisation =
-                NocNotificationHelper.buildBasePersonalisation(caseDetails.getCaseData());
+                NocNotificationHelper.addCommonEmailValues(caseDetails.getCaseData());
             personalisation.put(PARTY_NAME, partyName);
             personalisation.put(LINK_TO_CIT_UI, linkToCitUI);
 

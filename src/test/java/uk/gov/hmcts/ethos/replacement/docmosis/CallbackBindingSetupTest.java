@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -30,7 +32,11 @@ class CallbackBindingSetupTest {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-    private static final Path DEFINITION_SNAPSHOTS_ROOT = Path.of("build", "cftlib", "definition-snapshots");
+    private static final List<Path> DEFINITION_SNAPSHOTS_LOCATIONS = List.of(
+        Path.of("build", "cftlib", "definition-snapshots"),
+        Path.of("build", "resources", "test", "definition-snapshots")
+    );
+    private static final String DEFINITION_SNAPSHOTS_CLASSPATH = "definition-snapshots";
     private static final String CONTROLLERS_PACKAGE = "uk.gov.hmcts.ethos.replacement.docmosis.controllers";
     private static final String PRE_HEARING_DEPOSIT = "Pre_Hearing_Deposit";
     private static final String LOCAL_CALLBACK_BASE_URL = "http://localhost:8081";
@@ -53,7 +59,7 @@ class CallbackBindingSetupTest {
         Map<String, Object> definitions = new LinkedHashMap<>();
         Class<?> caseTypeDefinitionClass = Class.forName("uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition");
 
-        try (Stream<Path> paths = Files.walk(DEFINITION_SNAPSHOTS_ROOT)) {
+        try (Stream<Path> paths = Files.walk(resolveDefinitionSnapshotsRoot())) {
             for (Path path : paths
                 .filter(Files::isRegularFile)
                 .filter(snapshot -> snapshot.getFileName().toString().endsWith(".json"))
@@ -69,6 +75,26 @@ class CallbackBindingSetupTest {
         }
 
         return definitions;
+    }
+
+    private static Path resolveDefinitionSnapshotsRoot() {
+        for (Path candidate : DEFINITION_SNAPSHOTS_LOCATIONS) {
+            if (Files.isDirectory(candidate)) {
+                return candidate;
+            }
+        }
+
+        URL resource = CallbackBindingSetupTest.class.getClassLoader().getResource(DEFINITION_SNAPSHOTS_CLASSPATH);
+        if (resource != null && "file".equals(resource.getProtocol())) {
+            try {
+                return Path.of(resource.toURI());
+            } catch (URISyntaxException e) {
+                throw new IllegalStateException("Invalid definition-snapshots classpath location", e);
+            }
+        }
+
+        throw new IllegalStateException(
+            "CCD definition snapshots not found. Run ./gradlew dumpCCDDefinitions to generate them.");
     }
 
     private static List<Class<?>> discoverControllerClasses() throws ClassNotFoundException {

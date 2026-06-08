@@ -193,10 +193,18 @@ configurations {
 }
 
 test {
+    dependsOn dumpCCDDefinitions
     exclude '**/*ComponentTest*'
     useJUnitPlatform()
     testLogging {
         events "passed", "skipped", "failed"
+    }
+}
+
+processTestResources {
+    dependsOn dumpCCDDefinitions
+    from("$buildDir/cftlib/definition-snapshots") {
+        into 'definition-snapshots'
     }
 }
 

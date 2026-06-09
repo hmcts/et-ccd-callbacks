@@ -211,6 +211,35 @@ yarn test:seed-cutover
 yarn test:verify-cutover
 ```
 
+### Cutover DB Check Step
+After the cases have been moved to the ET decentralised store, compare the seeded case rows in CCD and ET:
+```bash
+yarn test:check-cutover-db
+```
+This reads `functional-output/cutover/seed-manifest.json` and writes a report to
+`functional-output/cutover/db-check-report.json`. It compares case state, revision, event count,
+latest event details, case data hash and supplementary data hash.
+
+Required environment variables:
+```bash
+CUTOVER_CCD_DB_URL=postgresql://<user>@<host>:5432/<ccd-data-store-db>?sslmode=require
+CUTOVER_CCD_DB_PASSWORD=<ccd data store db password>
+CUTOVER_ET_DB_URL=postgresql://<user>@<host>:5432/<et-cos-db>?sslmode=require
+CUTOVER_ET_DB_PASSWORD=<et cos db password>
+```
+
+Optional environment variables:
+```bash
+CUTOVER_DB_CHECK_MANIFEST_FILE=/tmp/seed-manifest.json
+CUTOVER_DB_CHECK_OUTPUT_FILE=/tmp/db-check-report.json
+CUTOVER_DB_CHECK_PROFILE_IDS=accepted-case-details,accepted-jurisdiction
+```
+
+For preview, `CUTOVER_PREVIEW_PR_ID`, `CHANGE_ID` or `PR_ID` can be used to infer
+`pr-<id>-data-store` for CCD and `pr-<id>-et_cos` for ET on
+`et-preview.postgres.database.azure.com`. Set the `CUTOVER_*_DB_URL` values directly if
+the preview deployment is using different database names.
+
 To run all test (using script in package.json)
 ```bash
 yarn test:fullfunctional

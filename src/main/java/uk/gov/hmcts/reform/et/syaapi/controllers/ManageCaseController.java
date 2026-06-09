@@ -92,6 +92,7 @@ public class ManageCaseController {
         @RequestHeader(AUTHORIZATION) String authorization,
         @PathVariable String caseId,
         @RequestParam(value = CASE_USER_ROLE_API_PARAMETER_NAME, required = false) String caseUserRole) {
+        log.info("CRITICAL: Received get case transfer info request - caseId: {} caseUserRole: {}", caseId, caseUserRole);
         CaseTransferInfoResponse transferInfo = caseTransferInfoService.getCaseTransferInfo(
             authorization,
             caseId,

@@ -127,11 +127,10 @@ public class NocNotificationService {
             // sending notification e-mail to tribunal
             notifyTribunalOfRespondentRepresentativeUpdate(caseDetails, nocType);
 
-            // sending notification e-mail to respondent
-            notifyRespondentOfRepresentativeUpdate(caseDetails, respondent);
-
-            // sending email to the new legal representative
             if (NOC_TYPE_ADDITION.equals(nocType)) {
+                // sending notification e-mail to respondent of new representation
+                notifyRespondentOfRepresentativeUpdate(caseDetails, respondent);
+                // sending email to the new legal representative
                 notifyRepresentativeOfNewAssignment(caseDetails, respondent.getValue().getRespondentName(),
                         representative);
             }

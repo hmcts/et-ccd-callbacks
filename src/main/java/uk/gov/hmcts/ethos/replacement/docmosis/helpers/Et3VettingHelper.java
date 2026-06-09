@@ -76,7 +76,7 @@ public final class Et3VettingHelper {
             + "|Tribunal| %s|\r\n"
             + "|Office| %s|";
     private static final String RESPONDENT_DETAILS =
-        "| <h2>Respondent</h2> | |\r\n"
+        "| <h2>Respondent</h2> | | \r\n"
             + TABLE_STRING
             + "| Name | %s |\r\n"
             + "| Contact address | %s |";

@@ -52,18 +52,6 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseEventID": "nocRemoveRepRespondent",
-    "CaseFieldID": "nocRemoveRepIsMoreThanOneFlag",
-    "DisplayContext": "READONLY",
-    "PageID": 2,
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 1,
-    "FieldShowCondition": "nocRemoveRepOptionLabel=\"dummy\"",
-    "PageShowCondition": "nocRemoveRepIsMoreThanOneFlag=\"Yes\"",
-    "ShowSummaryChangeOption": "N"
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
-    "CaseEventID": "nocRemoveRepRespondent",
     "CaseFieldID": "nocRemoveRepOptionLabel",
     "DisplayContext": "READONLY",
     "PageID": 2,

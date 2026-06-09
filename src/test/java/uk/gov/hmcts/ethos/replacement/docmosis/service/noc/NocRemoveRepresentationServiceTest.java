@@ -10,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -27,8 +28,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.REMOVE_ONLY_ME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.REMOVE_ORGANISATION;
 
 @ExtendWith(SpringExtension.class)
@@ -79,9 +78,9 @@ class NocRemoveRepresentationServiceTest {
     @BeforeEach
     void setUp() throws URISyntaxException, IOException {
         caseDetails = generateCaseDetails();
-        repR1 = caseDetails.getCaseData().getRepCollection().get(0);
-        repR2 = caseDetails.getCaseData().getRepCollection().get(1);
-        repR3 = caseDetails.getCaseData().getRepCollection().get(2);
+        repR1 = caseDetails.getCaseData().getRepCollection().get(LoggerTestUtils.INTEGER_ZERO);
+        repR2 = caseDetails.getCaseData().getRepCollection().get(LoggerTestUtils.INTEGER_ONE);
+        repR3 = caseDetails.getCaseData().getRepCollection().get(LoggerTestUtils.INTEGER_TWO);
     }
 
     private CaseDetails generateCaseDetails() throws URISyntaxException, IOException {
@@ -100,29 +99,29 @@ class NocRemoveRepresentationServiceTest {
 
         nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails);
 
-        verify(nocCcdService, times(1))
+        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ONE))
             .revokeClaimantRepresentation(ADMIN_TOKEN, caseDetails);
         // send email to organisation admin
-        verify(nocRemoveRepresentationEmailService, times(1))
+        verify(nocRemoveRepresentationEmailService, times(LoggerTestUtils.INTEGER_ONE))
             .sendEmailToOrgAdmin(
                 caseDetails,
                 ORG_CLAIMANT_EMAIL,
                 REP_CLAIMANT_NAME
             );
         // send email to removed legal rep
-        verify(nocRemoveRepresentationEmailService, times(1))
+        verify(nocRemoveRepresentationEmailService, times(LoggerTestUtils.INTEGER_ONE))
             .sendEmailToRemovedLegalRep(
                 caseDetails,
                 REP_CLAIMANT_EMAIL
             );
         // send email to unrepresented party
-        verify(nocRemoveRepresentationEmailService, times(1))
+        verify(nocRemoveRepresentationEmailService, times(LoggerTestUtils.INTEGER_ONE))
             .sendEmailToUnrepresentedClaimant(
                 caseDetails,
                 ORG_CLAIMANT_NAME
             );
         // send email to other party
-        verify(nocRemoveRepresentationEmailService, times(1))
+        verify(nocRemoveRepresentationEmailService, times(LoggerTestUtils.INTEGER_ONE))
             .sendEmailToOtherPartyRespondent(
                     caseDetails,
                     REP_EMAIL_LIST,
@@ -140,15 +139,12 @@ class NocRemoveRepresentationServiceTest {
         );
         assertThat(exception.getMessage())
             .isEqualTo("Missing RepresentativeClaimantType for case id: 1775651960650043");
-        verify(nocCcdService, times(0))
+        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO))
             .revokeClaimantRepresentation(anyString(), any());
     }
 
     @Test
     void shouldRevokeRespondentLegalRep_onlyCurrentRep() {
-        caseDetails.getCaseData().setNocRemoveRepIsMoreThanOneFlag(YES);
-        caseDetails.getCaseData().setNocRemoveRepOption(REMOVE_ONLY_ME);
-
         when(nocRespondentRepresentativeService.findRepresentativesByToken(anyString(), any()))
             .thenReturn(List.of(repR1, repR2));
         when(nocNotificationService
@@ -160,33 +156,33 @@ class NocRemoveRepresentationServiceTest {
         verify(nocRespondentRepresentativeService, times(1))
             .revokeAndRemoveRespondentRepresentatives(caseDetails, List.of(repR1, repR2));
         // send email to organisation admin
-        verify(nocRemoveRepresentationEmailService, times(1))
+        verify(nocRemoveRepresentationEmailService, times(LoggerTestUtils.INTEGER_ONE))
             .sendEmailToOrgAdmin(
                 caseDetails,
                 ORG_A_EMAIL,
                 REP_A1_NAME
             );
         // send email to removed legal rep
-        verify(nocRemoveRepresentationEmailService, times(1))
+        verify(nocRemoveRepresentationEmailService, times(LoggerTestUtils.INTEGER_ONE))
             .sendEmailToListOfRemovedLegalRep(
                 caseDetails,
                 List.of(REP_A1_EMAIL)
             );
         // send email to unrepresented party
-        verify(nocRemoveRepresentationEmailService, times(1))
+        verify(nocRemoveRepresentationEmailService, times(LoggerTestUtils.INTEGER_ONE))
             .sendEmailToUnrepresentedRespondent(
                 caseDetails,
                 List.of(repR1, repR2),
                 ORG_A_NAME
             );
         // send email to claimant
-        verify(nocRemoveRepresentationEmailService, times(1))
+        verify(nocRemoveRepresentationEmailService, times(LoggerTestUtils.INTEGER_ONE))
             .sendEmailToOtherPartyClaimant(
                 caseDetails,
                 RESPONDENT_1_NAME + ", " + RESPONDENT_2_NAME
             );
         // send email to other respondent
-        verify(nocRemoveRepresentationEmailService, times(1))
+        verify(nocRemoveRepresentationEmailService, times(LoggerTestUtils.INTEGER_ONE))
             .sendEmailToOtherPartyRespondent(
                 caseDetails,
                 List.of(RESPONDENT_1_ID, RESPONDENT_2_ID),
@@ -196,7 +192,6 @@ class NocRemoveRepresentationServiceTest {
 
     @Test
     void shouldRevokeRespondentLegalRep_removeOrg() {
-        caseDetails.getCaseData().setNocRemoveRepIsMoreThanOneFlag(YES);
         caseDetails.getCaseData().setNocRemoveRepOption(REMOVE_ORGANISATION);
 
         when(nocRespondentRepresentativeService.findRepresentativesByToken(anyString(), any()))
@@ -207,36 +202,36 @@ class NocRemoveRepresentationServiceTest {
 
         nocRemoveRepresentationService.revokeRespondentLegalRep(caseDetails, USER_TOKEN);
 
-        verify(nocRespondentRepresentativeService, times(1))
+        verify(nocRespondentRepresentativeService, times(LoggerTestUtils.INTEGER_ONE))
             .revokeAndRemoveRespondentRepresentatives(caseDetails, List.of(repR1, repR2, repR3));
         // send email to organisation admin
-        verify(nocRemoveRepresentationEmailService, times(1))
+        verify(nocRemoveRepresentationEmailService, times(LoggerTestUtils.INTEGER_ONE))
             .sendEmailToOrgAdmin(
                 caseDetails,
                 ORG_A_EMAIL,
                 REP_A1_NAME + ", " + REP_A2_NAME
             );
         // send email to removed legal rep
-        verify(nocRemoveRepresentationEmailService, times(1))
+        verify(nocRemoveRepresentationEmailService, times(LoggerTestUtils.INTEGER_ONE))
             .sendEmailToListOfRemovedLegalRep(
                 caseDetails,
                 List.of(REP_A1_EMAIL, REP_A2_EMAIL)
             );
         // send email to unrepresented party
-        verify(nocRemoveRepresentationEmailService, times(1))
+        verify(nocRemoveRepresentationEmailService, times(LoggerTestUtils.INTEGER_ONE))
             .sendEmailToUnrepresentedRespondent(
                 caseDetails,
                 List.of(repR1, repR2, repR3),
                 ORG_A_NAME
             );
         // send email to claimant
-        verify(nocRemoveRepresentationEmailService, times(1))
+        verify(nocRemoveRepresentationEmailService, times(LoggerTestUtils.INTEGER_ONE))
             .sendEmailToOtherPartyClaimant(
                 caseDetails,
                 RESPONDENT_1_NAME + ", " + RESPONDENT_2_NAME + ", " + RESPONDENT_3_NAME
             );
         // send email to other respondent
-        verify(nocRemoveRepresentationEmailService, times(1))
+        verify(nocRemoveRepresentationEmailService, times(LoggerTestUtils.INTEGER_ONE))
             .sendEmailToOtherPartyRespondent(
                 caseDetails,
                 List.of(RESPONDENT_1_ID, RESPONDENT_2_ID, RESPONDENT_3_ID),
@@ -255,7 +250,7 @@ class NocRemoveRepresentationServiceTest {
         );
         assertThat(exception.getMessage())
             .isEqualTo("Missing RepresentedTypeRItem list for case id: 1775651960650043");
-        verify(nocRespondentRepresentativeService, times(0))
+        verify(nocRespondentRepresentativeService, times(LoggerTestUtils.INTEGER_ZERO))
             .revokeAndRemoveRespondentRepresentatives(any(), any());
     }
 }

@@ -16,7 +16,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativ
 
 import java.util.List;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.MISSING_REP_CLAIMANT_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.MISSING_REP_TYPE_R_ITEM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
@@ -137,8 +136,7 @@ public class NocRemoveRepresentationService {
             throw new IllegalStateException(MISSING_REP_TYPE_R_ITEM + caseDetails.getCaseId());
         }
 
-        if (YES.equals(caseData.getNocRemoveRepIsMoreThanOneFlag())
-            && REMOVE_ORGANISATION.equals(caseData.getNocRemoveRepOption())) {
+        if (REMOVE_ORGANISATION.equals(caseData.getNocRemoveRepOption())) {
             String orgId = NocRespondentMapper.getFirstRepOrganisationId(currentRepList);
             return RespondentRepresentativeUtils.findRepresentativesByOrganisationId(caseData, orgId);
         }

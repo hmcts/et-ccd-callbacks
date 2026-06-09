@@ -240,6 +240,70 @@ For preview, `CUTOVER_PREVIEW_PR_ID`, `CHANGE_ID` or `PR_ID` can be used to infe
 `et-preview.postgres.database.azure.com`. Set the `CUTOVER_*_DB_URL` values directly if
 the preview deployment is using different database names.
 
+### Cutover Search and Indexing Check Step
+After cutover, verify the seeded cases are visible through CCD search and, optionally, direct Elasticsearch indexes:
+```bash
+yarn test:verify-cutover-search
+```
+This reads `functional-output/cutover/seed-manifest.json` and writes a report to
+`functional-output/cutover/search-report.json`. It always checks CCD search by CCD reference and
+ET reference where available. Direct index checks are only attempted when `CUTOVER_ELASTICSEARCH_URL`
+is set.
+
+Optional environment variables:
+```bash
+CUTOVER_SEARCH_MANIFEST_FILE=/tmp/seed-manifest.json
+CUTOVER_SEARCH_OUTPUT_FILE=/tmp/search-report.json
+CUTOVER_SEARCH_PROFILE_IDS=accepted-case-details,accepted-jurisdiction
+CUTOVER_SEARCH_ATTEMPTS=20
+CUTOVER_SEARCH_INTERVAL_MS=15000
+CUTOVER_ELASTICSEARCH_URL=https://<elasticsearch-host>
+CUTOVER_SEARCH_REQUIRE_ELASTICSEARCH=true
+CUTOVER_SEARCH_REQUIRE_GLOBAL=true
+```
+
+### Cutover Work Allocation Check Step
+After cutover, verify the seeded cases are queryable through the Work Allocation task API:
+```bash
+yarn test:verify-cutover-tasks
+```
+This reads `functional-output/cutover/seed-manifest.json` and writes a report to
+`functional-output/cutover/tasks-report.json`. By default it verifies the task API can be queried
+for each case. Set `CUTOVER_TASKS_REQUIRE_TASKS=true` once ET confirms which seeded cases should
+produce tasks.
+
+Optional environment variables:
+```bash
+CUTOVER_WA_TASK_MANAGEMENT_URL=https://wa-task-management-api-<preview-service-fqdn>
+CUTOVER_TASKS_MANIFEST_FILE=/tmp/seed-manifest.json
+CUTOVER_TASKS_OUTPUT_FILE=/tmp/tasks-report.json
+CUTOVER_TASKS_PROFILE_IDS=accepted-case-details,accepted-jurisdiction
+CUTOVER_TASKS_ATTEMPTS=10
+CUTOVER_TASKS_INTERVAL_MS=15000
+CUTOVER_TASKS_REQUIRE_TASKS=true
+```
+
+### Cutover Notice of Change Readiness Check Step
+After cutover, check whether the seeded cases have the organisation policy, representative and
+case assignment data needed for Notice of Change:
+```bash
+yarn test:verify-cutover-noc
+```
+This reads `functional-output/cutover/seed-manifest.json` and writes a report to
+`functional-output/cutover/noc-readiness-report.json`. It does not perform a full Notice of Change
+journey because that requires ET-owned professional users, organisation ids and expected case roles.
+Set the require flags once ET confirms those expectations.
+
+Optional environment variables:
+```bash
+CUTOVER_NOC_CASE_ASSIGNMENT_URL=https://ccd-data-store-api-<preview-service-fqdn>
+CUTOVER_NOC_MANIFEST_FILE=/tmp/seed-manifest.json
+CUTOVER_NOC_OUTPUT_FILE=/tmp/noc-readiness-report.json
+CUTOVER_NOC_PROFILE_IDS=accepted-case-details,accepted-jurisdiction
+CUTOVER_NOC_REQUIRE_READY=true
+CUTOVER_NOC_REQUIRE_ASSIGNMENTS=true
+```
+
 To run all test (using script in package.json)
 ```bash
 yarn test:fullfunctional

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.et.syaapi.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -49,13 +50,22 @@ public class CaseTransferInfoService {
     public CaseTransferInfoResponse getCaseTransferInfo(String authorization, String caseId, String caseUserRole) {
         verifyUserHasCaseRole(authorization, caseId, caseUserRole);
 
-        CaseDetails caseDetails = ccdApi.getCase(
-            adminUserService.getAdminUserToken(),
-            authTokenGenerator.generate(),
-            caseId
-        );
-
-        return buildTransferInfo(caseDetails);
+        try {
+            CaseDetails caseDetails = ccdApi.getCase(
+                adminUserService.getAdminUserToken(),
+                authTokenGenerator.generate(),
+                caseId
+            );
+            return buildTransferInfo(caseDetails);
+        } catch (FeignException.NotFound notFound) {
+            log.info("Case {} not found in CCD, returning fallback ECM transfer info", caseId);
+            return CaseTransferInfoResponse.builder()
+                .transferred(true)
+                .transferType(CaseTransferType.ECM)
+                .originalCaseId(caseId)
+                .transferComplete(false)
+                .build();
+        }
     }
 
     private void verifyUserHasCaseRole(String authorization, String caseId, String caseUserRole) {

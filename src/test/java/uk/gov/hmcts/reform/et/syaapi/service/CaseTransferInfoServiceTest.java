@@ -31,6 +31,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import feign.FeignException;
+import feign.Request;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -148,6 +151,26 @@ class CaseTransferInfoServiceTest {
 
     @Test
     @SneakyThrows
+    void shouldReturnFallbackTransferInfoWhenCaseNotFoundInCcd() {
+        mockUserHasCreatorRole();
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
+        when(authTokenGenerator.generate()).thenReturn(S2S_TOKEN);
+        when(ccdApi.getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID)).thenThrow(notFoundException());
+
+        CaseTransferInfoResponse response = caseTransferInfoService.getCaseTransferInfo(
+            TEST_SERVICE_AUTH_TOKEN,
+            CASE_ID,
+            CASE_USER_ROLE_CREATOR
+        );
+
+        assertTrue(response.isTransferred());
+        assertEquals(CaseTransferType.ECM, response.getTransferType());
+        assertEquals(CASE_ID, response.getOriginalCaseId());
+        assertFalse(response.isTransferComplete());
+    }
+
+    @Test
+    @SneakyThrows
     void shouldThrowWhenCaseHasNotBeenTransferred() {
         mockUserHasCreatorRole();
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
@@ -221,6 +244,15 @@ class CaseTransferInfoServiceTest {
 
     private CaseDetails buildTransferredCaseDetails(String linkedCaseCT, String transferredCaseLink) {
         return buildCaseDetails(CaseTransferInfoService.TRANSFERRED_STATE, linkedCaseCT, transferredCaseLink);
+    }
+
+    private FeignException.NotFound notFoundException() {
+        return new FeignException.NotFound(
+            "Not Found",
+            Request.create(Request.HttpMethod.GET, "/cases/" + CASE_ID, Map.of(), null, null, null),
+            null,
+            Map.of()
+        );
     }
 
     private CaseDetails buildCaseDetails(String state, String linkedCaseCT, String transferredCaseLink) {

@@ -149,6 +149,68 @@ Ensure your node version is `18` or greater
 proceed to `cofig.js` file change the test url to the desired environment
 Add corresponding user details for those environment
 
+### Cutover Seed Step
+To seed a cutover manifest with one case per controller category covered by the existing ET E2E scenarios:
+```bash
+yarn test:seed-cutover
+```
+This writes a manifest to `functional-output/cutover/seed-manifest.json`.
+
+Required environment variables:
+```bash
+ET_CCD_CASEWORKER_USER_NAME=<caseworker username>
+ET_CCD_CASEWORKER_PASSWORD=<caseworker password>
+IDAM_CLIENT_SECRET=<xuiwebapp client secret>
+MICROSERVICE_CCD_GW=<ccd_gw s2s secret>
+```
+
+Optional environment variables:
+```bash
+RUNNING_ENV=aat
+IDAM_URL=https://idam-api.aat.platform.hmcts.net
+REDIRECT_URI=https://xui-<preview-service-fqdn>/oauth2/callback
+CUTOVER_CCD_DATA_STORE_URL=https://ccd-data-store-api-<preview-service-fqdn>
+CUTOVER_S2S_URL=http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+CUTOVER_PREVIEW_SERVICE_FQDN=<preview-service-fqdn>
+CUTOVER_SEED_OUTPUT_FILE=/tmp/seed-manifest.json
+CUTOVER_SEED_PROFILE_IDS=accepted-case-details,accepted-jurisdiction
+```
+
+For preview, either set `CUTOVER_CCD_DATA_STORE_URL` directly or set
+`CUTOVER_PREVIEW_SERVICE_FQDN`/`SERVICE_FQDN`; the scripts will use
+`https://ccd-data-store-api-${SERVICE_FQDN}`.
+
+### Cutover Verify Step
+After the decentralisation cutover, verify the seeded cases still read correctly and can start the expected CCD event triggers:
+```bash
+yarn test:verify-cutover
+```
+This reads `functional-output/cutover/seed-manifest.json` and writes a report to
+`functional-output/cutover/verify-report.json`.
+It uses the same required IDAM and S2S environment variables as the cutover seed step.
+
+Optional environment variables:
+```bash
+CUTOVER_CCD_DATA_STORE_URL=https://ccd-data-store-api-<preview-service-fqdn>
+CUTOVER_S2S_URL=http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+CUTOVER_PREVIEW_SERVICE_FQDN=<preview-service-fqdn>
+CUTOVER_VERIFY_MANIFEST_FILE=/tmp/seed-manifest.json
+CUTOVER_VERIFY_OUTPUT_FILE=/tmp/verify-report.json
+CUTOVER_VERIFY_PROFILE_IDS=accepted-case-details,accepted-jurisdiction
+CUTOVER_VERIFY_REQUIRE_COMPLETE_SEED=false
+CUTOVER_VERIFY_SKIP_EVENT_TRIGGERS=true
+```
+
+Example preview smoke run:
+```bash
+export RUNNING_ENV=aat
+export SERVICE_FQDN=et-cos-pr-1234.preview.platform.hmcts.net
+export REDIRECT_URI=https://xui-${SERVICE_FQDN}/oauth2/callback
+export CUTOVER_SEED_PROFILE_IDS=accepted-case-details
+yarn test:seed-cutover
+yarn test:verify-cutover
+```
+
 To run all test (using script in package.json)
 ```bash
 yarn test:fullfunctional

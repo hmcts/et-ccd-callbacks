@@ -20,10 +20,6 @@ repositories {
     maven { url "https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1" }
 }
 
-// CVE-2026-41840, CVE-2026-41841, CVE-2026-41842, CVE-2026-41843, CVE-2026-41850,
-// CVE-2026-41851 - override the Spring Framework version managed by the Spring Boot BOM.
-ext['spring-framework.version'] = '6.2.19'
-
 dependencyManagement {
     imports {
         mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.14"

@@ -20,6 +20,10 @@ repositories {
     maven { url "https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1" }
 }
 
+// CVE-2026-41840, CVE-2026-41841, CVE-2026-41842, CVE-2026-41843, CVE-2026-41850,
+// CVE-2026-41851 - override the Spring Framework version managed by the Spring Boot BOM.
+ext['spring-framework.version'] = '6.2.19'
+
 dependencyManagement {
     imports {
         mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.14"
@@ -37,23 +41,6 @@ dependencyManagement {
         dependency 'com.squareup.okhttp3:okhttp-urlconnection:4.12.0'
         dependency 'com.squareup.okio:okio:3.17.0'
         dependency 'org.bouncycastle:bcprov-jdk15on:1.70'
-        // CVE-2026-41840, CVE-2026-41841, CVE-2026-41842, CVE-2026-41843, CVE-2026-41850,
-        // CVE-2026-41851 - override above the Spring Boot BOM
-        dependencySet(group: 'org.springframework', version: '6.2.19') {
-            entry 'spring-aop'
-            entry 'spring-aspects'
-            entry 'spring-beans'
-            entry 'spring-context'
-            entry 'spring-core'
-            entry 'spring-expression'
-            entry 'spring-jcl'
-            entry 'spring-jdbc'
-            entry 'spring-orm'
-            entry 'spring-tx'
-            entry 'spring-web'
-            entry 'spring-webflux'
-            entry 'spring-webmvc'
-        }
         // CVE-2026-42198 - override above the Spring Boot BOM
         dependency 'org.postgresql:postgresql:42.7.11'
         dependencySet(group: 'io.netty', version: '4.2.13.Final') {
@@ -160,7 +147,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.18.3'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.18.3'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.3'
-    implementation group: 'org.springframework', name: 'spring-core', version: '6.2.18'
+    implementation group: 'org.springframework', name: 'spring-core'
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
@@ -179,7 +166,7 @@ dependencies {
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.7'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.19.0'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.19.0'
-    testImplementation group: 'org.springframework', name: 'spring-test', version: '6.2.18'
+    testImplementation group: 'org.springframework', name: 'spring-test'
     testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
 }
 

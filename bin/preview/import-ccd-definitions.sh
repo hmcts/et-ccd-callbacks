@@ -136,12 +136,12 @@ create_global_search_index() {
 
 echo "📥 Importing CCD definition files..."
 
+create_global_search_index
+
 # Import each definition file
 for file_path in "${DEFINITION_FILES[@]}"; do
     import_definition "${file_path}"
     echo ""
 done
-
-create_global_search_index
 
 echo "✅ CCD definitions import completed!"

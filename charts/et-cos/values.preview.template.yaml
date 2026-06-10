@@ -42,7 +42,7 @@ java:
     ACAS_BASE_URL: "https://api-dev-acas-01.azure-api.net/ECCLUAT"
     CCD_SERVICEBUS_DESTINATION: ${SERVICE_NAME}-ccd-case-events
     CCD_SDK_DECENTRALISED: true
-    ELASTIC_SEARCH_HOSTS: http://10.96.149.253:9200
+    ELASTIC_SEARCH_HOSTS: http://${SERVICE_NAME}-es-master:9200
     SPRING_JMS_SERVICEBUS_ENABLED: true
     ET_SERVICEBUS_SCHEDULER_ENABLED: true
     AZURE_SERVICE_BUS_TOPIC_NAME: ${SERVICE_NAME}-ccd-case-events
@@ -203,7 +203,7 @@ ccd:
     activityApi:
       enabled: true
     elastic:
-      enabled: false
+      enabled: true
     postgresql:
       enabled: false
 
@@ -261,8 +261,8 @@ ccd:
         IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
         CASE_DOCUMENT_AM_URL: http://${SERVICE_NAME}-ccd-case-document-am-api
         ELASTIC_SEARCH_ENABLED: true
-        ELASTIC_SEARCH_HOSTS: http://10.96.149.253:9200
-        ELASTIC_SEARCH_DATA_NODES_HOSTS: http://10.96.149.253:9200
+        ELASTIC_SEARCH_HOSTS: http://${SERVICE_NAME}-es-master:9200
+        ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
         ENABLE_ATTRIBUTE_BASED_ACCESS_CONTROL: true
         ENABLE_PSEUDO_ROLE_ASSIGNMENTS_GENERATION: true
         ENABLE_PSEUDO_ACCESS_PROFILES_GENERATION: true
@@ -334,7 +334,7 @@ ccd:
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
         OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts
         ELASTIC_SEARCH_ENABLED: true
-        ELASTIC_SEARCH_HOST: 10.96.149.253
+        ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
         #TS_TRANSLATION_SERVICE_HOST: http://ts-translation-service-aat.service.core-compute-aat.internal
         WELSH_TRANSLATION_ENABLED: false
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
@@ -403,6 +403,7 @@ ccd:
 
   logstash:
     enabled: false
+    replicas: 0
     image: "hmctsprod.azurecr.io/imported/elastic/logstash"
     imageTag: "9.2.4"
     imagePullPolicy: "IfNotPresent"

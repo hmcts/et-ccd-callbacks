@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.ccd.sdk.api.CCDConfig;
 import uk.gov.hmcts.ccd.sdk.api.HasRole;
 import uk.gov.hmcts.ccd.sdk.json.JsonBackedCCDConfig;
-import uk.gov.hmcts.ccd.sdk.json.JsonBackedCCDConfigFactory;
+import uk.gov.hmcts.ccd.sdk.json.JsonCCDConfigSupport;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -35,10 +35,10 @@ public class EtJsonCcdConfig {
 
     @Bean
     public CCDConfig<AdminData, AdminCaseState, PlaceholderRole> etAdminJsonCcdConfig(
-        JsonBackedCCDConfigFactory factory
+        JsonCCDConfigSupport support
     ) {
         return new JsonBackedCCDConfig<>(
-          factory,
+          support,
           ADMIN_CASE_TYPE_ID,
           "file:ccd-definitions/jurisdictions/admin/json"
         ) { };
@@ -46,10 +46,10 @@ public class EtJsonCcdConfig {
 
     @Bean
     public CCDConfig<CaseData, CaseState, PlaceholderRole> etEnglandWalesJsonCcdConfig(
-        JsonBackedCCDConfigFactory factory
+        JsonCCDConfigSupport support
     ) {
         return new JsonBackedCCDConfig<>(
-          factory,
+          support,
           ENGLANDWALES_CASE_TYPE_ID,
           ENGLAND_WALES_JSON_ROOT
         ) { };
@@ -57,10 +57,10 @@ public class EtJsonCcdConfig {
 
     @Bean
     public CCDConfig<CaseData, CaseState, PlaceholderRole> etScotlandJsonCcdConfig(
-        JsonBackedCCDConfigFactory factory
+        JsonCCDConfigSupport support
     ) {
         return new JsonBackedCCDConfig<>(
-          factory,
+          support,
           SCOTLAND_CASE_TYPE_ID,
           SCOTLAND_JSON_ROOT
         ) { };
@@ -68,10 +68,10 @@ public class EtJsonCcdConfig {
 
     @Bean
     public CCDConfig<ListingData, ListingCaseState, PlaceholderRole> etEnglandWalesListingJsonCcdConfig(
-        JsonBackedCCDConfigFactory factory
+        JsonCCDConfigSupport support
     ) {
         return new JsonBackedCCDConfig<>(
-          factory,
+          support,
           ENGLANDWALES_LISTING_CASE_TYPE_ID,
           ENGLAND_WALES_JSON_ROOT
         ) { };
@@ -79,10 +79,10 @@ public class EtJsonCcdConfig {
 
     @Bean
     public CCDConfig<ListingData, ListingCaseState, PlaceholderRole> etScotlandListingJsonCcdConfig(
-        JsonBackedCCDConfigFactory factory
+        JsonCCDConfigSupport support
     ) {
         return new JsonBackedCCDConfig<>(
-          factory,
+          support,
           SCOTLAND_LISTING_CASE_TYPE_ID,
           SCOTLAND_JSON_ROOT
         ) { };
@@ -90,10 +90,10 @@ public class EtJsonCcdConfig {
 
     @Bean
     public CCDConfig<MultipleData, MultipleCaseState, PlaceholderRole> etEnglandWalesMultipleJsonCcdConfig(
-        JsonBackedCCDConfigFactory factory
+        JsonCCDConfigSupport support
     ) {
         return new JsonBackedCCDConfig<>(
-          factory,
+          support,
           ENGLANDWALES_BULK_CASE_TYPE_ID,
           ENGLAND_WALES_JSON_ROOT
         ) { };
@@ -101,10 +101,10 @@ public class EtJsonCcdConfig {
 
     @Bean
     public CCDConfig<MultipleData, MultipleCaseState, PlaceholderRole> etScotlandMultipleJsonCcdConfig(
-        JsonBackedCCDConfigFactory factory
+        JsonCCDConfigSupport support
     ) {
         return new JsonBackedCCDConfig<>(
-          factory,
+          support,
           SCOTLAND_BULK_CASE_TYPE_ID,
           SCOTLAND_JSON_ROOT
         ) { };

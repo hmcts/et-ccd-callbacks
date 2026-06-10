@@ -400,10 +400,6 @@ ccd:
     clusterName: "es"
     replicas: 1
     clusterHealthCheckParams: "wait_for_status=yellow&timeout=1s"
-    esConfig:
-      elasticsearch.yml: |
-        action.auto_create_index: .security*,.watches,.triggered_watches,.watcher-history-*,.logstash_dead_letter,.ml*,ccd-logstash-dead-letter,global_search,*_cases
-        xpack.security.enabled: false
 
   logstash:
     enabled: false

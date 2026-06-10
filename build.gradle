@@ -21,6 +21,8 @@ version = '0.0.1'
 ccd {
     configDir = file('build/definitions')
     decentralised = true
+    runtimeIndexing = true
+    caseEventServiceBus = true
 }
 
 pmd {
@@ -429,8 +431,12 @@ ext {
 ext["rest-assured.version"] = '5.1.0'
 
 dependencyManagement {
+    imports {
+        mavenBom 'com.azure:azure-sdk-bom:1.3.7'
+    }
     dependencies {
         dependency 'org.apache.httpcomponents.core5:httpcore5:5.4.2'
+        dependency 'com.microsoft.azure:msal4j:1.25.0'
         // CVE-2026-42198 - override above the Spring Boot BOM
         dependency 'org.postgresql:postgresql:42.7.11'
         // CVE-2026-22748, CVE-2026-22746 - force override above the Spring Boot BOM

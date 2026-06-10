@@ -155,6 +155,21 @@ allprojects {
             'com.squareup.okhttp3:okhttp:4.12.0',
             'com.squareup.okhttp3:okhttp-urlconnection:4.12.0',
             'com.squareup.okio:okio:3.17.0',
+            // CVE-2026-41840, CVE-2026-41841, CVE-2026-41842, CVE-2026-41843, CVE-2026-41850,
+            // CVE-2026-41851
+            'org.springframework:spring-aop:6.2.19',
+            'org.springframework:spring-aspects:6.2.19',
+            'org.springframework:spring-beans:6.2.19',
+            'org.springframework:spring-context:6.2.19',
+            'org.springframework:spring-core:6.2.19',
+            'org.springframework:spring-expression:6.2.19',
+            'org.springframework:spring-jcl:6.2.19',
+            'org.springframework:spring-jdbc:6.2.19',
+            'org.springframework:spring-orm:6.2.19',
+            'org.springframework:spring-tx:6.2.19',
+            'org.springframework:spring-web:6.2.19',
+            'org.springframework:spring-webflux:6.2.19',
+            'org.springframework:spring-webmvc:6.2.19',
             // CVE-2020-29582 - Fixed in Kotlin 2.1.0+
             'org.jetbrains.kotlin:kotlin-stdlib:2.1.0',
             'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.0',
@@ -431,6 +446,23 @@ dependencyManagement {
         dependency 'org.postgresql:postgresql:42.7.11'
         // CVE-2026-22748, CVE-2026-22746 - force override above the Spring Boot BOM
         dependency 'org.springframework.security:spring-security-crypto:6.5.10'
+        // CVE-2026-41840, CVE-2026-41841, CVE-2026-41842, CVE-2026-41843, CVE-2026-41850,
+        // CVE-2026-41851 - override above the Spring Boot BOM
+        dependencySet(group: 'org.springframework', version: '6.2.19') {
+            entry 'spring-aop'
+            entry 'spring-aspects'
+            entry 'spring-beans'
+            entry 'spring-context'
+            entry 'spring-core'
+            entry 'spring-expression'
+            entry 'spring-jcl'
+            entry 'spring-jdbc'
+            entry 'spring-orm'
+            entry 'spring-tx'
+            entry 'spring-web'
+            entry 'spring-webflux'
+            entry 'spring-webmvc'
+        }
         dependencySet(group: 'com.google.guava', version: '33.6.0-jre') {
             entry 'guava'
         }

@@ -314,12 +314,12 @@ class NocNotificationServiceTest {
         doNothing().when(emailService).sendEmail(anyString(), anyString(), anyMap());
         nocNotificationService.sendRespondentRepresentationUpdateNotifications(validCaseDetails, representatives,
                 NOC_TYPE_REMOVAL);
-        verify(emailService, times(LoggerTestUtils.INTEGER_FOUR)).sendEmail(anyString(), anyString(), anyMap());
+        verify(emailService, times(LoggerTestUtils.INTEGER_THREE)).sendEmail(anyString(), anyString(), anyMap());
         // when noc type is addition should send e-mail to claimant representative
         representatives.getFirst().getValue().setRepresentativeEmailAddress(CLAIMANT_REPRESENTATIVE_EMAIL);
         nocNotificationService.sendRespondentRepresentationUpdateNotifications(validCaseDetails, representatives,
                 NOC_TYPE_ADDITION);
-        verify(emailService, times(LoggerTestUtils.INTEGER_NINE)).sendEmail(anyString(), anyString(), anyMap());
+        verify(emailService, times(LoggerTestUtils.INTEGER_EIGHT)).sendEmail(anyString(), anyString(), anyMap());
     }
 
     @Test

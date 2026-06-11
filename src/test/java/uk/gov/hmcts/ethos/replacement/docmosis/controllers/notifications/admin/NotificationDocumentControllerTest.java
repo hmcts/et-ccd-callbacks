@@ -84,7 +84,7 @@ class NotificationDocumentControllerTest extends BaseControllerTest {
 
     @Test
     void aboutToSubmit() throws Exception {
-        when(sendNotificationService.createNotificationSummary(any(), any(), any()))
+        when(sendNotificationService.createNotificationSummary(any(), any(), any(), any()))
                 .thenReturn(documentInfo);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content(jsonMapper.toJson(ccdRequest))

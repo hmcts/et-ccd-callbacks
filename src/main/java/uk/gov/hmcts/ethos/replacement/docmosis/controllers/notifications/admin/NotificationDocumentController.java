@@ -65,7 +65,7 @@ public class NotificationDocumentController {
             @RequestHeader("Authorization") String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DocumentInfo documentInfo = sendNotificationService.createNotificationSummary(caseData, userToken,
-                ccdRequest.getCaseDetails().getCaseTypeId());
+                ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getCaseDetails().getCaseId());
         caseData.setDocMarkUp(documentInfo.getMarkUp());
         return getCallbackRespEntityNoErrors(caseData);
     }

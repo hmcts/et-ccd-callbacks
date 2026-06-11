@@ -46,6 +46,7 @@ class AcasCertificateControllerTest {
     private static final String RETRIEVE_ACAS_CERT_URL = "/acasCertificate/retrieveCertificate";
     private static final String ACAS_CONFIRMATION_URL = "/acasCertificate/confirmation";
     private static final String AUTH_TOKEN = "some-token";
+    private static final String CASE_ID = "1234567890123456";
     private CCDRequest ccdRequest;
 
     @MockitoBean
@@ -68,6 +69,7 @@ class AcasCertificateControllerTest {
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseData)
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+                .withCaseId(CASE_ID)
                 .build();
     }
 
@@ -75,7 +77,8 @@ class AcasCertificateControllerTest {
     void retrieveAcasCert_Success() throws Exception {
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(acasService.getAcasCertificate(any(), anyString(), anyString())).thenReturn(new ArrayList<>());
+        when(acasService.getAcasCertificate(
+                any(), anyString(), anyString(), anyString())).thenReturn(new ArrayList<>());
         mockMvc.perform(post(RETRIEVE_ACAS_CERT_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -84,7 +87,7 @@ class AcasCertificateControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(acasService, times(1)).getAcasCertificate(any(), anyString(), anyString());
+        verify(acasService, times(1)).getAcasCertificate(any(), anyString(), anyString(), anyString());
     }
 
     @Test
@@ -95,7 +98,7 @@ class AcasCertificateControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
-        verify(acasService, never()).getAcasCertificate(any(), anyString(), anyString());
+        verify(acasService, never()).getAcasCertificate(any(), anyString(), anyString(), anyString());
     }
 
     @Test
@@ -106,14 +109,15 @@ class AcasCertificateControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content("error"))
                 .andExpect(status().isBadRequest());
-        verify(acasService, never()).getAcasCertificate(any(), anyString(), anyString());
+        verify(acasService, never()).getAcasCertificate(any(), anyString(), anyString(), anyString());
     }
 
     @Test
     void acasConfirmation_Success() throws Exception {
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(acasService.getAcasCertificate(any(), anyString(), anyString())).thenReturn(new ArrayList<>());
+        when(acasService.getAcasCertificate(
+                any(), anyString(), anyString(), anyString())).thenReturn(new ArrayList<>());
         mockMvc.perform(post(ACAS_CONFIRMATION_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

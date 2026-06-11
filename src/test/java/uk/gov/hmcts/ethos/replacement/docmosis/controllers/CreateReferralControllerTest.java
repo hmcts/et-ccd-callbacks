@@ -139,7 +139,7 @@ class CreateReferralControllerTest {
         UserDetails details = new UserDetails();
         details.setName("First Last");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
-        when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString()))
+        when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString(), anyString()))
             .thenReturn(new DocumentInfo());
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .contentType(APPLICATION_JSON)
@@ -158,7 +158,7 @@ class CreateReferralControllerTest {
         UserDetails details = new UserDetails();
         details.setName("First Last");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
-        when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString()))
+        when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString(), anyString()))
                 .thenReturn(new DocumentInfo());
         CCDRequest noReferentEmailCCDRequest = ccdRequest;
         noReferentEmailCCDRequest.getCaseDetails().getCaseData().setReferentEmail("");

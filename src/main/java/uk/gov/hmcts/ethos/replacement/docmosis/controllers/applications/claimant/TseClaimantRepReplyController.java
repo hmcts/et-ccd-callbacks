@@ -195,7 +195,7 @@ public class TseClaimantRepReplyController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
         tseClaimantRepReplyService.addTseClaimantRepReplyPdfToDocCollection(caseData, userToken,
-                caseDetails.getCaseTypeId());
+                caseDetails.getCaseTypeId(), caseDetails.getCaseId());
         tseClaimantRepReplyService.claimantReplyToTse(caseDetails, caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);

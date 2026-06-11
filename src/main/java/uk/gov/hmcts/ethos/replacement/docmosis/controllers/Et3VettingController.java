@@ -291,7 +291,7 @@ public class Et3VettingController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DocumentInfo documentInfo = et3VettingService.generateEt3ProcessingDocument(caseData, userToken,
-                ccdRequest.getCaseDetails().getCaseTypeId());
+                ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getCaseDetails().getCaseId());
         et3VettingService.saveEt3VettingToRespondent(caseData, documentInfo);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);

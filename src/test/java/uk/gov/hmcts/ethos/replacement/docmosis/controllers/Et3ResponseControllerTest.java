@@ -249,7 +249,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(featureToggleServiceMock.isWorkAllocationEnabled()).thenReturn(true);
         when(et3ResponseService.generateEt3ResponseDocument(ccdRequest.getCaseDetails().getCaseData(), AUTH_TOKEN,
-                ccdRequest.getCaseDetails().getCaseTypeId(), "eventId"))
+                ccdRequest.getCaseDetails().getCaseTypeId(), "eventId", ccdRequest.getCaseDetails().getCaseId()))
                 .thenReturn(documentInfo);
 
         mvc.perform(post(ABOUT_TO_SUBMIT_URL)
@@ -481,7 +481,8 @@ class Et3ResponseControllerTest extends BaseControllerTest {
         documentInfo.setDescription("Document.pdf");
         ccdRequest.setEventId("draftEt3");
         when(et3ResponseService.generateEt3ResponseDocument(ccdRequest.getCaseDetails().getCaseData(), AUTH_TOKEN,
-                ENGLANDWALES_CASE_TYPE_ID, "draftEt3")).thenReturn(documentInfo);
+                ENGLANDWALES_CASE_TYPE_ID, "draftEt3", ccdRequest.getCaseDetails().getCaseId()))
+                .thenReturn(documentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DOWNLOAD_DRAFT_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))

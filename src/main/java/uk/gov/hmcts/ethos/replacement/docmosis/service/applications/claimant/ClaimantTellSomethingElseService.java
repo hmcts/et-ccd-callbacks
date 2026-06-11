@@ -138,7 +138,8 @@ public class ClaimantTellSomethingElseService {
         caseData.setClaimantTse(claimantTse);
     }
 
-    public void generateAndAddApplicationPdf(CaseData caseData, String userToken, String caseTypeId) {
+    public void generateAndAddApplicationPdf(CaseData caseData, String userToken, String caseTypeId,
+                                             String reference) {
         try {
             if (isEmpty(caseData.getDocumentCollection())) {
                 caseData.setDocumentCollection(new ArrayList<>());
@@ -149,7 +150,8 @@ public class ClaimantTellSomethingElseService {
                     DocumentHelper.claimantApplicationTypeToDocType(selectApplicationType);
             String topLevel = DocumentHelper.getTopLevelDocument(applicationDocMapping);
             DocumentInfo documentInfo =
-                    tornadoService.generateEventDocument(caseData, userToken, caseTypeId, CLAIMANT_TSE_FILE_NAME);
+                    tornadoService.generateEventDocument(caseData, userToken, caseTypeId, CLAIMANT_TSE_FILE_NAME,
+                            reference);
             caseData.setDocMarkUp(documentInfo.getMarkUp().replace("Document", "Download a copy of your application"));
             caseData.getDocumentCollection().add(createDocumentTypeItemFromTopLevel(
                     documentManagementService.addDocumentToDocumentField(documentInfo),

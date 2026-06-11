@@ -130,10 +130,11 @@ public class Et3VettingService {
      * @param caseTypeId reference which caseType the document will be uploaded to
      * @return DocumentInfo which contains the URL and description of the document uploaded to DM Store
      */
-    public DocumentInfo generateEt3ProcessingDocument(CaseData caseData, String userToken, String caseTypeId) {
+    public DocumentInfo generateEt3ProcessingDocument(CaseData caseData, String userToken, String caseTypeId,
+                                                      String reference) {
         try {
             return tornadoService.generateEventDocument(caseData, userToken,
-                    caseTypeId, "ET3 Processing.pdf");
+                    caseTypeId, "ET3 Processing.pdf", reference);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }

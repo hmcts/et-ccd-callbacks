@@ -160,7 +160,8 @@ public class CreateReferralMultiplesController {
         caseData.setReferredBy(String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
 
         String caseTypeId = details.getCaseTypeId();
-        DocumentInfo documentInfo = referralService.generateDocument(caseData, leadCase, userToken, caseTypeId);
+        DocumentInfo documentInfo = referralService.generateDocument(caseData, leadCase, userToken, caseTypeId,
+                details.getCaseId());
         String nextHearingDate = getNearestHearingToReferral(leadCase, "None");
 
         ReferralHelper.createReferral(

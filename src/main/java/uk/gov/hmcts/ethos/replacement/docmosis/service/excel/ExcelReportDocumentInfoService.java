@@ -21,16 +21,17 @@ public class ExcelReportDocumentInfoService {
     public DocumentInfo generateClaimsByHearingVenueExcelReportDocumentInfo(
             ClaimsByHearingVenueReportData reportData,
             String caseTypeId,
-            String userToken) {
+            String userToken,
+            String reference) {
         byte[] excelBytes = claimsByHearingVenueExcelReportCreationService.getReportExcelFile(reportData);
         String outPutFileName = UtilHelper.getListingCaseTypeId(caseTypeId) + CLAIMS_BY_HEARING_VENUE_FILE_NAME;
-        return excelDocManagementService.uploadExcelReportDocument(userToken, outPutFileName, excelBytes);
+        return excelDocManagementService.uploadExcelReportDocument(userToken, outPutFileName, excelBytes, reference);
     }
 
     public DocumentInfo generateBfExcelReportDocumentInfo(BfActionReportData reportData, String caseTypeId,
-                                                          String userToken) {
+                                                          String userToken, String reference) {
         byte[] excelBytes = bfExcelReportService.getReportExcelFile(reportData);
         String outPutFileName = UtilHelper.getListingCaseTypeId(caseTypeId) + BROUGHT_FORWARD_REPORT_FILE_NAME;
-        return excelDocManagementService.uploadExcelReportDocument(userToken, outPutFileName, excelBytes);
+        return excelDocManagementService.uploadExcelReportDocument(userToken, outPutFileName, excelBytes, reference);
     }
 }

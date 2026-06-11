@@ -91,7 +91,7 @@ public class NotificationsExcelReportService {
 
         log.info("Upload extract to doc store");
         URI documentSelfPath = documentManagementService.uploadDocument(userToken, schedule,
-                FILE_NAME, APPLICATION_EXCEL_VALUE, multipleDetails.getCaseTypeId());
+                FILE_NAME, APPLICATION_EXCEL_VALUE, multipleDetails.getCaseTypeId(), multipleDetails.getCaseId());
 
         log.info("Set case data with extract");
         setCaseDataWithExtractedDocument(multipleDetails, documentSelfPath, userToken);

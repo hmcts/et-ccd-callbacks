@@ -79,7 +79,8 @@ class NotificationsExcelReportServiceTest {
                         any(),
                         eq("notifications_extract.xlsx"),
                         eq(APPLICATION_EXCEL_VALUE),
-                        eq(ENGLANDWALES_BULK_CASE_TYPE_ID)))
+                        eq(ENGLANDWALES_BULK_CASE_TYPE_ID),
+                        eq(multipleDetails.getCaseId())))
                 .thenReturn(URI.create(DOC_URL));
         MultipleRequest multipleRequest = new MultipleRequest();
         multipleRequest.setCaseDetails(multipleDetails);

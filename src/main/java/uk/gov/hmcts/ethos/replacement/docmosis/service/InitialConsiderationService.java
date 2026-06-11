@@ -715,9 +715,9 @@ public class InitialConsiderationService {
      * @param caseTypeId reference which CaseType the document will be uploaded to
      * @return DocumentInfo which contains the url and markup for the uploaded document
      */
-    public DocumentInfo generateDocument(CaseData caseData, String userToken, String caseTypeId) {
+    public DocumentInfo generateDocument(CaseData caseData, String userToken, String caseTypeId, String reference) {
         try {
-            return tornadoService.generateEventDocument(caseData, userToken, caseTypeId, IC_OUTPUT_NAME);
+            return tornadoService.generateEventDocument(caseData, userToken, caseTypeId, IC_OUTPUT_NAME, reference);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOC_GEN_ERROR, caseData.getEthosCaseReference()), e);
         }

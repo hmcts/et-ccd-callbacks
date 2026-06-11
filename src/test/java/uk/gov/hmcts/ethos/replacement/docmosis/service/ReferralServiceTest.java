@@ -57,10 +57,10 @@ class ReferralServiceTest {
 
     @Test
     void whenCreatingReferral_ReturnDocument() throws IOException {
-        when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
-            anyString(), anyString())).thenReturn(documentInfo);
+        when(tornadoService.generateEventDocument(
+                any(CaseData.class), anyString(), anyString(), anyString(), anyString())).thenReturn(documentInfo);
 
-        DocumentInfo responseDoc = referralService.generateCRDocument(new CaseData(), "", "");
+        DocumentInfo responseDoc = referralService.generateCRDocument(new CaseData(), "", "", "caseReference");
         assertThat(responseDoc, is(documentInfo));
     }
 
@@ -68,11 +68,11 @@ class ReferralServiceTest {
     void whenCreatingReferralFails_ThrowException() throws IOException {
         Throwable ioException = new IOException("test");
 
-        when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
-            anyString(), anyString())).thenThrow(ioException);
+        when(tornadoService.generateEventDocument(
+                any(CaseData.class), anyString(), anyString(), anyString(), anyString())).thenThrow(ioException);
         assertThrows(DocumentManagementException.class,
             () -> referralService.generateCRDocument(new CaseData(), "",
-            ""));
+            "", "caseReference"));
     }
 
     @Test
@@ -99,24 +99,26 @@ class ReferralServiceTest {
     @Test
     void generateDocument_exception() throws IOException {
         MultipleData multipleData = MultipleData.builder().leadCaseId(null).build();
-        when(tornadoService.generateDocument(anyString(), any(), anyString(), anyString()))
+        when(tornadoService.generateDocument(anyString(), any(), anyString(), anyString(), anyString()))
             .thenThrow(IOException.class);
 
         assertThrows(Exception.class, () ->
-                referralService.generateDocument(multipleData, new CaseData(), "", ENGLANDWALES_BULK_CASE_TYPE_ID)
+                referralService.generateDocument(
+                        multipleData, new CaseData(), "", ENGLANDWALES_BULK_CASE_TYPE_ID, "caseReference")
         );
     }
 
     @Test
     void generateDocument_success() throws IOException {
         MultipleData multipleData = MultipleData.builder().leadCaseId(null).build();
-        when(tornadoService.generateDocument(anyString(), any(), anyString(), anyString()))
+        when(tornadoService.generateDocument(anyString(), any(), anyString(), anyString(), anyString()))
                 .thenReturn(DocumentInfo.builder().build());
 
         ArgumentCaptor<TornadoDocument> doc = ArgumentCaptor.forClass(TornadoDocument.class);
-        referralService.generateDocument(multipleData, new CaseData(), "", ENGLANDWALES_BULK_CASE_TYPE_ID);
+        referralService.generateDocument(
+                multipleData, new CaseData(), "", ENGLANDWALES_BULK_CASE_TYPE_ID, "caseReference");
 
-        verify(tornadoService).generateDocument(any(), doc.capture(), any(), any());
+        verify(tornadoService).generateDocument(any(), doc.capture(), any(), any(), any());
         assertEquals("Referral Summary.pdf", doc.getValue().getOutputName());
     }
 

@@ -112,7 +112,7 @@ public class Et1SubmissionService {
         List<DocumentTypeItem> acasCertificates = new ArrayList<>();
         try {
             acasCertificates = retrieveAndAddAcasCertificates(caseDetails.getCaseData(),
-                    userToken, caseDetails.getCaseTypeId());
+                    userToken, caseDetails.getCaseTypeId(), caseDetails.getCaseId());
         } catch (Exception e) {
             log.error("Failed to retrieve ACAS certificates", e);
         }
@@ -172,7 +172,8 @@ public class Et1SubmissionService {
         return tornadoService.createDocumentInfoFromBytes(userToken,
                 pdf,
                 getEt1DocumentName(caseDetails.getCaseData(), pdfSource),
-                caseDetails.getCaseTypeId());
+                caseDetails.getCaseTypeId(),
+                caseDetails.getCaseId());
     }
 
     private String getEt1DocumentName(CaseData caseData, String pdfSource) {
@@ -182,7 +183,7 @@ public class Et1SubmissionService {
 
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     public List<DocumentTypeItem> retrieveAndAddAcasCertificates(
-            CaseData caseData, String userToken, String caseTypeId) throws Exception {
+            CaseData caseData, String userToken, String caseTypeId, String reference) throws Exception {
         if (isEmpty(caseData.getRespondentCollection())) {
             return new ArrayList<>();
         }
@@ -196,7 +197,7 @@ public class Et1SubmissionService {
         }
 
         List<DocumentInfo> documentInfoList = acasService.getAcasCertificates(caseData, acasNumbers, userToken,
-                caseTypeId);
+                caseTypeId, reference);
 
         if (isEmpty(documentInfoList)) {
             return new ArrayList<>();

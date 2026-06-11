@@ -629,15 +629,15 @@ class SendNotificationServiceTest {
         expectedDocumentInfo.setUrl("http://dm-store/documents/123-456-789/binary");
 
         when(tornadoService.generateEventDocument(caseData, "userToken",
-                SCOTLAND_CASE_TYPE_ID, NOTIFICATION_SUMMARY_PDF))
+                SCOTLAND_CASE_TYPE_ID, NOTIFICATION_SUMMARY_PDF, "caseReference"))
                 .thenReturn(expectedDocumentInfo);
 
         DocumentInfo result = sendNotificationService.createNotificationSummary(
-                caseData, "userToken", SCOTLAND_CASE_TYPE_ID);
+                caseData, "userToken", SCOTLAND_CASE_TYPE_ID, "caseReference");
 
         verify(tornadoService, times(1)).generateEventDocument(
                 caseData, "userToken", SCOTLAND_CASE_TYPE_ID,
-                NOTIFICATION_SUMMARY_PDF);
+                NOTIFICATION_SUMMARY_PDF, "caseReference");
         assertSame(expectedDocumentInfo, result);
         assertEquals("<a href=\"http://dm-store/documents/123-456-789/binary\">Notification 1 Summary</a>",
                 result.getMarkUp());
@@ -649,11 +649,11 @@ class SendNotificationServiceTest {
         documentInfo.setDescription("Notification 1 Summary");
         documentInfo.setMarkUp("<a href=\"http://dm-store/documents/123-456-789/binary\">Document</a>");
 
-        when(tornadoService.generateEventDocument(any(), anyString(), anyString(), anyString()))
+        when(tornadoService.generateEventDocument(any(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(documentInfo);
 
         DocumentInfo result = sendNotificationService.createNotificationSummary(
-                caseData, "userToken", SCOTLAND_CASE_TYPE_ID);
+                caseData, "userToken", SCOTLAND_CASE_TYPE_ID, "caseReference");
 
         assertEquals("<a href=\"http://dm-store/documents/123-456-789/binary\">Notification 1 Summary</a>",
                 result.getMarkUp());
@@ -661,15 +661,16 @@ class SendNotificationServiceTest {
 
     @Test
     void testCreateNotificationSummaryThrowsDocumentManagementException() throws Exception {
-        when(tornadoService.generateEventDocument(any(), anyString(), anyString(), anyString()))
+        when(tornadoService.generateEventDocument(any(), anyString(), anyString(), anyString(), anyString()))
                 .thenThrow(new RuntimeException("Tornado down"));
 
         DocumentManagementException exception = assertThrows(DocumentManagementException.class,
-                () -> sendNotificationService.createNotificationSummary(caseData, "userToken", SCOTLAND_CASE_TYPE_ID));
+                () -> sendNotificationService.createNotificationSummary(
+                        caseData, "userToken", SCOTLAND_CASE_TYPE_ID, "caseReference"));
 
         assertTrue(exception.getMessage().contains("Failed to generate document for case id: 1234"));
         verify(tornadoService, times(1)).generateEventDocument(
-                caseData, "userToken", SCOTLAND_CASE_TYPE_ID, NOTIFICATION_SUMMARY_PDF);
+                caseData, "userToken", SCOTLAND_CASE_TYPE_ID, NOTIFICATION_SUMMARY_PDF, "caseReference");
     }
 
     @Test

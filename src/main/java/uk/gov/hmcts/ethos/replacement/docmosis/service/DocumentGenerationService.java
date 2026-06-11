@@ -149,7 +149,7 @@ public class DocumentGenerationService {
             return tornadoService.documentGeneration(
                     authToken, caseDetails.getCaseData(), caseDetails.getCaseTypeId(),
                     caseDetails.getCaseData().getCorrespondenceType(),
-                    caseDetails.getCaseData().getCorrespondenceScotType(), null);
+                    caseDetails.getCaseData().getCorrespondenceScotType(), null, caseDetails.getCaseId());
         } catch (Exception ex) {
             throw (DocumentManagementException) new DocumentManagementException(
                     MESSAGE + caseDetails.getCaseId() + ex.getMessage()).initCause(ex);

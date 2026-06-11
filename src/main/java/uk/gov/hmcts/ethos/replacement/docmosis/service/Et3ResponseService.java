@@ -90,7 +90,7 @@ public class Et3ResponseService {
      * @return DocumentInfo which contains the URL and description of the document uploaded to DM Store
      */
     public DocumentInfo generateEt3ResponseDocument(CaseData caseData, String userToken, String caseTypeId,
-                                                    String event) {
+                                                    String event, String reference) {
         try {
             // If the representative address is not set, set it to the organisation's address.
             RepresentedTypeR representative = findRepresentativeFromCaseData(caseData);
@@ -100,7 +100,7 @@ public class Et3ResponseService {
             }
 
             return pdfBoxService.generatePdfDocumentInfo(
-                    caseData, userToken, caseTypeId, ET3_RESPONSE_PDF_FILE_NAME, et3FormTemplate, event);
+                    caseData, userToken, caseTypeId, ET3_RESPONSE_PDF_FILE_NAME, et3FormTemplate, event, reference);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }

@@ -71,11 +71,11 @@ class ExcelReportDocumentInfoServiceTest {
         when(excelDocManagementService
                 .uploadExcelReportDocument("dummyToken",
                         "ET_EnglandWales_Hearings_By_Venue_Report.xlsx",
-                        new byte[0]))
+                        new byte[0], "caseReference"))
                 .thenReturn(docInfo);
 
         DocumentInfo resultDocInfo = excelReportDocInfService.generateClaimsByHearingVenueExcelReportDocumentInfo(
-                claimsByHearingVenueReportData, ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken");
+                claimsByHearingVenueReportData, ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken", "caseReference");
         assertNotNull(resultDocInfo);
     }
 
@@ -87,18 +87,18 @@ class ExcelReportDocumentInfoServiceTest {
         when(excelDocManagementService
                 .uploadExcelReportDocument("dummyToken",
                         "ET_EnglandWales_Hearings_By_Venue_Report.xlsx",
-                        new byte[0]))
+                        new byte[0], "caseReference"))
                 .thenReturn(docInfo);
 
         excelReportDocInfService.generateClaimsByHearingVenueExcelReportDocumentInfo(claimsByHearingVenueReportData,
-                ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken");
+                ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken", "caseReference");
 
         verify(claimsByHearingVenueExcelReportCreationService, times(1))
                 .getReportExcelFile(claimsByHearingVenueReportData);
         verifyNoMoreInteractions(claimsByHearingVenueExcelReportCreationService);
         verify(excelDocManagementService, times(1))
                 .uploadExcelReportDocument("dummyToken",
-                        "ET_EnglandWales_Hearings_By_Venue_Report.xlsx", new byte[0]);
+                        "ET_EnglandWales_Hearings_By_Venue_Report.xlsx", new byte[0], "caseReference");
         verifyNoMoreInteractions(excelDocManagementService);
     }
 
@@ -110,17 +110,17 @@ class ExcelReportDocumentInfoServiceTest {
         when(excelDocManagementService
                 .uploadExcelReportDocument("dummyToken",
                         "ET_EnglandWales_Brought_Forward_Report.xlsx",
-                        new byte[0]))
+                        new byte[0], "caseReference"))
                 .thenReturn(docInfo);
 
         excelReportDocInfService.generateBfExcelReportDocumentInfo(bfActionReportData,
-                ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken");
+                ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken", "caseReference");
 
         verify(bfExcelReportService, times(1)).getReportExcelFile(bfActionReportData);
         verifyNoMoreInteractions(bfExcelReportService);
         verify(excelDocManagementService, times(1))
                 .uploadExcelReportDocument("dummyToken",
-                        "ET_EnglandWales_Brought_Forward_Report.xlsx", new byte[0]);
+                        "ET_EnglandWales_Brought_Forward_Report.xlsx", new byte[0], "caseReference");
         verifyNoMoreInteractions(excelDocManagementService);
     }
 
@@ -132,11 +132,11 @@ class ExcelReportDocumentInfoServiceTest {
         when(excelDocManagementService
                 .uploadExcelReportDocument("dummyToken",
                         "ET_EnglandWales_Brought_Forward_Report.xlsx",
-                        new byte[0]))
+                        new byte[0], "caseReference"))
                 .thenReturn(docInfo);
 
         DocumentInfo resultDocInfo = excelReportDocInfService.generateBfExcelReportDocumentInfo(
-                bfActionReportData, ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken");
+                bfActionReportData, ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken", "caseReference");
         assertNotNull(resultDocInfo);
     }
 }

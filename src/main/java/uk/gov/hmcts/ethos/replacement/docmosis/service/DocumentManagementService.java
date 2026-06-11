@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import uk.gov.hmcts.ccd.sdk.CallbackInvocationContext;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -30,7 +31,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.DocumentDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClient;
+import uk.gov.hmcts.reform.ccd.document.am.model.CaseDocumentsMetadata;
 import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
+import uk.gov.hmcts.reform.ccd.document.am.model.DocumentHashToken;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Document;
@@ -74,6 +77,7 @@ public class DocumentManagementService {
     private final UserIdamService userIdamService;
     private final CaseDocumentClient caseDocumentClient;
     private final RestTemplate restTemplate;
+    private final CallbackInvocationContext callbackInvocationContext;
 
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
@@ -89,25 +93,28 @@ public class DocumentManagementService {
                                      AuthTokenGenerator authTokenGenerator, UserIdamService userIdamService,
                                      DocumentDownloadClientApi documentDownloadClientApi,
                                      CaseDocumentClient caseDocumentClient,
-                                     RestTemplate restTemplate) {
+                                     RestTemplate restTemplate,
+                                     CallbackInvocationContext callbackInvocationContext) {
         this.documentUploadClient = documentUploadClient;
         this.authTokenGenerator = authTokenGenerator;
         this.userIdamService = userIdamService;
         this.documentDownloadClientApi = documentDownloadClientApi;
         this.caseDocumentClient = caseDocumentClient;
         this.restTemplate = restTemplate;
+        this.callbackInvocationContext = callbackInvocationContext;
     }
 
     @Retryable(retryFor = {DocumentManagementException.class}, backoff = @Backoff(delay = 200))
     public URI uploadDocument(String authToken, byte[] byteArray, String outputFileName, String type,
-                              String caseTypeID) {
+                              String caseTypeID, String reference) {
         try {
             MultipartFile file = new InMemoryMultipartFile(FILES_NAME, outputFileName, type, byteArray);
             if (secureDocStoreEnabled) {
                 log.info("Using Case Document Client");
+                String serviceAuth = authTokenGenerator.generate();
                 uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse response = caseDocumentClient.uploadDocuments(
                         authToken,
-                        authTokenGenerator.generate(),
+                        serviceAuth,
                         caseTypeID,
                         JURISDICTION,
                         singletonList(file),
@@ -120,6 +127,7 @@ public class DocumentManagementService {
                                 new DocumentManagementException("Document management failed uploading file"
                                         + OUTPUT_FILE_NAME));
                 log.info(UPLOADED_DOCUMENT_SUCCESSFUL);
+                attachDocumentToCase(authToken, serviceAuth, caseTypeID, reference, document);
                 return URI.create(document.links.self.href);
             } else {
                 log.info("Using Document Upload Client");
@@ -145,6 +153,37 @@ public class DocumentManagementService {
             throw new DocumentManagementException(String.format("Unable to upload document %s to document management",
                     outputFileName), ex);
         }
+    }
+
+    private void attachDocumentToCase(String authToken, String serviceAuth, String caseTypeID, String reference,
+                                      uk.gov.hmcts.reform.ccd.document.am.model.Document document) {
+        if (!callbackInvocationContext.isDecentralisedRuntimeInvocation()) {
+            return;
+        }
+        if (isNullOrEmpty(reference)) {
+            throw new DocumentManagementException("Unable to attach document to case without a case reference");
+        }
+        if (isNullOrEmpty(document.hashToken)) {
+            throw new DocumentManagementException("Unable to attach document to case without a document hash token");
+        }
+
+        caseDocumentClient.patchDocument(
+                authToken,
+                serviceAuth,
+                CaseDocumentsMetadata.builder()
+                        .caseId(reference)
+                        .caseTypeId(caseTypeID)
+                        .jurisdictionId(JURISDICTION)
+                        .documentHashTokens(singletonList(DocumentHashToken.builder()
+                                .id(getDocumentId(document))
+                                .hashToken(document.hashToken)
+                                .build()))
+                        .build());
+    }
+
+    private static String getDocumentId(uk.gov.hmcts.reform.ccd.document.am.model.Document document) {
+        String href = document.links.self.href;
+        return href.substring(href.lastIndexOf('/') + 1);
     }
 
     public String generateDownloadableURL(URI documentSelf) {

@@ -183,7 +183,8 @@ public class MultipleLetterService {
                     UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()),
                     multipleDetails.getCaseData().getCorrespondenceType(),
                     multipleDetails.getCaseData().getCorrespondenceScotType(),
-                    multipleDetails.getCaseData());
+                    multipleDetails.getCaseData(),
+                    String.valueOf(submitEvent.getCaseId()));
 
         } catch (Exception ex) {
             throw (DocumentManagementException) new DocumentManagementException(

@@ -192,7 +192,8 @@ public class ReplyToReferralMultiplesController {
 
         String caseTypeId = caseDetails.getCaseTypeId();
         CaseData leadCase = caseLookupService.getLeadCaseFromMultipleAsAdmin(request.getCaseDetails());
-        DocumentInfo documentInfo = referralService.generateDocument(caseData, leadCase, userToken, caseTypeId);
+        DocumentInfo documentInfo = referralService.generateDocument(caseData, leadCase, userToken, caseTypeId,
+                caseDetails.getCaseId());
 
         ReferralType referral = ReferralHelper.getSelectedReferral(caseData);
 

@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -268,7 +269,9 @@ class DocumentGenerationServiceTest {
     @Test
     void processDocumentRequest() throws IOException {
         when(tornadoService.documentGeneration(
-                anyString(), any(), anyString(), any(), any(), any())).thenReturn(documentInfo);
+                anyString(), any(CaseData.class), anyString(), nullable(CorrespondenceType.class),
+                nullable(CorrespondenceScotType.class), any(), nullable(String.class)))
+                .thenReturn(documentInfo);
         DocumentInfo documentInfo1 = documentGenerationService.processDocumentRequest(
                 ccdRequest, "authToken");
         assertEquals(documentInfo, documentInfo1);
@@ -278,7 +281,8 @@ class DocumentGenerationServiceTest {
     void processDocumentRequestException() {
         assertThrows(Exception.class, () -> {
             when(tornadoService.documentGeneration(
-                    anyString(), any(), anyString(), any(), any(), any()))
+                    anyString(), any(CaseData.class), anyString(), nullable(CorrespondenceType.class),
+                    nullable(CorrespondenceScotType.class), any(), nullable(String.class)))
                     .thenThrow(new InternalException(ERROR_MESSAGE));
             documentGenerationService.processDocumentRequest(ccdRequest, "authToken");
 

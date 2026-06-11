@@ -31,6 +31,7 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -75,7 +76,7 @@ class AcasCertificateTaskTest {
         when(featureToggleService.isAcasCertificatePostSubmissionEnabled()).thenReturn(false);
         acasCertificateTask.generateAcasCertificates();
         // Verify that the method does not proceed with the task when the feature is off
-        verify(et1SubmissionService, times(0)).retrieveAndAddAcasCertificates(any(), any(), any());
+        verify(et1SubmissionService, times(0)).retrieveAndAddAcasCertificates(any(), any(), any(), anyString());
         verify(ccdClient, times(0)).startEventForCase(any(), any(), any(), any(), any());
     }
 
@@ -94,7 +95,7 @@ class AcasCertificateTaskTest {
                 .build();
         ccdRequest.getCaseDetails().setJurisdiction(EMPLOYMENT);
         when(ccdClient.startEventForCase(any(), any(), any(), any(), any())).thenReturn(ccdRequest);
-        when(et1SubmissionService.retrieveAndAddAcasCertificates(any(), any(), any()))
+        when(et1SubmissionService.retrieveAndAddAcasCertificates(any(), any(), any(), anyString()))
                 .thenReturn(createAcasDocumentList());
         acasCertificateTask.generateAcasCertificates();
         verify(ccdClient, times(1)).startEventForCase(any(), any(), any(), any(), any());

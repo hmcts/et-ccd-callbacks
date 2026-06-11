@@ -49,7 +49,8 @@ class PdfBoxServiceTest {
 
     private void mockTornadoService() {
         tornadoService = mock(TornadoService.class);
-        when(tornadoService.createDocumentInfoFromBytes(anyString(), any(byte[].class), anyString(), anyString()))
+        when(tornadoService.createDocumentInfoFromBytes(
+                anyString(), any(byte[].class), anyString(), anyString(), anyString()))
                 .thenReturn(new DocumentInfo(
                         APPLICATION_PDF_VALUE,
                         TEST_DOCUMENT_NAME,
@@ -64,7 +65,7 @@ class PdfBoxServiceTest {
             CaseData caseData, String userToken, String caseTypeId, String documentName, String pdfTemplate) {
         if (ObjectUtils.isEmpty(caseData)) {
             assertThatThrownBy(() -> pdfBoxService.generatePdfDocumentInfo(caseData, userToken, caseTypeId,
-                    documentName, pdfTemplate, SUBMIT_ET3))
+                    documentName, pdfTemplate, SUBMIT_ET3, "caseReference"))
                     .hasMessage(PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY);
             return;
         }
@@ -87,7 +88,7 @@ class PdfBoxServiceTest {
             return;
         }
         DocumentInfo documentInfo = pdfBoxService.generatePdfDocumentInfo(
-                caseData, userToken, caseTypeId, documentName, pdfTemplate, SUBMIT_ET3);
+                caseData, userToken, caseTypeId, documentName, pdfTemplate, SUBMIT_ET3, "caseReference");
 
         assertThat(documentInfo.getType()).isEqualTo(APPLICATION_PDF_VALUE);
         assertThat(documentInfo.getUrl()).contains(TEST_DOCUMENT_URL);
@@ -101,7 +102,8 @@ class PdfBoxServiceTest {
                                                                       String pdfTemplate) {
         if (StringUtils.isBlank(emptyValue)) {
             assertThatThrownBy(() -> pdfBoxService
-                    .generatePdfDocumentInfo(caseData, userToken, caseTypeId, documentName, pdfTemplate, SUBMIT_ET3))
+                    .generatePdfDocumentInfo(
+                            caseData, userToken, caseTypeId, documentName, pdfTemplate, SUBMIT_ET3, "caseReference"))
                     .hasMessage(expectedMessage);
             return true;
         }

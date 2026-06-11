@@ -124,7 +124,8 @@ public class TseClaimantRepReplyService {
      * @param userToken authorization token to use for generating an event document
      * @param caseTypeId the case type id
      */
-    public void addTseClaimantRepReplyPdfToDocCollection(CaseData caseData, String userToken, String caseTypeId) {
+    public void addTseClaimantRepReplyPdfToDocCollection(CaseData caseData, String userToken, String caseTypeId,
+                                                         String reference) {
         try {
             if (isEmpty(caseData.getDocumentCollection())) {
                 caseData.setDocumentCollection(new ArrayList<>());
@@ -137,7 +138,8 @@ public class TseClaimantRepReplyService {
                     applicationType.getType());
 
             UploadedDocumentType uploadedDocumentType = documentManagementService.addDocumentToDocumentField(
-                    tornadoService.generateEventDocument(caseData, userToken, caseTypeId, TSE_CLAIMANT_REP_REPLY));
+                    tornadoService.generateEventDocument(caseData, userToken, caseTypeId, TSE_CLAIMANT_REP_REPLY,
+                            reference));
             uploadedDocumentType.setDocumentFilename(documentName);
 
             String applicationDoc = getApplicationDoc(applicationType);

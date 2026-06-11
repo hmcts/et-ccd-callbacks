@@ -61,7 +61,7 @@ public class AcasCertificateController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = acasService.getAcasCertificate(caseData, userToken,
-                ccdRequest.getCaseDetails().getCaseTypeId());
+                ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getCaseDetails().getCaseId());
 
         return getCallbackRespEntityErrors(errors, caseData);
     }

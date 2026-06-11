@@ -156,13 +156,14 @@ class Et3ResponseServiceTest {
         try (MockedStatic<ET3FormMapper> et3FormMapperMockedStatic = Mockito.mockStatic(ET3FormMapper.class)) {
             et3FormMapperMockedStatic.when(() -> ET3FormMapper.mapEt3Form(any(), anyString())).thenReturn(
                     new ConcurrentHashMap<String, Optional<String>>());
-            when(documentManagementService.uploadDocument(anyString(), any(), anyString(), anyString(), anyString()))
+            when(documentManagementService.uploadDocument(
+                    anyString(), any(), anyString(), anyString(), anyString(), anyString()))
                     .thenReturn(new URI("testUri"));
-            when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(),
-                    anyString(), anyString(), anyString(), anyString())).thenReturn(null);
+            when(pdfBoxService.generatePdfDocumentInfo(
+                any(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(null);
             CaseData testGeneratePdfCaseData = ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
             DocumentInfo documentInfo1 = et3ResponseService.generateEt3ResponseDocument(testGeneratePdfCaseData,
-                    "userToken", ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3);
+                    "userToken", ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3, "caseReference");
             assertThat(documentInfo1).isNull();
         }
         // when pdfboxService.generatePdfDocumentInfo returns documentInfo
@@ -175,20 +176,22 @@ class Et3ResponseServiceTest {
                             "123456",
                             "PDFBoxService",
                             "generatePdfDocumentInfo"));
-            when(documentManagementService.uploadDocument(anyString(), any(), anyString(), anyString(), anyString()))
+            when(documentManagementService.uploadDocument(
+                    anyString(), any(), anyString(), anyString(), anyString(), anyString()))
                     .thenReturn(new URI("testUri"));
-            when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(),
-                    anyString(), anyString(), anyString(), anyString())).thenReturn(documentInfo);
+            when(pdfBoxService.generatePdfDocumentInfo(
+                any(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(documentInfo);
             assertDoesNotThrow(() -> et3ResponseService.generateEt3ResponseDocument(new CaseData(), "userToken",
-                    ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3));
+                    ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3, "caseReference"));
         }
         // when pdfboxService.generatePdfDocumentInfo throws exception
         when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(),
-                anyString(), anyString(), eq(null), anyString()))
+                anyString(), anyString(), eq(null), anyString(), anyString()))
                 .thenThrow(new IOException(ERROR_PDF_BOX_SERVICE_GENERATE_PDF_DOCUMENT_INFO));
         assertThrows(DocumentManagementException.class,
                 () -> et3ResponseService.generateEt3ResponseDocument(new CaseData(), "userToken",
-                ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3));
+                ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3, "caseReference"));
     }
 
     /**
@@ -656,11 +659,12 @@ class Et3ResponseServiceTest {
                 .build();
         
         when(myHmctsService.getOrganisationAddress(VALID_USER_TOKEN)).thenReturn(organisationAddress);
-        when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(), anyString(), 
-                anyString(), anyString(), anyString())).thenReturn(documentInfo);
+        when(pdfBoxService.generatePdfDocumentInfo(
+                any(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(documentInfo);
         
         et3ResponseService.generateEt3ResponseDocument(testCaseData, VALID_USER_TOKEN,
-                ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3);
+                ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3, "caseReference");
         
         assertThat(representative.getRepresentativeAddress()).isNotNull();
         assertThat(representative.getRepresentativeAddress().getAddressLine1()).isEqualTo(ADDRESS_LINE_1);
@@ -688,11 +692,12 @@ class Et3ResponseServiceTest {
         representative.setRepresentativeAddress(existingAddress);
         testCaseData.setRepCollection(List.of(RepresentedTypeRItem.builder().value(representative).build()));
         
-        when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(), anyString(), 
-                anyString(), anyString(), anyString())).thenReturn(documentInfo);
+        when(pdfBoxService.generatePdfDocumentInfo(
+                any(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(documentInfo);
         
         et3ResponseService.generateEt3ResponseDocument(testCaseData, VALID_USER_TOKEN,
-                ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3);
+                ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3, "caseReference");
         
         assertThat(representative.getRepresentativeAddress()).isNotNull();
         assertThat(representative.getRepresentativeAddress().getAddressLine1()).isEqualTo("Existing Address Line 1");
@@ -712,11 +717,12 @@ class Et3ResponseServiceTest {
                 .withSubmitEt3Respondent("Antonio Vazquez")
                 .build();
         
-        when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(), anyString(), 
-                anyString(), anyString(), anyString())).thenReturn(documentInfo);
+        when(pdfBoxService.generatePdfDocumentInfo(
+                any(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(documentInfo);
         
         assertDoesNotThrow(() -> et3ResponseService.generateEt3ResponseDocument(
-                caseData, VALID_USER_TOKEN, ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3));
+                caseData, VALID_USER_TOKEN, ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3, "caseReference"));
         
         verify(myHmctsService, times(0)).getOrganisationAddress(anyString());
     }

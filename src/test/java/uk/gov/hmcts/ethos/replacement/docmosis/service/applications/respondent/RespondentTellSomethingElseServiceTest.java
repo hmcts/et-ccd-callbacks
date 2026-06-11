@@ -821,7 +821,7 @@ class RespondentTellSomethingElseServiceTest {
     void generatesAndAddsTsePdfToDocumentCollection() {
         CaseData caseData = new CaseData();
         caseData.setResTseSelectApplication("Amend response");
-        respondentTellSomethingElseService.generateAndAddTsePdf(caseData, "token", "typeId");
+        respondentTellSomethingElseService.generateAndAddTsePdf(caseData, "token", "typeId", "caseReference");
 
         List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
         DocumentType actual = documentCollection.getFirst().getValue();

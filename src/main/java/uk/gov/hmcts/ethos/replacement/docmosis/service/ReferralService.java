@@ -37,10 +37,10 @@ public class ReferralService {
      * @param caseTypeId e.g. ET_EnglandWales
      * @return {@link DocumentInfo} object populated with pdf data
      */
-    public DocumentInfo generateCRDocument(CaseData caseData, String userToken, String caseTypeId) {
+    public DocumentInfo generateCRDocument(CaseData caseData, String userToken, String caseTypeId, String reference) {
         try {
             return tornadoService.generateEventDocument(caseData, userToken,
-                caseTypeId, "Referral Summary.pdf");
+                caseTypeId, "Referral Summary.pdf", reference);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }
@@ -54,10 +54,11 @@ public class ReferralService {
      * @param caseTypeId The ID of the type of case for which the referral summary should be generated.
      * @return A DocumentInfo object representing the generated document.
      */
-    public DocumentInfo generateDocument(MultipleData caseData, CaseData leadCase, String userJwt, String caseTypeId) {
+    public DocumentInfo generateDocument(MultipleData caseData, CaseData leadCase, String userJwt, String caseTypeId,
+                                         String reference) {
         try {
             var doc = ReferralHelper.getDocumentRequest(caseData, leadCase, caseTypeId);
-            return tornadoService.generateDocument(userJwt, doc, "Referral Summary.pdf", caseTypeId);
+            return tornadoService.generateDocument(userJwt, doc, "Referral Summary.pdf", caseTypeId, reference);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getMultipleReference()), e);
         }

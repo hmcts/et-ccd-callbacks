@@ -44,7 +44,7 @@ public class AcasService {
         this.acasApiKey = acasApiKey;
     }
 
-    public List<String> getAcasCertificate(CaseData caseData, String authToken, String caseTypeId) {
+    public List<String> getAcasCertificate(CaseData caseData, String authToken, String caseTypeId, String reference) {
         if (isNullOrEmpty(caseData.getAcasCertificate())) {
             return List.of("ACAS Certificate cannot be null or empty");
         }
@@ -67,7 +67,7 @@ public class AcasService {
 
         DocumentInfo documentInfo;
         try {
-            documentInfo = convertCertificateToPdf(caseData, acasCertificate, authToken, caseTypeId);
+            documentInfo = convertCertificateToPdf(caseData, acasCertificate, authToken, caseTypeId, reference);
         } catch (Exception exception) {
             log.error("Error converting ACAS Certificate with exception : {}", exception.getMessage());
             return List.of("Error uploading ACAS Certificate");
@@ -80,7 +80,7 @@ public class AcasService {
     }
 
     private DocumentInfo convertCertificateToPdf(CaseData caseData, AcasCertificate acasCertificate, String authToken,
-                                                 String caseTypeId) {
+                                                 String caseTypeId, String reference) {
         Optional<RespondentSumTypeItem> respondent = emptyIfNull(caseData.getRespondentCollection()).stream()
             .filter(r -> acasCertificate.getCertificateNumber().equals(
                     defaultIfEmpty(r.getValue().getRespondentAcas(), "")))
@@ -92,7 +92,7 @@ public class AcasService {
         byte[] pdfData = Base64.getDecoder().decode(acasCertificate.getCertificateDocument());
         return tornadoService.createDocumentInfoFromBytes(authToken, pdfData,
                 "ACAS Certificate" + acasName + " - " + acasCertificate.getCertificateNumber() + ".pdf",
-                caseTypeId);
+                caseTypeId, reference);
     }
 
     private List<AcasCertificate> fetchAcasCertificates(String... acasCertificate) {
@@ -110,7 +110,7 @@ public class AcasService {
     }
 
     public List<DocumentInfo> getAcasCertificates(CaseData caseData, List<String> acasNumber, String authToken,
-                                            String caseTypeId) {
+                                            String caseTypeId, String reference) {
         List<AcasCertificate> acasCertificateList;
         try {
             acasCertificateList = fetchAcasCertificates(acasNumber.toArray(new String[0]));
@@ -118,7 +118,7 @@ public class AcasService {
                 return new ArrayList<>();
             }
             return acasCertificateList.stream()
-                    .map(ac -> createAcasCertificate(caseData, authToken, caseTypeId, ac))
+                    .map(ac -> createAcasCertificate(caseData, authToken, caseTypeId, reference, ac))
                     .toList();
         } catch (Exception errorException) {
             log.error("Error retrieving ACAS Certificate with exception : {}", errorException.getMessage());
@@ -126,9 +126,10 @@ public class AcasService {
         }
     }
 
-    private DocumentInfo createAcasCertificate(CaseData caseData, String authToken, String caseTypeId,
+    private DocumentInfo createAcasCertificate(CaseData caseData, String authToken, String caseTypeId, String reference,
                                                AcasCertificate acasCertificate) {
-        DocumentInfo documentInfo = convertCertificateToPdf(caseData, acasCertificate, authToken, caseTypeId);
+        DocumentInfo documentInfo = convertCertificateToPdf(
+                caseData, acasCertificate, authToken, caseTypeId, reference);
         documentInfo.setMarkUp(documentInfo.getMarkUp().replace("Document", documentInfo.getDescription()));
         return documentInfo;
     }

@@ -80,7 +80,7 @@ class MultipleLetterServiceTest {
                 multipleObjectsFlags.firstKey(),
                 multipleDetails.getCaseData().getMultipleSource()))
                 .thenReturn(submitEvents.get(0));
-        when(tornadoService.documentGeneration(anyString(), any(), anyString(), any(), any(), any()))
+        when(tornadoService.documentGeneration(anyString(), any(), anyString(), any(), any(), any(), anyString()))
                 .thenReturn(new DocumentInfo());
         multipleLetterService.bulkLetterLogic(userToken,
                 multipleDetails,
@@ -102,7 +102,7 @@ class MultipleLetterServiceTest {
                 multipleObjectsFlags.firstKey(),
                 multipleDetails.getCaseData().getMultipleSource()))
                 .thenReturn(submitEvents.get(0));
-        when(tornadoService.documentGeneration(anyString(), any(), anyString(), any(), any(), any()))
+        when(tornadoService.documentGeneration(anyString(), any(), anyString(), any(), any(), any(), anyString()))
                 .thenThrow(new IOException());
 
         assertThrows(Exception.class, () ->
@@ -146,7 +146,7 @@ class MultipleLetterServiceTest {
                 multipleObjectsFlags.firstKey(),
                 multipleDetails.getCaseData().getMultipleSource()))
                 .thenReturn(submitEvents.get(0));
-        when(tornadoService.documentGeneration(anyString(), any(), anyString(), any(), any(), any()))
+        when(tornadoService.documentGeneration(anyString(), any(), anyString(), any(), any(), any(), anyString()))
                 .thenReturn(new DocumentInfo());
         multipleLetterService.bulkLetterLogic(userToken,
                 multipleDetails,
@@ -178,7 +178,7 @@ class MultipleLetterServiceTest {
                 multipleObjectsFlags.firstKey(),
                 multipleDetails.getCaseData().getMultipleSource()))
                 .thenReturn(submitEvents.get(0));
-        when(tornadoService.documentGeneration(anyString(), any(), anyString(), any(), any(), any()))
+        when(tornadoService.documentGeneration(anyString(), any(), anyString(), any(), any(), any(), anyString()))
                 .thenReturn(new DocumentInfo());
         multipleLetterService.bulkLetterLogic(userToken,
                 multipleDetails,

@@ -79,7 +79,8 @@ public class AcasCertificateTask {
                 return;
             }
             List<DocumentTypeItem> acasCertificates =
-                    et1SubmissionService.retrieveAndAddAcasCertificates(caseData, adminUserToken, caseTypeId);
+                    et1SubmissionService.retrieveAndAddAcasCertificates(
+                            caseData, adminUserToken, caseTypeId, String.valueOf(submitEvent.getCaseId()));
             if (isNotEmpty(acasCertificates)) {
                 if (isEmpty(caseData.getDocumentCollection())) {
                     caseData.setDocumentCollection(new ArrayList<>());

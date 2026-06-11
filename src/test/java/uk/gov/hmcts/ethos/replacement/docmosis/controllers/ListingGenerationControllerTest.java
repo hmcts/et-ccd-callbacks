@@ -53,6 +53,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doThrow;
@@ -287,7 +288,8 @@ class ListingGenerationControllerTest extends BaseControllerTest {
 
     @Test
     void generateHearingDocument() throws Exception {
-        when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
+        when(listingService.processHearingDocument(
+                isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN), anyString()))
                 .thenReturn(documentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_HEARING_DOCUMENT_URL)
@@ -328,7 +330,8 @@ class ListingGenerationControllerTest extends BaseControllerTest {
 
     @Test
     void generateHearingDocumentWithErrors() throws Exception {
-        when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
+        when(listingService.processHearingDocument(
+                isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN), anyString()))
                 .thenReturn(documentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_HEARING_DOCUMENT_URL)
@@ -359,7 +362,8 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     void generateListingsDocSingleCases() throws Exception {
         when(listingService.setManagingOfficeAndCourtAddressFromCaseData(isA(CaseData.class)))
                 .thenReturn(singleListingRequest.getCaseDetails().getCaseData());
-        when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
+        when(listingService.processHearingDocument(
+                isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN), anyString()))
                 .thenReturn(documentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_LISTINGS_DOC_SINGLE_CASES_URL)
@@ -387,7 +391,8 @@ class ListingGenerationControllerTest extends BaseControllerTest {
 
     @Test
     void generateListingsDocSingleCasesWithErrors() throws Exception {
-        when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
+        when(listingService.processHearingDocument(
+                isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN), anyString()))
                 .thenReturn(documentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_LISTINGS_DOC_SINGLE_CASES_URL)
@@ -405,8 +410,8 @@ class ListingGenerationControllerTest extends BaseControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(reportDataService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenReturn(listingRequest.getCaseDetails().getCaseData());
-        when(listingService.processHearingDocument(isA(ListingData.class),
-                isA(String.class), eq(AUTH_TOKEN)))
+        when(listingService.processHearingDocument(
+                isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN), anyString()))
                 .thenReturn(documentInfo);
         mvc.perform(post(GENERATE_REPORT_URL)
                 .content(requestContent.toString())
@@ -428,8 +433,8 @@ class ListingGenerationControllerTest extends BaseControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(reportDataService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenReturn(reportData);
-        when(listingService.processHearingDocument(isA(ListingData.class),
-                isA(String.class), eq(AUTH_TOKEN)))
+        when(listingService.processHearingDocument(
+                isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN), anyString()))
                 .thenReturn(documentInfo);
         mvc.perform(post(GENERATE_REPORT_URL)
                         .content(requestContent.toString())
@@ -450,8 +455,8 @@ class ListingGenerationControllerTest extends BaseControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(reportDataService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenReturn(reportData);
-        when(listingService.processHearingDocument(isA(ListingData.class),
-                isA(String.class), eq(AUTH_TOKEN)))
+        when(listingService.processHearingDocument(
+                isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN), anyString()))
                 .thenReturn(documentInfo);
         mvc.perform(post(GENERATE_REPORT_URL)
                         .content(requestContent.toString())
@@ -472,8 +477,8 @@ class ListingGenerationControllerTest extends BaseControllerTest {
             .thenReturn(true);
         when(reportDataService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
             .thenReturn(reportData);
-        when(listingService.processHearingDocument(isA(ListingData.class),
-            isA(String.class), eq(AUTH_TOKEN)))
+        when(listingService.processHearingDocument(
+                isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN), anyString()))
             .thenReturn(documentInfo);
 
         mvc.perform(post(GENERATE_REPORT_URL)
@@ -623,7 +628,8 @@ class ListingGenerationControllerTest extends BaseControllerTest {
 
     @Test
     void generateListingsDocSingleCasesError500() throws Exception {
-        when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
+        when(listingService.processHearingDocument(
+                isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -639,7 +645,8 @@ class ListingGenerationControllerTest extends BaseControllerTest {
 
     @Test
     void generateHearingDocumentError500() throws Exception {
-        when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
+        when(listingService.processHearingDocument(
+                isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_HEARING_DOCUMENT_URL)

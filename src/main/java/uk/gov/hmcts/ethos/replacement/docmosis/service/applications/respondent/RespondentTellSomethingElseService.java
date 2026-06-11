@@ -438,7 +438,7 @@ public class RespondentTellSomethingElseService {
      * @param userToken token used for authorisation
      * @param caseTypeId reference which casetype the document will be uploaded to
      */
-    public void generateAndAddTsePdf(CaseData caseData, String userToken, String caseTypeId) {
+    public void generateAndAddTsePdf(CaseData caseData, String userToken, String caseTypeId, String reference) {
         try {
             if (isEmpty(caseData.getDocumentCollection())) {
                 caseData.setDocumentCollection(new ArrayList<>());
@@ -448,7 +448,8 @@ public class RespondentTellSomethingElseService {
             String topLevel = DocumentHelper.getTopLevelDocument(applicationDocMapping);
             caseData.getDocumentCollection().add(createDocumentTypeItemFromTopLevel(
                     documentManagementService.addDocumentToDocumentField(
-                            tornadoService.generateEventDocument(caseData, userToken, caseTypeId, TSE_FILE_NAME)
+                            tornadoService.generateEventDocument(caseData, userToken, caseTypeId, TSE_FILE_NAME,
+                                    reference)
                     ),
                     topLevel,
                     applicationDocMapping,

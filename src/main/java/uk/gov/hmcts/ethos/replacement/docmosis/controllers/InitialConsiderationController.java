@@ -105,7 +105,7 @@ public class InitialConsiderationController {
         caseData.setIcCompletedBy(reportDataService.getUserFullName(userToken));
         caseData.setIcDateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT)));
         DocumentInfo documentInfo = initialConsiderationService.generateDocument(caseData, userToken,
-                ccdRequest.getCaseDetails().getCaseTypeId());
+                ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getCaseDetails().getCaseId());
         caseData.setEtInitialConsiderationDocument(documentManagementService.addDocumentToDocumentField(documentInfo));
         InitialConsiderationHelper.addToDocumentCollection(caseData);
 

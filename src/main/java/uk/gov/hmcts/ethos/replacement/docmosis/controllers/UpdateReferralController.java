@@ -149,7 +149,7 @@ public class UpdateReferralController {
                 .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
 
         DocumentInfo documentInfo = referralService.generateCRDocument(caseData, userToken,
-                ccdRequest.getCaseDetails().getCaseTypeId());
+                ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getCaseDetails().getCaseId());
 
         referral.setReferralSummaryPdf(documentManagementService.addDocumentToDocumentField(documentInfo));
 

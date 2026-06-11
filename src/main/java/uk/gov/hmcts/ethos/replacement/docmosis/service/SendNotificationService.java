@@ -401,10 +401,11 @@ public class SendNotificationService {
         return emailData;
     }
 
-    public DocumentInfo createNotificationSummary(CaseData caseData, String userToken, String caseTypeId) {
+    public DocumentInfo createNotificationSummary(CaseData caseData, String userToken, String caseTypeId,
+                                                  String reference) {
         try {
             DocumentInfo documentInfo = tornadoService.generateEventDocument(caseData, userToken,
-                    caseTypeId, NOTIFICATION_SUMMARY_PDF);
+                    caseTypeId, NOTIFICATION_SUMMARY_PDF, reference);
             // Show the custom name of the document in the UI
             documentInfo.setMarkUp(documentInfo.getMarkUp().replace("Document", documentInfo.getDescription()));
             return documentInfo;

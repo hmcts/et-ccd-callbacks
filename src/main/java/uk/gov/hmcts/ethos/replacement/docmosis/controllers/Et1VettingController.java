@@ -161,7 +161,7 @@ public class Et1VettingController {
         caseData.setEt1VettingCompletedBy(reportDataService.getUserFullName(userToken));
         caseData.setEt1DateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT)));
         DocumentInfo documentInfo = et1VettingService.generateEt1VettingDocument(caseData, userToken,
-                ccdRequest.getCaseDetails().getCaseTypeId());
+                ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getCaseDetails().getCaseId());
         caseData.setEt1VettingDocument(documentManagementService.addDocumentToDocumentField(documentInfo));
         Et1VettingHelper.addEt1VettingToDocTab(caseData);
         caseData.setSuggestedHearingVenues(caseData.getEt1HearingVenues());

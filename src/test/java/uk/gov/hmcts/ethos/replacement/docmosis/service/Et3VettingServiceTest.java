@@ -119,19 +119,20 @@ class Et3VettingServiceTest {
 
     @Test
     void generateEt3ProcessingDocument() throws IOException {
-        when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
-                anyString(), anyString())).thenReturn(documentInfo);
+        when(tornadoService.generateEventDocument(
+                any(CaseData.class), anyString(), anyString(), anyString(), anyString())).thenReturn(documentInfo);
         DocumentInfo documentInfo1 = et3VettingService.generateEt3ProcessingDocument(new CaseData(), "userToken",
-                ENGLANDWALES_CASE_TYPE_ID);
+                ENGLANDWALES_CASE_TYPE_ID, "caseReference");
         assertThat(documentInfo1, is(documentInfo));
     }
 
     @Test
     void generateEt3ProcessingDocumentExceptions() throws IOException {
-        when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
-                anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(tornadoService.generateEventDocument(
+                any(CaseData.class), anyString(), anyString(), anyString(), anyString()))
+                .thenThrow(new InternalException(ERROR_MESSAGE));
         assertThrows(Exception.class, () -> et3VettingService.generateEt3ProcessingDocument(new CaseData(), "userToken",
-                ENGLANDWALES_CASE_TYPE_ID));
+                ENGLANDWALES_CASE_TYPE_ID, "caseReference"));
     }
 
     @Test

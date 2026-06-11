@@ -479,10 +479,11 @@ public class Et1VettingService {
      * @param caseTypeId reference which casetype the document will be uploaded to
      * @return DocumentInfo, which contains the url and markup for the uploaded document
      */
-    public DocumentInfo generateEt1VettingDocument(CaseData caseData, String userToken, String caseTypeId) {
+    public DocumentInfo generateEt1VettingDocument(CaseData caseData, String userToken, String caseTypeId,
+                                                  String reference) {
         try {
             return tornadoService.generateEventDocument(caseData, userToken,
-                    caseTypeId, "ET1 Vetting.pdf");
+                    caseTypeId, "ET1 Vetting.pdf", reference);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }

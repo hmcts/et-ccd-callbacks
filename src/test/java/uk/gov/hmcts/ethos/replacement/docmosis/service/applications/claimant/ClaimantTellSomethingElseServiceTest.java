@@ -244,9 +244,9 @@ class ClaimantTellSomethingElseServiceTest {
         caseData.setClaimantTseSelectApplication("Withdraw all or part of claim");
         DocumentInfo documentInfo = new DocumentInfo("document.pdf", "Withdraw Claim",
                 "binaryUrl/documents/", "<>Some doc</>");
-        when(tornadoService.generateEventDocument(any(), any(), any(), any())).thenReturn(documentInfo);
+        when(tornadoService.generateEventDocument(any(), any(), any(), any(), any())).thenReturn(documentInfo);
 
-        claimantTellSomethingElseService.generateAndAddApplicationPdf(caseData, "token", "typeId");
+        claimantTellSomethingElseService.generateAndAddApplicationPdf(caseData, "token", "typeId", "caseReference");
 
         List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
         DocumentType actual = documentCollection.getFirst().getValue();
@@ -270,10 +270,10 @@ class ClaimantTellSomethingElseServiceTest {
         caseData.setClaimantTseSelectApplication("Withdraw all or part of claim");
         DocumentInfo documentInfo = new DocumentInfo("document.pdf", "Withdraw Claim",
                 "binaryUrl/documents/", "<>Some doc</>");
-        when(tornadoService.generateEventDocument(any(), any(), any(), any())).thenReturn(documentInfo);
+        when(tornadoService.generateEventDocument(any(), any(), any(), any(), any())).thenReturn(documentInfo);
 
-        claimantTellSomethingElseService.generateAndAddApplicationPdf(caseData, "token", "typeId");
-        claimantTellSomethingElseService.generateAndAddApplicationPdf(caseData, "token", "typeId");
+        claimantTellSomethingElseService.generateAndAddApplicationPdf(caseData, "token", "typeId", "caseReference");
+        claimantTellSomethingElseService.generateAndAddApplicationPdf(caseData, "token", "typeId", "caseReference");
 
         List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
         DocumentType actual = documentCollection.get(1).getValue();
@@ -296,7 +296,7 @@ class ClaimantTellSomethingElseServiceTest {
         CaseData caseData = new CaseData();
         caseData.setClaimantTseSelectApplication("Withdraw all or part of claim");
         try {
-            claimantTellSomethingElseService.generateAndAddApplicationPdf(caseData, "token", "typeId");
+            claimantTellSomethingElseService.generateAndAddApplicationPdf(caseData, "token", "typeId", "caseReference");
         } catch (Exception e) {
             assertThat(e.getMessage(), is(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference())));
         }

@@ -466,17 +466,18 @@ public class ListingService {
         return true;
     }
 
-    public DocumentInfo processHearingDocument(ListingData listingData, String caseTypeId, String authToken) {
+    public DocumentInfo processHearingDocument(ListingData listingData, String caseTypeId, String authToken,
+                                               String reference) {
         try {
             if (CLAIMS_BY_HEARING_VENUE_REPORT.equals(listingData.getReportType())) {
                 return excelReportDocumentInfoService.generateClaimsByHearingVenueExcelReportDocumentInfo(
-                        (ClaimsByHearingVenueReportData)listingData, caseTypeId, authToken);
+                        (ClaimsByHearingVenueReportData)listingData, caseTypeId, authToken, reference);
             }
             if (BROUGHT_FORWARD_REPORT.equals(listingData.getReportType())) {
                 return excelReportDocumentInfoService.generateBfExcelReportDocumentInfo(
-                        (BfActionReportData)listingData, caseTypeId, authToken);
+                        (BfActionReportData)listingData, caseTypeId, authToken, reference);
             }
-            return tornadoService.listingGeneration(authToken, listingData, caseTypeId);
+            return tornadoService.listingGeneration(authToken, listingData, caseTypeId, reference);
         } catch (Exception ex) {
             throw new DocumentManagementException(MESSAGE + caseTypeId, ex);
         }

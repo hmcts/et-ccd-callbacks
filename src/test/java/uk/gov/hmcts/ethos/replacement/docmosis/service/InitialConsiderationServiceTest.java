@@ -700,28 +700,29 @@ class InitialConsiderationServiceTest {
 
     @Test
     void generateDocument_EW_Normal() throws IOException {
-        when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
-                anyString(), anyString())).thenReturn(documentInfo);
+        when(tornadoService.generateEventDocument(
+                any(CaseData.class), anyString(), anyString(), anyString(), anyString())).thenReturn(documentInfo);
         DocumentInfo documentInfo1 = initialConsiderationService.generateDocument(new CaseData(), "userToken",
-                ENGLANDWALES_CASE_TYPE_ID);
+                ENGLANDWALES_CASE_TYPE_ID, "caseReference");
         assertThat(documentInfo).isEqualTo(documentInfo1);
     }
 
     @Test
     void generateDocument_SC_Normal() throws IOException {
-        when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
-                anyString(), anyString())).thenReturn(documentInfo);
+        when(tornadoService.generateEventDocument(
+                any(CaseData.class), anyString(), anyString(), anyString(), anyString())).thenReturn(documentInfo);
         DocumentInfo documentInfo1 = initialConsiderationService.generateDocument(new CaseData(), "userToken",
-                SCOTLAND_CASE_TYPE_ID);
+                SCOTLAND_CASE_TYPE_ID, "caseReference");
         assertThat(documentInfo).isEqualTo(documentInfo1);
     }
 
     @Test
     void generateDocument_Exceptions() throws IOException {
-        when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
-                anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(tornadoService.generateEventDocument(
+                any(CaseData.class), anyString(), anyString(), anyString(), anyString()))
+                .thenThrow(new InternalException(ERROR_MESSAGE));
         assertThrows(Exception.class, () -> initialConsiderationService.generateDocument(new CaseData(),
-                "userToken", ENGLANDWALES_CASE_TYPE_ID));
+                "userToken", ENGLANDWALES_CASE_TYPE_ID, "caseReference"));
     }
 
     @Test

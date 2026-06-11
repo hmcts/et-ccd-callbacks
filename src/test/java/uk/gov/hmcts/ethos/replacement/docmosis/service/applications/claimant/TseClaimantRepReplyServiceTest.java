@@ -366,7 +366,7 @@ class TseClaimantRepReplyServiceTest {
 
     @Test
     void addTseRespondentReplyPdfToDocCollection() throws IOException {
-        when(tornadoService.generateEventDocument(any(), anyString(), anyString(), anyString()))
+        when(tornadoService.generateEventDocument(any(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(new DocumentInfo());
         when(documentManagementService.addDocumentToDocumentField(any()))
                 .thenReturn(DocumentFixtures.getUploadedDocumentType());
@@ -377,7 +377,7 @@ class TseClaimantRepReplyServiceTest {
         caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
 
         tseClaimantRepReplyService.addTseClaimantRepReplyPdfToDocCollection(caseData, "testUserToken",
-                caseDetails.getCaseTypeId());
+                caseDetails.getCaseTypeId(), "caseReference");
 
         MatcherAssert.assertThat(caseData.getDocumentCollection().size(), is(2));
         MatcherAssert.assertThat(caseData.getDocumentCollection().getFirst().getValue().getTopLevelDocuments(),
@@ -574,7 +574,7 @@ class TseClaimantRepReplyServiceTest {
 
     @Test
     void addTseRespondentRepresentativeReplyPdfToDocCollection() throws IOException {
-        when(tornadoService.generateEventDocument(any(), anyString(), anyString(), anyString()))
+        when(tornadoService.generateEventDocument(any(), anyString(), anyString(), anyString(), anyString()))
             .thenReturn(new DocumentInfo());
         when(documentManagementService.addDocumentToDocumentField(any()))
             .thenReturn(DocumentFixtures.getUploadedDocumentType());
@@ -586,7 +586,7 @@ class TseClaimantRepReplyServiceTest {
         caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
 
         tseClaimantRepReplyService.addTseClaimantRepReplyPdfToDocCollection(caseData, "testUserToken",
-            caseDetails.getCaseTypeId());
+            caseDetails.getCaseTypeId(), "caseReference");
 
         MatcherAssert.assertThat(caseData.getDocumentCollection().size(), is(2));
         MatcherAssert.assertThat(caseData.getDocumentCollection().getFirst().getValue().getTopLevelDocuments(),

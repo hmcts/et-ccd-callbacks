@@ -116,7 +116,8 @@ public class ClaimantTellSomethingElseController {
 
         claimantTseService.populateClaimantTse(caseData);
         tseService.createApplication(caseData, CLAIMANT_REP_TITLE);
-        claimantTseService.generateAndAddApplicationPdf(caseData, userToken, caseDetails.getCaseTypeId());
+        claimantTseService.generateAndAddApplicationPdf(caseData, userToken, caseDetails.getCaseTypeId(),
+                caseDetails.getCaseId());
 
         // send notification emails
         claimantTseService.sendEmails(caseDetails);

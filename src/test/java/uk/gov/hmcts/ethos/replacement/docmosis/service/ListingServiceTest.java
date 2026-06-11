@@ -1053,22 +1053,22 @@ class ListingServiceTest {
 
     @Test
     void processHearingDocument() throws IOException {
-        when(tornadoService.listingGeneration(anyString(), any(), anyString())).thenReturn(documentInfo);
+        when(tornadoService.listingGeneration(anyString(), any(), anyString(), anyString())).thenReturn(documentInfo);
         listingDetails.getCaseData().setReportType(CASES_COMPLETED_REPORT);
         DocumentInfo documentInfo1 = listingService
                 .processHearingDocument(listingDetails.getCaseData(),
-                        listingDetails.getCaseTypeId(), "authToken");
+                        listingDetails.getCaseTypeId(), "authToken", "caseReference");
         assertEquals(documentInfo, documentInfo1);
     }
 
     @Test
     void processHearingDocumentWithException() throws IOException {
-        when(tornadoService.listingGeneration(anyString(), any(), anyString()))
+        when(tornadoService.listingGeneration(anyString(), any(), anyString(), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
 
         assertThrows(Exception.class, () ->
                 listingService.processHearingDocument(listingDetails.getCaseData(),
-                        listingDetails.getCaseTypeId(), "authToken")
+                        listingDetails.getCaseTypeId(), "authToken", "caseReference")
         );
     }
 

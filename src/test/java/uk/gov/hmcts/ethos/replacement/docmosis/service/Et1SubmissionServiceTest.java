@@ -141,7 +141,7 @@ class Et1SubmissionServiceTest {
                 .url("http://test.com/documents/random-uuid")
                 .markUp("<a target=\"_blank\" href=\"https://test.com/documents/random-uuid\">Document</a>")
                 .build();
-        when(tornadoService.createDocumentInfoFromBytes(anyString(), any(), anyString(), anyString()))
+        when(tornadoService.createDocumentInfoFromBytes(anyString(), any(), anyString(), anyString(), anyString()))
                 .thenReturn(documentInfo);
         UploadedDocumentType uploadedDocument = UploadedDocumentBuilder.builder()
                 .withUrl("http://test.com/documents/random-uuid")
@@ -153,7 +153,7 @@ class Et1SubmissionServiceTest {
                 .url("http://test.com/documents/random-uuid")
                 .markUp("<a target=\"_blank\" href=\"https://test.com/documents/random-uuid\">Document</a>")
                 .build();
-        when(acasService.getAcasCertificates(any(), anyList(), anyString(), anyString()))
+        when(acasService.getAcasCertificates(any(), anyList(), anyString(), anyString(), anyString()))
                 .thenReturn(List.of(acasDocument));
 
         assertDoesNotThrow(() -> et1SubmissionService.createAndUploadEt1Docs(caseDetails, "authToken"));
@@ -173,7 +173,7 @@ class Et1SubmissionServiceTest {
                 .url("http://test.com/documents/random-uuid")
                 .markUp("<a target=\"_blank\" href=\"https://test.com/documents/random-uuid\">Document</a>")
                 .build();
-        when(tornadoService.createDocumentInfoFromBytes(anyString(), any(), anyString(), anyString()))
+        when(tornadoService.createDocumentInfoFromBytes(anyString(), any(), anyString(), anyString(), anyString()))
                 .thenReturn(documentInfo);
         UploadedDocumentType uploadedDocument = UploadedDocumentBuilder.builder()
                 .withUrl("http://test.com/documents/random-uuid")
@@ -204,7 +204,7 @@ class Et1SubmissionServiceTest {
                 .url("http://test.com/documents/random-uuid")
                 .markUp("<a target=\"_blank\" href=\"https://test.com/documents/random-uuid\">Document</a>")
                 .build();
-        when(tornadoService.createDocumentInfoFromBytes(anyString(), any(), anyString(), anyString()))
+        when(tornadoService.createDocumentInfoFromBytes(anyString(), any(), anyString(), anyString(), anyString()))
                 .thenReturn(documentInfo);
         UploadedDocumentType uploadedDocument = UploadedDocumentBuilder.builder()
                 .withUrl("http://test.com/documents/random-uuid")
@@ -217,7 +217,7 @@ class Et1SubmissionServiceTest {
                 .markUp("<a target=\"_blank\" href=\"https://test.com/documents/random-uuid\">Document</a>")
                 .build();
         // Mock the ACAS service to return a list of 5 documents as the test case is expecting 5
-        when(acasService.getAcasCertificates(any(), anyList(), anyString(), anyString()))
+        when(acasService.getAcasCertificates(any(), anyList(), anyString(), anyString(), anyString()))
                 .thenReturn(List.of(acasDocument, acasDocument, acasDocument, acasDocument, acasDocument));
 
         assertDoesNotThrow(() -> et1SubmissionService.createAndUploadEt1Docs(caseDetails, "authToken"));
@@ -252,7 +252,7 @@ class Et1SubmissionServiceTest {
                 .url("http://test.com/documents/random-uuid")
                 .markUp("<a target=\"_blank\" href=\"https://test.com/documents/random-uuid\">Document</a>")
                 .build();
-        when(tornadoService.createDocumentInfoFromBytes(anyString(), any(), anyString(), anyString()))
+        when(tornadoService.createDocumentInfoFromBytes(anyString(), any(), anyString(), anyString(), anyString()))
                 .thenReturn(documentInfo);
         UploadedDocumentType uploadedDocument = UploadedDocumentBuilder.builder()
                 .withUrl("http://test.com/documents/random-uuid")
@@ -263,7 +263,7 @@ class Et1SubmissionServiceTest {
         assertDoesNotThrow(() -> et1SubmissionService.createAndUploadEt1Docs(caseDetails, "authToken"));
         assertEquals(2, caseDetails.getCaseData().getDocumentCollection().size());
         assertEquals(YES, caseDetails.getCaseData().getAcasCertificateRequired());
-        verify(acasService, times(0)).getAcasCertificates(any(), anyList(), anyString(), anyString());
+        verify(acasService, times(0)).getAcasCertificates(any(), anyList(), anyString(), anyString(), anyString());
     }
 
     @SneakyThrows

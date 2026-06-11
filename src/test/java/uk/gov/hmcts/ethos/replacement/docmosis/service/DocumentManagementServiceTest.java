@@ -20,6 +20,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import uk.gov.hmcts.ccd.sdk.CallbackInvocationContext;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -60,6 +61,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
@@ -83,6 +86,8 @@ class DocumentManagementServiceTest {
     private CaseDocumentClient caseDocumentClient;
     @Mock
     private RestTemplate restTemplate;
+    @Mock
+    private CallbackInvocationContext callbackInvocationContext;
     @InjectMocks
     private DocumentManagementService documentManagementService;
     @InjectMocks
@@ -118,11 +123,12 @@ class DocumentManagementServiceTest {
         when(documentUploadClient.upload(anyString(), anyString(), anyString(), anyList(), any(), anyList()))
                 .thenReturn(successfulDocumentManagementUploadResponse());
         URI documentSelfPath = documentManagementService.uploadDocument("authString", Files.readAllBytes(file.toPath()),
-                OUTPUT_FILE_NAME, APPLICATION_DOCX_VALUE, anyString());
+                OUTPUT_FILE_NAME, APPLICATION_DOCX_VALUE, "caseType", "caseReference");
         String documentDownloadableURL = documentManagementService.generateDownloadableURL(documentSelfPath);
         assertEquals(documentManagementService.generateMarkupDocument(documentDownloadableURL), markup);
         assertNotNull(documentSelfPath);
         assertEquals("/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4", documentSelfPath.getPath());
+        verify(caseDocumentClient, never()).patchDocument(anyString(), anyString(), any());
     }
 
     @Test
@@ -133,7 +139,7 @@ class DocumentManagementServiceTest {
 
         DocumentManagementException ex = assertThrows(DocumentManagementException.class, () ->
                 documentManagementService.uploadDocument("authString", Files.readAllBytes(file.toPath()),
-                        OUTPUT_FILE_NAME, APPLICATION_DOCX_VALUE, "123")
+                        OUTPUT_FILE_NAME, APPLICATION_DOCX_VALUE, "123", "caseReference")
         );
         assertEquals("Unable to upload document document.docx to document management", ex.getMessage());
     }
@@ -198,7 +204,8 @@ class DocumentManagementServiceTest {
         when(caseDocumentClient.uploadDocuments(anyString(), anyString(), anyString(), anyString(), anyList(), any()))
                 .thenReturn(successfulDocStoreUpload());
         URI documentSelfPath = documentManagementService.uploadDocument("authString",
-                Files.readAllBytes(file.toPath()), OUTPUT_FILE_NAME, APPLICATION_DOCX_VALUE, "LondonSouth");
+                Files.readAllBytes(file.toPath()), OUTPUT_FILE_NAME, APPLICATION_DOCX_VALUE, "LondonSouth",
+                "caseReference");
         String documentDownloadableURL = documentManagementService.generateDownloadableURL(documentSelfPath);
         assertEquals(documentManagementService.generateMarkupDocument(documentDownloadableURL), markup);
         assertNotNull(documentSelfPath);
@@ -513,7 +520,8 @@ class DocumentManagementServiceTest {
                         fileBytes,
                         "test.docx",
                         "application/docx",
-                        "caseType")
+                        "caseType",
+                        "caseReference")
         );
 
         assertEquals("Unable to upload document test.docx to document management", exception.getMessage());
@@ -536,7 +544,8 @@ class DocumentManagementServiceTest {
                         fileBytes,
                         "test.docx",
                         "application/docx",
-                        "caseType")
+                        "caseType",
+                        "caseReference")
         );
 
         assertEquals("Unable to upload document test.docx to document management", exception.getMessage());
@@ -554,7 +563,7 @@ class DocumentManagementServiceTest {
                 .thenReturn(response);
 
         URI result = documentManagementService.uploadDocument("authToken", multipartFile.getBytes(),
-                "test.docx", "application/docx", "caseType");
+                "test.docx", "application/docx", "caseType", "caseReference");
 
         assertEquals("/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4", result.getPath());
     }

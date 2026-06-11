@@ -313,7 +313,7 @@ class TseRespondentReplyServiceTest {
 
     @Test
     void addTseRespondentReplyPdfToDocCollection() throws IOException {
-        when(tornadoService.generateEventDocument(any(), anyString(), anyString(), anyString()))
+        when(tornadoService.generateEventDocument(any(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(new DocumentInfo());
         when(documentManagementService.addDocumentToDocumentField(any()))
                 .thenReturn(DocumentFixtures.getUploadedDocumentType());
@@ -324,7 +324,7 @@ class TseRespondentReplyServiceTest {
         caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
 
         tseRespondentReplyService.addTseRespondentReplyPdfToDocCollection(caseData, "testUserToken",
-                caseDetails.getCaseTypeId());
+                caseDetails.getCaseTypeId(), "caseReference");
 
         assertThat(caseData.getDocumentCollection().size(), is(2));
         assertThat(caseData.getDocumentCollection().getFirst().getValue().getTopLevelDocuments(),

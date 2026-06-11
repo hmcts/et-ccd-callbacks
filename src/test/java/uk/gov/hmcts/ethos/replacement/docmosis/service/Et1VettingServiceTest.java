@@ -617,19 +617,20 @@ class Et1VettingServiceTest {
 
     @Test
     void generateEt1VettingDocument() throws IOException {
-        when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
-                anyString(), anyString())).thenReturn(documentInfo);
+        when(tornadoService.generateEventDocument(
+                any(CaseData.class), anyString(), anyString(), anyString(), anyString())).thenReturn(documentInfo);
         DocumentInfo documentInfo1 = et1VettingService.generateEt1VettingDocument(new CaseData(), "userToken",
-                ENGLANDWALES_CASE_TYPE_ID);
+                ENGLANDWALES_CASE_TYPE_ID, "caseReference");
         assertThat(documentInfo).isEqualTo(documentInfo1);
     }
 
     @Test
     void generateEt1VettingDocumentExceptions() throws IOException {
-        when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
-                anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(tornadoService.generateEventDocument(
+                any(CaseData.class), anyString(), anyString(), anyString(), anyString()))
+                .thenThrow(new InternalException(ERROR_MESSAGE));
         assertThrows(Exception.class, () -> et1VettingService.generateEt1VettingDocument(new CaseData(), "userToken",
-                ENGLANDWALES_CASE_TYPE_ID));
+                ENGLANDWALES_CASE_TYPE_ID, "caseReference"));
     }
 
     @Test

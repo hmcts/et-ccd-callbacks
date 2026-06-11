@@ -77,7 +77,8 @@ public class PdfBoxService {
     timeout or maybe a bad gateway.
      */
     public DocumentInfo generatePdfDocumentInfo(CaseData caseData, String userToken, String caseTypeId,
-                                                String documentName, String pdfTemplate, String event)
+                                                String documentName, String pdfTemplate, String event,
+                                                String reference)
             throws IOException, GenericServiceException {
         if (ObjectUtils.isEmpty(caseData)) {
             Throwable exception = new Throwable(PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY);
@@ -96,7 +97,8 @@ public class PdfBoxService {
         try {
             byte[] bytes = convertCaseToPdfAsByteArray(caseData, pdfTemplate, event);
             String dmStoreDocumentName = generatePdfFileName(caseData, documentName);
-            return tornadoService.createDocumentInfoFromBytes(userToken, bytes, dmStoreDocumentName, caseTypeId);
+            return tornadoService.createDocumentInfoFromBytes(userToken, bytes, dmStoreDocumentName, caseTypeId,
+                    reference);
         } catch (IOException ioe) {
             logException(String.format(UNABLE_TO_PROCESS_PDF_SOURCE, pdfTemplate),
                     caseData.getEthosCaseReference(), ioe.getMessage(), PDF_SERVICE_CLASS_NAME,

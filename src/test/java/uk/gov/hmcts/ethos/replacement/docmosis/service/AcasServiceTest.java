@@ -81,7 +81,7 @@ class AcasServiceTest {
             .url("http://test.com/documents/random-uuid")
             .markUp("<a target=\"_blank\" href=\"https://test.com/documents/random-uuid\">Document</a>")
             .build();
-        when(tornadoService.createDocumentInfoFromBytes(anyString(), any(), anyString(), anyString()))
+        when(tornadoService.createDocumentInfoFromBytes(anyString(), any(), anyString(), anyString(), anyString()))
                 .thenReturn(documentInfo);
     }
 
@@ -106,7 +106,7 @@ class AcasServiceTest {
                 .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .setBody(objectMapper.writeValueAsString(certificates)));
         
-        errors = acasService.getAcasCertificate(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID);
+        errors = acasService.getAcasCertificate(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "caseReference");
         assertEquals(0, errors.size());
     }
 
@@ -115,7 +115,7 @@ class AcasServiceTest {
     @ValueSource(strings = "")
     void nullOrEmptyAcasCert(String certificateNumber) {
         caseData.setAcasCertificate(certificateNumber);
-        errors = acasService.getAcasCertificate(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID);
+        errors = acasService.getAcasCertificate(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "caseReference");
         assertEquals(1, errors.size());
     }
 
@@ -123,7 +123,7 @@ class AcasServiceTest {
     void unauthorisedResponseFromAcas() {
         mockWebServer.enqueue(new MockResponse().setResponseCode(401));
         
-        errors = acasService.getAcasCertificate(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID);
+        errors = acasService.getAcasCertificate(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "caseReference");
         assertEquals("Error retrieving ACAS Certificate", errors.getFirst());
     }
 
@@ -140,7 +140,7 @@ class AcasServiceTest {
                 .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .setBody(objectMapper.writeValueAsString(certificates)));
                 
-        errors = acasService.getAcasCertificate(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID);
+        errors = acasService.getAcasCertificate(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "caseReference");
         assertEquals("No ACAS Certificate found", errors.getFirst());
     }
 
@@ -158,7 +158,7 @@ class AcasServiceTest {
                 .setBody(objectMapper.writeValueAsString(certificates)));
         
         List<DocumentInfo> actual = acasService.getAcasCertificates(caseData, ACAS_CERT_LIST, AUTH_TOKEN,
-                ENGLANDWALES_CASE_TYPE_ID);
+                ENGLANDWALES_CASE_TYPE_ID, "caseReference");
         assertEquals(1, actual.size());
         assertEquals(documentInfo.getDescription(), actual.getFirst().getDescription());
     }
@@ -169,7 +169,7 @@ class AcasServiceTest {
         
         assertThrows(WebClientResponseException.class,
                 () -> acasService.getAcasCertificates(caseData, ACAS_CERT_LIST, AUTH_TOKEN,
-                        ENGLANDWALES_CASE_TYPE_ID));
+                        ENGLANDWALES_CASE_TYPE_ID, "caseReference"));
     }
 
     @Test
@@ -183,7 +183,7 @@ class AcasServiceTest {
                 .setBody(objectMapper.writeValueAsString(emptyCertificates)));
         
         List<DocumentInfo> actual = acasService.getAcasCertificates(caseData, ACAS_CERT_LIST, AUTH_TOKEN,
-                ENGLANDWALES_CASE_TYPE_ID);
+                ENGLANDWALES_CASE_TYPE_ID, "caseReference");
         assertEquals(0, actual.size());
     }
 

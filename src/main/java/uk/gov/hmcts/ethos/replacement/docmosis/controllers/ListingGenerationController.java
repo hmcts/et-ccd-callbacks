@@ -181,7 +181,8 @@ public class ListingGenerationController {
             listingData = listingService.setManagingOfficeAndCourtAddressFromCaseData(
                     ccdRequest.getCaseDetails().getCaseData());
             DocumentInfo documentInfo = listingService.processHearingDocument(
-                    listingData, ccdRequest.getCaseDetails().getCaseTypeId(), userToken);
+                    listingData, ccdRequest.getCaseDetails().getCaseTypeId(), userToken,
+                    ccdRequest.getCaseDetails().getCaseId());
             ccdRequest.getCaseDetails().getCaseData().setDocMarkUp(documentInfo.getMarkUp());
             return ResponseEntity.ok(CCDCallbackResponse.builder()
                     .data(ccdRequest.getCaseDetails().getCaseData())
@@ -269,18 +270,20 @@ public class ListingGenerationController {
 
         ListingData listingData = reportDataService.generateReportData(listingRequest.getCaseDetails(), userToken);
 
-        return getResponseEntity(listingData, listingRequest.getCaseDetails().getCaseTypeId(), userToken);
+        return getResponseEntity(listingData, listingRequest.getCaseDetails().getCaseTypeId(), userToken,
+                listingRequest.getCaseDetails().getCaseId());
 
     }
 
     private ResponseEntity<ListingCallbackResponse> getResponseEntity(ListingData listingData,
                                                                       String caseTypeId,
-                                                                      String userToken) {
+                                                                      String userToken,
+                                                                      String reference) {
         List<String> errorsList = new ArrayList<>();
 
         if (hasListings(listingData) || isAllowedReportType(listingData)
                 && hasServedClaims(listingData) || hasSummaryAndDetails(listingData)) {
-            DocumentInfo documentInfo = getDocumentInfo(listingData, caseTypeId, userToken);
+            DocumentInfo documentInfo = getDocumentInfo(listingData, caseTypeId, userToken, reference);
             updateListingDocMarkUp(listingData, documentInfo);
             return ResponseEntity.ok(ListingCallbackResponse.builder()
                     .data(listingData)
@@ -322,8 +325,9 @@ public class ListingGenerationController {
         listingData.setDocMarkUp(documentInfo.getMarkUp());
     }
 
-    private DocumentInfo getDocumentInfo(ListingData listingData, String caseTypeId, String userToken) {
-        return listingService.processHearingDocument(listingData, caseTypeId, userToken);
+    private DocumentInfo getDocumentInfo(ListingData listingData, String caseTypeId, String userToken,
+                                         String reference) {
+        return listingService.processHearingDocument(listingData, caseTypeId, userToken, reference);
     }
 
     @PostMapping(value = "/generateHearingDocument", consumes = APPLICATION_JSON_VALUE)
@@ -356,7 +360,8 @@ public class ListingGenerationController {
             errorsList.add("No cases with hearings have been found for your search criteria");
         }
         if (errorsList.isEmpty()) {
-            DocumentInfo documentInfo = getDocumentInfo(listingData, caseTypeId, userToken);
+            DocumentInfo documentInfo = getDocumentInfo(listingData, caseTypeId, userToken,
+                    listingRequest.getCaseDetails().getCaseId());
             updateListingDocMarkUp(listingData, documentInfo);
             return ResponseEntity.ok(ListingCallbackResponse.builder()
                     .data(listingData)

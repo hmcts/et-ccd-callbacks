@@ -55,7 +55,7 @@ public class ExcelDocManagementService {
                 multipleData.getMultipleReference());
         URI documentSelfPath = documentManagementService.uploadDocument(userToken, excelBytes,
                 MultiplesHelper.generateExcelDocumentName(multipleData), APPLICATION_EXCEL_VALUE,
-                multipleDetails.getCaseTypeId());
+                multipleDetails.getCaseTypeId(), multipleDetails.getCaseId());
 
         log.info("URI documentSelfPath uploaded and created: {}", documentSelfPath.toString());
 
@@ -135,7 +135,7 @@ public class ExcelDocManagementService {
         String documentName = MultiplesScheduleHelper.generateScheduleDocumentName(multipleDetails.getCaseData());
 
         URI documentSelfPath = documentManagementService.uploadDocument(userToken, excelBytes,
-                documentName, APPLICATION_EXCEL_VALUE, multipleDetails.getCaseTypeId());
+                documentName, APPLICATION_EXCEL_VALUE, multipleDetails.getCaseTypeId(), multipleDetails.getCaseId());
 
         log.info("URI documentSelfPath uploaded and created: {}", documentSelfPath.toString());
 
@@ -154,9 +154,10 @@ public class ExcelDocManagementService {
                 .build();
     }
 
-    public DocumentInfo uploadExcelReportDocument(String userToken, String documentName, byte[] excelBytes) {
+    public DocumentInfo uploadExcelReportDocument(String userToken, String documentName, byte[] excelBytes,
+                                                  String reference) {
         URI documentUri = documentManagementService.uploadDocument(userToken, excelBytes,
-            documentName, APPLICATION_EXCEL_VALUE, "Listings_Type");
+            documentName, APPLICATION_EXCEL_VALUE, "Listings_Type", reference);
 
         log.info("Excel Report - URI documentSelfPath uploaded and created: {}", documentUri.toString());
 

@@ -157,7 +157,8 @@ public class UpdateReferralMultiplesController {
                 .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
 
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
-        DocumentInfo documentInfo = referralService.generateDocument(caseData, leadCase, userToken, caseTypeId);
+        DocumentInfo documentInfo = referralService.generateDocument(caseData, leadCase, userToken, caseTypeId,
+                ccdRequest.getCaseDetails().getCaseId());
 
         referral.setReferralSummaryPdf(documentManagementService.addDocumentToDocumentField(documentInfo));
 

@@ -53,6 +53,7 @@ class ExcelDocManagementServiceTest {
     @BeforeEach
     public void setUp() {
         multipleDetails = new MultipleDetails();
+        multipleDetails.setCaseId("caseReference");
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
         UserDetails userDetails = HelperTest.getUserDetails();
         when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
@@ -67,7 +68,7 @@ class ExcelDocManagementServiceTest {
         when(documentManagementService.uploadDocument(userToken,
                 bytes,
                 MultiplesHelper.generateExcelDocumentName(multipleDetails.getCaseData()), APPLICATION_EXCEL_VALUE,
-                multipleDetails.getCaseTypeId()))
+                multipleDetails.getCaseTypeId(), multipleDetails.getCaseId()))
                 .thenReturn(uri);
         excelDocManagementService.uploadExcelDocument(userToken,
                 multipleDetails,
@@ -75,7 +76,7 @@ class ExcelDocManagementServiceTest {
         verify(documentManagementService, times(1)).uploadDocument(userToken,
                 bytes,
                 MultiplesHelper.generateExcelDocumentName(multipleDetails.getCaseData()), APPLICATION_EXCEL_VALUE,
-                multipleDetails.getCaseTypeId());
+                multipleDetails.getCaseTypeId(), multipleDetails.getCaseId());
         verifyNoMoreInteractions(documentManagementService);
     }
 
@@ -98,7 +99,7 @@ class ExcelDocManagementServiceTest {
         when(documentManagementService.uploadDocument(userToken,
                 bytes,
                 MultiplesHelper.generateExcelDocumentName(multipleDetails.getCaseData()),
-                APPLICATION_EXCEL_VALUE, multipleDetails.getCaseTypeId()))
+                APPLICATION_EXCEL_VALUE, multipleDetails.getCaseTypeId(), multipleDetails.getCaseId()))
                 .thenReturn(uri);
         when(excelCreationService.writeExcel(multipleCollection,
                 subMultipleCollection,
@@ -109,7 +110,7 @@ class ExcelDocManagementServiceTest {
         verify(documentManagementService, times(1)).uploadDocument(userToken,
                 bytes,
                 MultiplesHelper.generateExcelDocumentName(multipleDetails.getCaseData()), APPLICATION_EXCEL_VALUE,
-                multipleDetails.getCaseTypeId());
+                multipleDetails.getCaseTypeId(), multipleDetails.getCaseId());
         verifyNoMoreInteractions(documentManagementService);
         verify(excelCreationService, times(1)).writeExcel(multipleCollection,
                 subMultipleCollection,
@@ -128,7 +129,7 @@ class ExcelDocManagementServiceTest {
                 bytes,
                 MultiplesHelper.generateExcelDocumentName(
                         multipleDetails.getCaseData()), APPLICATION_EXCEL_VALUE,
-                multipleDetails.getCaseTypeId()))
+                multipleDetails.getCaseTypeId(), multipleDetails.getCaseId()))
                 .thenReturn(uri);
         when(excelCreationService.writeExcel(multipleCollection,
                 new ArrayList<>(),
@@ -140,7 +141,7 @@ class ExcelDocManagementServiceTest {
                 bytes,
                 MultiplesHelper.generateExcelDocumentName(
                         multipleDetails.getCaseData()), APPLICATION_EXCEL_VALUE,
-                multipleDetails.getCaseTypeId());
+                multipleDetails.getCaseTypeId(), multipleDetails.getCaseId());
         verifyNoMoreInteractions(documentManagementService);
         verify(excelCreationService, times(1)).writeExcel(
                 multipleCollection,
@@ -160,7 +161,7 @@ class ExcelDocManagementServiceTest {
                 bytes,
                 MultiplesScheduleHelper.generateScheduleDocumentName(
                         multipleDetails.getCaseData()), APPLICATION_EXCEL_VALUE,
-                multipleDetails.getCaseTypeId()))
+                multipleDetails.getCaseTypeId(), multipleDetails.getCaseId()))
                 .thenReturn(uri);
         excelDocManagementService.writeAndUploadScheduleDocument(userToken, new TreeMap<>(),
                 multipleDetails, new ArrayList<>());
@@ -168,7 +169,7 @@ class ExcelDocManagementServiceTest {
                 bytes,
                 MultiplesScheduleHelper.generateScheduleDocumentName(
                         multipleDetails.getCaseData()), APPLICATION_EXCEL_VALUE,
-                multipleDetails.getCaseTypeId());
+                multipleDetails.getCaseTypeId(), multipleDetails.getCaseId());
         verify(scheduleCreationService, times(1))
                 .writeSchedule(multipleDetails.getCaseData(),
                         new ArrayList<>(),

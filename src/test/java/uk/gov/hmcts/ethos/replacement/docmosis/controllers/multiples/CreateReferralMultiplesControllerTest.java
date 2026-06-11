@@ -151,7 +151,7 @@ class CreateReferralMultiplesControllerTest extends BaseControllerTest {
         UserDetails details = new UserDetails();
         details.setName("First Last");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
-        when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString()))
+        when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString(), anyString()))
                 .thenReturn(new DocumentInfo());
         request.getCaseDetails().getCaseData().setMultipleReference("012345");
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
@@ -170,7 +170,7 @@ class CreateReferralMultiplesControllerTest extends BaseControllerTest {
         UserDetails details = new UserDetails();
         details.setName("First Last");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
-        when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString()))
+        when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString(), anyString()))
                 .thenReturn(new DocumentInfo());
         MultipleRequest noReferentEmailCCDRequest = request;
         noReferentEmailCCDRequest.getCaseDetails().getCaseData().setReferentEmail("");
@@ -190,7 +190,7 @@ class CreateReferralMultiplesControllerTest extends BaseControllerTest {
         UserDetails details = new UserDetails();
         details.setName("First Last");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
-        when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString()))
+        when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString(), anyString()))
                 .thenReturn(new DocumentInfo());
         MultipleRequest referentEmailCCDRequest = request;
         referentEmailCCDRequest.getCaseDetails().getCaseData().setReferentEmail("Tester@testco.com");

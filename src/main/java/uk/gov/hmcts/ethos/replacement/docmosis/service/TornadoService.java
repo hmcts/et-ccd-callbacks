@@ -87,7 +87,8 @@ public class TornadoService {
     public DocumentInfo documentGeneration(String authToken, CaseData caseData, String caseTypeId,
                                            CorrespondenceType correspondenceType,
                                            CorrespondenceScotType correspondenceScotType,
-                                           MultipleData multipleData) throws IOException {
+                                           MultipleData multipleData,
+                                           String reference) throws IOException {
         HttpURLConnection conn = null;
         try {
             conn = createConnection();
@@ -96,7 +97,7 @@ public class TornadoService {
                     correspondenceType, correspondenceScotType, multipleData);
             String documentName = Helper.getDocumentName(correspondenceType, correspondenceScotType);
             byte[] bytes = getDocumentByteArray(conn);
-            return createDocumentInfoFromBytes(authToken, bytes, documentName, caseTypeId);
+            return createDocumentInfoFromBytes(authToken, bytes, documentName, caseTypeId, reference);
         } catch (IOException e) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, e);
             throw e;
@@ -115,7 +116,7 @@ public class TornadoService {
      * @throws IOException thrown when Tornado fails to create the document for any reason
      */
     public DocumentInfo generateDocument(String userToken, TornadoDocument<?> document, String documentName, 
-        String caseTypeId) throws IOException {
+        String caseTypeId, String reference) throws IOException {
 
         HttpURLConnection connection = null;
         try {
@@ -124,7 +125,7 @@ public class TornadoService {
             String content = new ObjectMapper().writeValueAsString(document);
             buildDocumentInstruction(connection, content);
             byte[] bytes = getDocumentByteArray(connection);
-            return createDocumentInfoFromBytes(userToken, bytes, documentName, caseTypeId);
+            return createDocumentInfoFromBytes(userToken, bytes, documentName, caseTypeId, reference);
         } catch (IOException exception) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
             throw exception;
@@ -164,7 +165,8 @@ public class TornadoService {
                 && correspondenceScotType.getLetterAddress().equals(LETTER_ADDRESS_ALLOCATED_OFFICE);
     }
 
-    DocumentInfo listingGeneration(String authToken, ListingData listingData, String caseType) throws IOException {
+    DocumentInfo listingGeneration(String authToken, ListingData listingData, String caseType, String reference)
+            throws IOException {
         HttpURLConnection conn = null;
         try {
             conn = createConnection();
@@ -172,7 +174,7 @@ public class TornadoService {
             String documentName = ListingHelper.getListingDocName(listingData);
             buildListingInstruction(conn, listingData, documentName, authToken, caseType);
             byte[] bytes = getDocumentByteArray(conn);
-            return createDocumentInfoFromBytes(authToken, bytes, documentName, caseType);
+            return createDocumentInfoFromBytes(authToken, bytes, documentName, caseType, reference);
         } catch (IOException e) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, e);
             throw e;
@@ -233,22 +235,23 @@ public class TornadoService {
      * @return DocumentInfo which contains the URL and markup of the uploaded document
      */
     public DocumentInfo createDocumentInfoFromBytes(String authToken, byte[] bytes, String documentName,
-                                                     String caseTypeId) {
+                                                    String caseTypeId, String reference) {
 
-        URI documentSelfPath = uploadDocument(documentName, authToken, bytes, caseTypeId);
+        URI documentSelfPath = uploadDocument(documentName, authToken, bytes, caseTypeId, reference);
         String downloadUrl = documentManagementService.generateDownloadableURL(documentSelfPath);
         String markup = documentManagementService.generateMarkupDocument(downloadUrl);
         return generateDocumentInfo(documentName, documentSelfPath, markup);
     }
 
-    private URI uploadDocument(String documentName, String authToken, byte[] bytes, String caseTypeId) {
+    private URI uploadDocument(String documentName, String authToken, byte[] bytes, String caseTypeId,
+                               String reference) {
         if (documentName.endsWith(".pdf")) {
             String pdfFileName = isCustomDocName(documentName) ? documentName : OUTPUT_FILE_NAME_PDF;
             return documentManagementService.uploadDocument(authToken, bytes, pdfFileName,
-                    APPLICATION_PDF_VALUE, caseTypeId);
+                    APPLICATION_PDF_VALUE, caseTypeId, reference);
         } else {
             return documentManagementService.uploadDocument(authToken, bytes, OUTPUT_FILE_NAME,
-                    APPLICATION_DOCX_VALUE, caseTypeId);
+                    APPLICATION_DOCX_VALUE, caseTypeId, reference);
         }
     }
 
@@ -294,7 +297,7 @@ public class TornadoService {
     timeout or maybe a bad gateway.
      */
     public DocumentInfo generateEventDocument(CaseData caseData, String userToken, String caseTypeId,
-                                              String documentName)
+                                              String documentName, String reference)
         throws IOException {
         HttpURLConnection connection = null;
         try {
@@ -303,7 +306,7 @@ public class TornadoService {
             buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
             byte[] bytes = getDocumentByteArray(connection);
             return createDocumentInfoFromBytes(userToken, bytes,
-                    getDmStoreDocumentName(caseData, documentName), caseTypeId);
+                    getDmStoreDocumentName(caseData, documentName), caseTypeId, reference);
         } catch (IOException exception) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
             throw exception;

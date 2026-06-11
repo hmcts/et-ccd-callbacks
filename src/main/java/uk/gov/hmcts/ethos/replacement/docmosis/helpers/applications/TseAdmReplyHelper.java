@@ -55,7 +55,7 @@ public final class TseAdmReplyHelper {
         CaseData caseData = caseDetails.getCaseData();
         try {
             return tornadoService.generateEventDocument(caseData, userToken, caseDetails.getCaseTypeId(),
-                    typeOfDocument);
+                    typeOfDocument, caseDetails.getCaseId());
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }

@@ -97,7 +97,7 @@ class TornadoServiceTest {
 
         assertThrows(IOException.class, () ->
                 tornadoService.documentGeneration(AUTH_TOKEN, caseData, ENGLANDWALES_CASE_TYPE_ID,
-                        caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), null)
+                        caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), null, "caseReference")
         );
     }
 
@@ -106,7 +106,8 @@ class TornadoServiceTest {
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);
 
         assertThrows(IOException.class, () ->
-                tornadoService.listingGeneration(AUTH_TOKEN, createListingData(), ENGLANDWALES_LISTING_CASE_TYPE_ID)
+                tornadoService.listingGeneration(AUTH_TOKEN, createListingData(), ENGLANDWALES_LISTING_CASE_TYPE_ID,
+                        "caseReference")
         );
     }
 
@@ -117,7 +118,7 @@ class TornadoServiceTest {
 
         assertThrows(IOException.class, () ->
                 tornadoService.documentGeneration(AUTH_TOKEN, caseData, ENGLANDWALES_CASE_TYPE_ID,
-                        caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), null)
+                        caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), null, "caseReference")
         );
     }
 
@@ -127,7 +128,7 @@ class TornadoServiceTest {
         CaseData caseData = new CaseData();
 
         DocumentInfo documentInfo = tornadoService.documentGeneration(AUTH_TOKEN, caseData, ENGLANDWALES_CASE_TYPE_ID,
-                caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), null);
+                caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), null, "caseReference");
 
         verifyDocumentInfo(documentInfo);
     }
@@ -146,7 +147,7 @@ class TornadoServiceTest {
         caseData.setCorrespondenceScotType(correspondenceScotType);
 
         DocumentInfo documentInfo = tornadoService.documentGeneration(AUTH_TOKEN, caseData, SCOTLAND_CASE_TYPE_ID,
-                caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), null);
+                caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), null, "caseReference");
 
         verifyDocumentInfo(documentInfo);
     }
@@ -165,7 +166,8 @@ class TornadoServiceTest {
         caseData.setCorrespondenceScotType(correspondenceScotType);
 
         DocumentInfo documentInfo = tornadoService.documentGeneration(AUTH_TOKEN, caseData, SCOTLAND_CASE_TYPE_ID,
-                caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), new MultipleData());
+                caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), new MultipleData(),
+                "caseReference");
 
         verifyDocumentInfo(documentInfo);
     }
@@ -176,7 +178,7 @@ class TornadoServiceTest {
         ListingData listingData = createListingData();
 
         DocumentInfo documentInfo = tornadoService.listingGeneration(
-            AUTH_TOKEN, listingData, ENGLANDWALES_LISTING_CASE_TYPE_ID);
+            AUTH_TOKEN, listingData, ENGLANDWALES_LISTING_CASE_TYPE_ID, "caseReference");
 
         verifyDocumentInfo(documentInfo);
     }
@@ -188,7 +190,7 @@ class TornadoServiceTest {
         listingData.setReportType(CLAIMS_ACCEPTED_REPORT);
 
         DocumentInfo documentInfo = tornadoService.listingGeneration(AUTH_TOKEN, listingData,
-                ENGLANDWALES_LISTING_CASE_TYPE_ID);
+                ENGLANDWALES_LISTING_CASE_TYPE_ID, "caseReference");
 
         verifyDocumentInfo(documentInfo);
     }
@@ -197,7 +199,7 @@ class TornadoServiceTest {
     void generateEt1VettingDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, ET1_VETTING_PDF);
+                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, ET1_VETTING_PDF, "caseReference");
         verifyDocumentInfo(documentInfo);
     }
 
@@ -205,7 +207,7 @@ class TornadoServiceTest {
     void generateTseAdminReplyDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                getCaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, TSE_ADMIN_REPLY_PDF);
+                getCaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, TSE_ADMIN_REPLY_PDF, "caseReference");
         verifyDocumentInfo(documentInfo);
     }
 
@@ -215,7 +217,7 @@ class TornadoServiceTest {
         CaseData caseData = new CaseData();
         caseData.setEt3ChooseRespondent(DynamicFixedListType.from("Test Code", "Test Label", true));
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, ET3_PROCESSING_PDF);
+                caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, ET3_PROCESSING_PDF, "caseReference");
         verifyDocumentInfo(documentInfo);
     }
 
@@ -223,7 +225,7 @@ class TornadoServiceTest {
     void generateInConEWDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, INITIAL_CONSIDERATION_PDF);
+                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, INITIAL_CONSIDERATION_PDF, "caseReference");
         verifyDocumentInfo(documentInfo);
     }
 
@@ -231,7 +233,7 @@ class TornadoServiceTest {
     void generateInConSCDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), AUTH_TOKEN, SCOTLAND_CASE_TYPE_ID, INITIAL_CONSIDERATION_PDF);
+                new CaseData(), AUTH_TOKEN, SCOTLAND_CASE_TYPE_ID, INITIAL_CONSIDERATION_PDF, "caseReference");
         verifyDocumentInfo(documentInfo);
     }
 
@@ -239,7 +241,7 @@ class TornadoServiceTest {
     void generateReferralSummaryDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "Referral Summary.pdf");
+                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "Referral Summary.pdf", "caseReference");
         verifyDocumentInfo(documentInfo);
     }
 
@@ -249,7 +251,7 @@ class TornadoServiceTest {
 
         assertThrows(IOException.class, () ->
                 tornadoService.generateEventDocument(new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID,
-                        "random-string")
+                        "random-string", "caseReference")
         );
     }
 
@@ -259,7 +261,7 @@ class TornadoServiceTest {
 
         assertThrows(IllegalArgumentException.class, () ->
                 tornadoService.generateEventDocument(new CaseData(),
-                        AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, null)
+                        AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, null, "caseReference")
         );
     }
 
@@ -327,7 +329,7 @@ class TornadoServiceTest {
         mockConnectionSuccess();
         var document = TornadoDocument.builder().templateName("template.docx").data(DOCUMENT_INFO_MARKUP).build();
         DocumentInfo documentInfo = tornadoService.generateDocument(
-            AUTH_TOKEN, document, INITIAL_CONSIDERATION_PDF, ENGLANDWALES_CASE_TYPE_ID);
+            AUTH_TOKEN, document, INITIAL_CONSIDERATION_PDF, ENGLANDWALES_CASE_TYPE_ID, "caseReference");
 
         verifyDocumentInfo(documentInfo);
         assertEquals(INITIAL_CONSIDERATION_PDF, documentInfo.getDescription());
@@ -404,8 +406,8 @@ class TornadoServiceTest {
         documentManagementService = mock(DocumentManagementService.class);
         String documentUrl = "http://testdocumentserver/testdocument";
         URI uri = URI.create(documentUrl);
-        when(documentManagementService.uploadDocument(anyString(), any(byte[].class),
-                anyString(), anyString(), anyString())).thenReturn(uri);
+        when(documentManagementService.uploadDocument(
+                anyString(), any(byte[].class), anyString(), anyString(), anyString(), anyString())).thenReturn(uri);
         when(documentManagementService.generateDownloadableURL(uri)).thenReturn(documentUrl);
         when(documentManagementService.generateMarkupDocument(anyString())).thenReturn(DOCUMENT_INFO_MARKUP);
     }

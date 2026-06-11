@@ -193,7 +193,7 @@ public class ReplyToReferralController {
         ReferralHelper.createReferralReply(caseData, name, featureToggleService.isWorkAllocationEnabled());
 
         DocumentInfo documentInfo = referralService.generateCRDocument(caseData, userToken,
-            caseDetails.getCaseTypeId());
+            caseDetails.getCaseTypeId(), caseDetails.getCaseId());
 
         ReferralType referral = ReferralHelper.getSelectedReferral(caseData);
 

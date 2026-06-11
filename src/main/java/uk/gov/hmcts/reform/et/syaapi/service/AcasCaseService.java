@@ -85,6 +85,27 @@ public class AcasCaseService {
                           "gte": "%s"
                         }
                       }
+                    },
+                    {
+                      "bool": {
+                        "should": [
+                          {
+                            "range": {
+                              "data.receiptDate": {
+                                "gte": "2026-05-30"
+                              }
+                            }
+                          },
+                          {
+                            "range": {
+                              "data.respondentCollection.value.responseReceivedDate": {
+                                "gte": "2026-05-30"
+                              }
+                            }
+                          }
+                        ],
+                        "minimum_should_match": 1
+                      }
                     }
                   ],
                   "must_not": [
@@ -174,10 +195,6 @@ public class AcasCaseService {
     private List<DocumentTypeItem> getAllCaseDocuments(String authorisation, List<CaseDocumentAcasResponse> documents,
                                                        CaseData caseData) {
 
-        if (checkReceiptDateForAcas(caseData)) {
-            return new ArrayList<>();
-        }
-
         retrieveRespondentDocuments(authorisation, documents, caseData);
 
         List<DocumentTypeItem> documentTypeItemList = new ArrayList<>(getDocumentCollectionDocs(caseData));
@@ -189,20 +206,6 @@ public class AcasCaseService {
             ));
         }
         return documentTypeItemList;
-    }
-
-    /**
-     * ACAS should not receive documents for cases submitted before 1st April 2026. This is so that they can avoid
-     * having duplicate documents for older cases.
-     * @param caseData the case data
-     * @return true if the receipt date is before 1st April 2026 or if the receipt date is not provided or false if the
-     *     receipt date is on or after 1st April 2026.
-     */
-    private boolean checkReceiptDateForAcas(CaseData caseData) {
-        if (caseData.getReceiptDate() == null) {
-            return true;
-        }
-        return LocalDate.parse(caseData.getReceiptDate()).isBefore(LocalDate.of(2026, 4, 1));
     }
 
     private static List<DocumentTypeItem> getDocumentCollectionDocs(CaseData caseData) {

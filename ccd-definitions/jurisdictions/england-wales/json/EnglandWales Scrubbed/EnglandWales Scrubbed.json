@@ -4119,116 +4119,134 @@
   {
     "ID": "fl_Part_10",
     "ListElementCode": "10.1",
-    "ListElement": "10.1 - Judgment - no hearing - Rule 58",
+    "ListElement": "10.1 Judgment after oral summary reasons given Rule 59",
     "DisplayOrder": 1
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "10.2",
-    "ListElement": "10.2 - Judgment - Rule 59",
+    "ListElement": "10.2 Judgment after oral full reasons given Rule 59",
     "DisplayOrder": 2
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "10.3",
-    "ListElement": "10.3 - Judgment reasons reserved - Rule 60(2)",
+    "ListElement": "10.3 Judgment after oral judgment with reasons reserved Rule 59, 60(3)",
     "DisplayOrder": 3
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "10.4",
-    "ListElement": "10.4 - Reserved judgment letter - Rule 60(2)",
+    "ListElement": "10.4 Letter confirming judgment reserved Rule 60(2)",
     "DisplayOrder": 4
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "10.5",
-    "ListElement": "10.5 - Reserved judgment with reasons - Rule 60",
+    "ListElement": "10.5 Reserved judgment with reasons template Rule 60(2)",
     "DisplayOrder": 5
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "10.6",
-    "ListElement": "10.6 - Judgment cover letter - Rule 59",
+    "ListElement": "10.6 Judgment cover letter",
     "DisplayOrder": 6
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "10.6A",
-    "ListElement": "10.6A Judgment cover letter Enforcement Notices ",
+    "ListElement": "10.6A Judgment cover letter Enforcement Notice appeals",
     "DisplayOrder": 7
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "10.6B",
-    "ListElement": "10.6B Rule 22 Judgment cover letter ",
+    "ListElement": "10.6B Judgment cover letter Rule 22 judgments",
     "DisplayOrder": 8
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "10.7",
-    "ListElement": "10.7 - Judgment with reasons - Rule 60",
+    "ListElement": "10.7 Judgment plus full reasons template (reasons requested at hearing) Rule 60",
     "DisplayOrder": 9
   },
   {
     "ID": "fl_Part_10",
-    "ListElementCode": "10.8",
-    "ListElement": "10.8 - Reasons - Rule 60(3) ",
+    "ListElementCode": "10.7A",
+    "ListElement": "10.7A Judgment plus summary reasons template (reasons requested at hearing) Rule 60",
     "DisplayOrder": 10
   },
   {
     "ID": "fl_Part_10",
-    "ListElementCode": "10.9",
-    "ListElement": "10.9 - Extending the time to request written reasons - claimant - Rules 60(3) & 5",
+    "ListElementCode": "10.8",
+    "ListElement": "10.8 Written full reasons template Rule 60",
     "DisplayOrder": 11
   },
   {
     "ID": "fl_Part_10",
-    "ListElementCode": "10.10",
-    "ListElement": "10.10 - Extending the time to request written reasons - respondent - Rule 60(3) & 5",
+    "ListElementCode": "10.8A",
+    "ListElement": "10.8A Written summary reasons template Rule 60",
     "DisplayOrder": 12
   },
   {
     "ID": "fl_Part_10",
-    "ListElementCode": "10.11",
-    "ListElement": "10.11 - Refusal of late request for written reasons - Rule 60(3) ",
+    "ListElementCode": "10.9",
+    "ListElement": "10.9 Letter confirming extension of time to request written summary reasons",
     "DisplayOrder": 13
   },
   {
     "ID": "fl_Part_10",
-    "ListElementCode": "10.12",
-    "ListElement": "10.12 - Refusal of late request for written reasons - respondent -Rule 60(3) ",
+    "ListElementCode": "10.10",
+    "ListElement": "10.10 Letter confirming extension of time to request written full reasons",
     "DisplayOrder": 14
   },
   {
     "ID": "fl_Part_10",
-    "ListElementCode": "10.13",
-    "ListElement": "10.13 - Consent judgment - Rule 62",
+    "ListElementCode": "10.11",
+    "ListElement": "10.11 Letter confirming refusal of extension of time to request written summary reasons",
     "DisplayOrder": 15
   },
   {
     "ID": "fl_Part_10",
-    "ListElementCode": "10.14",
-    "ListElement": "10.14 - Consent order - Rule 62",
+    "ListElementCode": "10.12",
+    "ListElement": "10.12 Letter confirming refusal of extension of time to request written full reasons",
     "DisplayOrder": 16
   },
   {
     "ID": "fl_Part_10",
-    "ListElementCode": "10.15",
-    "ListElement": "10.15 - Certificate of correction - Rule 67",
+    "ListElementCode": "10.13",
+    "ListElement": "10.13 Consent judgment Rule 62",
     "DisplayOrder": 17
   },
   {
     "ID": "fl_Part_10",
-    "ListElementCode": "10.16",
-    "ListElement": "10.16 - Corrected judgment with reasons - Rule 67",
+    "ListElementCode": "10.14",
+    "ListElement": "10.14 Consent order Rule 62",
     "DisplayOrder": 18
   },
   {
     "ID": "fl_Part_10",
-    "ListElementCode": "10.17",
-    "ListElement": "10.17 - Letter with Corrected Judgment - Rule 67",
+    "ListElementCode": "10.15",
+    "ListElement": "10.15 Certificate of correction Rule 67",
     "DisplayOrder": 19
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.16",
+    "ListElement": "10.16 Corrected judgment with full reasons Rule 67",
+    "DisplayOrder": 20
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.16A",
+    "ListElement": "10.16A Corrected judgment with summary reasons Rule 67",
+    "DisplayOrder": 21
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.17",
+    "ListElement": "10.17 Letter sending corrected judgment Rule 67",
+    "DisplayOrder": 22
   },
   {
     "ID": "fl_Part_11",

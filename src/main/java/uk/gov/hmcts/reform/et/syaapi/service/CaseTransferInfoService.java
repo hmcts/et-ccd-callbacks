@@ -51,11 +51,14 @@ public class CaseTransferInfoService {
         verifyUserHasCaseRole(authorization, caseId, caseUserRole);
 
         try {
+            log.info("Retrieving transferred case details for case {} to determine transfer information", caseId);
             CaseDetails caseDetails = ccdApi.getCase(
                 adminUserService.getAdminUserToken(),
                 authTokenGenerator.generate(),
                 caseId
             );
+            log.info("Successfully retrieved transferred case details for case {}, building transfer info response",
+                    caseId);
             return buildTransferInfo(caseDetails);
         } catch (FeignException.NotFound notFound) {
             log.info("Case {} not found in CCD, returning fallback ECM transfer info", caseId);
@@ -76,7 +79,9 @@ public class CaseTransferInfoService {
                 authorization,
                 List.of(caseReference)
             );
-
+            log.info("Retrieved transferred case user roles for user {} and case {}, response: {}",
+                userInfo.getUid(), caseId, rolesResponse
+            );
             if (rolesResponse == null || CollectionUtils.isEmpty(rolesResponse.getCaseAssignedUserRoles())) {
                 throw new CaseUserRoleNotFoundException(String.format(EXCEPTION_CASE_USER_ROLE_NOT_FOUND, caseId));
             }

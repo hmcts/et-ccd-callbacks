@@ -124,6 +124,8 @@ sourceSets {
 }
 
 allprojects {
+    ext['spring-framework.version'] = '6.2.19'
+
     configurations.configureEach {
         resolutionStrategy.eachDependency { details ->
             if (details.requested.group.startsWith("com.fasterxml.jackson")) {

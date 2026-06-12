@@ -90,53 +90,7 @@ import_definition() {
     fi
 }
 
-create_global_search_index() {
-    local response_body_file
-    response_body_file=$(mktemp)
-
-    echo "🔎 Creating global search Elasticsearch index"
-
-    local http_code
-    if http_code=$(curl --silent --show-error --location \
-        --http1.1 \
-        --retry "${CURL_RETRY_COUNT}" \
-        --retry-delay "${CURL_RETRY_DELAY_SECONDS}" \
-        --retry-all-errors \
-        --connect-timeout "${CURL_CONNECT_TIMEOUT_SECONDS}" \
-        --max-time "${CURL_MAX_TIME_SECONDS}" \
-        --output "${response_body_file}" \
-        --write-out "%{http_code}" \
-        -X POST \
-        "${CCD_DEFINITION_STORE_API_BASE_URL}/elastic-support/global-search/index" \
-        -H "Authorization: Bearer ${USER_TOKEN}" \
-        -H "ServiceAuthorization: ${SERVICE_TOKEN}"); then
-        :
-    else
-        local curl_exit_code="$?"
-        echo "    ❌ curl failed to create global search index (exit ${curl_exit_code})"
-        if [[ -s "${response_body_file}" ]]; then
-            echo "    Response: $(cat "${response_body_file}")"
-        fi
-        rm -f "${response_body_file}"
-        return "${curl_exit_code}"
-    fi
-
-    local response_body
-    response_body=$(cat "${response_body_file}")
-    rm -f "${response_body_file}"
-
-    if [[ "${http_code}" == "201" ]] || [[ "${http_code}" == "200" ]]; then
-        echo "    ✅ Successfully created global search index"
-    else
-        echo "    ❌ Failed to create global search index (HTTP ${http_code})"
-        echo "    Response: ${response_body}"
-        return 1
-    fi
-}
-
 echo "📥 Importing CCD definition files..."
-
-create_global_search_index
 
 # Import each definition file
 for file_path in "${DEFINITION_FILES[@]}"; do

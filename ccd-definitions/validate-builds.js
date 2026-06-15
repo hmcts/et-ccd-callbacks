@@ -32,7 +32,12 @@ function validateExcelFile(filePath, environment, jurisdiction) {
         row.forEach((cell, colIndex) => {
           if (typeof cell === 'string') {
             // Check for placeholders that weren't replaced
-            if (cell.includes('${ET_COS_URL}') || cell.includes('${CCD_DEF_URL}') || cell.includes('${CCD_DEF_AAC_URL}')) {
+            if (
+              cell.includes('${ET_COS_URL}')
+              || cell.includes('${CCD_DEF_BASE_URL}')
+              || cell.includes('${CCD_DEF_URL}')
+              || cell.includes('${CCD_DEF_AAC_URL}')
+            ) {
               foundPlaceholders.add(cell);
             }
             
@@ -146,4 +151,3 @@ jurisdictions.forEach(jurisdiction => {
 });
 
 console.log('\n✅ Task completed: Build outputs validated per jurisdiction');
-

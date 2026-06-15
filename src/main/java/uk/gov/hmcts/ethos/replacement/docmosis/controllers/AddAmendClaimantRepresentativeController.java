@@ -20,10 +20,13 @@ import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddAmendClaimantRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocClaimantRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 
 import java.io.IOException;
+
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -39,6 +42,8 @@ public class AddAmendClaimantRepresentativeController {
     private final AddAmendClaimantRepresentativeService addAmendClaimantRepresentativeService;
     private final NocClaimantRepresentativeService nocClaimantRepresentativeService;
     private final UserIdamService userIdamService;
+    private final FeatureToggleService featureToggleService;
+    private final CaseFlagsService caseFlagsService;
 
     /**
      * AboutToSubmit for addAmendClaimantRepresentative. Sets the claimant rep's id.
@@ -72,16 +77,24 @@ public class AddAmendClaimantRepresentativeController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public void amendClaimantRepSubmitted(
+    public ResponseEntity<CCDCallbackResponse> amendClaimantRepSubmitted(
             @RequestBody CallbackRequest callbackRequest,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken) {
 
         log.info("AMEND CLAIMANT REPRESENTATIVE SUBMITTED ---> " + LOG_MESSAGE + "{}",
                 callbackRequest.getCaseDetails().getCaseId());
+        CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
+
         try {
             nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest);
+
+            if (featureToggleService.isCaseFlagsEnabled()) {
+                caseFlagsService.setupCaseFlags(caseData);
+            }
         } catch (IOException e) {
             throw new CcdInputOutputException("Failed to update claimant representatives access", e);
         }
+
+        return getCallbackRespEntityNoErrors(caseData);
     }
 }

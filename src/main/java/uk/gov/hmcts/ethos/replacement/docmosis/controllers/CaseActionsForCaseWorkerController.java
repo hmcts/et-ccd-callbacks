@@ -447,7 +447,10 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setPublicCaseName(caseData);
         }
 
-        caseFlagsService.setupCaseFlags(caseData);
+        if (featureToggleService.isCaseFlagsEnabled()) {
+            caseFlagsService.setupCaseFlags(caseData);
+        }
+
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         removeSpacesFromPartyNames(caseData);
         return getCallbackRespEntityNoErrors(caseData);
@@ -500,7 +503,10 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setPublicCaseName(caseData);
         }
 
-        caseFlagsService.setupCaseFlags(caseData);
+        if (featureToggleService.isCaseFlagsEnabled()) {
+            caseFlagsService.setupCaseFlags(caseData);
+        }
+
         caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
         removeSpacesFromPartyNames(caseData);
 
@@ -535,6 +541,10 @@ public class CaseActionsForCaseWorkerController {
 
             if (featureToggleService.isHmcEnabled()) {
                 nocRespondentRepresentativeService.updateNonMyHmctsOrgIds(caseData.getRepCollection());
+            }
+
+            if (featureToggleService.isCaseFlagsEnabled()) {
+                caseFlagsService.setupCaseFlags(caseData);
             }
         }
 

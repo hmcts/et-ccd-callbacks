@@ -22,6 +22,20 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
+    "ID": "claimantRepresentativeFlags",
+    "Label": "Claimant Representative Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "claimantRepresentativeExternalFlags",
+    "Label": "Claimant Representative External Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
     "ID": "flagLauncher",
     "Label": "Flag Launcher",
     "FieldType": "FlagLauncher",
@@ -172,6 +186,146 @@
     "CaseTypeID": "ET_Scotland",
     "ID": "respondent9ExternalFlags",
     "Label": "Respondent 9 External Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representativeFlags",
+    "Label": "Representative Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representative1Flags",
+    "Label": "Representative 1 Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representative2Flags",
+    "Label": "Representative 2 Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representative3Flags",
+    "Label": "Representative 3 Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representative4Flags",
+    "Label": "Representative 4 Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representative5Flags",
+    "Label": "Representative 5 Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representative6Flags",
+    "Label": "Representative 6 Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representative7Flags",
+    "Label": "Representative 7 Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representative8Flags",
+    "Label": "Representative 8 Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representative9Flags",
+    "Label": "Representative 9 Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representativeExternalFlags",
+    "Label": "Representative External Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representative1ExternalFlags",
+    "Label": "Representative 1 External Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representative2ExternalFlags",
+    "Label": "Representative 2 External Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representative3ExternalFlags",
+    "Label": "Representative 3 External Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representative4ExternalFlags",
+    "Label": "Representative 4 External Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representative5ExternalFlags",
+    "Label": "Representative 5 External Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representative6ExternalFlags",
+    "Label": "Representative 6 External Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representative7ExternalFlags",
+    "Label": "Representative 7 External Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representative8ExternalFlags",
+    "Label": "Representative 8 External Flags",
+    "FieldType": "Flags",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "representative9ExternalFlags",
+    "Label": "Representative 9 External Flags",
     "FieldType": "Flags",
     "SecurityClassification": "Public"
   },

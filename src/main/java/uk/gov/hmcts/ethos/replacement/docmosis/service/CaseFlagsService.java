@@ -16,6 +16,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.ACTIVE;
@@ -31,92 +33,125 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Service
 public class CaseFlagsService {
     private static final String GRANTED = "Granted";
+    private static final int NOT_INDEXED = -1;
 
-    public static final String INTERNAL    = "Internal";
-    public static final String EXTERNAL    = "External";
-    public static final String CLAIMANT    = "Claimant";
-    public static final String RESPONDENT1  = "Respondent 1";
-    public static final String RESPONDENT2  = "Respondent 2";
-    public static final String RESPONDENT3  = "Respondent 3";
-    public static final String RESPONDENT4  = "Respondent 4";
-    public static final String RESPONDENT5  = "Respondent 5";
-    public static final String RESPONDENT6  = "Respondent 6";
-    public static final String RESPONDENT7  = "Respondent 7";
-    public static final String RESPONDENT8  = "Respondent 8";
-    public static final String RESPONDENT9  = "Respondent 9";
-    public static final String RESPONDENT10  = "Respondent 10";
+    public static final String INTERNAL = "Internal";
+    public static final String EXTERNAL = "External";
+    public static final String CLAIMANT = "Claimant";
+    public static final String RESPONDENT1 = "Respondent 1";
+    public static final String RESPONDENT2 = "Respondent 2";
+    public static final String RESPONDENT3 = "Respondent 3";
+    public static final String RESPONDENT4 = "Respondent 4";
+    public static final String RESPONDENT5 = "Respondent 5";
+    public static final String RESPONDENT6 = "Respondent 6";
+    public static final String RESPONDENT7 = "Respondent 7";
+    public static final String RESPONDENT8 = "Respondent 8";
+    public static final String RESPONDENT9 = "Respondent 9";
+    public static final String RESPONDENT10 = "Respondent 10";
+    public static final String CLAIMANT_REPRESENTATIVE = "Claimant Representative";
+    public static final String REPRESENTATIVE1 = "Representative 1";
+    public static final String REPRESENTATIVE2 = "Representative 2";
+    public static final String REPRESENTATIVE3 = "Representative 3";
+    public static final String REPRESENTATIVE4 = "Representative 4";
+    public static final String REPRESENTATIVE5 = "Representative 5";
+    public static final String REPRESENTATIVE6 = "Representative 6";
+    public static final String REPRESENTATIVE7 = "Representative 7";
+    public static final String REPRESENTATIVE8 = "Representative 8";
+    public static final String REPRESENTATIVE9 = "Representative 9";
+    public static final String REPRESENTATIVE10 = "Representative 10";
+
+    private static final List<PartyFlag> PARTY_FLAGS = List.of(
+            claimantFlag(CaseData::getClaimantFlags, CaseData::setClaimantFlags, INTERNAL),
+            claimantFlag(CaseData::getClaimantExternalFlags, CaseData::setClaimantExternalFlags, EXTERNAL),
+
+            respondentFlag(CaseData::getRespondentFlags, CaseData::setRespondentFlags, RESPONDENT1, INTERNAL, 0),
+            respondentFlag(CaseData::getRespondentExternalFlags, CaseData::setRespondentExternalFlags,
+                    RESPONDENT1, EXTERNAL, 0),
+            respondentFlag(CaseData::getRespondent1Flags, CaseData::setRespondent1Flags, RESPONDENT2, INTERNAL, 1),
+            respondentFlag(CaseData::getRespondent1ExternalFlags, CaseData::setRespondent1ExternalFlags,
+                    RESPONDENT2, EXTERNAL, 1),
+            respondentFlag(CaseData::getRespondent2Flags, CaseData::setRespondent2Flags, RESPONDENT3, INTERNAL, 2),
+            respondentFlag(CaseData::getRespondent2ExternalFlags, CaseData::setRespondent2ExternalFlags,
+                    RESPONDENT3, EXTERNAL, 2),
+            respondentFlag(CaseData::getRespondent3Flags, CaseData::setRespondent3Flags, RESPONDENT4, INTERNAL, 3),
+            respondentFlag(CaseData::getRespondent3ExternalFlags, CaseData::setRespondent3ExternalFlags,
+                    RESPONDENT4, EXTERNAL, 3),
+            respondentFlag(CaseData::getRespondent4Flags, CaseData::setRespondent4Flags, RESPONDENT5, INTERNAL, 4),
+            respondentFlag(CaseData::getRespondent4ExternalFlags, CaseData::setRespondent4ExternalFlags,
+                    RESPONDENT5, EXTERNAL, 4),
+            respondentFlag(CaseData::getRespondent5Flags, CaseData::setRespondent5Flags, RESPONDENT6, INTERNAL, 5),
+            respondentFlag(CaseData::getRespondent5ExternalFlags, CaseData::setRespondent5ExternalFlags,
+                    RESPONDENT6, EXTERNAL, 5),
+            respondentFlag(CaseData::getRespondent6Flags, CaseData::setRespondent6Flags, RESPONDENT7, INTERNAL, 6),
+            respondentFlag(CaseData::getRespondent6ExternalFlags, CaseData::setRespondent6ExternalFlags,
+                    RESPONDENT7, EXTERNAL, 6),
+            respondentFlag(CaseData::getRespondent7Flags, CaseData::setRespondent7Flags, RESPONDENT8, INTERNAL, 7),
+            respondentFlag(CaseData::getRespondent7ExternalFlags, CaseData::setRespondent7ExternalFlags,
+                    RESPONDENT8, EXTERNAL, 7),
+            respondentFlag(CaseData::getRespondent8Flags, CaseData::setRespondent8Flags, RESPONDENT9, INTERNAL, 8),
+            respondentFlag(CaseData::getRespondent8ExternalFlags, CaseData::setRespondent8ExternalFlags,
+                    RESPONDENT9, EXTERNAL, 8),
+            respondentFlag(CaseData::getRespondent9Flags, CaseData::setRespondent9Flags, RESPONDENT10,
+                    INTERNAL, 9),
+            respondentFlag(CaseData::getRespondent9ExternalFlags, CaseData::setRespondent9ExternalFlags,
+                    RESPONDENT10, EXTERNAL, 9),
+
+            claimantRepresentativeFlag(CaseData::getClaimantRepresentativeFlags,
+                    CaseData::setClaimantRepresentativeFlags, INTERNAL),
+            claimantRepresentativeFlag(CaseData::getClaimantRepresentativeExternalFlags,
+                    CaseData::setClaimantRepresentativeExternalFlags, EXTERNAL),
+
+            representativeFlag(CaseData::getRepresentativeFlags, CaseData::setRepresentativeFlags,
+                    REPRESENTATIVE1, INTERNAL, 0),
+            representativeFlag(CaseData::getRepresentativeExternalFlags, CaseData::setRepresentativeExternalFlags,
+                    REPRESENTATIVE1, EXTERNAL, 0),
+            representativeFlag(CaseData::getRepresentative1Flags, CaseData::setRepresentative1Flags,
+                    REPRESENTATIVE2, INTERNAL, 1),
+            representativeFlag(CaseData::getRepresentative1ExternalFlags, CaseData::setRepresentative1ExternalFlags,
+                    REPRESENTATIVE2, EXTERNAL, 1),
+            representativeFlag(CaseData::getRepresentative2Flags, CaseData::setRepresentative2Flags,
+                    REPRESENTATIVE3, INTERNAL, 2),
+            representativeFlag(CaseData::getRepresentative2ExternalFlags, CaseData::setRepresentative2ExternalFlags,
+                    REPRESENTATIVE3, EXTERNAL, 2),
+            representativeFlag(CaseData::getRepresentative3Flags, CaseData::setRepresentative3Flags,
+                    REPRESENTATIVE4, INTERNAL, 3),
+            representativeFlag(CaseData::getRepresentative3ExternalFlags, CaseData::setRepresentative3ExternalFlags,
+                    REPRESENTATIVE4, EXTERNAL, 3),
+            representativeFlag(CaseData::getRepresentative4Flags, CaseData::setRepresentative4Flags,
+                    REPRESENTATIVE5, INTERNAL, 4),
+            representativeFlag(CaseData::getRepresentative4ExternalFlags, CaseData::setRepresentative4ExternalFlags,
+                    REPRESENTATIVE5, EXTERNAL, 4),
+            representativeFlag(CaseData::getRepresentative5Flags, CaseData::setRepresentative5Flags,
+                    REPRESENTATIVE6, INTERNAL, 5),
+            representativeFlag(CaseData::getRepresentative5ExternalFlags, CaseData::setRepresentative5ExternalFlags,
+                    REPRESENTATIVE6, EXTERNAL, 5),
+            representativeFlag(CaseData::getRepresentative6Flags, CaseData::setRepresentative6Flags,
+                    REPRESENTATIVE7, INTERNAL, 6),
+            representativeFlag(CaseData::getRepresentative6ExternalFlags, CaseData::setRepresentative6ExternalFlags,
+                    REPRESENTATIVE7, EXTERNAL, 6),
+            representativeFlag(CaseData::getRepresentative7Flags, CaseData::setRepresentative7Flags,
+                    REPRESENTATIVE8, INTERNAL, 7),
+            representativeFlag(CaseData::getRepresentative7ExternalFlags, CaseData::setRepresentative7ExternalFlags,
+                    REPRESENTATIVE8, EXTERNAL, 7),
+            representativeFlag(CaseData::getRepresentative8Flags, CaseData::setRepresentative8Flags,
+                    REPRESENTATIVE9, INTERNAL, 8),
+            representativeFlag(CaseData::getRepresentative8ExternalFlags, CaseData::setRepresentative8ExternalFlags,
+                    REPRESENTATIVE9, EXTERNAL, 8),
+            representativeFlag(CaseData::getRepresentative9Flags, CaseData::setRepresentative9Flags,
+                    REPRESENTATIVE10, INTERNAL, 9),
+            representativeFlag(CaseData::getRepresentative9ExternalFlags, CaseData::setRepresentative9ExternalFlags,
+                    REPRESENTATIVE10, EXTERNAL, 9)
+    );
 
     public boolean caseFlagsSetupRequired(CaseData caseData) {
-        return (caseData.getCaseFlags() == null
-            || caseData.getClaimantFlags() == null
-            || StringUtils.isEmpty(caseData.getClaimantFlags().getRoleOnCase())
-            || caseData.getClaimantExternalFlags() == null
-            || StringUtils.isEmpty(caseData.getClaimantExternalFlags().getRoleOnCase())
-            || (!caseData.getRespondentCollection().isEmpty()
-                && (caseData.getRespondentFlags() == null
-                || StringUtils.isEmpty(caseData.getRespondentFlags().getRoleOnCase())))
-            || (!caseData.getRespondentCollection().isEmpty()
-                && (caseData.getRespondentExternalFlags() == null
-                || StringUtils.isEmpty(caseData.getRespondentExternalFlags().getRoleOnCase())))
-            || (caseData.getRespondentCollection().size() > 1
-                && (caseData.getRespondent1Flags() == null
-                || StringUtils.isEmpty(caseData.getRespondent1Flags().getRoleOnCase())))
-            || (caseData.getRespondentCollection().size() > 1
-                && (caseData.getRespondent1ExternalFlags() == null
-                || StringUtils.isEmpty(caseData.getRespondent1ExternalFlags().getRoleOnCase())))
-            || (caseData.getRespondentCollection().size() > 2
-                && (caseData.getRespondent2Flags() == null
-                || StringUtils.isEmpty(caseData.getRespondent2Flags().getRoleOnCase())))
-            || (caseData.getRespondentCollection().size() > 2
-                && (caseData.getRespondent2ExternalFlags() == null
-                || StringUtils.isEmpty(caseData.getRespondent2ExternalFlags().getRoleOnCase())))
-            || (caseData.getRespondentCollection().size() > 3
-                && (caseData.getRespondent3Flags() == null
-                || StringUtils.isEmpty(caseData.getRespondent3Flags().getRoleOnCase())))
-            || (caseData.getRespondentCollection().size() > 3
-                && (caseData.getRespondent3ExternalFlags() == null
-                || StringUtils.isEmpty(caseData.getRespondent3ExternalFlags().getRoleOnCase())))
-            || (caseData.getRespondentCollection().size() > 4
-                && (caseData.getRespondent4Flags() == null
-                || StringUtils.isEmpty(caseData.getRespondent4Flags().getRoleOnCase())))
-            || (caseData.getRespondentCollection().size() > 4
-                && (caseData.getRespondent4ExternalFlags() == null
-                || StringUtils.isEmpty(caseData.getRespondent4ExternalFlags().getRoleOnCase())))
-            || (caseData.getRespondentCollection().size() > 5
-                && (caseData.getRespondent5Flags() == null
-                || StringUtils.isEmpty(caseData.getRespondent5Flags().getRoleOnCase())))
-            || (caseData.getRespondentCollection().size() > 5
-                && (caseData.getRespondent5ExternalFlags() == null
-                || StringUtils.isEmpty(caseData.getRespondent5ExternalFlags().getRoleOnCase())))
-            || (caseData.getRespondentCollection().size() > 6
-                && (caseData.getRespondent6Flags() == null
-                || StringUtils.isEmpty(caseData.getRespondent6Flags().getRoleOnCase())))
-            || (caseData.getRespondentCollection().size() > 6
-                && (caseData.getRespondent6ExternalFlags() == null
-                || StringUtils.isEmpty(caseData.getRespondent6ExternalFlags().getRoleOnCase())))
-            || (caseData.getRespondentCollection().size() > 7
-                && (caseData.getRespondent7Flags() == null
-                || StringUtils.isEmpty(caseData.getRespondent7Flags().getRoleOnCase())))
-            || (caseData.getRespondentCollection().size() > 7
-                && (caseData.getRespondent7ExternalFlags() == null
-                || StringUtils.isEmpty(caseData.getRespondent7ExternalFlags().getRoleOnCase())))
-            || (caseData.getRespondentCollection().size() > 8
-                && (caseData.getRespondent8Flags() == null
-                || StringUtils.isEmpty(caseData.getRespondent8Flags().getRoleOnCase())))
-            || (caseData.getRespondentCollection().size() > 8
-                && (caseData.getRespondent8ExternalFlags() == null
-                || StringUtils.isEmpty(caseData.getRespondent8ExternalFlags().getRoleOnCase())))
-            || (caseData.getRespondentCollection().size() > 9
-                && (caseData.getRespondent9Flags() == null
-                || StringUtils.isEmpty(caseData.getRespondent9Flags().getRoleOnCase())))
-            || (caseData.getRespondentCollection().size() > 9
-                && (caseData.getRespondent9ExternalFlags() == null
-                || StringUtils.isEmpty(caseData.getRespondent9ExternalFlags().getRoleOnCase())))
-            );
+        return caseData.getCaseFlags() == null
+                || PARTY_FLAGS.stream()
+                        .filter(flag -> isRequired(caseData, flag))
+                        .anyMatch(flag -> isMissingRole(caseData, flag));
     }
 
     /**
-     * Setup case flags for Claimant, Respondent and Case level.
+     * Setup case flags for Claimant, Respondent, Representative and Case level.
      *
      * @param caseData Data about the current case
      */
@@ -125,352 +160,19 @@ public class CaseFlagsService {
             caseData.setCaseFlags(CaseFlagsType.builder().build());
         }
 
-        if (caseData.getClaimantFlags() == null
-                || StringUtils.isEmpty(caseData.getClaimantFlags().getRoleOnCase())) {
-            caseData.setClaimantFlags(CaseFlagsType.builder()
-                    .partyName(caseData.getClaimant())
-                    .roleOnCase(CLAIMANT)
-                    .groupId(CLAIMANT)
-                    .visibility(INTERNAL)
-                    .build()
-            );
-        } else if (!caseData.getClaimant().equals(caseData.getClaimantFlags().getPartyName())) {
-            caseData.getClaimantFlags().setPartyName(caseData.getClaimant());
-        }
-
-        if (caseData.getClaimantExternalFlags() == null
-                || StringUtils.isEmpty(caseData.getClaimantExternalFlags().getRoleOnCase())) {
-            caseData.setClaimantExternalFlags(CaseFlagsType.builder()
-                    .partyName(caseData.getClaimant())
-                    .roleOnCase(CLAIMANT)
-                    .groupId(CLAIMANT)
-                    .visibility(EXTERNAL)
-                    .build()
-            );
-        } else if (!caseData.getClaimant().equals(caseData.getClaimantExternalFlags().getPartyName())) {
-            caseData.getClaimantExternalFlags().setPartyName(caseData.getClaimant());
-        }
-
-        if (!caseData.getRespondentCollection().isEmpty()) {
-            String respondent = caseData.getRespondentCollection().getFirst().getValue().getRespondentName();
-            if (caseData.getRespondentFlags() == null
-                    || StringUtils.isEmpty(caseData.getRespondentFlags().getRoleOnCase())) {
-                caseData.setRespondentFlags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT1)
-                        .groupId(RESPONDENT1)
-                        .visibility(INTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondentFlags().getPartyName())) {
-                caseData.getRespondentFlags().setPartyName(respondent);
-            }
-
-            if (caseData.getRespondentExternalFlags() == null
-                    || StringUtils.isEmpty(caseData.getRespondentExternalFlags().getRoleOnCase())) {
-                caseData.setRespondentExternalFlags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT1)
-                        .groupId(RESPONDENT1)
-                        .visibility(EXTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondentExternalFlags().getPartyName())) {
-                caseData.getRespondentExternalFlags().setPartyName(respondent);
-            }
-        }
-
-        if (caseData.getRespondentCollection().size() > 1) {
-            String respondent = caseData.getRespondentCollection().get(1).getValue().getRespondentName();
-            if (caseData.getRespondent1Flags() == null
-                    || StringUtils.isEmpty(caseData.getRespondent1Flags().getRoleOnCase())) {
-                caseData.setRespondent1Flags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT2)
-                        .groupId(RESPONDENT2)
-                        .visibility(INTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondent1Flags().getPartyName())) {
-                caseData.getRespondent1Flags().setPartyName(respondent);
-            }
-
-            if (caseData.getRespondent1ExternalFlags() == null
-                    || StringUtils.isEmpty(caseData.getRespondent1ExternalFlags().getRoleOnCase())) {
-                caseData.setRespondent1ExternalFlags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT2)
-                        .groupId(RESPONDENT2)
-                        .visibility(EXTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondent1ExternalFlags().getPartyName())) {
-                caseData.getRespondent1ExternalFlags().setPartyName(respondent);
-            }
-        }
-
-        if (caseData.getRespondentCollection().size() > 2) {
-            String respondent = caseData.getRespondentCollection().get(2).getValue().getRespondentName();
-            if (caseData.getRespondent2Flags() == null
-                    || StringUtils.isEmpty(caseData.getRespondent2Flags().getRoleOnCase())) {
-                caseData.setRespondent2Flags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT3)
-                        .groupId(RESPONDENT3)
-                        .visibility(INTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondent2Flags().getPartyName())) {
-                caseData.getRespondent2Flags().setPartyName(respondent);
-            }
-
-            if (caseData.getRespondent2ExternalFlags() == null
-                    || StringUtils.isEmpty(caseData.getRespondent2ExternalFlags().getRoleOnCase())) {
-                caseData.setRespondent2ExternalFlags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT3)
-                        .groupId(RESPONDENT3)
-                        .visibility(EXTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondent2ExternalFlags().getPartyName())) {
-                caseData.getRespondent2ExternalFlags().setPartyName(respondent);
-            }
-        }
-
-        if (caseData.getRespondentCollection().size() > 3) {
-            String respondent = caseData.getRespondentCollection().get(3).getValue().getRespondentName();
-            if (caseData.getRespondent3Flags() == null
-                    || StringUtils.isEmpty(caseData.getRespondent3Flags().getRoleOnCase())) {
-                caseData.setRespondent3Flags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT4)
-                        .groupId(RESPONDENT4)
-                        .visibility(INTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondent3Flags().getPartyName())) {
-                caseData.getRespondent3Flags().setPartyName(respondent);
-            }
-
-            if (caseData.getRespondent3ExternalFlags() == null
-                    || StringUtils.isEmpty(caseData.getRespondent3ExternalFlags().getRoleOnCase())) {
-                caseData.setRespondent3ExternalFlags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT4)
-                        .groupId(RESPONDENT4)
-                        .visibility(EXTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondent3ExternalFlags().getPartyName())) {
-                caseData.getRespondent3ExternalFlags().setPartyName(respondent);
-            }
-        }
-
-        if (caseData.getRespondentCollection().size() > 4) {
-            String respondent = caseData.getRespondentCollection().get(4).getValue().getRespondentName();
-            if (caseData.getRespondent4Flags() == null
-                    || StringUtils.isEmpty(caseData.getRespondent4Flags().getRoleOnCase())) {
-                caseData.setRespondent4Flags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT5)
-                        .groupId(RESPONDENT5)
-                        .visibility(INTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondent4Flags().getPartyName())) {
-                caseData.getRespondent4Flags().setPartyName(respondent);
-            }
-
-            if (caseData.getRespondent4ExternalFlags() == null
-                    || StringUtils.isEmpty(caseData.getRespondent4ExternalFlags().getRoleOnCase())) {
-                caseData.setRespondent4ExternalFlags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT5)
-                        .groupId(RESPONDENT5)
-                        .visibility(EXTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondent4ExternalFlags().getPartyName())) {
-                caseData.getRespondent4ExternalFlags().setPartyName(respondent);
-            }
-        }
-
-        if (caseData.getRespondentCollection().size() > 5) {
-            String respondent = caseData.getRespondentCollection().get(5).getValue().getRespondentName();
-            if (caseData.getRespondent5Flags() == null
-                    || StringUtils.isEmpty(caseData.getRespondent5Flags().getRoleOnCase())) {
-                caseData.setRespondent5Flags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT6)
-                        .groupId(RESPONDENT6)
-                        .visibility(INTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondent5Flags().getPartyName())) {
-                caseData.getRespondent5Flags().setPartyName(respondent);
-            }
-
-            if (caseData.getRespondent5ExternalFlags() == null
-                    || StringUtils.isEmpty(caseData.getRespondent5ExternalFlags().getRoleOnCase())) {
-                caseData.setRespondent5ExternalFlags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT6)
-                        .groupId(RESPONDENT6)
-                        .visibility(EXTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondent5ExternalFlags().getPartyName())) {
-                caseData.getRespondent5ExternalFlags().setPartyName(respondent);
-            }
-        }
-
-        if (caseData.getRespondentCollection().size() > 6) {
-            String respondent = caseData.getRespondentCollection().get(6).getValue().getRespondentName();
-            if (caseData.getRespondent6Flags() == null
-                    || StringUtils.isEmpty(caseData.getRespondent6Flags().getRoleOnCase())) {
-                caseData.setRespondent6Flags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT7)
-                        .groupId(RESPONDENT7)
-                        .visibility(INTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondent6Flags().getPartyName())) {
-                caseData.getRespondent6Flags().setPartyName(respondent);
-            }
-
-            if (caseData.getRespondent6ExternalFlags() == null
-                    || StringUtils.isEmpty(caseData.getRespondent6ExternalFlags().getRoleOnCase())) {
-                caseData.setRespondent6ExternalFlags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT7)
-                        .groupId(RESPONDENT7)
-                        .visibility(EXTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondent6ExternalFlags().getPartyName())) {
-                caseData.getRespondent6ExternalFlags().setPartyName(respondent);
-            }
-        }
-
-        if (caseData.getRespondentCollection().size() > 7) {
-            String respondent = caseData.getRespondentCollection().get(7).getValue().getRespondentName();
-            if (caseData.getRespondent7Flags() == null
-                    || StringUtils.isEmpty(caseData.getRespondent7Flags().getRoleOnCase())) {
-                caseData.setRespondent7Flags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT8)
-                        .groupId(RESPONDENT8)
-                        .visibility(INTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondent7Flags().getPartyName())) {
-                caseData.getRespondent7Flags().setPartyName(respondent);
-            }
-
-            if (caseData.getRespondent7ExternalFlags() == null
-                    || StringUtils.isEmpty(caseData.getRespondent7ExternalFlags().getRoleOnCase())) {
-                caseData.setRespondent7ExternalFlags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT8)
-                        .groupId(RESPONDENT8)
-                        .visibility(EXTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondent7ExternalFlags().getPartyName())) {
-                caseData.getRespondent7ExternalFlags().setPartyName(respondent);
-            }
-        }
-
-        if (caseData.getRespondentCollection().size() > 8) {
-            String respondent = caseData.getRespondentCollection().get(8).getValue().getRespondentName();
-            if (caseData.getRespondent8Flags() == null
-                    || StringUtils.isEmpty(caseData.getRespondent8Flags().getRoleOnCase())) {
-                caseData.setRespondent8Flags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT9)
-                        .groupId(RESPONDENT9)
-                        .visibility(INTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondent8Flags().getPartyName())) {
-                caseData.getRespondent8Flags().setPartyName(respondent);
-            }
-
-            if (caseData.getRespondent8ExternalFlags() == null
-                    || StringUtils.isEmpty(caseData.getRespondent8ExternalFlags().getRoleOnCase())) {
-                caseData.setRespondent8ExternalFlags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT9)
-                        .groupId(RESPONDENT9)
-                        .visibility(EXTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondent8ExternalFlags().getPartyName())) {
-                caseData.getRespondent8ExternalFlags().setPartyName(respondent);
-            }
-        }
-
-        if (caseData.getRespondentCollection().size() > 9) {
-            String respondent = caseData.getRespondentCollection().get(9).getValue().getRespondentName();
-            if (caseData.getRespondent9Flags() == null
-                    || StringUtils.isEmpty(caseData.getRespondent9Flags().getRoleOnCase())) {
-                caseData.setRespondent9Flags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT10)
-                        .groupId(RESPONDENT10)
-                        .visibility(INTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondent9Flags().getPartyName())) {
-                caseData.getRespondent9Flags().setPartyName(respondent);
-            }
-
-            if (caseData.getRespondent9ExternalFlags() == null
-                    || StringUtils.isEmpty(caseData.getRespondent9ExternalFlags().getRoleOnCase())) {
-                caseData.setRespondent9ExternalFlags(CaseFlagsType.builder()
-                        .partyName(respondent)
-                        .roleOnCase(RESPONDENT10)
-                        .groupId(RESPONDENT10)
-                        .visibility(EXTERNAL)
-                        .build()
-                );
-            } else if (!respondent.equals(caseData.getRespondent9ExternalFlags().getPartyName())) {
-                caseData.getRespondent9ExternalFlags().setPartyName(respondent);
-            }
-        }
+        PARTY_FLAGS.stream()
+                .filter(flag -> hasParty(caseData, flag))
+                .forEach(flag -> setupPartyFlag(caseData, flag));
     }
 
     /**
-     * Sets case flags for Claimant, Respondent and Case level to null.
+     * Sets case flags for Claimant, Respondent, Representative and Case level to null.
      *
      * @param caseData Data about the current case
      */
     public void rollbackCaseFlags(CaseData caseData) {
         caseData.setCaseFlags(null);
-        caseData.setClaimantFlags(null);
-        caseData.setClaimantExternalFlags(null);
-        caseData.setRespondentFlags(null);
-        caseData.setRespondentExternalFlags(null);
-        caseData.setRespondent1Flags(null);
-        caseData.setRespondent1ExternalFlags(null);
-        caseData.setRespondent2Flags(null);
-        caseData.setRespondent2ExternalFlags(null);
-        caseData.setRespondent3Flags(null);
-        caseData.setRespondent3ExternalFlags(null);
-        caseData.setRespondent4Flags(null);
-        caseData.setRespondent4ExternalFlags(null);
-        caseData.setRespondent5Flags(null);
-        caseData.setRespondent5ExternalFlags(null);
-        caseData.setRespondent6Flags(null);
-        caseData.setRespondent6ExternalFlags(null);
-        caseData.setRespondent7Flags(null);
-        caseData.setRespondent7ExternalFlags(null);
-        caseData.setRespondent8Flags(null);
-        caseData.setRespondent8ExternalFlags(null);
-        caseData.setRespondent9Flags(null);
-        caseData.setRespondent9ExternalFlags(null);
+        PARTY_FLAGS.forEach(flag -> flag.clear(caseData));
     }
 
     /**
@@ -500,6 +202,104 @@ public class CaseFlagsService {
         caseData.setPrivateHearingRequiredFlag(shouldBePrivate ? YES : NO);
     }
 
+    private static PartyFlag claimantFlag(
+            Function<CaseData, CaseFlagsType> getter,
+            BiConsumer<CaseData, CaseFlagsType> setter,
+            String visibility) {
+        return new PartyFlag(getter, setter, PartyType.CLAIMANT, CLAIMANT, visibility, NOT_INDEXED);
+    }
+
+    private static PartyFlag respondentFlag(
+            Function<CaseData, CaseFlagsType> getter,
+            BiConsumer<CaseData, CaseFlagsType> setter,
+            String roleOnCase,
+            String visibility,
+            int index) {
+        return new PartyFlag(getter, setter, PartyType.RESPONDENT, roleOnCase, visibility, index);
+    }
+
+    private static PartyFlag claimantRepresentativeFlag(
+            Function<CaseData, CaseFlagsType> getter,
+            BiConsumer<CaseData, CaseFlagsType> setter,
+            String visibility) {
+        return new PartyFlag(getter, setter, PartyType.CLAIMANT_REPRESENTATIVE, CLAIMANT_REPRESENTATIVE,
+                visibility, NOT_INDEXED);
+    }
+
+    private static PartyFlag representativeFlag(
+            Function<CaseData, CaseFlagsType> getter,
+            BiConsumer<CaseData, CaseFlagsType> setter,
+            String roleOnCase,
+            String visibility,
+            int index) {
+        return new PartyFlag(getter, setter, PartyType.RESPONDENT_REPRESENTATIVE, roleOnCase, visibility, index);
+    }
+
+    private static boolean isRequired(CaseData caseData, PartyFlag flag) {
+        return switch (flag.partyType()) {
+            case CLAIMANT, CLAIMANT_REPRESENTATIVE -> true;
+            case RESPONDENT -> respondentCount(caseData) > flag.index();
+            case RESPONDENT_REPRESENTATIVE -> representativeCount(caseData) > flag.index();
+        };
+    }
+
+    private static boolean hasParty(CaseData caseData, PartyFlag flag) {
+        return switch (flag.partyType()) {
+            case CLAIMANT -> true;
+            case RESPONDENT -> respondentCount(caseData) > flag.index();
+            case CLAIMANT_REPRESENTATIVE -> caseData.getRepresentativeClaimantType() != null;
+            case RESPONDENT_REPRESENTATIVE -> representativeCount(caseData) > flag.index();
+        };
+    }
+
+    private static boolean isMissingRole(CaseData caseData, PartyFlag flag) {
+        CaseFlagsType flags = flag.get(caseData);
+        return flags == null || StringUtils.isEmpty(flags.getRoleOnCase());
+    }
+
+    private static void setupPartyFlag(CaseData caseData, PartyFlag flag) {
+        String partyName = getPartyName(caseData, flag);
+        CaseFlagsType existingFlag = flag.get(caseData);
+
+        if (existingFlag == null || StringUtils.isEmpty(existingFlag.getRoleOnCase())) {
+            flag.set(caseData, createShellFlag(partyName, flag.roleOnCase(), flag.visibility()));
+        } else if (!Objects.equals(partyName, existingFlag.getPartyName())) {
+            existingFlag.setPartyName(partyName);
+        }
+    }
+
+    private static CaseFlagsType createShellFlag(String partyName, String roleOnCase, String visibility) {
+        return CaseFlagsType.builder()
+                .partyName(partyName)
+                .roleOnCase(roleOnCase)
+                .groupId(roleOnCase)
+                .visibility(visibility)
+                .build();
+    }
+
+    private static String getPartyName(CaseData caseData, PartyFlag flag) {
+        return switch (flag.partyType()) {
+            case CLAIMANT -> caseData.getClaimant();
+            case RESPONDENT -> caseData.getRespondentCollection()
+                    .get(flag.index())
+                    .getValue()
+                    .getRespondentName();
+            case CLAIMANT_REPRESENTATIVE -> caseData.getRepresentativeClaimantType().getNameOfRepresentative();
+            case RESPONDENT_REPRESENTATIVE -> caseData.getRepCollection()
+                    .get(flag.index())
+                    .getValue()
+                    .getNameOfRepresentative();
+        };
+    }
+
+    private static int respondentCount(CaseData caseData) {
+        return caseData.getRespondentCollection() == null ? 0 : caseData.getRespondentCollection().size();
+    }
+
+    private static int representativeCount(CaseData caseData) {
+        return caseData.getRepCollection() == null ? 0 : caseData.getRepCollection().size();
+    }
+
     private boolean isFlaggedForRestrictedReporting(CaseData caseData) {
         RestrictedReportingType restricted = caseData.getRestrictedReporting();
         return restricted != null && (YES.equals(restricted.getRule503b()) || YES.equals(restricted.getImposed()));
@@ -526,31 +326,11 @@ public class CaseFlagsService {
     }
 
     private ListTypeItem<FlagDetailType> getPartyCaseFlags(CaseData caseData) {
-        ListTypeItem<FlagDetailType> partyLevel = ListTypeItem.concat(
-                caseData.getClaimantFlags().getDetails(),
-                caseData.getClaimantExternalFlags().getDetails()
-        );
+        ListTypeItem<FlagDetailType> partyLevel = new ListTypeItem<>();
 
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondentFlags());
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondentExternalFlags());
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondent1Flags());
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondent1ExternalFlags());
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondent2Flags());
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondent2ExternalFlags());
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondent3Flags());
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondent3ExternalFlags());
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondent4Flags());
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondent4ExternalFlags());
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondent5Flags());
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondent5ExternalFlags());
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondent6Flags());
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondent6ExternalFlags());
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondent7Flags());
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondent7ExternalFlags());
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondent8Flags());
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondent8ExternalFlags());
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondent9Flags());
-        partyLevel = appendDetailsIfPresent(partyLevel, caseData.getRespondent9ExternalFlags());
+        for (PartyFlag flag : PARTY_FLAGS) {
+            partyLevel = appendDetailsIfPresent(partyLevel, flag.get(caseData));
+        }
 
         return partyLevel;
     }
@@ -577,5 +357,33 @@ public class CaseFlagsService {
                 .map(o -> findFlagByName(flags, o))
                 .filter(Objects::nonNull)
                 .anyMatch(o -> ACTIVE.equals(o.getStatus()));
+    }
+
+    private enum PartyType {
+        CLAIMANT,
+        RESPONDENT,
+        CLAIMANT_REPRESENTATIVE,
+        RESPONDENT_REPRESENTATIVE
+    }
+
+    private record PartyFlag(
+            Function<CaseData, CaseFlagsType> getter,
+            BiConsumer<CaseData, CaseFlagsType> setter,
+            PartyType partyType,
+            String roleOnCase,
+            String visibility,
+            int index) {
+
+        private CaseFlagsType get(CaseData caseData) {
+            return getter.apply(caseData);
+        }
+
+        private void set(CaseData caseData, CaseFlagsType flags) {
+            setter.accept(caseData, flags);
+        }
+
+        private void clear(CaseData caseData) {
+            setter.accept(caseData, null);
+        }
     }
 }

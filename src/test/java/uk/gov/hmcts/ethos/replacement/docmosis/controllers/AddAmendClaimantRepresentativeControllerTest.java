@@ -9,10 +9,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddAmendClaimantRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocClaimantRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScheduledTaskRunner;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
@@ -49,6 +51,10 @@ class AddAmendClaimantRepresentativeControllerTest {
     private NocClaimantRepresentativeService nocClaimantRepresentativeService;
     @MockitoBean
     private UserIdamService userIdamService;
+    @MockitoBean
+    private FeatureToggleService featureToggleService;
+    @MockitoBean
+    private CaseFlagsService caseFlagsService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -56,16 +62,22 @@ class AddAmendClaimantRepresentativeControllerTest {
     private JsonMapper jsonMapper;
 
     private CCDRequest ccdRequest;
+    private CallbackRequest callbackRequest;
 
     @BeforeEach
     void setUp() {
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseId("1234");
 
         caseDetails.getCaseData().setEthosCaseReference("1234");
 
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseDetails.getCaseData())
+                .build();
+        callbackRequest = CallbackRequest.builder()
+                .caseDetails(caseDetails)
+                .caseDetailsBefore(caseDetails)
                 .build();
     }
 
@@ -88,16 +100,36 @@ class AddAmendClaimantRepresentativeControllerTest {
     @Test
     void testAmendClaimantRepSubmitted() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        UserDetails userDetails = new UserDetails();
-        userDetails.setEmail("test@test.com");
-        when(userIdamService.getUserDetails(any())).thenReturn(userDetails);
         mockMvc.perform(post(SUBMITTED_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
+                        .content(jsonMapper.toJson(callbackRequest))
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
 
         verify(nocClaimantRepresentativeService, times(1))
                 .updateClaimantRepAccess(any());
+        verify(caseFlagsService, times(0)).setupCaseFlags(any());
+    }
+
+    @Test
+    void testAmendClaimantRepSubmittedSetsUpCaseFlagsWhenEnabled() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+
+        mockMvc.perform(post(SUBMITTED_URL)
+                        .content(jsonMapper.toJson(callbackRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+
+        verify(nocClaimantRepresentativeService, times(1))
+                .updateClaimantRepAccess(any());
+        verify(caseFlagsService, times(1)).setupCaseFlags(any());
     }
 }

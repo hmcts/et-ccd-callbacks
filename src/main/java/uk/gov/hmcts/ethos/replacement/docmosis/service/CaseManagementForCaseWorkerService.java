@@ -46,6 +46,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -735,41 +737,37 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void updateNocAnswers(CaseData caseData) {
-        List<RespondentSumTypeItem> respondentType = caseData.getRespondentCollection();
+        List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
 
-        for (int i = 0; i < respondentType.size(); i++) {
-            NoticeOfChangeAnswers existing = switch (i) {
-                case 0 -> caseData.getNoticeOfChangeAnswers0();
-                case 1 -> caseData.getNoticeOfChangeAnswers1();
-                case 2 -> caseData.getNoticeOfChangeAnswers2();
-                case 3 -> caseData.getNoticeOfChangeAnswers3();
-                case 4 -> caseData.getNoticeOfChangeAnswers4();
-                case 5 -> caseData.getNoticeOfChangeAnswers5();
-                case 6 -> caseData.getNoticeOfChangeAnswers6();
-                case 7 -> caseData.getNoticeOfChangeAnswers7();
-                case 8 -> caseData.getNoticeOfChangeAnswers8();
-                case 9 -> caseData.getNoticeOfChangeAnswers9();
-                default -> null;
-            };
+        for (int i = 0; i < respondents.size(); i++) {
+            if (i >= NOC_GETTERS.size()) {
+                throw new IllegalArgumentException("Respondent index out of bounds: " + i);
+            }
+
+            NoticeOfChangeAnswers existing = NOC_GETTERS.get(i).apply(caseData);
 
             if (ObjectUtils.isEmpty(existing)) {
                 NoticeOfChangeAnswers answer = answersConverter.generateForSubmission(
-                        respondentType.get(i), caseData.getClaimantIndType()
+                        respondents.get(i), caseData.getClaimantIndType()
                 );
-                switch (i) {
-                    case 0 -> caseData.setNoticeOfChangeAnswers0(answer);
-                    case 1 -> caseData.setNoticeOfChangeAnswers1(answer);
-                    case 2 -> caseData.setNoticeOfChangeAnswers2(answer);
-                    case 3 -> caseData.setNoticeOfChangeAnswers3(answer);
-                    case 4 -> caseData.setNoticeOfChangeAnswers4(answer);
-                    case 5 -> caseData.setNoticeOfChangeAnswers5(answer);
-                    case 6 -> caseData.setNoticeOfChangeAnswers6(answer);
-                    case 7 -> caseData.setNoticeOfChangeAnswers7(answer);
-                    case 8 -> caseData.setNoticeOfChangeAnswers8(answer);
-                    case 9 -> caseData.setNoticeOfChangeAnswers9(answer);
-                    default -> throw new IllegalArgumentException("Respondent index out of bounds: " + i);
-                }
+                NOC_SETTERS.get(i).accept(caseData, answer);
             }
         }
     }
+
+    private static final List<Function<CaseData, NoticeOfChangeAnswers>> NOC_GETTERS = List.of(
+            CaseData::getNoticeOfChangeAnswers0, CaseData::getNoticeOfChangeAnswers1,
+            CaseData::getNoticeOfChangeAnswers2, CaseData::getNoticeOfChangeAnswers3,
+            CaseData::getNoticeOfChangeAnswers4, CaseData::getNoticeOfChangeAnswers5,
+            CaseData::getNoticeOfChangeAnswers6, CaseData::getNoticeOfChangeAnswers7,
+            CaseData::getNoticeOfChangeAnswers8, CaseData::getNoticeOfChangeAnswers9
+    );
+
+    private static final List<BiConsumer<CaseData, NoticeOfChangeAnswers>> NOC_SETTERS = List.of(
+            CaseData::setNoticeOfChangeAnswers0, CaseData::setNoticeOfChangeAnswers1,
+            CaseData::setNoticeOfChangeAnswers2, CaseData::setNoticeOfChangeAnswers3,
+            CaseData::setNoticeOfChangeAnswers4, CaseData::setNoticeOfChangeAnswers5,
+            CaseData::setNoticeOfChangeAnswers6, CaseData::setNoticeOfChangeAnswers7,
+            CaseData::setNoticeOfChangeAnswers8, CaseData::setNoticeOfChangeAnswers9
+    );
 }

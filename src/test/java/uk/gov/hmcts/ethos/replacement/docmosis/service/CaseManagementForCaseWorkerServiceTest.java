@@ -1760,4 +1760,52 @@ class CaseManagementForCaseWorkerServiceTest {
         return item;
     }
 
+    @Test
+    void testUpdateNocAnswers_PopulatesUpToTenRespondents() {
+        CaseData caseData = new CaseData();
+        List<RespondentSumTypeItem> tenRespondents = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            tenRespondents.add(createRespondentItemForNoc("Resp" + i));
+        }
+        caseData.setRespondentCollection(tenRespondents);
+        caseData.setClaimantIndType(createClaimantIndType());
+
+        Mockito.reset(answersConverter);
+        when(answersConverter.generateForSubmission(any(), any())).thenAnswer(invocation -> {
+            RespondentSumTypeItem respondent = invocation.getArgument(0);
+            return NoticeOfChangeAnswers.builder()
+                    .respondentName(respondent.getValue().getRespondentName())
+                    .build();
+        });
+
+        caseManagementForCaseWorkerService.updateNocAnswers(caseData);
+
+        verify(answersConverter, times(10)).generateForSubmission(any(), any());
+
+        assertThat(caseData.getNoticeOfChangeAnswers0().getRespondentName()).isEqualTo("Resp0");
+        assertThat(caseData.getNoticeOfChangeAnswers9().getRespondentName()).isEqualTo("Resp9");
+    }
+
+    @Test
+    void testUpdateNocAnswers_ThrowsExceptionWhenMoreThanTenRespondents() {
+        CaseData caseData = new CaseData();
+        List<RespondentSumTypeItem> elevenRespondents = new ArrayList<>();
+        // Generate 11 respondents to trigger the default switch case (index 10)
+        for (int i = 0; i < 11; i++) {
+            elevenRespondents.add(createRespondentItemForNoc("Resp" + i));
+        }
+        caseData.setRespondentCollection(elevenRespondents);
+        caseData.setClaimantIndType(createClaimantIndType());
+
+        Mockito.reset(answersConverter);
+        when(answersConverter.generateForSubmission(any(), any()))
+                .thenReturn(NoticeOfChangeAnswers.builder().build());
+
+        // Verify that passing 11 respondents throws the expected exception
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                caseManagementForCaseWorkerService.updateNocAnswers(caseData)
+        );
+
+        assertThat(exception.getMessage()).contains("Respondent index out of bounds: 10");
+    }
 }

@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
@@ -63,6 +64,8 @@ final class NocUtilsTest {
     private static final String EXPECTED_EXCEPTION_OLD_AND_NEW_RESPONDENTS_ARE_DIFFERENT =
             "Old and new respondent collections contain different respondents for case ID 1234567890123456.";
 
+    private static final String CLAIMANT_FIRST_NAMES = "Michael John";
+    private static final String CLAIMANT_LAST_NAME = "Doe";
     private static final String REPRESENTATIVE_NAME = "Representative Name";
     private static final String RESPONDENT_NAME_ONE = "Respondent Name One";
     private static final String RESPONDENT_NAME_TWO = "Respondent Name Two";
@@ -533,8 +536,15 @@ final class NocUtilsTest {
         // when case data is empty should do nothing
         assertDoesNotThrow(() -> NocUtils.setNoticeOfChangeAnswerAtIndex(null, RESPONDENT_NAME_ONE,
                 NumberUtils.INTEGER_ZERO));
-        // when respondent name is empty should do nothing
+        // when case data claimant is empty should do nothing
         CaseData caseData = new CaseData();
+        assertDoesNotThrow(() -> NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, StringUtils.EMPTY,
+                NumberUtils.INTEGER_ZERO));
+        // when respondent name is empty should do nothing
+        ClaimantIndType claimant = new ClaimantIndType();
+        claimant.setClaimantFirstNames(CLAIMANT_FIRST_NAMES);
+        claimant.setClaimantLastName(CLAIMANT_LAST_NAME);
+        caseData.setClaimantIndType(claimant);
         assertDoesNotThrow(() -> NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, StringUtils.EMPTY,
                 NumberUtils.INTEGER_ZERO));
         assertThat(caseData.getNoticeOfChangeAnswers0()).isNull();
@@ -562,6 +572,8 @@ final class NocUtilsTest {
         NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_TEN, LoggerTestUtils.INTEGER_NINE);
 
         assertThat(caseData.getNoticeOfChangeAnswers0().getRespondentName()).isEqualTo(RESPONDENT_NAME_ONE);
+        assertThat(caseData.getNoticeOfChangeAnswers0().getClaimantFirstName()).isEqualTo(CLAIMANT_FIRST_NAMES);
+        assertThat(caseData.getNoticeOfChangeAnswers0().getClaimantLastName()).isEqualTo(CLAIMANT_LAST_NAME);
         assertThat(caseData.getNoticeOfChangeAnswers1().getRespondentName()).isEqualTo(RESPONDENT_NAME_TWO);
         assertThat(caseData.getNoticeOfChangeAnswers2().getRespondentName()).isEqualTo(RESPONDENT_NAME_THREE);
         assertThat(caseData.getNoticeOfChangeAnswers3().getRespondentName()).isEqualTo(RESPONDENT_NAME_FOUR);
@@ -577,8 +589,14 @@ final class NocUtilsTest {
     void thePopulateNoticeOfChangeAnswers() {
         // when case data is null should not do anything
         assertDoesNotThrow(() -> NocUtils.populateNoticeOfChangeAnswers(null));
-        // when respondent collection is empty should not do anything
+        // when caseData does not have claimant should do nothing
         CaseData caseData = new CaseData();
+        assertDoesNotThrow(() -> NocUtils.populateNoticeOfChangeAnswers(caseData));
+        // when respondent collection is empty should not do anything
+        ClaimantIndType claimant = new ClaimantIndType();
+        claimant.setClaimantFirstNames(CLAIMANT_FIRST_NAMES);
+        claimant.setClaimantLastName(CLAIMANT_LAST_NAME);
+        caseData.setClaimantIndType(claimant);
         caseData.setRespondentCollection(new ArrayList<>());
         assertDoesNotThrow(() -> NocUtils.populateNoticeOfChangeAnswers(caseData));
         // when respondent collection has a respondent with valid notice of change answers should not do anything
@@ -610,7 +628,9 @@ final class NocUtilsTest {
                 .respondentName(RESPONDENT_NAME_ONE).build());
         assertThat(caseData.getNoticeOfChangeAnswers1()).isNull();
         assertThat(caseData.getNoticeOfChangeAnswers2()).isEqualTo(NoticeOfChangeAnswers.builder()
-                .respondentName(RESPONDENT_NAME_TWO).build());
+                .respondentName(RESPONDENT_NAME_TWO)
+                .claimantFirstName(CLAIMANT_FIRST_NAMES)
+                .claimantLastName(CLAIMANT_LAST_NAME).build());
     }
 
     @Test

@@ -111,6 +111,20 @@ public class CaseManagementForCaseWorkerService {
     private final List<String> caseTypeIdsToCheck = List.of("ET_EnglandWales", "ET_Scotland", "Bristol",
             "Leeds", "LondonCentral", "LondonEast", "LondonSouth", "Manchester", "MidlandsEast", "MidlandsWest",
             "Newcastle", "Scotland", "Wales", "Watford");
+    private static final List<Function<CaseData, NoticeOfChangeAnswers>> NOC_GETTERS = List.of(
+            CaseData::getNoticeOfChangeAnswers0, CaseData::getNoticeOfChangeAnswers1,
+            CaseData::getNoticeOfChangeAnswers2, CaseData::getNoticeOfChangeAnswers3,
+            CaseData::getNoticeOfChangeAnswers4, CaseData::getNoticeOfChangeAnswers5,
+            CaseData::getNoticeOfChangeAnswers6, CaseData::getNoticeOfChangeAnswers7,
+            CaseData::getNoticeOfChangeAnswers8, CaseData::getNoticeOfChangeAnswers9
+    );
+    private static final List<BiConsumer<CaseData, NoticeOfChangeAnswers>> NOC_SETTERS = List.of(
+            CaseData::setNoticeOfChangeAnswers0, CaseData::setNoticeOfChangeAnswers1,
+            CaseData::setNoticeOfChangeAnswers2, CaseData::setNoticeOfChangeAnswers3,
+            CaseData::setNoticeOfChangeAnswers4, CaseData::setNoticeOfChangeAnswers5,
+            CaseData::setNoticeOfChangeAnswers6, CaseData::setNoticeOfChangeAnswers7,
+            CaseData::setNoticeOfChangeAnswers8, CaseData::setNoticeOfChangeAnswers9
+    );
 
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
@@ -754,20 +768,4 @@ public class CaseManagementForCaseWorkerService {
             }
         }
     }
-
-    private static final List<Function<CaseData, NoticeOfChangeAnswers>> NOC_GETTERS = List.of(
-            CaseData::getNoticeOfChangeAnswers0, CaseData::getNoticeOfChangeAnswers1,
-            CaseData::getNoticeOfChangeAnswers2, CaseData::getNoticeOfChangeAnswers3,
-            CaseData::getNoticeOfChangeAnswers4, CaseData::getNoticeOfChangeAnswers5,
-            CaseData::getNoticeOfChangeAnswers6, CaseData::getNoticeOfChangeAnswers7,
-            CaseData::getNoticeOfChangeAnswers8, CaseData::getNoticeOfChangeAnswers9
-    );
-
-    private static final List<BiConsumer<CaseData, NoticeOfChangeAnswers>> NOC_SETTERS = List.of(
-            CaseData::setNoticeOfChangeAnswers0, CaseData::setNoticeOfChangeAnswers1,
-            CaseData::setNoticeOfChangeAnswers2, CaseData::setNoticeOfChangeAnswers3,
-            CaseData::setNoticeOfChangeAnswers4, CaseData::setNoticeOfChangeAnswers5,
-            CaseData::setNoticeOfChangeAnswers6, CaseData::setNoticeOfChangeAnswers7,
-            CaseData::setNoticeOfChangeAnswers8, CaseData::setNoticeOfChangeAnswers9
-    );
 }

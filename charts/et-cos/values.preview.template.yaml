@@ -136,8 +136,11 @@ et-syr:
       ET_SYA_API_HOST: https://${SERVICE_FQDN}
       PCQ_ENABLED: true
 
+# Standalone et-sya-api is retired in preview: the sya-api code is now merged into
+# et-cos (scanned via uk.gov.hmcts.reform.et.syaapi) and served on ${SERVICE_FQDN}.
+# Keeping it enabled would route traffic to the stale prod image (no case-transfer).
 et-sya-api:
-  enabled: true
+  enabled: false
   java:
     imagePullPolicy: Always
     image: hmctsprod.azurecr.io/et/sya-api:latest

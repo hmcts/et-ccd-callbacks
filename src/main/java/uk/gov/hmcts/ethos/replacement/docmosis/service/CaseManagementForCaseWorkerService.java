@@ -26,10 +26,12 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.NextHearingDetails;
+import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeAnswersConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
@@ -86,6 +88,7 @@ public class CaseManagementForCaseWorkerService {
     private final CaseManagementLocationService caseManagementLocationService;
     private final MultipleReferenceService multipleReferenceService;
     private final MultipleCasesSendingService multipleCasesSendingService;
+    private final NoticeOfChangeAnswersConverter answersConverter;
 
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
@@ -116,7 +119,8 @@ public class CaseManagementForCaseWorkerService {
                                               CaseManagementLocationService caseManagementLocationService,
                                               MultipleReferenceService multipleReferenceService,
                                               @Value("${ccd_gateway_base_url}") String ccdGatewayBaseUrl,
-                                              MultipleCasesSendingService multipleCasesSendingService) {
+                                              MultipleCasesSendingService multipleCasesSendingService,
+                                              NoticeOfChangeAnswersConverter answersConverter) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.featureToggleService = featureToggleService;
@@ -126,6 +130,7 @@ public class CaseManagementForCaseWorkerService {
         this.multipleReferenceService = multipleReferenceService;
         this.ccdGatewayBaseUrl = ccdGatewayBaseUrl;
         this.multipleCasesSendingService = multipleCasesSendingService;
+        this.answersConverter = answersConverter;
     }
 
     public void caseDataDefaults(CaseData caseData) {
@@ -727,5 +732,44 @@ public class CaseManagementForCaseWorkerService {
                 .toList();
 
         caseData.setRespondentsWithEcc(String.join(", ", respondentNames));
+    }
+
+    public void updateNocAnswers(CaseData caseData) {
+        List<RespondentSumTypeItem> respondentType = caseData.getRespondentCollection();
+
+        for (int i = 0; i < respondentType.size(); i++) {
+            NoticeOfChangeAnswers existing = switch (i) {
+                case 0 -> caseData.getNoticeOfChangeAnswers0();
+                case 1 -> caseData.getNoticeOfChangeAnswers1();
+                case 2 -> caseData.getNoticeOfChangeAnswers2();
+                case 3 -> caseData.getNoticeOfChangeAnswers3();
+                case 4 -> caseData.getNoticeOfChangeAnswers4();
+                case 5 -> caseData.getNoticeOfChangeAnswers5();
+                case 6 -> caseData.getNoticeOfChangeAnswers6();
+                case 7 -> caseData.getNoticeOfChangeAnswers7();
+                case 8 -> caseData.getNoticeOfChangeAnswers8();
+                case 9 -> caseData.getNoticeOfChangeAnswers9();
+                default -> null;
+            };
+
+            if (ObjectUtils.isEmpty(existing)) {
+                NoticeOfChangeAnswers answer = answersConverter.generateForSubmission(
+                        respondentType.get(i), caseData.getClaimantIndType()
+                );
+                switch (i) {
+                    case 0 -> caseData.setNoticeOfChangeAnswers0(answer);
+                    case 1 -> caseData.setNoticeOfChangeAnswers1(answer);
+                    case 2 -> caseData.setNoticeOfChangeAnswers2(answer);
+                    case 3 -> caseData.setNoticeOfChangeAnswers3(answer);
+                    case 4 -> caseData.setNoticeOfChangeAnswers4(answer);
+                    case 5 -> caseData.setNoticeOfChangeAnswers5(answer);
+                    case 6 -> caseData.setNoticeOfChangeAnswers6(answer);
+                    case 7 -> caseData.setNoticeOfChangeAnswers7(answer);
+                    case 8 -> caseData.setNoticeOfChangeAnswers8(answer);
+                    case 9 -> caseData.setNoticeOfChangeAnswers9(answer);
+                    default -> throw new IllegalArgumentException("Respondent index out of bounds: " + i);
+                }
+            }
+        }
     }
 }

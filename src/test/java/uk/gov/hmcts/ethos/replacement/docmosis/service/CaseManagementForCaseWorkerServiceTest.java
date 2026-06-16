@@ -43,6 +43,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -51,6 +52,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeAnswersConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
@@ -139,6 +141,8 @@ class CaseManagementForCaseWorkerServiceTest {
     private MultipleReferenceService multipleReferenceService;
     @MockitoBean
     private MultipleCasesSendingService multipleCasesSendingService;
+    @MockitoBean
+    private NoticeOfChangeAnswersConverter answersConverter;
 
     @BeforeEach
     void setUp() throws URISyntaxException, IOException {
@@ -156,7 +160,7 @@ class CaseManagementForCaseWorkerServiceTest {
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
                 caseRetrievalForCaseWorkerService, ccdClient, featureToggleService, HMCTS_SERVICE_ID,
                 adminUserService, caseManagementLocationService, multipleReferenceService, ccdGatewayBaseUrl,
-                multipleCasesSendingService);
+                multipleCasesSendingService, answersConverter);
     }
 
     private void setScotlandCaseRequests() throws URISyntaxException, IOException {
@@ -1671,4 +1675,137 @@ class CaseManagementForCaseWorkerServiceTest {
         return hearingTypeItem;
     }
 
+    @ParameterizedTest
+    @MethodSource("updateNocAnswersTestCases")
+    void testUpdateNocAnswers(List<RespondentSumTypeItem> respondentCollection,
+                              NoticeOfChangeAnswers existingAnswer0,
+                              NoticeOfChangeAnswers existingAnswer1,
+                              String expectedAnswer0Respondent,
+                              String expectedAnswer1Respondent,
+                              int expectedConverterCalls) {
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(respondentCollection);
+        caseData.setClaimantIndType(createClaimantIndType());
+        caseData.setNoticeOfChangeAnswers0(existingAnswer0);
+        caseData.setNoticeOfChangeAnswers1(existingAnswer1);
+
+        Mockito.reset(answersConverter);
+        when(answersConverter.generateForSubmission(any(), any())).thenAnswer(invocation -> {
+            RespondentSumTypeItem respondent = invocation.getArgument(0);
+            return NoticeOfChangeAnswers.builder()
+                    .respondentName(respondent.getValue().getRespondentName())
+                    .build();
+        });
+
+        caseManagementForCaseWorkerService.updateNocAnswers(caseData);
+
+        if (expectedAnswer0Respondent == null) {
+            assertThat(caseData.getNoticeOfChangeAnswers0()).isNull();
+        } else {
+            assertThat(caseData.getNoticeOfChangeAnswers0()).isNotNull();
+            assertThat(caseData.getNoticeOfChangeAnswers0().getRespondentName()).isEqualTo(expectedAnswer0Respondent);
+        }
+
+        if (expectedAnswer1Respondent == null) {
+            assertThat(caseData.getNoticeOfChangeAnswers1()).isNull();
+        } else {
+            assertThat(caseData.getNoticeOfChangeAnswers1()).isNotNull();
+            assertThat(caseData.getNoticeOfChangeAnswers1().getRespondentName()).isEqualTo(expectedAnswer1Respondent);
+        }
+
+        verify(answersConverter, times(expectedConverterCalls)).generateForSubmission(any(), any());
+    }
+
+    private static Stream<Arguments> updateNocAnswersTestCases() {
+        NoticeOfChangeAnswers existing0 = NoticeOfChangeAnswers.builder().respondentName("ExistingResp0").build();
+
+        return Stream.of(
+                // No existing answers: first respondent answer should be created.
+                Arguments.of(
+                        List.of(createRespondentItemForNoc("Resp1")),
+                        null,
+                        null,
+                        "Resp1",
+                        null,
+                        1
+                ),
+                // Existing answer at index 0 is preserved; index 1 is populated.
+                Arguments.of(
+                        List.of(createRespondentItemForNoc("Resp1"), createRespondentItemForNoc("Resp2")),
+                        existing0,
+                        null,
+                        "ExistingResp0",
+                        "Resp2",
+                        1
+                ),
+                // Existing answer at index 0 is preserved and converter is not called.
+                Arguments.of(
+                        List.of(createRespondentItemForNoc("Resp1")),
+                        existing0,
+                        null,
+                        "ExistingResp0",
+                        null,
+                        0
+                )
+        );
+    }
+
+    private static RespondentSumTypeItem createRespondentItemForNoc(String respondentName) {
+        RespondentSumType respondent = new RespondentSumType();
+        respondent.setRespondentName(respondentName);
+
+        RespondentSumTypeItem item = new RespondentSumTypeItem();
+        item.setId(UUID.randomUUID().toString());
+        item.setValue(respondent);
+        return item;
+    }
+
+    @Test
+    void testUpdateNocAnswers_PopulatesUpToTenRespondents() {
+        CaseData caseData = new CaseData();
+        List<RespondentSumTypeItem> tenRespondents = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            tenRespondents.add(createRespondentItemForNoc("Resp" + i));
+        }
+        caseData.setRespondentCollection(tenRespondents);
+        caseData.setClaimantIndType(createClaimantIndType());
+
+        Mockito.reset(answersConverter);
+        when(answersConverter.generateForSubmission(any(), any())).thenAnswer(invocation -> {
+            RespondentSumTypeItem respondent = invocation.getArgument(0);
+            return NoticeOfChangeAnswers.builder()
+                    .respondentName(respondent.getValue().getRespondentName())
+                    .build();
+        });
+
+        caseManagementForCaseWorkerService.updateNocAnswers(caseData);
+
+        verify(answersConverter, times(10)).generateForSubmission(any(), any());
+
+        assertThat(caseData.getNoticeOfChangeAnswers0().getRespondentName()).isEqualTo("Resp0");
+        assertThat(caseData.getNoticeOfChangeAnswers9().getRespondentName()).isEqualTo("Resp9");
+    }
+
+    @Test
+    void testUpdateNocAnswers_ThrowsExceptionWhenMoreThanTenRespondents() {
+        CaseData caseData = new CaseData();
+        List<RespondentSumTypeItem> elevenRespondents = new ArrayList<>();
+        // Generate 11 respondents to trigger the default switch case (index 10)
+        for (int i = 0; i < 11; i++) {
+            elevenRespondents.add(createRespondentItemForNoc("Resp" + i));
+        }
+        caseData.setRespondentCollection(elevenRespondents);
+        caseData.setClaimantIndType(createClaimantIndType());
+
+        Mockito.reset(answersConverter);
+        when(answersConverter.generateForSubmission(any(), any()))
+                .thenReturn(NoticeOfChangeAnswers.builder().build());
+
+        // Verify that passing 11 respondents throws the expected exception
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                caseManagementForCaseWorkerService.updateNocAnswers(caseData)
+        );
+
+        assertThat(exception.getMessage()).contains("Respondent index out of bounds: 10");
+    }
 }

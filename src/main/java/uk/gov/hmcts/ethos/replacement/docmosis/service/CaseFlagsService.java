@@ -21,8 +21,34 @@ import java.util.function.Function;
 import javax.annotation.Nullable;
 
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.ACTIVE;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.CLAIMANT;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.CLAIMANT_REPRESENTATIVE;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.DISRUPTIVE_CUSTOMER;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.EXTERNAL;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.GRANTED;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.INTERNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.LANGUAGE_INTERPRETER;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.NOT_INDEXED;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.REPRESENTATIVE1;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.REPRESENTATIVE10;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.REPRESENTATIVE2;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.REPRESENTATIVE3;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.REPRESENTATIVE4;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.REPRESENTATIVE5;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.REPRESENTATIVE6;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.REPRESENTATIVE7;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.REPRESENTATIVE8;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.REPRESENTATIVE9;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT1;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT10;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT2;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT3;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT4;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT5;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT6;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT7;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT8;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT9;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.SIGN_LANGUAGE_INTERPRETER;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.VEXATIOUS_LITIGANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -32,33 +58,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Slf4j
 @Service
 public class CaseFlagsService {
-    private static final String GRANTED = "Granted";
-    private static final int NOT_INDEXED = -1;
-
-    public static final String INTERNAL = "Internal";
-    public static final String EXTERNAL = "External";
-    public static final String CLAIMANT = "Claimant";
-    public static final String RESPONDENT1 = "Respondent 1";
-    public static final String RESPONDENT2 = "Respondent 2";
-    public static final String RESPONDENT3 = "Respondent 3";
-    public static final String RESPONDENT4 = "Respondent 4";
-    public static final String RESPONDENT5 = "Respondent 5";
-    public static final String RESPONDENT6 = "Respondent 6";
-    public static final String RESPONDENT7 = "Respondent 7";
-    public static final String RESPONDENT8 = "Respondent 8";
-    public static final String RESPONDENT9 = "Respondent 9";
-    public static final String RESPONDENT10 = "Respondent 10";
-    public static final String CLAIMANT_REPRESENTATIVE = "Claimant Representative";
-    public static final String REPRESENTATIVE1 = "Representative 1";
-    public static final String REPRESENTATIVE2 = "Representative 2";
-    public static final String REPRESENTATIVE3 = "Representative 3";
-    public static final String REPRESENTATIVE4 = "Representative 4";
-    public static final String REPRESENTATIVE5 = "Representative 5";
-    public static final String REPRESENTATIVE6 = "Representative 6";
-    public static final String REPRESENTATIVE7 = "Representative 7";
-    public static final String REPRESENTATIVE8 = "Representative 8";
-    public static final String REPRESENTATIVE9 = "Representative 9";
-    public static final String REPRESENTATIVE10 = "Representative 10";
 
     private static final List<PartyFlag> PARTY_FLAGS = List.of(
             claimantFlag(CaseData::getClaimantFlags, CaseData::setClaimantFlags, INTERNAL),

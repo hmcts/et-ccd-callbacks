@@ -22,10 +22,10 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.CLAIMANT;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.INTERNAL;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT1;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService.CLAIMANT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService.INTERNAL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService.RESPONDENT1;
 
 @Slf4j
 @RequiredArgsConstructor

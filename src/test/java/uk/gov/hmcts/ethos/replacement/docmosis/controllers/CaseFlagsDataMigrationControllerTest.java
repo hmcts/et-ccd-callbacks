@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -65,7 +66,8 @@ class CaseFlagsDataMigrationControllerTest {
     }
 
     @Test
-    void shouldMigrateCaseFlags() throws Exception {
+    @SneakyThrows
+    void shouldMigrateCaseFlags() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CASE_FLAGS_DATA_MIGRATION)
                         .content(requestContent.toString())
@@ -80,7 +82,8 @@ class CaseFlagsDataMigrationControllerTest {
     }
 
     @Test
-    void shouldAddCaseFlagGroupIdAndVisibilityForPreviouslyMigratedFlags() throws Exception {
+    @SneakyThrows
+    void shouldAddCaseFlagGroupIdAndVisibilityForPreviouslyMigratedFlags() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mvc.perform(post(CASE_FLAGS_DATA_MIGRATION)
@@ -95,7 +98,8 @@ class CaseFlagsDataMigrationControllerTest {
     }
 
     @Test
-    void shouldNotOverwriteExistingCaseFlagGroupIdAndVisibility() throws Exception {
+    @SneakyThrows
+    void shouldNotOverwriteExistingCaseFlagGroupIdAndVisibility() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         ObjectNode caseData = (ObjectNode) requestContent.at("/case_details/case_data");
@@ -118,7 +122,8 @@ class CaseFlagsDataMigrationControllerTest {
     }
 
     @Test
-    void shouldMigrateCaseFlags_tokenFail() throws Exception {
+    @SneakyThrows
+    void shouldMigrateCaseFlags_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CASE_FLAGS_DATA_MIGRATION)
                         .content(requestContent.toString())
@@ -128,7 +133,8 @@ class CaseFlagsDataMigrationControllerTest {
     }
 
     @Test
-    void shouldRollbackCaseFlags() throws Exception {
+    @SneakyThrows
+    void shouldRollbackCaseFlags() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CASE_FLAGS_DATA_ROLLBACK)
                         .content(requestContent.toString())
@@ -141,7 +147,8 @@ class CaseFlagsDataMigrationControllerTest {
     }
 
     @Test
-    void shouldRollbackCaseFlags_tokenFail() throws Exception {
+    @SneakyThrows
+    void shouldRollbackCaseFlags_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CASE_FLAGS_DATA_ROLLBACK)
                         .content(requestContent.toString())

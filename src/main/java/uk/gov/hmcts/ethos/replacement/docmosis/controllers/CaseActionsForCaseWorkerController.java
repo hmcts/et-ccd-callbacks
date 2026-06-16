@@ -490,6 +490,8 @@ public class CaseActionsForCaseWorkerController {
 
         if (errors.isEmpty() && isNotEmpty(caseData.getRespondentCollection())) {
             caseManagementForCaseWorkerService.updateListOfRespondentsWithAnEcc(caseData);
+            log.info("UPDATING NOC answers for case: " + caseData.getEthosCaseReference());
+            caseManagementForCaseWorkerService.updateNocAnswers(caseData);
         }
 
         if (featureToggleService.isGlobalSearchEnabled()) {

@@ -22,5 +22,17 @@
     "CaseFieldID": "addClaimantMethod",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "additionalClaimantSpreadsheet",
+    "UserRole": "citizen",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "additionalClaimantSpreadsheet",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
   }
 ]

@@ -15,5 +15,13 @@
     "FieldType": "Text",
     "SecurityClassification": "Public",
     "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "additionalClaimantSpreadsheet",
+    "Label": "Additional claimant spreadsheet",
+    "FieldType": "Document",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   }
 ]

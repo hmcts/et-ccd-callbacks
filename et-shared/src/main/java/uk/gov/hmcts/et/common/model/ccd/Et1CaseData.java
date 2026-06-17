@@ -20,6 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.TTL;
 import uk.gov.hmcts.et.common.model.ccd.types.TaskListCheckType;
 import uk.gov.hmcts.et.common.model.ccd.types.TriageQuestions;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.HubLinksStatuses;
 import uk.gov.hmcts.et.common.model.ccd.types.multiples.AdditionalClaimant;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
@@ -87,6 +88,8 @@ public class Et1CaseData extends BaseCaseData {
     private List<GenericTypeItem<AdditionalClaimant>> additionalClaimants;
     @JsonProperty("addClaimantMethod")
     private String addClaimantMethod;
+    @JsonProperty("additionalClaimantSpreadsheet")
+    private UploadedDocumentType additionalClaimantSpreadsheet;
     // Citizen hub
     @JsonProperty("hubLinksStatuses")
     private HubLinksStatuses hubLinksStatuses;

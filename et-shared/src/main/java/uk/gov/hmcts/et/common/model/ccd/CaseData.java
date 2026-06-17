@@ -3,6 +3,7 @@ package uk.gov.hmcts.et.common.model.ccd;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -26,7 +27,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsSelectionType;
-import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
+import uk.gov.hmcts.et.common.model.ccd.types.AllPartyFlags;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseNote;
 import uk.gov.hmcts.et.common.model.ccd.types.CasePreAcceptType;
@@ -1557,52 +1558,8 @@ public class CaseData extends Et1CaseData {
     @JsonProperty("appealDocumentCollection")
     private List<DocumentTypeItem> appealDocumentCollection;
 
-    // Case Flags
-    private CaseFlagsType caseFlags;
-    private CaseFlagsType claimantFlags;
-    private CaseFlagsType claimantExternalFlags;
-    private CaseFlagsType respondentFlags;
-    private CaseFlagsType respondentExternalFlags;
-    private CaseFlagsType respondent1Flags;
-    private CaseFlagsType respondent1ExternalFlags;
-    private CaseFlagsType respondent2Flags;
-    private CaseFlagsType respondent2ExternalFlags;
-    private CaseFlagsType respondent3Flags;
-    private CaseFlagsType respondent3ExternalFlags;
-    private CaseFlagsType respondent4Flags;
-    private CaseFlagsType respondent4ExternalFlags;
-    private CaseFlagsType respondent5Flags;
-    private CaseFlagsType respondent5ExternalFlags;
-    private CaseFlagsType respondent6Flags;
-    private CaseFlagsType respondent6ExternalFlags;
-    private CaseFlagsType respondent7Flags;
-    private CaseFlagsType respondent7ExternalFlags;
-    private CaseFlagsType respondent8Flags;
-    private CaseFlagsType respondent8ExternalFlags;
-    private CaseFlagsType respondent9Flags;
-    private CaseFlagsType respondent9ExternalFlags;
-    private CaseFlagsType claimantRepresentativeFlags;
-    private CaseFlagsType claimantRepresentativeExternalFlags;
-    private CaseFlagsType representativeFlags;
-    private CaseFlagsType representativeExternalFlags;
-    private CaseFlagsType representative1Flags;
-    private CaseFlagsType representative1ExternalFlags;
-    private CaseFlagsType representative2Flags;
-    private CaseFlagsType representative2ExternalFlags;
-    private CaseFlagsType representative3Flags;
-    private CaseFlagsType representative3ExternalFlags;
-    private CaseFlagsType representative4Flags;
-    private CaseFlagsType representative4ExternalFlags;
-    private CaseFlagsType representative5Flags;
-    private CaseFlagsType representative5ExternalFlags;
-    private CaseFlagsType representative6Flags;
-    private CaseFlagsType representative6ExternalFlags;
-    private CaseFlagsType representative7Flags;
-    private CaseFlagsType representative7ExternalFlags;
-    private CaseFlagsType representative8Flags;
-    private CaseFlagsType representative8ExternalFlags;
-    private CaseFlagsType representative9Flags;
-    private CaseFlagsType representative9ExternalFlags;
+    @JsonUnwrapped
+    private AllPartyFlags allPartyFlags;
 
     //et-hearings-api
     @JsonProperty("autoListFlag")

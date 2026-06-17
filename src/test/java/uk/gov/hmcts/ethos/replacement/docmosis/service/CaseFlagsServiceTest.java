@@ -15,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.AllPartyFlags;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -107,7 +109,7 @@ class CaseFlagsServiceTest {
     @Test
     void caseFlagsSetupRequired_shouldBeTrueWhenCaseFlagsAreMissing() {
         caseFlagsService.setupCaseFlags(caseData);
-        caseData.setCaseFlags(null);
+        allPartyFlags(caseData).setCaseFlags(null);
 
         assertTrue(caseFlagsService.caseFlagsSetupRequired(caseData));
     }
@@ -117,7 +119,7 @@ class CaseFlagsServiceTest {
     void caseFlagsSetupRequired_shouldBeTrueWhenAnyRequiredPartyFlagIsMissing(FlagSlot slot) {
         caseFlagsService.setupCaseFlags(caseData);
 
-        slot.setter.accept(caseData, null);
+        slot.set(caseData, null);
 
         assertTrue(caseFlagsService.caseFlagsSetupRequired(caseData));
     }
@@ -126,7 +128,7 @@ class CaseFlagsServiceTest {
     @MethodSource("allPartyFlagSlots")
     void caseFlagsSetupRequired_shouldBeTrueWhenAnyRequiredPartyFlagRoleIsMissing(FlagSlot slot) {
         caseFlagsService.setupCaseFlags(caseData);
-        slot.getter.apply(caseData).setRoleOnCase("");
+        Objects.requireNonNull(slot.get(caseData)).setRoleOnCase("");
 
         assertTrue(caseFlagsService.caseFlagsSetupRequired(caseData));
     }
@@ -138,8 +140,8 @@ class CaseFlagsServiceTest {
         caseFlagsService.setupCaseFlags(caseData);
 
         assertFalse(caseFlagsService.caseFlagsSetupRequired(caseData));
-        assertNull(caseData.getRespondentFlags());
-        assertNull(caseData.getRespondentExternalFlags());
+        assertNull(allPartyFlags(caseData).getRespondentFlags());
+        assertNull(allPartyFlags(caseData).getRespondentExternalFlags());
     }
 
     @Test
@@ -150,7 +152,7 @@ class CaseFlagsServiceTest {
 
         assertFalse(caseFlagsService.caseFlagsSetupRequired(caseData));
         respondentPartyFlagSlots()
-                .forEach(slot -> assertNull(slot.getter.apply(caseData), slot + " should not be populated"));
+                .forEach(slot -> assertNull(slot.get(caseData), slot + " should not be populated"));
     }
 
     @Test
@@ -161,7 +163,7 @@ class CaseFlagsServiceTest {
 
         assertFalse(caseFlagsService.caseFlagsSetupRequired(caseData));
         respondentRepresentativePartyFlagSlots()
-                .forEach(slot -> assertNull(slot.getter.apply(caseData), slot + " should not be populated"));
+                .forEach(slot -> assertNull(slot.get(caseData), slot + " should not be populated"));
     }
 
     @Test
@@ -171,19 +173,31 @@ class CaseFlagsServiceTest {
         caseFlagsService.setupCaseFlags(caseData);
 
         assertTrue(caseFlagsService.caseFlagsSetupRequired(caseData));
-        assertNull(caseData.getClaimantRepresentativeFlags());
-        assertNull(caseData.getClaimantRepresentativeExternalFlags());
+        assertNull(allPartyFlags(caseData).getClaimantRepresentativeFlags());
+        assertNull(allPartyFlags(caseData).getClaimantRepresentativeExternalFlags());
     }
 
     @Test
     void setupCaseFlags_setsShellCaseFlagsForClaimantRespondentAndRepresentativeParties() {
         caseFlagsService.setupCaseFlags(caseData);
 
-        CaseFlagsType caseFlags = caseData.getCaseFlags();
+        CaseFlagsType caseFlags = allPartyFlags(caseData).getCaseFlags();
         assertThat(caseFlags.getPartyName(), is(nullValue()));
         assertThat(caseFlags.getRoleOnCase(), is(nullValue()));
 
-        allPartyFlagSlots().forEach(slot -> assertCaseFlag(slot, slot.getter.apply(caseData)));
+        allPartyFlagSlots().forEach(slot -> assertCaseFlag(slot, slot.get(caseData)));
+    }
+
+    @Test
+    void setupCaseFlags_shouldCreateAllPartyFlagsHolderWhenAbsent() {
+        assertNull(caseData.getAllPartyFlags());
+
+        caseFlagsService.setupCaseFlags(caseData);
+
+        assertNotNull(caseData.getAllPartyFlags());
+        assertNotNull(allPartyFlags(caseData).getCaseFlags());
+        assertNotNull(allPartyFlags(caseData).getClaimantFlags());
+        assertNotNull(allPartyFlags(caseData).getClaimantExternalFlags());
     }
 
     @Test
@@ -194,9 +208,9 @@ class CaseFlagsServiceTest {
 
         respondentPartyFlagSlots().forEach(slot -> {
             if (slot.respondentIndex < 3) {
-                assertNotNull(slot.getter.apply(caseData), slot + " should be populated");
+                assertNotNull(slot.get(caseData), slot + " should be populated");
             } else {
-                assertNull(slot.getter.apply(caseData), slot + " should not be populated");
+                assertNull(slot.get(caseData), slot + " should not be populated");
             }
         });
     }
@@ -209,9 +223,9 @@ class CaseFlagsServiceTest {
 
         respondentRepresentativePartyFlagSlots().forEach(slot -> {
             if (slot.representativeIndex < 3) {
-                assertNotNull(slot.getter.apply(caseData), slot + " should be populated");
+                assertNotNull(slot.get(caseData), slot + " should be populated");
             } else {
-                assertNull(slot.getter.apply(caseData), slot + " should not be populated");
+                assertNull(slot.get(caseData), slot + " should not be populated");
             }
         });
     }
@@ -222,15 +236,15 @@ class CaseFlagsServiceTest {
 
         caseFlagsService.setupCaseFlags(caseData);
 
-        assertNull(caseData.getClaimantRepresentativeFlags());
-        assertNull(caseData.getClaimantRepresentativeExternalFlags());
+        assertNull(allPartyFlags(caseData).getClaimantRepresentativeFlags());
+        assertNull(allPartyFlags(caseData).getClaimantRepresentativeExternalFlags());
     }
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("allPartyFlagSlots")
     void setupCaseFlags_shouldRecreatePartyFlagsWhenRoleIsMissing(FlagSlot slot) {
         caseFlagsService.setupCaseFlags(caseData);
-        slot.setter.accept(caseData, CaseFlagsType.builder()
+        slot.set(caseData, CaseFlagsType.builder()
                 .partyName("Old name")
                 .roleOnCase("")
                 .groupId("old-group")
@@ -239,7 +253,7 @@ class CaseFlagsServiceTest {
 
         caseFlagsService.setupCaseFlags(caseData);
 
-        assertCaseFlag(slot, slot.getter.apply(caseData));
+        assertCaseFlag(slot, slot.get(caseData));
     }
 
     @Test
@@ -247,12 +261,19 @@ class CaseFlagsServiceTest {
         caseFlagsService.setupCaseFlags(caseData);
         caseFlagsService.rollbackCaseFlags(caseData);
 
-        assertThat(caseData.getCaseFlags(), is(nullValue()));
-        assertThat(caseData.getClaimantFlags(), is(nullValue()));
-        assertThat(caseData.getRespondentFlags(), is(nullValue()));
-        assertThat(caseData.getClaimantExternalFlags(), is(nullValue()));
-        assertThat(caseData.getRespondentExternalFlags(), is(nullValue()));
-        allPartyFlagSlots().forEach(slot -> assertNull(slot.getter.apply(caseData), slot + " should be cleared"));
+        assertThat(allPartyFlags(caseData).getCaseFlags(), is(nullValue()));
+        assertThat(allPartyFlags(caseData).getClaimantFlags(), is(nullValue()));
+        assertThat(allPartyFlags(caseData).getRespondentFlags(), is(nullValue()));
+        assertThat(allPartyFlags(caseData).getClaimantExternalFlags(), is(nullValue()));
+        assertThat(allPartyFlags(caseData).getRespondentExternalFlags(), is(nullValue()));
+        allPartyFlagSlots().forEach(slot -> assertNull(slot.get(caseData), slot + " should be cleared"));
+    }
+
+    @Test
+    void rollbackCaseFlags_shouldNotCreateAllPartyFlagsWhenAbsent() {
+        caseFlagsService.rollbackCaseFlags(caseData);
+
+        assertNull(caseData.getAllPartyFlags());
     }
 
     @Test
@@ -263,15 +284,17 @@ class CaseFlagsServiceTest {
 
         caseFlagsService.setupCaseFlags(caseData);
 
-        assertEquals(updatedClaimantName, caseData.getClaimantFlags().getPartyName());
-        assertEquals(CLAIMANT, caseData.getClaimantFlags().getRoleOnCase());
-        assertEquals(CLAIMANT, caseData.getClaimantFlags().getGroupId());
-        assertEquals(INTERNAL, caseData.getClaimantFlags().getVisibility());
+        CaseFlagsType claimantFlags = allPartyFlags(caseData).getClaimantFlags();
+        assertEquals(updatedClaimantName, claimantFlags.getPartyName());
+        assertEquals(CLAIMANT, claimantFlags.getRoleOnCase());
+        assertEquals(CLAIMANT, claimantFlags.getGroupId());
+        assertEquals(INTERNAL, claimantFlags.getVisibility());
 
-        assertEquals(updatedClaimantName, caseData.getClaimantExternalFlags().getPartyName());
-        assertEquals(CLAIMANT, caseData.getClaimantExternalFlags().getRoleOnCase());
-        assertEquals(CLAIMANT, caseData.getClaimantExternalFlags().getGroupId());
-        assertEquals(EXTERNAL, caseData.getClaimantExternalFlags().getVisibility());
+        CaseFlagsType claimantExternalFlags = allPartyFlags(caseData).getClaimantExternalFlags();
+        assertEquals(updatedClaimantName, claimantExternalFlags.getPartyName());
+        assertEquals(CLAIMANT, claimantExternalFlags.getRoleOnCase());
+        assertEquals(CLAIMANT, claimantExternalFlags.getGroupId());
+        assertEquals(EXTERNAL, claimantExternalFlags.getVisibility());
     }
 
     @ParameterizedTest(name = "{0}")
@@ -286,10 +309,10 @@ class CaseFlagsServiceTest {
 
         caseFlagsService.setupCaseFlags(caseData);
 
-        assertEquals(updatedRespondentName, slot.getter.apply(caseData).getPartyName());
-        assertEquals(slot.roleOnCase, slot.getter.apply(caseData).getRoleOnCase());
-        assertEquals(slot.roleOnCase, slot.getter.apply(caseData).getGroupId());
-        assertEquals(slot.visibility, slot.getter.apply(caseData).getVisibility());
+        assertEquals(updatedRespondentName, Objects.requireNonNull(slot.get(caseData)).getPartyName());
+        assertEquals(slot.roleOnCase, Objects.requireNonNull(slot.get(caseData)).getRoleOnCase());
+        assertEquals(slot.roleOnCase, Objects.requireNonNull(slot.get(caseData)).getGroupId());
+        assertEquals(slot.visibility, Objects.requireNonNull(slot.get(caseData)).getVisibility());
     }
 
     @Test
@@ -300,15 +323,18 @@ class CaseFlagsServiceTest {
 
         caseFlagsService.setupCaseFlags(caseData);
 
-        assertEquals(updatedRepresentativeName, caseData.getClaimantRepresentativeFlags().getPartyName());
-        assertEquals(CLAIMANT_REPRESENTATIVE, caseData.getClaimantRepresentativeFlags().getRoleOnCase());
-        assertEquals(CLAIMANT_REPRESENTATIVE, caseData.getClaimantRepresentativeFlags().getGroupId());
-        assertEquals(INTERNAL, caseData.getClaimantRepresentativeFlags().getVisibility());
+        CaseFlagsType claimantRepresentativeFlags = allPartyFlags(caseData).getClaimantRepresentativeFlags();
+        assertEquals(updatedRepresentativeName, claimantRepresentativeFlags.getPartyName());
+        assertEquals(CLAIMANT_REPRESENTATIVE, claimantRepresentativeFlags.getRoleOnCase());
+        assertEquals(CLAIMANT_REPRESENTATIVE, claimantRepresentativeFlags.getGroupId());
+        assertEquals(INTERNAL, claimantRepresentativeFlags.getVisibility());
 
-        assertEquals(updatedRepresentativeName, caseData.getClaimantRepresentativeExternalFlags().getPartyName());
-        assertEquals(CLAIMANT_REPRESENTATIVE, caseData.getClaimantRepresentativeExternalFlags().getRoleOnCase());
-        assertEquals(CLAIMANT_REPRESENTATIVE, caseData.getClaimantRepresentativeExternalFlags().getGroupId());
-        assertEquals(EXTERNAL, caseData.getClaimantRepresentativeExternalFlags().getVisibility());
+        CaseFlagsType claimantRepresentativeExternalFlags =
+                allPartyFlags(caseData).getClaimantRepresentativeExternalFlags();
+        assertEquals(updatedRepresentativeName, claimantRepresentativeExternalFlags.getPartyName());
+        assertEquals(CLAIMANT_REPRESENTATIVE, claimantRepresentativeExternalFlags.getRoleOnCase());
+        assertEquals(CLAIMANT_REPRESENTATIVE, claimantRepresentativeExternalFlags.getGroupId());
+        assertEquals(EXTERNAL, claimantRepresentativeExternalFlags.getVisibility());
     }
 
     @ParameterizedTest(name = "{0}")
@@ -323,16 +349,16 @@ class CaseFlagsServiceTest {
 
         caseFlagsService.setupCaseFlags(caseData);
 
-        assertEquals(updatedRepresentativeName, slot.getter.apply(caseData).getPartyName());
-        assertEquals(slot.roleOnCase, slot.getter.apply(caseData).getRoleOnCase());
-        assertEquals(slot.roleOnCase, slot.getter.apply(caseData).getGroupId());
-        assertEquals(slot.visibility, slot.getter.apply(caseData).getVisibility());
+        assertEquals(updatedRepresentativeName, Objects.requireNonNull(slot.get(caseData)).getPartyName());
+        assertEquals(slot.roleOnCase, Objects.requireNonNull(slot.get(caseData)).getRoleOnCase());
+        assertEquals(slot.roleOnCase, Objects.requireNonNull(slot.get(caseData)).getGroupId());
+        assertEquals(slot.visibility, Objects.requireNonNull(slot.get(caseData)).getVisibility());
     }
 
     @Test
     void processNewlySetCaseFlags_shouldSetInterpreterRequiredTrue() {
-        caseData.setRespondentFlags(CaseFlagsType.builder().build());
-        caseData.setClaimantFlags(CaseFlagsType.builder()
+        getOrCreateAllPartyFlags(caseData).setRespondentFlags(CaseFlagsType.builder().build());
+        getOrCreateAllPartyFlags(caseData).setClaimantFlags(CaseFlagsType.builder()
                 .details(
                         ListTypeItem.from(
                                 FlagDetailType.builder()
@@ -341,7 +367,7 @@ class CaseFlagsServiceTest {
                                         .flagCode("RA00010")
                                         .build()))
                 .build());
-        caseData.setClaimantExternalFlags(CaseFlagsType.builder().build());
+        getOrCreateAllPartyFlags(caseData).setClaimantExternalFlags(CaseFlagsType.builder().build());
 
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
@@ -350,8 +376,8 @@ class CaseFlagsServiceTest {
 
     @Test
     void processNewlySetCaseFlags_shouldSetAdditionalSecurityFlagTrue() {
-        caseData.setRespondentFlags(CaseFlagsType.builder().build());
-        caseData.setClaimantFlags(CaseFlagsType.builder()
+        getOrCreateAllPartyFlags(caseData).setRespondentFlags(CaseFlagsType.builder().build());
+        getOrCreateAllPartyFlags(caseData).setClaimantFlags(CaseFlagsType.builder()
                 .details(
                         ListTypeItem.from(
                                 FlagDetailType.builder()
@@ -360,7 +386,7 @@ class CaseFlagsServiceTest {
                                         .flagCode("CA00010")
                                         .build()))
                 .build());
-        caseData.setClaimantExternalFlags(CaseFlagsType.builder().build());
+        getOrCreateAllPartyFlags(caseData).setClaimantExternalFlags(CaseFlagsType.builder().build());
 
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
@@ -371,7 +397,7 @@ class CaseFlagsServiceTest {
     @MethodSource("allPartyFlagSlots")
     void processNewlySetCaseFlags_shouldReadInterpreterFlagsFromAnyPartyFlagCollection(FlagSlot slot) {
         caseFlagsService.setupCaseFlags(caseData);
-        slot.getter.apply(caseData).setDetails(ListTypeItem.from(activeFlag(SIGN_LANGUAGE_INTERPRETER)));
+        Objects.requireNonNull(slot.get(caseData)).setDetails(ListTypeItem.from(activeFlag(SIGN_LANGUAGE_INTERPRETER)));
 
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
@@ -383,7 +409,7 @@ class CaseFlagsServiceTest {
     @MethodSource("allPartyFlagSlots")
     void processNewlySetCaseFlags_shouldReadSecurityFlagsFromAnyPartyFlagCollection(FlagSlot slot) {
         caseFlagsService.setupCaseFlags(caseData);
-        slot.getter.apply(caseData).setDetails(ListTypeItem.from(activeFlag(VEXATIOUS_LITIGANT)));
+        Objects.requireNonNull(slot.get(caseData)).setDetails(ListTypeItem.from(activeFlag(VEXATIOUS_LITIGANT)));
 
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
@@ -394,9 +420,10 @@ class CaseFlagsServiceTest {
     @Test
     void processNewlySetCaseFlags_shouldSupportAlternativeInterpreterAndSecurityFlagNames() {
         caseFlagsService.setupCaseFlags(caseData);
-        caseData.getClaimantRepresentativeExternalFlags()
+        allPartyFlags(caseData).getClaimantRepresentativeExternalFlags()
                 .setDetails(ListTypeItem.from(activeFlag(LANGUAGE_INTERPRETER)));
-        caseData.getRepresentative9ExternalFlags().setDetails(ListTypeItem.from(activeFlag(DISRUPTIVE_CUSTOMER)));
+        allPartyFlags(caseData).getRepresentative9ExternalFlags()
+                .setDetails(ListTypeItem.from(activeFlag(DISRUPTIVE_CUSTOMER)));
 
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
@@ -407,15 +434,16 @@ class CaseFlagsServiceTest {
     @Test
     void processNewlySetCaseFlags_shouldSetFlagsToNoWhenMatchingFlagsAreInactiveOrAbsent() {
         caseFlagsService.setupCaseFlags(caseData);
-        caseData.getClaimantFlags().setDetails(ListTypeItem.from(FlagDetailType.builder()
+        allPartyFlags(caseData).getClaimantFlags().setDetails(ListTypeItem.from(FlagDetailType.builder()
                 .name(SIGN_LANGUAGE_INTERPRETER)
                 .status(INACTIVE)
                 .build()));
-        caseData.getRespondentFlags().setDetails(ListTypeItem.from(FlagDetailType.builder()
+        allPartyFlags(caseData).getRespondentFlags().setDetails(ListTypeItem.from(FlagDetailType.builder()
                 .name(VEXATIOUS_LITIGANT)
                 .status(INACTIVE)
                 .build()));
-        caseData.getRespondentExternalFlags().setDetails(ListTypeItem.from(activeFlag("A different flag")));
+        allPartyFlags(caseData).getRespondentExternalFlags()
+                .setDetails(ListTypeItem.from(activeFlag("A different flag")));
 
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
@@ -547,104 +575,115 @@ class CaseFlagsServiceTest {
 
     private static Stream<FlagSlot> allPartyFlagSlots() {
         return Stream.of(
-                slot("claimant internal flags", CaseData::getClaimantFlags, CaseData::setClaimantFlags,
+                slot("claimant internal flags", AllPartyFlags::getClaimantFlags, AllPartyFlags::setClaimantFlags,
                         CLAIMANT_NAME, CLAIMANT, INTERNAL, -1),
-                slot("claimant external flags", CaseData::getClaimantExternalFlags,
-                        CaseData::setClaimantExternalFlags, CLAIMANT_NAME, CLAIMANT, EXTERNAL, -1),
-                slot("claimant representative internal flags", CaseData::getClaimantRepresentativeFlags,
-                        CaseData::setClaimantRepresentativeFlags, CLAIMANT_REPRESENTATIVE_NAME,
+                slot("claimant external flags", AllPartyFlags::getClaimantExternalFlags,
+                        AllPartyFlags::setClaimantExternalFlags, CLAIMANT_NAME, CLAIMANT, EXTERNAL, -1),
+                slot("claimant representative internal flags", AllPartyFlags::getClaimantRepresentativeFlags,
+                        AllPartyFlags::setClaimantRepresentativeFlags, CLAIMANT_REPRESENTATIVE_NAME,
                         CLAIMANT_REPRESENTATIVE, INTERNAL, -1),
-                slot("claimant representative external flags", CaseData::getClaimantRepresentativeExternalFlags,
-                        CaseData::setClaimantRepresentativeExternalFlags, CLAIMANT_REPRESENTATIVE_NAME,
+                slot("claimant representative external flags", AllPartyFlags::getClaimantRepresentativeExternalFlags,
+                        AllPartyFlags::setClaimantRepresentativeExternalFlags, CLAIMANT_REPRESENTATIVE_NAME,
                         CLAIMANT_REPRESENTATIVE, EXTERNAL, -1),
-                slot("respondent 1 internal flags", CaseData::getRespondentFlags, CaseData::setRespondentFlags,
+                slot("respondent 1 internal flags", AllPartyFlags::getRespondentFlags,
+                        AllPartyFlags::setRespondentFlags,
                         respondentName(0), RESPONDENT1, INTERNAL, 0),
-                slot("respondent 1 external flags", CaseData::getRespondentExternalFlags,
-                        CaseData::setRespondentExternalFlags, respondentName(0), RESPONDENT1, EXTERNAL, 0),
-                slot("respondent 2 internal flags", CaseData::getRespondent1Flags, CaseData::setRespondent1Flags,
+                slot("respondent 1 external flags", AllPartyFlags::getRespondentExternalFlags,
+                        AllPartyFlags::setRespondentExternalFlags, respondentName(0), RESPONDENT1, EXTERNAL, 0),
+                slot("respondent 2 internal flags", AllPartyFlags::getRespondent1Flags,
+                        AllPartyFlags::setRespondent1Flags,
                         respondentName(1), RESPONDENT2, INTERNAL, 1),
-                slot("respondent 2 external flags", CaseData::getRespondent1ExternalFlags,
-                        CaseData::setRespondent1ExternalFlags, respondentName(1), RESPONDENT2, EXTERNAL, 1),
-                slot("respondent 3 internal flags", CaseData::getRespondent2Flags, CaseData::setRespondent2Flags,
+                slot("respondent 2 external flags", AllPartyFlags::getRespondent1ExternalFlags,
+                        AllPartyFlags::setRespondent1ExternalFlags, respondentName(1), RESPONDENT2, EXTERNAL, 1),
+                slot("respondent 3 internal flags", AllPartyFlags::getRespondent2Flags,
+                        AllPartyFlags::setRespondent2Flags,
                         respondentName(2), RESPONDENT3, INTERNAL, 2),
-                slot("respondent 3 external flags", CaseData::getRespondent2ExternalFlags,
-                        CaseData::setRespondent2ExternalFlags, respondentName(2), RESPONDENT3, EXTERNAL, 2),
-                slot("respondent 4 internal flags", CaseData::getRespondent3Flags, CaseData::setRespondent3Flags,
+                slot("respondent 3 external flags", AllPartyFlags::getRespondent2ExternalFlags,
+                        AllPartyFlags::setRespondent2ExternalFlags, respondentName(2), RESPONDENT3, EXTERNAL, 2),
+                slot("respondent 4 internal flags", AllPartyFlags::getRespondent3Flags,
+                        AllPartyFlags::setRespondent3Flags,
                         respondentName(3), RESPONDENT4, INTERNAL, 3),
-                slot("respondent 4 external flags", CaseData::getRespondent3ExternalFlags,
-                        CaseData::setRespondent3ExternalFlags, respondentName(3), RESPONDENT4, EXTERNAL, 3),
-                slot("respondent 5 internal flags", CaseData::getRespondent4Flags, CaseData::setRespondent4Flags,
+                slot("respondent 4 external flags", AllPartyFlags::getRespondent3ExternalFlags,
+                        AllPartyFlags::setRespondent3ExternalFlags, respondentName(3), RESPONDENT4, EXTERNAL, 3),
+                slot("respondent 5 internal flags", AllPartyFlags::getRespondent4Flags,
+                        AllPartyFlags::setRespondent4Flags,
                         respondentName(4), RESPONDENT5, INTERNAL, 4),
-                slot("respondent 5 external flags", CaseData::getRespondent4ExternalFlags,
-                        CaseData::setRespondent4ExternalFlags, respondentName(4), RESPONDENT5, EXTERNAL, 4),
-                slot("respondent 6 internal flags", CaseData::getRespondent5Flags, CaseData::setRespondent5Flags,
+                slot("respondent 5 external flags", AllPartyFlags::getRespondent4ExternalFlags,
+                        AllPartyFlags::setRespondent4ExternalFlags, respondentName(4), RESPONDENT5, EXTERNAL, 4),
+                slot("respondent 6 internal flags", AllPartyFlags::getRespondent5Flags,
+                        AllPartyFlags::setRespondent5Flags,
                         respondentName(5), RESPONDENT6, INTERNAL, 5),
-                slot("respondent 6 external flags", CaseData::getRespondent5ExternalFlags,
-                        CaseData::setRespondent5ExternalFlags, respondentName(5), RESPONDENT6, EXTERNAL, 5),
-                slot("respondent 7 internal flags", CaseData::getRespondent6Flags, CaseData::setRespondent6Flags,
+                slot("respondent 6 external flags", AllPartyFlags::getRespondent5ExternalFlags,
+                        AllPartyFlags::setRespondent5ExternalFlags, respondentName(5), RESPONDENT6, EXTERNAL, 5),
+                slot("respondent 7 internal flags", AllPartyFlags::getRespondent6Flags,
+                        AllPartyFlags::setRespondent6Flags,
                         respondentName(6), RESPONDENT7, INTERNAL, 6),
-                slot("respondent 7 external flags", CaseData::getRespondent6ExternalFlags,
-                        CaseData::setRespondent6ExternalFlags, respondentName(6), RESPONDENT7, EXTERNAL, 6),
-                slot("respondent 8 internal flags", CaseData::getRespondent7Flags, CaseData::setRespondent7Flags,
+                slot("respondent 7 external flags", AllPartyFlags::getRespondent6ExternalFlags,
+                        AllPartyFlags::setRespondent6ExternalFlags, respondentName(6), RESPONDENT7, EXTERNAL, 6),
+                slot("respondent 8 internal flags", AllPartyFlags::getRespondent7Flags,
+                        AllPartyFlags::setRespondent7Flags,
                         respondentName(7), RESPONDENT8, INTERNAL, 7),
-                slot("respondent 8 external flags", CaseData::getRespondent7ExternalFlags,
-                        CaseData::setRespondent7ExternalFlags, respondentName(7), RESPONDENT8, EXTERNAL, 7),
-                slot("respondent 9 internal flags", CaseData::getRespondent8Flags, CaseData::setRespondent8Flags,
+                slot("respondent 8 external flags", AllPartyFlags::getRespondent7ExternalFlags,
+                        AllPartyFlags::setRespondent7ExternalFlags, respondentName(7), RESPONDENT8, EXTERNAL, 7),
+                slot("respondent 9 internal flags", AllPartyFlags::getRespondent8Flags,
+                        AllPartyFlags::setRespondent8Flags,
                         respondentName(8), RESPONDENT9, INTERNAL, 8),
-                slot("respondent 9 external flags", CaseData::getRespondent8ExternalFlags,
-                        CaseData::setRespondent8ExternalFlags, respondentName(8), RESPONDENT9, EXTERNAL, 8),
-                slot("respondent 10 internal flags", CaseData::getRespondent9Flags, CaseData::setRespondent9Flags,
+                slot("respondent 9 external flags", AllPartyFlags::getRespondent8ExternalFlags,
+                        AllPartyFlags::setRespondent8ExternalFlags, respondentName(8), RESPONDENT9, EXTERNAL, 8),
+                slot("respondent 10 internal flags", AllPartyFlags::getRespondent9Flags,
+                        AllPartyFlags::setRespondent9Flags,
                         respondentName(9), RESPONDENT10, INTERNAL, 9),
-                slot("respondent 10 external flags", CaseData::getRespondent9ExternalFlags,
-                        CaseData::setRespondent9ExternalFlags, respondentName(9), RESPONDENT10, EXTERNAL, 9),
-                representativeSlot("representative 1 internal flags", CaseData::getRepresentativeFlags,
-                        CaseData::setRepresentativeFlags, representativeName(0), REPRESENTATIVE1, INTERNAL, 0),
-                representativeSlot("representative 1 external flags", CaseData::getRepresentativeExternalFlags,
-                        CaseData::setRepresentativeExternalFlags, representativeName(0), REPRESENTATIVE1, EXTERNAL, 0),
-                representativeSlot("representative 2 internal flags", CaseData::getRepresentative1Flags,
-                        CaseData::setRepresentative1Flags, representativeName(1), REPRESENTATIVE2, INTERNAL, 1),
-                representativeSlot("representative 2 external flags", CaseData::getRepresentative1ExternalFlags,
-                        CaseData::setRepresentative1ExternalFlags, representativeName(1), REPRESENTATIVE2,
+                slot("respondent 10 external flags", AllPartyFlags::getRespondent9ExternalFlags,
+                        AllPartyFlags::setRespondent9ExternalFlags, respondentName(9), RESPONDENT10, EXTERNAL, 9),
+                representativeSlot("representative 1 internal flags", AllPartyFlags::getRepresentativeFlags,
+                        AllPartyFlags::setRepresentativeFlags, representativeName(0), REPRESENTATIVE1, INTERNAL, 0),
+                representativeSlot("representative 1 external flags", AllPartyFlags::getRepresentativeExternalFlags,
+                        AllPartyFlags::setRepresentativeExternalFlags, representativeName(0), REPRESENTATIVE1,
+                        EXTERNAL, 0),
+                representativeSlot("representative 2 internal flags", AllPartyFlags::getRepresentative1Flags,
+                        AllPartyFlags::setRepresentative1Flags, representativeName(1), REPRESENTATIVE2, INTERNAL, 1),
+                representativeSlot("representative 2 external flags", AllPartyFlags::getRepresentative1ExternalFlags,
+                        AllPartyFlags::setRepresentative1ExternalFlags, representativeName(1), REPRESENTATIVE2,
                         EXTERNAL, 1),
-                representativeSlot("representative 3 internal flags", CaseData::getRepresentative2Flags,
-                        CaseData::setRepresentative2Flags, representativeName(2), REPRESENTATIVE3, INTERNAL, 2),
-                representativeSlot("representative 3 external flags", CaseData::getRepresentative2ExternalFlags,
-                        CaseData::setRepresentative2ExternalFlags, representativeName(2), REPRESENTATIVE3,
+                representativeSlot("representative 3 internal flags", AllPartyFlags::getRepresentative2Flags,
+                        AllPartyFlags::setRepresentative2Flags, representativeName(2), REPRESENTATIVE3, INTERNAL, 2),
+                representativeSlot("representative 3 external flags", AllPartyFlags::getRepresentative2ExternalFlags,
+                        AllPartyFlags::setRepresentative2ExternalFlags, representativeName(2), REPRESENTATIVE3,
                         EXTERNAL, 2),
-                representativeSlot("representative 4 internal flags", CaseData::getRepresentative3Flags,
-                        CaseData::setRepresentative3Flags, representativeName(3), REPRESENTATIVE4, INTERNAL, 3),
-                representativeSlot("representative 4 external flags", CaseData::getRepresentative3ExternalFlags,
-                        CaseData::setRepresentative3ExternalFlags, representativeName(3), REPRESENTATIVE4,
+                representativeSlot("representative 4 internal flags", AllPartyFlags::getRepresentative3Flags,
+                        AllPartyFlags::setRepresentative3Flags, representativeName(3), REPRESENTATIVE4, INTERNAL, 3),
+                representativeSlot("representative 4 external flags", AllPartyFlags::getRepresentative3ExternalFlags,
+                        AllPartyFlags::setRepresentative3ExternalFlags, representativeName(3), REPRESENTATIVE4,
                         EXTERNAL, 3),
-                representativeSlot("representative 5 internal flags", CaseData::getRepresentative4Flags,
-                        CaseData::setRepresentative4Flags, representativeName(4), REPRESENTATIVE5, INTERNAL, 4),
-                representativeSlot("representative 5 external flags", CaseData::getRepresentative4ExternalFlags,
-                        CaseData::setRepresentative4ExternalFlags, representativeName(4), REPRESENTATIVE5,
+                representativeSlot("representative 5 internal flags", AllPartyFlags::getRepresentative4Flags,
+                        AllPartyFlags::setRepresentative4Flags, representativeName(4), REPRESENTATIVE5, INTERNAL, 4),
+                representativeSlot("representative 5 external flags", AllPartyFlags::getRepresentative4ExternalFlags,
+                        AllPartyFlags::setRepresentative4ExternalFlags, representativeName(4), REPRESENTATIVE5,
                         EXTERNAL, 4),
-                representativeSlot("representative 6 internal flags", CaseData::getRepresentative5Flags,
-                        CaseData::setRepresentative5Flags, representativeName(5), REPRESENTATIVE6, INTERNAL, 5),
-                representativeSlot("representative 6 external flags", CaseData::getRepresentative5ExternalFlags,
-                        CaseData::setRepresentative5ExternalFlags, representativeName(5), REPRESENTATIVE6,
+                representativeSlot("representative 6 internal flags", AllPartyFlags::getRepresentative5Flags,
+                        AllPartyFlags::setRepresentative5Flags, representativeName(5), REPRESENTATIVE6, INTERNAL, 5),
+                representativeSlot("representative 6 external flags", AllPartyFlags::getRepresentative5ExternalFlags,
+                        AllPartyFlags::setRepresentative5ExternalFlags, representativeName(5), REPRESENTATIVE6,
                         EXTERNAL, 5),
-                representativeSlot("representative 7 internal flags", CaseData::getRepresentative6Flags,
-                        CaseData::setRepresentative6Flags, representativeName(6), REPRESENTATIVE7, INTERNAL, 6),
-                representativeSlot("representative 7 external flags", CaseData::getRepresentative6ExternalFlags,
-                        CaseData::setRepresentative6ExternalFlags, representativeName(6), REPRESENTATIVE7,
+                representativeSlot("representative 7 internal flags", AllPartyFlags::getRepresentative6Flags,
+                        AllPartyFlags::setRepresentative6Flags, representativeName(6), REPRESENTATIVE7, INTERNAL, 6),
+                representativeSlot("representative 7 external flags", AllPartyFlags::getRepresentative6ExternalFlags,
+                        AllPartyFlags::setRepresentative6ExternalFlags, representativeName(6), REPRESENTATIVE7,
                         EXTERNAL, 6),
-                representativeSlot("representative 8 internal flags", CaseData::getRepresentative7Flags,
-                        CaseData::setRepresentative7Flags, representativeName(7), REPRESENTATIVE8, INTERNAL, 7),
-                representativeSlot("representative 8 external flags", CaseData::getRepresentative7ExternalFlags,
-                        CaseData::setRepresentative7ExternalFlags, representativeName(7), REPRESENTATIVE8,
+                representativeSlot("representative 8 internal flags", AllPartyFlags::getRepresentative7Flags,
+                        AllPartyFlags::setRepresentative7Flags, representativeName(7), REPRESENTATIVE8, INTERNAL, 7),
+                representativeSlot("representative 8 external flags", AllPartyFlags::getRepresentative7ExternalFlags,
+                        AllPartyFlags::setRepresentative7ExternalFlags, representativeName(7), REPRESENTATIVE8,
                         EXTERNAL, 7),
-                representativeSlot("representative 9 internal flags", CaseData::getRepresentative8Flags,
-                        CaseData::setRepresentative8Flags, representativeName(8), REPRESENTATIVE9, INTERNAL, 8),
-                representativeSlot("representative 9 external flags", CaseData::getRepresentative8ExternalFlags,
-                        CaseData::setRepresentative8ExternalFlags, representativeName(8), REPRESENTATIVE9,
+                representativeSlot("representative 9 internal flags", AllPartyFlags::getRepresentative8Flags,
+                        AllPartyFlags::setRepresentative8Flags, representativeName(8), REPRESENTATIVE9, INTERNAL, 8),
+                representativeSlot("representative 9 external flags", AllPartyFlags::getRepresentative8ExternalFlags,
+                        AllPartyFlags::setRepresentative8ExternalFlags, representativeName(8), REPRESENTATIVE9,
                         EXTERNAL, 8),
-                representativeSlot("representative 10 internal flags", CaseData::getRepresentative9Flags,
-                        CaseData::setRepresentative9Flags, representativeName(9), REPRESENTATIVE10, INTERNAL, 9),
-                representativeSlot("representative 10 external flags", CaseData::getRepresentative9ExternalFlags,
-                        CaseData::setRepresentative9ExternalFlags, representativeName(9), REPRESENTATIVE10,
+                representativeSlot("representative 10 internal flags", AllPartyFlags::getRepresentative9Flags,
+                        AllPartyFlags::setRepresentative9Flags, representativeName(9), REPRESENTATIVE10, INTERNAL, 9),
+                representativeSlot("representative 10 external flags", AllPartyFlags::getRepresentative9ExternalFlags,
+                        AllPartyFlags::setRepresentative9ExternalFlags, representativeName(9), REPRESENTATIVE10,
                         EXTERNAL, 9)
         );
     }
@@ -670,14 +709,14 @@ class CaseFlagsServiceTest {
         );
     }
 
-    private static FlagSlot slot(String name, Function<CaseData, CaseFlagsType> getter,
-                                BiConsumer<CaseData, CaseFlagsType> setter, String partyName,
+    private static FlagSlot slot(String name, Function<AllPartyFlags, CaseFlagsType> getter,
+                                BiConsumer<AllPartyFlags, CaseFlagsType> setter, String partyName,
                                 String roleOnCase, String visibility, int respondentIndex) {
         return new FlagSlot(name, getter, setter, partyName, roleOnCase, visibility, respondentIndex, -1);
     }
 
-    private static FlagSlot representativeSlot(String name, Function<CaseData, CaseFlagsType> getter,
-                                               BiConsumer<CaseData, CaseFlagsType> setter, String partyName,
+    private static FlagSlot representativeSlot(String name, Function<AllPartyFlags, CaseFlagsType> getter,
+                                               BiConsumer<AllPartyFlags, CaseFlagsType> setter, String partyName,
                                                String roleOnCase, String visibility, int representativeIndex) {
         return new FlagSlot(name, getter, setter, partyName, roleOnCase, visibility, -1, representativeIndex);
     }
@@ -717,6 +756,17 @@ class CaseFlagsServiceTest {
         return index == 0 ? REPRESENTATIVE_NAME : REPRESENTATIVE_NAME + " " + (index + 1);
     }
 
+    private static AllPartyFlags allPartyFlags(CaseData caseData) {
+        return caseData.getAllPartyFlags();
+    }
+
+    private static AllPartyFlags getOrCreateAllPartyFlags(CaseData caseData) {
+        if (caseData.getAllPartyFlags() == null) {
+            caseData.setAllPartyFlags(new AllPartyFlags());
+        }
+        return caseData.getAllPartyFlags();
+    }
+
     private static void assertCaseFlag(FlagSlot slot, CaseFlagsType actual) {
         assertNotNull(actual, slot + " should be populated");
         assertAll(slot.toString(),
@@ -754,16 +804,16 @@ class CaseFlagsServiceTest {
 
     private static final class FlagSlot {
         private final String name;
-        private final Function<CaseData, CaseFlagsType> getter;
-        private final BiConsumer<CaseData, CaseFlagsType> setter;
+        private final Function<AllPartyFlags, CaseFlagsType> getter;
+        private final BiConsumer<AllPartyFlags, CaseFlagsType> setter;
         private final String partyName;
         private final String roleOnCase;
         private final String visibility;
         private final int respondentIndex;
         private final int representativeIndex;
 
-        private FlagSlot(String name, Function<CaseData, CaseFlagsType> getter,
-                         BiConsumer<CaseData, CaseFlagsType> setter, String partyName,
+        private FlagSlot(String name, Function<AllPartyFlags, CaseFlagsType> getter,
+                         BiConsumer<AllPartyFlags, CaseFlagsType> setter, String partyName,
                          String roleOnCase, String visibility, int respondentIndex, int representativeIndex) {
             this.name = name;
             this.getter = getter;
@@ -773,6 +823,15 @@ class CaseFlagsServiceTest {
             this.visibility = visibility;
             this.respondentIndex = respondentIndex;
             this.representativeIndex = representativeIndex;
+        }
+
+        private CaseFlagsType get(CaseData caseData) {
+            AllPartyFlags allPartyFlags = caseData.getAllPartyFlags();
+            return allPartyFlags == null ? null : getter.apply(allPartyFlags);
+        }
+
+        private void set(CaseData caseData, CaseFlagsType flags) {
+            setter.accept(getOrCreateAllPartyFlags(caseData), flags);
         }
 
         @Override

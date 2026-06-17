@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -59,24 +60,26 @@ public class CaseFlagsDataMigrationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseFlagsService.setupCaseFlags(caseData);
+        CaseFlagsType claimantFlags = caseData.getAllPartyFlags().getClaimantFlags();
+        CaseFlagsType respondentFlags = caseData.getAllPartyFlags().getRespondentFlags();
 
         /* Add visibility and group ID fields for the claimant and the first respondent records
            that were already migrated in Case Flag v1.0. */
-        if (caseData.getClaimantFlags().getGroupId() == null) {
-            caseData.getClaimantFlags().setGroupId(CLAIMANT);
-            caseData.getClaimantFlags().setVisibility(INTERNAL);
+        if (claimantFlags.getGroupId() == null) {
+            claimantFlags.setGroupId(CLAIMANT);
+            claimantFlags.setVisibility(INTERNAL);
         }
 
-        if (caseData.getRespondentFlags().getGroupId() == null) {
-            caseData.getRespondentFlags().setRoleOnCase(RESPONDENT1);
-            caseData.getRespondentFlags().setGroupId(RESPONDENT1);
-            caseData.getRespondentFlags().setVisibility(INTERNAL);
+        if (respondentFlags.getGroupId() == null) {
+            respondentFlags.setRoleOnCase(RESPONDENT1);
+            respondentFlags.setGroupId(RESPONDENT1);
+            respondentFlags.setVisibility(INTERNAL);
         }
 
         log.info("Migrating existing case: {} for claimant: {},  respondent: {},",
                 ccdRequest.getCaseDetails().getCaseTypeId(),
-                caseData.getClaimantFlags().getPartyName(),
-                caseData.getRespondentFlags().getPartyName());
+                claimantFlags.getPartyName(),
+                respondentFlags.getPartyName());
 
         return getCallbackRespEntityErrors(List.of(), caseData);
     }

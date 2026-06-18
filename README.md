@@ -156,6 +156,15 @@ yarn test:seed-cutover
 ```
 This writes a manifest to `functional-output/cutover/seed-manifest.json`.
 
+For a cutover rehearsal, run the steps in this order:
+
+1. Seed cases before migration.
+2. Migrate CCD data into the ET decentralised store.
+3. Enable decentralisation/routing for ET.
+4. Run `yarn test:verify-cutover`.
+
+Do not reseed after migration unless you intentionally want a new pre-cutover baseline.
+
 Required environment variables:
 ```bash
 ET_CCD_CASEWORKER_USER_NAME=<caseworker username>
@@ -200,6 +209,9 @@ CUTOVER_VERIFY_PROFILE_IDS=accepted-case-details,accepted-jurisdiction
 CUTOVER_VERIFY_REQUIRE_COMPLETE_SEED=false
 CUTOVER_VERIFY_SKIP_EVENT_TRIGGERS=true
 ```
+
+Use `CUTOVER_VERIFY_SKIP_EVENT_TRIGGERS=true` for a read/state-only check. A full cutover verification should run
+without that flag after decentralisation/routing has been enabled.
 
 Example preview smoke run:
 ```bash

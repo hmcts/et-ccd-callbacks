@@ -3,7 +3,7 @@ const path = require('path');
 const axios = require('axios');
 const { randomUUID } = require('crypto');
 const { Logger } = require('@hmcts/nodejs-logging');
-const totp = require('totp-generator');
+const { TOTP } = require('totp-generator');
 
 const testConfig = require('../../config.js');
 const idamApi = require('../helpers/idamApi');
@@ -110,7 +110,7 @@ function writeManifest(outputFile, profiles, cases, status, error = null) {
 }
 
 async function getCcdGwServiceToken() {
-    const oneTimePassword = totp(testConfig.TestCcdGwSecret, { digits: 6, period: 30 });
+    const oneTimePassword = TOTP.generate(testConfig.TestCcdGwSecret, { digits: 6, period: 30 }).otp;
     const response = await axios.post(
         s2sLeaseUrl,
         {
@@ -139,7 +139,21 @@ async function getAuthContext() {
     };
 }
 
-async function createCase(context) {
+function buildCreateCaseData(profile) {
+    const data = JSON.parse(JSON.stringify(seedData.data));
+
+    if (profile.respondentResponseStatus && Array.isArray(data.respondentCollection)) {
+        data.respondentCollection
+            .filter(respondent => respondent && respondent.value)
+            .forEach(respondent => {
+                respondent.value.response_status = profile.respondentResponseStatus;
+            });
+    }
+
+    return data;
+}
+
+async function createCase(context, profile) {
     const initiateUrl = `${ccdApiUrl}/caseworkers/${context.userId}/jurisdictions/${jurisdiction}`
         + `/case-types/${caseTypeId}/event-triggers/initiateCase/token`;
     const initiateResponse = await axios.get(initiateUrl, {
@@ -148,7 +162,7 @@ async function createCase(context) {
     const createUrl = `${ccdApiUrl}/caseworkers/${context.userId}/jurisdictions/${jurisdiction}`
         + `/case-types/${caseTypeId}/cases?ignore-warning=false`;
     const createPayload = {
-        data: seedData.data,
+        data: buildCreateCaseData(profile),
         event: {
             id: 'initiateCase',
             summary: 'Creating cutover seed case',
@@ -401,7 +415,7 @@ async function seedProfile(context, profile) {
     let caseId = null;
 
     try {
-        caseId = await createCase(context);
+        caseId = await createCase(context, profile);
         await applyTransitions(context, caseId, profile.transitions);
         const caseDetails = await fetchCaseDetails(context, caseId);
 

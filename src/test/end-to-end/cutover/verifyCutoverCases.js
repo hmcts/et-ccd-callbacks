@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const { Logger } = require('@hmcts/nodejs-logging');
-const totp = require('totp-generator');
+const { TOTP } = require('totp-generator');
 
 const testConfig = require('../../config.js');
 const idamApi = require('../helpers/idamApi');
@@ -59,7 +59,7 @@ function getErrorDetails(error) {
 }
 
 async function getCcdGwServiceToken() {
-    const oneTimePassword = totp(testConfig.TestCcdGwSecret, { digits: 6, period: 30 });
+    const oneTimePassword = TOTP.generate(testConfig.TestCcdGwSecret, { digits: 6, period: 30 }).otp;
     const response = await axios.post(
         s2sLeaseUrl,
         {

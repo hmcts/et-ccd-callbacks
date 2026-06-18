@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
-const totp = require('totp-generator');
+const { TOTP } = require('totp-generator');
 
 const testConfig = require('../../config.js');
 const idamApi = require('../helpers/idamApi');
@@ -76,7 +76,7 @@ function buildHeaders(context, additionalHeaders = {}) {
 }
 
 async function getCcdGwServiceToken() {
-    const oneTimePassword = totp(testConfig.TestCcdGwSecret, { digits: 6, period: 30 });
+    const oneTimePassword = TOTP.generate(testConfig.TestCcdGwSecret, { digits: 6, period: 30 }).otp;
     const response = await axios.post(
         getS2sLeaseUrl(env),
         {

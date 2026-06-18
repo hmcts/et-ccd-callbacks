@@ -3,7 +3,7 @@ const fs = require('fs');
 const testConfig = require('../../config.js');
 const querystring = require('querystring');
 const logger = Logger.getLogger('helpers/idamApi.js');
-const totp = require("totp-generator");
+const {TOTP} = require("totp-generator");
 const {expect} = require('chai');
 const env = testConfig.TestEnv;
 const dataLocation = require('../data/et-ccd-basic-data.json')
@@ -38,7 +38,7 @@ async function getAuthToken() {
 
 async function getS2SServiceToken() {
 
-    const oneTimepwd = totp(testConfig.TestCcdGwSecret, {digits: 6, period: 30});
+    const oneTimepwd = TOTP.generate(testConfig.TestCcdGwSecret, {digits: 6, period: 30}).otp;
     // get s2s token
     console.log("checking OTP => :" + oneTimepwd);
 

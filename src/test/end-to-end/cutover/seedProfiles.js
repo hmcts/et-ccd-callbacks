@@ -165,6 +165,7 @@ const seedProfiles = [
         description: 'Accepted case for ET3 notification callbacks.',
         targetState: 'Accepted',
         verifyEventId: 'et3Notification',
+        respondentResponseStatus: 'Not Accepted',
         transitions: ['vet', 'accept'],
         scenarioRefs: [scenario('verifyET3Notification.js')]
     },
@@ -174,6 +175,7 @@ const seedProfiles = [
         description: 'Accepted case for ET3 response callbacks.',
         targetState: 'Accepted',
         verifyEventId: 'et3Response',
+        respondentResponseStatus: 'Not Accepted',
         transitions: ['vet', 'accept'],
         scenarioRefs: [scenario('verifyET3response.js')]
     },

@@ -585,6 +585,7 @@ public final class NocUtils {
      */
     public static void setNoticeOfChangeAnswerAtIndex(CaseData caseData, String respondentName, int index) {
         if (ObjectUtils.isEmpty(caseData)
+                || ObjectUtils.isEmpty(caseData.getClaimantIndType())
                 || StringUtils.isBlank(respondentName)
                 || index < 0
                 || index >= MAX_NOC_ANSWERS) {
@@ -593,6 +594,8 @@ public final class NocUtils {
 
         NoticeOfChangeAnswers answer = NoticeOfChangeAnswers.builder()
                 .respondentName(respondentName)
+                .claimantFirstName(caseData.getClaimantIndType().getClaimantFirstNames())
+                .claimantLastName(caseData.getClaimantIndType().getClaimantLastName())
                 .build();
 
         switch (index) {

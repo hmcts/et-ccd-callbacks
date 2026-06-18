@@ -531,7 +531,8 @@ public class NocRespondentRepresentativeService {
             return;
         }
         if (ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType())
-                || CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())) {
+                || CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())
+                || CollectionUtils.isEmpty(caseDetails.getCaseData().getRespondentCollection())) {
             return;
         }
         String organisationId = ClaimantRepresentativeUtils.getHmctsOrganisationIdOrEmpty(caseDetails.getCaseData()

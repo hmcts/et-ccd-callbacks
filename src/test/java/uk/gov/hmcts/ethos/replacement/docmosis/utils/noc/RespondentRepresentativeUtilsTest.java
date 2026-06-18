@@ -32,6 +32,7 @@ final class RespondentRepresentativeUtilsTest {
 
     private static final String RESPONDENT_ID_1 = "1abc957b-e8f5-3487-84c5-a736eb6605b8";
     private static final String RESPONDENT_ID_2 = "2abc957b-e8f5-3487-84c5-a736eb6605b8";
+    private static final String RESPONDENT_EMAIL_1 = "respondent1@testmail.com";
     private static final String REPRESENTATIVE_ID_1 = "6abc957b-e8f5-3487-84c5-a736eb6605b8";
     private static final String REPRESENTATIVE_ID_2 = "6abc957b-e8f5-3487-84c5-a736eb6605b9";
     private static final String REPRESENTATIVE_ID_IDAM_ID_1 = "6abc9888-e8888-3488-84c5-a736eb660588";
@@ -58,7 +59,7 @@ final class RespondentRepresentativeUtilsTest {
     private static final String ROLE_INVALID = "[INVALID]";
 
     private static final String EXPECTED_EXCEPTION_REPRESENTATIVE_NOT_FOUND =
-            "Representative not found for case ID 1234567890123456.";
+            "No representative found for case ID 1234567890123456.";
     private static final String EXPECTED_EXCEPTION_REPRESENTATIVE_ID_NOT_FOUND =
             "Representative ID not found for case ID 1234567890123456.";
     private static final String EXPECTED_EXCEPTION_REPRESENTATIVE_DETAILS_NOT_EXISTS =
@@ -393,11 +394,7 @@ final class RespondentRepresentativeUtilsTest {
 
     @Test
     void theFindRespondentByRepresentative() {
-        // when case data is null should return null
         RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
-        assertThat(RespondentRepresentativeUtils.findRespondentByRepresentative(null, representative))
-                .isNull();
-        // when case data respondent collection is empty should return null
         CaseData tmpCaseData = new CaseData();
         tmpCaseData.setRespondentCollection(new ArrayList<>());
         assertThat(RespondentRepresentativeUtils.findRespondentByRepresentative(tmpCaseData, representative)).isNull();
@@ -416,6 +413,7 @@ final class RespondentRepresentativeUtilsTest {
         tmpRespondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_1)
                 .representativeId(REPRESENTATIVE_ID_1).build());
         representative.getValue().setRespondentId(RESPONDENT_ID_1);
+        representative.setId(REPRESENTATIVE_ID_1);
         assertThat(RespondentRepresentativeUtils.findRespondentByRepresentative(tmpCaseData, representative))
                 .isEqualTo(tmpRespondentSumTypeItem);
         // When respondent found by name should return that respondent
@@ -1124,4 +1122,30 @@ final class RespondentRepresentativeUtilsTest {
                 .isEqualTo(List.of(caseUserAssignmentMatchingRole));
     }
 
+    @Test
+    void theFindRespondentsByRepresentatives() {
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setId(RESPONDENT_ID_1);
+        RespondentSumType respondentValue = RespondentSumType.builder().respondentName(RESPONDENT_NAME_1)
+                .representativeId(REPRESENTATIVE_ID_1).respondentEmail(RESPONDENT_EMAIL_1).build();
+        respondent.setValue(respondentValue);
+        List<RespondentSumTypeItem>  respondents = new ArrayList<>();
+        respondents.add(respondent);
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(respondents);
+        // when representative list is empty should return an empty list
+        List<RepresentedTypeRItem> representatives = new ArrayList<>();
+        assertThat(RespondentRepresentativeUtils.findRespondentsByRepresentatives(caseData, representatives))
+                .isEmpty();
+        // when respondent not found should return an empty list
+        RepresentedTypeRItem representative = new RepresentedTypeRItem();
+        representatives.add(representative);
+        assertThat(RespondentRepresentativeUtils.findRespondentsByRepresentatives(caseData, representatives))
+                .isEmpty();
+        // when respondent found should return that respondent
+        representative.setId(REPRESENTATIVE_ID_1);
+        representative.setValue(RepresentedTypeR.builder().respondentId(RESPONDENT_ID_1).build());
+        assertThat(RespondentRepresentativeUtils.findRespondentsByRepresentatives(caseData, representatives))
+                .isNotEmpty().hasSize(LoggerTestUtils.INTEGER_ONE).isEqualTo(List.of(respondent));
+    }
 }

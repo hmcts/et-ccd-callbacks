@@ -42,7 +42,6 @@ public class NocRemoveRepresentationController {
     public ResponseEntity<CCDCallbackResponse> aboutToSubmitClaimant(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
-
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails);
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
@@ -61,7 +60,6 @@ public class NocRemoveRepresentationController {
     public ResponseEntity<CCDCallbackResponse> aboutToSubmitRespondent(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
-
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         nocRemoveRepresentationService.revokeRespondentLegalRep(caseDetails, userToken);
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());

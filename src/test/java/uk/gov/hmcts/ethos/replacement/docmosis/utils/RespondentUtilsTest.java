@@ -343,4 +343,28 @@ final class RespondentUtilsTest {
         assertThat(RespondentUtils.findRepresentativeByRespondentId(representatives, RESPONDENT_ID_1))
                 .isEqualTo(representative);
     }
+
+    @Test
+    void theFindAllRespondents() {
+        respondentUtils.close();
+        // when respondent collection is empty should return empty list
+        CaseData caseData = new CaseData();
+        CaseDetails  caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        assertThat(RespondentUtils.findAllRespondents(caseDetails)).isEmpty();
+        // when respondent collection is not empty but respondent is not valid should return empty list
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setValue(RespondentSumType.builder().build());
+        caseData.setRespondentCollection(List.of(respondent));
+        assertThat(RespondentUtils.findAllRespondents(caseDetails)).isEmpty();
+        // when respondent collection is not empty but respondent does not have email address should return empty list
+        respondent.setId(RESPONDENT_ID_1);
+        respondent.getValue().setRespondentName(RESPONDENT_NAME_1);
+        assertThat(RespondentUtils.findAllRespondents(caseDetails)).isEmpty();
+        // when respondent collection is not empty and respondent has email address should return list of that email
+        // address
+        respondent.getValue().setRespondentEmail(RESPONDENT_EMAIL_ADDRESS_1);
+        assertThat(RespondentUtils.findAllRespondents(caseDetails))
+                .isEqualTo(List.of(respondent));
+    }
 }

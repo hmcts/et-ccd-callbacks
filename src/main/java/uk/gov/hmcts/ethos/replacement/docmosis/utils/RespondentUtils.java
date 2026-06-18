@@ -343,9 +343,9 @@ public final class RespondentUtils {
      *         returns an empty list when no valid respondent email addresses can be resolved
      */
     public static List<String> resolveRespondentNotificationEmailAddresses(CaseDetails caseDetails) {
-        List<String> respondentEmailAddresses = new ArrayList<>();
+        List<String> resolvedRespondentEmailAddresses = new ArrayList<>();
         if (CollectionUtils.isEmpty(caseDetails.getCaseData().getRespondentCollection())) {
-            return respondentEmailAddresses;
+            return resolvedRespondentEmailAddresses;
         }
         for (RespondentSumTypeItem respondent : caseDetails.getCaseData().getRespondentCollection()) {
             if (isValidRespondent(respondent)) {
@@ -353,13 +353,44 @@ public final class RespondentUtils {
                         caseDetails.getCaseData().getRepCollection(), respondent.getId());
                 if (ObjectUtils.isNotEmpty(representative)
                         && StringUtils.isNotBlank(representative.getValue().getRepresentativeEmailAddress())) {
-                    respondentEmailAddresses.add(representative.getValue().getRepresentativeEmailAddress());
+                    resolvedRespondentEmailAddresses.add(representative.getValue().getRepresentativeEmailAddress());
                     continue;
                 }
                 if (StringUtils.isNotBlank(respondent.getValue().getRespondentEmail())) {
-                    respondentEmailAddresses.add(respondent.getValue().getRespondentEmail());
+                    resolvedRespondentEmailAddresses.add(respondent.getValue().getRespondentEmail());
                 }
             }
+        }
+        return resolvedRespondentEmailAddresses;
+    }
+
+    /**
+     * Finds all non-blank email addresses for valid respondents on the given case.
+     *
+     * <p>This method assumes that {@code caseDetails} is not {@code null} and that it
+     * contains non-null case data. If the respondent collection is empty or not present,
+     * an empty list is returned.</p>
+     *
+     * <p>Respondents are included only when they are considered valid by
+     * {@link #isValidRespondent(RespondentSumTypeItem)} and have a non-blank email
+     * address.</p>
+     *
+     * @param caseDetails the case details containing case data and respondent information;
+     *                    must not be {@code null} and must contain case data
+     * @return a list of email addresses for all valid respondents with non-blank email
+     *         addresses, or an empty list if no matching respondents are found
+     * @throws NullPointerException if {@code caseDetails} or its case data is {@code null}
+     */
+    public static List<RespondentSumTypeItem> findAllRespondents(CaseDetails caseDetails) {
+        List<RespondentSumTypeItem> respondentEmailAddresses = new ArrayList<>();
+        if (CollectionUtils.isEmpty(caseDetails.getCaseData().getRespondentCollection())) {
+            return respondentEmailAddresses;
+        }
+        for (RespondentSumTypeItem respondent : caseDetails.getCaseData().getRespondentCollection()) {
+            if (!isValidRespondent(respondent) || StringUtils.isBlank(respondent.getValue().getRespondentEmail())) {
+                continue;
+            }
+            respondentEmailAddresses.add(respondent);
         }
         return respondentEmailAddresses;
     }

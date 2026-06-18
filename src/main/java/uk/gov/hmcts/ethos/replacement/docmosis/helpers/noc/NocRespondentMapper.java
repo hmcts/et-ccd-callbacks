@@ -89,22 +89,6 @@ public final class NocRespondentMapper {
     }
 
     /**
-     * Returns a comma-separated string of unique representative names from the provided list.
-     *
-     * @param repList List of {@link RepresentedTypeRItem} representing representatives
-     * @return Comma-separated representative names, or an empty string if none found
-     */
-    public static String getRepresentativeNames(List<RepresentedTypeRItem> repList) {
-        return repList.stream()
-            .map(RepresentedTypeRItem::getValue)
-            .filter(Objects::nonNull)
-            .map(RepresentedTypeR::getNameOfRepresentative)
-            .filter(name -> !isNullOrEmpty(name))
-            .distinct()
-            .collect(Collectors.joining(STRING_COMMA_WITH_SPACE));
-    }
-
-    /**
      * Returns a list of unique representative email addresses from the provided list.
      *
      * @param repList List of {@link RepresentedTypeRItem} representing representatives

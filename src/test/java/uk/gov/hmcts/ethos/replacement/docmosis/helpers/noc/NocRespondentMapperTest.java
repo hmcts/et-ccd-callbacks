@@ -122,34 +122,6 @@ class NocRespondentMapperTest {
     }
 
     @Test
-    void getRepresentativeNames_joinsDistinctNames() {
-        RepresentedTypeRItem item1 = new RepresentedTypeRItem();
-        item1.setValue(RepresentedTypeR.builder()
-            .nameOfRepresentative("Rep1")
-            .build());
-        RepresentedTypeRItem item2 = new RepresentedTypeRItem();
-        item2.setValue(RepresentedTypeR.builder()
-            .nameOfRepresentative("Rep2")
-            .build());
-        RepresentedTypeRItem item3 = new RepresentedTypeRItem();
-        item3.setValue(RepresentedTypeR.builder()
-            .nameOfRepresentative("Rep1")
-            .build());
-        List<RepresentedTypeRItem> reps = List.of(item1, item2, item3);
-
-        String actual = NocRespondentMapper.getRepresentativeNames(reps);
-
-        assertThat(actual).isEqualTo("Rep1, Rep2");
-    }
-
-    @Test
-    void getRepresentativeNames_emptyList() {
-        String actual = NocRespondentMapper.getRepresentativeNames(Collections.emptyList());
-
-        assertThat(actual).isEmpty();
-    }
-
-    @Test
     void getRepresentativeEmails_returnsDistinctEmails() {
         RepresentedTypeRItem item1 = new RepresentedTypeRItem();
         item1.setValue(RepresentedTypeR.builder()

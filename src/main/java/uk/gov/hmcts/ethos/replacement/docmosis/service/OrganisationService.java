@@ -7,6 +7,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
@@ -17,9 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_CHECK_REPRESENTATIVE_ACCOUNT_BY_EMAIL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_FIND_REPRESENTATIVE_ACCOUNT_BY_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL_LOG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID;
 
 @Service
 @RequiredArgsConstructor
@@ -94,30 +95,37 @@ public class OrganisationService {
     }
 
     /**
-     * Finds an organisation account ID for the supplied email address.
-     * <p>
-     * This method calls the organisation service using an admin user token and a
-     * generated service authentication token. If the response contains a valid user
-     * identifier, the response body is returned. If the user cannot be found or the
-     * organisation service call fails, {@code null} is returned.
-     * </p>
+     * Finds and returns organisation details for the given IDAM user ID.
      *
-     * @param email the email address to search for
-     * @return the account ID response for the matching organisation user, or
-     *         {@code null} if no valid user identifier is found or the lookup fails
+     * <p>This method retrieves organisation details by calling the organisation service using
+     * an admin user token and a generated service authentication token. If the response contains
+     * a valid organisation identifier, the organisation details are returned. If no valid
+     * organisation is found, or if the organisation service call fails with a {@link FeignException},
+     * the method logs a warning and returns {@code null}.</p>
+     *
+     * <p>Assumptions:</p>
+     * <ul>
+     *     <li>The provided {@code userIdamId} is a valid IDAM user identifier.</li>
+     *     <li>The admin user token returned by {@code adminUserService} is valid.</li>
+     *     <li>The generated service authentication token is valid for calling the organisation service.</li>
+     *     <li>A valid organisation response must contain an organisation identifier.</li>
+     *     <li>If the organisation cannot be found or the response is invalid, returning {@code null} is acceptable.
+     *     </li>
+     * </ul>
+     *
+     * @param userIdamId the IDAM user ID used to retrieve organisation details
+     * @return the organisation details if found and valid; otherwise {@code null}
      */
-    // TODO implement tests
-    public AccountIdByEmailResponse findAccountIdByEmail(String email) {
+    public OrganisationsResponse findOrganisationByIdamUserId(String userIdamId) {
         try {
-            ResponseEntity<AccountIdByEmailResponse> userResponse =
-                    organisationClient.getAccountIdByEmail(adminUserService.getAdminUserToken(),
-                            authTokenGenerator.generate(), email);
-            // checking if representative email address exists in organisation users
-            if (OrganisationUtils.hasUserIdentifier(userResponse)) {
-                return userResponse.getBody();
+            ResponseEntity<OrganisationsResponse> organisationRepsonse =
+                    organisationClient.retrieveOrganisationDetailsByUserId(adminUserService.getAdminUserToken(),
+                            authTokenGenerator.generate(), userIdamId);
+            if (OrganisationUtils.hasOrganisationIdentifier(organisationRepsonse)) {
+                return organisationRepsonse.getBody();
             }
         } catch (FeignException e) {
-            log.error(ERROR_UNABLE_TO_FIND_REPRESENTATIVE_ACCOUNT_BY_EMAIL, e.getMessage());
+            log.warn(WARNING_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID, e.getMessage());
         }
         return null;
     }

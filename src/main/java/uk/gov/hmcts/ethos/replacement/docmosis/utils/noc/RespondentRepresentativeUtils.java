@@ -455,13 +455,9 @@ public final class RespondentRepresentativeUtils {
      */
     public static RespondentSumTypeItem findRespondentByRepresentative(CaseData caseData,
                                                                        RepresentedTypeRItem representative) {
-        if (ObjectUtils.isEmpty(caseData)
-                || CollectionUtils.isEmpty(caseData.getRespondentCollection())
-                || ObjectUtils.isEmpty(representative)
-                || ObjectUtils.isEmpty(representative.getValue())
+        if (!isValidRepresentative(representative)
                 || StringUtils.isBlank(representative.getValue().getRespondentId())
-                && StringUtils.isBlank(representative.getValue().getRespRepName())
-                && StringUtils.isBlank(representative.getId())) {
+                && StringUtils.isBlank(representative.getValue().getRespRepName())) {
             return null;
         }
         RespondentSumTypeItem respondent = RespondentUtils.findRespondentById(caseData.getRespondentCollection(),
@@ -475,6 +471,48 @@ public final class RespondentRepresentativeUtils {
                     representative.getId());
         }
         return respondent;
+    }
+
+    /**
+     * Finds all respondents associated with the given representatives.
+     *
+     * <p>If {@code caseData}, the respondent collection, or the list of representatives
+     * is empty or not present, an empty list is returned.</p>
+     *
+     * <p>For each representative, this method delegates to
+     * {@link #findRespondentByRepresentative(CaseData, RepresentedTypeRItem)} to find the
+     * matching respondent. Any non-empty respondent returned by that method is added to
+     * the result list.</p>
+     *
+     * <p>Assumptions:</p>
+     * <ul>
+     *     <li>{@code caseData}, when provided, contains the respondent collection to search.</li>
+     *     <li>{@code representatives}, when provided, contains representative items that can be
+     *         used to identify matching respondents.</li>
+     *     <li>{@link #findRespondentByRepresentative(CaseData, RepresentedTypeRItem)} handles
+     *         the matching logic and any required field-level checks.</li>
+     *     <li>No duplicate filtering is performed; if multiple representatives resolve to the
+     *         same respondent, that respondent may appear more than once in the returned list.</li>
+     * </ul>
+     *
+     * @param caseData the case data containing the respondent collection to search
+     * @param representatives the representatives whose associated respondents should be found
+     * @return a list of respondents associated with the given representatives, or an empty list
+     *         if no matching respondents are found
+     */
+    public static List<RespondentSumTypeItem> findRespondentsByRepresentatives(
+            CaseData caseData, List<RepresentedTypeRItem> representatives) {
+        List<RespondentSumTypeItem> respondents = new ArrayList<>();
+        if (CollectionUtils.isEmpty(representatives)) {
+            return respondents;
+        }
+        for (RepresentedTypeRItem representative : representatives) {
+            RespondentSumTypeItem respondent = findRespondentByRepresentative(caseData, representative);
+            if (ObjectUtils.isNotEmpty(respondent)) {
+                respondents.add(respondent);
+            }
+        }
+        return respondents;
     }
 
     /**

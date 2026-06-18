@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -395,13 +397,35 @@ public final class OrganisationUtils {
     }
 
     /**
+     * Checks whether the given organisations response contains an organisation identifier.
+     *
+     * <p>This method returns {@code true} only when the response, response body, and
+     * organisation identifier are all present and not empty.</p>
+     *
+     * <p>Assumptions:</p>
+     * <ul>
+     *     <li>{@code organisationsResponse} may be {@code null}.</li>
+     *     <li>{@code organisationsResponse.getBody()} may be {@code null}.</li>
+     *     <li>The organisation identifier is considered present only when it is not empty.</li>
+     * </ul>
+     *
+     * @param organisationsResponse the response containing organisation details
+     * @return {@code true} if an organisation identifier is present; otherwise {@code false}
+     */
+    public static boolean hasOrganisationIdentifier(ResponseEntity<OrganisationsResponse> organisationsResponse) {
+        return ObjectUtils.isNotEmpty(organisationsResponse)
+                && ObjectUtils.isNotEmpty(organisationsResponse.getBody())
+                && ObjectUtils.isNotEmpty(organisationsResponse.getBody().getOrganisationIdentifier());
+    }
+
+    /**
      * Determines whether the organisation identifier in the given {@link Organisation}
      * matches the organisation identifier in the provided {@link OrganisationsResponse}.
      *
      * <p>This method performs a case-sensitive comparison of the two organisation IDs.
      * If either input object is {@code null}, or if either organisation identifier is
      * blank, the method returns {@code true}. In other words, the method only returns
-     * {@code false} when both identifiers are present and they do not match.</p>
+     * {@code false} when both identifiers are present, and they do not match.</p>
      *
      * <h3>Assumptions:</h3>
      * <ul>
@@ -433,5 +457,38 @@ public final class OrganisationUtils {
             return true;
         }
         return Strings.CS.equals(organisationResponseId, organisationId);
+    }
+
+    /**
+     * Checks whether the case contains at least one valid respondent representative
+     * belonging to the given organisation.
+     *
+     * <p>The method returns {@code false} when the representative collection is empty
+     * or the provided organisation ID is blank. Otherwise, it checks the case
+     * representative collection and returns {@code true} if any valid respondent
+     * representative has a matching organisation ID.</p>
+     *
+     * <p>Assumptions:</p>
+     * <ul>
+     *     <li>{@code caseData} is not {@code null}.</li>
+     *     <li>{@link RespondentRepresentativeUtils#isValidRepresentative(RepresentedTypeRItem)}
+     *     ensures the representative, its value, and respondent organisation are present.</li>
+     *     <li>The organisation ID comparison is case-sensitive.</li>
+     * </ul>
+     *
+     * @param caseData the case data containing the respondent representative collection
+     * @param organisationId the organisation ID to match against respondent representatives
+     * @return {@code true} if a valid respondent representative exists for the organisation;
+     *         otherwise {@code false}
+     */
+    public static boolean hasRemainingRespondentReps(CaseData caseData,
+                                                     String organisationId) {
+        if (CollectionUtils.isEmpty(caseData.getRepCollection()) || StringUtils.isBlank(organisationId)) {
+            return false;
+        }
+        return caseData.getRepCollection().stream()
+                .filter(RespondentRepresentativeUtils::isValidRepresentative)
+                .anyMatch(rep -> organisationId.equals(
+                        rep.getValue().getRespondentOrganisation().getOrganisationID()));
     }
 }

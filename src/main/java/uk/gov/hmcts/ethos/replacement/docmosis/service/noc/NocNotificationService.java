@@ -107,7 +107,8 @@ public class NocNotificationService {
     public void sendRespondentRepresentationUpdateNotifications(CaseDetails caseDetails,
                                                                 List<RepresentedTypeRItem> representatives,
                                                                 String nocType) {
-        if (CollectionUtils.isEmpty(representatives) || StringUtils.isBlank(nocType)) {
+        if (CollectionUtils.isEmpty(representatives)
+                || StringUtils.isBlank(nocType)) {
             return;
         }
         for (RepresentedTypeRItem representative : representatives) {
@@ -564,7 +565,12 @@ public class NocNotificationService {
             partyName = caseDataPrevious.getClaimant();
             if (caseDataNew.getRepresentativeClaimantType() != null) {
                 newRepEmailAddress = caseDataNew.getRepresentativeClaimantType().getRepresentativeEmailAddress();
-                handleClaimantNocEmails(caseDetailsNew, partyName);
+                String nocType = NOC_TYPE_REMOVAL;
+                if (ObjectUtils.isNotEmpty(changeRequest.getOrganisationToAdd())
+                        && StringUtils.isNotBlank(changeRequest.getOrganisationToAdd().getOrganisationID())) {
+                    nocType = NOC_TYPE_ADDITION;
+                }
+                handleClaimantNocEmails(caseDetailsNew, partyName, nocType);
             }
         } else {
             // send respondent noc change email
@@ -579,7 +585,7 @@ public class NocNotificationService {
         notifyTribunalOfRespondentRepresentativeUpdate(caseDetailsPrevious, NOC_TYPE_REMOVAL);
     }
 
-    private void handleClaimantNocEmails(CaseDetails caseDetailsNew, String partyName) {
+    private void handleClaimantNocEmails(CaseDetails caseDetailsNew, String partyName, String nocType) {
         CaseData caseDataNew = caseDetailsNew.getCaseData();
 
         List<CaseUserAssignment> caseUserAssignments =
@@ -601,16 +607,18 @@ public class NocNotificationService {
                             buildPersonalisationWithPartyName(caseDetailsNew, partyName, caseLink));
                 });
 
-        // send claimant noc change email
-        String claimantEmail = ClaimantUtils.getClaimantEmailAddress(caseDataNew);
-        if (isNullOrEmpty(claimantEmail)) {
-            log.warn("missing claimantEmail");
-            return;
-        }
+        if (nocType.equals(NOC_TYPE_ADDITION)) {
+            // send claimant noc change email
+            String claimantEmail = ClaimantUtils.getClaimantEmailAddress(caseDataNew);
+            if (isNullOrEmpty(claimantEmail)) {
+                log.warn("missing claimantEmail");
+                return;
+            }
 
-        Map<String, String> personalisation = buildNoCPersonalisation(caseDetailsNew, partyName);
-        personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetailsNew.getCaseId()));
-        emailService.sendEmail(claimantRepAssignedTemplateId, claimantEmail, personalisation);
+            Map<String, String> personalisation = buildNoCPersonalisation(caseDetailsNew, partyName);
+            personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetailsNew.getCaseId()));
+            emailService.sendEmail(claimantRepAssignedTemplateId, claimantEmail, personalisation);
+        }
     }
 
     private void handleRespondentNocEmails(CaseDetails caseDetailsPrevious,

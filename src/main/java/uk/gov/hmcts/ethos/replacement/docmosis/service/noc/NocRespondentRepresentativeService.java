@@ -502,16 +502,14 @@ public class NocRespondentRepresentativeService {
     }
 
     /**
-     * Finds respondent representatives associated with the given organisation,
-     * notifies the corresponding respondents, and delegates access revocation
-     * and case-data removal to
-     * {@link #revokeAndRemoveRespondentRepresentatives(CaseDetails, List)}.
+     * Revokes and removes all respondent representatives associated with the specified organisation
+     * from the provided case details.
+     * <p>
+     * If no respondent representatives are found for the given organisation ID, this method returns
+     * without making any changes.
      *
-     * <p>If no matching representatives are found, this method makes no changes.</p>
-     *
-     * @param caseDetails the case details containing the case data to update
-     * @param organisationId the organisation identifier used to find matching
-     *                       respondent representatives
+     * @param caseDetails the case details containing the case data to search and update
+     * @param organisationId the organisation ID used to identify respondent representatives to revoke
      */
     public void revokeAndRemoveRepresentativesByOrganisation(CaseDetails caseDetails, String organisationId) {
         List<RepresentedTypeRItem> respondentRepresentativesToRevoke = RespondentRepresentativeUtils

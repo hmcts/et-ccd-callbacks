@@ -56,15 +56,16 @@ import uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -370,7 +371,7 @@ class NocRespondentRepresentativeServiceTest {
                 .userId("54321")
                 .userFirstName("John")
                 .userLastName("Brown")
-                .createdDate(LocalDateTime.now())
+                .createdDate(LocalDateTime.of(2026, Month.JANUARY, 1, 0, 0))
                 .build();
     }
 
@@ -1209,7 +1210,6 @@ class NocRespondentRepresentativeServiceTest {
         tmpCaseData.getRepCollection().getFirst().getValue().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_1);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         doNothing().when(nocCcdService).revokeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
-        doNothing().when(nocNotificationService).notifyClaimantOfRepresentationRemoval(any(CaseDetails.class));
         assertThat(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails))
                 .isEqualTo(tmpCaseData);
         verify(nocCcdService, times(LoggerTestUtils.INTEGER_ONE)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,

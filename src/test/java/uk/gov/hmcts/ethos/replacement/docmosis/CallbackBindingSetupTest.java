@@ -2,10 +2,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 import org.mockito.Mockito;
-import org.junit.jupiter.api.Assumptions;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.annotation.AnnotatedElementUtils;

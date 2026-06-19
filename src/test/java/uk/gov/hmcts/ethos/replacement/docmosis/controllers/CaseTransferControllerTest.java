@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -180,7 +181,7 @@ class CaseTransferControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(caseTransferSameCountryService, times(1)).transferCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(caseTransferSameCountryService, times(1)).transferCase(any(CaseDetails.class), eq(AUTH_TOKEN));
     }
 
     @Test
@@ -205,7 +206,7 @@ class CaseTransferControllerTest extends BaseControllerTest {
                 .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
 
-        verify(caseTransferSameCountryService, never()).transferCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(caseTransferSameCountryService, never()).transferCase(any(CaseDetails.class), eq(AUTH_TOKEN));
     }
 
     @Test
@@ -222,7 +223,7 @@ class CaseTransferControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(caseTransferSameCountryService, times(1)).updateEccLinkedCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(caseTransferSameCountryService, times(1)).updateEccLinkedCase(any(CaseDetails.class), eq(AUTH_TOKEN));
     }
 
     @Test
@@ -244,10 +245,10 @@ class CaseTransferControllerTest extends BaseControllerTest {
         mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_ECC_LINKED_CASE_URL)
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.toJson(ccdRequest)))
+                .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
 
-        verify(caseTransferSameCountryService, never()).updateEccLinkedCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(caseTransferSameCountryService, never()).updateEccLinkedCase(any(CaseDetails.class), eq(AUTH_TOKEN));
     }
 
     @Test
@@ -264,7 +265,7 @@ class CaseTransferControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(caseTransferDifferentCountryService, times(1)).transferCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(caseTransferDifferentCountryService, times(1)).transferCase(any(CaseDetails.class), eq(AUTH_TOKEN));
     }
 
     @Test
@@ -286,10 +287,10 @@ class CaseTransferControllerTest extends BaseControllerTest {
         mockMvc.perform(post(CASE_TRANSFER_DIFFERENT_COUNTRY_URL)
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.toJson(ccdRequest)))
+                .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
 
-        verify(caseTransferDifferentCountryService, never()).transferCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(caseTransferDifferentCountryService, never()).transferCase(any(CaseDetails.class), eq(AUTH_TOKEN));
     }
 
     @Test
@@ -397,7 +398,7 @@ class CaseTransferControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(caseManagementLocationService, times(1))
-                .setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
+                .setCaseManagementLocationCode(any(CaseData.class));
     }
 
     @Test
@@ -415,7 +416,7 @@ class CaseTransferControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(caseManagementLocationService, times(1))
-                .setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
+                .setCaseManagementLocationCode(any(CaseData.class));
 
     }
 

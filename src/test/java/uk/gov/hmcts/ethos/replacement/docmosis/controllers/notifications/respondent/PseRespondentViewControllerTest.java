@@ -20,8 +20,6 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -77,7 +75,8 @@ class PseRespondentViewControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(provideSomethingElseViewService).populateSelectDropdownView(any(CaseData.class), eq(RESPONDENT_TITLE));
+        verify(provideSomethingElseViewService).populateSelectDropdownView(ccdRequest.getCaseDetails().getCaseData(),
+                RESPONDENT_TITLE);
     }
 
     @Test
@@ -102,7 +101,7 @@ class PseRespondentViewControllerTest {
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(provideSomethingElseViewService).initialOrdReqDetailsTableMarkUp(
-                any(CaseData.class), eq(RESPONDENT_TITLE));
+                ccdRequest.getCaseDetails().getCaseData(), RESPONDENT_TITLE);
     }
 
     @Test

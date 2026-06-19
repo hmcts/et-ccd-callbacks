@@ -1188,7 +1188,8 @@ class Et1ReppedControllerTest {
                 StringUtils.EMPTY,
                 "Et1ReppedService",
                 "checkCaseData")).when(et1ReppedService)
-                .setMyHmctsOrganisationAddress(anyString(), any(CaseData.class));
+                .setMyHmctsOrganisationAddress(AUTH_TOKEN,
+                        ccdRequestWithClaimantRepresentative.getCaseDetails().getCaseData());
         mockMvc.perform(post(MID_EVENT_AMEND_CLAIMANT_REPRESENTATIVE_CONTACT)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -1227,7 +1228,8 @@ class Et1ReppedControllerTest {
                 StringUtils.EMPTY,
                 "Et3ResponseService",
                 "setRespondentRepresentsContactDetails")).when(et1ReppedService)
-                .setClaimantRepresentativeValues(anyString(), any(CaseData.class));
+                .setClaimantRepresentativeValues(AUTH_TOKEN,
+                        ccdRequestWithClaimantRepresentative.getCaseDetails().getCaseData());
         mockMvc.perform(post(ABOUT_TO_SUBMIT_AMEND_CLAIMANT_REPRESENTATIVE_CONTACT)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

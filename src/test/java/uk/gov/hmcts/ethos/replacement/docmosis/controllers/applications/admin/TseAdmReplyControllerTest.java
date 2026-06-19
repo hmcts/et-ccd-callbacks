@@ -10,7 +10,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.controllers.BaseControllerTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.applications.admin.TseAdmReplyService;
@@ -23,8 +22,6 @@ import java.net.URISyntaxException;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -80,8 +77,8 @@ class TseAdmReplyControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseAdmReplyService).initialTseAdmReplyTableMarkUp(
-                any(CaseData.class),
-                eq(AUTH_TOKEN));
+                ccdRequest.getCaseDetails().getCaseData(),
+                AUTH_TOKEN);
     }
 
     @Test
@@ -93,8 +90,8 @@ class TseAdmReplyControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
         verify(tseAdmReplyService, never()).initialTseAdmReplyTableMarkUp(
-                any(CaseData.class),
-                eq(AUTH_TOKEN));
+                ccdRequest.getCaseDetails().getCaseData(),
+                AUTH_TOKEN);
     }
 
     @Test
@@ -105,8 +102,8 @@ class TseAdmReplyControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
         verify(tseAdmReplyService, never()).initialTseAdmReplyTableMarkUp(
-                any(CaseData.class),
-                eq(AUTH_TOKEN));
+                ccdRequest.getCaseDetails().getCaseData(),
+                AUTH_TOKEN);
     }
 
     @Test
@@ -121,7 +118,7 @@ class TseAdmReplyControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseAdmReplyService).validateInput(
-                any(CaseData.class));
+                ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
@@ -133,7 +130,7 @@ class TseAdmReplyControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
         verify(tseAdmReplyService, never()).validateInput(
-                any(CaseData.class));
+                ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
@@ -144,7 +141,7 @@ class TseAdmReplyControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
         verify(tseAdmReplyService, never()).validateInput(
-                any(CaseData.class));
+                ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
@@ -159,11 +156,11 @@ class TseAdmReplyControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseAdmReplyService).saveTseAdmReplyDataFromCaseData(
-            any(CaseData.class));
+            ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdmReplyService).sendNotifyEmailsToClaimant(
-            eq(ccdRequest.getCaseDetails().getCaseId()), any(CaseData.class), eq(AUTH_TOKEN));
+            ccdRequest.getCaseDetails().getCaseId(), ccdRequest.getCaseDetails().getCaseData(), AUTH_TOKEN);
         verify(tseAdmReplyService).clearTseAdmReplyDataFromCaseData(
-            any(CaseData.class));
+            ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
@@ -175,11 +172,11 @@ class TseAdmReplyControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
         verify(tseAdmReplyService, never()).saveTseAdmReplyDataFromCaseData(
-                any(CaseData.class));
+                ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdmReplyService, never()).sendNotifyEmailsToClaimant(
-            eq("4321"), any(CaseData.class), eq(AUTH_TOKEN));
+            "4321", ccdRequest.getCaseDetails().getCaseData(), AUTH_TOKEN);
         verify(tseAdmReplyService, never()).clearTseAdmReplyDataFromCaseData(
-                any(CaseData.class));
+                ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
@@ -190,11 +187,11 @@ class TseAdmReplyControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
         verify(tseAdmReplyService, never()).saveTseAdmReplyDataFromCaseData(
-                any(CaseData.class));
+                ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdmReplyService, never()).sendNotifyEmailsToClaimant(
-            eq("4321"), any(CaseData.class), eq(AUTH_TOKEN));
+            "4321", ccdRequest.getCaseDetails().getCaseData(), AUTH_TOKEN);
         verify(tseAdmReplyService, never()).clearTseAdmReplyDataFromCaseData(
-                any(CaseData.class));
+                ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test

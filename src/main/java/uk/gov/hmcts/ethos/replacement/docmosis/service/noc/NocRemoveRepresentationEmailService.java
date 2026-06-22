@@ -14,6 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CallbacksCollectionUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.ClaimantUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 
 import java.util.List;
@@ -96,6 +97,9 @@ public class NocRemoveRepresentationEmailService {
      * @param emailToSend The email address of the removed legal representative
      */
     public void sendEmailToRemovedLegalRep(CaseDetails caseDetails, String emailToSend) {
+        if (isNullOrEmpty(emailToSend)) {
+            return;
+        }
         try {
             Map<String, String> personalisation =
                 NocNotificationHelper.addCommonEmailValues(caseDetails.getCaseData());
@@ -181,9 +185,7 @@ public class NocRemoveRepresentationEmailService {
         boolean isClaimantRepresented = representativeClaimantType != null;
 
         // get email address of claimant or claimant legal rep
-        String emailToSend = isClaimantRepresented
-            ? representativeClaimantType.getRepresentativeEmailAddress()
-            : caseData.getClaimantType().getClaimantEmailAddress();
+        String emailToSend = ClaimantUtils.resolveClaimantEmailAddress(caseDetails.getCaseData());
         if (isNullOrEmpty(emailToSend)) {
             return;
         }

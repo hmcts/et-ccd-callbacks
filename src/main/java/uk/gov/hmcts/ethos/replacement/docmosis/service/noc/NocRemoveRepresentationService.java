@@ -155,8 +155,8 @@ public class NocRemoveRepresentationService {
         if (REMOVE_ORGANISATION.equals(caseDetails.getCaseData().getNocRemoveRepOption())) {
             nocRemoveRepresentationEmailService.sendEmailToOrgAdmin(caseDetailsBeforeRepUpdate, orgEmailAddress,
                     repName, EMAIL_TYPE_TO_ORG_ADMIN_REMOVED);
-        } else if (!OrganisationUtils.hasRemainingRespondentReps(caseDetails.getCaseData(),
-                organisation.getOrganisationIdentifier())) {
+        } else if (ObjectUtils.isNotEmpty(organisation) && !OrganisationUtils.hasRemainingRespondentReps(
+                caseDetails.getCaseData(), organisation.getOrganisationIdentifier())) {
             nocRemoveRepresentationEmailService.sendEmailToOrgAdmin(caseDetailsBeforeRepUpdate, orgEmailAddress,
                     repName, EMAIL_TYPE_TO_ORG_ADMIN_NO_REP_LEFT);
         }

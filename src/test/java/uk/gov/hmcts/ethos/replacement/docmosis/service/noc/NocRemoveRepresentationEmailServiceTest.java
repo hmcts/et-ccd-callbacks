@@ -313,7 +313,7 @@ class NocRemoveRepresentationEmailServiceTest {
     @Test
     void sendEmailToOtherPartyClaimant_doesNothing_whenNoEmail() {
         caseDetails.getCaseData().getRepresentativeClaimantType().setRepresentativeEmailAddress(null);
-
+        caseDetails.getCaseData().getClaimantType().setClaimantEmailAddress(null);
         nocRemoveRepresentationEmailService.sendEmailToOtherPartyClaimant(caseDetails, PARTY_NAME);
 
         verify(emailService, never())

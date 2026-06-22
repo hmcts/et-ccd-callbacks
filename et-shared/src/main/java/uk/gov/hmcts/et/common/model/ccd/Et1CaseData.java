@@ -84,11 +84,12 @@ public class Et1CaseData extends BaseCaseData {
     @JsonProperty("et1OnlineSubmission")
     private String et1OnlineSubmission;
     @JsonProperty("additionalClaimants")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonInclude(JsonInclude.Include.ALWAYS)
     private List<GenericTypeItem<AdditionalClaimant>> additionalClaimants;
     @JsonProperty("addClaimantMethod")
     private String addClaimantMethod;
     @JsonProperty("additionalClaimantSpreadsheet")
+    @JsonInclude(JsonInclude.Include.ALWAYS)
     private UploadedDocumentType additionalClaimantSpreadsheet;
     // Citizen hub
     @JsonProperty("hubLinksStatuses")

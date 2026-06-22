@@ -428,6 +428,17 @@ public final class RespondentUtils {
                 .orElse(null);
     }
 
+    /**
+     * Finds the email address for the given respondent.
+     * <p>
+     * The response respondent email address is returned first if it is present.
+     * If not, the respondent email address is returned instead.
+     * If the respondent, respondent value, or both email address fields are empty,
+     * an empty string is returned.
+     *
+     * @param respondent the respondent item to retrieve the email address from
+     * @return the respondent email address, or an empty string if no email address is available
+     */
     public static String findRespondentEmailAddress(RespondentSumTypeItem respondent) {
         if (ObjectUtils.isEmpty(respondent) || ObjectUtils.isEmpty(respondent.getValue())) {
             return StringUtils.EMPTY;

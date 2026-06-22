@@ -427,4 +427,17 @@ public final class RespondentUtils {
                 .findFirst()
                 .orElse(null);
     }
+
+    public static String findRespondentEmailAddress(RespondentSumTypeItem respondent) {
+        if (ObjectUtils.isEmpty(respondent) || ObjectUtils.isEmpty(respondent.getValue())) {
+            return StringUtils.EMPTY;
+        }
+        if (StringUtils.isNotBlank(respondent.getValue().getResponseRespondentEmail())) {
+            return respondent.getValue().getResponseRespondentEmail();
+        }
+        if (StringUtils.isNotBlank(respondent.getValue().getRespondentEmail())) {
+            return respondent.getValue().getRespondentEmail();
+        }
+        return StringUtils.EMPTY;
+    }
 }

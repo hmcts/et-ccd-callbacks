@@ -33,6 +33,7 @@ final class RespondentUtilsTest {
     private static final String REPRESENTATIVE_ID_2 = "dummy65_representative43_id21";
     private static final String REPRESENTATIVE_EMAIL_ADDRESS_1 = "representative1@hmcts.org";
     private static final String RESPONDENT_EMAIL_ADDRESS_1 = "respondent1@hmcts.org";
+    private static final String RESPONDENT_EMAIL_ADDRESS_2 = "respondent2@hmcts.org";
 
     private static final String EXCEPTION_RESPONDENT_NOT_FOUND =
             "Respondent not found for case ID 1234567890123456.";
@@ -366,5 +367,24 @@ final class RespondentUtilsTest {
         respondent.getValue().setRespondentEmail(RESPONDENT_EMAIL_ADDRESS_1);
         assertThat(RespondentUtils.findAllRespondents(caseDetails))
                 .isEqualTo(List.of(respondent));
+    }
+
+    @Test
+    void theFindRespondentEmailAddress() {
+        respondentUtils.close();
+        // when respondent is empty should return empty string
+        assertThat(RespondentUtils.findRespondentEmailAddress(null)).isEmpty();
+        // when respondent does not have value should return empty string
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        assertThat(RespondentUtils.findRespondentEmailAddress(respondent)).isEmpty();
+        // when respondent does not have email address should return empty
+        respondent.setValue(RespondentSumType.builder().build());
+        assertThat(RespondentUtils.findRespondentEmailAddress(respondent)).isEmpty();
+        // when respondent has email should return that e-mail address
+        respondent.getValue().setRespondentEmail(RESPONDENT_EMAIL_ADDRESS_1);
+        assertThat(RespondentUtils.findRespondentEmailAddress(respondent)).isEqualTo(RESPONDENT_EMAIL_ADDRESS_1);
+        // when respondent has response respondent email address should return that email address
+        respondent.getValue().setResponseRespondentEmail(RESPONDENT_EMAIL_ADDRESS_2);
+        assertThat(RespondentUtils.findRespondentEmailAddress(respondent)).isEqualTo(RESPONDENT_EMAIL_ADDRESS_2);
     }
 }

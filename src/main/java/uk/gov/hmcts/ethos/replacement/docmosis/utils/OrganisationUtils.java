@@ -488,6 +488,7 @@ public final class OrganisationUtils {
         }
         return caseData.getRepCollection().stream()
                 .filter(RespondentRepresentativeUtils::isValidRepresentative)
+                .filter(rep -> Objects.nonNull(rep.getValue().getRespondentOrganisation()))
                 .anyMatch(rep -> organisationId.equals(
                         rep.getValue().getRespondentOrganisation().getOrganisationID()));
     }

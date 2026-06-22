@@ -141,7 +141,7 @@ public class NocRemoveRepresentationEmailService {
                     || StringUtils.isBlank(respondent.getValue().getRespondentEmail())) {
                 continue;
             }
-            String respondentEmailAddress = respondent.getValue().getRespondentEmail();
+            String respondentEmailAddress = RespondentUtils.findRespondentEmailAddress(respondent);
             String linkToCitUI = emailService.getSyrCaseLink(caseDetails.getCaseId(), respondent.getId());
             sendEmailToUnrepresentedParty(caseDetails, respondentEmailAddress, orgName, linkToCitUI);
         }

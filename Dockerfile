@@ -6,6 +6,7 @@ WORKDIR /opt/app
 
 COPY lib/applicationinsights.json /opt/app/
 COPY build/libs/et-cos.jar /opt/app/
+COPY ccd-definitions/jurisdictions /opt/app/ccd-definitions/jurisdictions
 COPY build/cftlib/definition-snapshots /opt/app/build/cftlib/definition-snapshots
 
 EXPOSE 8081

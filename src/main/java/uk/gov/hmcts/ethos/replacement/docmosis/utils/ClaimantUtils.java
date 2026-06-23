@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_CLAIMANT_NOT_FOUND;
 
 public final class ClaimantUtils {
@@ -41,7 +40,7 @@ public final class ClaimantUtils {
             throw new NotFoundException(EXCEPTION_CLAIMANT_NOT_FOUND);
         }
         String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
-        return isNullOrEmpty(claimantEmailAddress) ? "" : claimantEmailAddress;
+        return StringUtils.isBlank(claimantEmailAddress) ? StringUtils.EMPTY : claimantEmailAddress;
     }
 
     public static String getClaimant(CaseData caseData) {

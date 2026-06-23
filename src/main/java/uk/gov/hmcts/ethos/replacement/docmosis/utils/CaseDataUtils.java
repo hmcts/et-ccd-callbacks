@@ -15,7 +15,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants
 
 public final class CaseDataUtils {
 
-    private static final String CLASS_NAME = RespondentUtils.class.getSimpleName();
+    private static final String CLASS_NAME = CaseDataUtils.class.getSimpleName();
 
     private CaseDataUtils() {
         // Utility classes should not have a public or default constructor.

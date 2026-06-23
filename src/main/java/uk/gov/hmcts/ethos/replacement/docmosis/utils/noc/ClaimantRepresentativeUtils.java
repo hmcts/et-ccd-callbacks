@@ -146,7 +146,7 @@ public final class ClaimantRepresentativeUtils {
 
         for (RepresentedTypeRItem respondentRepresentative : caseData.getRepCollection()) {
             if (ObjectUtils.isEmpty(respondentRepresentative)
-                    && ObjectUtils.isEmpty(respondentRepresentative.getValue())) {
+                    || ObjectUtils.isEmpty(respondentRepresentative.getValue())) {
                 continue;
             }
             if (claimantEmail.equals(respondentRepresentative.getValue().getRepresentativeEmailAddress())) {

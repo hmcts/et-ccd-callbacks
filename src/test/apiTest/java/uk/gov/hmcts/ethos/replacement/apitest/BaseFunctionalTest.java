@@ -108,8 +108,7 @@ public abstract class BaseFunctionalTest {
     }
 
     private String createRandomEmail() {
-        int randomNumber = (int) (Math.random() * 10_000_000);
-        return "test" + randomNumber + "@hmcts.net";
+        return "test" + java.util.UUID.randomUUID() + "@hmcts.net";
     }
 
     private CloseableHttpClient buildClient()

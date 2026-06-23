@@ -16,7 +16,6 @@ import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.et.syaapi.config.interceptors.ResourceNotFoundException;
 import uk.gov.hmcts.reform.et.syaapi.exception.CaseUserRoleNotFoundException;
 import uk.gov.hmcts.reform.et.syaapi.models.CaseTransferInfoResponse;
 import uk.gov.hmcts.reform.et.syaapi.models.CaseTransferType;
@@ -170,7 +169,7 @@ class CaseTransferInfoServiceTest {
 
     @Test
     @SneakyThrows
-    void shouldThrowWhenCaseHasNotBeenTransferred() {
+    void shouldReturnFallbackTransferInfoWhenCaseHasNotBeenTransferred() {
         mockUserHasCreatorRole();
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
         when(authTokenGenerator.generate()).thenReturn(S2S_TOKEN);
@@ -180,14 +179,17 @@ class CaseTransferInfoServiceTest {
             null
         ));
 
-        assertThrows(
-            ResourceNotFoundException.class,
-            () -> caseTransferInfoService.getCaseTransferInfo(
-                TEST_SERVICE_AUTH_TOKEN,
-                CASE_ID,
-                CASE_USER_ROLE_CREATOR
-            )
+        CaseTransferInfoResponse response = caseTransferInfoService.getCaseTransferInfo(
+            TEST_SERVICE_AUTH_TOKEN,
+            CASE_ID,
+            CASE_USER_ROLE_CREATOR
         );
+
+        assertTrue(response.isTransferred());
+        assertEquals(CaseTransferType.ECM, response.getTransferType());
+        assertEquals(CASE_ID, response.getOriginalCaseId());
+        assertEquals(ETHOS_REFERENCE, response.getOriginalEthosCaseReference());
+        assertFalse(response.isTransferComplete());
     }
 
     @ParameterizedTest

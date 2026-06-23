@@ -11,7 +11,6 @@ import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.et.syaapi.config.interceptors.ResourceNotFoundException;
 import uk.gov.hmcts.reform.et.syaapi.exception.CaseUserRoleNotFoundException;
 import uk.gov.hmcts.reform.et.syaapi.exception.ManageCaseRoleException;
 import uk.gov.hmcts.reform.et.syaapi.models.CaseTransferInfoResponse;
@@ -110,10 +109,20 @@ public class CaseTransferInfoService {
         String caseState = caseDetails.getState();
 
         if (!isTransferredCase(caseState, linkedCaseCT)) {
-            throw new ResourceNotFoundException(
-                String.format("Case %s has not been transferred", caseDetails.getId()),
-                null
+            log.info(
+                "Case {} found in CCD but transfer markers missing (state: {}, linkedCaseCT: {}), returning fallback ECM transfer info",
+                caseDetails.getId(),
+                caseState,
+                linkedCaseCT
             );
+            return CaseTransferInfoResponse.builder()
+                .transferred(true)
+                .transferType(CaseTransferType.ECM)
+                .caseState(caseState)
+                .originalCaseId(caseDetails.getId().toString())
+                .originalEthosCaseReference(stringValue(data.get("ethosCaseReference")))
+                .transferComplete(false)
+                .build();
         }
 
         ParsedTransferredCaseLink parsedLink = parseTransferredCaseLink(transferredCaseLink);

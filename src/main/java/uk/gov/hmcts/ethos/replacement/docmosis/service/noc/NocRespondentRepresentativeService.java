@@ -70,6 +70,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERR
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_SOLICITOR_ROLE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_REVOKE_RESPONDENT_REPRESENTATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_SET_ROLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REQUEST;
@@ -398,7 +399,7 @@ public class NocRespondentRepresentativeService {
         try {
             revokeCaseAssignments(userToken, caseUserAssignmentsToRevoke);
         } catch (GenericRuntimeException e) {
-            log.error(ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL, oldCaseDetails.getCaseId(), e.getMessage(), e);
+            log.error(ERROR_UNABLE_TO_REVOKE_RESPONDENT_REPRESENTATION, oldCaseDetails.getCaseId(), e.getMessage(), e);
             return new ArrayList<>();
         }
         return representativesToRevoke;
@@ -931,33 +932,38 @@ public class NocRespondentRepresentativeService {
     }
 
     /**
-     * Removes the claimant's legal representation where a conflict exists with a respondent's
-     * representative.
+     * Removes claimant representation when it conflicts with respondent representative details.
      *
-     * <p>This method performs a series of validation checks to ensure the supplied
-     * {@link CaseDetails} contains the minimum required information (case ID,
-     * case type ID, jurisdiction, case data, representative collection, and that
-     * the claimant is currently marked as represented). If any of these checks fail,
-     * no action is taken and the existing {@link CaseData} is returned (or {@code null}
-     * if {@code caseDetails} itself is {@code null}).</p>
+     * <p>This method checks whether the claimant representative is linked to any respondent
+     * representative either by organisation or by email address. If a conflict is found, the
+     * claimant representation is revoked in CCD and the claimant is marked as unrepresented
+     * in the case data.</p>
      *
-     * <p>If validation passes, the method:
-     * <ol>
-     *     <li>Obtains an admin user token.</li>
-     *     <li>Attempts to revoke the claimant's representation via CCD.</li>
-     *     <li>If revocation fails and the claimant representative’s email matches
-     *         a respondent representative, forcefully removes the claimant representation.</li>
-     *     <li>Sends a notification to the claimant if the representation is successfully removed.</li>
-     * </ol>
+     * <p>If the supplied {@link CaseDetails} is missing required information, or if the claimant
+     * is not represented, the method does not perform any revocation and returns the existing
+     * case data unchanged. If {@code caseDetails} is {@code null} or empty, {@code null} is
+     * returned.</p>
      *
-     * <p>If representation removal is unsuccessful, the original {@link CaseData}
-     * is returned unchanged.</p>
+     * <p><strong>Assumptions:</strong></p>
+     * <ul>
+     *     <li>A claimant representation conflict exists when the claimant representative
+     *     organisation matches one of the respondent representative organisations, or when
+     *     the claimant representative email matches a respondent representative email.</li>
+     *     <li>The claimant is considered represented only when
+     *     {@code claimantRepresentedQuestion} is equal to {@code YES}.</li>
+     *     <li>{@code caseId}, {@code caseTypeId}, {@code jurisdiction}, {@code caseData}, and
+     *     {@code repCollection} are required before attempting to revoke representation.</li>
+     *     <li>The CCD revocation is performed using an admin user token.</li>
+     *     <li>If the CCD revocation service call fails, the exception is expected to propagate
+     *     to the caller, as no rollback or local error handling is performed in this method.</li>
+     *     <li>The returned {@link CaseData} is the same mutable instance contained in the
+     *     supplied {@link CaseDetails}.</li>
+     * </ul>
      *
-     * @param caseDetails the case details containing identifiers and case data;
-     *                    may be {@code null}
-     * @return the updated {@link CaseData} if representation was successfully removed,
-     *         the existing {@link CaseData} if no action was taken or removal failed,
-     *         or {@code null} if {@code caseDetails} is {@code null}
+     * @param caseDetails the case details containing case metadata and case data to validate
+     *                    and update
+     * @return the updated {@link CaseData}; the original case data if no conflict is found or
+     *         validation fails; or {@code null} when {@code caseDetails} is {@code null} or empty
      */
     public CaseData removeConflictingClaimantRepresentation(CaseDetails caseDetails) {
         if (ObjectUtils.isEmpty(caseDetails)

@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -136,7 +137,7 @@ class RetentionCaseDataRepositoryTest {
         assertThat(paramsCaptor.getValue().getValue("references")).isEqualTo(List.of(111L, 222L));
     }
 
-    private void mockCaseDataQuery() throws Exception {
+    private void mockCaseDataQuery() throws SQLException {
         mockResultSet();
         when(jdbcTemplate.query(anyString(), any(MapSqlParameterSource.class),
                 ArgumentMatchers.<RowMapper<RetentionCaseData>>any()))
@@ -146,7 +147,7 @@ class RetentionCaseDataRepositoryTest {
             });
     }
 
-    private void mockResultSet() throws Exception {
+    private void mockResultSet() throws SQLException {
         when(resultSet.getObject("reference", Long.class)).thenReturn(111L);
         when(resultSet.getObject("id", Long.class)).thenReturn(999L);
         when(resultSet.getString("case_type_id")).thenReturn("ET_EnglandWales");

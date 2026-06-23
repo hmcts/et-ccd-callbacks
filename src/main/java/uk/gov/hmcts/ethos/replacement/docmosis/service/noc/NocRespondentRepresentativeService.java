@@ -70,6 +70,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERR
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_SOLICITOR_ROLE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_REVOKE_RESPONDENT_REPRESENTATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_SET_ROLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REQUEST;
@@ -398,7 +399,7 @@ public class NocRespondentRepresentativeService {
         try {
             revokeCaseAssignments(userToken, caseUserAssignmentsToRevoke);
         } catch (GenericRuntimeException e) {
-            log.error(ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL, oldCaseDetails.getCaseId(), e.getMessage(), e);
+            log.error(ERROR_UNABLE_TO_REVOKE_RESPONDENT_REPRESENTATION, oldCaseDetails.getCaseId(), e.getMessage(), e);
             return new ArrayList<>();
         }
         return representativesToRevoke;

@@ -78,6 +78,10 @@ document_management:
 
 decentralisation:
   legacy-json-service: true
+  local-callback-placeholder: ET_COS_URL
+  local-callback-base-url: ${ET_COS_URL:http://localhost:8081}
+  external-callback-base-urls:
+    "[CCD_DEF_AAC_URL]": ${AAC_URL:http://localhost:4454}
 
 idam:
   s2s-auth:

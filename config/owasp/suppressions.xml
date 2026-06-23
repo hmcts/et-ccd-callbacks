@@ -30,6 +30,37 @@
         <packageUrl regex="true">^pkg:maven/commons\-validator/commons\-validator@.*$</packageUrl>
         <cpe>cpe:/a:validator:validator</cpe>
     </suppress>
+    <!-- Azure Service Bus SDK transitive dependencies. These are already on the latest Azure SDK BOM/MSAL stable versions. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: azure-core-1.58.0.jar, azure-core-amqp-2.11.4.jar, azure-core-http-netty-1.16.4.jar,
+   azure-core-management-1.19.4.jar, azure-identity-1.18.3.jar, azure-identity-extensions-1.2.8.jar,
+   azure-json-1.5.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.azure/azure\-(core|core\-amqp|core\-http\-netty|core\-management|identity|identity\-extensions|json)@.*$</packageUrl>
+        <cve>CVE-2026-33117</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: azure-identity-1.18.3.jar and azure-identity-extensions-1.2.8.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.azure/azure\-identity(\-extensions)?@.*$</packageUrl>
+        <cve>CVE-2023-36415</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: azure-identity-extensions-1.2.8.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.azure/azure\-identity\-extensions@.*$</packageUrl>
+        <cve>CVE-2023-36414</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: azure-identity-1.18.3.jar, azure-identity-extensions-1.2.8.jar and msal4j-1.25.0.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/(com\.azure/azure\-identity(\-extensions)?|com\.microsoft\.azure/msal4j)@.*$</packageUrl>
+        <cve>CVE-2024-35255</cve>
+    </suppress>
     <!-- Spring Framework CVEs fixed in 6.2.19 - suppress until Spring Boot BOM upgrade -->
     <suppress>
         <notes><![CDATA[

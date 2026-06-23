@@ -62,7 +62,7 @@ class CaseRetentionServiceTest {
     }
 
     @Test
-    void skipsDeleteWhenCcdPointerStillExists() throws Exception {
+    void skipsDeleteWhenCcdPointerStillExists() {
         RetentionCaseData caseData = caseData(111L, "2026-06-22", null, "No");
         when(repository.findExpiredCases(Set.of(CASE_TYPE), 10)).thenReturn(List.of(caseData));
         when(repository.findByReferences(Set.of(111L))).thenReturn(List.of(caseData));

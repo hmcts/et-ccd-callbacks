@@ -400,6 +400,10 @@ ccd:
     clusterName: "es"
     replicas: 1
     clusterHealthCheckParams: "wait_for_status=yellow&timeout=1s"
+    volumeClaimTemplate:
+      resources:
+        requests:
+          storage: 5Gi
 
   logstash:
     enabled: false

@@ -81,11 +81,13 @@ class CaseRetentionServiceTest {
         when(repository.findExpiredCases(Set.of(CASE_TYPE), 10)).thenReturn(List.of(expired));
         when(repository.findByReferences(Set.of(111L))).thenReturn(List.of(expired));
         when(repository.findByReferences(Set.of(222L))).thenReturn(List.of(notExpired));
+        when(adminUserService.getAdminUserToken()).thenReturn(TOKEN);
 
         RetentionTaskResult result = service.run(Set.of(CASE_TYPE), Set.of(), 10);
 
         assertThat(result.deletedCases()).isZero();
-        verifyNoInteractions(adminUserService, ccdClient);
+        verify(adminUserService).getAdminUserToken();
+        verifyNoInteractions(ccdClient);
         verify(repository, never()).deleteCases(Set.of(111L, 222L));
     }
 
@@ -94,11 +96,13 @@ class CaseRetentionServiceTest {
         RetentionCaseData caseData = caseData(111L, "2026-06-22", null, "No");
         when(repository.findExpiredCases(Set.of(CASE_TYPE), 10)).thenReturn(List.of(caseData));
         when(repository.findByReferences(Set.of(111L))).thenReturn(List.of(caseData));
+        when(adminUserService.getAdminUserToken()).thenReturn(TOKEN);
 
         RetentionTaskResult result = service.run(Set.of(), Set.of(CASE_TYPE), 10);
 
         assertThat(result.simulatedCases()).isEqualTo(1);
-        verifyNoInteractions(adminUserService, ccdClient);
+        verify(adminUserService).getAdminUserToken();
+        verifyNoInteractions(ccdClient);
         verify(repository, never()).deleteCases(Set.of(111L));
     }
 

@@ -76,10 +76,14 @@ public class IdamTestApiRequests {
                                                              .build());
 
         int statusCode = createUserResponse.getStatusLine().getStatusCode();
+        String responseBody = EntityUtils.toString(createUserResponse.getEntity());
 
-        assertTrue(statusCode == CREATED.value() || statusCode == OK.value());
+        assertTrue(
+            "Expected IDAM test user creation to return 200 or 201, but got " + statusCode + ": " + responseBody,
+            statusCode == CREATED.value() || statusCode == OK.value()
+        );
         log.info("BaseFunctionalTest user created.");
-        return EntityUtils.toString(createUserResponse.getEntity());
+        return responseBody;
     }
 
     /**

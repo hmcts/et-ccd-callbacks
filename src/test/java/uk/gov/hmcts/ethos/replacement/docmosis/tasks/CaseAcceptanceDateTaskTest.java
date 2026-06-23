@@ -60,6 +60,7 @@ class CaseAcceptanceDateTaskTest {
         caseAcceptanceDateTask = new CaseAcceptanceDateTask(
             adminUserService, ccdClient, ecmCcdClient, preAcceptanceCaseService);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
+        ReflectionTestUtils.setField(caseAcceptanceDateTask, "maxCasesToProcess", 100);
     }
 
     @Test
@@ -284,11 +285,42 @@ class CaseAcceptanceDateTaskTest {
             any(), any(), any());
     }
     
+    @Test
+    void run_etCaseType_exceedsMaxCasesToProcess_limitsProcessedCases() throws IOException {
+        setEtCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
+        ReflectionTestUtils.setField(caseAcceptanceDateTask, "maxCasesToProcess", 2);
+
+        List<SubmitEvent> fiveCases = List.of(
+            buildEtSubmitEventWithId(1L),
+            buildEtSubmitEventWithId(2L),
+            buildEtSubmitEventWithId(3L),
+            buildEtSubmitEventWithId(4L),
+            buildEtSubmitEventWithId(5L)
+        );
+        CCDRequest ccdRequest = buildEtCcdRequest(new CaseData());
+
+        when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
+            .thenReturn(fiveCases);
+        when(ccdClient.startEventForCase(any(), eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT), any(), any()))
+            .thenReturn(ccdRequest);
+
+        caseAcceptanceDateTask.run();
+
+        verify(ccdClient, times(2)).startEventForCase(any(), eq(ENGLANDWALES_CASE_TYPE_ID),
+            eq(EMPLOYMENT), any(), any());
+        verify(ccdClient, times(2)).submitEventForCase(any(), any(CaseData.class),
+            eq(ENGLANDWALES_CASE_TYPE_ID), any(), any(), any());
+    }
+
     private void setEtCaseTypeId(String caseTypeId) {
         ReflectionTestUtils.setField(caseAcceptanceDateTask, "caseTypeIdsString", caseTypeId);
     }
 
     private SubmitEvent buildEtSubmitEvent() {
+        return buildEtSubmitEventWithId(Long.parseLong(CASE_ID));
+    }
+
+    private SubmitEvent buildEtSubmitEventWithId(long id) {
         CasePreAcceptType preAccept = new CasePreAcceptType();
         preAccept.setCaseAccepted(YES);
         preAccept.setDateAccepted("2024-01-01");
@@ -297,7 +329,7 @@ class CaseAcceptanceDateTaskTest {
         caseData.setPreAcceptCase(preAccept);
 
         SubmitEvent submitEvent = new SubmitEvent();
-        submitEvent.setCaseId(Long.parseLong(CASE_ID));
+        submitEvent.setCaseId(id);
         submitEvent.setCaseData(caseData);
         return submitEvent;
     }

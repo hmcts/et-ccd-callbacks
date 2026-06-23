@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
@@ -61,6 +62,8 @@ public class CaseAcceptanceDateTask implements Runnable {
 
     @Value("${cron.caseTypeId}")
     private String caseTypeIdsString;
+    @Value("${cron.maxCasesToProcess}")
+    private int maxCasesToProcess;
 
     @Override
     public void run() {
@@ -100,6 +103,11 @@ public class CaseAcceptanceDateTask implements Runnable {
                 log.info("{} - Case Acceptance Date task - No cases to process", caseTypeId);
                 return;
             }
+            if (cases.size() > maxCasesToProcess) {
+                log.info("{} - Case Acceptance Date task - Limiting to {} cases (retrieved {})",
+                    caseTypeId, maxCasesToProcess, cases.size());
+                cases = cases.subList(0, maxCasesToProcess);
+            }
             updateCases(cases, caseTypeId, processor);
         } catch (IOException e) {
             log.warn("{} - Case Acceptance Date task - error: {}", caseTypeId, e.getMessage(), e);
@@ -123,9 +131,16 @@ public class CaseAcceptanceDateTask implements Runnable {
         throws InterruptedException {
         final int poolSize = Math.min(15, Runtime.getRuntime().availableProcessors() * 2);
 
+        final int total = cases.size();
+        final AtomicInteger counter = new AtomicInteger(0);
+
         try (ExecutorService executor = Executors.newFixedThreadPool(poolSize)) {
             for (T submitEvent : cases) {
-                executor.execute(() -> processor.accept(submitEvent));
+                executor.execute(() -> {
+                    processor.accept(submitEvent);
+                    log.info("{} - Case Acceptance Date task - {} out of {}",
+                        caseTypeId, counter.incrementAndGet(), total);
+                });
             }
             executor.shutdown();
             if (!executor.awaitTermination(EXECUTOR_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {

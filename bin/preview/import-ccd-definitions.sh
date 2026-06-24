@@ -11,7 +11,7 @@ CURL_RETRY_DELAY_SECONDS=5
 # searchable case types. ES can still be starting up when the import runs, which
 # surfaces as an HTTP 400 with an "ElasticSearch initialisation" message. These
 # are transient, so retry the whole import for this specific error.
-IMPORT_ES_RETRY_COUNT="${IMPORT_ES_RETRY_COUNT:-30}"
+IMPORT_ES_RETRY_COUNT="${IMPORT_ES_RETRY_COUNT:-20}"
 IMPORT_ES_RETRY_DELAY_SECONDS="${IMPORT_ES_RETRY_DELAY_SECONDS:-15}"
 IMPORT_ES_MAX_RETRY_DELAY_SECONDS="${IMPORT_ES_MAX_RETRY_DELAY_SECONDS:-60}"
 IMPORT_ES_INITIAL_WAIT_SECONDS="${IMPORT_ES_INITIAL_WAIT_SECONDS:-30}"

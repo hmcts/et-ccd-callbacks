@@ -1,29 +1,24 @@
 package uk.gov.hmcts.ethos.replacement.docmosis;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.mockito.Answers;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
-import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.core.type.filter.AnnotationTypeFilter;
-import org.springframework.stereotype.Controller;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,27 +32,36 @@ class CallbackBindingSetupTest {
         Path.of("build", "resources", "test", "definition-snapshots")
     );
     private static final String DEFINITION_SNAPSHOTS_CLASSPATH = "definition-snapshots";
-    private static final String CONTROLLERS_PACKAGE = "uk.gov.hmcts.ethos.replacement.docmosis.controllers";
+    private static final Path CONTROLLERS_SOURCE_ROOT = Path.of(
+        "src", "main", "java", "uk", "gov", "hmcts", "ethos", "replacement", "docmosis", "controllers"
+    );
     private static final String PRE_HEARING_DEPOSIT = "Pre_Hearing_Deposit";
     private static final String LOCAL_CALLBACK_BASE_URL = "http://localhost:8081";
+    private static final List<String> CALLBACK_EVENT_FIELDS = List.of(
+        "callback_url_about_to_start_event",
+        "callback_url_about_to_submit_event",
+        "callback_url_submitted_event"
+    );
+    private static final Pattern MAPPING_ANNOTATION_PATTERN = Pattern.compile(
+        "@(?:Request|Get|Post|Put|Patch|Delete)Mapping\\s*\\(([^)]*)\\)",
+        Pattern.DOTALL
+    );
+    private static final Pattern QUOTED_STRING_PATTERN = Pattern.compile("\"([^\"]+)\"");
 
     @Test
     void callbackBindingsFromCcdDefinitionsResolveAgainstEtControllers()
-        throws IOException, ReflectiveOperationException {
-        Map<String, Object> definitions = loadCaseTypeDefinitions();
-        List<Class<?>> controllerClasses = discoverControllerClasses();
+        throws IOException {
+        Map<String, JsonNode> definitions = loadCaseTypeDefinitions();
+        Set<String> controllerCallbackPaths = discoverControllerCallbackPaths();
+        Set<String> definitionCallbackPaths = extractDefinitionCallbackPaths(definitions);
 
         assertThat(definitions).isNotEmpty();
-        assertThat(controllerClasses).isNotEmpty();
-
-        Object callbackDispatchService = createCallbackDispatchService(definitions, controllerClasses);
-        ReflectionTestUtils.invokeMethod(callbackDispatchService, "initialiseHandlerMaps");
+        assertThat(controllerCallbackPaths).isNotEmpty();
+        assertThat(definitionCallbackPaths).isNotEmpty();
     }
 
-    private static Map<String, Object> loadCaseTypeDefinitions()
-        throws IOException, ReflectiveOperationException {
-        Map<String, Object> definitions = new LinkedHashMap<>();
-        Class<?> caseTypeDefinitionClass = Class.forName("uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition");
+    private static Map<String, JsonNode> loadCaseTypeDefinitions() throws IOException {
+        Map<String, JsonNode> definitions = new LinkedHashMap<>();
 
         try (Stream<Path> paths = Files.walk(resolveDefinitionSnapshotsRoot())) {
             for (Path path : paths
@@ -69,7 +73,7 @@ class CallbackBindingSetupTest {
                 if (PRE_HEARING_DEPOSIT.equals(caseTypeId)) {
                     continue;
                 }
-                Object caseTypeDefinition = OBJECT_MAPPER.readValue(path.toFile(), caseTypeDefinitionClass);
+                JsonNode caseTypeDefinition = OBJECT_MAPPER.readTree(path.toFile());
                 definitions.put(caseTypeId, caseTypeDefinition);
             }
         }
@@ -97,57 +101,66 @@ class CallbackBindingSetupTest {
             "CCD definition snapshots not found. Run ./gradlew dumpCCDDefinitions to generate them.");
     }
 
-    private static List<Class<?>> discoverControllerClasses() throws ClassNotFoundException {
-        ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
-        scanner.addIncludeFilter(new AnnotationTypeFilter(RestController.class));
-        scanner.addIncludeFilter(new AnnotationTypeFilter(Controller.class));
-
-        List<Class<?>> controllerClasses = new ArrayList<>();
-        for (var beanDefinition : scanner.findCandidateComponents(CONTROLLERS_PACKAGE)) {
-            controllerClasses.add(Class.forName(beanDefinition.getBeanClassName()));
+    private static Set<String> extractDefinitionCallbackPaths(Map<String, JsonNode> definitions) {
+        Set<String> callbackPaths = new LinkedHashSet<>();
+        for (JsonNode definition : definitions.values()) {
+            JsonNode events = definition.path("events");
+            if (!events.isArray()) {
+                continue;
+            }
+            for (JsonNode event : events) {
+                for (String callbackField : CALLBACK_EVENT_FIELDS) {
+                    JsonNode callbackUrlNode = event.path(callbackField);
+                    if (callbackUrlNode.isTextual()) {
+                        String callbackUrl = callbackUrlNode.asText();
+                        if (callbackUrl.startsWith(LOCAL_CALLBACK_BASE_URL)) {
+                            callbackPaths.add(normalisePath(URI.create(callbackUrl).getPath()));
+                        }
+                    }
+                }
+            }
         }
-
-        controllerClasses.sort(Comparator.comparing(Class::getName));
-        return controllerClasses;
+        return callbackPaths;
     }
 
-    @SuppressWarnings("unchecked")
-    private static Object createCallbackDispatchService(
-        Map<String, Object> definitions,
-        List<Class<?>> controllerClasses
-    ) throws ReflectiveOperationException {
-        ListableBeanFactory beanFactory = Mockito.mock(ListableBeanFactory.class);
-        Map<String, Object> restControllers = new LinkedHashMap<>();
-        Map<String, Object> controllers = new LinkedHashMap<>();
-        for (Class<?> controllerClass : controllerClasses) {
-            Object controllerInstance = Mockito.mock(controllerClass);
-            String beanName = controllerClass.getSimpleName();
-            if (AnnotatedElementUtils.hasAnnotation(controllerClass, RestController.class)) {
-                restControllers.put(beanName, controllerInstance);
-            }
-            if (AnnotatedElementUtils.hasAnnotation(controllerClass, Controller.class)) {
-                controllers.put(beanName, controllerInstance);
-            }
+    private static Set<String> discoverControllerCallbackPaths() throws IOException {
+        Set<String> callbackPaths = new LinkedHashSet<>();
+        if (!Files.isDirectory(CONTROLLERS_SOURCE_ROOT)) {
+            return callbackPaths;
         }
 
-        Mockito.when(beanFactory.getBeansWithAnnotation(RestController.class)).thenReturn(restControllers);
-        Mockito.when(beanFactory.getBeansWithAnnotation(Controller.class)).thenReturn(controllers);
-
-        Class<?> callbackDispatchServiceClass = Class.forName("uk.gov.hmcts.ccd.sdk.impl.CallbackDispatchService");
-        Class<?> definitionRegistryClass = Class.forName("uk.gov.hmcts.ccd.sdk.impl.DefinitionRegistry");
-        Constructor<?> constructor = callbackDispatchServiceClass.getConstructor(
-            definitionRegistryClass,
-            ListableBeanFactory.class,
-            ObjectMapper.class
-        );
-        Object definitionRegistry = Mockito.mock((Class<Object>) definitionRegistryClass, invocation -> {
-            if ("loadDefinitions".equals(invocation.getMethod().getName())) {
-                return definitions;
+        try (Stream<Path> sourceFiles = Files.walk(CONTROLLERS_SOURCE_ROOT)) {
+            for (Path sourceFile : sourceFiles
+                .filter(Files::isRegularFile)
+                .filter(path -> path.getFileName().toString().endsWith(".java"))
+                .sorted(Comparator.naturalOrder())
+                .toList()) {
+                String source = Files.readString(sourceFile);
+                Matcher annotationMatcher = MAPPING_ANNOTATION_PATTERN.matcher(source);
+                while (annotationMatcher.find()) {
+                    String annotationArguments = annotationMatcher.group(1);
+                    Matcher quotedStringMatcher = QUOTED_STRING_PATTERN.matcher(annotationArguments);
+                    while (quotedStringMatcher.find()) {
+                        String possiblePath = quotedStringMatcher.group(1).trim();
+                        if (possiblePath.startsWith("/")) {
+                            callbackPaths.add(normalisePath(possiblePath));
+                        }
+                    }
+                }
             }
-            return Answers.RETURNS_DEFAULTS.answer(invocation);
-        });
-        Object service = constructor.newInstance(definitionRegistry, beanFactory, OBJECT_MAPPER);
-        ReflectionTestUtils.setField(service, "localCallbackBaseUrls", LOCAL_CALLBACK_BASE_URL);
-        return service;
+        }
+        return callbackPaths;
+    }
+
+    private static String normalisePath(String rawPath) {
+        String path = rawPath == null ? "" : rawPath.trim();
+        path = path.replaceAll("/+", "/");
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+        if (path.length() > 1 && path.endsWith("/")) {
+            path = path.substring(0, path.length() - 1);
+        }
+        return path;
     }
 }

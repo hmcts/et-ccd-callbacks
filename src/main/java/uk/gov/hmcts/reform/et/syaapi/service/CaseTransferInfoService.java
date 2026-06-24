@@ -110,7 +110,8 @@ public class CaseTransferInfoService {
 
         if (!isTransferredCase(caseState, linkedCaseCT)) {
             log.info(
-                "Case {} found in CCD but transfer markers missing (state: {}, linkedCaseCT: {}), returning fallback ECM transfer info",
+                "Case {} found in CCD but transfer markers missing (state: {}, linkedCaseCT: {}), "
+                        + "returning fallback ECM transfer info",
                 caseDetails.getId(),
                 caseState,
                 linkedCaseCT
@@ -190,7 +191,8 @@ public class CaseTransferInfoService {
 
     record ParsedTransferredCaseLink(String caseId, String ethosCaseReference) {
         static ParsedTransferredCaseLink empty() {
-            return new ParsedTransferredCaseLink(null, null);
+            return new ParsedTransferredCaseLink(null,
+                    null);
         }
     }
 }

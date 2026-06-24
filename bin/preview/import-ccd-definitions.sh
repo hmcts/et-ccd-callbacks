@@ -49,6 +49,7 @@ is_transient_es_error() {
 
     [[ "${http_code}" == "400" || "${http_code}" == "500" || "${http_code}" == "503" ]] \
         && [[ "${response_body}" == *"ElasticSearch initialisation"* \
+            || "${response_body}" == *"Elasticsearch initialisation"* \
             || "${response_body}" == *"check alias existence"* ]]
 }
 
@@ -60,7 +61,7 @@ import_definition_attempt() {
     response_body_file=$(mktemp)
 
     local http_code
-    if ! http_code=$(curl --silent --show-error --location \
+    if http_code=$(curl --silent --show-error --location \
         --http1.1 \
         --retry "${CURL_RETRY_COUNT}" \
         --retry-delay "${CURL_RETRY_DELAY_SECONDS}" \
@@ -74,6 +75,8 @@ import_definition_attempt() {
         -H "Authorization: Bearer ${USER_TOKEN}" \
         -H "ServiceAuthorization: ${SERVICE_TOKEN}" \
         -F "file=@${full_path}"); then
+        :
+    else
         local curl_exit_code="$?"
         if [[ -s "${response_body_file}" ]]; then
             echo "    Response: $(cat "${response_body_file}")" >&2
@@ -107,7 +110,9 @@ import_definition() {
     local max_attempts=$((IMPORT_ES_RETRY_COUNT + 1))
     while true; do
         local result http_code response_body
-        if ! result=$(import_definition_attempt "${full_path}"); then
+        if result=$(import_definition_attempt "${full_path}"); then
+            :
+        else
             local curl_exit_code="$?"
             echo "    ❌ curl failed to import ${file_name} (exit ${curl_exit_code})"
             return "${curl_exit_code}"

@@ -36,7 +36,7 @@ class CallbackBindingSetupTest {
         "src", "main", "java", "uk", "gov", "hmcts", "ethos", "replacement", "docmosis", "controllers"
     );
     private static final String PRE_HEARING_DEPOSIT = "Pre_Hearing_Deposit";
-    private static final String LOCAL_CALLBACK_BASE_URL = "http://localhost:8081";
+    private static final String DEFAULT_CALLBACK_BASE_URL = "http://localhost:8081";
     private static final List<String> CALLBACK_EVENT_FIELDS = List.of(
         "callback_url_about_to_start_event",
         "callback_url_about_to_submit_event",
@@ -102,6 +102,7 @@ class CallbackBindingSetupTest {
     }
 
     private static Set<String> extractDefinitionCallbackPaths(Map<String, JsonNode> definitions) {
+        String callbackBaseUrl = resolveCallbackBaseUrl();
         Set<String> callbackPaths = new LinkedHashSet<>();
         for (JsonNode definition : definitions.values()) {
             JsonNode events = definition.path("events");
@@ -113,7 +114,7 @@ class CallbackBindingSetupTest {
                     JsonNode callbackUrlNode = event.path(callbackField);
                     if (callbackUrlNode.isTextual()) {
                         String callbackUrl = callbackUrlNode.asText();
-                        if (callbackUrl.startsWith(LOCAL_CALLBACK_BASE_URL)) {
+                        if (callbackUrl.startsWith(callbackBaseUrl)) {
                             callbackPaths.add(normalisePath(URI.create(callbackUrl).getPath()));
                         }
                     }
@@ -121,6 +122,14 @@ class CallbackBindingSetupTest {
             }
         }
         return callbackPaths;
+    }
+
+    private static String resolveCallbackBaseUrl() {
+        String callbackBaseUrl = System.getenv("ET_COS_URL");
+        if (callbackBaseUrl == null || callbackBaseUrl.isBlank()) {
+            return DEFAULT_CALLBACK_BASE_URL;
+        }
+        return callbackBaseUrl.replaceAll("/+$", "");
     }
 
     private static Set<String> discoverControllerCallbackPaths() throws IOException {

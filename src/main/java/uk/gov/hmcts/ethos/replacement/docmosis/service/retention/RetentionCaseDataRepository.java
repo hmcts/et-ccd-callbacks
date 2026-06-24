@@ -16,7 +16,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class RetentionCaseDataRepository {
     private static final String SELECT_CASE_DATA = """
-        select reference, id, case_type_id, jurisdiction, data::text as data
+        select reference, id, case_type_id, jurisdiction, resolved_ttl, data::text as data
         from ccd.case_data
         """;
 
@@ -30,19 +30,8 @@ public class RetentionCaseDataRepository {
 
         String sql = SELECT_CASE_DATA + """
             where case_type_id in (:caseTypeIds)
-              and lower(coalesce(nullif(data #>> '{TTL,Suspended}', ''), 'no')) <> 'yes'
-              and (
-                (
-                  nullif(data #>> '{TTL,OverrideTTL}', '') is not null
-                  and (data #>> '{TTL,OverrideTTL}')::date < current_date
-                )
-                or (
-                  nullif(data #>> '{TTL,OverrideTTL}', '') is null
-                  and nullif(data #>> '{TTL,SystemTTL}', '') is not null
-                  and (data #>> '{TTL,SystemTTL}')::date < current_date
-                )
-              )
-            order by reference
+              and resolved_ttl < current_date
+            order by resolved_ttl desc
             limit :limit
             """;
 
@@ -100,6 +89,7 @@ public class RetentionCaseDataRepository {
             rs.getObject("id", Long.class),
             rs.getString("case_type_id"),
             rs.getString("jurisdiction"),
+            rs.getObject("resolved_ttl", java.time.LocalDate.class),
             readJson(rs.getString("data"))
         );
     }

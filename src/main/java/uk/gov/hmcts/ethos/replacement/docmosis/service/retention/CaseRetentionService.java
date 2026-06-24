@@ -12,7 +12,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -22,7 +21,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
@@ -135,33 +133,12 @@ public class CaseRetentionService {
 
     private boolean allCasesEligible(Collection<RetentionCaseData> cases, Collection<String> caseTypeIds) {
         return cases.stream().allMatch(retentionCase ->
-            caseTypeIds.contains(retentionCase.caseTypeId()) && isExpiredAndNotSuspended(retentionCase.data()));
+            caseTypeIds.contains(retentionCase.caseTypeId()) && isExpired(retentionCase));
     }
 
-    private boolean isExpiredAndNotSuspended(JsonNode data) {
-        JsonNode ttl = data.path("TTL");
-        if (equalsIgnoreCase(ttl.path("Suspended").asText(null), "Yes")) {
-            return false;
-        }
-
-        LocalDate today = LocalDate.now(clock);
-        LocalDate overrideTtl = parseDate(ttl.path("OverrideTTL").asText(null));
-        LocalDate systemTtl = parseDate(ttl.path("SystemTTL").asText(null));
-
-        return overrideTtl != null && overrideTtl.isBefore(today)
-            || overrideTtl == null && systemTtl != null && systemTtl.isBefore(today);
-    }
-
-    private LocalDate parseDate(String value) {
-        if (StringUtils.isBlank(value)) {
-            return null;
-        }
-        try {
-            return LocalDate.parse(value);
-        } catch (DateTimeParseException e) {
-            log.warn("Ignoring invalid TTL date '{}'", value);
-            return null;
-        }
+    private boolean isExpired(RetentionCaseData retentionCase) {
+        LocalDate resolvedTtl = retentionCase.resolvedTtl();
+        return resolvedTtl != null && resolvedTtl.isBefore(LocalDate.now(clock));
     }
 
     private boolean allCcdPointersRemoved(Collection<RetentionCaseData> cases, String adminUserToken) {

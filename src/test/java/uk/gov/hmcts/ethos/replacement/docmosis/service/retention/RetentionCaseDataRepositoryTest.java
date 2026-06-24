@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -64,9 +65,13 @@ class RetentionCaseDataRepositoryTest {
         List<RetentionCaseData> cases = repository.findExpiredCases(List.of("ET_EnglandWales"), 25);
 
         assertMappedCase(cases);
+        ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<MapSqlParameterSource> paramsCaptor = ArgumentCaptor.forClass(MapSqlParameterSource.class);
-        verify(jdbcTemplate).query(anyString(), paramsCaptor.capture(),
+        verify(jdbcTemplate).query(sqlCaptor.capture(), paramsCaptor.capture(),
             ArgumentMatchers.<RowMapper<RetentionCaseData>>any());
+        assertThat(sqlCaptor.getValue())
+            .contains("resolved_ttl < current_date", "order by resolved_ttl desc")
+            .doesNotContain("SystemTTL", "OverrideTTL", "Suspended");
         assertThat(paramsCaptor.getValue().getValue("caseTypeIds")).isEqualTo(List.of("ET_EnglandWales"));
         assertThat(paramsCaptor.getValue().getValue("limit")).isEqualTo(25);
     }
@@ -152,6 +157,7 @@ class RetentionCaseDataRepositoryTest {
         when(resultSet.getObject("id", Long.class)).thenReturn(999L);
         when(resultSet.getString("case_type_id")).thenReturn("ET_EnglandWales");
         when(resultSet.getString("jurisdiction")).thenReturn("EMPLOYMENT");
+        when(resultSet.getObject("resolved_ttl", LocalDate.class)).thenReturn(LocalDate.of(2026, 6, 22));
         when(resultSet.getString("data")).thenReturn(CASE_DATA_JSON);
     }
 
@@ -162,6 +168,7 @@ class RetentionCaseDataRepositoryTest {
         assertThat(retentionCaseData.id()).isEqualTo(999L);
         assertThat(retentionCaseData.caseTypeId()).isEqualTo("ET_EnglandWales");
         assertThat(retentionCaseData.jurisdiction()).isEqualTo("EMPLOYMENT");
+        assertThat(retentionCaseData.resolvedTtl()).isEqualTo(LocalDate.of(2026, 6, 22));
         assertThat(retentionCaseData.data().path("TTL").path("SystemTTL").asText()).isEqualTo("2026-06-22");
     }
 }

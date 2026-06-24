@@ -12,6 +12,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
@@ -47,7 +48,7 @@ class CaseRetentionServiceTest {
 
     @Test
     void deletesLocalCaseWhenExpiredAndCcdPointerHasGone() throws Exception {
-        RetentionCaseData caseData = caseData(111L, "2026-06-22", null, "No");
+        RetentionCaseData caseData = caseData(111L, LocalDate.of(2026, 6, 22));
         when(repository.findExpiredCases(Set.of(CASE_TYPE), 10)).thenReturn(List.of(caseData));
         when(repository.findByReferences(Set.of(111L))).thenReturn(List.of(caseData));
         when(adminUserService.getAdminUserToken()).thenReturn(TOKEN);
@@ -63,7 +64,7 @@ class CaseRetentionServiceTest {
 
     @Test
     void skipsDeleteWhenCcdPointerStillExists() {
-        RetentionCaseData caseData = caseData(111L, "2026-06-22", null, "No");
+        RetentionCaseData caseData = caseData(111L, LocalDate.of(2026, 6, 22));
         when(repository.findExpiredCases(Set.of(CASE_TYPE), 10)).thenReturn(List.of(caseData));
         when(repository.findByReferences(Set.of(111L))).thenReturn(List.of(caseData));
         when(adminUserService.getAdminUserToken()).thenReturn(TOKEN);
@@ -76,8 +77,8 @@ class CaseRetentionServiceTest {
 
     @Test
     void skipsLinkedGroupWhenLinkedCaseIsNotExpired() {
-        RetentionCaseData expired = caseData(111L, "2026-06-22", null, "No", 222L);
-        RetentionCaseData notExpired = caseData(222L, "2026-06-24", null, "No");
+        RetentionCaseData expired = caseData(111L, LocalDate.of(2026, 6, 22), 222L);
+        RetentionCaseData notExpired = caseData(222L, LocalDate.of(2026, 6, 24));
         when(repository.findExpiredCases(Set.of(CASE_TYPE), 10)).thenReturn(List.of(expired));
         when(repository.findByReferences(Set.of(111L))).thenReturn(List.of(expired));
         when(repository.findByReferences(Set.of(222L))).thenReturn(List.of(notExpired));
@@ -93,7 +94,7 @@ class CaseRetentionServiceTest {
 
     @Test
     void simulationModeDoesNotDeleteOrCheckCcdPointer() {
-        RetentionCaseData caseData = caseData(111L, "2026-06-22", null, "No");
+        RetentionCaseData caseData = caseData(111L, LocalDate.of(2026, 6, 22));
         when(repository.findExpiredCases(Set.of(CASE_TYPE), 10)).thenReturn(List.of(caseData));
         when(repository.findByReferences(Set.of(111L))).thenReturn(List.of(caseData));
         when(adminUserService.getAdminUserToken()).thenReturn(TOKEN);
@@ -106,17 +107,42 @@ class CaseRetentionServiceTest {
         verify(repository, never()).deleteCases(Set.of(111L));
     }
 
-    private RetentionCaseData caseData(Long reference, String systemTtl, String overrideTtl, String suspended) {
-        return caseData(reference, systemTtl, overrideTtl, suspended, null);
+    @Test
+    void usesResolvedTtlForEligibilityInsteadOfRawTtlFields() throws Exception {
+        RetentionCaseData caseData = new RetentionCaseData(
+            111L,
+            111L,
+            CASE_TYPE,
+            JURISDICTION,
+            LocalDate.of(2026, 6, 22),
+            objectMapper.valueToTree(new TestCaseData("2026-06-24", null, "No", null))
+        );
+        when(repository.findExpiredCases(Set.of(CASE_TYPE), 10)).thenReturn(List.of(caseData));
+        when(repository.findByReferences(Set.of(111L))).thenReturn(List.of(caseData));
+        when(adminUserService.getAdminUserToken()).thenReturn(TOKEN);
+        when(ccdClient.retrieveCase(TOKEN, CASE_TYPE, JURISDICTION, "111"))
+            .thenThrow(new HttpClientErrorException(NOT_FOUND));
+        when(repository.deleteCases(Set.of(111L))).thenReturn(1);
+
+        RetentionTaskResult result = service.run(Set.of(CASE_TYPE), Set.of(), 10);
+
+        assertThat(result.deletedCases()).isEqualTo(1);
+        verify(repository).deleteCases(Set.of(111L));
     }
 
-    private RetentionCaseData caseData(Long reference,
-                                       String systemTtl,
-                                       String overrideTtl,
-                                       String suspended,
-                                       Long linkedReference) {
+    private RetentionCaseData caseData(Long reference, LocalDate resolvedTtl) {
+        return caseData(reference, resolvedTtl, null);
+    }
+
+    private RetentionCaseData caseData(Long reference, LocalDate resolvedTtl, Long linkedReference) {
         return new RetentionCaseData(reference, reference, CASE_TYPE, JURISDICTION,
-            objectMapper.valueToTree(new TestCaseData(systemTtl, overrideTtl, suspended, linkedReference)));
+            resolvedTtl,
+            objectMapper.valueToTree(new TestCaseData(
+                resolvedTtl == null ? null : resolvedTtl.toString(),
+                null,
+                "No",
+                linkedReference
+            )));
     }
 
     private record TestCaseData(TestTtl TTL, List<TestCaseLink> caseLinks) {

@@ -11,8 +11,10 @@ CURL_RETRY_DELAY_SECONDS=5
 # searchable case types. ES can still be starting up when the import runs, which
 # surfaces as an HTTP 400 with an "ElasticSearch initialisation" message. These
 # are transient, so retry the whole import for this specific error.
-IMPORT_ES_RETRY_COUNT="${IMPORT_ES_RETRY_COUNT:-10}"
+IMPORT_ES_RETRY_COUNT="${IMPORT_ES_RETRY_COUNT:-30}"
 IMPORT_ES_RETRY_DELAY_SECONDS="${IMPORT_ES_RETRY_DELAY_SECONDS:-15}"
+IMPORT_ES_MAX_RETRY_DELAY_SECONDS="${IMPORT_ES_MAX_RETRY_DELAY_SECONDS:-60}"
+IMPORT_ES_INITIAL_WAIT_SECONDS="${IMPORT_ES_INITIAL_WAIT_SECONDS:-30}"
 
 echo "📥 Importing CCD Definitions via API"
 echo "===================================="
@@ -33,6 +35,46 @@ echo "Retrieving IDAM user token"
 USER_TOKEN=$(get_user_token)
 echo "Retrieving S2S service token for CCD Gateway"
 SERVICE_TOKEN=$(get_service_token "ccd_gw")
+
+if (( IMPORT_ES_INITIAL_WAIT_SECONDS > 0 )); then
+    echo "⏳ Waiting ${IMPORT_ES_INITIAL_WAIT_SECONDS}s before CCD definition import to allow dependent services to settle..."
+    sleep "${IMPORT_ES_INITIAL_WAIT_SECONDS}"
+fi
+
+log_definition_store_health() {
+    local endpoint_path="$1"
+    local health_url="${CCD_DEFINITION_STORE_API_BASE_URL}${endpoint_path}"
+    local response_file
+    response_file=$(mktemp)
+
+    local http_code
+    http_code=$(curl --silent --show-error --location \
+        --http1.1 \
+        --connect-timeout 10 \
+        --max-time 30 \
+        --output "${response_file}" \
+        --write-out "%{http_code}" \
+        -H "Authorization: Bearer ${USER_TOKEN}" \
+        -H "ServiceAuthorization: ${SERVICE_TOKEN}" \
+        "${health_url}" || true)
+
+    local response_body
+    response_body=$(cat "${response_file}")
+    rm -f "${response_file}"
+
+    if [[ -n "${http_code}" && "${http_code}" != "000" ]]; then
+        echo "ℹ️  definition-store health probe ${endpoint_path} -> HTTP ${http_code}"
+        if [[ -n "${response_body}" ]]; then
+            echo "ℹ️  health response: ${response_body}"
+        fi
+    else
+        echo "ℹ️  definition-store health probe ${endpoint_path} unavailable"
+    fi
+}
+
+# Best-effort diagnostics to aid triage when ES readiness keeps failing.
+log_definition_store_health "/health"
+log_definition_store_health "/actuator/health"
 
 # Define the Excel files to import (in order)
 declare -a DEFINITION_FILES=(
@@ -127,10 +169,16 @@ import_definition() {
         fi
 
         if is_transient_es_error "${http_code}" "${response_body}" && (( attempt < max_attempts )); then
-            echo "    ⏳ ElasticSearch not ready yet for ${file_name} (HTTP ${http_code}, attempt ${attempt}/${max_attempts}), retrying in ${IMPORT_ES_RETRY_DELAY_SECONDS}s..."
+            local retry_sleep_seconds
+            retry_sleep_seconds=$((IMPORT_ES_RETRY_DELAY_SECONDS * attempt))
+            if (( retry_sleep_seconds > IMPORT_ES_MAX_RETRY_DELAY_SECONDS )); then
+                retry_sleep_seconds="${IMPORT_ES_MAX_RETRY_DELAY_SECONDS}"
+            fi
+
+            echo "    ⏳ ElasticSearch not ready yet for ${file_name} (HTTP ${http_code}, attempt ${attempt}/${max_attempts}), retrying in ${retry_sleep_seconds}s..."
             echo "    Response: ${response_body}"
             attempt=$((attempt + 1))
-            sleep "${IMPORT_ES_RETRY_DELAY_SECONDS}"
+            sleep "${retry_sleep_seconds}"
             continue
         fi
 

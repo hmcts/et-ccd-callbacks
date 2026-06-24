@@ -76,7 +76,7 @@ public class CaseFlagsDataMigrationController {
             respondentFlags.setVisibility(INTERNAL);
         }
 
-        log.info("Migrating existing case: {}", ccdRequest.getCaseDetails().getCaseTypeId());
+        log.info("Migrating existing case: {}", ccdRequest.getCaseDetails().getCaseId());
 
         return getCallbackRespEntityErrors(List.of(), caseData);
     }

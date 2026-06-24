@@ -68,6 +68,10 @@ public class AddAmendClaimantRepresentativeController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         addAmendClaimantRepresentativeService.addAmendClaimantRepresentative(caseData);
 
+        if (featureToggleService.isCaseFlagsEnabled()) {
+            caseFlagsService.setupCaseFlags(caseData);
+        }
+
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -77,24 +81,16 @@ public class AddAmendClaimantRepresentativeController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> amendClaimantRepSubmitted(
+    public void amendClaimantRepSubmitted(
             @RequestBody CallbackRequest callbackRequest,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken) {
 
         log.info("AMEND CLAIMANT REPRESENTATIVE SUBMITTED ---> " + LOG_MESSAGE + "{}",
                 callbackRequest.getCaseDetails().getCaseId());
-        CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
-
         try {
             nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest);
-
-            if (featureToggleService.isCaseFlagsEnabled()) {
-                caseFlagsService.setupCaseFlags(caseData);
-            }
         } catch (IOException e) {
             throw new CcdInputOutputException("Failed to update claimant representatives access", e);
         }
-
-        return getCallbackRespEntityNoErrors(caseData);
     }
 }

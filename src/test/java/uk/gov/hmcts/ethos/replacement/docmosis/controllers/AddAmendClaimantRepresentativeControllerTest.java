@@ -27,6 +27,7 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -97,6 +98,27 @@ class AddAmendClaimantRepresentativeControllerTest {
 
         verify(addAmendClaimantRepresentativeService, times(1))
                 .addAmendClaimantRepresentative(any());
+        verify(caseFlagsService, never()).setupCaseFlags(any());
+    }
+
+    @Test
+    @SneakyThrows
+    void testAboutToSubmitSetsUpCaseFlagsWhenEnabled() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+
+        verify(addAmendClaimantRepresentativeService, times(1))
+                .addAmendClaimantRepresentative(any());
+        verify(caseFlagsService, times(1)).setupCaseFlags(any());
     }
 
     @Test
@@ -104,36 +126,30 @@ class AddAmendClaimantRepresentativeControllerTest {
     void testAmendClaimantRepSubmitted() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_URL)
-                        .content(jsonMapper.toJson(callbackRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .content(jsonMapper.toJson(callbackRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
 
         verify(nocClaimantRepresentativeService, times(1))
                 .updateClaimantRepAccess(any());
-        verify(caseFlagsService, times(0)).setupCaseFlags(any());
+        verify(caseFlagsService, never()).setupCaseFlags(any());
     }
 
     @Test
     @SneakyThrows
-    void testAmendClaimantRepSubmittedSetsUpCaseFlagsWhenEnabled() {
+    void testAmendClaimantRepSubmittedDoesNotSetUpCaseFlagsWhenEnabled() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
 
         mockMvc.perform(post(SUBMITTED_URL)
-                        .content(jsonMapper.toJson(callbackRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .content(jsonMapper.toJson(callbackRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
 
         verify(nocClaimantRepresentativeService, times(1))
                 .updateClaimantRepAccess(any());
-        verify(caseFlagsService, times(1)).setupCaseFlags(any());
+        verify(caseFlagsService, never()).setupCaseFlags(any());
     }
 }

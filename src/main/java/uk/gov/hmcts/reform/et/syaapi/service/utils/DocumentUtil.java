@@ -151,8 +151,7 @@ public final class DocumentUtil {
         if (ManageCaseRoleConstants.CASE_USER_ROLE_CREATOR.equals(caseUserRole)) {
             return Stream.of(
                     HIDDEN_DOCUMENT_TYPES_FOR_CLAIMANT,
-                    RESPONDENT_APPLICATION_DOC_TYPE,
-                    CLAIMANT_APPLICATION_DOC_TYPE
+                    RESPONDENT_APPLICATION_DOC_TYPE
                 )
                 .flatMap(List::stream)
                 .distinct()
@@ -161,7 +160,6 @@ public final class DocumentUtil {
         if (ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT.equals(caseUserRole)) {
             return Stream.of(
                     HIDDEN_DOCUMENT_TYPES_FOR_RESPONDENT,
-                    RESPONDENT_APPLICATION_DOC_TYPE,
                     CLAIMANT_APPLICATION_DOC_TYPE
                 )
                 .flatMap(List::stream)

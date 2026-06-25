@@ -26,10 +26,12 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.NextHearingDetails;
+import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeAnswersConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
@@ -44,6 +46,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -86,6 +90,7 @@ public class CaseManagementForCaseWorkerService {
     private final CaseManagementLocationService caseManagementLocationService;
     private final MultipleReferenceService multipleReferenceService;
     private final MultipleCasesSendingService multipleCasesSendingService;
+    private final NoticeOfChangeAnswersConverter answersConverter;
 
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
@@ -106,6 +111,20 @@ public class CaseManagementForCaseWorkerService {
     private final List<String> caseTypeIdsToCheck = List.of("ET_EnglandWales", "ET_Scotland", "Bristol",
             "Leeds", "LondonCentral", "LondonEast", "LondonSouth", "Manchester", "MidlandsEast", "MidlandsWest",
             "Newcastle", "Scotland", "Wales", "Watford");
+    private static final List<Function<CaseData, NoticeOfChangeAnswers>> NOC_GETTERS = List.of(
+            CaseData::getNoticeOfChangeAnswers0, CaseData::getNoticeOfChangeAnswers1,
+            CaseData::getNoticeOfChangeAnswers2, CaseData::getNoticeOfChangeAnswers3,
+            CaseData::getNoticeOfChangeAnswers4, CaseData::getNoticeOfChangeAnswers5,
+            CaseData::getNoticeOfChangeAnswers6, CaseData::getNoticeOfChangeAnswers7,
+            CaseData::getNoticeOfChangeAnswers8, CaseData::getNoticeOfChangeAnswers9
+    );
+    private static final List<BiConsumer<CaseData, NoticeOfChangeAnswers>> NOC_SETTERS = List.of(
+            CaseData::setNoticeOfChangeAnswers0, CaseData::setNoticeOfChangeAnswers1,
+            CaseData::setNoticeOfChangeAnswers2, CaseData::setNoticeOfChangeAnswers3,
+            CaseData::setNoticeOfChangeAnswers4, CaseData::setNoticeOfChangeAnswers5,
+            CaseData::setNoticeOfChangeAnswers6, CaseData::setNoticeOfChangeAnswers7,
+            CaseData::setNoticeOfChangeAnswers8, CaseData::setNoticeOfChangeAnswers9
+    );
 
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
@@ -116,7 +135,8 @@ public class CaseManagementForCaseWorkerService {
                                               CaseManagementLocationService caseManagementLocationService,
                                               MultipleReferenceService multipleReferenceService,
                                               @Value("${ccd_gateway_base_url}") String ccdGatewayBaseUrl,
-                                              MultipleCasesSendingService multipleCasesSendingService) {
+                                              MultipleCasesSendingService multipleCasesSendingService,
+                                              NoticeOfChangeAnswersConverter answersConverter) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.featureToggleService = featureToggleService;
@@ -126,6 +146,7 @@ public class CaseManagementForCaseWorkerService {
         this.multipleReferenceService = multipleReferenceService;
         this.ccdGatewayBaseUrl = ccdGatewayBaseUrl;
         this.multipleCasesSendingService = multipleCasesSendingService;
+        this.answersConverter = answersConverter;
     }
 
     public void caseDataDefaults(CaseData caseData) {
@@ -727,5 +748,24 @@ public class CaseManagementForCaseWorkerService {
                 .toList();
 
         caseData.setRespondentsWithEcc(String.join(", ", respondentNames));
+    }
+
+    public void updateNocAnswers(CaseData caseData) {
+        List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
+
+        for (int i = 0; i < respondents.size(); i++) {
+            if (i >= NOC_GETTERS.size()) {
+                throw new IllegalArgumentException("Respondent index out of bounds: " + i);
+            }
+
+            NoticeOfChangeAnswers existing = NOC_GETTERS.get(i).apply(caseData);
+
+            if (ObjectUtils.isEmpty(existing)) {
+                NoticeOfChangeAnswers answer = answersConverter.generateForSubmission(
+                        respondents.get(i), caseData.getClaimantIndType()
+                );
+                NOC_SETTERS.get(i).accept(caseData, answer);
+            }
+        }
     }
 }

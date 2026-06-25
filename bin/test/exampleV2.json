@@ -1,0 +1,199 @@
+{
+  "case_details": {
+    "case_data": {
+      "managingOffice": "Manchester",
+      "tribunalCorrespondenceAddress": {
+        "AddressLine1": "Manchester Employment Tribunal,",
+        "AddressLine2": "Alexandra House,",
+        "AddressLine3": "14-22 The Parsonage,",
+        "PostCode": "M3 2JA",
+        "PostTown": "Manchester,"
+      },
+      "tribunalCorrespondenceTelephone": "03577131270",
+      "tribunalCorrespondenceFax": "07577126570",
+      "tribunalCorrespondenceDX": "123456",
+      "tribunalCorrespondenceEmail": "ManchesterOfficeET@hmcts.gov.uk",
+      "caseNotes": "Example note",
+      "caseType": "Single",
+      "claimant_TypeOfClaimant": "Individual",
+      "claimantFlags": {},
+      "respondentFlags": {},
+      "claimantCollection": [
+        {
+          "id": "1121212121",
+          "value": {
+            "claimant_addressUK": {
+              "AddressLine1": "56 Block C",
+              "AddressLine2": "Ellesmere Street",
+              "Country": "UK",
+              "County": "Lancashire",
+              "PostCode": "M3 KJR",
+              "PostTown": "Manchester"
+            },
+            "claimant_contact_preference": "Post",
+            "claimant_date_of_birth": "1990-02-25",
+            "claimant_email_address": "example@gmail.com",
+            "claimant_first_name": "Andrew",
+            "claimant_gender": "Male",
+            "claimant_initials": "AC",
+            "claimant_last_name": "Smith",
+            "claimant_mobile_number": "07577136570",
+            "claimant_phone_number": "07577136570",
+            "claimant_title": "Mr"
+          }
+        }
+      ],
+      "claimantType": {
+        "claimant_addressUK": {
+          "AddressLine1": "34",
+          "AddressLine2": "Low Street",
+          "Country": "UK",
+          "County": "Lancashire",
+          "PostCode": "M3 6gw",
+          "PostTown": "Manchester"
+        },
+        "claimant_contact_preference": "Post",
+        "claimant_email_address": "anton@gmail.com",
+        "claimant_mobile_number": "07577136570",
+        "claimant_phone_number": "07577136570"
+      },
+      "claimantIndType": {
+        "claimant_date_of_birth": "1990-02-25",
+        "claimant_first_names": "Anton Juliet",
+        "claimant_gender": "Male",
+        "claimant_last_name": "Rodriguez",
+        "claimant_title1": "Mr"
+      },
+      "feeGroupReference": "123321",
+      "judgementType": {
+        "judgementFinal": "FinalJ",
+        "judgementTextArea": "FinalJ"
+      },
+      "jurCodesCollection": [
+        {
+          "id": "12121",
+          "value": {
+            "judgmentOutcome": "something"
+          }
+        }
+      ],
+      "locationType": "Manchester",
+      "receiptDate": "2019-03-12",
+      "representedType": {
+        "if_represented": "Yes",
+        "name_of_organisation": "JL",
+        "name_of_representative": "Batman",
+        "representative_address": {
+          "AddressLine1": "34 High Street",
+          "AddressLine2": "Liverpool",
+          "AddressLine3": "Long",
+          "Country": "UK",
+          "County": "Lancashire",
+          "PostCode": "L3567",
+          "PostTown": "Liverpool"
+        },
+        "representative_dx": "12121212",
+        "representative_email_address": "danW@gmail.com",
+        "representative_mobile_number": "07577136570",
+        "representative_phone_number": "07577136570",
+        "representative_preference": "Email",
+        "representative_reference": "Ref"
+      },
+      "repCollection": [
+        {
+          "id": "123345",
+          "value": {
+            "dynamic_resp_rep_name": {
+              "value": {
+                "code": "Robin",
+                "label": "Robin"
+              },
+              "list_items": [
+                {
+                  "code": "Robin",
+                  "label": "Robin"
+                }
+              ]
+            },
+            "resp_rep_name": "Robin",
+            "name_of_organisation": "RepresentativeOrganisation",
+            "name_of_representative": "RepresentativeNameRespondent",
+            "representative_address": {
+              "AddressLine1": "56 Block C",
+              "AddressLine2": "Ellesmere Street",
+              "Country": "UK",
+              "County": "Lancashire",
+              "PostCode": "M3 KJR",
+              "PostTown": "Manchester"
+            },
+            "representative_dx": "222222222",
+            "representative_email_address": "example@gmail.com",
+            "representative_mobile_number": "07577136570",
+            "representative_phone_number": "07577136570",
+            "representative_preference": "Post",
+            "representative_reference": "1111111"
+          }
+        }
+      ],
+      "documentCollection": [
+        {
+          "id": "12121",
+          "value": {
+            "typeOfDocument": "ET1",
+            "uploadedDocument": {
+              "document_url": "http://test.com/random-uuid",
+              "document_binary_url": "http://test.com/random-uuid/binary",
+              "document_filename": "Filename"
+            }
+          }
+        }
+      ],
+      "respondentCollection": [
+        {
+          "id": "32342342",
+          "value": {
+            "respondent_address": {
+              "AddressLine1": "23 Judgement",
+              "AddressLine2": "Street",
+              "Country": "Ireland",
+              "County": "Ireland",
+              "PostCode": "Ir322",
+              "PostTown": "Dublin"
+            },
+            "respondent_contact_preference": "Phone",
+            "respondent_email": "07577136570",
+            "respondent_name": "Robin",
+            "respondent_phone1": "07577136570",
+            "respondent_phone2": "07577136570"
+          }
+        }
+      ],
+      "scheduleType": {
+        "scheduleAttendance": [
+          {
+            "id": "12121",
+            "value": {
+              "scheduleParticipants": "Participants"
+            }
+          }
+        ],
+        "scheduleClerk": "Clerk Juan",
+        "scheduleDateTime": "2017-01-25T10:10:10.000",
+        "scheduleDuration": "2",
+        "scheduleJudge": "Juan Judge",
+        "scheduleRooms": "4",
+        "scheduleTextArea": "Schedule",
+        "scheduleVenues": "Manchester"
+      },
+      "tribunalOffice": "Manchester",
+      "userLocation": "Manchester"
+    },
+    "id": "232323232",
+    "jurisdiction": "Nothing",
+    "case_type_id": "ET_EnglandWales",
+    "state": "Accepted"
+  },
+  "event_id": "1212121",
+  "token": "string"
+}
+

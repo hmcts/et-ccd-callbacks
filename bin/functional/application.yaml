@@ -1,0 +1,31 @@
+tidam:
+  api:
+    url: ${TIDAM_API_URL:https://tidam-api-demo.service.core-compute-demo.internal}
+idam:
+  s2s-auth:
+    url: ${SERVICE_AUTH_PROVIDER_URL:http://172.18.0.7:8080}
+    microservice: ${MICRO_SERVICE:ccd_gw}
+    totp_secret: ${ETHOS_S2S_SECRET:AAAAAAAAAAAAAAAC}
+  api:
+    url: ${IDAM_API_URL:http://sidam-api:5000}
+    jwkUrl: ${IDAM_API_JWK_URL:http://sidam-api:5000/jwks}
+docmosis:
+  api:
+    url: ${DOCMOSIS_API_URL:https://ethos-repl-docmosis-backend-demo.service.core-compute-demo.internal}
+hmcts_service_id: BHA1
+
+launchdarkly:
+  sdk-key: ${LAUNCH_DARKLY_SDK_KEY:sdk-key}
+  env: ${LAUNCH_DARKLY_ENV:default}
+
+es:
+  partition:
+    notifications: ${ES_NOTIFICATIONS_PARTITION_SIZE:3000}
+
+cron:
+  bfActionTask: ${CRON_BFACTION_TASK:0 0 * * * ?}
+  caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}
+  maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:10}
+  acasCertSubmission: ${CRON_ACAS_CERT_SUBMISSION_TASK:0 */5 * * * ?}
+
+etcos.url: ${ET_COS_URL:http://localhost:8080}

@@ -121,7 +121,7 @@ withPipeline(type, product, component) {
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
   }
   syncBranchesWithMaster(branchesToSync)
-  enableSlackNotifications('#et-builds')
+  //enableSlackNotifications('#et-builds')
 
   // Enable Performance Test Stages
   enablePerformanceTestStages(timeout: 10, perfTestEnvironments: ['preview','aat','perftest'])

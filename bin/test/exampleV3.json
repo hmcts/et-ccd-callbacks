@@ -1,0 +1,47 @@
+{
+  "case_details": {
+    "case_data":{
+      "caseType": "Single",
+      "jurCodesCollection": [
+        {
+          "id": "12121",
+          "value": {}
+        }
+      ],
+      "judgementCollection": [
+        {
+          "id": "a1e2b95e-4873-4f43-b7b4-65808c422de0",
+          "value": {
+            "judgement_type": "Case Management",
+            "judgment_notes": null,
+            "Judgement_costs": {
+              "costs_question": null
+            },
+            "reconsiderations": {
+              "reconsideration": null
+            },
+            "judgement_details": {
+              "awardMade": null,
+              "folio_number": null,
+              "reasons_given": null,
+              "non-financial_award": null,
+              "certificateOfCorrection": null
+            },
+            "jurisdictionCodes": [],
+            "date_judgment_made": "2000-01-01",
+            "date_judgment_sent": "2000-01-01",
+            "liability_optional": null,
+            "non_hearing_judgment": "Yes"
+          }
+        }
+      ]
+    },
+    "id": "232323232",
+    "state": "Accepted",
+    "jurisdiction": "Nothing",
+    "case_type_id" : "ET_EnglandWales"
+  },
+  "event_id": "1212121",
+  "token": "string"
+}
+

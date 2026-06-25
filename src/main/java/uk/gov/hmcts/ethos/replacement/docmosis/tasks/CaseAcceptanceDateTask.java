@@ -46,19 +46,16 @@ import static uk.gov.hmcts.ecm.compat.common.model.helper.Constants.ECM_CASE_TYP
 public class CaseAcceptanceDateTask implements Runnable {
 
     private static final String FIX_CASE_API_EVENT_ID = "fixCaseAPI";
-    private static final long EXECUTOR_TIMEOUT_SECONDS = 120;
 
     private final AdminUserService adminUserService;
     private final CcdClient ccdClient;
     private final uk.gov.hmcts.ecm.compat.common.client.CcdClient ecmCcdClient;
     private final PreAcceptanceCaseService preAcceptanceCaseService;
 
-
     @Value("${cron.reconfigurationCaseIds}")
     private String casesToUpdate;
 
     public record CasesToUpdate(String caseId, String caseTypeId) {}
-
 
     @Override
     public void run() {
@@ -89,7 +86,6 @@ public class CaseAcceptanceDateTask implements Runnable {
         AtomicInteger counter = new AtomicInteger(0);
         AtomicReference<String> updatedCases = new AtomicReference<>();
         AtomicReference<String> failedCases = new AtomicReference<>();
-
 
         String adminUserToken = adminUserService.getAdminUserToken();
 

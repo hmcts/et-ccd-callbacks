@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesMsg;
 import uk.gov.hmcts.ecm.common.model.servicebus.UpdateCaseMsg;
+import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreateMultiplesDataModel;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.TransferToEcmDataModel;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.CreateUpdatesQueueMessage;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.messagequeue.CreateUpdatesQueueRepository;
@@ -115,6 +116,8 @@ public class CreateUpdatesQueueProcessor {
 
             if (createUpdatesMsg.getDataModelParent() instanceof TransferToEcmDataModel) {
                 transferToEcmService.transferToEcm(createUpdatesMsg);
+            } else if (createUpdatesMsg.getDataModelParent() instanceof CreateMultiplesDataModel) {
+                sendCreateMultiplesMessages(createUpdatesMsg);
             } else {
                 sendUpdateCaseMessages(createUpdatesMsg);
             }
@@ -138,6 +141,14 @@ public class CreateUpdatesQueueProcessor {
             for (String ethosCaseReference : createUpdatesMsg.getEthosCaseRefCollection()) {
                 UpdateCaseMsg updateCaseMsg = mapToUpdateCaseMsg(createUpdatesMsg, ethosCaseReference);
                 updateCaseQueueSender.sendMessage(updateCaseMsg);
+            }
+        }
+    }
+
+    private void sendCreateMultiplesMessages(CreateUpdatesMsg createUpdatesMsg) {
+        if (createUpdatesMsg.getEthosCaseRefCollection() != null) {
+            for (String ethosCaseReference : createUpdatesMsg.getEthosCaseRefCollection()) {
+                updateCaseQueueSender.sendCreateMultiplesMessage(createUpdatesMsg, ethosCaseReference);
             }
         }
     }

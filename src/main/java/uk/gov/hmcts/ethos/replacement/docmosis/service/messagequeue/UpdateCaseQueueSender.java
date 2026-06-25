@@ -8,6 +8,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesMsg;
 import uk.gov.hmcts.ecm.common.model.servicebus.UpdateCaseMsg;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.UpdateCaseQueueMessage;
@@ -52,5 +53,31 @@ public class UpdateCaseQueueSender {
     public void sendMessageAsync(UpdateCaseMsg updateCaseMsg) {
         // For compatibility with existing code that expects async behavior
         selfProvider.getObject().sendMessage(updateCaseMsg);
+    }
+
+    /**
+     * Builds and enqueues an {@link UpdateCaseMsg} for a multiple-creation payload.
+     * The message targets the lead case (identified by {@code ethosCaseReference}) so that
+     * {@code SingleReadingService} can retrieve it as the template for the new case.
+     *
+     * @param createUpdatesMsg the originating create-updates message carrying the
+     *                         {@code CreateMultiplesDataModel} and shared metadata
+     * @param ethosCaseReference ethos case reference of the lead case
+     */
+    @Transactional
+    public void sendCreateMultiplesMessage(CreateUpdatesMsg createUpdatesMsg, String ethosCaseReference) {
+        UpdateCaseMsg updateCaseMsg = UpdateCaseMsg.builder()
+                .msgId(UUID.randomUUID().toString())
+                .multipleRef(createUpdatesMsg.getMultipleRef())
+                .ethosCaseReference(ethosCaseReference)
+                .totalCases(createUpdatesMsg.getTotalCases())
+                .multipleReferenceLinkMarkUp(createUpdatesMsg.getMultipleReferenceLinkMarkUp())
+                .jurisdiction(createUpdatesMsg.getJurisdiction())
+                .caseTypeId(createUpdatesMsg.getCaseTypeId())
+                .username(createUpdatesMsg.getUsername())
+                .confirmation(createUpdatesMsg.getConfirmation())
+                .dataModelParent(createUpdatesMsg.getDataModelParent())
+                .build();
+        sendMessage(updateCaseMsg);
     }
 }

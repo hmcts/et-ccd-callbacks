@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.servicebus.UpdateCaseMsg;
+import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreateMultiplesDataModel;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreationSingleDataModel;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
@@ -32,6 +33,7 @@ public class SingleReadingService {
     private final AdminUserService userService;
     private final SingleUpdateService singleUpdateService;
     private final SingleTransferService singleTransferService;
+    private final CreateMultiplesService createMultiplesService;
 
     public void sendUpdateToSingleLogic(UpdateCaseMsg updateCaseMsg) throws IOException {
         String accessToken = userService.getAdminUserToken();
@@ -40,6 +42,8 @@ public class SingleReadingService {
         if (CollectionUtils.isNotEmpty(submitEvents)) {
             if (updateCaseMsg.getDataModelParent() instanceof CreationSingleDataModel) {
                 singleTransferService.sendTransferred(submitEvents.getFirst(), accessToken, updateCaseMsg);
+            } else if (updateCaseMsg.getDataModelParent() instanceof CreateMultiplesDataModel) {
+                createMultiplesService.createCase(submitEvents.getFirst(), accessToken, updateCaseMsg);
             } else {
                 singleUpdateService.sendUpdate(submitEvents.getFirst(), accessToken, updateCaseMsg);
             }

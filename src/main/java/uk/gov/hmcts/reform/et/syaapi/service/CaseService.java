@@ -26,6 +26,13 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesMsg;
+import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreateMultiplesDataModel;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.multiples.AdditionalClaimant;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 import uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent;
 import uk.gov.hmcts.reform.et.syaapi.helper.CaseDetailsConverter;
 import uk.gov.hmcts.reform.et.syaapi.helper.EmployeeObjectMapper;
@@ -51,7 +58,10 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CLAIMANT_CORRESPONDENCE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONDENT_CORRESPONDENCE;
@@ -79,6 +89,8 @@ import static uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent.UPDATE_CASE_SUBMITTE
 public class CaseService {
 
     public static final String DOCUMENT_COLLECTION = "documentCollection";
+    private static final String ADD_CLAIMANT_MANUALLY = "manually";
+    private static final String ADD_CLAIMANT_SPREADSHEET = "spreadsheet";
     private final AuthTokenGenerator authTokenGenerator;
     private final CoreCaseDataApi ccdApiClient;
     private final IdamClient idamClient;
@@ -93,6 +105,9 @@ public class CaseService {
     private static final String VARY_REVOKE_AN_ORDER = "Vary/revoke an order";
     private static final String VARY_OR_REVOKE_AN_ORDER_APP_TYPE = "Vary or revoke an order";
     private final FeatureToggleService featureToggleService;
+    private final CreateUpdatesBusSender createUpdatesBusSender;
+    private final ExcelReadingService excelReadingService;
+    private final UserIdamService userIdamService;
 
     /**
      * Given a user derived from the authorisation token in the request,
@@ -240,7 +255,71 @@ public class CaseService {
                          caseDetails.getData()
             );
         }
+
+        if (MULTIPLE_CASE_TYPE.equals(caseDetails.getData().get(CASE_TYPE))) {
+            triggerMultipleCreation(authorization, caseDetails);
+        }
+
         return caseDetails;
+    }
+
+    private void triggerMultipleCreation(String authorization, CaseDetails caseDetails) {
+        Et1CaseData et1CaseData = new EmployeeObjectMapper().getEmploymentCaseData(caseDetails.getData());
+        String ethosCaseReference = caseDetails.getData().get("ethosCaseReference") == null ? ""
+                : caseDetails.getData().get("ethosCaseReference").toString();
+        String caseTypeId = caseDetails.getCaseTypeId();
+        String username = userIdamService.getUserDetails(authorization).getEmail();
+
+        List<AdditionalClaimant> claimants = new ArrayList<>();
+
+        if (ADD_CLAIMANT_MANUALLY.equals(et1CaseData.getAddClaimantMethod())) {
+            List<GenericTypeItem<AdditionalClaimant>> items = et1CaseData.getAdditionalClaimants();
+            if (!CollectionUtils.isEmpty(items)) {
+                items.stream()
+                        .map(GenericTypeItem::getValue)
+                        .filter(c -> c != null)
+                        .forEach(claimants::add);
+            }
+        } else if (ADD_CLAIMANT_SPREADSHEET.equals(et1CaseData.getAddClaimantMethod())) {
+            if (et1CaseData.getAdditionalClaimantSpreadsheet() != null) {
+                List<String> errors = new ArrayList<>();
+                claimants.addAll(excelReadingService.readClaimantsFromSpreadsheet(
+                        authorization,
+                        et1CaseData.getAdditionalClaimantSpreadsheet().getDocumentBinaryUrl(),
+                        errors
+                ));
+                errors.forEach(e -> log.error("Error reading additional claimant spreadsheet: {}", e));
+            }
+        } else {
+            log.warn("Unknown addClaimantMethod '{}' on case {}", et1CaseData.getAddClaimantMethod(),
+                    ethosCaseReference);
+        }
+
+        if (claimants.isEmpty()) {
+            log.info("No additional claimants to process for case {}", ethosCaseReference);
+            return;
+        }
+
+        log.info("Queuing {} additional claimant case(s) for multiple {}", claimants.size(), ethosCaseReference);
+        List<String> errors = new ArrayList<>();
+        for (AdditionalClaimant claimant : claimants) {
+            CreateMultiplesDataModel dataModel = CreateMultiplesDataModel.builder()
+                    .additionalClaimant(claimant)
+                    .build();
+            CreateUpdatesMsg msg = CreateUpdatesMsg.builder()
+                    .msgId(java.util.UUID.randomUUID().toString())
+                    .jurisdiction(JURISDICTION_ID)
+                    .caseTypeId(caseTypeId)
+                    .multipleRef(SINGLE_CASE_TYPE)
+                    .totalCases("1")
+                    .username(username)
+                    .confirmation("No")
+                    .ethosCaseRefCollection(List.of(ethosCaseReference))
+                    .dataModelParent(dataModel)
+                    .build();
+            createUpdatesBusSender.sendSingleMessage(msg, errors);
+        }
+        errors.forEach(e -> log.error("Error queuing multiple creation message: {}", e));
     }
 
     private List<DocumentTypeItem> uploadAllDocuments(String authorization,

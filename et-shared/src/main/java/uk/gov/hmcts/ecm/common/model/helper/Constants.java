@@ -106,6 +106,7 @@ public class Constants {
     public static final String ONE = "1";
     public static final String ZERO = "0";
 
+    public static final String CASE_TYPE = "caseType";
     public static final String SINGLE_CASE_TYPE = "Single";
     public static final String MULTIPLE_CASE_TYPE = "Multiple";
     public static final String INDIVIDUAL_TYPE_CLAIMANT = "Individual";

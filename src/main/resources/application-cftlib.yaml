@@ -11,6 +11,9 @@ idam:
     microservice: et_cos
 
 spring:
+  jms:
+    servicebus:
+      enabled: false
   flyway:
     locations: classpath:db/migration,classpath:db/dev
   datasource:

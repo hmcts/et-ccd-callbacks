@@ -6,6 +6,8 @@ CURL_CONNECT_TIMEOUT_SECONDS=30
 CURL_MAX_TIME_SECONDS=600
 CURL_RETRY_COUNT=3
 CURL_RETRY_DELAY_SECONDS=5
+IMPORT_HTTP_RESPONSE_RETRY_COUNT=6
+IMPORT_HTTP_RESPONSE_RETRY_DELAY_SECONDS=20
 
 echo "📥 Importing CCD Definitions via API"
 echo "===================================="
@@ -46,48 +48,62 @@ import_definition() {
     fi
 
     local file_size=$(du -h "${full_path}" | cut -f1)
-    local response_body_file
-    response_body_file=$(mktemp)
     echo "  📋 Importing: ${file_name} (${file_size})"
     echo "    Using HTTP/1.1 with ${CURL_RETRY_COUNT} retries, ${CURL_CONNECT_TIMEOUT_SECONDS}s connect timeout, ${CURL_MAX_TIME_SECONDS}s max time"
 
-    local http_code
-    if http_code=$(curl --silent --show-error --location \
-        --http1.1 \
-        --retry "${CURL_RETRY_COUNT}" \
-        --retry-delay "${CURL_RETRY_DELAY_SECONDS}" \
-        --retry-all-errors \
-        --connect-timeout "${CURL_CONNECT_TIMEOUT_SECONDS}" \
-        --max-time "${CURL_MAX_TIME_SECONDS}" \
-        --output "${response_body_file}" \
-        --write-out "%{http_code}" \
-        -X POST \
-        "${CCD_DEFINITION_STORE_API_BASE_URL}/import" \
-        -H "Authorization: Bearer ${USER_TOKEN}" \
-        -H "ServiceAuthorization: ${SERVICE_TOKEN}" \
-        -F "file=@${full_path}"); then
-        :
-    else
-        local curl_exit_code="$?"
-        echo "    ❌ curl failed to import ${file_name} (exit ${curl_exit_code})"
-        if [[ -s "${response_body_file}" ]]; then
-            echo "    Response: $(cat "${response_body_file}")"
+    local attempt
+    for attempt in $(seq 1 "${IMPORT_HTTP_RESPONSE_RETRY_COUNT}"); do
+        local response_body_file
+        response_body_file=$(mktemp)
+
+        local http_code
+        if http_code=$(curl --silent --show-error --location \
+            --http1.1 \
+            --retry "${CURL_RETRY_COUNT}" \
+            --retry-delay "${CURL_RETRY_DELAY_SECONDS}" \
+            --retry-all-errors \
+            --connect-timeout "${CURL_CONNECT_TIMEOUT_SECONDS}" \
+            --max-time "${CURL_MAX_TIME_SECONDS}" \
+            --output "${response_body_file}" \
+            --write-out "%{http_code}" \
+            -X POST \
+            "${CCD_DEFINITION_STORE_API_BASE_URL}/import" \
+            -H "Authorization: Bearer ${USER_TOKEN}" \
+            -H "ServiceAuthorization: ${SERVICE_TOKEN}" \
+            -F "file=@${full_path}"); then
+            :
+        else
+            local curl_exit_code="$?"
+            echo "    ❌ curl failed to import ${file_name} (exit ${curl_exit_code})"
+            if [[ -s "${response_body_file}" ]]; then
+                echo "    Response: $(cat "${response_body_file}")"
+            fi
+            rm -f "${response_body_file}"
+            return "${curl_exit_code}"
         fi
+
+        local response_body
+        response_body=$(cat "${response_body_file}")
         rm -f "${response_body_file}"
-        return "${curl_exit_code}"
-    fi
 
-    local response_body
-    response_body=$(cat "${response_body_file}")
-    rm -f "${response_body_file}"
+        if [[ "${http_code}" == "201" ]] || [[ "${http_code}" == "200" ]]; then
+            echo "    ✅ Successfully imported ${file_name}"
+            return 0
+        fi
 
-    if [[ "${http_code}" == "201" ]] || [[ "${http_code}" == "200" ]]; then
-        echo "    ✅ Successfully imported ${file_name}"
-    else
+        if [[ "${response_body}" == *"ElasticSearch initialisation exception"* ]] \
+            || [[ "${response_body}" == *"Failed to execute check alias existence"* ]]; then
+            if (( attempt < IMPORT_HTTP_RESPONSE_RETRY_COUNT )); then
+                echo "    ⚠️  CCD Elasticsearch not ready while importing ${file_name} (HTTP ${http_code}); retrying in ${IMPORT_HTTP_RESPONSE_RETRY_DELAY_SECONDS}s (${attempt}/${IMPORT_HTTP_RESPONSE_RETRY_COUNT})"
+                sleep "${IMPORT_HTTP_RESPONSE_RETRY_DELAY_SECONDS}"
+                continue
+            fi
+        fi
+
         echo "    ❌ Failed to import ${file_name} (HTTP ${http_code})"
         echo "    Response: ${response_body}"
         return 1
-    fi
+    done
 }
 
 echo "📥 Importing CCD definition files..."

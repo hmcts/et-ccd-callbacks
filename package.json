@@ -32,6 +32,12 @@
     },
     "scripts": {
         "setup": "sh ./bin/pull-latest-e2e-tests.sh",
+        "test:seed-cutover": "node src/test/end-to-end/cutover/seedCutoverCases.js",
+        "test:verify-cutover": "node src/test/end-to-end/cutover/verifyCutoverCases.js",
+        "test:check-cutover-db": "node src/test/end-to-end/cutover/checkCutoverDbData.js",
+        "test:verify-cutover-search": "node src/test/end-to-end/cutover/verifyCutoverSearch.js",
+        "test:verify-cutover-tasks": "node src/test/end-to-end/cutover/verifyCutoverTasks.js",
+        "test:verify-cutover-noc": "node src/test/end-to-end/cutover/verifyCutoverNocReadiness.js",
         "test:local": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run --steps -c src/test/end-to-end/codecept.conf.js --steps --reporter mocha-multi --verbose",
         "test:smoke": "cd et-xui-e2e-tests && yarn install && yarn test:smoke",
         "test:fullfunctional": "cd et-xui-e2e-tests && yarn install && yarn test:functional-ccd-callback",

@@ -4,22 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_PARAMETERS_TO_RESOLVE_ORGANISATION_EMAIL;
-
 @Slf4j
 public final class NotificationUtils {
-
-    private static final String OLD_LOWERCASE = "old";
-    private static final String NEW_LOWERCASE = "new";
 
     private NotificationUtils() {
         // Utility classes should not have a public or default constructor.
@@ -89,76 +79,4 @@ public final class NotificationUtils {
                 ? StringUtils.EMPTY : claimantRepresentative.getMyHmctsOrganisation().getOrganisationID();
     }
 
-    /**
-     * Determines whether the organisation response is valid for resolving the
-     * organisation superuser email address.
-     *
-     * <p>This method validates:</p>
-     * <ul>
-     *     <li>That {@code caseId}, {@code orgId}, and {@code nocType} are not blank,</li>
-     *     <li>That the organisation response is not null,</li>
-     *     <li>That the HTTP status code indicates a successful (2xx) response,</li>
-     *     <li>That the response body is present,</li>
-     *     <li>That a superuser exists in the response,</li>
-     *     <li>That the superuser email address is not blank.</li>
-     * </ul>
-     *
-     * <p>If any validation step fails, a warning is logged and {@code false} is returned.
-     * This method does not throw exceptions for validation failures.</p>
-     *
-     * <p>The {@code nocType} is used to determine whether the validation relates to an
-     * old or new organisation (for example, in Notice of Change removal scenarios),
-     * which is reflected in logging context.</p>
-     *
-     * @param caseId the case identifier associated with the request (must not be blank)
-     * @param orgId the organisation identifier to validate (must not be blank)
-     * @param nocType the Notice of Change (NoC) type used to determine context (must not be blank)
-     * @param orgResponse the response returned from retrieving the organisation by ID
-     * @return {@code true} if the organisation response contains a valid superuser
-     *         email address and all required parameters are valid; {@code false} otherwise
-     */
-    public static boolean hasOrganisationSuperuserEmail(String caseId,
-                                                        String orgId,
-                                                        String nocType,
-                                                        ResponseEntity<RetrieveOrgByIdResponse>
-                                                                               orgResponse) {
-        if (StringUtils.isBlank(caseId) || StringUtils.isBlank(orgId) || StringUtils.isBlank(nocType)) {
-            String tmpCaseId = StringUtils.isBlank(caseId) ? StringUtils.EMPTY : caseId;
-            log.warn(WARNING_INVALID_PARAMETERS_TO_RESOLVE_ORGANISATION_EMAIL, tmpCaseId);
-            return false;
-        }
-        final String orgType = NOC_TYPE_REMOVAL.equals(nocType) ? OLD_LOWERCASE : NEW_LOWERCASE;
-        if (!hasOrganisationSuperuserEmail(orgResponse)) {
-            RetrieveOrgByIdResponse body = ObjectUtils.isEmpty(orgResponse) ? null : orgResponse.getBody();
-            HttpStatusCode statusCode = ObjectUtils.isEmpty(orgResponse) ? null : orgResponse.getStatusCode();
-            log.warn(WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL, orgType, orgId,
-                    statusCode, body, caseId);
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Checks whether the given organisation response contains a valid superuser email address.
-     *
-     * <p>This method returns {@code true} only if:
-     * <ul>
-     *   <li>The response entity is not null</li>
-     *   <li>The HTTP status code indicates a successful (2xx) response</li>
-     *   <li>The response body is present</li>
-     *   <li>The superuser details are present</li>
-     *   <li>The superuser email is not blank</li>
-     * </ul>
-     * Otherwise, {@code false} is returned.</p>
-     *
-     * @param orgResponse the organisation lookup response to validate
-     * @return {@code true} if a non-blank superuser email exists in the response; {@code false} otherwise
-     */
-    public static boolean hasOrganisationSuperuserEmail(ResponseEntity<RetrieveOrgByIdResponse> orgResponse) {
-        return ObjectUtils.isNotEmpty(orgResponse)
-                && orgResponse.getStatusCode().is2xxSuccessful()
-                && ObjectUtils.isNotEmpty(orgResponse.getBody())
-                && ObjectUtils.isNotEmpty(orgResponse.getBody().getSuperUser())
-                && StringUtils.isNotBlank(orgResponse.getBody().getSuperUser().getEmail());
-    }
 }

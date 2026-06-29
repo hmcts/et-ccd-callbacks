@@ -4,10 +4,13 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.tika.utils.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
+import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
+import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse.SuperUser;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
@@ -21,6 +24,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERR
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL_LOG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_UNABLE_TO_FIND_ORGANISATION_SUPER_USER;
 
 @Service
 @RequiredArgsConstructor
@@ -128,5 +132,24 @@ public class OrganisationService {
             log.warn(WARNING_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID, e.getMessage());
         }
         return null;
+    public SuperUser findOrganisationSuperUser(String orgId) {
+        if (StringUtils.isBlank(orgId)) {
+            return null;
+        }
+        ResponseEntity<RetrieveOrgByIdResponse> organisationResponse = null;
+        try {
+            organisationResponse = organisationClient.getOrganisationById(adminUserService.getAdminUserToken(),
+                    authTokenGenerator.generate(), orgId);
+            if (!OrganisationUtils.hasOrganisationSuperuserEmail(organisationResponse)) {
+                return null;
+            }
+        } catch (FeignException e) {
+            if (e.status() != HttpStatus.NOT_FOUND.value()) {
+                log.error(WARNING_UNABLE_TO_FIND_ORGANISATION_SUPER_USER, e.getMessage());
+            }
+            return null;
+        }
+        assert organisationResponse.getBody() != null;
+        return organisationResponse.getBody().getSuperUser();
     }
 }

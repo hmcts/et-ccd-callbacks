@@ -134,8 +134,7 @@ public class OrganisationService {
         return null;
     }
 
-    public SuperUser findOrganisationSuperUser(String orgId) {
-     * Finds the superuser for the organisation with the given organisation ID.
+    /** Finds the superuser for the organisation with the given organisation ID.
      *
      * <p>Returns {@code null} if the organisation ID is blank, the organisation
      * cannot be found, or the organisation response does not contain a superuser

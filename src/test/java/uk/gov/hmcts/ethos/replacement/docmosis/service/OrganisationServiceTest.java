@@ -12,9 +12,9 @@ import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
 import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse.SuperUser;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
@@ -51,9 +51,13 @@ class OrganisationServiceTest {
     private static final String ORGANISATION_ADMIN_EMAIL = "organisation_admin@gmail.com";
     private static final String URL_GET_ACCOUNT_ID_BY_EMAIL =
             "http://localhost:8765/refdata/external/v1/organisations/users/accountId";
-    private static final String URL_GET_ORGANISATION_BY_ID =
+    private static final String URL_FIND_ORGANISATION_BY_IDAM_USER_ID =
+            "http://localhost:8765/refdata/internal/v1/organisations/orgDetails/" + REPRESENTATIVE_IDAM_ID;
+    private static final String URL_FIND_ORGANISATION_SUPERUSER_BY_ID =
             "http://localhost:8765/refdata/internal/v1/organisations?id=" + ORGANISATION_ID;
     private static final String FEIGN_EXCEPTION_USER_NOT_FOUND = "status 404 reading UserClient#getUser(String)";
+    private static final String FEIGN_EXCEPTION_ORGANISATION_NOT_FOUND =
+            "status 404 reading OrganisationClient#retrieveOrganisationDetailsByUserId(String)";
     private static final String FEIGN_EXCEPTION_SUPER_USER_NOT_FOUND =
             "status 404 reading OrganisationClient#getSuperUser(String)";
 
@@ -90,7 +94,6 @@ class OrganisationServiceTest {
         // when feign exception 404 is thrown should return warning message
         Request request = Request.create(
                 Request.HttpMethod.GET,
-                "http://localhost/organisations/userIdamId",
                 URL_GET_ACCOUNT_ID_BY_EMAIL,
                 Collections.emptyMap(),
                 new byte[0],
@@ -99,7 +102,6 @@ class OrganisationServiceTest {
         );
 
         FeignException.NotFound notFound = new FeignException.NotFound(
-                "status 404 reading OrganisationClient#getOrganisation(String)",
                 FEIGN_EXCEPTION_USER_NOT_FOUND,
                 request,
                 new byte[0],
@@ -131,9 +133,28 @@ class OrganisationServiceTest {
         // when feign exception is thrown should return null
         Request request = Request.create(
                 Request.HttpMethod.GET,
-                "http://localhost/organisations/representative_idam_id",
+                URL_FIND_ORGANISATION_BY_IDAM_USER_ID,
                 Collections.emptyMap(),
                 null,
+                StandardCharsets.UTF_8,
+                new RequestTemplate()
+        );
+
+        FeignException.NotFound notFound = new FeignException.NotFound(
+                FEIGN_EXCEPTION_ORGANISATION_NOT_FOUND,
+                request,
+                new byte[0],
+                Collections.emptyMap()
+        );
+        when(organisationClient.retrieveOrganisationDetailsByUserId(ADMIN_USER_TOKEN, AUTHORISATION_TOKEN,
+                REPRESENTATIVE_IDAM_ID)).thenThrow(notFound);
+        assertThat(organisationService.findOrganisationByIdamUserId(REPRESENTATIVE_IDAM_ID))
+                .isNull();
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
+                EXPECTED_WARNING_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID);
+    }
+
+    @Test
     void theFindSuperUserByOrganisationId() {
         // when organisation id is empty should return null
         assertThat(organisationService.findSuperUserByOrganisationId(ORGANISATION_ID)).isNull();
@@ -155,7 +176,7 @@ class OrganisationServiceTest {
         // when organisation client throws exception should return null
         Request request = Request.create(
                 Request.HttpMethod.GET,
-                URL_GET_ORGANISATION_BY_ID,
+                URL_FIND_ORGANISATION_SUPERUSER_BY_ID,
                 Collections.emptyMap(),
                 new byte[0],
                 StandardCharsets.UTF_8,
@@ -163,18 +184,11 @@ class OrganisationServiceTest {
         );
 
         FeignException.NotFound notFound = new FeignException.NotFound(
-                "status 404 reading OrganisationClient#retrieveOrganisationDetailsByUserId(String)",
                 FEIGN_EXCEPTION_SUPER_USER_NOT_FOUND,
                 request,
                 new byte[0],
                 Collections.emptyMap()
         );
-        when(organisationClient.retrieveOrganisationDetailsByUserId(ADMIN_USER_TOKEN, AUTHORISATION_TOKEN,
-                REPRESENTATIVE_IDAM_ID)).thenThrow(notFound);
-        assertThat(organisationService.findOrganisationByIdamUserId(REPRESENTATIVE_IDAM_ID))
-                .isNull();
-        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
-                EXPECTED_WARNING_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID);
         when(organisationClient.getOrganisationById(ADMIN_USER_TOKEN, AUTHORISATION_TOKEN, ORGANISATION_ID))
                 .thenThrow(notFound);
         assertThat(organisationService.findSuperUserByOrganisationId(ORGANISATION_ID)).isNull();

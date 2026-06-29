@@ -75,5 +75,14 @@
         <cve>CVE-2026-41850</cve>
         <cve>CVE-2026-41851</cve>
     </suppress>
+    <!-- OpenTelemetry semconv is already forced to the latest published version; these match the broad OpenTelemetry CPE. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: opentelemetry-semconv-1.42.0.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.opentelemetry\.semconv/opentelemetry\-semconv@.*$</packageUrl>
+        <cve>CVE-2026-39882</cve>
+        <cve>CVE-2026-39883</cve>
+    </suppress>
     <!-- All other CVEs below -->
 </suppressions>

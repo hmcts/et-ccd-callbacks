@@ -75,10 +75,12 @@ public final class Et3VettingHelper {
             + TABLE_STRING
             + "|Tribunal| %s|\r\n"
             + "|Office| %s|";
-    private static final String RESPONDENT_DETAILS = "<h2>Respondent</h2>"
-        + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
-        + "<br><br>Contact address &#09&#09 %s</pre><hr>";
-    private static final String BR_WITH_TAB = "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 ";
+    private static final String RESPONDENT_DETAILS =
+        "| <h2>Respondent</h2> | | \r\n"
+            + TABLE_STRING
+            + "| Name | %s |\r\n"
+            + "| Contact address | %s |";
+    private static final String BR_STRING = "<br>";
     private static final int ET3_RESPONSE_WINDOW = 28;
     private static final String NONE = "None";
     private static final String NONE_GIVEN = "None Given";
@@ -175,13 +177,13 @@ public final class Et3VettingHelper {
         StringBuilder addressBuilder = new StringBuilder();
         addressBuilder.append(address.getAddressLine1());
         if (!isNullOrEmpty(address.getAddressLine2())) {
-            addressBuilder.append(BR_WITH_TAB).append(address.getAddressLine2());
+            addressBuilder.append(BR_STRING).append(address.getAddressLine2());
         }
         if (!isNullOrEmpty(address.getAddressLine3())) {
-            addressBuilder.append(BR_WITH_TAB).append(address.getAddressLine3());
+            addressBuilder.append(BR_STRING).append(address.getAddressLine3());
         }
-        addressBuilder.append(BR_WITH_TAB).append(address.getPostTown())
-            .append(BR_WITH_TAB).append(address.getPostCode());
+        addressBuilder.append(BR_STRING).append(address.getPostTown())
+            .append(BR_STRING).append(address.getPostCode());
         return addressBuilder.toString();
     }
 

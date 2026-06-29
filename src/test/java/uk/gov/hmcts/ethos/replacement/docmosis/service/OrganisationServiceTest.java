@@ -7,8 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
+import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse.SuperUser;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -38,6 +41,15 @@ class OrganisationServiceTest {
     private static final String REPRESENTATIVE_NAME_1 = "Representative Name 1";
     private static final String REPRESENTATIVE_EMAIL_1 = "representative_1@hmcts.org";
     private static final String REPRESENTATIVE_ID_1 = "representative_id_1";
+    private static final String ORGANISATION_ID = "organisation_id";
+    private static final String ORGANISATION_ADMIN_EMAIL = "organisation_admin@gmail.com";
+    private static final String URL_GET_ACCOUNT_ID_BY_EMAIL =
+            "http://localhost:8765/refdata/external/v1/organisations/users/accountId";
+    private static final String URL_GET_ORGANISATION_BY_ID =
+            "http://localhost:8765/refdata/internal/v1/organisations?id=" + ORGANISATION_ID;
+    private static final String FEIGN_EXCEPTION_USER_NOT_FOUND = "status 404 reading UserClient#getUser(String)";
+    private static final String FEIGN_EXCEPTION_SUPER_USER_NOT_FOUND =
+            "status 404 reading OrganisationClient#getSuperUser(String)";
 
     private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
             "We have been unable to assign 'Representative Name 1' access to this case via MyHMCTS. They must "
@@ -64,15 +76,15 @@ class OrganisationServiceTest {
         // when feign exception 404 is thrown should return warning message
         Request request = Request.create(
                 Request.HttpMethod.GET,
-                "http://localhost/users/test@example.com",
+                URL_GET_ACCOUNT_ID_BY_EMAIL,
                 Collections.emptyMap(),
-                null,
+                new byte[0],
                 StandardCharsets.UTF_8,
                 new RequestTemplate()
         );
 
         FeignException.NotFound notFound = new FeignException.NotFound(
-                "status 404 reading UserClient#getUser(String)",
+                FEIGN_EXCEPTION_USER_NOT_FOUND,
                 request,
                 new byte[0],
                 Collections.emptyMap()
@@ -82,5 +94,45 @@ class OrganisationServiceTest {
         assertThat(organisationService.checkRepresentativeAccountByEmail(REPRESENTATIVE_NAME_1, REPRESENTATIVE_EMAIL_1))
                 .isEqualTo(List.of(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL));
 
+    }
+
+    @Test
+    void theFindSuperUserByOrganisationId() {
+        // when organisation id is empty should return null
+        assertThat(organisationService.findSuperUserByOrganisationId(ORGANISATION_ID)).isNull();
+        // when organisation response does not have superuser should return null
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        when(authTokenGenerator.generate()).thenReturn(AUTHORISATION_TOKEN);
+        ResponseEntity<RetrieveOrgByIdResponse> organisationResponse =
+                new ResponseEntity<>(RetrieveOrgByIdResponse.builder().build(), HttpStatus.OK);
+        when(organisationClient.getOrganisationById(ADMIN_USER_TOKEN, AUTHORISATION_TOKEN, ORGANISATION_ID))
+                .thenReturn(organisationResponse);
+        assertThat(organisationService.findSuperUserByOrganisationId(ORGANISATION_ID)).isNull();
+        // when organisation response returns superuser should return that superuser
+        SuperUser superUser = SuperUser.builder().email(ORGANISATION_ADMIN_EMAIL).build();
+        organisationResponse = new ResponseEntity<>(RetrieveOrgByIdResponse.builder().superUser(superUser).build(),
+                HttpStatus.OK);
+        when(organisationClient.getOrganisationById(ADMIN_USER_TOKEN, AUTHORISATION_TOKEN, ORGANISATION_ID))
+                .thenReturn(organisationResponse);
+        assertThat(organisationService.findSuperUserByOrganisationId(ORGANISATION_ID)).isEqualTo(superUser);
+        // when organisation client throws exception should return null
+        Request request = Request.create(
+                Request.HttpMethod.GET,
+                URL_GET_ORGANISATION_BY_ID,
+                Collections.emptyMap(),
+                new byte[0],
+                StandardCharsets.UTF_8,
+                new RequestTemplate()
+        );
+
+        FeignException.NotFound notFound = new FeignException.NotFound(
+                FEIGN_EXCEPTION_SUPER_USER_NOT_FOUND,
+                request,
+                new byte[0],
+                Collections.emptyMap()
+        );
+        when(organisationClient.getOrganisationById(ADMIN_USER_TOKEN, AUTHORISATION_TOKEN, ORGANISATION_ID))
+                .thenThrow(notFound);
+        assertThat(organisationService.findSuperUserByOrganisationId(ORGANISATION_ID)).isNull();
     }
 }

@@ -96,11 +96,25 @@ public class OrganisationService {
         return nocWarnings;
     }
 
-    public SuperUser findOrganisationSuperUser(String orgId) {
+    /**
+     * Finds the superuser for the organisation with the given organisation ID.
+     *
+     * <p>Returns {@code null} if the organisation ID is blank, the organisation
+     * cannot be found, or the organisation response does not contain a superuser
+     * email address.</p>
+     *
+     * <p>If the organisation lookup fails with a {@link FeignException}, the
+     * exception is handled and {@code null} is returned. Non-404 errors are logged.</p>
+     *
+     * @param orgId the ID of the organisation to retrieve the superuser for
+     * @return the organisation's {@link SuperUser}, or {@code null} if no superuser
+     *         can be found
+     */
+    public SuperUser findSuperUserByOrganisationId(String orgId) {
         if (StringUtils.isBlank(orgId)) {
             return null;
         }
-        ResponseEntity<RetrieveOrgByIdResponse> organisationResponse = null;
+        ResponseEntity<RetrieveOrgByIdResponse> organisationResponse;
         try {
             organisationResponse = organisationClient.getOrganisationById(adminUserService.getAdminUserToken(),
                     authTokenGenerator.generate(), orgId);

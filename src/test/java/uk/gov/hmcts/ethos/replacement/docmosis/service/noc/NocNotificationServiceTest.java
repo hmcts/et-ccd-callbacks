@@ -278,7 +278,7 @@ class NocNotificationServiceTest {
         validCaseDetails.getCaseData().setTribunalCorrespondenceEmail(TRIBUNAL_CORRESPONDENCE_EMAIL);
         when(emailService.getCitizenCaseLink(CASE_ID)).thenReturn(CITIZEN_CASE_LINK);
         when(emailService.getExuiCaseLink(CASE_ID)).thenReturn(EXUI_CASE_LINK);
-        when(organisationService.findOrganisationSuperUser(OLD_ORG_ID)).thenReturn(SuperUser.builder()
+        when(organisationService.findSuperUserByOrganisationId(OLD_ORG_ID)).thenReturn(SuperUser.builder()
                 .email(ORGANISATION_ADMIN_EMAIL).build());
         doNothing().when(emailService).sendEmail(anyString(), anyString(), anyMap());
         nocNotificationService.sendRespondentRepresentationUpdateNotifications(validCaseDetails, representatives,
@@ -437,7 +437,7 @@ class NocNotificationServiceTest {
                 NEW_RESPONDENT_SOLICITOR_TEMPLATE_ID);
         // when send email throws exception should log that exception
         SuperUser superUser = SuperUser.builder().email(ORGANISATION_ADMIN_EMAIL).build();
-        when(organisationService.findOrganisationSuperUser(OLD_ORG_ID)).thenReturn(superUser);
+        when(organisationService.findSuperUserByOrganisationId(OLD_ORG_ID)).thenReturn(superUser);
         doThrow(new RuntimeException(EXCEPTION_RESPONDENT_EMAIL_SEND)).when(emailService).sendEmail(
                 eq(PREVIOUS_RESPONDENT_SOLICITOR_TEMPLATE_ID), eq(ORGANISATION_ADMIN_EMAIL), anyMap());
         nocNotificationService.notifyOrganisationOfRespondentRepresentativeUpdate(validCaseDetails, representative,
@@ -480,12 +480,12 @@ class NocNotificationServiceTest {
         representative.setId(REPRESENTATIVE_ID);
         representative.setValue(RepresentedTypeR.builder().respondentOrganisation(Organisation.builder()
                 .organisationID(OLD_ORG_ID).build()).build());
-        when(organisationService.findOrganisationSuperUser(OLD_ORG_ID)).thenReturn(null);
+        when(organisationService.findSuperUserByOrganisationId(OLD_ORG_ID)).thenReturn(null);
         assertThat(nocNotificationService.resolveRespondentRepresentativeOrganisationSuperuserEmail(validCaseDetails,
                 representative, NOC_TYPE_REMOVAL)).isEmpty();
         // when able to find respondent representative organisation should return superuser email
         SuperUser superUser = SuperUser.builder().email(ORGANISATION_ADMIN_EMAIL).build();
-        when(organisationService.findOrganisationSuperUser(OLD_ORG_ID)).thenReturn(superUser);
+        when(organisationService.findSuperUserByOrganisationId(OLD_ORG_ID)).thenReturn(superUser);
         assertThat(nocNotificationService.resolveRespondentRepresentativeOrganisationSuperuserEmail(validCaseDetails,
                 representative, NOC_TYPE_REMOVAL)).isNotEmpty().isEqualTo(ORGANISATION_ADMIN_EMAIL);
     }
@@ -497,11 +497,11 @@ class NocNotificationServiceTest {
         // when representative organisation not found should return empty string
         RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder().myHmctsOrganisation(Organisation.builder()
                 .organisationID(OLD_ORG_ID).build()).build();
-        when(organisationService.findOrganisationSuperUser(OLD_ORG_ID)).thenReturn(null);
+        when(organisationService.findSuperUserByOrganisationId(OLD_ORG_ID)).thenReturn(null);
         assertThat(nocNotificationService.findClaimantRepOrgSuperUserEmail(claimantRepresentative)).isEmpty();
         // when able to find respondent representative organisation should return superuser email
         SuperUser superUser = SuperUser.builder().email(ORGANISATION_ADMIN_EMAIL).build();
-        when(organisationService.findOrganisationSuperUser(OLD_ORG_ID)).thenReturn(superUser);
+        when(organisationService.findSuperUserByOrganisationId(OLD_ORG_ID)).thenReturn(superUser);
         assertThat(nocNotificationService.findClaimantRepOrgSuperUserEmail(claimantRepresentative)).isNotEmpty()
                 .isEqualTo(ORGANISATION_ADMIN_EMAIL);
     }
@@ -584,9 +584,9 @@ class NocNotificationServiceTest {
     @Test
     void sendNotificationsShouldSendFiveNotifications() {
         SuperUser oldSuperUser = SuperUser.builder().email(OLD_ORG_ADMIN_EMAIL).build();
-        when(organisationService.findOrganisationSuperUser(OLD_ORG_ID)).thenReturn(oldSuperUser);
+        when(organisationService.findSuperUserByOrganisationId(OLD_ORG_ID)).thenReturn(oldSuperUser);
         SuperUser newSuperUser = SuperUser.builder().email(NEW_ORG_ADMIN_EMAIL).build();
-        when(organisationService.findOrganisationSuperUser(NEW_ORG_ID)).thenReturn(newSuperUser);
+        when(organisationService.findSuperUserByOrganisationId(NEW_ORG_ID)).thenReturn(newSuperUser);
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName("Respondent");
         respondentSumType.setRespondentEmail("res@rep.com");
@@ -612,8 +612,8 @@ class NocNotificationServiceTest {
     @Test
     void sendNotificationsShouldSendFiveNotifications_NoSuperUserEmail() {
         SuperUser superUser = SuperUser.builder().email(ORGANISATION_ADMIN_EMAIL).build();
-        when(organisationService.findOrganisationSuperUser(NEW_ORG_ID)).thenReturn(superUser);
-        when(organisationService.findOrganisationSuperUser(OLD_ORG_ID)).thenReturn(superUser);
+        when(organisationService.findSuperUserByOrganisationId(NEW_ORG_ID)).thenReturn(superUser);
+        when(organisationService.findSuperUserByOrganisationId(OLD_ORG_ID)).thenReturn(superUser);
 
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName("Respondent");
@@ -642,7 +642,7 @@ class NocNotificationServiceTest {
     @Test
     void handleMissingEmails() {
         reset(emailService);
-        when(organisationService.findOrganisationSuperUser(anyString())).thenReturn(null);
+        when(organisationService.findSuperUserByOrganisationId(anyString())).thenReturn(null);
 
         CaseData oldCaseData = caseDetailsBefore.getCaseData();
 
@@ -674,10 +674,10 @@ class NocNotificationServiceTest {
         when(emailService.getCitizenCaseLink(any())).thenReturn("citizenLink");
 
         SuperUser oldSuperUser = SuperUser.builder().email(OLD_ORG_ADMIN_EMAIL).build();
-        when(organisationService.findOrganisationSuperUser(OLD_ORG_ID)).thenReturn(oldSuperUser);
+        when(organisationService.findSuperUserByOrganisationId(OLD_ORG_ID)).thenReturn(oldSuperUser);
 
         SuperUser newSuperUser = SuperUser.builder().email(NEW_ORG_ADMIN_EMAIL).build();
-        when(organisationService.findOrganisationSuperUser(NEW_ORG_ID)).thenReturn(newSuperUser);
+        when(organisationService.findSuperUserByOrganisationId(NEW_ORG_ID)).thenReturn(newSuperUser);
 
         DynamicValueType dynamicValueType = new DynamicValueType();
         dynamicValueType.setCode(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
@@ -712,10 +712,10 @@ class NocNotificationServiceTest {
                 PREVIOUS_RESPONDENT_SOLICITOR_TEMPLATE_ID);
         ReflectionTestUtils.setField(nocNotificationService, FIELD_NAME_TRIBUNAL_TEMPLATE_ID, TRIBUNAL_TEMPLATE_ID);
         SuperUser oldSuperUser = SuperUser.builder().email(OLD_ORG_ADMIN_EMAIL).build();
-        when(organisationService.findOrganisationSuperUser(OLD_ORG_ID)).thenReturn(oldSuperUser);
+        when(organisationService.findSuperUserByOrganisationId(OLD_ORG_ID)).thenReturn(oldSuperUser);
 
         SuperUser newSuperUser = SuperUser.builder().email(NEW_ORG_ADMIN_EMAIL).build();
-        when(organisationService.findOrganisationSuperUser(NEW_ORG_ID)).thenReturn(newSuperUser);
+        when(organisationService.findSuperUserByOrganisationId(NEW_ORG_ID)).thenReturn(newSuperUser);
 
         // Set up caseRoleId to trigger claimant NOC logic
         DynamicFixedListType caseRoleId = new DynamicFixedListType();

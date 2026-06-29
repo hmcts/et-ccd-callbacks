@@ -322,7 +322,7 @@ public class NocNotificationService {
         }
 
         String organisationId = representative.getValue().getRespondentOrganisation().getOrganisationID();
-        SuperUser superUser = organisationService.findOrganisationSuperUser(organisationId);
+        SuperUser superUser = organisationService.findSuperUserByOrganisationId(organisationId);
         if (superUser == null) {
             final String orgType = NOC_TYPE_REMOVAL.equals(nocType) ? OLD_LOWERCASE : NEW_LOWERCASE;
             log.warn(WARNING_ORGANISATION_SUPER_USER_EMAIL_NOT_FOUND_WITH_PARAMETERS, orgType, caseDetails.getCaseId());
@@ -346,7 +346,7 @@ public class NocNotificationService {
         if (StringUtils.isBlank(organisationId)) {
             return StringUtils.EMPTY;
         }
-        SuperUser superUser  = organisationService.findOrganisationSuperUser(organisationId);
+        SuperUser superUser  = organisationService.findSuperUserByOrganisationId(organisationId);
         if (ObjectUtils.isEmpty(superUser)) {
             return StringUtils.EMPTY;
         }
@@ -447,7 +447,7 @@ public class NocNotificationService {
 
     private void sendEmailToOldOrgAdmin(String orgId, CaseData caseDataPrevious) {
 
-        SuperUser superUser = organisationService.findOrganisationSuperUser(orgId);
+        SuperUser superUser = organisationService.findSuperUserByOrganisationId(orgId);
         if (ObjectUtils.isEmpty(superUser)) {
             log.warn("{} organisation {} is missing org admin email", OLD_CAPITALISED, orgId);
             return;
@@ -464,7 +464,7 @@ public class NocNotificationService {
     }
 
     private void sendEmailToNewOrgAdmin(String orgId, CaseDetails caseDetailsNew, String partyName) {
-        SuperUser superUser = organisationService.findOrganisationSuperUser(orgId);
+        SuperUser superUser = organisationService.findSuperUserByOrganisationId(orgId);
         if (ObjectUtils.isEmpty(superUser)) {
             log.warn("{} org {} is missing org admin email", NEW_CAPITALISED, orgId);
             return;

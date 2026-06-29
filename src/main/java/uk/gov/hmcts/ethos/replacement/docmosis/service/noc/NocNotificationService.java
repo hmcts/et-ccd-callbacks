@@ -6,15 +6,12 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
-import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
+import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse.SuperUser;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
@@ -23,18 +20,16 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ClaimantUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.NotificationUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.util.List;
 import java.util.Map;
@@ -44,6 +39,10 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_FAILED_TO_SEND_EMAIL_ORGANISATION_ADMIN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_CASE_DETAILS_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.NEW_CAPITALISED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.NEW_LOWERCASE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.OLD_CAPITALISED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.OLD_LOWERCASE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.WARNING_CLAIMANT_EMAIL_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_ADDITION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
@@ -63,6 +62,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WAR
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_REP_EMAIL_NOTIFY_NEW_REPRESENTATIVE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_RESPONDENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_MISSING_RESPONDENT_EMAIL_ADDRESS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_ORGANISATION_SUPER_USER_EMAIL_NOT_FOUND_WITH_PARAMETERS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_RESPONDENT_NAME_MISSING_TO_NOTIFY_CLAIMANT_FOR_RESP_REP_UPDATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_TRIBUNAL_EMAIL_NOT_FOUND_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
@@ -81,11 +81,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHel
 public class NocNotificationService {
     private final EmailService emailService;
     private final NocRespondentHelper nocRespondentHelper;
-    private final OrganisationClient organisationClient;
-    private final AdminUserService adminUserService;
-    private final AuthTokenGenerator authTokenGenerator;
     private final EmailNotificationService emailNotificationService;
     private final CaseAccessService caseAccessService;
+    private final OrganisationService organisationService;
 
     @Value("${template.nocNotification.respondent}")
     private String respondentTemplateId;
@@ -322,14 +320,15 @@ public class NocNotificationService {
             log.warn(WARNING_INVALID_REPRESENTATIVE_TO_RESOLVE_ORGANISATION_EMAIL, caseDetails.getCaseId(), nocType);
             return StringUtils.EMPTY;
         }
+
         String organisationId = representative.getValue().getRespondentOrganisation().getOrganisationID();
-        ResponseEntity<RetrieveOrgByIdResponse> organisationResponse = getOrganisationById(organisationId);
-        if (!NotificationUtils.hasOrganisationSuperuserEmail(caseDetails.getCaseId(), organisationId, nocType,
-                organisationResponse)) {
+        SuperUser superUser = organisationService.findOrganisationSuperUser(organisationId);
+        if (superUser == null) {
+            final String orgType = NOC_TYPE_REMOVAL.equals(nocType) ? OLD_LOWERCASE : NEW_LOWERCASE;
+            log.warn(WARNING_ORGANISATION_SUPER_USER_EMAIL_NOT_FOUND_WITH_PARAMETERS, orgType, caseDetails.getCaseId());
             return StringUtils.EMPTY;
         }
-        assert organisationResponse.getBody() != null;
-        return organisationResponse.getBody().getSuperUser().getEmail();
+        return superUser.getEmail();
     }
 
     /**
@@ -347,12 +346,11 @@ public class NocNotificationService {
         if (StringUtils.isBlank(organisationId)) {
             return StringUtils.EMPTY;
         }
-        ResponseEntity<RetrieveOrgByIdResponse> organisationResponse = getOrganisationById(organisationId);
-        if (!NotificationUtils.hasOrganisationSuperuserEmail(organisationResponse)) {
+        SuperUser superUser  = organisationService.findOrganisationSuperUser(organisationId);
+        if (ObjectUtils.isEmpty(superUser)) {
             return StringUtils.EMPTY;
         }
-        assert organisationResponse.getBody() != null;
-        return organisationResponse.getBody().getSuperUser().getEmail();
+        return superUser.getEmail();
     }
 
     /**
@@ -447,37 +445,18 @@ public class NocNotificationService {
         }
     }
 
-    private RetrieveOrgByIdResponse getOrganisationResponse(String orgId, boolean isNewOrg) {
-        ResponseEntity<RetrieveOrgByIdResponse> getOrgResponse = getOrganisationById(orgId);
-        HttpStatusCode statusCode = getOrgResponse.getStatusCode();
-        if (!HttpStatus.OK.equals(statusCode)) {
-            String orgType = isNewOrg ? "new" : "old";
-            log.error("Cannot retrieve {} org by id {} [{}] {}", orgType, orgId, statusCode, getOrgResponse.getBody());
-            return null;
-        }
-        RetrieveOrgByIdResponse resBody = getOrgResponse.getBody();
-        if (resBody == null) {
-            return null;
-        }
-        if (resBody.getSuperUser() == null || isNullOrEmpty(resBody.getSuperUser().getEmail())) {
-            String orgType = isNewOrg ? "New" : "Previous";
-            log.warn("{} Org {} is missing org admin email", orgType, orgId);
-            return null;
-        }
-        return resBody;
-    }
-
     private void sendEmailToOldOrgAdmin(String orgId, CaseData caseDataPrevious) {
 
-        RetrieveOrgByIdResponse resBody = getOrganisationResponse(orgId, false);
-        if (ObjectUtils.isEmpty(resBody)) {
+        SuperUser superUser = organisationService.findOrganisationSuperUser(orgId);
+        if (ObjectUtils.isEmpty(superUser)) {
+            log.warn("{} organisation {} is missing org admin email", OLD_CAPITALISED, orgId);
             return;
         }
         Map<String, String> personalisation = addCommonEmailValues(caseDataPrevious);
         try {
             emailService.sendEmail(
                     previousRespondentSolicitorTemplateId,
-                    resBody.getSuperUser().getEmail(),
+                    superUser.getEmail(),
                     personalisation);
         } catch (Exception e) {
             LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_ORGANISATION_ADMIN, e);
@@ -485,13 +464,14 @@ public class NocNotificationService {
     }
 
     private void sendEmailToNewOrgAdmin(String orgId, CaseDetails caseDetailsNew, String partyName) {
-        RetrieveOrgByIdResponse resBody = getOrganisationResponse(orgId, true);
-        if (ObjectUtils.isEmpty(resBody)) {
+        SuperUser superUser = organisationService.findOrganisationSuperUser(orgId);
+        if (ObjectUtils.isEmpty(superUser)) {
+            log.warn("{} org {} is missing org admin email", NEW_CAPITALISED, orgId);
             return;
         }
         String citUrl = emailService.getCitizenCaseLink(caseDetailsNew.getCaseId());
         Map<String, String> personalisation = buildPersonalisationWithPartyName(caseDetailsNew, partyName, citUrl);
-        emailService.sendEmail(newRespondentSolicitorTemplateId, resBody.getSuperUser().getEmail(), personalisation);
+        emailService.sendEmail(newRespondentSolicitorTemplateId, superUser.getEmail(), personalisation);
     }
 
     public void sendNotificationOfChangeEmails(CaseDetails caseDetailsPrevious,
@@ -628,12 +608,5 @@ public class NocNotificationService {
         } catch (Exception e) {
             LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT, e);
         }
-    }
-
-    private ResponseEntity<RetrieveOrgByIdResponse> getOrganisationById(String orgId) {
-        return organisationClient.getOrganisationById(
-                adminUserService.getAdminUserToken(),
-                authTokenGenerator.generate(),
-                orgId);
     }
 }

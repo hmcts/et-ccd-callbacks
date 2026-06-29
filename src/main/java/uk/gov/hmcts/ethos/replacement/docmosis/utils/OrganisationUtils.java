@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
@@ -27,6 +29,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EXCEPTIO
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EXCEPTION_CASE_REFERENCE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EXCEPTION_UPDATE_RESPONDENT_REPRESENTATIVE_REQUEST_EMPTY;
 
+@Slf4j
 public final class OrganisationUtils {
 
     private static final String CLASS_NAME_ORGANISATION_UTILS = "OrganisationUtils";
@@ -401,7 +404,7 @@ public final class OrganisationUtils {
      * <p>This method performs a case-sensitive comparison of the two organisation IDs.
      * If either input object is {@code null}, or if either organisation identifier is
      * blank, the method returns {@code true}. In other words, the method only returns
-     * {@code false} when both identifiers are present and they do not match.</p>
+     * {@code false} when both identifiers are present, and they do not match.</p>
      *
      * <h3>Assumptions:</h3>
      * <ul>
@@ -433,5 +436,29 @@ public final class OrganisationUtils {
             return true;
         }
         return Strings.CS.equals(organisationResponseId, organisationId);
+    }
+
+    /**
+     * Checks whether the given organisation response contains a valid superuser email address.
+     *
+     * <p>This method returns {@code true} only if:
+     * <ul>
+     *   <li>The response entity is not null</li>
+     *   <li>The HTTP status code indicates a successful (2xx) response</li>
+     *   <li>The response body is present</li>
+     *   <li>The superuser details are present</li>
+     *   <li>The superuser email is not blank</li>
+     * </ul>
+     * Otherwise, {@code false} is returned.</p>
+     *
+     * @param orgResponse the organisation lookup response to validate
+     * @return {@code true} if a non-blank superuser email exists in the response; {@code false} otherwise
+     */
+    public static boolean hasOrganisationSuperuserEmail(ResponseEntity<RetrieveOrgByIdResponse> orgResponse) {
+        return ObjectUtils.isNotEmpty(orgResponse)
+                && orgResponse.getStatusCode().is2xxSuccessful()
+                && ObjectUtils.isNotEmpty(orgResponse.getBody())
+                && ObjectUtils.isNotEmpty(orgResponse.getBody().getSuperUser())
+                && StringUtils.isNotBlank(orgResponse.getBody().getSuperUser().getEmail());
     }
 }

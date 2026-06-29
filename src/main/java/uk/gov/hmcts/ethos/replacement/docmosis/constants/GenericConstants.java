@@ -21,6 +21,11 @@ public final class GenericConstants {
     public static final String EMPTY_LOWERCASE = "empty";
     public static final String CASE_DETAILS_OR_CASE_DATA_NOT_FOUND = "Case details or case data not found";
 
+    public static final String OLD_CAPITALISED = "New";
+    public static final String NEW_CAPITALISED = "New";
+    public static final String OLD_LOWERCASE = "old";
+    public static final String NEW_LOWERCASE = "new";
+
     private GenericConstants() {
         // Final classes should not have a public or default constructor.
     }

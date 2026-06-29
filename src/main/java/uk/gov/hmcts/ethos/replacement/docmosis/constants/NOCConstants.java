@@ -95,6 +95,11 @@ public final class NOCConstants {
 
     public static final String WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND =
             "Representative email address not found. To continue, please click Ignore and Continue.";
+    public static final String WARNING_ORGANISATION_SUPER_USER_NOT_FOUND = "Organisation's admin not found.";
+    public static final String WARNING_ORGANISATION_SUPER_USER_EMAIL_NOT_FOUND_WITH_PARAMETERS =
+            "Cannot retrieve {} organisation super user. Case id: {}";
+    public static final String WARNING_UNABLE_TO_FIND_ORGANISATION_SUPER_USER =
+            "The organisation administrator could not be found due to a system error. Exception: {}";
     public static final String WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
             "We have been unable to assign '%s' access to this case via MyHMCTS. They must check with their "
                     + "organisation administrator to ensure they have a valid MyHMCTS account, who will need to "

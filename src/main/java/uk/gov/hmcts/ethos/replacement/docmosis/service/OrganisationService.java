@@ -8,9 +8,9 @@ import org.apache.tika.utils.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
 import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse.SuperUser;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
@@ -132,11 +132,13 @@ public class OrganisationService {
             log.warn(WARNING_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID, e.getMessage());
         }
         return null;
+    }
+
     public SuperUser findOrganisationSuperUser(String orgId) {
         if (StringUtils.isBlank(orgId)) {
             return null;
         }
-        ResponseEntity<RetrieveOrgByIdResponse> organisationResponse = null;
+        ResponseEntity<RetrieveOrgByIdResponse> organisationResponse;
         try {
             organisationResponse = organisationClient.getOrganisationById(adminUserService.getAdminUserToken(),
                     authTokenGenerator.generate(), orgId);

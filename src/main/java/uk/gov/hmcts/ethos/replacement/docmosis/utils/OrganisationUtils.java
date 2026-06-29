@@ -10,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
@@ -494,7 +494,9 @@ public final class OrganisationUtils {
                 .filter(rep -> Objects.nonNull(rep.getValue().getRespondentOrganisation()))
                 .anyMatch(rep -> organisationId.equals(
                         rep.getValue().getRespondentOrganisation().getOrganisationID()));
-     * Checks whether the given organisation response contains a valid superuser email address.
+    }
+
+    /** Checks whether the given organisation response contains a valid superuser email address.
      *
      * <p>This method returns {@code true} only if:
      * <ul>

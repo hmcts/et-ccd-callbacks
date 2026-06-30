@@ -18,6 +18,9 @@ import java.util.stream.Collectors;
 public class CaseRetentionTask implements Runnable {
     private final CaseRetentionService caseRetentionService;
 
+    @Value("${retention.disposal.enabled:true}")
+    private boolean enabled;
+
     @Value("${retention.disposal.caseTypeIds:}")
     private String caseTypeIds;
 
@@ -29,6 +32,11 @@ public class CaseRetentionTask implements Runnable {
 
     @Override
     public void run() {
+        if (!enabled) {
+            log.info("Case retention task is disabled");
+            return;
+        }
+
         RetentionTaskResult result = caseRetentionService.run(
             parseCaseTypes(caseTypeIds),
             parseCaseTypes(simulationCaseTypeIds),

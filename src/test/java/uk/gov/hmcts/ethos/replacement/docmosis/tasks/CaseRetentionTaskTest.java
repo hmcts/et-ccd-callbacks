@@ -11,6 +11,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.retention.RetentionTaskRe
 
 import java.util.Set;
 
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -24,6 +25,7 @@ class CaseRetentionTaskTest {
     @BeforeEach
     void setUp() {
         task = new CaseRetentionTask(caseRetentionService);
+        ReflectionTestUtils.setField(task, "enabled", true);
         ReflectionTestUtils.setField(task, "caseTypeIds", "ET_EnglandWales, ET_Scotland");
         ReflectionTestUtils.setField(task, "simulationCaseTypeIds", "ET_EnglandWales_Multiple");
         ReflectionTestUtils.setField(task, "batchSize", 25);
@@ -38,6 +40,16 @@ class CaseRetentionTaskTest {
         task.run();
 
         verify(caseRetentionService).run(Set.of("ET_EnglandWales", "ET_Scotland"),
+            Set.of("ET_EnglandWales_Multiple"), 25);
+    }
+
+    @Test
+    void runDoesNothingWhenDisabled() {
+        ReflectionTestUtils.setField(task, "enabled", false);
+
+        task.run();
+
+        verify(caseRetentionService, never()).run(Set.of("ET_EnglandWales", "ET_Scotland"),
             Set.of("ET_EnglandWales_Multiple"), 25);
     }
 }

@@ -301,6 +301,7 @@ cron:
 
 retention:
   disposal:
+    enabled: ${RETENTION_DISPOSAL_ENABLED:true}
     caseTypeIds: ${RETENTION_DISPOSAL_CASE_TYPE_IDS:ET_Admin,ET_EnglandWales,ET_Scotland}
     simulationCaseTypeIds: ${RETENTION_DISPOSAL_SIMULATION_CASE_TYPE_IDS:ET_Admin,ET_EnglandWales,ET_Scotland}
     batchSize: ${RETENTION_DISPOSAL_BATCH_SIZE:100}

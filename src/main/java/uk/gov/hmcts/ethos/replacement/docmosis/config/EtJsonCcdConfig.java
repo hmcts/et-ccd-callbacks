@@ -15,11 +15,14 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.AdminCaseSt
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.CaseState;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.ListingCaseState;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.MultipleCaseState;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.PreHearingDepositCaseState;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.prehearingdeposit.PreHearingDepositData;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.PRE_HEARING_DEPOSIT_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
@@ -40,6 +43,16 @@ public class EtJsonCcdConfig {
         return new JsonBackedCCDConfig<>(
           support,
           ADMIN_CASE_TYPE_ID,
+          "file:ccd-definitions/jurisdictions/admin/json"
+        ) { };
+    }
+
+    @Bean
+    public CCDConfig<PreHearingDepositData, PreHearingDepositCaseState, PlaceholderRole>
+        etPreHearingDepositJsonCcdConfig(JsonCCDConfigSupport support) {
+        return new JsonBackedCCDConfig<>(
+          support,
+          PRE_HEARING_DEPOSIT_CASE_TYPE_ID,
           "file:ccd-definitions/jurisdictions/admin/json"
         ) { };
     }

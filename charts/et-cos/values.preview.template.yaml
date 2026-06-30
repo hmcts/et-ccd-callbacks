@@ -223,7 +223,6 @@ ethos:
             alias: ETHOS_REPL_DB_HOST
           - name: ethos-postgres-port-v15
             alias: ETHOS_REPL_DB_PORT
-    aadIdentityName: ethos
     environment:
       RUN_DB_MIGRATION_ON_STARTUP: false
       SERVER_PORT: 8081
@@ -300,15 +299,14 @@ ccd:
         enabled: false
       imagePullPolicy: Always
       image: hmctsprod.azurecr.io/ccd/user-profile-api:latest
-      enviroment:
+      environment:
         USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
+        USER_PROFILE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_definition,ccd_admin
       keyVaults: []
       devcpuRequests: 10m
       devcpuLimits: 1000m
       devmemoryRequests: 768Mi
       devmemoryLimits: 1536Mi
-      environment:
-        USER_PROFILE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_definition,ccd_admin
       ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
 
   ccd-data-store-api:
@@ -437,7 +435,7 @@ ccd:
         IDAM_SERVICE_KEY: ${API_GATEWAY_S2S_KEY}
         IDAM_OAUTH2_CLIENT_SECRET: ${API_GATEWAY_IDAM_SECRET}
         CORS_ORIGIN_WHITELIST: "*"
-        PROXY_CASE_ACTIVITY: http://${SERVICE_NAME}-ccd-case-activity-apif
+        PROXY_CASE_ACTIVITY: http://${SERVICE_NAME}-ccd-case-activity-api
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
         PROXY_PRINT_SERVICE: http://ccd-case-print-service-${SERVICE_FQDN}
         ADDRESS_LOOKUP_TOKEN: ${ADDRESS_LOOKUP_TOKEN}

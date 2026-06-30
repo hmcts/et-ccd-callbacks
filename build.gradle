@@ -254,20 +254,33 @@ tasks.register('functional', Test) {
     maxHeapSize = '1G'
 }
 
+def resolveExecutable(String name) {
+    def searchPaths = (System.getenv('PATH') ?: '').tokenize(':') +
+            ['/opt/homebrew/bin', '/usr/local/bin']
+    searchPaths.findResult { dir ->
+        def candidate = new File(dir, name)
+        candidate.exists() && candidate.canExecute() ? candidate.absolutePath : null
+    } ?: name
+}
+
+def ccdDefinitionsYarnCommand(String... args) {
+    [resolveExecutable('node'), '.yarn/releases/yarn-4.13.0.cjs'] + (args as List)
+}
+
 tasks.register('yarnInstall', Exec) {
     workingDir '.'
-    commandLine 'yarn', 'install'
+    commandLine resolveExecutable('node'), '.yarn/releases/yarn-4.13.0.cjs', 'install'
 }
 
 tasks.register('setupCcdDefinitionsWorkspace', Exec) {
     workingDir 'ccd-definitions'
-    commandLine 'yarn', 'install'
+    commandLine ccdDefinitionsYarnCommand('install')
 }
 
 tasks.register('generateCftlibCcdDefinitions', Exec) {
     dependsOn 'setupCcdDefinitionsWorkspace'
     workingDir 'ccd-definitions'
-    commandLine 'yarn', 'generate-excel:cftlib'
+    commandLine ccdDefinitionsYarnCommand('generate-excel:cftlib')
 }
 
 tasks.register('yarnAudit', Exec) {

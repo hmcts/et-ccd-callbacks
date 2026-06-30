@@ -24,6 +24,8 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Locale;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.PRE_HEARING_DEPOSIT_CASE_TYPE_ID;
+
 @Service
 @RequiredArgsConstructor
 public class PreHearingDepositService {
@@ -33,7 +35,6 @@ public class PreHearingDepositService {
     private static final String PRE_HEARING_CASE_CREATION_EVENT_DESCRIPTION =
             "Pre-Hearing Deposit is Crated By Excel File";
     private static final String PRE_HEARING_CASE_CREATION_EVENT_SUMMARY = "Pre-Hearing Deposit Bulk Case Creation";
-    private static final String PRE_HEARING_CASE_TYPE_ID = "Pre_Hearing_Deposit";
     private static final String JURISDICTION_EMPLOYMENT = "EMPLOYMENT";
     private static final String YES = "Yes";
     private static final String NO = "No";
@@ -92,7 +93,7 @@ public class PreHearingDepositService {
     private GenericTypeCaseDetails<PreHearingDepositData> generatePreHearingDepositCaseDetails(
             ImportFile importFile, Row row) {
         GenericTypeCaseDetails<PreHearingDepositData> preHearingDepositCaseDetails = new GenericTypeCaseDetails<>();
-        preHearingDepositCaseDetails.setCaseTypeId(PRE_HEARING_CASE_TYPE_ID);
+        preHearingDepositCaseDetails.setCaseTypeId(PRE_HEARING_DEPOSIT_CASE_TYPE_ID);
         preHearingDepositCaseDetails.setJurisdiction(JURISDICTION_EMPLOYMENT);
         PreHearingDepositData preHearingDepositData = new PreHearingDepositData();
         preHearingDepositData.setPreHearingDepositImportFile(importFile);

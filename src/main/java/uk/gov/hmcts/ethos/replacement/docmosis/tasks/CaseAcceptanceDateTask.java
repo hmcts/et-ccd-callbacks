@@ -2,32 +2,25 @@ package uk.gov.hmcts.ethos.replacement.docmosis.tasks;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PreAcceptanceCaseService;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.IntStream;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -53,111 +46,71 @@ import static uk.gov.hmcts.ecm.compat.common.model.helper.Constants.ECM_CASE_TYP
 public class CaseAcceptanceDateTask implements Runnable {
 
     private static final String FIX_CASE_API_EVENT_ID = "fixCaseAPI";
-    private static final long EXECUTOR_TIMEOUT_SECONDS = 120;
 
     private final AdminUserService adminUserService;
     private final CcdClient ccdClient;
     private final uk.gov.hmcts.ecm.compat.common.client.CcdClient ecmCcdClient;
     private final PreAcceptanceCaseService preAcceptanceCaseService;
 
-    @Value("${cron.caseTypeId}")
-    private String caseTypeIdsString;
-    @Value("${cron.maxCasesToProcess}")
-    private int maxCasesToProcess;
+    @Value("${cron.reconfigurationCaseIds}")
+    private String casesToUpdate;
+
+    public record CasesToUpdate(String caseId, String caseTypeId) {}
 
     @Override
     public void run() {
         log.info("CaseAcceptanceDateTask started");
-        String[] caseTypeIds = caseTypeIdsString.split(",");
-        String query = buildQuery();
+        if (isNullOrEmpty(casesToUpdate)) {
+            log.info("No cases to transfer");
+            return;
+        }
+
+        String[] caseIds = casesToUpdate.split(",");
+        if (caseIds.length % 2 != 0) {
+            log.info("Invalid case ids format. Expected format: caseId1,caseTypeId1, caseId2,caseTypeId2,...");
+            return;
+        }
+
+        List<CasesToUpdate> casesToUpdateList =
+            IntStream.iterate(0, i -> i < caseIds.length, i -> i + 2)
+                .mapToObj(i -> new CasesToUpdate(caseIds[i], caseIds[i + 1]))
+                .toList();
+
+        if (casesToUpdateList.isEmpty()) {
+            log.info("No cases to transfer");
+            return;
+        }
+
+        log.info("Number of cases to update - {}", casesToUpdateList.size());
+
+        AtomicInteger counter = new AtomicInteger(0);
+        AtomicReference<String> updatedCases = new AtomicReference<>();
+        AtomicReference<String> failedCases = new AtomicReference<>();
 
         String adminUserToken = adminUserService.getAdminUserToken();
 
-        for (String caseTypeId : caseTypeIds) {
-            if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId) || SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
-                processCaseType(caseTypeId,
-                    () -> ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query),
-                    submitEvent -> triggerEventForCase(adminUserToken, submitEvent, caseTypeId));
-            } else if (ECM_CASE_TYPES.contains(caseTypeId)) {
-                processCaseType(caseTypeId,
-                    () -> ecmCcdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query),
-                    submitEvent -> triggerEcmEventForCase(adminUserToken, submitEvent, caseTypeId));
+        casesToUpdateList.parallelStream().forEach(caseToUpdate -> {
+            log.info("Updating case {} of type {}", caseToUpdate.caseId, caseToUpdate.caseTypeId);
+            try {
+                String caseTypeId = caseToUpdate.caseTypeId;
+                if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId) || SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+                    triggerEventForCase(adminUserToken, caseToUpdate.caseId, caseTypeId);
+                } else if (ECM_CASE_TYPES.contains(caseTypeId)) {
+                    triggerEcmEventForCase(adminUserToken, caseToUpdate.caseId, caseTypeId);
+                }
+            } catch (Exception e) {
+                log.error("Error updating case {} of type {}: {}", caseToUpdate.caseId, caseToUpdate.caseTypeId,
+                    e.getMessage());
+                failedCases.updateAndGet(v -> v == null ? caseToUpdate.caseId : v + ", " + caseToUpdate.caseId);
             }
-        }
+        });
+
+        log.info("Completed transfer of {} cases", counter.get());
+        log.info("Updated cases: {}", updatedCases.get());
+        log.info("Failed cases: {}", failedCases.get());
     }
 
-    /**
-     * Fetches cases for a single case type and dispatches them for processing.
-     * Errors during the fetch are logged and swallowed so that remaining case types
-     * in the loop are still attempted.
-     *
-     * @param caseTypeId the CCD case type ID to process
-     * @param fetcher    supplier that retrieves the matching cases from Elasticsearch
-     * @param processor  per-case action to execute (start event, clear dates, submit event)
-     */
-    private <T> void processCaseType(String caseTypeId, CasesFetcher<T> fetcher, Consumer<T> processor) {
-        try {
-            List<T> cases = fetcher.fetch();
-            log.info("{} - Case Acceptance Date task - Retrieved {} cases", caseTypeId, cases.size());
-            if (cases.isEmpty()) {
-                log.info("{} - Case Acceptance Date task - No cases to process", caseTypeId);
-                return;
-            }
-            if (cases.size() > maxCasesToProcess) {
-                log.info("{} - Case Acceptance Date task - Limiting to {} cases (retrieved {})",
-                    caseTypeId, maxCasesToProcess, cases.size());
-                cases = cases.subList(0, maxCasesToProcess);
-            }
-            updateCases(cases, caseTypeId, processor);
-        } catch (IOException e) {
-            log.warn("{} - Case Acceptance Date task - error: {}", caseTypeId, e.getMessage(), e);
-        } catch (InterruptedException e) {
-            log.error(e.getMessage());
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    /**
-     * Dispatches all cases to a fixed thread pool and awaits completion.
-     * If the pool does not terminate within {@value #EXECUTOR_TIMEOUT_SECONDS} seconds
-     * it is forcibly shut down.
-     *
-     * @param cases      the cases to process
-     * @param caseTypeId the case type ID, used for logging
-     * @param processor  per-case action to execute on each thread
-     * @throws InterruptedException if the awaiting thread is interrupted
-     */
-    private <T> void updateCases(List<T> cases, String caseTypeId, Consumer<T> processor)
-        throws InterruptedException {
-        final int poolSize = Math.min(15, Runtime.getRuntime().availableProcessors() * 2);
-
-        final int total = cases.size();
-        final AtomicInteger counter = new AtomicInteger(0);
-
-        try (ExecutorService executor = Executors.newFixedThreadPool(poolSize)) {
-            for (T submitEvent : cases) {
-                executor.execute(() -> {
-                    processor.accept(submitEvent);
-                    log.info("{} - Case Acceptance Date task - {} out of {}",
-                        caseTypeId, counter.incrementAndGet(), total);
-                });
-            }
-            executor.shutdown();
-            if (!executor.awaitTermination(EXECUTOR_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
-                log.warn("{} - Executor did not terminate within {}s, forcing shutdown",
-                    caseTypeId, EXECUTOR_TIMEOUT_SECONDS);
-                executor.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw e;
-        } catch (Exception e) {
-            log.warn(e.getMessage());
-        }
-    }
-
-    private void triggerEventForCase(String adminUserToken, SubmitEvent submitEvent, String caseTypeId) {
-        String caseId = String.valueOf(submitEvent.getCaseId());
+    private void triggerEventForCase(String adminUserToken, String caseId, String caseTypeId) {
         try {
             CCDRequest ccdRequest = ccdClient.startEventForCase(adminUserToken, caseTypeId, EMPLOYMENT,
                 caseId, FIX_CASE_API_EVENT_ID);
@@ -173,10 +126,7 @@ public class CaseAcceptanceDateTask implements Runnable {
         }
     }
 
-    private void triggerEcmEventForCase(String adminUserToken,
-                                        uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent submitEvent,
-                                        String caseTypeId) {
-        String caseId = String.valueOf(submitEvent.getCaseId());
+    private void triggerEcmEventForCase(String adminUserToken, String caseId, String caseTypeId) {
         try {
             uk.gov.hmcts.ecm.common.model.ccd.CCDRequest ccdRequest =
                 ecmCcdClient.startEventForCase(adminUserToken, caseTypeId, EMPLOYMENT,
@@ -204,23 +154,4 @@ public class CaseAcceptanceDateTask implements Runnable {
         }
     }
 
-    /**
-     * Functional interface for retrieving a list of cases from Elasticsearch.
-     * Declared separately to allow the fetch operation to propagate {@link IOException}.
-     *
-     * @param <T> the submit event type ({@code ET_EnglandWales}/{@code ET_Scotland} or ECM)
-     */
-    @FunctionalInterface
-    private interface CasesFetcher<T> {
-        List<T> fetch() throws IOException;
-    }
-
-    private String buildQuery() {
-        return new SearchSourceBuilder()
-            .size(MAX_ES_SIZE)
-            .query(new BoolQueryBuilder()
-                .must(QueryBuilders.existsQuery("data.preAcceptCase.dateAccepted"))
-                .must(QueryBuilders.existsQuery("data.preAcceptCase.dateRejected"))
-            ).toString();
-    }
 }

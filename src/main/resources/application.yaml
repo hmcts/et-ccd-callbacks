@@ -62,7 +62,7 @@ ccd:
     enabled: ${ET_CCD_DATA_MIGRATION_ENABLED:false}
     task-name: ${ET_CCD_DATA_MIGRATION_TASK_NAME:et-ccd-data-migration}
     mode: ${ET_CCD_DATA_MIGRATION_MODE:PRELOAD_EVENTS}
-    case-type-ids: ${ET_CCD_DATA_MIGRATION_CASE_TYPE_IDS:ET_EnglandWales,ET_Scotland}
+    case-type-ids: ${ET_CCD_DATA_MIGRATION_CASE_TYPE_IDS:ET_EnglandWales,ET_Scotland,ET_Admin,ET_EnglandWales_Multiple,ET_Scotland_Multiple,ET_EnglandWales_Listings,ET_Scotland_Listings}
     event-batch-size: ${ET_CCD_DATA_MIGRATION_EVENT_BATCH_SIZE:10000}
     max-batches-per-run: ${ET_CCD_DATA_MIGRATION_MAX_BATCHES_PER_RUN:100}
     max-run-time: ${ET_CCD_DATA_MIGRATION_MAX_RUN_TIME:2h}

@@ -12,14 +12,8 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.et.common.model.ccd.types.CasePreAcceptType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PreAcceptanceCaseService;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,6 +34,7 @@ class CaseAcceptanceDateTaskTest {
 
     private static final String ADMIN_TOKEN = "AdminToken";
     private static final String CASE_ID = "123456789";
+    private static final String SECOND_CASE_ID = "987654321";
 
     private CaseAcceptanceDateTask caseAcceptanceDateTask;
 
@@ -60,83 +55,106 @@ class CaseAcceptanceDateTaskTest {
         caseAcceptanceDateTask = new CaseAcceptanceDateTask(
             adminUserService, ccdClient, ecmCcdClient, preAcceptanceCaseService);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
-        ReflectionTestUtils.setField(caseAcceptanceDateTask, "maxCasesToProcess", 100);
     }
 
     @Test
-    void run_englandWalesCaseType_fetchesAndUpdatesCase() throws IOException {
-        setEtCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
-        SubmitEvent submitEvent = buildEtSubmitEvent();
-        CCDRequest ccdRequest = buildEtCcdRequest(submitEvent.getCaseData());
+    void run_nullCasesToUpdate_returnsEarlyWithoutCallingCcd() throws Exception {
+        caseAcceptanceDateTask.run();
 
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
-            .thenReturn(List.of(submitEvent));
-        when(ccdClient.startEventForCase(any(), eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT),
-            eq(CASE_ID), any()))
+        verify(ccdClient, never()).startEventForCase(any(), any(), any(), any(), any());
+        verify(ecmCcdClient, never()).startEventForCase(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void run_emptyCasesToUpdate_returnsEarlyWithoutCallingCcd() throws Exception {
+        setCasesToUpdate("");
+
+        caseAcceptanceDateTask.run();
+
+        verify(ccdClient, never()).startEventForCase(any(), any(), any(), any(), any());
+        verify(ecmCcdClient, never()).startEventForCase(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void run_oddNumberOfTokens_returnsEarlyWithoutCallingCcd() throws Exception {
+        setCasesToUpdate(CASE_ID);
+
+        caseAcceptanceDateTask.run();
+
+        verify(ccdClient, never()).startEventForCase(any(), any(), any(), any(), any());
+        verify(ecmCcdClient, never()).startEventForCase(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void run_englandWalesCaseType_updatesCase() throws Exception {
+        setCasesToUpdate(CASE_ID + "," + ENGLANDWALES_CASE_TYPE_ID);
+        CCDRequest ccdRequest = buildEtCcdRequest(new CaseData());
+
+        when(ccdClient.startEventForCase(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID),
+            eq(EMPLOYMENT), eq(CASE_ID), eq("fixCaseAPI")))
             .thenReturn(ccdRequest);
 
         caseAcceptanceDateTask.run();
 
-        verify(ccdClient, times(1)).startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID,
+        verify(ccdClient).startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID,
             EMPLOYMENT, CASE_ID, "fixCaseAPI");
-        verify(preAcceptanceCaseService, times(1)).clearPreAcceptanceDates(any());
-        verify(ccdClient, times(1)).submitEventForCase(eq(ADMIN_TOKEN), any(CaseData.class),
+        verify(preAcceptanceCaseService).clearPreAcceptanceDates(any());
+        verify(ccdClient).submitEventForCase(eq(ADMIN_TOKEN), any(CaseData.class),
             eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT), any(), eq(CASE_ID));
     }
 
     @Test
-    void run_scotlandCaseType_fetchesAndUpdatesCase() throws IOException {
-        setEtCaseTypeId(SCOTLAND_CASE_TYPE_ID);
-        SubmitEvent submitEvent = buildEtSubmitEvent();
-        CCDRequest ccdRequest = buildEtCcdRequest(submitEvent.getCaseData());
+    void run_scotlandCaseType_updatesCase() throws Exception {
+        setCasesToUpdate(CASE_ID + "," + SCOTLAND_CASE_TYPE_ID);
+        CCDRequest ccdRequest = buildEtCcdRequest(new CaseData());
 
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID), any()))
-            .thenReturn(List.of(submitEvent));
-        when(ccdClient.startEventForCase(any(), eq(SCOTLAND_CASE_TYPE_ID), eq(EMPLOYMENT),
-            eq(CASE_ID), any()))
+        when(ccdClient.startEventForCase(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID),
+            eq(EMPLOYMENT), eq(CASE_ID), eq("fixCaseAPI")))
             .thenReturn(ccdRequest);
 
         caseAcceptanceDateTask.run();
 
-        verify(ccdClient, times(1)).startEventForCase(ADMIN_TOKEN, SCOTLAND_CASE_TYPE_ID,
+        verify(ccdClient).startEventForCase(ADMIN_TOKEN, SCOTLAND_CASE_TYPE_ID,
             EMPLOYMENT, CASE_ID, "fixCaseAPI");
-        verify(ccdClient, times(1)).submitEventForCase(eq(ADMIN_TOKEN), any(CaseData.class),
+        verify(ccdClient).submitEventForCase(eq(ADMIN_TOKEN), any(CaseData.class),
             eq(SCOTLAND_CASE_TYPE_ID), eq(EMPLOYMENT), any(), eq(CASE_ID));
     }
 
     @Test
-    void run_etCaseType_emptyCaseList_doesNotTriggerEvent() throws IOException {
-        setEtCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
-        when(ccdClient.buildAndGetElasticSearchRequest(any(), any(), any()))
-            .thenReturn(Collections.emptyList());
+    void run_ecmCaseType_updatesCase() throws Exception {
+        setCasesToUpdate(CASE_ID + "," + LEEDS_CASE_TYPE_ID);
+        uk.gov.hmcts.ecm.common.model.ccd.CCDRequest ccdRequest =
+            buildEcmCcdRequest(new uk.gov.hmcts.ecm.common.model.ccd.CaseData());
+
+        when(ecmCcdClient.startEventForCase(eq(ADMIN_TOKEN), eq(LEEDS_CASE_TYPE_ID),
+            eq(EMPLOYMENT), eq(CASE_ID), eq("fixCaseAPI")))
+            .thenReturn(ccdRequest);
+
+        caseAcceptanceDateTask.run();
+
+        verify(ecmCcdClient).startEventForCase(ADMIN_TOKEN, LEEDS_CASE_TYPE_ID,
+            EMPLOYMENT, CASE_ID, "fixCaseAPI");
+        verify(ecmCcdClient).submitEventForCase(eq(ADMIN_TOKEN),
+            any(uk.gov.hmcts.ecm.common.model.ccd.CaseData.class),
+            eq(LEEDS_CASE_TYPE_ID), eq(EMPLOYMENT), any(), eq(CASE_ID));
+    }
+
+    @Test
+    void run_unknownCaseType_neitherClientCalled() throws Exception {
+        setCasesToUpdate(CASE_ID + ",UnknownCaseType");
 
         caseAcceptanceDateTask.run();
 
         verify(ccdClient, never()).startEventForCase(any(), any(), any(), any(), any());
-        verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
+        verify(ecmCcdClient, never()).startEventForCase(any(), any(), any(), any(), any());
     }
 
     @Test
-    void run_etCaseType_fetchThrowsIoException_doesNotPropagateAndSkipsProcessing() throws IOException {
-        setEtCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
-        when(ccdClient.buildAndGetElasticSearchRequest(any(), any(), any()))
-            .thenThrow(new IOException("ES unavailable"));
+    void run_startEventThrowsException_swallowsExceptionAndDoesNotSubmit() throws Exception {
+        setCasesToUpdate(CASE_ID + "," + ENGLANDWALES_CASE_TYPE_ID);
 
-        caseAcceptanceDateTask.run();
-
-        verify(ccdClient, never()).startEventForCase(any(), any(), any(), any(), any());
-        verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
-    }
-
-    @Test
-    void run_etCaseType_startEventThrowsException_logsWarnAndContinues() throws IOException {
-        setEtCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
-        SubmitEvent submitEvent = buildEtSubmitEvent();
-
-        when(ccdClient.buildAndGetElasticSearchRequest(any(), any(), any()))
-            .thenReturn(List.of(submitEvent));
         when(ccdClient.startEventForCase(any(), any(), any(), any(), any()))
-            .thenThrow(new RuntimeException("CCD error"));
+            .thenThrow(new RuntimeException("CCD unavailable"));
 
         caseAcceptanceDateTask.run();
 
@@ -145,65 +163,49 @@ class CaseAcceptanceDateTaskTest {
     }
 
     @Test
-    void run_unknownCaseType_neitherClientCalled() throws IOException {
-        setEtCaseTypeId("UnknownCaseType");
+    void run_mixedCaseTypes_processesBothEtAndEcm() throws Exception {
+        setCasesToUpdate(CASE_ID + "," + ENGLANDWALES_CASE_TYPE_ID
+            + "," + SECOND_CASE_ID + "," + LEEDS_CASE_TYPE_ID);
+
+        CCDRequest etCcdRequest = buildEtCcdRequest(new CaseData());
+        uk.gov.hmcts.ecm.common.model.ccd.CCDRequest ecmCcdRequest =
+            buildEcmCcdRequest(new uk.gov.hmcts.ecm.common.model.ccd.CaseData());
+
+        when(ccdClient.startEventForCase(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any(), any(), any()))
+            .thenReturn(etCcdRequest);
+        when(ecmCcdClient.startEventForCase(any(), eq(LEEDS_CASE_TYPE_ID), any(), any(), any()))
+            .thenReturn(ecmCcdRequest);
 
         caseAcceptanceDateTask.run();
 
-        verify(ccdClient, never()).buildAndGetElasticSearchRequest(any(), any(), any());
-        verify(ecmCcdClient, never()).buildAndGetElasticSearchRequest(any(), any(), any());
+        verify(ccdClient, times(1)).submitEventForCase(any(), any(),
+            eq(ENGLANDWALES_CASE_TYPE_ID), any(), any(), any());
+        verify(ecmCcdClient, times(1)).submitEventForCase(any(), any(),
+            eq(LEEDS_CASE_TYPE_ID), any(), any(), any());
     }
 
     @Test
-    void run_ecmCaseType_fetchesAndUpdatesCase() throws IOException {
-        setEtCaseTypeId(LEEDS_CASE_TYPE_ID);
-        uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent submitEvent = buildEcmSubmitEvent();
-        uk.gov.hmcts.ecm.common.model.ccd.CCDRequest ccdRequest =
-            buildEcmCcdRequest(submitEvent.getCaseData());
+    void run_multipleCasesOfSameType_processesAll() throws Exception {
+        setCasesToUpdate(CASE_ID + "," + ENGLANDWALES_CASE_TYPE_ID
+            + "," + SECOND_CASE_ID + "," + ENGLANDWALES_CASE_TYPE_ID);
+        CCDRequest ccdRequest = buildEtCcdRequest(new CaseData());
 
-        when(ecmCcdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(LEEDS_CASE_TYPE_ID), any()))
-            .thenReturn(List.of(submitEvent));
-        when(ecmCcdClient.startEventForCase(any(), eq(LEEDS_CASE_TYPE_ID), eq(EMPLOYMENT),
-            eq(CASE_ID), any()))
+        when(ccdClient.startEventForCase(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any(), any(), any()))
             .thenReturn(ccdRequest);
 
         caseAcceptanceDateTask.run();
 
-        verify(ecmCcdClient, times(1)).startEventForCase(ADMIN_TOKEN, LEEDS_CASE_TYPE_ID,
-            EMPLOYMENT, CASE_ID, "fixCaseAPI");
-        verify(ecmCcdClient, times(1)).submitEventForCase(eq(ADMIN_TOKEN),
-            any(uk.gov.hmcts.ecm.common.model.ccd.CaseData.class),
-            eq(LEEDS_CASE_TYPE_ID), eq(EMPLOYMENT), any(), eq(CASE_ID));
-    }
-
-    @Test
-    void run_ecmCaseType_emptyCaseList_doesNotTriggerEvent() throws IOException {
-        setEtCaseTypeId(LEEDS_CASE_TYPE_ID);
-        when(ecmCcdClient.buildAndGetElasticSearchRequest(any(), any(), any()))
-            .thenReturn(Collections.emptyList());
-
-        caseAcceptanceDateTask.run();
-
-        verify(ecmCcdClient, never()).startEventForCase(any(), any(), any(), any(), any());
-        verify(ecmCcdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
-    }
-
-    @Test
-    void run_ecmCaseType_fetchThrowsIoException_doesNotPropagateAndSkipsProcessing() throws IOException {
-        setEtCaseTypeId(LEEDS_CASE_TYPE_ID);
-        when(ecmCcdClient.buildAndGetElasticSearchRequest(any(), any(), any()))
-            .thenThrow(new IOException("ES unavailable"));
-
-        caseAcceptanceDateTask.run();
-
-        verify(ecmCcdClient, never()).startEventForCase(any(), any(), any(), any(), any());
+        verify(ccdClient, times(2)).startEventForCase(any(), eq(ENGLANDWALES_CASE_TYPE_ID),
+            eq(EMPLOYMENT), any(), eq("fixCaseAPI"));
+        verify(ccdClient, times(2)).submitEventForCase(any(), any(CaseData.class),
+            eq(ENGLANDWALES_CASE_TYPE_ID), any(), any(), any());
     }
 
     // --- clearEcmPreAcceptanceDates ---
 
     @Test
-    void run_ecmCaseType_accepted_clearsDateRejected() throws IOException {
-        setEtCaseTypeId(LEEDS_CASE_TYPE_ID);
+    void run_ecmCaseType_accepted_clearsDateRejected() throws Exception {
+        setCasesToUpdate(CASE_ID + "," + LEEDS_CASE_TYPE_ID);
 
         uk.gov.hmcts.ecm.common.model.ccd.types.CasePreAcceptType preAccept =
             new uk.gov.hmcts.ecm.common.model.ccd.types.CasePreAcceptType();
@@ -214,24 +216,19 @@ class CaseAcceptanceDateTaskTest {
             new uk.gov.hmcts.ecm.common.model.ccd.CaseData();
         caseData.setPreAcceptCase(preAccept);
 
-        uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent submitEvent = buildEcmSubmitEvent(caseData);
-        uk.gov.hmcts.ecm.common.model.ccd.CCDRequest ccdRequest = buildEcmCcdRequest(caseData);
-
-        when(ecmCcdClient.buildAndGetElasticSearchRequest(any(), any(), any()))
-            .thenReturn(List.of(submitEvent));
         when(ecmCcdClient.startEventForCase(any(), any(), any(), any(), any()))
-            .thenReturn(ccdRequest);
+            .thenReturn(buildEcmCcdRequest(caseData));
 
         caseAcceptanceDateTask.run();
 
-        verify(ecmCcdClient, times(1)).submitEventForCase(any(), ecmCaseDataCaptor.capture(),
+        verify(ecmCcdClient).submitEventForCase(any(), ecmCaseDataCaptor.capture(),
             any(), any(), any(), any());
         assertNull(ecmCaseDataCaptor.getValue().getPreAcceptCase().getDateRejected());
     }
 
     @Test
-    void run_ecmCaseType_rejected_clearsDateAccepted() throws IOException {
-        setEtCaseTypeId(LEEDS_CASE_TYPE_ID);
+    void run_ecmCaseType_rejected_clearsDateAccepted() throws Exception {
+        setCasesToUpdate(CASE_ID + "," + LEEDS_CASE_TYPE_ID);
 
         uk.gov.hmcts.ecm.common.model.ccd.types.CasePreAcceptType preAccept =
             new uk.gov.hmcts.ecm.common.model.ccd.types.CasePreAcceptType();
@@ -242,96 +239,18 @@ class CaseAcceptanceDateTaskTest {
             new uk.gov.hmcts.ecm.common.model.ccd.CaseData();
         caseData.setPreAcceptCase(preAccept);
 
-        uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent submitEvent = buildEcmSubmitEvent(caseData);
-        uk.gov.hmcts.ecm.common.model.ccd.CCDRequest ccdRequest = buildEcmCcdRequest(caseData);
-
-        when(ecmCcdClient.buildAndGetElasticSearchRequest(any(), any(), any()))
-            .thenReturn(List.of(submitEvent));
         when(ecmCcdClient.startEventForCase(any(), any(), any(), any(), any()))
-            .thenReturn(ccdRequest);
+            .thenReturn(buildEcmCcdRequest(caseData));
 
         caseAcceptanceDateTask.run();
 
-        verify(ecmCcdClient, times(1)).submitEventForCase(any(), ecmCaseDataCaptor.capture(),
+        verify(ecmCcdClient).submitEventForCase(any(), ecmCaseDataCaptor.capture(),
             any(), any(), any(), any());
         assertNull(ecmCaseDataCaptor.getValue().getPreAcceptCase().getDateAccepted());
     }
     
-    @Test
-    void run_mixedCaseTypes_processesBothEtAndEcm() throws IOException {
-        ReflectionTestUtils.setField(caseAcceptanceDateTask, "caseTypeIdsString",
-            ENGLANDWALES_CASE_TYPE_ID + "," + LEEDS_CASE_TYPE_ID);
-
-        SubmitEvent etSubmitEvent = buildEtSubmitEvent();
-        CCDRequest etCcdRequest = buildEtCcdRequest(etSubmitEvent.getCaseData());
-        when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
-            .thenReturn(List.of(etSubmitEvent));
-        when(ccdClient.startEventForCase(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any(), any(), any()))
-            .thenReturn(etCcdRequest);
-
-        uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent ecmSubmitEvent = buildEcmSubmitEvent();
-        uk.gov.hmcts.ecm.common.model.ccd.CCDRequest ecmCcdRequest =
-            buildEcmCcdRequest(ecmSubmitEvent.getCaseData());
-        when(ecmCcdClient.buildAndGetElasticSearchRequest(any(), eq(LEEDS_CASE_TYPE_ID), any()))
-            .thenReturn(List.of(ecmSubmitEvent));
-        when(ecmCcdClient.startEventForCase(any(), eq(LEEDS_CASE_TYPE_ID), any(), any(), any()))
-            .thenReturn(ecmCcdRequest);
-
-        caseAcceptanceDateTask.run();
-
-        verify(ccdClient, times(1)).submitEventForCase(any(), any(), eq(ENGLANDWALES_CASE_TYPE_ID),
-            any(), any(), any());
-        verify(ecmCcdClient, times(1)).submitEventForCase(any(), any(), eq(LEEDS_CASE_TYPE_ID),
-            any(), any(), any());
-    }
-    
-    @Test
-    void run_etCaseType_exceedsMaxCasesToProcess_limitsProcessedCases() throws IOException {
-        setEtCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
-        ReflectionTestUtils.setField(caseAcceptanceDateTask, "maxCasesToProcess", 2);
-
-        List<SubmitEvent> fiveCases = List.of(
-            buildEtSubmitEventWithId(1L),
-            buildEtSubmitEventWithId(2L),
-            buildEtSubmitEventWithId(3L),
-            buildEtSubmitEventWithId(4L),
-            buildEtSubmitEventWithId(5L)
-        );
-        CCDRequest ccdRequest = buildEtCcdRequest(new CaseData());
-
-        when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
-            .thenReturn(fiveCases);
-        when(ccdClient.startEventForCase(any(), eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT), any(), any()))
-            .thenReturn(ccdRequest);
-
-        caseAcceptanceDateTask.run();
-
-        verify(ccdClient, times(2)).startEventForCase(any(), eq(ENGLANDWALES_CASE_TYPE_ID),
-            eq(EMPLOYMENT), any(), any());
-        verify(ccdClient, times(2)).submitEventForCase(any(), any(CaseData.class),
-            eq(ENGLANDWALES_CASE_TYPE_ID), any(), any(), any());
-    }
-
-    private void setEtCaseTypeId(String caseTypeId) {
-        ReflectionTestUtils.setField(caseAcceptanceDateTask, "caseTypeIdsString", caseTypeId);
-    }
-
-    private SubmitEvent buildEtSubmitEvent() {
-        return buildEtSubmitEventWithId(Long.parseLong(CASE_ID));
-    }
-
-    private SubmitEvent buildEtSubmitEventWithId(long id) {
-        CasePreAcceptType preAccept = new CasePreAcceptType();
-        preAccept.setCaseAccepted(YES);
-        preAccept.setDateAccepted("2024-01-01");
-        preAccept.setDateRejected("2024-01-02");
-        CaseData caseData = new CaseData();
-        caseData.setPreAcceptCase(preAccept);
-
-        SubmitEvent submitEvent = new SubmitEvent();
-        submitEvent.setCaseId(id);
-        submitEvent.setCaseData(caseData);
-        return submitEvent;
+    private void setCasesToUpdate(String value) {
+        ReflectionTestUtils.setField(caseAcceptanceDateTask, "casesToUpdate", value);
     }
 
     private CCDRequest buildEtCcdRequest(CaseData caseData) {
@@ -341,19 +260,6 @@ class CaseAcceptanceDateTaskTest {
         CCDRequest ccdRequest = new CCDRequest();
         ccdRequest.setCaseDetails(caseDetails);
         return ccdRequest;
-    }
-
-    private uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent buildEcmSubmitEvent() {
-        return buildEcmSubmitEvent(new uk.gov.hmcts.ecm.common.model.ccd.CaseData());
-    }
-
-    private uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent buildEcmSubmitEvent(
-        uk.gov.hmcts.ecm.common.model.ccd.CaseData caseData) {
-        uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent submitEvent =
-            new uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent();
-        submitEvent.setCaseId(Long.parseLong(CASE_ID));
-        submitEvent.setCaseData(caseData);
-        return submitEvent;
     }
 
     private uk.gov.hmcts.ecm.common.model.ccd.CCDRequest buildEcmCcdRequest(

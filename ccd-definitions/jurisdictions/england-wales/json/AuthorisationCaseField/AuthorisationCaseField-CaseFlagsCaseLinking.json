@@ -982,5 +982,17 @@
     "CaseFieldID": "representative9ExternalFlags",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "claimantExternalFlags",
+    "UserRole": "[CREATOR]",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "respondentExternalFlags",
+    "UserRole": "[DEFENDANT]",
+    "CRUD": "CRU"
   }
 ]

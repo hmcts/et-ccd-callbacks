@@ -71,4 +71,38 @@
         <cve>CVE-2026-39883</cve>
     </suppress>
     <!-- All other CVEs below -->
+    <!-- CVE-2026-54515 affects jackson-databind 2.22.0 which is the latest available version.
+         No fixed version exists. Suppress until a patched release is available. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: jackson-databind-2.22.0.jar
+   Latest available version. No fix released for CVE-2026-54515 as of 2026-07-01.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+        <cve>CVE-2026-54515</cve>
+    </suppress>
+    <!-- CVE-2026-53914 affects kotlin-stdlib 2.2.0 which is the latest available version.
+         No fixed version exists. Suppress until a patched release is available. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: kotlin-stdlib-2.2.0.jar, kotlin-stdlib-jdk7-2.2.0.jar, kotlin-stdlib-jdk8-2.2.0.jar
+   Latest available version. No fix released for CVE-2026-53914 as of 2026-07-01.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-stdlib.*@.*$</packageUrl>
+        <cve>CVE-2026-53914</cve>
+    </suppress>
+    <!-- cucumber-core-7.18.0.jar shades jackson-databind:2.17.1 internally; the resolution strategy
+         cannot override bundled/shaded jars. cucumber is a test-only dependency and these CVEs do not
+         affect production runtime. Suppress until cucumber-core ships a newer embedded jackson. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: cucumber-core-7.18.0.jar (shaded: com.fasterxml.jackson.core:jackson-databind:2.17.1)
+   Bundled/shaded jackson inside cucumber-core test dependency. Not exploitable in production.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@2\.17\.1$</packageUrl>
+        <cve>CVE-2026-54512</cve>
+        <cve>CVE-2026-54513</cve>
+        <cve>CVE-2026-54514</cve>
+        <cve>CVE-2026-54515</cve>
+    </suppress>
 </suppressions>

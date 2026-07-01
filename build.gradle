@@ -136,6 +136,8 @@ sourceSets {
 allprojects {
     // CVE-2026-41840, CVE-2026-41841, CVE-2026-41842, CVE-2026-41843, CVE-2026-41850,
     // CVE-2026-41851 - override the Spring Framework version managed by the Spring Boot BOM.
+    // CVE-2026-54512, CVE-2026-54513, CVE-2026-54514, CVE-2026-54515, CVE-2026-54516,
+    // CVE-2026-54517, CVE-2026-54518 - jackson-databind upgraded to 2.22.0
     ext['spring-framework.version'] = '6.2.19'
 
     configurations.configureEach {
@@ -145,15 +147,19 @@ allprojects {
                 details.useVersion("$jacksonAnnotationsVersion")
             } else if (details.requested.group.startsWith("com.fasterxml.jackson")) {
                 details.useVersion("$jacksonVersion")
+            } else if (details.requested.group == "tools.jackson.core") {
+                // CVE-2026-54512, CVE-2026-54513, CVE-2026-54514, CVE-2026-54515,
+                // CVE-2026-54516, CVE-2026-54517, CVE-2026-54518 - upgrade Jackson 3.x
+                details.useVersion("$jacksonV3Version")
             }
             if (details.requested.group == "org.apache.tomcat.embed"
                 && ["tomcat-embed-core", "tomcat-embed-websocket"].contains(details.requested.name)) {
                 details.useVersion(tomcatEmbedVersion)
             }
-            // CVE-2020-29582 - Force Kotlin to 2.1.0+
+            // CVE-2020-29582, CVE-2026-53914 - Force Kotlin to 2.2.0+
             if (details.requested.group == "org.jetbrains.kotlin"
                 && details.requested.name.startsWith("kotlin-stdlib")) {
-                details.useVersion("2.1.0")
+                details.useVersion("2.2.0")
             }
         }
         resolutionStrategy.force(
@@ -166,10 +172,10 @@ allprojects {
             'com.squareup.okhttp3:okhttp:4.12.0',
             'com.squareup.okhttp3:okhttp-urlconnection:4.12.0',
             'com.squareup.okio:okio:3.17.0',
-            // CVE-2020-29582 - Fixed in Kotlin 2.1.0+
-            'org.jetbrains.kotlin:kotlin-stdlib:2.1.0',
-            'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.0',
-            'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0',
+            // CVE-2020-29582, CVE-2026-53914 - Fixed in Kotlin 2.2.0+
+            'org.jetbrains.kotlin:kotlin-stdlib:2.2.0',
+            'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.2.0',
+            'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.0',
             'org.bouncycastle:bcprov-jdk15on:1.70',
             'io.netty:netty-buffer:4.2.15.Final',
             'io.netty:netty-codec:4.2.15.Final',
@@ -431,8 +437,9 @@ ext {
     reformLoggingVersion = '6.0.1'
     serenity = '5.3.10'
     tomcatEmbedVersion = '10.1.55'
-    jacksonVersion = '2.21.2'
-    jacksonAnnotationsVersion = '2.21'
+    jacksonVersion = '2.22.0'
+    jacksonAnnotationsVersion = '2.22'
+    jacksonV3Version = '3.2.0'
 }
 
 ext["rest-assured.version"] = '5.1.0'

@@ -99,7 +99,8 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 
 withPipeline(type, product, component) {
   env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
-  env.PUPPETEER_CACHE_DIR = '/tmp/puppeteer-cache'
+  def puppeteerCacheKey = "${env.JOB_NAME ?: 'job'}-${env.BUILD_NUMBER ?: java.util.UUID.randomUUID().toString()}".replaceAll(/[^A-Za-z0-9_.-]/, '-')
+  env.PUPPETEER_CACHE_DIR = "/tmp/puppeteer-cache-${puppeteerCacheKey}"
   loadVaultSecrets(secrets)
 //  enableHighLevelDataSetup()
   enableAksStagingDeployment()

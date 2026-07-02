@@ -227,13 +227,17 @@ withPipeline(type, product, component) {
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
     }
 
+    before('functionalTest:preview') {
+      env.PUPPETEER_CACHE_DIR = "${env.PUPPETEER_CACHE_BASE_DIR}-functional"
+    }
+
     afterAlways('functionalTest:preview') {
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
 
       stage('Functional UI tests chromium') {
         try {
-          env.PUPPETEER_CACHE_DIR = "${env.PUPPETEER_CACHE_BASE_DIR}-functional"
+          env.PUPPETEER_CACHE_DIR = "${env.PUPPETEER_CACHE_BASE_DIR}-functional-ui"
           env.ET_COS_PREVIEW_ET_SYA_API = "https://et-sya-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
           env.ET_COS_PREVIEW_CCD = "https://ccd-data-store-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
           yarnBuilder.yarn('test:functional-chromium')
@@ -290,12 +294,16 @@ withPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
   }
 
+  before('functionalTest:aat') {
+    env.PUPPETEER_CACHE_DIR = "${env.PUPPETEER_CACHE_BASE_DIR}-functional"
+  }
+
   afterAlways('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
     stage('Functional UI tests chromium') {
       try {
-        env.PUPPETEER_CACHE_DIR = "${env.PUPPETEER_CACHE_BASE_DIR}-functional"
+        env.PUPPETEER_CACHE_DIR = "${env.PUPPETEER_CACHE_BASE_DIR}-functional-ui"
         yarnBuilder.yarn('test:functional-chromium')
       } catch (Error) {
         unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())

@@ -282,19 +282,6 @@ tasks.register('functional', Test) {
     maxHeapSize = '1G'
 }
 
-def resolveExecutable(String name) {
-    def searchPaths = (System.getenv('PATH') ?: '').tokenize(':') +
-            ['/opt/homebrew/bin', '/usr/local/bin']
-    searchPaths.findResult { dir ->
-        def candidate = new File(dir, name)
-        candidate.exists() && candidate.canExecute() ? candidate.absolutePath : null
-    } ?: name
-}
-
-def ccdDefinitionsYarnCommand(String... args) {
-    [resolveExecutable('node'), '.yarn/releases/yarn-4.13.0.cjs'] + (args as List)
-}
-
 tasks.register('yarnInstall', Exec) {
     workingDir '.'
     commandLine resolveExecutable('node'), '.yarn/releases/yarn-4.13.0.cjs', 'install'

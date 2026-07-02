@@ -30,6 +30,7 @@ module "postgres" {
       "value" : "on"
     }
   ]
+  auto_grow_enabled = true
 }
 
 resource "azurerm_key_vault_secret" "et_cos_postgres_user_v15" {

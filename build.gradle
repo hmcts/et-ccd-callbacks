@@ -284,18 +284,18 @@ tasks.register('functional', Test) {
 
 tasks.register('yarnInstall', Exec) {
     workingDir '.'
-    commandLine resolveExecutable('node'), '.yarn/releases/yarn-4.13.0.cjs', 'install'
+    commandLine 'yarn', 'install'
 }
 
 tasks.register('setupCcdDefinitionsWorkspace', Exec) {
     workingDir 'ccd-definitions'
-    commandLine ccdDefinitionsYarnCommand('install')
+    commandLine 'yarn', 'install'
 }
 
 tasks.register('generateCftlibCcdDefinitions', Exec) {
     dependsOn 'setupCcdDefinitionsWorkspace'
     workingDir 'ccd-definitions'
-    commandLine ccdDefinitionsYarnCommand('generate-excel:cftlib')
+    commandLine 'yarn', 'generate-excel:cftlib'
 }
 
 tasks.register('yarnAudit', Exec) {

@@ -100,7 +100,8 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 withPipeline(type, product, component) {
   env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
   def puppeteerCacheKey = "${env.JOB_NAME ?: 'job'}-${env.BUILD_NUMBER ?: java.util.UUID.randomUUID().toString()}".replaceAll(/[^A-Za-z0-9_.-]/, '-')
-  env.PUPPETEER_CACHE_DIR = "/tmp/puppeteer-cache-${puppeteerCacheKey}"
+  env.PUPPETEER_CACHE_BASE_DIR = "/tmp/puppeteer-cache-${puppeteerCacheKey}"
+  env.PUPPETEER_CACHE_DIR = "${env.PUPPETEER_CACHE_BASE_DIR}-smoke"
   loadVaultSecrets(secrets)
 //  enableHighLevelDataSetup()
   enableAksStagingDeployment()
@@ -232,6 +233,7 @@ withPipeline(type, product, component) {
 
       stage('Functional UI tests chromium') {
         try {
+          env.PUPPETEER_CACHE_DIR = "${env.PUPPETEER_CACHE_BASE_DIR}-functional"
           env.ET_COS_PREVIEW_ET_SYA_API = "https://et-sya-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
           env.ET_COS_PREVIEW_CCD = "https://ccd-data-store-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
           yarnBuilder.yarn('test:functional-chromium')
@@ -293,6 +295,7 @@ withPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
     stage('Functional UI tests chromium') {
       try {
+        env.PUPPETEER_CACHE_DIR = "${env.PUPPETEER_CACHE_BASE_DIR}-functional"
         yarnBuilder.yarn('test:functional-chromium')
       } catch (Error) {
         unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())

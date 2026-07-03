@@ -5,7 +5,7 @@ java:
   devcpuRequests: 20m
   devcpuLimits: 1024m
   devmemoryRequests: 1536Mi
-  devmemoryLimits: 3Gi
+  devmemoryLimits: 4Gi
   secrets:
       AZURE_SERVICE_BUS_CONNECTION_STRING:
         secretRef: et-sb-preview

@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.et.syaapi.config.interceptors.ResourceNotFoundException;
 import uk.gov.hmcts.reform.et.syaapi.exception.CaseUserRoleNotFoundException;
+import uk.gov.hmcts.reform.et.syaapi.exception.CaseUserRoleValidationException;
 import uk.gov.hmcts.reform.et.syaapi.exception.ManageCaseRoleException;
 import uk.gov.hmcts.reform.et.syaapi.models.CaseTransferInfoResponse;
 import uk.gov.hmcts.reform.et.syaapi.models.CaseTransferType;
@@ -36,6 +37,12 @@ public class CaseTransferInfoService {
     static final String TRANSFERRED_STATE = "Transferred";
     static final String TRANSFERRED_TO_ECM = "Transferred to ECM";
     static final String TRANSFERRED_TO_PREFIX = "Transferred to ";
+    static final String INVALID_CASE_ID = "Invalid caseId";
+    static final String LINKED_CASE_CT_FIELD = "linkedCaseCT";
+    static final String TRANSFERRED_CASE_LINK_FIELD = "transferredCaseLink";
+    static final String ETHOS_CASE_REFERENCE_FIELD = "ethosCaseReference";
+    static final String REASON_FOR_CT_FIELD = "reasonForCT";
+    private static final Pattern CCD_CASE_ID_PATTERN = Pattern.compile("\\d{16}");
     private static final Pattern TRANSFERRED_CASE_ID_PATTERN =
         Pattern.compile("/cases/case-details/(\\d{16})");
     private static final Pattern TRANSFERRED_ETHOS_REF_PATTERN =
@@ -48,6 +55,7 @@ public class CaseTransferInfoService {
     private final IdamClient idamClient;
 
     public CaseTransferInfoResponse getCaseTransferInfo(String authorization, String caseId, String caseUserRole) {
+        validateCaseId(caseId);
         verifyUserHasCaseRole(authorization, caseId, caseUserRole);
 
         try {
@@ -61,33 +69,54 @@ public class CaseTransferInfoService {
                     caseId);
             return buildTransferInfo(caseDetails);
         } catch (FeignException.NotFound notFound) {
-            log.info("Case {} not found in CCD, returning fallback ECM transfer info", caseId);
-            return CaseTransferInfoResponse.builder()
-                .transferred(true)
-                .transferType(CaseTransferType.ECM)
-                .originalCaseId(caseId)
-                .transferComplete(false)
-                .build();
+            return buildInferredEcmTransferInfo(caseId);
+        }
+    }
+
+    /**
+     * When the caller holds a verified role on the case but CCD returns 404, the case has likely been
+     * migrated to ECM and removed from Reformed ET. This response is inferred from that combination only.
+     */
+    private CaseTransferInfoResponse buildInferredEcmTransferInfo(String caseId) {
+        log.info(
+            "Case {} not found in CCD after role verification; returning inferred ECM transfer info",
+            caseId
+        );
+        return CaseTransferInfoResponse.builder()
+            .transferred(true)
+            .transferType(CaseTransferType.ECM)
+            .originalCaseId(caseId)
+            .transferComplete(false)
+            .build();
+    }
+
+    private static void validateCaseId(String caseId) {
+        if (StringUtils.isBlank(caseId) || !CCD_CASE_ID_PATTERN.matcher(caseId).matches()) {
+            throw new CaseUserRoleValidationException(INVALID_CASE_ID);
         }
     }
 
     private void verifyUserHasCaseRole(String authorization, String caseId, String caseUserRole) {
         try {
             UserInfo userInfo = idamClient.getUserInfo(authorization);
-            CaseDetails caseReference = CaseDetails.builder().id(Long.valueOf(caseId)).build();
+            CaseDetails caseReference = CaseDetails.builder().id(Long.parseLong(caseId)).build();
             CaseAssignedUserRolesResponse rolesResponse = manageCaseRoleService.getCaseUserRolesByCaseAndUserIdsCcd(
                 authorization,
                 List.of(caseReference)
-            );
-            log.info("Retrieved transferred case user roles for user {} and case {}, response: {}",
-                userInfo.getUid(), caseId, rolesResponse
             );
             if (rolesResponse == null || CollectionUtils.isEmpty(rolesResponse.getCaseAssignedUserRoles())) {
                 throw new CaseUserRoleNotFoundException(String.format(EXCEPTION_CASE_USER_ROLE_NOT_FOUND, caseId));
             }
 
+            log.info(
+                "Retrieved transferred case user roles for user {} and case {}, role count: {}",
+                userInfo.getUid(),
+                caseId,
+                rolesResponse.getCaseAssignedUserRoles().size()
+            );
+
             boolean hasRole = rolesResponse.getCaseAssignedUserRoles().stream()
-                .anyMatch(role -> userHasRequestedRole(userInfo.getUid(), caseUserRole, role));
+                .anyMatch(role -> userHasRequestedRole(userInfo.getUid(), caseId, caseUserRole, role));
 
             if (!hasRole) {
                 throw new CaseUserRoleNotFoundException(String.format(EXCEPTION_CASE_USER_ROLE_NOT_FOUND, caseId));
@@ -97,16 +126,23 @@ public class CaseTransferInfoService {
         }
     }
 
-    private static boolean userHasRequestedRole(String userId, String caseUserRole, CaseAssignmentUserRole role) {
-        return userId.equals(role.getUserId()) && caseUserRole.equals(role.getCaseRole());
+    private static boolean userHasRequestedRole(
+        String userId,
+        String caseId,
+        String caseUserRole,
+        CaseAssignmentUserRole role
+    ) {
+        return userId.equals(role.getUserId())
+            && caseId.equals(role.getCaseDataId())
+            && caseUserRole.equals(role.getCaseRole());
     }
 
     private CaseTransferInfoResponse buildTransferInfo(CaseDetails caseDetails) {
         Map<String, Object> data = caseDetails.getData() == null
             ? Collections.emptyMap()
             : caseDetails.getData();
-        String linkedCaseCT = stringValue(data.get("linkedCaseCT"));
-        String transferredCaseLink = stringValue(data.get("transferredCaseLink"));
+        String linkedCaseCT = stringValue(data.get(LINKED_CASE_CT_FIELD));
+        String transferredCaseLink = stringValue(data.get(TRANSFERRED_CASE_LINK_FIELD));
         String caseState = caseDetails.getState();
 
         if (!isTransferredCase(caseState, linkedCaseCT)) {
@@ -120,15 +156,15 @@ public class CaseTransferInfoService {
 
         return CaseTransferInfoResponse.builder()
             .transferred(true)
-            .transferType(resolveTransferType(linkedCaseCT))
+            .transferType(resolveTransferType(linkedCaseCT, caseState))
             .caseState(caseState)
             .originalCaseId(caseDetails.getId().toString())
-            .originalEthosCaseReference(stringValue(data.get("ethosCaseReference")))
+            .originalEthosCaseReference(stringValue(data.get(ETHOS_CASE_REFERENCE_FIELD)))
             .newEthosCaseReference(parsedLink.ethosCaseReference())
             .newCaseId(parsedLink.caseId())
             .destinationOffice(extractDestinationOffice(linkedCaseCT))
-            .reasonForCT(stringValue(data.get("reasonForCT")))
-            .transferComplete(StringUtils.isNotBlank(transferredCaseLink))
+            .reasonForCT(stringValue(data.get(REASON_FOR_CT_FIELD)))
+            .transferComplete(parsedLink.isComplete())
             .build();
     }
 
@@ -145,8 +181,14 @@ public class CaseTransferInfoService {
             && linkedCaseCT.startsWith(TRANSFERRED_TO_PREFIX);
     }
 
-    static CaseTransferType resolveTransferType(String linkedCaseCT) {
+    static CaseTransferType resolveTransferType(String linkedCaseCT, String caseState) {
         if (TRANSFERRED_TO_ECM.equals(linkedCaseCT)) {
+            return CaseTransferType.ECM;
+        }
+        if (isTransferLinkedCaseCT(linkedCaseCT)) {
+            return CaseTransferType.CROSS_COUNTRY;
+        }
+        if (TRANSFERRED_STATE.equals(caseState)) {
             return CaseTransferType.ECM;
         }
         return CaseTransferType.CROSS_COUNTRY;
@@ -159,6 +201,11 @@ public class CaseTransferInfoService {
         return linkedCaseCT.substring(TRANSFERRED_TO_PREFIX.length());
     }
 
+    /**
+     * Parses the {@code transferredCaseLink} HTML stored on a transferred case.
+     * Expected format matches {@code TransferToEcmCaseDataHelper.generateMarkUp}:
+     * {@code <a target="_blank" href="{gateway}/cases/case-details/{16-digit-id}">{ethosRef}</a>}.
+     */
     static ParsedTransferredCaseLink parseTransferredCaseLink(String transferredCaseLink) {
         if (StringUtils.isBlank(transferredCaseLink)) {
             return ParsedTransferredCaseLink.empty();
@@ -183,6 +230,10 @@ public class CaseTransferInfoService {
         static ParsedTransferredCaseLink empty() {
             return new ParsedTransferredCaseLink(null,
                     null);
+        }
+
+        public boolean isComplete() {
+            return StringUtils.isNotBlank(caseId) && StringUtils.isNotBlank(ethosCaseReference);
         }
     }
 }

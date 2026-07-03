@@ -207,7 +207,7 @@ class ManageCaseControllerTest {
                             .header(HttpHeaders.AUTHORIZATION, TEST_SERVICE_AUTH_TOKEN))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.code").value(400))
-            .andExpect(jsonPath("$.message").value("Bad request - incorrect payload"));
+            .andExpect(jsonPath("$.message").value("Bad request"));
     }
 
     @Test

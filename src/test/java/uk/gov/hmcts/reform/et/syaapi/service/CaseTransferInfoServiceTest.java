@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.et.syaapi.config.interceptors.ResourceNotFoundException;
 import uk.gov.hmcts.reform.et.syaapi.exception.CaseUserRoleNotFoundException;
+import uk.gov.hmcts.reform.et.syaapi.exception.CaseUserRoleValidationException;
 import uk.gov.hmcts.reform.et.syaapi.models.CaseTransferInfoResponse;
 import uk.gov.hmcts.reform.et.syaapi.models.CaseTransferType;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -37,6 +38,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CREATOR;
+import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_SERVICE_AUTH_TOKEN;
 
 @ExtendWith(MockitoExtension.class)
@@ -133,6 +135,65 @@ class CaseTransferInfoServiceTest {
 
     @Test
     @SneakyThrows
+    void shouldReturnEcmTransferTypeWhenTransferredStateWithoutLinkedCaseCT() {
+        mockUserHasCreatorRole();
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
+        when(authTokenGenerator.generate()).thenReturn(S2S_TOKEN);
+        when(ccdApi.getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID)).thenReturn(buildCaseDetails(
+            CaseTransferInfoService.TRANSFERRED_STATE,
+            null,
+            null
+        ));
+
+        CaseTransferInfoResponse response = caseTransferInfoService.getCaseTransferInfo(
+            TEST_SERVICE_AUTH_TOKEN,
+            CASE_ID,
+            CASE_USER_ROLE_CREATOR
+        );
+
+        assertTrue(response.isTransferred());
+        assertEquals(CaseTransferType.ECM, response.getTransferType());
+        assertEquals(CaseTransferInfoService.TRANSFERRED_STATE, response.getCaseState());
+        assertFalse(response.isTransferComplete());
+    }
+
+    @Test
+    void shouldThrowWhenCaseIdIsInvalid() {
+        assertThrows(
+            CaseUserRoleValidationException.class,
+            () -> caseTransferInfoService.getCaseTransferInfo(
+                TEST_SERVICE_AUTH_TOKEN,
+                "not-a-case-id",
+                CASE_USER_ROLE_CREATOR
+            )
+        );
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldThrowWhenUserHasRoleOnDifferentCase() {
+        when(idamClient.getUserInfo(TEST_SERVICE_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
+        when(manageCaseRoleService.getCaseUserRolesByCaseAndUserIdsCcd(eq(TEST_SERVICE_AUTH_TOKEN), any()))
+            .thenReturn(CaseAssignedUserRolesResponse.builder()
+                            .caseAssignedUserRoles(List.of(CaseAssignmentUserRole.builder()
+                                                                 .caseDataId("9999999999999999")
+                                                                 .userId(USER_ID)
+                                                                 .caseRole(CASE_USER_ROLE_CREATOR)
+                                                                 .build()))
+                            .build());
+
+        assertThrows(
+            CaseUserRoleNotFoundException.class,
+            () -> caseTransferInfoService.getCaseTransferInfo(
+                TEST_SERVICE_AUTH_TOKEN,
+                CASE_ID,
+                CASE_USER_ROLE_CREATOR
+            )
+        );
+    }
+
+    @Test
+    @SneakyThrows
     void shouldThrowWhenUserDoesNotHaveCaseRole() {
         when(idamClient.getUserInfo(TEST_SERVICE_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
         when(manageCaseRoleService.getCaseUserRolesByCaseAndUserIdsCcd(eq(TEST_SERVICE_AUTH_TOKEN), any()))
@@ -198,8 +259,90 @@ class CaseTransferInfoServiceTest {
 
     @ParameterizedTest
     @MethodSource("transferTypeCases")
-    void shouldResolveTransferType(String linkedCaseCT, CaseTransferType expectedType) {
-        assertEquals(expectedType, CaseTransferInfoService.resolveTransferType(linkedCaseCT));
+    void shouldResolveTransferType(String linkedCaseCT, String caseState, CaseTransferType expectedType) {
+        assertEquals(expectedType, CaseTransferInfoService.resolveTransferType(linkedCaseCT, caseState));
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldThrowWhenUserDoesNotHaveRequestedCaseRole() {
+        when(idamClient.getUserInfo(TEST_SERVICE_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
+        when(manageCaseRoleService.getCaseUserRolesByCaseAndUserIdsCcd(eq(TEST_SERVICE_AUTH_TOKEN), any()))
+            .thenReturn(CaseAssignedUserRolesResponse.builder()
+                            .caseAssignedUserRoles(List.of(CaseAssignmentUserRole.builder()
+                                                                 .caseDataId(CASE_ID)
+                                                                 .userId(USER_ID)
+                                                                 .caseRole(CASE_USER_ROLE_CREATOR)
+                                                                 .build()))
+                            .build());
+
+        assertThrows(
+            CaseUserRoleNotFoundException.class,
+            () -> caseTransferInfoService.getCaseTransferInfo(
+                TEST_SERVICE_AUTH_TOKEN,
+                CASE_ID,
+                CASE_USER_ROLE_DEFENDANT
+            )
+        );
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldTreatMalformedTransferredCaseLinkAsIncomplete() {
+        mockUserHasCreatorRole();
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
+        when(authTokenGenerator.generate()).thenReturn(S2S_TOKEN);
+        when(ccdApi.getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID)).thenReturn(buildTransferredCaseDetails(
+            CaseTransferInfoService.TRANSFERRED_TO_ECM,
+            "not-a-valid-transferred-case-link"
+        ));
+
+        CaseTransferInfoResponse response = caseTransferInfoService.getCaseTransferInfo(
+            TEST_SERVICE_AUTH_TOKEN,
+            CASE_ID,
+            CASE_USER_ROLE_CREATOR
+        );
+
+        assertFalse(response.isTransferComplete());
+        assertNull(response.getNewCaseId());
+        assertNull(response.getNewEthosCaseReference());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldPropagateCcdErrorsOtherThanNotFound() {
+        mockUserHasCreatorRole();
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
+        when(authTokenGenerator.generate()).thenReturn(S2S_TOKEN);
+        when(ccdApi.getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID)).thenThrow(
+            new FeignException.InternalServerError(
+                "Server Error",
+                Request.create(Request.HttpMethod.GET, "/cases/" + CASE_ID, Map.of(), null, null, null),
+                null,
+                Map.of()
+            )
+        );
+
+        assertThrows(
+            FeignException.InternalServerError.class,
+            () -> caseTransferInfoService.getCaseTransferInfo(
+                TEST_SERVICE_AUTH_TOKEN,
+                CASE_ID,
+                CASE_USER_ROLE_CREATOR
+            )
+        );
+    }
+
+    @Test
+    void shouldParseRelativeTransferredCaseLinkFromGenerateMarkUpFormat() {
+        String relativeLink = "<a target=\"_blank\" href=\"/cases/case-details/" + NEW_CASE_ID + "\">"
+            + NEW_ETHOS_REFERENCE + "</a>";
+        CaseTransferInfoService.ParsedTransferredCaseLink parsed =
+            CaseTransferInfoService.parseTransferredCaseLink(relativeLink);
+
+        assertEquals(NEW_CASE_ID, parsed.caseId());
+        assertEquals(NEW_ETHOS_REFERENCE, parsed.ethosCaseReference());
+        assertTrue(parsed.isComplete());
     }
 
     @Test
@@ -223,8 +366,9 @@ class CaseTransferInfoServiceTest {
 
     private static Stream<Arguments> transferTypeCases() {
         return Stream.of(
-            Arguments.of(CaseTransferInfoService.TRANSFERRED_TO_ECM, CaseTransferType.ECM),
-            Arguments.of("Transferred to Scotland", CaseTransferType.CROSS_COUNTRY)
+            Arguments.of(CaseTransferInfoService.TRANSFERRED_TO_ECM, null, CaseTransferType.ECM),
+            Arguments.of("Transferred to Scotland", "Transferred", CaseTransferType.CROSS_COUNTRY),
+            Arguments.of(null, CaseTransferInfoService.TRANSFERRED_STATE, CaseTransferType.ECM)
         );
     }
 
@@ -257,9 +401,9 @@ class CaseTransferInfoServiceTest {
     private CaseDetails buildCaseDetails(String state, String linkedCaseCT, String transferredCaseLink) {
         Map<String, Object> data = new HashMap<>();
         data.put("ethosCaseReference", ETHOS_REFERENCE);
-        data.put("linkedCaseCT", linkedCaseCT);
-        data.put("transferredCaseLink", transferredCaseLink);
-        data.put("reasonForCT", "Office move");
+        data.put(CaseTransferInfoService.LINKED_CASE_CT_FIELD, linkedCaseCT);
+        data.put(CaseTransferInfoService.TRANSFERRED_CASE_LINK_FIELD, transferredCaseLink);
+        data.put(CaseTransferInfoService.REASON_FOR_CT_FIELD, "Office move");
 
         return CaseDetails.builder()
             .id(Long.valueOf(CASE_ID))

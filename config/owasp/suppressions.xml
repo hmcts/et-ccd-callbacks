@@ -61,20 +61,6 @@
         <packageUrl regex="true">^pkg:maven/(com\.azure/azure\-identity(\-extensions)?|com\.microsoft\.azure/msal4j)@.*$</packageUrl>
         <cve>CVE-2024-35255</cve>
     </suppress>
-    <!-- Spring Framework CVEs fixed in 6.2.19 - suppress until Spring Boot BOM upgrade -->
-    <suppress>
-        <notes><![CDATA[
-   Spring Framework 6.2.18 via Spring Boot 3.5.14 - upgrade to 6.2.19 pending.
-   file name: spring-core-6.2.18.jar, spring-web-6.2.18.jar, spring-webflux-6.2.18.jar, etc.
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework/.*@.*$</packageUrl>
-        <cve>CVE-2026-41840</cve>
-        <cve>CVE-2026-41841</cve>
-        <cve>CVE-2026-41842</cve>
-        <cve>CVE-2026-41843</cve>
-        <cve>CVE-2026-41850</cve>
-        <cve>CVE-2026-41851</cve>
-    </suppress>
     <!-- OpenTelemetry semconv is already forced to the latest published version; these match the broad OpenTelemetry CPE. -->
     <suppress>
         <notes><![CDATA[
@@ -93,43 +79,22 @@
         <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-stdlib.*@.*$</packageUrl>
         <cve>CVE-2026-53914</cve>
     </suppress>
-    <!-- CVE-2026-54515 fix requires jackson-databind 2.21.5 (not yet on Maven Central). Remove when released. -->
+    <!-- CVE-2026-54515: latest jackson-databind 2.22.0 on Maven Central; suppress until patched release. -->
     <suppress>
         <notes><![CDATA[
-   jackson-databind pinned to 2.21.4 pending jackson-databind 2.21.5 release.
+   jackson-databind 2.22.0 is the latest available version.
    CVE-2026-54515: case-insensitive deserialization bypasses per-property @JsonIgnoreProperties.
    Practical risk is low: requires ACCEPT_CASE_INSENSITIVE_PROPERTIES plus per-property @JsonIgnoreProperties.
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
         <cve>CVE-2026-54515</cve>
     </suppress>
-    <!-- All other CVEs below -->
-    <!-- CVE-2026-54515 affects jackson-databind 2.22.0 which is the latest available version.
-         No fixed version exists. Suppress until a patched release is available. -->
-    <suppress>
-        <notes><![CDATA[
-   file name: jackson-databind-2.22.0.jar
-   Latest available version. No fix released for CVE-2026-54515 as of 2026-07-01.
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
-        <cve>CVE-2026-54515</cve>
-    </suppress>
-    <!-- CVE-2026-53914 affects kotlin-stdlib 2.2.0 which is the latest available version.
-         No fixed version exists. Suppress until a patched release is available. -->
-    <suppress>
-        <notes><![CDATA[
-   file name: kotlin-stdlib-2.2.0.jar, kotlin-stdlib-jdk7-2.2.0.jar, kotlin-stdlib-jdk8-2.2.0.jar
-   Latest available version. No fix released for CVE-2026-53914 as of 2026-07-01.
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-stdlib.*@.*$</packageUrl>
-        <cve>CVE-2026-53914</cve>
-    </suppress>
-    <!-- cucumber-core-7.18.0.jar shades jackson-databind:2.17.1 internally; the resolution strategy
+    <!-- cucumber-core shades an older jackson-databind internally; the resolution strategy
          cannot override bundled/shaded jars. cucumber is a test-only dependency and these CVEs do not
          affect production runtime. Suppress until cucumber-core ships a newer embedded jackson. -->
     <suppress>
         <notes><![CDATA[
-   file name: cucumber-core-7.18.0.jar (shaded: com.fasterxml.jackson.core:jackson-databind:2.17.1)
+   file name: cucumber-core-*.jar (shaded: com.fasterxml.jackson.core:jackson-databind:2.17.1)
    Bundled/shaded jackson inside cucumber-core test dependency. Not exploitable in production.
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@2\.17\.1$</packageUrl>

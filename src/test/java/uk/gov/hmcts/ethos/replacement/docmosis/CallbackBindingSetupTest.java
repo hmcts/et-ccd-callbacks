@@ -35,6 +35,7 @@ class CallbackBindingSetupTest {
     private static final Path CONTROLLERS_SOURCE_ROOT = Path.of(
         "src", "main", "java", "uk", "gov", "hmcts", "ethos", "replacement", "docmosis", "controllers"
     );
+    // Admin-only case type; callbacks live under controllers/admin/prehearingdeposit, outside this scan root.
     private static final String PRE_HEARING_DEPOSIT = "Pre_Hearing_Deposit";
     private static final String DEFAULT_CALLBACK_BASE_URL = "http://localhost:8081";
     private static final List<String> CALLBACK_EVENT_FIELDS = List.of(
@@ -42,6 +43,7 @@ class CallbackBindingSetupTest {
         "callback_url_about_to_submit_event",
         "callback_url_submitted_event"
     );
+    private static final Pattern CLASS_REQUEST_MAPPING_PATTERN = Pattern.compile("@RequestMapping\\(\"([^\"]+)\"\\)");
     private static final Pattern MAPPING_ANNOTATION_PATTERN = Pattern.compile(
         "@(?:Request|Get|Post|Put|Patch|Delete)Mapping\\s*\\(([^)]*)\\)",
         Pattern.DOTALL
@@ -58,6 +60,15 @@ class CallbackBindingSetupTest {
         assertThat(definitions).isNotEmpty();
         assertThat(controllerCallbackPaths).isNotEmpty();
         assertThat(definitionCallbackPaths).isNotEmpty();
+
+        List<String> unresolvedDefinitionPaths = definitionCallbackPaths.stream()
+            .filter(definitionPath -> !controllerCallbackPaths.contains(definitionPath))
+            .sorted()
+            .toList();
+
+        assertThat(unresolvedDefinitionPaths)
+            .as("CCD callback URLs must map to a controller endpoint exposed by et-cos")
+            .isEmpty();
     }
 
     private static Map<String, JsonNode> loadCaseTypeDefinitions() throws IOException {
@@ -144,21 +155,57 @@ class CallbackBindingSetupTest {
                 .filter(path -> path.getFileName().toString().endsWith(".java"))
                 .sorted(Comparator.naturalOrder())
                 .toList()) {
-                String source = Files.readString(sourceFile);
-                Matcher annotationMatcher = MAPPING_ANNOTATION_PATTERN.matcher(source);
-                while (annotationMatcher.find()) {
-                    String annotationArguments = annotationMatcher.group(1);
-                    Matcher quotedStringMatcher = QUOTED_STRING_PATTERN.matcher(annotationArguments);
-                    while (quotedStringMatcher.find()) {
-                        String possiblePath = quotedStringMatcher.group(1).trim();
-                        if (possiblePath.startsWith("/")) {
-                            callbackPaths.add(normalisePath(possiblePath));
-                        }
-                    }
-                }
+                callbackPaths.addAll(extractControllerPaths(Files.readString(sourceFile)));
             }
         }
         return callbackPaths;
+    }
+
+    private static Set<String> extractControllerPaths(String source) {
+        Set<String> callbackPaths = new LinkedHashSet<>();
+        String classBasePath = extractClassBasePath(source);
+        Set<String> mappingPaths = extractMappingPaths(source);
+
+        for (String path : mappingPaths) {
+            callbackPaths.add(path);
+            if (!classBasePath.isEmpty()
+                && !path.equals(classBasePath)
+                && !path.startsWith(classBasePath + "/")) {
+                callbackPaths.add(normalisePath(classBasePath + path));
+            }
+        }
+        return callbackPaths;
+    }
+
+    private static String extractClassBasePath(String source) {
+        int classDeclarationIndex = source.indexOf("public class ");
+        if (classDeclarationIndex < 0) {
+            return "";
+        }
+        Matcher matcher = CLASS_REQUEST_MAPPING_PATTERN.matcher(source.substring(0, classDeclarationIndex));
+        String classBasePath = "";
+        while (matcher.find()) {
+            classBasePath = matcher.group(1);
+        }
+        return classBasePath.isEmpty() ? "" : normalisePath(classBasePath);
+    }
+
+    private static Set<String> extractMappingPaths(String source) {
+        Set<String> paths = new LinkedHashSet<>();
+        Matcher annotationMatcher = MAPPING_ANNOTATION_PATTERN.matcher(source);
+        while (annotationMatcher.find()) {
+            String annotationArguments = annotationMatcher.group(1);
+            Matcher quotedStringMatcher = QUOTED_STRING_PATTERN.matcher(annotationArguments);
+            while (quotedStringMatcher.find()) {
+                String possiblePath = quotedStringMatcher.group(1).trim();
+                if (possiblePath.startsWith("/")) {
+                    paths.add(normalisePath(possiblePath));
+                } else if (possiblePath.contains("/")) {
+                    paths.add(normalisePath("/" + possiblePath));
+                }
+            }
+        }
+        return paths;
     }
 
     private static String normalisePath(String rawPath) {

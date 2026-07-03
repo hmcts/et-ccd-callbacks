@@ -133,10 +133,10 @@ sourceSets {
 
 ext {
     tomcatEmbedVersion = '10.1.55'
-    // CVE-2026-54515: upgrade to 2.21.5 when released to Maven Central
-    jacksonVersion = '2.21.4'
-    jacksonAnnotationsVersion = '2.21'
-    jackson3Version = '3.1.4'
+    // CVE-2026-54515: no fixed jackson-databind release on Maven Central yet; suppress until available
+    jacksonVersion = '2.22.0'
+    jacksonAnnotationsVersion = '2.22'
+    jackson3Version = '3.2.0'
     kotlinVersion = '2.4.0'
     cucumberVersion = '7.34.2'
     messagesNdjsonVersion = '0.5.0'
@@ -187,7 +187,7 @@ allprojects {
             // CVE-2026-54512..54517 - Jackson 3.x via elasticsearch-java / cucumber
             "tools.jackson.core:jackson-databind:$jackson3Version",
             "tools.jackson.core:jackson-core:$jackson3Version",
-            // CVE-2026-54515 - Jackson 2.x via Spring Boot; upgrade jacksonVersion to 2.21.5 when released
+            // CVE-2026-54515 - Jackson 2.x via Spring Boot; suppress until patched release is available
             "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
             "com.fasterxml.jackson.core:jackson-core:$jacksonVersion",
             // befta-fw pins cucumber 7.18.0 on runtime classpath

@@ -15,6 +15,16 @@ IMPORT_ES_RETRY_COUNT="${IMPORT_ES_RETRY_COUNT:-20}"
 IMPORT_ES_RETRY_DELAY_SECONDS="${IMPORT_ES_RETRY_DELAY_SECONDS:-15}"
 IMPORT_ES_MAX_RETRY_DELAY_SECONDS="${IMPORT_ES_MAX_RETRY_DELAY_SECONDS:-60}"
 IMPORT_ES_INITIAL_WAIT_SECONDS="${IMPORT_ES_INITIAL_WAIT_SECONDS:-30}"
+LOG_OUTPUT_MAX_LENGTH="${LOG_OUTPUT_MAX_LENGTH:-200}"
+
+truncate_log_output() {
+    local value="$1"
+    if ((${#value} > LOG_OUTPUT_MAX_LENGTH)); then
+        echo "${value:0:LOG_OUTPUT_MAX_LENGTH}...[truncated]"
+    else
+        echo "${value}"
+    fi
+}
 
 echo "📥 Importing CCD Definitions via API"
 echo "===================================="
@@ -65,7 +75,7 @@ log_definition_store_health() {
     if [[ -n "${http_code}" && "${http_code}" != "000" ]]; then
         echo "ℹ️  definition-store health probe ${endpoint_path} -> HTTP ${http_code}"
         if [[ -n "${response_body}" ]]; then
-            echo "ℹ️  health response: ${response_body}"
+            echo "ℹ️  health response: $(truncate_log_output "${response_body}")"
         fi
     else
         echo "ℹ️  definition-store health probe ${endpoint_path} unavailable"
@@ -121,7 +131,7 @@ import_definition_attempt() {
     else
         local curl_exit_code="$?"
         if [[ -s "${response_body_file}" ]]; then
-            echo "    Response: $(cat "${response_body_file}")" >&2
+            echo "    Response: $(truncate_log_output "$(cat "${response_body_file}")")" >&2
         fi
         rm -f "${response_body_file}"
         return "${curl_exit_code}"
@@ -176,14 +186,14 @@ import_definition() {
             fi
 
             echo "    ⏳ ElasticSearch not ready yet for ${file_name} (HTTP ${http_code}, attempt ${attempt}/${max_attempts}), retrying in ${retry_sleep_seconds}s..."
-            echo "    Response: ${response_body}"
+            echo "    Response: $(truncate_log_output "${response_body}")"
             attempt=$((attempt + 1))
             sleep "${retry_sleep_seconds}"
             continue
         fi
 
         echo "    ❌ Failed to import ${file_name} (HTTP ${http_code})"
-        echo "    Response: ${response_body}"
+        echo "    Response: $(truncate_log_output "${response_body}")"
         return 1
     done
 }

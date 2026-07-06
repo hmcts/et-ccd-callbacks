@@ -8,5 +8,15 @@
     "FieldDisplayOrder": 1,
     "DisplayContext": "MANDATORY",
     "RetainHiddenValue": "No"
+  },
+  {
+    "ID": "bundlesClaimantUploadFile",
+    "CaseFieldID": "bundlesClaimantUploadFile",
+    "CaseEventID": "bundlesClaimantPrepareDoc",
+    "ListElementCode": "uploadedDocument",
+    "EventElementLabel": "Document",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "RetainHiddenValue": "No"
   }
 ]

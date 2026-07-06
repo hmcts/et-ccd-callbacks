@@ -1533,7 +1533,29 @@ public class CaseData extends Et1CaseData {
     @JsonProperty("bundlesRespondentCollection")
     private List<GenericTypeItem<HearingBundleType>> bundlesRespondentCollection;
 
-    // Claimant Bundles
+    // Bundles Claimant
+    @JsonProperty("bundlesClaimantPrepareDocNotesShow")
+    private String bundlesClaimantPrepareDocNotesShow;
+
+    @JsonProperty("bundlesClaimantAgreedDocWith")
+    private String bundlesClaimantAgreedDocWith;
+    @JsonProperty("bundlesClaimantAgreedDocWithBut")
+    private String bundlesClaimantAgreedDocWithBut;
+    @JsonProperty("bundlesClaimantAgreedDocWithNo")
+    private String bundlesClaimantAgreedDocWithNo;
+
+    @JsonProperty("bundlesClaimantSelectHearing")
+    private DynamicFixedListType bundlesClaimantSelectHearing;
+
+    @JsonProperty("bundlesClaimantWhatDocuments")
+    private String bundlesClaimantWhatDocuments;
+
+    @JsonProperty("bundlesClaimantWhoseDocuments")
+    private String bundlesClaimantWhoseDocuments;
+
+    @JsonProperty("bundlesClaimantUploadFile")
+    private UploadedDocumentType bundlesClaimantUploadFile;
+
     @JsonProperty("bundlesClaimantCollection")
     private List<GenericTypeItem<HearingBundleType>> bundlesClaimantCollection;
 

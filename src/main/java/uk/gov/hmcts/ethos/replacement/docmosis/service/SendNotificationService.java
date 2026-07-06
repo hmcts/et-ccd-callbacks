@@ -85,6 +85,10 @@ public class SendNotificationService {
     private String bundlesSubmittedNotificationForClaimantTemplateId;
     @Value("${template.bundles.respondentSubmittedNotificationForTribunal}")
     private String bundlesSubmittedNotificationForTribunalTemplateId;
+    @Value("${template.bundles.claimantSubmittedNotificationForRespondent}")
+    private String bundlesClaimantSubmittedNotificationForRespondentTemplateId;
+    @Value("${template.bundles.claimantSubmittedNotificationForTribunal}")
+    private String bundlesClaimantSubmittedNotificationForTribunalTemplateId;
 
     private static final String BLANK_DOCUMENT_MARKDOWN = "| Document | | \r\n| Description | |";
 
@@ -388,6 +392,40 @@ public class SendNotificationService {
                 caseDetails.getCaseData().getTribunalCorrespondenceEmail(),
                 emailData
         );
+    }
+
+    public void notifyClaimantBundlesSubmitted(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        String caseId = caseDetails.getCaseId();
+        Map<String, String> emailData = getEmailData(caseData, caseId);
+
+        List<CaseUserAssignment> assignments = caseAccessService.getCaseUserAssignmentsById(caseId);
+        sendRespondentBundlesSubmittedEmails(caseData, emailData, assignments);
+
+        emailData.remove(LINK_TO_CITIZEN_HUB);
+        emailData.put(EXUI_HEARING_DOCUMENTS_LINK, emailService.getExuiHearingDocumentsLink(caseId));
+        emailService.sendEmail(bundlesClaimantSubmittedNotificationForTribunalTemplateId,
+                caseData.getTribunalCorrespondenceEmail(),
+                emailData
+        );
+    }
+
+    private void sendRespondentBundlesSubmittedEmails(CaseData caseData, Map<String, String> emailData,
+                                                       List<CaseUserAssignment> assignments) {
+        Set<String> emails = new HashSet<>();
+        if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
+            caseData.getRespondentCollection().stream()
+                    .map(respondent ->
+                            NotificationHelper.getEmailAddressForRespondent(caseData, respondent.getValue()))
+                    .filter(email -> email != null && !email.isEmpty())
+                    .forEach(emails::add);
+        }
+
+        emailNotificationService.getRespondentSolicitorEmails(assignments).stream()
+                .filter(email -> email != null && !email.isEmpty())
+                .forEach(emails::add);
+        emails.forEach(email ->
+                emailService.sendEmail(bundlesClaimantSubmittedNotificationForRespondentTemplateId, email, emailData));
     }
 
     @NotNull

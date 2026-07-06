@@ -95,6 +95,10 @@ class SendNotificationServiceTest {
             "bundlesSubmittedNotificationForClaimantTemplateId";
     private static final String BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID =
             "bundlesSubmittedNotificationForTribunalTemplateId";
+    private static final String BUNDLES_CLAIMANT_SUBMITTED_NOTIFICATION_FOR_RESPONDENT_TEMPLATE_ID =
+            "bundlesClaimantSubmittedNotificationForRespondentTemplateId";
+    private static final String BUNDLES_CLAIMANT_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID =
+            "bundlesClaimantSubmittedNotificationForTribunalTemplateId";
     private static final String ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED =
         "Select the party or parties to notify must include the party or parties who must respond";
     private static final String CLAIMANT_ONLY = "Claimant only";
@@ -117,6 +121,12 @@ class SendNotificationServiceTest {
         ReflectionTestUtils.setField(sendNotificationService,
                 BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID,
                 "bundlesSubmittedNotificationForTribunalTemplateId");
+        ReflectionTestUtils.setField(sendNotificationService,
+                BUNDLES_CLAIMANT_SUBMITTED_NOTIFICATION_FOR_RESPONDENT_TEMPLATE_ID,
+                "bundlesClaimantSubmittedNotificationForRespondentTemplateId");
+        ReflectionTestUtils.setField(sendNotificationService,
+                BUNDLES_CLAIMANT_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID,
+                "bundlesClaimantSubmittedNotificationForTribunalTemplateId");
 
         caseDetails = CaseDataBuilder.builder().withEthosCaseReference("1234")
                 .withClaimantType("claimant@email.com")
@@ -619,6 +629,23 @@ class SendNotificationServiceTest {
         assertEquals("claimant", persVal.get("respondentNames"));
         assertEquals("2020-01-02", persVal.get("hearingDate"));
 
+    }
+
+    @Test
+    void sendNotifyEmailsToRespondentAndTribunalWhenClaimantSubmitsBundles() {
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of());
+        sendNotificationService.notifyClaimantBundlesSubmitted(caseDetails);
+        verify(emailService, times(1))
+                .sendEmail(eq(BUNDLES_CLAIMANT_SUBMITTED_NOTIFICATION_FOR_RESPONDENT_TEMPLATE_ID),
+                        any(), personalisationCaptor.capture());
+        verify(emailService, times(1))
+                .sendEmail(eq(BUNDLES_CLAIMANT_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID),
+                        any(), personalisationCaptor.capture());
+        Map<String, String> persVal = personalisationCaptor.getValue();
+        assertEquals("1234", persVal.get("caseNumber"));
+        assertEquals("claimant", persVal.get("claimant"));
+        assertEquals("claimant", persVal.get("respondentNames"));
+        assertEquals("2020-01-02", persVal.get("hearingDate"));
     }
 
     @Test

@@ -43,18 +43,6 @@ services:
     image: mcr.microsoft.com/azure-storage/azurite
     ports:
       - "10000:10000"
-    command:
-      - azurite
-      - -l
-      - /data
-      - --blobHost
-      - 0.0.0.0
-      - --queueHost
-      - 0.0.0.0
-      - --tableHost
-      - 0.0.0.0
-      - --loose
-      - --skipApiVersionCheck
     environment:
       executable: "blob"
     volumes:

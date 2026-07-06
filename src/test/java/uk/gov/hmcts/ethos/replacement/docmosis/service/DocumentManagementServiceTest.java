@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.core.io.Resource;
@@ -20,7 +21,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import uk.gov.hmcts.ccd.sdk.CallbackInvocationContext;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -35,6 +35,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClient;
+import uk.gov.hmcts.reform.ccd.document.am.model.CaseDocumentsMetadata;
 import uk.gov.hmcts.reform.ccd.document.am.util.InMemoryMultipartFile;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
@@ -86,8 +87,6 @@ class DocumentManagementServiceTest {
     private CaseDocumentClient caseDocumentClient;
     @Mock
     private RestTemplate restTemplate;
-    @Mock
-    private CallbackInvocationContext callbackInvocationContext;
     @InjectMocks
     private DocumentManagementService documentManagementService;
     @InjectMocks
@@ -210,6 +209,16 @@ class DocumentManagementServiceTest {
         assertEquals(documentManagementService.generateMarkupDocument(documentDownloadableURL), markup);
         assertNotNull(documentSelfPath);
         assertEquals("/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4", documentSelfPath.getPath());
+
+        ArgumentCaptor<CaseDocumentsMetadata> metadataCaptor = ArgumentCaptor.forClass(CaseDocumentsMetadata.class);
+        verify(caseDocumentClient).patchDocument(eq("authString"), eq("authString"), metadataCaptor.capture());
+        CaseDocumentsMetadata metadata = metadataCaptor.getValue();
+        assertEquals("caseReference", metadata.getCaseId());
+        assertEquals("LondonSouth", metadata.getCaseTypeId());
+        assertEquals("EMPLOYMENT", metadata.getJurisdictionId());
+        assertEquals("85d97996-22a5-40d7-882e-3a382c8ae1b4",
+                metadata.getDocumentHashTokens().getFirst().getId());
+        assertEquals("hash-token", metadata.getDocumentHashTokens().getFirst().getHashToken());
     }
 
     @Test

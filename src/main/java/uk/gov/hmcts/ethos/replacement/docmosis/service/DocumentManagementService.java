@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import uk.gov.hmcts.ccd.sdk.CallbackInvocationContext;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -77,7 +76,6 @@ public class DocumentManagementService {
     private final UserIdamService userIdamService;
     private final CaseDocumentClient caseDocumentClient;
     private final RestTemplate restTemplate;
-    private final CallbackInvocationContext callbackInvocationContext;
 
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
@@ -93,15 +91,13 @@ public class DocumentManagementService {
                                      AuthTokenGenerator authTokenGenerator, UserIdamService userIdamService,
                                      DocumentDownloadClientApi documentDownloadClientApi,
                                      CaseDocumentClient caseDocumentClient,
-                                     RestTemplate restTemplate,
-                                     CallbackInvocationContext callbackInvocationContext) {
+                                     RestTemplate restTemplate) {
         this.documentUploadClient = documentUploadClient;
         this.authTokenGenerator = authTokenGenerator;
         this.userIdamService = userIdamService;
         this.documentDownloadClientApi = documentDownloadClientApi;
         this.caseDocumentClient = caseDocumentClient;
         this.restTemplate = restTemplate;
-        this.callbackInvocationContext = callbackInvocationContext;
     }
 
     @Retryable(retryFor = {DocumentManagementException.class}, backoff = @Backoff(delay = 200))
@@ -157,9 +153,6 @@ public class DocumentManagementService {
 
     private void attachDocumentToCase(String authToken, String serviceAuth, String caseTypeID, String reference,
                                       uk.gov.hmcts.reform.ccd.document.am.model.Document document) {
-        if (!callbackInvocationContext.isDecentralisedRuntimeInvocation()) {
-            return;
-        }
         if (isNullOrEmpty(reference)) {
             throw new DocumentManagementException("Unable to attach document to case without a case reference");
         }

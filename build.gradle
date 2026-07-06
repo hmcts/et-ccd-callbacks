@@ -436,7 +436,7 @@ ext {
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
     serenity = '5.3.10'
-    tomcatEmbedVersion = '10.1.55'
+    tomcatEmbedVersion = '10.1.56'
     jacksonVersion = '2.22.0'
     jacksonAnnotationsVersion = '2.22'
     jacksonV3Version = '3.2.0'

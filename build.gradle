@@ -132,7 +132,8 @@ sourceSets {
 }
 
 ext {
-    tomcatEmbedVersion = '10.1.55'
+    // CVE-2026-53434, CVE-2026-55276, CVE-2026-53404, CVE-2026-55955, CVE-2026-55956, CVE-2026-50229
+    tomcatEmbedVersion = '10.1.56'
     // CVE-2026-54515: no fixed jackson-databind release on Maven Central yet; suppress until available
     jacksonVersion = '2.22.0'
     jacksonAnnotationsVersion = '2.22'

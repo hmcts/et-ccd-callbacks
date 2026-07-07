@@ -19,9 +19,11 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -91,6 +93,16 @@ class BundlesClaimantControllerTest extends BaseControllerTest {
     }
 
     @Test
+    void aboutToStart_bundlesFeatureDisabled() throws Exception {
+        when(featureToggleService.isBundlesEnabled()).thenReturn(false);
+        mockMvc.perform(post(ABOUT_TO_START_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isServiceUnavailable());
+    }
+
+    @Test
     void aboutToStart_badRequest() throws Exception {
         mockMvc.perform(post(ABOUT_TO_START_URL)
                 .content("garbage content")
@@ -110,6 +122,7 @@ class BundlesClaimantControllerTest extends BaseControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(bundlesClaimantService).addToBundlesCollection(ccdRequest.getCaseDetails().getCaseData());
         verify(bundlesClaimantService).clearInputData(ccdRequest.getCaseDetails().getCaseData());
     }
 
@@ -167,6 +180,21 @@ class BundlesClaimantControllerTest extends BaseControllerTest {
     }
 
     @Test
+    void midPopulateHearings_validationErrors() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(bundlesClaimantService.validateTextAreaLength(any()))
+                .thenReturn(List.of("This field must be 2500 characters or less"));
+        mockMvc.perform(post(MID_POPULATE_HEARINGS_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors", notNullValue()))
+            .andExpect(jsonPath("$.data", notNullValue()));
+        verify(bundlesClaimantService, never()).populateSelectHearings(any());
+    }
+
+    @Test
     void midValidateUpload_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(MID_VALIDATE_UPLOAD_URL)
@@ -208,7 +236,10 @@ class BundlesClaimantControllerTest extends BaseControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath("$.warnings", nullValue()))
+            .andExpect(jsonPath("$.confirmation_header", notNullValue()))
+            .andExpect(jsonPath("$.confirmation_body", notNullValue()));
+        verify(sendNotificationService).notifyClaimantBundlesSubmitted(ccdRequest.getCaseDetails());
     }
 
     @Test

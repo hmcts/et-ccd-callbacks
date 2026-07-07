@@ -164,7 +164,6 @@ allprojects {
             if (details.requested.group == "org.apache.httpcomponents.core5"
                 && details.requested.name.startsWith("httpcore5")) {
                 details.useVersion(httpcore5Version)
-                details.useVersion("2.2.0")
             }
         }
         resolutionStrategy.force(
@@ -415,6 +414,8 @@ jacocoTestCoverageVerification {
 }
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
+def nvdApiKey = System.getenv('NVD_API_KEY') ?: findProperty('NVD_API_KEY')?.toString()?.trim()
+
 dependencyCheck {
     // Specifies if the build should be failed if a CVSS score above a specified level is identified.
     // range of 0-10 fails the build, anything greater and it doesn't fail the build

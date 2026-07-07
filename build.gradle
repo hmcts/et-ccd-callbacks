@@ -447,7 +447,7 @@ dependencyManagement {
         mavenBom 'com.azure:azure-sdk-bom:1.3.7'
     }
     dependencies {
-        dependency 'org.apache.httpcomponents.core5:httpcore5:5.4.3'
+        dependency 'org.apache.httpcomponents.core5:httpcore5:5.4.2'
         dependency 'com.microsoft.azure:msal4j:1.25.0'
         // CVE-2026-42198 - override above the Spring Boot BOM
         dependency 'org.postgresql:postgresql:42.7.11'

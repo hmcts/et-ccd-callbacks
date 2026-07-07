@@ -139,7 +139,11 @@ allprojects {
     configurations.configureEach {
         resolutionStrategy.eachDependency { details ->
             if (details.requested.group.startsWith("com.fasterxml.jackson")) {
-                details.useVersion("$jacksonVersion")
+                if (details.requested.name == 'jackson-annotations') {
+                    details.useVersion("$jacksonAnnotationsVersion")
+                } else {
+                    details.useVersion("$jacksonVersion")
+                }
             }
             if (details.requested.group == "org.apache.tomcat.embed"
                 && ["tomcat-embed-core", "tomcat-embed-el", "tomcat-embed-websocket"].contains(details.requested.name)) {
@@ -153,10 +157,17 @@ allprojects {
                 && details.requested.name.startsWith("kotlin-stdlib")) {
                 details.useVersion(kotlinVersion)
             }
+            // CVE-2026-54399, CVE-2026-54428
+            if (details.requested.group == "org.apache.httpcomponents.core5"
+                && details.requested.name.startsWith("httpcore5")) {
+                details.useVersion(httpcore5Version)
+            }
         }
         resolutionStrategy.force(
             'commons-fileupload:commons-fileupload:1.6.0',
             'org.apache.httpcomponents:httpclient:4.5.14',
+            'org.apache.httpcomponents.core5:httpcore5:5.4.3',
+            'org.apache.httpcomponents.core5:httpcore5-h2:5.4.3',
             'org.apache.logging.log4j:log4j-core:2.25.4',
             'com.nimbusds:nimbus-jose-jwt:10.9',
             'net.minidev:json-smart:2.5.2',
@@ -441,7 +452,10 @@ ext {
     // CVE-2026-53434, CVE-2026-55276, CVE-2026-53404, CVE-2026-55955, CVE-2026-55956, CVE-2026-50229
     tomcatEmbedVersion = '10.1.56'
     // CVE-2026-54512, CVE-2026-54513, CVE-2026-54514, CVE-2026-54515
-    jacksonVersion = '2.18.8'
+    jacksonVersion = '2.21.5'
+    jacksonAnnotationsVersion = '2.21'
+    // CVE-2026-54399, CVE-2026-54428
+    httpcore5Version = '5.4.3'
     kotlinVersion = '2.3.21'
     cucumberCoreVersion = '7.34.4'
 }
@@ -451,9 +465,11 @@ ext["rest-assured.version"] = '5.1.0'
 dependencyManagement {
     imports {
         mavenBom 'com.azure:azure-sdk-bom:1.3.7'
+        mavenBom "com.fasterxml.jackson:jackson-bom:${jacksonVersion}"
     }
     dependencies {
-        dependency 'org.apache.httpcomponents.core5:httpcore5:5.4.2'
+        dependency "org.apache.httpcomponents.core5:httpcore5:${httpcore5Version}"
+        dependency "org.apache.httpcomponents.core5:httpcore5-h2:${httpcore5Version}"
         dependency 'com.microsoft.azure:msal4j:1.25.0'
         // CVE-2026-42198 - override above the Spring Boot BOM
         dependency 'org.postgresql:postgresql:42.7.11'
@@ -510,7 +526,7 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.28.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
     implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.5.1'
-    implementation group: 'org.apache.httpcomponents.core5', name: 'httpcore5', version: '5.4.2'
+    implementation group: 'org.apache.httpcomponents.core5', name: 'httpcore5', version: httpcore5Version
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4JVersion
     implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: log4JVersion
     implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.7'

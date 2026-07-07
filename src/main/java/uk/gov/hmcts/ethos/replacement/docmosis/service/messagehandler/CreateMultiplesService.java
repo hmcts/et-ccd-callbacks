@@ -18,7 +18,6 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 import uk.gov.hmcts.reform.et.syaapi.service.NotificationService;
 
 import java.io.IOException;
@@ -50,7 +49,6 @@ public class CreateMultiplesService {
     @Autowired
     public CreateMultiplesService(CcdClient ccdClient,
                                   CaseManagementForCaseWorkerService caseManagementForCaseWorkerService,
-                                  MultipleReferenceService multipleReferenceService,
                                   NotificationService notificationService) {
         this.ccdClient = ccdClient;
         this.caseManagementForCaseWorkerService = caseManagementForCaseWorkerService;

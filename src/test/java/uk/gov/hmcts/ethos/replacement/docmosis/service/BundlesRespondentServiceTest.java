@@ -170,6 +170,19 @@ class BundlesRespondentServiceTest {
     }
 
     @Test
+    void validateTextAreaLength_nullTextAreaWhenRequired_returnsNoError() {
+        englandCaseData.setBundlesRespondentAgreedDocWith(NO);
+        englandCaseData.setBundlesRespondentAgreedDocWithNo(null);
+        List<String> errors = bundlesRespondentService.validateTextAreaLength(englandCaseData);
+        assertTrue(errors.isEmpty());
+
+        englandCaseData.setBundlesRespondentAgreedDocWith("But");
+        englandCaseData.setBundlesRespondentAgreedDocWithBut(null);
+        errors = bundlesRespondentService.validateTextAreaLength(englandCaseData);
+        assertTrue(errors.isEmpty());
+    }
+
+    @Test
     void addToBundlesCollection_whenEmptyCollection_createsNewCollection() {
         englandCaseData.setBundlesRespondentCollection(null);
         englandCaseData.setBundlesRespondentSelectHearing(getTestSelectHearing());

@@ -94,13 +94,14 @@ public class BundlesClaimantService {
 
     public List<String> validateTextAreaLength(CaseData caseData) {
         List<String> errors = new ArrayList<>();
+        String agreedDocWithNo = caseData.getBundlesClaimantAgreedDocWithNo();
+        String agreedDocWithBut = caseData.getBundlesClaimantAgreedDocWithBut();
         if (NO.equals(caseData.getBundlesClaimantAgreedDocWith())
-                &&
-                caseData.getBundlesClaimantAgreedDocWithNo().length() > MAX_CHAR_TEXT_AREA
-            ||
-            BUT.equals(caseData.getBundlesClaimantAgreedDocWith())
-                    &&
-                    caseData.getBundlesClaimantAgreedDocWithBut().length() > MAX_CHAR_TEXT_AREA) {
+                && agreedDocWithNo != null
+                && agreedDocWithNo.length() > MAX_CHAR_TEXT_AREA
+            || BUT.equals(caseData.getBundlesClaimantAgreedDocWith())
+                && agreedDocWithBut != null
+                && agreedDocWithBut.length() > MAX_CHAR_TEXT_AREA) {
             errors.add(EXCEEDED_CHAR_LIMIT);
         }
         return errors;

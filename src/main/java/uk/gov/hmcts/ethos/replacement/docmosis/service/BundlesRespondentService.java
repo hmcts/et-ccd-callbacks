@@ -116,13 +116,14 @@ public class BundlesRespondentService {
      */
     public List<String> validateTextAreaLength(CaseData caseData) {
         List<String> errors = new ArrayList<>();
+        String agreedDocWithNo = caseData.getBundlesRespondentAgreedDocWithNo();
+        String agreedDocWithBut = caseData.getBundlesRespondentAgreedDocWithBut();
         if (NO.equals(caseData.getBundlesRespondentAgreedDocWith())
-                &&
-                caseData.getBundlesRespondentAgreedDocWithNo().length() > MAX_CHAR_TEXT_AREA
-            ||
-            BUT.equals(caseData.getBundlesRespondentAgreedDocWith())
-                    &&
-                    caseData.getBundlesRespondentAgreedDocWithBut().length() > MAX_CHAR_TEXT_AREA) {
+                && agreedDocWithNo != null
+                && agreedDocWithNo.length() > MAX_CHAR_TEXT_AREA
+            || BUT.equals(caseData.getBundlesRespondentAgreedDocWith())
+                && agreedDocWithBut != null
+                && agreedDocWithBut.length() > MAX_CHAR_TEXT_AREA) {
             errors.add(EXCEEDED_CHAR_LIMIT);
         }
         return errors;

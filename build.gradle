@@ -5,7 +5,7 @@ plugins {
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.1.5'
     id 'org.springframework.boot' version '3.5.14'
-    id 'org.owasp.dependencycheck' version '9.2.0'
+    id 'org.owasp.dependencycheck' version '11.1.1'
     id 'com.github.ben-manes.versions' version '0.51.0'
     id 'au.com.dius.pact' version '4.3.15'
     id 'io.freefair.lombok' version '8.14.4'
@@ -142,13 +142,16 @@ allprojects {
                 details.useVersion("$jacksonVersion")
             }
             if (details.requested.group == "org.apache.tomcat.embed"
-                && ["tomcat-embed-core", "tomcat-embed-websocket"].contains(details.requested.name)) {
+                && ["tomcat-embed-core", "tomcat-embed-el", "tomcat-embed-websocket"].contains(details.requested.name)) {
                 details.useVersion(tomcatEmbedVersion)
             }
-            // CVE-2020-29582 - Force Kotlin to 2.1.0+
+            if (details.requested.group == "io.cucumber" && details.requested.name == "cucumber-core") {
+                details.useVersion(cucumberCoreVersion)
+            }
+            // CVE-2026-53914 - latest stable stdlib; runtime transitive dep only (see OWASP suppression)
             if (details.requested.group == "org.jetbrains.kotlin"
                 && details.requested.name.startsWith("kotlin-stdlib")) {
-                details.useVersion("2.1.0")
+                details.useVersion(kotlinVersion)
             }
         }
         resolutionStrategy.force(
@@ -161,10 +164,11 @@ allprojects {
             'com.squareup.okhttp3:okhttp:4.12.0',
             'com.squareup.okhttp3:okhttp-urlconnection:4.12.0',
             'com.squareup.okio:okio:3.17.0',
-            // CVE-2020-29582 - Fixed in Kotlin 2.1.0+
-            'org.jetbrains.kotlin:kotlin-stdlib:2.1.0',
-            'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.0',
-            'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0',
+            'io.cucumber:cucumber-core:7.34.4',
+            // CVE-2026-53914 - latest stable stdlib; runtime transitive dep only (see OWASP suppression)
+            'org.jetbrains.kotlin:kotlin-stdlib:2.3.21',
+            'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.3.21',
+            'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.21',
             'org.bouncycastle:bcprov-jdk15on:1.70',
             'io.netty:netty-buffer:4.2.15.Final',
             'io.netty:netty-codec:4.2.15.Final',
@@ -394,6 +398,8 @@ jacocoTestCoverageVerification {
 }
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
+def nvdApiKey = System.getenv('NVD_API_KEY') ?: findProperty('NVD_API_KEY')?.toString()?.trim()
+
 dependencyCheck {
     // Specifies if the build should be failed if a CVSS score above a specified level is identified.
     // range of 0-10 fails the build, anything greater and it doesn't fail the build
@@ -401,6 +407,15 @@ dependencyCheck {
     suppressionFile = 'config/owasp/suppressions.xml'
     analyzers.assemblyEnabled = false
     analyzers.nodeAudit.yarnEnabled = false
+    // NVD API updates require a key since dependency-check 9+. Without one, use the local cache only.
+    autoUpdate = nvdApiKey ? true : false
+    nvd {
+        if (nvdApiKey) {
+            apiKey = nvdApiKey
+            delay = 5000
+        }
+        validForHours = 168
+    }
 }
 
 repositories {
@@ -423,8 +438,12 @@ ext {
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
     serenity = '5.3.10'
-    tomcatEmbedVersion = '10.1.55'
-    jacksonVersion = '2.18.3'
+    // CVE-2026-53434, CVE-2026-55276, CVE-2026-53404, CVE-2026-55955, CVE-2026-55956, CVE-2026-50229
+    tomcatEmbedVersion = '10.1.56'
+    // CVE-2026-54512, CVE-2026-54513, CVE-2026-54514, CVE-2026-54515
+    jacksonVersion = '2.18.8'
+    kotlinVersion = '2.3.21'
+    cucumberCoreVersion = '7.34.4'
 }
 
 ext["rest-assured.version"] = '5.1.0'

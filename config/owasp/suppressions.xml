@@ -70,12 +70,12 @@
         <cve>CVE-2026-39882</cve>
         <cve>CVE-2026-39883</cve>
     </suppress>
-    <!-- CCD SDK 6.17.0 pins Elasticsearch client 9.4.2 through ccd-runtime-indexing Gradle metadata.
+    <!-- CCD SDK 6.19.0 pins Elasticsearch client 9.4.2 through ccd-runtime-indexing Gradle metadata.
          Suppress until the SDK publishes a patched runtime dependency. -->
     <suppress>
         <notes><![CDATA[
    file name: elasticsearch-java-9.4.2.jar, elasticsearch-rest5-client-9.4.2.jar
-   Transitive dependency from com.github.hmcts:ccd-runtime-indexing:6.17.0.
+   Transitive dependency from com.github.hmcts:ccd-runtime-indexing:6.19.0.
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/co\.elastic\.clients/elasticsearch\-(java|rest5\-client)@9\.4\.2$</packageUrl>
         <cve>CVE-2026-56148</cve>

@@ -4,10 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.LegalRepDataModel;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -21,9 +20,12 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,7 +42,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_C
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class MultipleCreationServiceTest {
 
     @Mock
@@ -48,15 +50,24 @@ class MultipleCreationServiceTest {
     @Mock
     private MultipleReferenceService multipleReferenceService;
     @Mock
+    private MultipleHelperService multipleHelperService;
+    @Mock
+    private MultipleTransferService multipleTransferService;
+    @Mock
+    private CaseManagementLocationService caseManagementLocationService;
+    @Mock
     FeatureToggleService featureToggleService;
+    @Mock
+    private AdminUserService adminUserService;
     @Mock
     private CcdClient ccdClient;
     @Mock
     private OrganisationClient organisationClient;
     @Mock
     private CreateUpdatesBusSender createUpdatesBusSender;
+    @Mock
+    private AuthTokenGenerator authTokenGenerator;
 
-    @InjectMocks
     private MultipleCreationService multipleCreationService;
 
     private MultipleDetails multipleDetails;
@@ -65,6 +76,19 @@ class MultipleCreationServiceTest {
 
     @BeforeEach
     public void setUp() {
+        multipleCreationService = new MultipleCreationService(
+                excelDocManagementService,
+                multipleReferenceService,
+                multipleHelperService,
+                multipleTransferService,
+                caseManagementLocationService,
+                featureToggleService,
+                ccdClient,
+                adminUserService,
+                organisationClient,
+                authTokenGenerator,
+                createUpdatesBusSender
+        );
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseTypeId(ENGLANDWALES_BULK_CASE_TYPE_ID);
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
@@ -234,8 +258,6 @@ class MultipleCreationServiceTest {
         multipleDetails.getCaseData().setLeadCase(null);
         multipleDetails.getCaseData().setLeadCaseId(null);
         multipleDetails.getCaseData().setCaseIdCollection(new ArrayList<>());
-
-        when(ccdClient.retrieveCasesElasticSearch(any(), any(), any())).thenReturn(List.of());
 
         multipleDetails.getCaseData().setMultipleSource(ET1_ONLINE_CASE_SOURCE);
         multipleCreationService.bulkCreationLogic(userToken,

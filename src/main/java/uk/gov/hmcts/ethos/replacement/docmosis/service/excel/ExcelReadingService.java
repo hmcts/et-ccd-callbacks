@@ -102,14 +102,16 @@ public class ExcelReadingService {
                                                     String subMultiple) throws IOException {
         List<SubmitEvent> submitEvents = ccdClient.retrieveCasesElasticSearch(userToken,
                 UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()), List.of(ethosRef));
-        submitEvents.getFirst().getCaseData().setSubMultipleName(Strings.isNullOrEmpty(subMultiple) ? " " : subMultiple);
+        submitEvents.getFirst().getCaseData().setSubMultipleName(Strings.isNullOrEmpty(subMultiple)
+                ? " " : subMultiple);
         CCDRequest returnedRequest = ccdClient.startEventForCase(userToken,
                 UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()),
                 multipleDetails.getJurisdiction(), String.valueOf(submitEvents.getFirst().getCaseId()));
         ccdClient.submitEventForCase(userToken,
                 submitEvents.getFirst().getCaseData(),
                 UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()),
-                multipleDetails.getJurisdiction(), returnedRequest, String.valueOf(submitEvents.getFirst().getCaseId()));
+                multipleDetails.getJurisdiction(), returnedRequest,
+                String.valueOf(submitEvents.getFirst().getCaseId()));
     }
 
     public XSSFSheet checkExcelErrors(String userToken, String documentBinaryUrl, List<String> errors)

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.NumberToTextConverter;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -14,16 +15,14 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.types.multiples.AdditionalClaimant;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
-import uk.gov.hmcts.et.common.model.ccd.Address;
-import uk.gov.hmcts.et.common.model.ccd.types.multiples.AdditionalClaimant;
-
-import org.apache.poi.ss.usermodel.DateUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,9 +32,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.CONSTRAINT_KEY;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_2;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_3;
@@ -101,14 +102,14 @@ public class ExcelReadingService {
                                                     String subMultiple) throws IOException {
         List<SubmitEvent> submitEvents = ccdClient.retrieveCasesElasticSearch(userToken,
                 UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()), List.of(ethosRef));
-        submitEvents.get(0).getCaseData().setSubMultipleName(Strings.isNullOrEmpty(subMultiple) ? " " : subMultiple);
+        submitEvents.getFirst().getCaseData().setSubMultipleName(Strings.isNullOrEmpty(subMultiple) ? " " : subMultiple);
         CCDRequest returnedRequest = ccdClient.startEventForCase(userToken,
                 UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()),
-                multipleDetails.getJurisdiction(), String.valueOf(submitEvents.get(0).getCaseId()));
+                multipleDetails.getJurisdiction(), String.valueOf(submitEvents.getFirst().getCaseId()));
         ccdClient.submitEventForCase(userToken,
-                submitEvents.get(0).getCaseData(),
+                submitEvents.getFirst().getCaseData(),
                 UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()),
-                multipleDetails.getJurisdiction(), returnedRequest, String.valueOf(submitEvents.get(0).getCaseId()));
+                multipleDetails.getJurisdiction(), returnedRequest, String.valueOf(submitEvents.getFirst().getCaseId()));
     }
 
     public XSSFSheet checkExcelErrors(String userToken, String documentBinaryUrl, List<String> errors)
@@ -230,8 +231,8 @@ public class ExcelReadingService {
      * @return list of {@link AdditionalClaimant} parsed from the spreadsheet data rows
      */
     public List<AdditionalClaimant> readClaimantsFromSpreadsheet(String userToken,
-                                                                  String documentBinaryUrl,
-                                                                  List<String> errors) {
+                                                                 String documentBinaryUrl,
+                                                                 List<String> errors) {
         List<AdditionalClaimant> claimants = new ArrayList<>();
         try (XSSFWorkbook workbook = readWorkbook(userToken, documentBinaryUrl)) {
             XSSFSheet sheet = workbook.getSheetAt(0);
@@ -291,7 +292,7 @@ public class ExcelReadingService {
     }
 
     private String normaliseHeader(String raw) {
-        return raw == null ? "" : raw.trim().toLowerCase().replaceAll("\\s+", "");
+        return raw == null ? "" : raw.trim().toLowerCase(Locale.ROOT).replaceAll("\\s+", "");
     }
 
     private AdditionalClaimant rowToAdditionalClaimant(Row row, Map<String, Integer> headerMap) {

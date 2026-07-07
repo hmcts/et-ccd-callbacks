@@ -117,6 +117,7 @@ public class Constants {
     public static final String MIGRATION_CASE_SOURCE = "Migration";
 
     public static final String CREATION_EVENT_TRIGGER_ID = "initiateCase";
+    public static final String MULTIPLE_CREATION_EVENT_TRIGGER_ID = "initiateMultipleCase";
     public static final String UPDATE_EVENT_TRIGGER_ID_BULK = "amendCaseDetailsBulk";
     public static final String PRE_ACCEPT_CASE_TRIGGER_ID_BULK = "preAcceptanceCase";
     public static final String UPDATE_BULK_EVENT_TRIGGER_ID = "updateBulkAction";

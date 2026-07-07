@@ -4,8 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.model.servicebus.UpdateCaseMsg;
-import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreateMultiplesDataModel;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesMsg;
+import uk.gov.hmcts.et.common.model.bulk.items.CaseIdTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -13,15 +14,28 @@ import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.multiples.AdditionalClaimant;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
+import uk.gov.hmcts.reform.et.syaapi.service.NotificationService;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static io.netty.util.internal.StringUtil.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
 
 /**
- * Creates a new CCD case for a single additional claimant within a multiple.
+ * Creates the child CCD cases for the additional claimants of a multiple, and the multiple shell.
  *
- * <p>The new case is a copy of the lead case with the claimant identity fields
- * ({@link ClaimantIndType} and {@link ClaimantType}) overridden with the details
- * supplied in the {@link CreateMultiplesDataModel}.  Fields specific to a multiple
+ * <p>Each child case is a copy of the lead case with the claimant identity fields
+ * ({@link ClaimantIndType} and {@link ClaimantType}) overridden with the supplied
+ * {@link AdditionalClaimant}.  Fields specific to a multiple
  * (e.g. the additional-claimant spreadsheet, {@code addClaimantMethod}) are deliberately
  * not copied to the child cases.
  */
@@ -30,31 +44,51 @@ import java.io.IOException;
 public class CreateMultiplesService {
 
     private final CcdClient ccdClient;
+    private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
+    private final NotificationService notificationService;
 
     @Autowired
-    public CreateMultiplesService(CcdClient ccdClient) {
+    public CreateMultiplesService(CcdClient ccdClient,
+                                  CaseManagementForCaseWorkerService caseManagementForCaseWorkerService,
+                                  MultipleReferenceService multipleReferenceService,
+                                  NotificationService notificationService) {
         this.ccdClient = ccdClient;
+        this.caseManagementForCaseWorkerService = caseManagementForCaseWorkerService;
+        this.notificationService = notificationService;
     }
 
     /**
-     * Copies the lead case and creates a new CCD case whose claimant details are
-     * overridden with those carried by the {@link CreateMultiplesDataModel}.
+     * Retrieves the lead (parent) case that child cases are copied from.
      *
-     * @param leadSubmitEvent the lead case retrieved from CCD
-     * @param accessToken     admin access token
-     * @param updateCaseMsg   the update-case message carrying the {@link CreateMultiplesDataModel}
+     * @param accessToken      admin access token
+     * @param createUpdatesMsg the create-updates message carrying the lead ethos case reference
+     * @return the lead case, or {@code null} if none is found
      * @throws IOException if CCD communication fails
      */
-    public void createCase(SubmitEvent leadSubmitEvent, String accessToken, UpdateCaseMsg updateCaseMsg)
-            throws IOException {
+    public SubmitEvent retrieveLeadCase(String accessToken, CreateUpdatesMsg createUpdatesMsg) throws IOException {
+        List<SubmitEvent> submitEvents = ccdClient.retrieveCasesElasticSearch(
+                accessToken,
+                createUpdatesMsg.getCaseTypeId(),
+                createUpdatesMsg.getEthosCaseRefCollection());
+        return submitEvents == null || submitEvents.isEmpty() ? null : submitEvents.getFirst();
+    }
 
-        CreateMultiplesDataModel dataModel = (CreateMultiplesDataModel) updateCaseMsg.getDataModelParent();
-        AdditionalClaimant additionalClaimant = dataModel.getAdditionalClaimant();
+    /**
+     * Copies the lead case and creates a new CCD case whose claimant details are overridden with
+     * those of the supplied {@link AdditionalClaimant}.
+     *
+     * @param leadSubmitEvent    the lead case retrieved from CCD
+     * @param accessToken        admin access token
+     * @param createUpdatesMsg   the create-updates message carrying the shared case metadata
+     * @param additionalClaimant the claimant whose details override the lead case
+     * @return the ethos case reference of the created child case, or {@code null} if not created
+     * @throws IOException if CCD communication fails
+     */
+    public String createCase(SubmitEvent leadSubmitEvent, String accessToken, CreateUpdatesMsg createUpdatesMsg,
+                             AdditionalClaimant additionalClaimant) throws IOException {
 
         if (additionalClaimant == null) {
-            log.warn("CreateMultiplesDataModel has no additionalClaimant - skipping case creation for msgId={}",
-                    updateCaseMsg.getMsgId());
-            return;
+            return null;
         }
 
         String leadCaseId = String.valueOf(leadSubmitEvent.getCaseId());
@@ -63,11 +97,11 @@ public class CreateMultiplesService {
         CaseData newCaseData = copyAndOverrideClaimant(leadSubmitEvent.getCaseData(), additionalClaimant);
 
         CaseDetails newCaseDetails = new CaseDetails();
-        newCaseDetails.setCaseTypeId(updateCaseMsg.getCaseTypeId());
-        newCaseDetails.setJurisdiction(updateCaseMsg.getJurisdiction());
+        newCaseDetails.setCaseTypeId(createUpdatesMsg.getCaseTypeId());
+        newCaseDetails.setJurisdiction(createUpdatesMsg.getJurisdiction());
         newCaseDetails.setCaseData(newCaseData);
 
-        CCDRequest ccdRequest = ccdClient.startCaseCreation(accessToken, newCaseDetails);
+        CCDRequest ccdRequest = ccdClient.startMultipleCaseCreation(accessToken, newCaseDetails);
         SubmitEvent createdCase = ccdClient.submitCaseCreation(
                 accessToken,
                 newCaseDetails,
@@ -75,10 +109,135 @@ public class CreateMultiplesService {
                 "Case created as part of multiple - lead case " + leadSubmitEvent.getCaseData().getEthosCaseReference()
         );
 
-        if (createdCase != null) {
-            log.info("Successfully created additional claimant case {} from lead case {}",
-                    createdCase.getCaseId(), leadCaseId);
+        if (createdCase == null) {
+            log.warn("CCD returned no case when creating additional claimant case from lead {}", leadCaseId);
+            return null;
         }
+
+        log.info("Setting HMCTS service ID for new case {}", createdCase.getCaseId());
+        ccdRequest = ccdClient.startEventForCase(accessToken, createUpdatesMsg.getCaseTypeId(),
+                createUpdatesMsg.getJurisdiction(), String.valueOf(createdCase.getCaseId()));
+        caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
+        log.info("Successfully set HMCTS service ID for new case {}", createdCase.getCaseId());
+
+        return createdCase.getCaseData() == null ? null : createdCase.getCaseData().getEthosCaseReference();
+    }
+
+    /**
+     * Creates a new multiple "shell" case (the {@code _Multiple} case type) grouping the lead case
+     * and the newly created child cases.  A fresh multiple is always created - the lead single case
+     * is only linked as the first member of the multiple, it is never converted into the shell.
+     *
+     * <p>The multiple reference and managing office are populated explicitly here because, for the
+     * ET1-online source, the {@code createMultiple} callback does not generate them.  Without a
+     * reference / managing office the created multiple is invalid and does not show up.
+     *
+     * @param accessToken      admin access token
+     * @param createUpdatesMsg the create-updates message carrying the lead ethos reference and metadata
+     * @param leadSubmitEvent  the lead case, used for the managing office and lead ethos reference
+     * @param childEthosRefs   ethos case references of the created child cases
+     * @return the created multiple, or {@code null} if creation failed
+     * @throws IOException if CCD communication fails
+     */
+    public SubmitMultipleEvent createMultipleShell(String accessToken, CreateUpdatesMsg createUpdatesMsg,
+                                                   SubmitEvent leadSubmitEvent,
+                                                   List<String> childEthosRefs,
+                                                   Map<Integer, AdditionalClaimant> failedCases) throws IOException {
+
+        CaseData leadCaseData = leadSubmitEvent == null ? null : leadSubmitEvent.getCaseData();
+        String leadCaseRef = leadCaseData != null && leadCaseData.getEthosCaseReference() != null
+                ? leadCaseData.getEthosCaseReference()
+                : firstEthosRef(createUpdatesMsg.getEthosCaseRefCollection());
+
+        List<CaseIdTypeItem> caseIdCollection = new ArrayList<>();
+        if (leadCaseRef != null) {
+            caseIdCollection.add(MultiplesHelper.createCaseIdTypeItem(leadCaseRef));
+        }
+        if (childEthosRefs != null) {
+            for (String childRef : childEthosRefs) {
+                if (childRef != null) {
+                    caseIdCollection.add(MultiplesHelper.createCaseIdTypeItem(childRef));
+                }
+            }
+        }
+
+        MultipleData multipleData = new MultipleData();
+        multipleData.setMultipleName(leadCaseData.getRespondent());
+        multipleData.setMultipleSource(ET1_ONLINE_CASE_SOURCE);
+        multipleData.setCaseIdCollection(caseIdCollection);
+        multipleData.setLeadCase(leadCaseRef);
+        multipleData.setManagingOffice(leadCaseData.getManagingOffice());
+
+        String jurisdiction = createUpdatesMsg.getJurisdiction();
+        String multipleCaseTypeId = UtilHelper.getBulkCaseTypeId(createUpdatesMsg.getCaseTypeId());
+        log.info("Creating new multiple shell {} (ref {}) for lead case {} with {} case(s)",
+            multipleCaseTypeId, multipleData.getMultipleReference(), leadCaseRef, caseIdCollection.size());
+
+        handleFailedCases(failedCases, multipleData, leadCaseData.getAddClaimantMethod());
+        CCDRequest ccdRequest = ccdClient.startCaseMultipleCreation(accessToken, multipleCaseTypeId, jurisdiction);
+        SubmitMultipleEvent createdMultiple = ccdClient.submitMultipleCreation(
+            accessToken, multipleData, multipleCaseTypeId, jurisdiction, ccdRequest);
+
+        if (createdMultiple != null) {
+            sendEmailForFailedCases(failedCases, createdMultiple);
+            log.info("Created multiple shell case {}", createdMultiple.getCaseId());
+        } else {
+            log.info("Error creating multiple shell case for {}", leadCaseData.getCcdID());
+            // two different templates ??
+            notificationService.sendFailedMultiplesShellCreationEmail(
+                    leadCaseRef,
+                    Long.parseLong(leadCaseData.getFeeGroupReference()));
+        }
+        return createdMultiple;
+    }
+
+    private void handleFailedCases(Map<Integer, AdditionalClaimant> failedCases,
+                                   MultipleData multipleData, String addClaimantMethod) {
+        if (!failedCases.isEmpty()) {
+            boolean isSpreadsheetUpload = !"manually".equals(addClaimantMethod);
+
+            String source = isSpreadsheetUpload ? "spreadsheet upload" : "manual entry";
+
+            String failedClaimantDetails = failedCases.entrySet().stream()
+                    .map(entry -> buildFailedClaimantLine(entry.getKey(), entry.getValue(), isSpreadsheetUpload))
+                    .collect(Collectors.joining("\n"));
+
+            multipleData.setMultipleNote(
+                    "Additional claimant cases failed to create for the following claimant(s), added via "
+                            + source + ":\n" + failedClaimantDetails);
+        }
+    }
+
+    private void sendEmailForFailedCases(Map<Integer, AdditionalClaimant> failedCases,
+                                   SubmitMultipleEvent createdMultiple) {
+
+        notificationService.sendFailedAdditionalClaimantsEmail(
+                createdMultiple.getCaseData().getLeadEthosCaseRef(),
+                createdMultiple.getCaseData().getMultipleReference(),
+                createdMultiple.getCaseId());
+        log.error("Multiple {} created with {} failed additional claimant(s)",
+                createdMultiple.getCaseData().getMultipleReference(), failedCases.size());
+    }
+
+    private static String buildFailedClaimantLine(int index, AdditionalClaimant claimant, boolean isSpreadsheetUpload) {
+        String location = isSpreadsheetUpload
+                ? "Row " + (index + 1)
+                : "Additional claimant " + (index + 1);
+
+        if (claimant == null) {
+            return "- " + location + ": no claimant data supplied";
+        }
+
+        String firstName = isNullOrEmpty(claimant.getFirstName())
+                ? "[First name not provided]" : claimant.getFirstName();
+        String lastName = isNullOrEmpty(claimant.getLastName())
+                ? "[Last name not provided]" : claimant.getLastName();
+
+        return "- " + location + " (" + firstName + " " + lastName + ")";
+    }
+
+    private static String firstEthosRef(List<String> ethosRefs) {
+        return ethosRefs == null || ethosRefs.isEmpty() ? null : ethosRefs.getFirst();
     }
 
     /**
@@ -126,6 +285,7 @@ public class CreateMultiplesService {
         newCaseData.setConciliationTrack(leadCaseData.getConciliationTrack());
         newCaseData.setPreAcceptCase(leadCaseData.getPreAcceptCase());
         newCaseData.setMultipleReference(leadCaseData.getMultipleReference());
+        newCaseData.setClaimantRequests(leadCaseData.getClaimantRequests());
 
         // Override claimant identity fields with those of the additional claimant
         ClaimantIndType claimantIndType = new ClaimantIndType();

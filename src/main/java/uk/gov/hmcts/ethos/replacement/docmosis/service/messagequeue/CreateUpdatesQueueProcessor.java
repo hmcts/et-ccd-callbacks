@@ -14,13 +14,21 @@ import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesMsg;
 import uk.gov.hmcts.ecm.common.model.servicebus.UpdateCaseMsg;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreateMultiplesDataModel;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.TransferToEcmDataModel;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.types.multiples.AdditionalClaimant;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.CreateUpdatesQueueMessage;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.messagequeue.CreateUpdatesQueueRepository;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.messagehandler.CreateMultiplesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.messagehandler.TransferToEcmService;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,6 +50,8 @@ public class CreateUpdatesQueueProcessor {
     private final ObjectMapper objectMapper;
     private final ObjectProvider<CreateUpdatesQueueProcessor> selfProvider;
     private final TransferToEcmService transferToEcmService;
+    private final AdminUserService adminUserService;
+    private final CreateMultiplesService createMultiplesService;
 
     @Value("${queue.create-updates.batch-size:10}")
     private int batchSize;
@@ -145,12 +155,65 @@ public class CreateUpdatesQueueProcessor {
         }
     }
 
-    private void sendCreateMultiplesMessages(CreateUpdatesMsg createUpdatesMsg) {
-        if (createUpdatesMsg.getEthosCaseRefCollection() != null) {
-            for (String ethosCaseReference : createUpdatesMsg.getEthosCaseRefCollection()) {
-                updateCaseQueueSender.sendCreateMultiplesMessage(createUpdatesMsg, ethosCaseReference);
+    private void sendCreateMultiplesMessages(CreateUpdatesMsg createUpdatesMsg) throws IOException {
+        CreateMultiplesDataModel dataModel = (CreateMultiplesDataModel) createUpdatesMsg.getDataModelParent();
+        List<AdditionalClaimant> additionalClaimants = dataModel.getAdditionalClaimants();
+
+        if (additionalClaimants == null || additionalClaimants.isEmpty()) {
+            log.warn("No additional claimants on create-multiples message {} - nothing to create",
+                    createUpdatesMsg.getMsgId());
+            return;
+        }
+
+        String accessToken = adminUserService.getAdminUserToken();
+
+        SubmitEvent leadCase = createMultiplesService.retrieveLeadCase(accessToken, createUpdatesMsg);
+        if (leadCase == null) {
+            throw new IllegalStateException("Could not retrieve lead case for create-multiples message "
+                    + createUpdatesMsg.getMsgId());
+        }
+
+        List<String> createdCaseRefs = new ArrayList<>();
+        Map<Integer, AdditionalClaimant> failedCases = new LinkedHashMap<>();
+
+        additionalClaimants.set(2, null);
+        additionalClaimants.set(3, null);
+
+        for (int i = 0; i < additionalClaimants.size(); i++) {
+            String createdRef = createCaseWithRetry(additionalClaimants, leadCase, accessToken, createUpdatesMsg, i);
+            if (createdRef != null) {
+                createdCaseRefs.add(createdRef);
+            } else {
+                failedCases.put(i, additionalClaimants.get(i));
             }
         }
+
+        log.info("Create-multiples message {}: expected {} additional case(s), created {} (totalCases={}), "
+                        + "failed {} case(s), failedIndexes={}",
+                createUpdatesMsg.getMsgId(), additionalClaimants.size(), createdCaseRefs.size(),
+                createUpdatesMsg.getTotalCases(), failedCases.size(), failedCases.keySet());
+
+        createMultiplesService.createMultipleShell(accessToken, createUpdatesMsg,
+                leadCase, createdCaseRefs, failedCases);
+    }
+
+    private String createCaseWithRetry(List<AdditionalClaimant> additionalClaimants, SubmitEvent leadCase,
+                                       String accessToken, CreateUpdatesMsg createUpdatesMsg, int index) {
+        for (int attempt = 1; attempt <= 3; attempt++) {
+            AdditionalClaimant claimant = additionalClaimants.get(index);
+            try {
+                log.info("Creating case for additional claimant index {}, attempt {}", index, attempt);
+                String createdRef = createMultiplesService.createCase(leadCase, accessToken,
+                        createUpdatesMsg, claimant);
+                if (createdRef != null) {
+                    return createdRef;
+                }
+            } catch (Exception e) {
+                log.warn("Could not create lead case for claimant index {}, attempt {}: {}",
+                        index, attempt, e.getMessage());
+            }
+        }
+        return null;
     }
 
     private UpdateCaseMsg mapToUpdateCaseMsg(CreateUpdatesMsg createUpdatesMsg, String ethosCaseReference) {

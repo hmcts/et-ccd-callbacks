@@ -9,30 +9,30 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.dwp.regex.InvalidPostcodeException;
 import uk.gov.hmcts.ecm.common.helpers.DocumentHelper;
+import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesMsg;
+import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreateMultiplesDataModel;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
 import uk.gov.hmcts.ecm.common.service.pdf.PdfDecodedMultipartFile;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.Et1CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentTse;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
+import uk.gov.hmcts.et.common.model.ccd.types.multiples.AdditionalClaimant;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesMsg;
-import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreateMultiplesDataModel;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.multiples.AdditionalClaimant;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
-import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 import uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent;
 import uk.gov.hmcts.reform.et.syaapi.helper.CaseDetailsConverter;
 import uk.gov.hmcts.reform.et.syaapi.helper.EmployeeObjectMapper;
@@ -53,6 +53,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -267,8 +268,6 @@ public class CaseService {
         Et1CaseData et1CaseData = new EmployeeObjectMapper().getEmploymentCaseData(caseDetails.getData());
         String ethosCaseReference = caseDetails.getData().get("ethosCaseReference") == null ? ""
                 : caseDetails.getData().get("ethosCaseReference").toString();
-        String caseTypeId = caseDetails.getCaseTypeId();
-        String username = userIdamService.getUserDetails(authorization).getEmail();
 
         List<AdditionalClaimant> claimants = new ArrayList<>();
 
@@ -277,7 +276,7 @@ public class CaseService {
             if (!CollectionUtils.isEmpty(items)) {
                 items.stream()
                         .map(GenericTypeItem::getValue)
-                        .filter(c -> c != null)
+                        .filter(Objects::nonNull)
                         .forEach(claimants::add);
             }
         } else if (ADD_CLAIMANT_SPREADSHEET.equals(et1CaseData.getAddClaimantMethod())) {
@@ -302,23 +301,25 @@ public class CaseService {
 
         log.info("Queuing {} additional claimant case(s) for multiple {}", claimants.size(), ethosCaseReference);
         List<String> errors = new ArrayList<>();
-        for (AdditionalClaimant claimant : claimants) {
-            CreateMultiplesDataModel dataModel = CreateMultiplesDataModel.builder()
-                    .additionalClaimant(claimant)
-                    .build();
-            CreateUpdatesMsg msg = CreateUpdatesMsg.builder()
-                    .msgId(java.util.UUID.randomUUID().toString())
-                    .jurisdiction(JURISDICTION_ID)
-                    .caseTypeId(caseTypeId)
-                    .multipleRef(SINGLE_CASE_TYPE)
-                    .totalCases("1")
-                    .username(username)
-                    .confirmation("No")
-                    .ethosCaseRefCollection(List.of(ethosCaseReference))
-                    .dataModelParent(dataModel)
-                    .build();
-            createUpdatesBusSender.sendSingleMessage(msg, errors);
-        }
+        // Send a single message carrying every claimant. CreateUpdatesQueueProcessor creates all the
+        // child cases and the multiple shell from this one message.
+        String caseTypeId = caseDetails.getCaseTypeId();
+        String username = userIdamService.getUserDetails(authorization).getEmail();
+        CreateMultiplesDataModel dataModel = CreateMultiplesDataModel.builder()
+                .additionalClaimants(claimants)
+                .build();
+        CreateUpdatesMsg msg = CreateUpdatesMsg.builder()
+                .msgId(UUID.randomUUID().toString())
+                .jurisdiction(JURISDICTION_ID)
+                .caseTypeId(caseTypeId)
+                .multipleRef(SINGLE_CASE_TYPE)
+                .totalCases(String.valueOf(claimants.size()))
+                .username(username)
+                .confirmation("No")
+                .ethosCaseRefCollection(List.of(ethosCaseReference))
+                .dataModelParent(dataModel)
+                .build();
+        createUpdatesBusSender.sendSingleMessage(msg, errors);
         errors.forEach(e -> log.error("Error queuing multiple creation message: {}", e));
     }
 

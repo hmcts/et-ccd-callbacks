@@ -15,4 +15,5 @@ public class DocumentInfo {
     private String description;
     private String url;
     private String markUp;
+    private String hashToken;
 }

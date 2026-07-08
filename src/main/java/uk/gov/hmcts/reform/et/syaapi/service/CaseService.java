@@ -273,7 +273,7 @@ public class CaseService {
 
         if (ADD_CLAIMANT_MANUALLY.equals(et1CaseData.getAddClaimantMethod())) {
             List<GenericTypeItem<AdditionalClaimant>> items = et1CaseData.getAdditionalClaimants();
-            if (!CollectionUtils.isEmpty(items)) {
+            if (CollectionUtils.isNotEmpty(items)) {
                 items.stream()
                         .map(GenericTypeItem::getValue)
                         .filter(Objects::nonNull)

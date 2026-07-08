@@ -175,10 +175,6 @@ public class CreateUpdatesQueueProcessor {
 
         List<String> createdCaseRefs = new ArrayList<>();
         Map<Integer, AdditionalClaimant> failedCases = new LinkedHashMap<>();
-
-        additionalClaimants.set(2, null);
-        additionalClaimants.set(3, null);
-
         for (int i = 0; i < additionalClaimants.size(); i++) {
             String createdRef = createCaseWithRetry(additionalClaimants, leadCase, accessToken, createUpdatesMsg, i);
             if (createdRef != null) {

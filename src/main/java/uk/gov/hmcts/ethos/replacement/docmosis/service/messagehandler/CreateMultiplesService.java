@@ -168,8 +168,8 @@ public class CreateMultiplesService {
 
         String jurisdiction = createUpdatesMsg.getJurisdiction();
         String multipleCaseTypeId = UtilHelper.getBulkCaseTypeId(createUpdatesMsg.getCaseTypeId());
-        log.info("Creating new multiple shell {} (ref {}) for lead case {} with {} case(s)",
-            multipleCaseTypeId, multipleData.getMultipleReference(), leadCaseRef, caseIdCollection.size());
+        log.info("Creating new multiple shell {} for lead case {} with {} case(s)",
+            multipleCaseTypeId, leadCaseRef, caseIdCollection.size());
 
         handleFailedCases(failedCases, multipleData, leadCaseData.getAddClaimantMethod());
         CCDRequest ccdRequest = ccdClient.startCaseMultipleCreation(accessToken, multipleCaseTypeId, jurisdiction);
@@ -181,7 +181,6 @@ public class CreateMultiplesService {
             log.info("Created multiple shell case {}", createdMultiple.getCaseId());
         } else {
             log.info("Error creating multiple shell case for {}", leadCaseData.getCcdID());
-            // two different templates ??
             notificationService.sendFailedMultiplesShellCreationEmail(
                     leadCaseRef,
                     Long.parseLong(leadCaseData.getFeeGroupReference()));

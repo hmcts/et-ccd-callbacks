@@ -637,15 +637,39 @@ class SendNotificationServiceTest {
         sendNotificationService.notifyClaimantBundlesSubmitted(caseDetails);
         verify(emailService, times(1))
                 .sendEmail(eq(BUNDLES_CLAIMANT_SUBMITTED_NOTIFICATION_FOR_RESPONDENT_TEMPLATE_ID),
-                        any(), personalisationCaptor.capture());
+                        eq("respondentRep@email.com"), personalisationCaptor.capture());
         verify(emailService, times(1))
                 .sendEmail(eq(BUNDLES_CLAIMANT_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID),
                         any(), personalisationCaptor.capture());
-        Map<String, String> persVal = personalisationCaptor.getValue();
-        assertEquals("1234", persVal.get("caseNumber"));
-        assertEquals("claimant", persVal.get("claimant"));
-        assertEquals("claimant", persVal.get("respondentNames"));
-        assertEquals("2020-01-02", persVal.get("hearingDate"));
+        Map<String, String> respondentPersVal = personalisationCaptor.getAllValues().getFirst();
+        assertEquals("1234", respondentPersVal.get("caseNumber"));
+        assertEquals("claimant", respondentPersVal.get("claimant"));
+        assertEquals("exuiUrl1234", respondentPersVal.get("exuiHearingDocumentsLink"));
+        assertNull(respondentPersVal.get("linkToCitizenHub"));
+        Map<String, String> tribunalPersVal = personalisationCaptor.getAllValues().get(1);
+        assertEquals("exuiUrl1234#Hearing%20Documents", tribunalPersVal.get("exuiHearingDocumentsLink"));
+        assertNull(tribunalPersVal.get("linkToCitizenHub"));
+    }
+
+    @Test
+    void sendNotifyEmailsToUnrepresentedRespondentWhenClaimantSubmitsBundles() {
+        caseDetails = CaseDataBuilder.builder().withEthosCaseReference("1234")
+                .withClaimantType("claimant@email.com")
+                .withRespondent("Name", YES, "2020-01-02", "respondent@email.com", false)
+                .buildAsCaseDetails(SCOTLAND_CASE_TYPE_ID);
+        caseDetails.setCaseId("1234");
+        caseData = caseDetails.getCaseData();
+        caseData.setClaimant("claimant");
+        caseData.setRespondent("respondent");
+        caseData.setTargetHearingDate("2020-01-02");
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of());
+        sendNotificationService.notifyClaimantBundlesSubmitted(caseDetails);
+        verify(emailService, times(1))
+                .sendEmail(eq(BUNDLES_CLAIMANT_SUBMITTED_NOTIFICATION_FOR_RESPONDENT_TEMPLATE_ID),
+                        eq("respondent@email.com"), personalisationCaptor.capture());
+        assertEquals("syrUrl1234/" + caseDetails.getCaseData().getRespondentCollection().getFirst().getId(),
+                personalisationCaptor.getValue().get("exuiHearingDocumentsLink"));
+        assertNull(personalisationCaptor.getValue().get("linkToCitizenHub"));
     }
 
     @Test

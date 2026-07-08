@@ -6,6 +6,7 @@ import com.launchdarkly.shaded.org.jetbrains.annotations.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
@@ -302,7 +304,8 @@ public class SendNotificationService {
     public Optional<SendNotificationTypeItem> getSendNotification(CaseData caseData) {
         return caseData.getSendNotificationCollection()
                 .stream()
-                .filter(s -> s.getId().equals(caseData.getSelectNotificationDropdown().getSelectedCode()))
+                .filter(s -> s.getId().equals(
+                        caseData.getSelectNotificationDropdown().getSelectedCode()))
                 .findFirst();
     }
 
@@ -397,12 +400,11 @@ public class SendNotificationService {
     public void notifyClaimantBundlesSubmitted(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         String caseId = caseDetails.getCaseId();
-        Map<String, String> emailData = getEmailData(caseData, caseId);
+        Map<String, String> emailData = getBundlesSubmissionEmailData(caseData);
 
         List<CaseUserAssignment> assignments = caseAccessService.getCaseUserAssignmentsById(caseId);
-        sendRespondentBundlesSubmittedEmails(caseData, emailData, assignments);
+        sendRespondentBundlesSubmittedEmails(caseData, emailData, assignments, caseId);
 
-        emailData.remove(LINK_TO_CITIZEN_HUB);
         emailData.put(EXUI_HEARING_DOCUMENTS_LINK, emailService.getExuiHearingDocumentsLink(caseId));
         emailService.sendEmail(bundlesClaimantSubmittedNotificationForTribunalTemplateId,
                 caseData.getTribunalCorrespondenceEmail(),
@@ -410,22 +412,54 @@ public class SendNotificationService {
         );
     }
 
-    private void sendRespondentBundlesSubmittedEmails(CaseData caseData, Map<String, String> emailData,
-                                                       List<CaseUserAssignment> assignments) {
-        Set<String> emails = new HashSet<>();
+    private void sendRespondentBundlesSubmittedEmails(CaseData caseData, Map<String, String> baseEmailData,
+                                                       List<CaseUserAssignment> assignments, String caseId) {
+        Set<String> sentEmails = new HashSet<>();
+
         if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
-            caseData.getRespondentCollection().stream()
-                    .map(respondent ->
-                            NotificationHelper.getEmailAddressForRespondent(caseData, respondent.getValue()))
-                    .filter(email -> email != null && !email.isEmpty())
-                    .forEach(emails::add);
+            caseData.getRespondentCollection().forEach(respondentItem -> {
+                RepresentedTypeR representative =
+                        NotificationHelper.getRespondentRepresentative(caseData, respondentItem.getValue());
+                if (representative != null && StringUtils.isNotBlank(representative.getRepresentativeEmailAddress())) {
+                    sendRespondentBundlesSubmittedEmail(baseEmailData,
+                            representative.getRepresentativeEmailAddress(),
+                            emailService.getExuiCaseLink(caseId), sentEmails);
+                    return;
+                }
+
+                String respondentEmail = NotificationHelper.getEmailAddressForUnrepresentedRespondent(
+                        caseData, respondentItem.getValue());
+                if (StringUtils.isNotBlank(respondentEmail)) {
+                    sendRespondentBundlesSubmittedEmail(baseEmailData, respondentEmail,
+                            emailService.getSyrCaseLink(caseId, respondentItem.getId()), sentEmails);
+                }
+            });
         }
 
         emailNotificationService.getRespondentSolicitorEmails(assignments).stream()
-                .filter(email -> email != null && !email.isEmpty())
-                .forEach(emails::add);
-        emails.forEach(email ->
-                emailService.sendEmail(bundlesClaimantSubmittedNotificationForRespondentTemplateId, email, emailData));
+                .filter(StringUtils::isNotBlank)
+                .forEach(email -> sendRespondentBundlesSubmittedEmail(baseEmailData, email,
+                        emailService.getExuiCaseLink(caseId), sentEmails));
+    }
+
+    private void sendRespondentBundlesSubmittedEmail(Map<String, String> baseEmailData, String email,
+                                                     String documentLink, Set<String> sentEmails) {
+        if (!sentEmails.add(email)) {
+            return;
+        }
+        Map<String, String> emailData = new ConcurrentHashMap<>(baseEmailData);
+        emailData.put(EXUI_HEARING_DOCUMENTS_LINK, documentLink);
+        emailService.sendEmail(bundlesClaimantSubmittedNotificationForRespondentTemplateId, email, emailData);
+    }
+
+    @NotNull
+    private Map<String, String> getBundlesSubmissionEmailData(CaseData caseData) {
+        Map<String, String> emailData = new ConcurrentHashMap<>();
+        emailData.put(CLAIMANT, caseData.getClaimant());
+        emailData.put(CASE_NUMBER, caseData.getEthosCaseReference());
+        emailData.put(RESPONDENT_NAMES, caseData.getRespondent());
+        emailData.put(HEARING_DATE, caseData.getTargetHearingDate());
+        return emailData;
     }
 
     @NotNull

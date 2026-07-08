@@ -487,6 +487,7 @@ public class CaseDocumentService {
         uploadedDocumentType.setDocumentUrl(caseDocument.getLinks().get("self").get("href"));
         uploadedDocumentType.setDocumentBinaryUrl(caseDocument.getLinks().get("binary") == null ? null :
                                                       caseDocument.getLinks().get("binary").get("href"));
+        uploadedDocumentType.setDocumentHash(caseDocument.getHashToken());
         documentType.setUploadedDocument(uploadedDocumentType);
         DocumentTypeItem documentTypeItem = new DocumentTypeItem();
         documentTypeItem.setId(UUID.randomUUID().toString());

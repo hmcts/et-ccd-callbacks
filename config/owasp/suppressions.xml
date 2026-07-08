@@ -70,6 +70,26 @@
         <cve>CVE-2026-39882</cve>
         <cve>CVE-2026-39883</cve>
     </suppress>
+    <!-- Suppress Apache HttpComponents CVEs until patched dependency versions are agreed. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: httpcore-4.4.16.jar, httpcore5-5.4.2.jar, httpcore5-h2-5.3.6.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/(org\.apache\.httpcomponents/httpcore@4\.4\.16|org\.apache\.httpcomponents\.core5/httpcore5@5\.4\.2|org\.apache\.httpcomponents\.core5/httpcore5\-h2@5\.3\.6)$</packageUrl>
+        <cve>CVE-2026-54399</cve>
+        <cve>CVE-2026-54428</cve>
+    </suppress>
+    <!-- CCD SDK 6.19.0 pins Elasticsearch client 9.4.2 through ccd-runtime-indexing Gradle metadata.
+         Suppress until the SDK publishes a patched runtime dependency. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: elasticsearch-java-9.4.2.jar, elasticsearch-rest5-client-9.4.2.jar
+   Transitive dependency from com.github.hmcts:ccd-runtime-indexing:6.19.0.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/co\.elastic\.clients/elasticsearch\-(java|rest5\-client)@9\.4\.2$</packageUrl>
+        <cve>CVE-2026-56148</cve>
+        <cve>CVE-2026-56149</cve>
+    </suppress>
     <!-- All other CVEs below -->
     <!-- CVE-2026-54515 affects jackson-databind 2.22.0 which is the latest available version.
          No fixed version exists. Suppress until a patched release is available. -->

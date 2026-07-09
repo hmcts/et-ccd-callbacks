@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,6 +21,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignedUserRolesResponse;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
@@ -1422,6 +1424,7 @@ class ManageCaseRoleServiceTest {
             .build();
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void assignClaimantNonLegalRepresentativeRole_assignsRoleWhenRepresentedIsYes() {
         when(idamClient.getUserInfo(DUMMY_AUTHORISATION_TOKEN)).thenReturn(userInfo);
@@ -1438,11 +1441,22 @@ class ManageCaseRoleServiceTest {
         manageCaseRoleService.assignClaimantNonLegalRepresentativeRole(
             DUMMY_AUTHORISATION_TOKEN, caseDetailsWithRepresentedQuestion(YES));
 
+        ArgumentCaptor<HttpEntity<CaseAssignmentUserRolesRequest>> requestCaptor =
+            ArgumentCaptor.forClass(HttpEntity.class);
         verify(restTemplate, times(1)).exchange(
             eq(CCD_API_URL_PARAMETER_TEST_VALUE + ManageCaseRoleConstants.CASE_USERS_API_URL),
             eq(HttpMethod.POST),
-            any(HttpEntity.class),
+            requestCaptor.capture(),
             eq(CaseAssignmentUserRolesResponse.class));
+
+        List<CaseAssignmentUserRole> assignedRoles =
+            requestCaptor.getValue().getBody().getCaseAssignmentUserRoles();
+        assertThat(assignedRoles).hasSize(1);
+        CaseAssignmentUserRole assignedRole = assignedRoles.get(0);
+        assertThat(assignedRole.getCaseDataId()).isEqualTo(CASE_ID);
+        assertThat(assignedRole.getUserId()).isEqualTo(userInfo.getUid());
+        assertThat(assignedRole.getCaseRole())
+            .isEqualTo(ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE);
     }
 
     @Test
@@ -1450,6 +1464,71 @@ class ManageCaseRoleServiceTest {
         manageCaseRoleService.assignClaimantNonLegalRepresentativeRole(
             DUMMY_AUTHORISATION_TOKEN, caseDetailsWithRepresentedQuestion(NO));
 
+        verifyNoRoleAssignmentCall();
+    }
+
+    @Test
+    void assignClaimantNonLegalRepresentativeRole_doesNothingWhenRepresentedQuestionIsNull() {
+        manageCaseRoleService.assignClaimantNonLegalRepresentativeRole(
+            DUMMY_AUTHORISATION_TOKEN, caseDetailsWithRepresentedQuestion(null));
+
+        verifyNoRoleAssignmentCall();
+    }
+
+    @Test
+    void assignClaimantNonLegalRepresentativeRole_doesNothingWhenCaseDetailsIsNull() {
+        manageCaseRoleService.assignClaimantNonLegalRepresentativeRole(DUMMY_AUTHORISATION_TOKEN, null);
+
+        verifyNoRoleAssignmentCall();
+    }
+
+    @Test
+    void assignClaimantNonLegalRepresentativeRole_doesNothingWhenCaseIdIsNull() {
+        CaseData caseData = new CaseData();
+        caseData.setClaimantRepresentedQuestion(YES);
+        CaseDetails caseDetails = CaseDetails.builder()
+            .data(EmployeeObjectMapper.mapCaseDataToLinkedHashMap(caseData))
+            .build();
+
+        manageCaseRoleService.assignClaimantNonLegalRepresentativeRole(DUMMY_AUTHORISATION_TOKEN, caseDetails);
+
+        verifyNoRoleAssignmentCall();
+    }
+
+    @Test
+    void assignClaimantNonLegalRepresentativeRole_doesNothingWhenCaseDataIsNull() {
+        CaseDetails caseDetails = CaseDetails.builder().id(Long.valueOf(CASE_ID)).data(null).build();
+
+        manageCaseRoleService.assignClaimantNonLegalRepresentativeRole(DUMMY_AUTHORISATION_TOKEN, caseDetails);
+
+        verifyNoRoleAssignmentCall();
+    }
+
+    @Test
+    void assignClaimantNonLegalRepresentativeRole_swallowsExceptionWhenAssignmentFails() {
+        when(idamClient.getUserInfo(DUMMY_AUTHORISATION_TOKEN)).thenReturn(userInfo);
+        when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_AUTHORISATION_TOKEN);
+        when(authTokenGenerator.generate()).thenReturn(TEST_SERVICE_AUTH_TOKEN);
+        ReflectionTestUtils.setField(manageCaseRoleService, CCD_API_URL_PARAMETER_NAME,
+                                     CCD_API_URL_PARAMETER_TEST_VALUE);
+        when(restTemplate.exchange(eq(CCD_API_URL_PARAMETER_TEST_VALUE + ManageCaseRoleConstants.CASE_USERS_API_URL),
+                                   eq(HttpMethod.POST),
+                                   any(HttpEntity.class),
+                                   eq(CaseAssignmentUserRolesResponse.class)))
+            .thenThrow(new RestClientResponseException("error", 500, "Server Error", null, null, null));
+
+        CaseDetails caseDetails = caseDetailsWithRepresentedQuestion(YES);
+        assertDoesNotThrow(() ->
+            manageCaseRoleService.assignClaimantNonLegalRepresentativeRole(DUMMY_AUTHORISATION_TOKEN, caseDetails));
+
+        verify(restTemplate, times(1)).exchange(
+            eq(CCD_API_URL_PARAMETER_TEST_VALUE + ManageCaseRoleConstants.CASE_USERS_API_URL),
+            eq(HttpMethod.POST),
+            any(HttpEntity.class),
+            eq(CaseAssignmentUserRolesResponse.class));
+    }
+
+    private void verifyNoRoleAssignmentCall() {
         verify(restTemplate, never()).exchange(anyString(), any(HttpMethod.class),
                                                any(HttpEntity.class), eq(CaseAssignmentUserRolesResponse.class));
     }

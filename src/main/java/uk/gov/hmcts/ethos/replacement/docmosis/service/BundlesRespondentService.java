@@ -40,8 +40,6 @@ public class BundlesRespondentService {
     private static final String AGREED_DOCS_WITH_BUT = "We have agreed but there are some disputed documents";
     private static final String AGREED_DOCS_WITH_NO = "No, we have not agreed and I want to provide my own documents";
     private static final String BUT = "But";
-    private static final String EXCEEDED_CHAR_LIMIT = "This field must be 2500 characters or less";
-    private static final int MAX_CHAR_TEXT_AREA = 2500;
     private static final String SELECT_CLAIMANT_HEARING_BUNDLES = "selectClaimantHearingBundles";
     private static final String SELECT_RESPONDENT_HEARING_BUNDLES = "selectRespondentHearingBundles";
 
@@ -107,26 +105,6 @@ public class BundlesRespondentService {
         }
 
         return List.of("Your upload contains a disallowed file type");
-    }
-
-    /**
-     * Validate text area length < 2500 for fields.
-     * @param caseData contains all the case data
-     * @return Error Message List
-     */
-    public List<String> validateTextAreaLength(CaseData caseData) {
-        List<String> errors = new ArrayList<>();
-        String agreedDocWithNo = caseData.getBundlesRespondentAgreedDocWithNo();
-        String agreedDocWithBut = caseData.getBundlesRespondentAgreedDocWithBut();
-        if (NO.equals(caseData.getBundlesRespondentAgreedDocWith())
-                && agreedDocWithNo != null
-                && agreedDocWithNo.length() > MAX_CHAR_TEXT_AREA
-            || BUT.equals(caseData.getBundlesRespondentAgreedDocWith())
-                && agreedDocWithBut != null
-                && agreedDocWithBut.length() > MAX_CHAR_TEXT_AREA) {
-            errors.add(EXCEEDED_CHAR_LIMIT);
-        }
-        return errors;
     }
 
     /**

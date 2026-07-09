@@ -61,6 +61,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantN
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.isPartyToNotifyMismatch;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.NOTIFICATION_SUMMARY_PDF;
+import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT;
 
 @Service("sendNotificationService")
 @RequiredArgsConstructor
@@ -424,17 +425,24 @@ public class SendNotificationService {
                     sendRespondentBundlesSubmittedEmail(baseEmailData,
                             representative.getRepresentativeEmailAddress(),
                             emailService.getExuiCaseLink(caseId), sentEmails);
-                    return;
-                }
-
-                String respondentEmail = NotificationHelper.getEmailAddressForUnrepresentedRespondent(
-                        caseData, respondentItem.getValue());
-                if (StringUtils.isNotBlank(respondentEmail)) {
-                    sendRespondentBundlesSubmittedEmail(baseEmailData, respondentEmail,
-                            emailService.getSyrCaseLink(caseId, respondentItem.getId()), sentEmails);
                 }
             });
         }
+
+        assignments.stream()
+                .filter(assignment -> CASE_USER_ROLE_DEFENDANT.equals(assignment.getCaseRole()))
+                .forEach(assignment -> caseData.getRespondentCollection().stream()
+                        .filter(respondentItem -> assignment.getUserId()
+                                .equals(respondentItem.getValue().getIdamId()))
+                        .findFirst()
+                        .ifPresent(respondentItem -> {
+                            String respondentEmail = NotificationHelper.getEmailAddressForUnrepresentedRespondent(
+                                    caseData, respondentItem.getValue());
+                            if (StringUtils.isNotBlank(respondentEmail)) {
+                                sendRespondentBundlesSubmittedEmail(baseEmailData, respondentEmail,
+                                        emailService.getSyrCaseLink(caseId, respondentItem.getId()), sentEmails);
+                            }
+                        }));
 
         emailNotificationService.getRespondentSolicitorEmails(assignments).stream()
                 .filter(StringUtils::isNotBlank)

@@ -34,8 +34,6 @@ public class BundlesClaimantService {
     private static final String AGREED_DOCS_WITH_BUT = "We have agreed but there are some disputed documents";
     private static final String AGREED_DOCS_WITH_NO = "No, we have not agreed and I want to provide my own documents";
     private static final String BUT = "But";
-    private static final String EXCEEDED_CHAR_LIMIT = "This field must be 2500 characters or less";
-    private static final int MAX_CHAR_TEXT_AREA = 2500;
 
     public void clearInputData(CaseData caseData) {
         caseData.setBundlesClaimantPrepareDocNotesShow(null);
@@ -90,21 +88,6 @@ public class BundlesClaimantService {
         }
 
         return List.of("Your upload contains a disallowed file type");
-    }
-
-    public List<String> validateTextAreaLength(CaseData caseData) {
-        List<String> errors = new ArrayList<>();
-        String agreedDocWithNo = caseData.getBundlesClaimantAgreedDocWithNo();
-        String agreedDocWithBut = caseData.getBundlesClaimantAgreedDocWithBut();
-        if (NO.equals(caseData.getBundlesClaimantAgreedDocWith())
-                && agreedDocWithNo != null
-                && agreedDocWithNo.length() > MAX_CHAR_TEXT_AREA
-            || BUT.equals(caseData.getBundlesClaimantAgreedDocWith())
-                && agreedDocWithBut != null
-                && agreedDocWithBut.length() > MAX_CHAR_TEXT_AREA) {
-            errors.add(EXCEEDED_CHAR_LIMIT);
-        }
-        return errors;
     }
 
     public void addToBundlesCollection(CaseData caseData) {

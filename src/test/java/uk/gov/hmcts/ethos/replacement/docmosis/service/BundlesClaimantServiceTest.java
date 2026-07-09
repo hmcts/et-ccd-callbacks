@@ -20,7 +20,6 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -30,8 +29,6 @@ class BundlesClaimantServiceTest {
     private BundlesClaimantService bundlesClaimantService;
     private CaseData scotlandCaseData;
     private CaseData englandCaseData;
-    private static final String VALID_TEXT = "valid text";
-    private static final String EXCEED_CHAR_LIMIT_TEXT = "a".repeat(2501);
 
     @BeforeEach
     void setUp() {
@@ -133,53 +130,6 @@ class BundlesClaimantServiceTest {
         englandCaseData.setBundlesClaimantUploadFile(uploadedDocumentType);
         List<String> errors = bundlesClaimantService.validateFileUpload(englandCaseData);
         assertThat(errors.size(), is(0));
-    }
-
-    @Test
-    void validateTextAreaLength_noTooLong_returnsError() {
-        englandCaseData.setBundlesClaimantAgreedDocWith("No");
-        englandCaseData.setBundlesClaimantAgreedDocWithNo(EXCEED_CHAR_LIMIT_TEXT);
-        List<String> errors = bundlesClaimantService.validateTextAreaLength(englandCaseData);
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(0), is("This field must be 2500 characters or less"));
-    }
-
-    @Test
-    void validateTextAreaLength_butTooLong_returnsError() {
-        englandCaseData.setBundlesClaimantAgreedDocWith("But");
-        englandCaseData.setBundlesClaimantAgreedDocWithBut(EXCEED_CHAR_LIMIT_TEXT);
-        List<String> errors = bundlesClaimantService.validateTextAreaLength(englandCaseData);
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(0), is("This field must be 2500 characters or less"));
-    }
-
-    @Test
-    void validateTextAreaLength_validTextForNo_returnsNoError() {
-        englandCaseData.setBundlesClaimantAgreedDocWith(NO);
-        englandCaseData.setBundlesClaimantAgreedDocWithNo(VALID_TEXT);
-        List<String> errors = bundlesClaimantService.validateTextAreaLength(englandCaseData);
-        assertTrue(errors.isEmpty());
-    }
-
-    @Test
-    void validateTextAreaLength_validTextForBut_returnsNoError() {
-        englandCaseData.setBundlesClaimantAgreedDocWith("But");
-        englandCaseData.setBundlesClaimantAgreedDocWithBut(VALID_TEXT);
-        List<String> errors = bundlesClaimantService.validateTextAreaLength(englandCaseData);
-        assertTrue(errors.isEmpty());
-    }
-
-    @Test
-    void validateTextAreaLength_nullTextAreaWhenRequired_returnsNoError() {
-        englandCaseData.setBundlesClaimantAgreedDocWith(NO);
-        englandCaseData.setBundlesClaimantAgreedDocWithNo(null);
-        List<String> errors = bundlesClaimantService.validateTextAreaLength(englandCaseData);
-        assertTrue(errors.isEmpty());
-
-        englandCaseData.setBundlesClaimantAgreedDocWith("But");
-        englandCaseData.setBundlesClaimantAgreedDocWithBut(null);
-        errors = bundlesClaimantService.validateTextAreaLength(englandCaseData);
-        assertTrue(errors.isEmpty());
     }
 
     @Test

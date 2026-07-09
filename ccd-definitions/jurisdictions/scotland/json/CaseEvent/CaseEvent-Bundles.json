@@ -21,7 +21,7 @@
     "Name": "Upload documents for hearing",
     "Description": "Upload documents for a hearing",
     "DisplayOrder": 2,
-    "PreConditionState(s)": "*",
+    "PreConditionState(s)": "Accepted",
     "PostConditionState": "*",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",

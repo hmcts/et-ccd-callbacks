@@ -46,6 +46,7 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -63,6 +64,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationSe
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService.EMPLOYER_CONTRACT_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService.NOTICE_OF_EMPLOYER_CONTRACT_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.NOTIFICATION_SUMMARY_PDF;
+import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT;
 
 @ExtendWith(SpringExtension.class)
 class SendNotificationServiceTest {
@@ -662,7 +664,14 @@ class SendNotificationServiceTest {
         caseData.setClaimant("claimant");
         caseData.setRespondent("respondent");
         caseData.setTargetHearingDate("2020-01-02");
-        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of());
+        caseData.getRespondentCollection().getFirst().getValue().setIdamId("defendant-user-id");
+
+        CaseUserAssignment defendantAssignment = CaseUserAssignment.builder()
+                .userId("defendant-user-id")
+                .caseRole(CASE_USER_ROLE_DEFENDANT)
+                .build();
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(defendantAssignment));
+
         sendNotificationService.notifyClaimantBundlesSubmitted(caseDetails);
         verify(emailService, times(1))
                 .sendEmail(eq(BUNDLES_CLAIMANT_SUBMITTED_NOTIFICATION_FOR_RESPONDENT_TEMPLATE_ID),
@@ -670,6 +679,29 @@ class SendNotificationServiceTest {
         assertEquals("syrUrl1234/" + caseDetails.getCaseData().getRespondentCollection().getFirst().getId(),
                 personalisationCaptor.getValue().get("exuiHearingDocumentsLink"));
         assertNull(personalisationCaptor.getValue().get("linkToCitizenHub"));
+    }
+
+    @Test
+    void doesNotSendEmailToUnrepresentedRespondentWithoutPortalAccessWhenClaimantSubmitsBundles() {
+        caseDetails = CaseDataBuilder.builder().withEthosCaseReference("1234")
+                .withClaimantType("claimant@email.com")
+                .withRespondent("Name", YES, "2020-01-02", "respondent@email.com", false)
+                .buildAsCaseDetails(SCOTLAND_CASE_TYPE_ID);
+        caseDetails.setCaseId("1234");
+        caseData = caseDetails.getCaseData();
+        caseData.setClaimant("claimant");
+        caseData.setRespondent("respondent");
+        caseData.setTargetHearingDate("2020-01-02");
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of());
+
+        sendNotificationService.notifyClaimantBundlesSubmitted(caseDetails);
+
+        verify(emailService, never())
+                .sendEmail(eq(BUNDLES_CLAIMANT_SUBMITTED_NOTIFICATION_FOR_RESPONDENT_TEMPLATE_ID),
+                        eq("respondent@email.com"), any());
+        verify(emailService, times(1))
+                .sendEmail(eq(BUNDLES_CLAIMANT_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID),
+                        any(), any());
     }
 
     @Test

@@ -7,11 +7,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
@@ -20,12 +18,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BundlesCallbackHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesRespondentService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -38,17 +33,14 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequiredArgsConstructor
 public class BundlesRespondentController {
 
-    private final VerifyTokenService verifyTokenService;
     private final BundlesRespondentService bundlesRespondentService;
     private final SendNotificationService sendNotificationService;
-    private final FeatureToggleService featureToggleService;
 
     /**
      * Called at the start of Bundles Respondent Prepare Doc for Hearing journey.
      * Sets hidden inset fields to YES to enable inset text functionality in ExUI.
      *
      * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
      * @return Callback response entity with case data attached.
      */
     @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
@@ -62,16 +54,7 @@ public class BundlesRespondentController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> aboutToStart(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
-
-        Optional<ResponseEntity<CCDCallbackResponse>> authFailure =
-                BundlesCallbackHelper.validateBundlesCallback(verifyTokenService, featureToggleService, userToken);
-        if (authFailure.isPresent()) {
-            return authFailure.get();
-        }
-
+    public ResponseEntity<CCDCallbackResponse> aboutToStart(@RequestBody CCDRequest ccdRequest) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setBundlesRespondentPrepareDocNotesShow(YES);
         return getCallbackRespEntityNoErrors(caseData);
@@ -81,7 +64,6 @@ public class BundlesRespondentController {
      * About to Submit for Bundles Respondent Prepare Doc for Hearing journey.
      *
      * @param ccdRequest generic request from CCD
-     * @param userToken  authentication token to verify the user
      * @return Callback response entity with case data attached.
      */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
@@ -94,16 +76,7 @@ public class BundlesRespondentController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
-
-        Optional<ResponseEntity<CCDCallbackResponse>> authFailure =
-                BundlesCallbackHelper.validateBundlesCallback(verifyTokenService, featureToggleService, userToken);
-        if (authFailure.isPresent()) {
-            return authFailure.get();
-        }
-
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmit(@RequestBody CCDRequest ccdRequest) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         bundlesRespondentService.addToBundlesCollection(caseData);
         bundlesRespondentService.clearInputData(caseData);
@@ -114,7 +87,6 @@ public class BundlesRespondentController {
      * Populates the hearing list on page 3 and validates the length of text input.
      *
      * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
      * @return Callback response entity with case data attached.
      */
     @PostMapping(value = "/midPopulateHearings", consumes = APPLICATION_JSON_VALUE)
@@ -128,21 +100,8 @@ public class BundlesRespondentController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> midPopulateHearings(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
-
-        Optional<ResponseEntity<CCDCallbackResponse>> authFailure =
-                BundlesCallbackHelper.validateBundlesCallback(verifyTokenService, featureToggleService, userToken);
-        if (authFailure.isPresent()) {
-            return authFailure.get();
-        }
-
+    public ResponseEntity<CCDCallbackResponse> midPopulateHearings(@RequestBody CCDRequest ccdRequest) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = bundlesRespondentService.validateTextAreaLength(caseData);
-        if (CollectionUtils.isNotEmpty(errors)) {
-            return getCallbackRespEntityErrors(errors, caseData);
-        }
         bundlesRespondentService.populateSelectHearings(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -151,7 +110,6 @@ public class BundlesRespondentController {
      * Validates the uploaded file is a PDF.
      *
      * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
      * @return Callback response entity with case data attached.
      */
     @PostMapping(value = "/midValidateUpload", consumes = APPLICATION_JSON_VALUE)
@@ -165,16 +123,7 @@ public class BundlesRespondentController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> midValidateUpload(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
-
-        Optional<ResponseEntity<CCDCallbackResponse>> authFailure =
-                BundlesCallbackHelper.validateBundlesCallback(verifyTokenService, featureToggleService, userToken);
-        if (authFailure.isPresent()) {
-            return authFailure.get();
-        }
-
+    public ResponseEntity<CCDCallbackResponse> midValidateUpload(@RequestBody CCDRequest ccdRequest) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = bundlesRespondentService.validateFileUpload(caseData);
         return getCallbackRespEntityErrors(errors, caseData);
@@ -194,19 +143,9 @@ public class BundlesRespondentController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> submitted(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
-
-        Optional<ResponseEntity<CCDCallbackResponse>> authFailure =
-                BundlesCallbackHelper.validateBundlesCallback(verifyTokenService, featureToggleService, userToken);
-        if (authFailure.isPresent()) {
-            return authFailure.get();
-        }
-
+    public ResponseEntity<CCDCallbackResponse> submitted(@RequestBody CCDRequest ccdRequest) {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         sendNotificationService.notify(caseDetails);
-
         return BundlesCallbackHelper.buildSubmittedResponse(ccdRequest);
     }
 
@@ -221,12 +160,7 @@ public class BundlesRespondentController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> removeHearingBundle(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
-
-        BundlesCallbackHelper.throwIfBundlesFlagDisabled(featureToggleService);
-
+    public ResponseEntity<CCDCallbackResponse> removeHearingBundle(@RequestBody CCDRequest ccdRequest) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         try {
             bundlesRespondentService.removeHearingBundles(caseData);
@@ -242,7 +176,6 @@ public class BundlesRespondentController {
      * Populates the hearing bundle list on page 2 based on the party selected.
      *
      * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
      * @return Callback response entity with case data attached.
      */
     @PostMapping(value = "/midPopulateRemoveHearingBundles", consumes = APPLICATION_JSON_VALUE)
@@ -256,11 +189,7 @@ public class BundlesRespondentController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> midPopulateRemoveHearingBundles(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
-
-        BundlesCallbackHelper.throwIfBundlesFlagDisabled(featureToggleService);
+    public ResponseEntity<CCDCallbackResponse> midPopulateRemoveHearingBundles(@RequestBody CCDRequest ccdRequest) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         bundlesRespondentService.populateSelectRemoveHearingBundle(caseData);
         return getCallbackRespEntityNoErrors(caseData);

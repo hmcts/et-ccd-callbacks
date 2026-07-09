@@ -11,19 +11,17 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesClaimantService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.List;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -33,8 +31,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest({BundlesClaimantController.class, JsonMapper.class})
-class BundlesClaimantControllerTest extends BaseControllerTest {
+class BundlesClaimantControllerTest {
 
+    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_START_URL = "/bundlesClaimant/aboutToStart";
     private static final String ABOUT_TO_SUBMIT_URL = "/bundlesClaimant/aboutToSubmit";
     private static final String MID_POPULATE_HEARINGS_URL = "/bundlesClaimant/midPopulateHearings";
@@ -45,10 +44,10 @@ class BundlesClaimantControllerTest extends BaseControllerTest {
     private BundlesClaimantService bundlesClaimantService;
 
     @MockitoBean
-    private FeatureToggleService featureToggleService;
+    private SendNotificationService sendNotificationService;
 
     @MockitoBean
-    private SendNotificationService sendNotificationService;
+    private VerifyTokenService verifyTokenService;
 
     @Autowired
     private JsonMapper jsonMapper;
@@ -59,19 +58,15 @@ class BundlesClaimantControllerTest extends BaseControllerTest {
     private MockMvc mockMvc;
 
     @BeforeEach
-    @Override
-    protected void setUp() throws IOException, URISyntaxException {
-        super.setUp();
+    void setUp() throws IOException, URISyntaxException {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(CaseDataBuilder.builder().build())
             .build();
-
-        when(featureToggleService.isBundlesEnabled()).thenReturn(true);
     }
 
     @Test
-    void aboutToStart_tokenOk() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+    void aboutToStart_success() throws Exception {
         mockMvc.perform(post(ABOUT_TO_START_URL)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
@@ -80,26 +75,6 @@ class BundlesClaimantControllerTest extends BaseControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
-    }
-
-    @Test
-    void aboutToStart_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_START_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void aboutToStart_bundlesFeatureDisabled() throws Exception {
-        when(featureToggleService.isBundlesEnabled()).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_START_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isServiceUnavailable());
     }
 
     @Test
@@ -112,8 +87,7 @@ class BundlesClaimantControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_tokenOk() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+    void aboutToSubmit_success() throws Exception {
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
@@ -127,17 +101,6 @@ class BundlesClaimantControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
-        verify(bundlesClaimantService, never()).clearInputData(ccdRequest.getCaseDetails().getCaseData());
-    }
-
-    @Test
     void aboutToSubmit_badRequest() throws Exception {
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content("garbage content")
@@ -148,8 +111,7 @@ class BundlesClaimantControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midPopulateHearings_tokenOk() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+    void midPopulateHearings_success() throws Exception {
         mockMvc.perform(post(MID_POPULATE_HEARINGS_URL)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
@@ -158,16 +120,6 @@ class BundlesClaimantControllerTest extends BaseControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
-    }
-
-    @Test
-    void midPopulateHearings_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_POPULATE_HEARINGS_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
     }
 
     @Test
@@ -180,23 +132,7 @@ class BundlesClaimantControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midPopulateHearings_validationErrors() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(bundlesClaimantService.validateTextAreaLength(any()))
-                .thenReturn(List.of("This field must be 2500 characters or less"));
-        mockMvc.perform(post(MID_POPULATE_HEARINGS_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.errors", notNullValue()))
-            .andExpect(jsonPath("$.data", notNullValue()));
-        verify(bundlesClaimantService, never()).populateSelectHearings(any());
-    }
-
-    @Test
-    void midValidateUpload_tokenOk() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+    void midValidateUpload_success() throws Exception {
         mockMvc.perform(post(MID_VALIDATE_UPLOAD_URL)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
@@ -205,16 +141,6 @@ class BundlesClaimantControllerTest extends BaseControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", notNullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
-    }
-
-    @Test
-    void midValidateUpload_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_VALIDATE_UPLOAD_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
     }
 
     @Test
@@ -227,8 +153,7 @@ class BundlesClaimantControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void submitted_tokenOk() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+    void submitted_success() throws Exception {
         mockMvc.perform(post(SUBMITTED_URL)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
@@ -240,16 +165,6 @@ class BundlesClaimantControllerTest extends BaseControllerTest {
             .andExpect(jsonPath("$.confirmation_header", notNullValue()))
             .andExpect(jsonPath("$.confirmation_body", notNullValue()));
         verify(sendNotificationService).notifyClaimantBundlesSubmitted(ccdRequest.getCaseDetails());
-    }
-
-    @Test
-    void submitted_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(SUBMITTED_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
     }
 
     @Test

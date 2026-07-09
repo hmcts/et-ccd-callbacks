@@ -66,6 +66,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CCD_API_POST_METHOD_NAME;
@@ -77,6 +80,7 @@ import static uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent.REMOVE_OWN_REP_AS_RE
 import static uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent.UPDATE_CASE_SUBMITTED;
 import static uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent.UPDATE_ET3_FORM;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.DUMMY_AUTHORISATION_TOKEN;
+import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.NO;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_APPLICATION_NAME;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_CASE_ID_LONG;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_CASE_ID_STRING;
@@ -1407,5 +1411,46 @@ class ManageCaseRoleServiceTest {
         CaseData updatedCaseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(caseDetails.getData());
         assertThat(updatedCaseData.getClaimantId()).isEqualTo(USER_ID);
         assertThat(updatedCaseData.getClaimantType().getClaimantEmailAddress()).isEqualTo("test@email.com");
+    }
+
+    private CaseDetails caseDetailsWithRepresentedQuestion(String representedAnswer) {
+        CaseData caseData = new CaseData();
+        caseData.setClaimantRepresentedQuestion(representedAnswer);
+        return CaseDetails.builder()
+            .id(Long.valueOf(CASE_ID))
+            .data(EmployeeObjectMapper.mapCaseDataToLinkedHashMap(caseData))
+            .build();
+    }
+
+    @Test
+    void assignClaimantNonLegalRepresentativeRole_assignsRoleWhenRepresentedIsYes() {
+        when(idamClient.getUserInfo(DUMMY_AUTHORISATION_TOKEN)).thenReturn(userInfo);
+        when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_AUTHORISATION_TOKEN);
+        when(authTokenGenerator.generate()).thenReturn(TEST_SERVICE_AUTH_TOKEN);
+        ReflectionTestUtils.setField(manageCaseRoleService, CCD_API_URL_PARAMETER_NAME,
+                                     CCD_API_URL_PARAMETER_TEST_VALUE);
+        when(restTemplate.exchange(eq(CCD_API_URL_PARAMETER_TEST_VALUE + ManageCaseRoleConstants.CASE_USERS_API_URL),
+                                   eq(HttpMethod.POST),
+                                   any(HttpEntity.class),
+                                   eq(CaseAssignmentUserRolesResponse.class)))
+            .thenReturn(new ResponseEntity<>(HttpStatus.OK));
+
+        manageCaseRoleService.assignClaimantNonLegalRepresentativeRole(
+            DUMMY_AUTHORISATION_TOKEN, caseDetailsWithRepresentedQuestion(YES));
+
+        verify(restTemplate, times(1)).exchange(
+            eq(CCD_API_URL_PARAMETER_TEST_VALUE + ManageCaseRoleConstants.CASE_USERS_API_URL),
+            eq(HttpMethod.POST),
+            any(HttpEntity.class),
+            eq(CaseAssignmentUserRolesResponse.class));
+    }
+
+    @Test
+    void assignClaimantNonLegalRepresentativeRole_doesNothingWhenRepresentedIsNo() {
+        manageCaseRoleService.assignClaimantNonLegalRepresentativeRole(
+            DUMMY_AUTHORISATION_TOKEN, caseDetailsWithRepresentedQuestion(NO));
+
+        verify(restTemplate, never()).exchange(anyString(), any(HttpMethod.class),
+                                               any(HttpEntity.class), eq(CaseAssignmentUserRolesResponse.class));
     }
 }

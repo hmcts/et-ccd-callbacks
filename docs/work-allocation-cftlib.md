@@ -60,7 +60,7 @@ cd ccd-definitions && yarn generate-excel:cftlib
 
 The CFTLib SDK reads from `build/cftlib/definition-snapshots/` to understand which case types
 exist. Without this, the `MessagePublisher` logs `Case type ET_EnglandWales is not known`
-and WA events are not published.
+and WA events are not published. Note - CFTLIB_IMPORT_CCD_DEFS_ON_BOOT needs to be set to false for this to work.
 
 ```bash
 # Stop any running Gradle daemons first (they cache the old environment)
@@ -74,7 +74,7 @@ After `bootWithCCD` is fully up (with `ET_WORK_ALLOCATION=true`):
 ```bash
 WA_STANDALONE_TASK_REPO_PATH=/path/to/wa-standalone-task-bpmn \
 WA_TASK_CONFIGURATION_REPO_PATH=/path/to/et-wa-task-configuration \
-./bin/import-camunda-definitions.sh
+./bin/wa/import-camunda-definitions-cftlib.sh
 ```
 
 Required repositories:

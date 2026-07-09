@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/refdata/internal/staff/usersByServiceName"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "prd/usersByServiceName.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

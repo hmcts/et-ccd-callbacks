@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/refdata/location/orgServices"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "prd/orgServices.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

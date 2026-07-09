@@ -1,0 +1,22 @@
+[
+  {
+    "jurisdiction": "EMPLOYMENT",
+    "service_id": 16,
+    "org_unit": "HMCTS",
+    "business_area": "Employment Tribunals",
+    "sub_business_area": "Employment Tribunals",
+    "service_description": "Employment Tribunals",
+    "service_code": "BHA1",
+    "service_short_description": "Employment Tribunals",
+    "ccd_service_name": "EMPLOYMENT",
+    "last_update": "2021-01-01T00:00:00.000Z",
+    "ccd_case_types": [
+      "ET_EnglandWales",
+      "ET_Scotland",
+      "ET_EnglandWales_Multiple",
+      "ET_Scotland_Multiple",
+      "ET_EnglandWales_Listings",
+      "ET_Scotland_Listings"
+    ]
+  }
+]

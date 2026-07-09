@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/refdata/case-worker/user-type"
+  },
+  "response": {
+    "status": 200,
+    "body": "{\"user_type\": []}",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

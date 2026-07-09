@@ -16,4 +16,8 @@ public class DocumentInfo {
     private String url;
     private String markUp;
     private String hashToken;
+
+    public DocumentInfo(String type, String description, String url, String markUp) {
+        this(type, description, url, markUp, null);
+    }
 }

@@ -105,8 +105,8 @@ public class DocumentManagementService {
     }
 
     @Retryable(retryFor = {DocumentManagementException.class}, backoff = @Backoff(delay = 200))
-    public UploadedDocumentMetadata uploadDocumentWithMetadata(String authToken, byte[] byteArray, String outputFileName,
-                                                               String type, String caseTypeID) {
+    public UploadedDocumentMetadata uploadDocumentWithMetadata(String authToken, byte[] byteArray,
+                                                               String outputFileName, String type, String caseTypeID) {
         try {
             MultipartFile file = new InMemoryMultipartFile(FILES_NAME, outputFileName, type, byteArray);
             if (secureDocStoreEnabled) {

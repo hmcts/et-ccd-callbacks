@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.dwp.regex.InvalidPostcodeException;
@@ -280,7 +281,7 @@ public class CaseService {
                         .forEach(claimants::add);
             }
         } else if (ADD_CLAIMANT_SPREADSHEET.equals(et1CaseData.getAddClaimantMethod())) {
-            if (et1CaseData.getAdditionalClaimantSpreadsheet() != null) {
+            if (ObjectUtils.isNotEmpty(et1CaseData.getAdditionalClaimantSpreadsheet())) {
                 List<String> errors = new ArrayList<>();
                 claimants.addAll(excelReadingService.readClaimantsFromSpreadsheet(
                         authorization,

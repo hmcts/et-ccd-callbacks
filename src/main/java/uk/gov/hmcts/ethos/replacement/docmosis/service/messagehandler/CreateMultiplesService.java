@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.messagehandler;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -24,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.netty.util.internal.StringUtil.isNullOrEmpty;
@@ -68,7 +71,7 @@ public class CreateMultiplesService {
                 accessToken,
                 createUpdatesMsg.getCaseTypeId(),
                 createUpdatesMsg.getEthosCaseRefCollection());
-        return submitEvents == null || submitEvents.isEmpty() ? null : submitEvents.getFirst();
+        return CollectionUtils.isEmpty(submitEvents) ? null : submitEvents.getFirst();
     }
 
     /**
@@ -85,7 +88,7 @@ public class CreateMultiplesService {
     public String createCase(SubmitEvent leadSubmitEvent, String accessToken, CreateUpdatesMsg createUpdatesMsg,
                              AdditionalClaimant additionalClaimant) throws IOException {
 
-        if (additionalClaimant == null) {
+        if (ObjectUtils.isEmpty(additionalClaimant)) {
             return null;
         }
 
@@ -107,7 +110,7 @@ public class CreateMultiplesService {
                 "Case created as part of multiple - lead case " + leadSubmitEvent.getCaseData().getEthosCaseReference()
         );
 
-        if (createdCase == null) {
+        if (ObjectUtils.isEmpty(createdCase)) {
             log.warn("CCD returned no case when creating additional claimant case from lead {}", leadCaseId);
             return null;
         }
@@ -118,7 +121,9 @@ public class CreateMultiplesService {
         caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
         log.info("Successfully set HMCTS service ID for new case {}", createdCase.getCaseId());
 
-        return createdCase.getCaseData() == null ? null : createdCase.getCaseData().getEthosCaseReference();
+        return Optional.ofNullable(createdCase.getCaseData())
+                .map(CaseData::getEthosCaseReference)
+                .orElse(null);
     }
 
     /**
@@ -142,18 +147,20 @@ public class CreateMultiplesService {
                                                    List<String> childEthosRefs,
                                                    Map<Integer, AdditionalClaimant> failedCases) throws IOException {
 
-        CaseData leadCaseData = leadSubmitEvent == null ? null : leadSubmitEvent.getCaseData();
-        String leadCaseRef = leadCaseData != null && leadCaseData.getEthosCaseReference() != null
-                ? leadCaseData.getEthosCaseReference()
-                : firstEthosRef(createUpdatesMsg.getEthosCaseRefCollection());
+        CaseData leadCaseData = Optional.ofNullable(leadSubmitEvent)
+                .map(SubmitEvent::getCaseData)
+                .orElse(null);
+        String leadCaseRef = Optional.ofNullable(leadCaseData)
+                .map(CaseData::getEthosCaseReference)
+                .orElseGet(() -> firstEthosRef(createUpdatesMsg.getEthosCaseRefCollection()).orElse(null));
 
         List<CaseIdTypeItem> caseIdCollection = new ArrayList<>();
-        if (leadCaseRef != null) {
+        if (ObjectUtils.isNotEmpty(leadCaseRef)) {
             caseIdCollection.add(MultiplesHelper.createCaseIdTypeItem(leadCaseRef));
         }
-        if (childEthosRefs != null) {
+        if (ObjectUtils.isNotEmpty(childEthosRefs)) {
             for (String childRef : childEthosRefs) {
-                if (childRef != null) {
+                if (ObjectUtils.isNotEmpty(childRef)) {
                     caseIdCollection.add(MultiplesHelper.createCaseIdTypeItem(childRef));
                 }
             }
@@ -176,8 +183,10 @@ public class CreateMultiplesService {
         SubmitMultipleEvent createdMultiple = ccdClient.submitMultipleCreation(
             accessToken, multipleData, multipleCaseTypeId, jurisdiction, ccdRequest);
 
-        if (createdMultiple != null) {
-            sendEmailForFailedCases(failedCases, createdMultiple);
+        if (ObjectUtils.isNotEmpty(createdMultiple)) {
+            if (ObjectUtils.isNotEmpty(failedCases)) {
+                sendEmailForFailedCases(failedCases, createdMultiple);
+            }
             log.info("Created multiple shell case {}", createdMultiple.getCaseId());
         } else {
             log.info("Error creating multiple shell case for {}", leadCaseData.getCcdID());
@@ -190,19 +199,20 @@ public class CreateMultiplesService {
 
     private void handleFailedCases(Map<Integer, AdditionalClaimant> failedCases,
                                    MultipleData multipleData, String addClaimantMethod) {
-        if (!failedCases.isEmpty()) {
-            boolean isSpreadsheetUpload = !"manually".equals(addClaimantMethod);
-
-            String source = isSpreadsheetUpload ? "spreadsheet upload" : "manual entry";
-
-            String failedClaimantDetails = failedCases.entrySet().stream()
-                    .map(entry -> buildFailedClaimantLine(entry.getKey(), entry.getValue(), isSpreadsheetUpload))
-                    .collect(Collectors.joining("\n"));
-
-            multipleData.setMultipleNote(
-                    "Additional claimant cases failed to create for the following claimant(s), added via "
-                            + source + ":\n" + failedClaimantDetails);
+        if (failedCases.isEmpty()) {
+            return;
         }
+
+        boolean isSpreadsheetUpload = !"manually".equals(addClaimantMethod);
+        String source = isSpreadsheetUpload ? "spreadsheet upload" : "manual entry";
+
+        String failedClaimantDetails = failedCases.entrySet().stream()
+                .map(entry -> buildFailedClaimantLine(entry.getKey(), entry.getValue(), isSpreadsheetUpload))
+                .collect(Collectors.joining("\n"));
+
+        multipleData.setMultipleNote(
+                "Additional claimant cases failed to create for the following claimant(s), added via "
+                        + source + ":\n" + failedClaimantDetails);
     }
 
     private void sendEmailForFailedCases(Map<Integer, AdditionalClaimant> failedCases,
@@ -221,7 +231,7 @@ public class CreateMultiplesService {
                 ? "Row " + (index + 1)
                 : "Additional claimant " + (index + 1);
 
-        if (claimant == null) {
+        if (ObjectUtils.isEmpty(claimant)) {
             return "- " + location + ": no claimant data supplied";
         }
 
@@ -233,8 +243,10 @@ public class CreateMultiplesService {
         return "- " + location + " (" + firstName + " " + lastName + ")";
     }
 
-    private static String firstEthosRef(List<String> ethosRefs) {
-        return ethosRefs == null || ethosRefs.isEmpty() ? null : ethosRefs.getFirst();
+    private static Optional<String> firstEthosRef(List<String> ethosRefs) {
+        return ethosRefs == null || ethosRefs.isEmpty()
+                ? Optional.empty()
+                : Optional.ofNullable(ethosRefs.getFirst());
     }
 
     /**
@@ -244,7 +256,7 @@ public class CreateMultiplesService {
      * callers can skip setting the field and avoid CCD validation errors.
      */
     private String convertDobToIso(String dob) {
-        if (dob == null || dob.isBlank()) {
+        if (ObjectUtils.isEmpty(dob)) {
             return null;
         }
         // DD/MM/YYYY → YYYY-MM-DD

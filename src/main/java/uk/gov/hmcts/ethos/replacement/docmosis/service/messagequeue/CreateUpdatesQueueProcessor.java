@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.messagequeue;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -63,7 +64,7 @@ public class CreateUpdatesQueueProcessor {
     private String processorId;
 
     public void init() {
-        if (executor == null) {
+        if (ObjectUtils.isEmpty(executor)) {
             executor = Executors.newFixedThreadPool(threadCount);
             try {
                 processorId = InetAddress.getLocalHost().getHostName() + "-" + UUID.randomUUID();
@@ -159,7 +160,7 @@ public class CreateUpdatesQueueProcessor {
         CreateMultiplesDataModel dataModel = (CreateMultiplesDataModel) createUpdatesMsg.getDataModelParent();
         List<AdditionalClaimant> additionalClaimants = dataModel.getAdditionalClaimants();
 
-        if (additionalClaimants == null || additionalClaimants.isEmpty()) {
+        if (ObjectUtils.isEmpty(additionalClaimants)) {
             log.warn("No additional claimants on create-multiples message {} - nothing to create",
                     createUpdatesMsg.getMsgId());
             return;
@@ -168,7 +169,7 @@ public class CreateUpdatesQueueProcessor {
         String accessToken = adminUserService.getAdminUserToken();
 
         SubmitEvent leadCase = createMultiplesService.retrieveLeadCase(accessToken, createUpdatesMsg);
-        if (leadCase == null) {
+        if (ObjectUtils.isEmpty(leadCase)) {
             throw new IllegalStateException("Could not retrieve lead case for create-multiples message "
                     + createUpdatesMsg.getMsgId());
         }
@@ -177,7 +178,7 @@ public class CreateUpdatesQueueProcessor {
         Map<Integer, AdditionalClaimant> failedCases = new LinkedHashMap<>();
         for (int i = 0; i < additionalClaimants.size(); i++) {
             String createdRef = createCaseWithRetry(additionalClaimants, leadCase, accessToken, createUpdatesMsg, i);
-            if (createdRef != null) {
+            if (ObjectUtils.isNotEmpty(createdRef)) {
                 createdCaseRefs.add(createdRef);
             } else {
                 failedCases.put(i, additionalClaimants.get(i));
@@ -201,7 +202,7 @@ public class CreateUpdatesQueueProcessor {
                 log.info("Creating case for additional claimant index {}, attempt {}", index, attempt);
                 String createdRef = createMultiplesService.createCase(leadCase, accessToken,
                         createUpdatesMsg, claimant);
-                if (createdRef != null) {
+                if (ObjectUtils.isNotEmpty(createdRef)) {
                     return createdRef;
                 }
             } catch (Exception e) {

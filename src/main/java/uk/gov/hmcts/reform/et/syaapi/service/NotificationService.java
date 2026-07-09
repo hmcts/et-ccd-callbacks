@@ -295,8 +295,8 @@ public class NotificationService {
 
     public void sendFailedAdditionalClaimantsEmail(String leadEthosCaseRef,
                                                    String multipleReference, long multipleCaseId) {
-        String caseNumber = leadEthosCaseRef == null ? CASE_ID_NOT_FOUND : leadEthosCaseRef;
-        String multipleCaseNumber = multipleReference == null ? MULTIPLE_ID_NOT_FOUND : multipleReference;
+        String caseNumber = Objects.requireNonNullElse(leadEthosCaseRef, CASE_ID_NOT_FOUND);
+        String multipleCaseNumber = Objects.requireNonNullElse(multipleReference, MULTIPLE_ID_NOT_FOUND);
 
         try {
             Map<String, Object> parameters = new ConcurrentHashMap<>();

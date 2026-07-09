@@ -49,14 +49,14 @@ public class CreateUpdatesBusSender {
         try {
             String messageBody = objectMapper.writeValueAsString(msg);
             CreateUpdatesQueueMessage queueMessage = CreateUpdatesQueueMessage.builder()
-                    .messageId(UUID.randomUUID().toString())
+                    .messageId(msg.getMsgId())
                     .messageBody(messageBody)
                     .status(QueueMessageStatus.PENDING)
                     .createdAt(LocalDateTime.now())
                     .retryCount(0)
                     .build();
             createUpdatesQueueRepository.save(queueMessage);
-            log.info("SENT single message to create-updates queue -----> {}", msg);
+            log.info("SENT single message to create-updates queue -----> {}", msg.getMsgId());
         } catch (Exception e) {
             log.error("Error sending single message to create-updates queue", e);
             errors.add(ERROR_MESSAGE);

@@ -27,8 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
@@ -134,7 +136,9 @@ class CreateMultiplesServiceTest {
         assertEquals("Leeds", multipleData.getManagingOffice());
         // lead ref + two child refs
         assertEquals(3, multipleData.getCaseIdCollection().size());
-        verify(notificationService).sendFailedAdditionalClaimantsEmail("6000001/2024", "6000123/2024", 123_456L);
+        // No claimant cases failed, so no failure email should be sent
+        verify(notificationService, never())
+                .sendFailedAdditionalClaimantsEmail(anyString(), anyString(), anyLong());
     }
 
     @Test

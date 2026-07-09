@@ -60,7 +60,7 @@ ccd:
   data-store-api-url: ${CCD_DATA_STORE_API_URL:http://ccd-data-store-api:4452}
   decentralised-runtime:
     cdam-attach:
-      enabled: ${CCD_DECENTRALISED_RUNTIME_CDAM_ATTACH_ENABLED:false}
+      enabled: ${CCD_DECENTRALISED_RUNTIME_CDAM_ATTACH_ENABLED:true}
   data-migration:
     enabled: ${ET_CCD_DATA_MIGRATION_ENABLED:false}
     task-name: ${ET_CCD_DATA_MIGRATION_TASK_NAME:et-ccd-data-migration}

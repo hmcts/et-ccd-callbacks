@@ -28,6 +28,18 @@ module "postgres" {
     {
       "name" : "backslash_quote",
       "value" : "on"
+    },
+    {
+      name  = "pg_qs.query_capture_mode"
+      value = "top"
+    },
+    {
+      name  = "pg_qs.store_query_plans"
+      value = "on"
+    },
+    {
+      name  = "pgms_wait_sampling.query_capture_mode"
+      value = "all"
     }
   ]
   auto_grow_enabled = true

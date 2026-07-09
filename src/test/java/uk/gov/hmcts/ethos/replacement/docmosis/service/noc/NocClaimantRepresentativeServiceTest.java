@@ -185,7 +185,7 @@ class NocClaimantRepresentativeServiceTest {
                 .thenReturn(createChangeOrganisationRequest());
         nocClaimantRepresentativeService.updateClaimantRepAccess(getCallBackCallbackRequest());
         verify(nocNotificationService, times(1))
-                .sendNotificationOfChangeEmails(any(), any(), any());
+                .sendNotificationOfChangeEmails(any(), any(), any(), eq(true));
     }
 
     @Test
@@ -209,7 +209,7 @@ class NocClaimantRepresentativeServiceTest {
         nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest);
         // Assert
         verify(nocNotificationService, times(NumberUtils.INTEGER_ONE)).sendNotificationOfChangeEmails(
-                any(), any(), any());
+                any(), any(), any(), eq(true));
         verify(nocService, times(NumberUtils.INTEGER_ONE)).removeOrganisationRepresentativeAccess(
                 anyString(), any(ChangeOrganisationRequest.class));
     }

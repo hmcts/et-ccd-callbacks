@@ -33,6 +33,7 @@ import java.util.Objects;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -109,7 +110,7 @@ class NoticeOfChangeControllerTest {
     void nocSubmitted() throws Exception {
         when(verifyTokenService.isTokenSignatureValid(AUTH_TOKEN)).thenReturn(true);
         doNothing().when(notificationService).sendNotificationOfChangeEmails(any(),
-            any(), any());
+            any(), any(), eq(false));
 
         mvc.perform(post(SUBMITTED_URL)
                 .content(requestContent.toString())

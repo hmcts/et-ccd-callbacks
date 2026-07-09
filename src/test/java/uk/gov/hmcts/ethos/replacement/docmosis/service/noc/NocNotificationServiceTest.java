@@ -596,7 +596,8 @@ class NocNotificationServiceTest {
         nocNotificationService.sendNotificationOfChangeEmails(
                 caseDetailsBefore,
                 caseDetailsNew,
-                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
+                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField(),
+                true);
         // Claimant Representative
         verify(emailService, times(0)).sendEmail(any(), eq("claimant@represented.com"), any());
         //New Representative
@@ -625,7 +626,8 @@ class NocNotificationServiceTest {
         nocNotificationService.sendNotificationOfChangeEmails(
                 caseDetailsBefore,
                 caseDetailsNew,
-                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
+                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField(),
+                true);
 
         // Claimant Representative
         verify(emailService, times(0)).sendEmail(any(), eq("claimant@represented.com"), any());
@@ -663,7 +665,8 @@ class NocNotificationServiceTest {
         nocNotificationService.sendNotificationOfChangeEmails(
                 caseDetailsBefore,
                 caseDetailsNew,
-                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
+                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField(),
+                true);
 
         verify(emailService, times(0)).sendEmail(any(), any(), any());
     }
@@ -692,7 +695,8 @@ class NocNotificationServiceTest {
         nocNotificationService.sendNotificationOfChangeEmails(
                 caseDetailsBefore,
                 caseDetailsNew,
-                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField()
+                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField(),
+                true
         );
 
         verify(emailNotificationService, times(0))
@@ -753,7 +757,8 @@ class NocNotificationServiceTest {
         nocNotificationService.sendNotificationOfChangeEmails(
                 caseDetailsBefore,
                 caseDetailsNew,
-                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
+                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField(),
+                true);
 
         // Respondent email notification
         verify(emailService, times(1)).sendEmail(eq(PREVIOUS_RESPONDENT_SOLICITOR_TEMPLATE_ID),

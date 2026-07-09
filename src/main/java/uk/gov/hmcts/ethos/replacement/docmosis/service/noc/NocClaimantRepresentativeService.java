@@ -235,7 +235,7 @@ public class NocClaimantRepresentativeService {
         ChangeOrganisationRequest changeRequest = identifyRepresentationChanges(caseData,
                 caseDataBefore);
         try {
-            nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest);
+            nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest, true);
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
         }

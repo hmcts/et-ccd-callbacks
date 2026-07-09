@@ -475,8 +475,9 @@ public class NocNotificationService {
     }
 
     public void sendNotificationOfChangeEmails(CaseDetails caseDetailsPrevious,
-                             CaseDetails caseDetailsNew,
-                             ChangeOrganisationRequest changeRequest) {
+                                               CaseDetails caseDetailsNew,
+                                               ChangeOrganisationRequest changeRequest,
+                                               boolean sendToOtherParty) {
         DynamicFixedListType caseRoleId = changeRequest.getCaseRoleId();
         CaseData caseDataNew = caseDetailsNew.getCaseData();
         CaseData caseDataPrevious = caseDetailsPrevious.getCaseData();
@@ -488,11 +489,11 @@ public class NocNotificationService {
             partyName = caseDataPrevious.getClaimant();
             if (caseDataNew.getRepresentativeClaimantType() != null) {
                 newRepEmailAddress = caseDataNew.getRepresentativeClaimantType().getRepresentativeEmailAddress();
-                handleClaimantNocEmails(caseDetailsNew, partyName);
+                handleClaimantNocEmails(caseDetailsNew, partyName, sendToOtherParty);
             }
         } else {
             // send respondent noc change email
-            handleRespondentNocEmails(caseDetailsPrevious, caseDetailsNew, changeRequest);
+            handleRespondentNocEmails(caseDetailsPrevious, caseDetailsNew, changeRequest, sendToOtherParty);
             partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
         }
 
@@ -503,7 +504,7 @@ public class NocNotificationService {
         notifyTribunalOfRespondentRepresentativeUpdate(caseDetailsPrevious, NOC_TYPE_REMOVAL);
     }
 
-    private void handleClaimantNocEmails(CaseDetails caseDetailsNew, String partyName) {
+    private void handleClaimantNocEmails(CaseDetails caseDetailsNew, String partyName, boolean sendToOtherParty) {
         CaseData caseDataNew = caseDetailsNew.getCaseData();
 
         List<CaseUserAssignment> caseUserAssignments =
@@ -516,15 +517,16 @@ public class NocNotificationService {
         }
 
         // send respondents or respondent solicitors the claimant noc change email
-        emailNotificationService.getRespondentsAndRepsEmailAddresses(caseDataNew, caseUserAssignments)
-                .forEach((email, respondentId) -> {
-                    String caseLink = StringUtils.isNotBlank(respondentId)
-                            ? emailService.getSyrCaseLink(caseDetailsNew.getCaseId(), respondentId)
-                            : emailService.getExuiCaseLink(caseDetailsNew.getCaseId());
-                    emailService.sendEmail(claimantTemplateId, email,
-                            buildPersonalisationWithPartyName(caseDetailsNew, partyName, caseLink));
-                });
-
+        if (sendToOtherParty) {
+            emailNotificationService.getRespondentsAndRepsEmailAddresses(caseDataNew, caseUserAssignments)
+                    .forEach((email, respondentId) -> {
+                        String caseLink = StringUtils.isNotBlank(respondentId)
+                                ? emailService.getSyrCaseLink(caseDetailsNew.getCaseId(), respondentId)
+                                : emailService.getExuiCaseLink(caseDetailsNew.getCaseId());
+                        emailService.sendEmail(claimantTemplateId, email,
+                                buildPersonalisationWithPartyName(caseDetailsNew, partyName, caseLink));
+                    });
+        }
         // send claimant noc change email
         String claimantEmail = ClaimantUtils.getClaimantEmailAddress(caseDataNew);
         if (isNullOrEmpty(claimantEmail)) {
@@ -538,14 +540,15 @@ public class NocNotificationService {
     }
 
     private void handleRespondentNocEmails(CaseDetails caseDetailsPrevious,
-                                          CaseDetails caseDetailsNew,
-                                          ChangeOrganisationRequest changeRequest) {
+                                           CaseDetails caseDetailsNew,
+                                           ChangeOrganisationRequest changeRequest,
+                                           boolean sendToOtherParty) {
         CaseData caseDataNew = caseDetailsNew.getCaseData();
         CaseData caseDataPrevious = caseDetailsPrevious.getCaseData();
         String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
         // send claimant or claimant solicitor noc change email
-        if (!isClaimantNonSystemUser(caseDataPrevious)
-                || isClaimantRepresentedByMyHmctsOrganisation(caseDataPrevious)) {
+        if ((!isClaimantNonSystemUser(caseDataPrevious)
+                || isClaimantRepresentedByMyHmctsOrganisation(caseDataPrevious) && sendToOtherParty)) {
             sendClaimantEmail(caseDetailsPrevious, caseDetailsNew, partyName);
         }
 

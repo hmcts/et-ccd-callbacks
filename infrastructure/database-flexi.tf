@@ -18,7 +18,7 @@ module "postgres" {
     }
   ]
   pgsql_version                  = "15"
-  pgsql_storage_mb               = var.env == "prod" ? 131072 : 65536
+  pgsql_storage_mb               = var.env == "prod" ? 262144 : 65536
   admin_user_object_id           = var.jenkins_AAD_objectId
   force_user_permissions_trigger = "2"
   pgsql_server_configuration = [

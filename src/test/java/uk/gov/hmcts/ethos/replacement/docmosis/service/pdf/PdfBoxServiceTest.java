@@ -54,7 +54,8 @@ class PdfBoxServiceTest {
                         APPLICATION_PDF_VALUE,
                         TEST_DOCUMENT_NAME,
                         TEST_DOCUMENT_URL,
-                        TEST_DOCUMENT_MARKUP));
+                        TEST_DOCUMENT_MARKUP,
+                        null));
     }
 
     @ParameterizedTest

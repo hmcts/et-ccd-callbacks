@@ -243,7 +243,7 @@ class ClaimantTellSomethingElseServiceTest {
         CaseData caseData = new CaseData();
         caseData.setClaimantTseSelectApplication("Withdraw all or part of claim");
         DocumentInfo documentInfo = new DocumentInfo("document.pdf", "Withdraw Claim",
-                "binaryUrl/documents/", "<>Some doc</>");
+                "binaryUrl/documents/", "<>Some doc</>", null);
         when(tornadoService.generateEventDocument(any(), any(), any(), any())).thenReturn(documentInfo);
 
         claimantTellSomethingElseService.generateAndAddApplicationPdf(caseData, "token", "typeId");
@@ -269,7 +269,7 @@ class ClaimantTellSomethingElseServiceTest {
         CaseData caseData = new CaseData();
         caseData.setClaimantTseSelectApplication("Withdraw all or part of claim");
         DocumentInfo documentInfo = new DocumentInfo("document.pdf", "Withdraw Claim",
-                "binaryUrl/documents/", "<>Some doc</>");
+                "binaryUrl/documents/", "<>Some doc</>", null);
         when(tornadoService.generateEventDocument(any(), any(), any(), any())).thenReturn(documentInfo);
 
         claimantTellSomethingElseService.generateAndAddApplicationPdf(caseData, "token", "typeId");

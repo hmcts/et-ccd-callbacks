@@ -206,7 +206,7 @@ class DocumentManagementServiceTest {
     }
 
     @Test
-    void uploadDocumentWithMetadataSecureDocStoreTrueIncludesHash() throws IOException {
+    void uploadDocumentWithMetadataSecureDocStoreTrueIncludesHash() throws IOException, URISyntaxException {
         ReflectionTestUtils.setField(documentManagementService, "secureDocStoreEnabled", true);
         when(caseDocumentClient.uploadDocuments(anyString(), anyString(), anyString(), anyString(), anyList(), any()))
                 .thenReturn(successfulDocStoreUpload());

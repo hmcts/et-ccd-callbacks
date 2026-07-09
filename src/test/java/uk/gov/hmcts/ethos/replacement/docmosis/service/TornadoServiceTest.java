@@ -406,6 +406,9 @@ class TornadoServiceTest {
         URI uri = URI.create(documentUrl);
         when(documentManagementService.uploadDocument(anyString(), any(byte[].class),
                 anyString(), anyString(), anyString())).thenReturn(uri);
+        when(documentManagementService.uploadDocumentWithMetadata(anyString(), any(byte[].class),
+                anyString(), anyString(), anyString()))
+                .thenReturn(new DocumentManagementService.UploadedDocumentMetadata(uri, "hash-token"));
         when(documentManagementService.generateDownloadableURL(uri)).thenReturn(documentUrl);
         when(documentManagementService.generateMarkupDocument(anyString())).thenReturn(DOCUMENT_INFO_MARKUP);
     }

@@ -254,8 +254,11 @@ tasks.register('functional', Test) {
     maxHeapSize = '1G'
 }
 
+def puppeteerCacheDir = layout.buildDirectory.dir('puppeteer-cache').get().asFile.absolutePath
+
 tasks.register('yarnInstall', Exec) {
     workingDir '.'
+    environment 'PUPPETEER_CACHE_DIR', puppeteerCacheDir
     commandLine 'yarn', 'install'
 }
 

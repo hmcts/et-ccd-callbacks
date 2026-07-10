@@ -252,6 +252,24 @@ tasks.register('functional', Test) {
     maxHeapSize = '1G'
 }
 
+def isJenkinsPullRequestBuild = providers.environmentVariable('CHANGE_ID').isPresent()
+
+if (isJenkinsPullRequestBuild) {
+    // Jenkins PR previews run these tasks after static checks have already compiled the relevant source sets.
+    // Keep --rerun-tasks from compiling the same classes again during post-deploy verification.
+    tasks.named('smoke', Test) {
+        setDependsOn([tasks.named('codeceptSmoke')])
+        testClassesDirs = files(sourceSets.functional.output.classesDirs.files)
+        classpath = files(sourceSets.functional.runtimeClasspath.files)
+    }
+
+    tasks.named('functional', Test) {
+        setDependsOn([])
+        testClassesDirs = files(sourceSets.apiTest.output.classesDirs.files)
+        classpath = files(sourceSets.apiTest.runtimeClasspath.files)
+    }
+}
+
 tasks.register('yarnInstall', Exec) {
     workingDir '.'
     commandLine 'yarn', 'install'

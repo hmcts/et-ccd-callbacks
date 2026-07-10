@@ -18,6 +18,7 @@ module "postgres" {
     }
   ]
   pgsql_version                  = "15"
+  pgsql_storage_mb               = var.env == "prod" ? 262144 : 65536
   admin_user_object_id           = var.jenkins_AAD_objectId
   force_user_permissions_trigger = "2"
   pgsql_server_configuration = [
@@ -28,6 +29,18 @@ module "postgres" {
     {
       "name" : "backslash_quote",
       "value" : "on"
+    },
+    {
+      name  = "pg_qs.query_capture_mode"
+      value = "top"
+    },
+    {
+      name  = "pg_qs.store_query_plans"
+      value = "on"
+    },
+    {
+      name  = "pgms_wait_sampling.query_capture_mode"
+      value = "all"
     }
   ]
   auto_grow_enabled = true

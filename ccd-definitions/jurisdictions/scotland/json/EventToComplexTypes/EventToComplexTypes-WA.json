@@ -604,6 +604,16 @@
     "DisplayContext": "OPTIONAL"
   },
   {
+    "ID": "DraftAndSignJudgement",
+    "CaseEventID": "draftAndSignJudgement",
+    "CaseFieldID": "draftAndSignJudgement",
+    "ListElementCode": "isUrgent",
+    "EventElementLabel": "Is this urgent?",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "MANDATORY",
+    "Publish": "Y"
+  },
+  {
     "ID": "HearingDetails",
     "CaseEventID": "updateHearing",
     "CaseFieldID": "hearingDetailsCollection",

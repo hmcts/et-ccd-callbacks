@@ -62,6 +62,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -260,6 +261,37 @@ class NotificationServiceTest {
         return notificationService.sendEmail(TestConstants.TEST_TEMPLATE_API_KEY,
                                              TestConstants.TEST_EMAIL, parameters, TestConstants.REFERENCE_STRING
         );
+    }
+
+    @Test
+    void isWelshLanguageShouldReturnFalseWhenClaimantPreferenceIsMissing() {
+        CaseData localCaseData = new CaseData();
+        when(featureToggleService.isWelshEnabled()).thenReturn(true);
+
+        assertFalse(notificationService.isWelshLanguage(localCaseData));
+    }
+
+    @Test
+    void isWelshLanguageShouldReturnFalseWhenWelshFlagDisabled() {
+        ClaimantHearingPreference preference = new ClaimantHearingPreference();
+        preference.setContactLanguage(WELSH_LANGUAGE);
+        CaseData localCaseData = new CaseData();
+        localCaseData.setClaimantHearingPreference(preference);
+        when(featureToggleService.isWelshEnabled()).thenReturn(false);
+
+        assertFalse(notificationService.isWelshLanguage(localCaseData));
+    }
+
+    @Test
+    void isWelshLanguageForRespondentShouldReturnFalseWhenWelshFlagDisabled() {
+        RespondentSumType respondent = RespondentSumType.builder()
+            .et3ResponseLanguagePreference(WELSH_LANGUAGE)
+            .build();
+        RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
+        respondentItem.setValue(respondent);
+        when(featureToggleService.isWelshEnabled()).thenReturn(false);
+
+        assertFalse(notificationService.isWelshLanguage(respondentItem));
     }
 
     @ParameterizedTest
@@ -1473,7 +1505,7 @@ class NotificationServiceTest {
                 hearingDate,
                 caseTestData.getExpectedDetails().getId().toString()
             );
-            setLanguagePreference(details.caseData(), WELSH_LANGUAGE);
+            setLanguagePreference(details.caseData());
 
             when(featureToggleService.isWelshEnabled()).thenReturn(true);
             when(notificationsProperties.getRespondentTseTypeCRespAckTemplateId()).thenReturn(
@@ -1502,10 +1534,10 @@ class NotificationServiceTest {
                 .map(entry -> Arguments.of(entry.getKey(), entry.getValue()));
         }
 
-        static void setLanguagePreference(CaseData caseData, String languagePreference) {
+        static void setLanguagePreference(CaseData caseData) {
             caseData.getRespondentCollection().forEach(respondentSumTypeItem -> {
                 RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
-                respondentSumType.setEt3ResponseLanguagePreference(languagePreference);
+                respondentSumType.setEt3ResponseLanguagePreference(TestConstants.WELSH_LANGUAGE);
             });
         }
     }

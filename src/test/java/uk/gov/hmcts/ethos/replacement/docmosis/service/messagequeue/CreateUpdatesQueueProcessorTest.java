@@ -170,6 +170,26 @@ class CreateUpdatesQueueProcessorTest {
         );
     }
 
+    @Test
+    void processMessage_runtimeExceptionAtMaxRetry_setsProcessedAtTimestamp() throws Exception {
+        CreateUpdatesMsg msg = generateCreateUpdatesMsg();
+        CreateUpdatesQueueMessage queueMessage = createQueueMessage(msg);
+        queueMessage.setRetryCount(9);
+
+        when(objectMapper.readValue(anyString(), eq(CreateUpdatesMsg.class)))
+            .thenThrow(new RuntimeException("Failed"));
+        when(createUpdatesQueueRepository.lockMessage(anyString(), anyString(), any(), any())).thenReturn(1);
+
+        processor.processMessage(queueMessage);
+
+        verify(createUpdatesQueueRepository).incrementRetryAndMarkFailureIfMax(
+            eq(queueMessage.getMessageId()),
+            anyString(),
+            eq(10),
+            any(LocalDateTime.class)
+        );
+    }
+
     private CreateUpdatesMsg generateCreateUpdatesMsg() {
         CreateUpdatesMsg msg = new CreateUpdatesMsg();
         msg.setMsgId(UUID.randomUUID().toString());

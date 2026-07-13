@@ -13,6 +13,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import uk.gov.dwp.regex.InvalidPostcodeException;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
 import uk.gov.hmcts.ecm.common.service.pdf.PdfDecodedMultipartFile;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -52,6 +53,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -251,6 +253,46 @@ class CaseServiceTest {
     }
 
     @Test
+    void shouldCreateDraftCaseUsingDefaultCaseTypeWhenPostcodeInvalid() throws Exception {
+        when(authTokenGenerator.generate()).thenReturn(TEST_SERVICE_AUTH_TOKEN);
+        when(idamClient.getUserInfo(TEST_SERVICE_AUTH_TOKEN)).thenReturn(new UserInfo(
+            null,
+            USER_ID,
+            TEST_NAME,
+            caseTestData.getCaseData().getClaimantIndType().getClaimantFirstNames(),
+            caseTestData.getCaseData().getClaimantIndType().getClaimantLastName(),
+            null
+        ));
+        when(postcodeToOfficeService.getTribunalOfficeFromPostcode(anyString()))
+            .thenThrow(new InvalidPostcodeException("invalid"));
+        when(ccdApiClient.startForCitizen(
+            eq(TEST_SERVICE_AUTH_TOKEN),
+            eq(TEST_SERVICE_AUTH_TOKEN),
+            eq(USER_ID),
+            eq(JURISDICTION_ID),
+            anyString(),
+            eq(DRAFT_EVENT_TYPE)
+        )).thenReturn(caseTestData.getStartEventResponse());
+        when(ccdApiClient.submitForCitizen(
+            eq(TEST_SERVICE_AUTH_TOKEN),
+            eq(TEST_SERVICE_AUTH_TOKEN),
+            eq(USER_ID),
+            eq(JURISDICTION_ID),
+            anyString(),
+            eq(true),
+            any(CaseDataContent.class)
+        )).thenReturn(caseTestData.getExpectedDetails());
+
+        CaseRequest caseRequest = caseTestData.getCaseRequest();
+        caseRequest.setCaseTypeId(null);
+
+        CaseDetails caseDetails = caseService.createCase(TEST_SERVICE_AUTH_TOKEN, caseRequest);
+
+        assertEquals(caseTestData.getExpectedDetails(), caseDetails);
+        verify(postcodeToOfficeService, times(1)).getTribunalOfficeFromPostcode(nullable(String.class));
+    }
+
+    @Test
     void shouldCreateNewDraftCaseInCcdWithPostCode() {
 
         when(authTokenGenerator.generate()).thenReturn(TEST_SERVICE_AUTH_TOKEN);
@@ -384,7 +426,7 @@ class CaseServiceTest {
              + "judgmentAndReasonsDocuments=null, reconsiderationDocuments=null, miscDocuments=null, "
              + "documentType=null, dateOfCorrespondence=null, docNumber=null, tornadoEmbeddedPdfUrl=null, "
              + "excludeFromDcf=null, documentIndex=null)",
-            ((DocumentTypeItem) docCollection.get(0)).getValue().toString());
+            ((DocumentTypeItem) docCollection.getFirst()).getValue().toString());
     }
 
     @Test
@@ -444,7 +486,7 @@ class CaseServiceTest {
                                                     Optional.empty());
 
             CaseData caseData = convertCaseDataMapToCaseDataObject(caseDetails.getData());
-            String actual = caseData.getDocumentCollection().get(0).getValue().getShortDescription();
+            String actual = caseData.getDocumentCollection().getFirst().getValue().getShortDescription();
             String expected = "Withdraw all/part of claim";
             assertThat(actual).isEqualTo(expected);
         }
@@ -458,9 +500,34 @@ class CaseServiceTest {
                                                     Optional.of("Amend response"));
 
             CaseData caseData = convertCaseDataMapToCaseDataObject(caseDetails.getData());
-            String actual = caseData.getDocumentCollection().get(0).getValue().getShortDescription();
+            String actual = caseData.getDocumentCollection().getFirst().getValue().getShortDescription();
             assertThat(actual).isEqualTo(contactApplicationType);
         }
+    }
+
+    @Test
+    @SneakyThrows
+    void submitCaseCcdFailsAndNotSubmittedStateRethrowsException() {
+        when(featureToggle.citizenEt1Generation()).thenReturn(true);
+        when(ccdApiClient.submitEventForCitizen(
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyBoolean(),
+            any())).thenThrow(new RuntimeException("Submission failed"));
+        when(ccdApiClient.getCase(
+            TEST_SERVICE_AUTH_TOKEN,
+            TEST_SERVICE_AUTH_TOKEN,
+            caseTestData.getCaseRequest().getCaseId()
+        )).thenReturn(caseTestData.getExpectedDetails());
+        caseTestData.getExpectedDetails().setState("draft");
+
+        assertThrows(RuntimeException.class,
+            () -> caseService.submitCase(TEST_SERVICE_AUTH_TOKEN, caseTestData.getCaseRequest()));
+        verify(ccdApiClient, times(1)).getCase(any(), any(), any());
     }
 
     @Test
@@ -639,6 +706,26 @@ class CaseServiceTest {
                                    caseTestData.getRespondentTse(),
                                    "TEST"
                                )
+        );
+    }
+
+    @Test
+    void shouldUseVaryOrRevokeLabelInRespondentTsePdfName() throws Exception {
+        when(pdfUploadService.convertRespondentTseIntoMultipartFile(any(), any(), anyString()))
+            .thenReturn(tsePdfMultipartFileMock);
+        caseTestData.getRespondentTse().setContactApplicationClaimantType("Vary/revoke an order");
+
+        caseService.uploadRespondentTseAsPdf(
+            TEST_SERVICE_AUTH_TOKEN,
+            caseTestData.getCaseDetails(),
+            caseTestData.getRespondentTse(),
+            "TEST"
+        );
+
+        verify(pdfUploadService).convertRespondentTseIntoMultipartFile(
+            any(),
+            any(),
+            eq("Application 1 - Vary or revoke an order.pdf")
         );
     }
 

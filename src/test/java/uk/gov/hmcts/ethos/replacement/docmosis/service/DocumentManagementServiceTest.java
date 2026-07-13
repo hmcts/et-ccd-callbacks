@@ -206,14 +206,30 @@ class DocumentManagementServiceTest {
     }
 
     @Test
+    void uploadDocumentWithMetadataSecureDocStoreTrueIncludesHash() throws IOException, URISyntaxException {
+        ReflectionTestUtils.setField(documentManagementService, "secureDocStoreEnabled", true);
+        when(caseDocumentClient.uploadDocuments(anyString(), anyString(), anyString(), anyString(), anyList(), any()))
+                .thenReturn(successfulDocStoreUpload());
+
+        DocumentManagementService.UploadedDocumentMetadata uploadedDocument =
+                documentManagementService.uploadDocumentWithMetadata("authString", Files.readAllBytes(file.toPath()),
+                        OUTPUT_FILE_NAME, APPLICATION_DOCX_VALUE, "LondonSouth");
+
+        assertThat(uploadedDocument.uri().getPath()).isEqualTo("/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4");
+        assertThat(uploadedDocument.hashToken()).isEqualTo("hash-token-1");
+    }
+
+    @Test
     void addDocumentToDocumentField() {
         DocumentInfo documentInfo = new DocumentInfo();
         documentInfo.setDescription("Test description");
         documentInfo.setUrl("http://dm-store:8080/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary");
+        documentInfo.setHashToken("test-hash-token");
 
         UploadedDocumentType uploadedDocumentType = documentManagementService.addDocumentToDocumentField(documentInfo);
         assertThat(uploadedDocumentType.getDocumentFilename()).isEqualTo(documentInfo.getDescription());
         assertThat(uploadedDocumentType.getDocumentBinaryUrl()).isEqualTo(documentInfo.getUrl());
+        assertThat(uploadedDocumentType.getDocumentHash()).isEqualTo(documentInfo.getHashToken());
     }
 
     @Test

@@ -101,6 +101,12 @@ public class DocumentManagementService {
     @Retryable(retryFor = {DocumentManagementException.class}, backoff = @Backoff(delay = 200))
     public URI uploadDocument(String authToken, byte[] byteArray, String outputFileName, String type,
                               String caseTypeID) {
+        return uploadDocumentWithMetadata(authToken, byteArray, outputFileName, type, caseTypeID).uri();
+    }
+
+    @Retryable(retryFor = {DocumentManagementException.class}, backoff = @Backoff(delay = 200))
+    public UploadedDocumentMetadata uploadDocumentWithMetadata(String authToken, byte[] byteArray,
+                                                               String outputFileName, String type, String caseTypeID) {
         try {
             MultipartFile file = new InMemoryMultipartFile(FILES_NAME, outputFileName, type, byteArray);
             if (secureDocStoreEnabled) {
@@ -120,7 +126,7 @@ public class DocumentManagementService {
                                 new DocumentManagementException("Document management failed uploading file"
                                         + OUTPUT_FILE_NAME));
                 log.info(UPLOADED_DOCUMENT_SUCCESSFUL);
-                return URI.create(document.links.self.href);
+                return new UploadedDocumentMetadata(URI.create(document.links.self.href), document.hashToken);
             } else {
                 log.info("Using Document Upload Client");
                 UserDetails user = userIdamService.getUserDetails(authToken);
@@ -138,7 +144,7 @@ public class DocumentManagementService {
                                 new DocumentManagementException("Document management failed uploading file"
                                         + OUTPUT_FILE_NAME));
                 log.info(UPLOADED_DOCUMENT_SUCCESSFUL);
-                return URI.create(document.links.self.href);
+                return new UploadedDocumentMetadata(URI.create(document.links.self.href), null);
             }
         } catch (Exception ex) {
             log.info("Exception: " + ex.getMessage());
@@ -206,6 +212,7 @@ public class DocumentManagementService {
         document.setDocumentBinaryUrl(ccdDMStoreBaseUrl + documentId);
         document.setDocumentUrl(document.getDocumentBinaryUrl().replace(BINARY, ""));
         document.setDocumentFilename(documentInfo.getDescription());
+        document.setDocumentHash(documentInfo.getHashToken());
         return document;
     }
 
@@ -321,6 +328,9 @@ public class DocumentManagementService {
         responseHeaders.add("X-XSS-Protection", "1; mode=block");
         responseHeaders.add("X-Content-Type-Options", "nosniff");
         return responseHeaders;
+    }
+
+    public record UploadedDocumentMetadata(URI uri, String hashToken) {
     }
 
 }

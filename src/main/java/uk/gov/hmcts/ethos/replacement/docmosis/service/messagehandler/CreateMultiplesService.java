@@ -165,20 +165,22 @@ public class CreateMultiplesService {
                 }
             }
         }
-
+        String multipleName = Optional.ofNullable(leadCaseData).map(CaseData::getRespondent).orElse(null);
+        String managingOffice = Optional.ofNullable(leadCaseData).map(CaseData::getManagingOffice).orElse(null);
         MultipleData multipleData = new MultipleData();
-        multipleData.setMultipleName(leadCaseData.getRespondent());
+        multipleData.setMultipleName(multipleName);
         multipleData.setMultipleSource(ET1_ONLINE_CASE_SOURCE);
         multipleData.setCaseIdCollection(caseIdCollection);
         multipleData.setLeadCase(leadCaseRef);
-        multipleData.setManagingOffice(leadCaseData.getManagingOffice());
+        multipleData.setManagingOffice(managingOffice);
 
         String jurisdiction = createUpdatesMsg.getJurisdiction();
         String multipleCaseTypeId = UtilHelper.getBulkCaseTypeId(createUpdatesMsg.getCaseTypeId());
         log.info("Creating new multiple shell {} for lead case {} with {} case(s)",
             multipleCaseTypeId, leadCaseRef, caseIdCollection.size());
+        String addClaimantMethod = Optional.ofNullable(leadCaseData).map(CaseData::getAddClaimantMethod).orElse(null);
 
-        handleFailedCases(failedCases, multipleData, leadCaseData.getAddClaimantMethod());
+        handleFailedCases(failedCases, multipleData, addClaimantMethod);
         CCDRequest ccdRequest = ccdClient.startCaseMultipleCreation(accessToken, multipleCaseTypeId, jurisdiction);
         SubmitMultipleEvent createdMultiple = ccdClient.submitMultipleCreation(
             accessToken, multipleData, multipleCaseTypeId, jurisdiction, ccdRequest);
@@ -189,10 +191,16 @@ public class CreateMultiplesService {
             }
             log.info("Created multiple shell case {}", createdMultiple.getCaseId());
         } else {
-            log.info("Error creating multiple shell case for {}", leadCaseData.getCcdID());
+            String ccdId = Optional.ofNullable(leadCaseData).map(CaseData::getCcdID).orElse(null);
+            long feeGroupReference = Optional.ofNullable(leadCaseData)
+                    .map(CaseData::getFeeGroupReference)
+                    .filter(ObjectUtils::isNotEmpty)
+                    .map(Long::parseLong)
+                    .orElse(0L);
+            log.info("Error creating multiple shell case for {}", ccdId);
             notificationService.sendFailedMultiplesShellCreationEmail(
                     leadCaseRef,
-                    Long.parseLong(leadCaseData.getFeeGroupReference()));
+                    feeGroupReference);
         }
         return createdMultiple;
     }

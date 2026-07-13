@@ -1,7 +1,7 @@
 [
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CRUD": "R",
+    "CRUD": "D",
     "UserRole": "caseworker-ras-validation"
   },
   {
@@ -11,7 +11,7 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales_Listings",
-    "CRUD": "R",
+    "CRUD": "D",
     "UserRole": "caseworker-ras-validation"
   },
   {
@@ -21,7 +21,7 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales_Multiple",
-    "CRUD": "R",
+    "CRUD": "D",
     "UserRole": "caseworker-ras-validation"
   },
   {

@@ -255,21 +255,24 @@ tasks.register('functional', Test) {
 def isJenkinsPullRequestBuild = providers.environmentVariable('CHANGE_ID').isPresent()
 
 if (isJenkinsPullRequestBuild) {
-    def etSharedOutput = project(':et-shared').sourceSets.main.output
+    def etSharedCompiledOutput = files(
+        project(':et-shared').layout.buildDirectory.dir('classes/java/main'),
+        project(':et-shared').layout.buildDirectory.dir('resources/main')
+    )
 
     // Jenkins PR previews run these tasks after static checks have already compiled the relevant source sets.
     // Keep --rerun-tasks from compiling the same classes again during post-deploy verification.
     tasks.named('smoke', Test) {
         setDependsOn([tasks.named('codeceptSmoke')])
         testClassesDirs = files(sourceSets.functional.output.classesDirs.files)
-        classpath = files(sourceSets.functional.runtimeClasspath.files, etSharedOutput.files)
+        classpath = files(sourceSets.functional.runtimeClasspath.files, etSharedCompiledOutput)
         include '**/HealthCheckTest.class'
     }
 
     tasks.named('functional', Test) {
         setDependsOn([])
         testClassesDirs = files(sourceSets.apiTest.output.classesDirs.files)
-        classpath = files(sourceSets.apiTest.runtimeClasspath.files, etSharedOutput.files)
+        classpath = files(sourceSets.apiTest.runtimeClasspath.files, etSharedCompiledOutput)
         include '**/*Test.class'
     }
 }

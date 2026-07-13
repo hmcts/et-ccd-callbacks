@@ -227,4 +227,25 @@ public class CcdCaseAssignment {
 
         log.info("Add case user roles. Http status received from CCD API; {}", response.getStatusCode().value());
     }
+
+    /**
+     * Remove a user role from a case.
+     * @param caseAssignmentUserRolesRequest the request containing the user role to remove
+     */
+    public void removeCaseUserRole(CaseAssignmentUserRolesRequest caseAssignmentUserRolesRequest) throws IOException {
+        String userToken = adminUserService.getAdminUserToken();
+        HttpEntity<CaseAssignmentUserRolesRequest> requestEntity =
+                new HttpEntity<>(caseAssignmentUserRolesRequest, ccdClient.buildHeaders(userToken));
+        try {
+            ResponseEntity<CaseAssignmentUserRolesResponse> response = restTemplate.exchange(
+                    ccdDataStoreUrl + CASE_USERS,
+                    HttpMethod.DELETE,
+                    requestEntity,
+                    CaseAssignmentUserRolesResponse.class);
+            log.info("Remove case user role. Http status received from CCD API; {}", response.getStatusCode().value());
+        } catch (RestClientResponseException exception) {
+            log.info(ERROR_FROM_CCD, exception.getMessage());
+            throw exception;
+        }
+    }
 }

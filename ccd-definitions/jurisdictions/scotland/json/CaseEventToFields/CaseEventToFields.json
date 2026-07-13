@@ -9501,5 +9501,27 @@
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "updateClaimantEmail",
+    "CaseFieldID": "currentClaimantEmail",
+    "DisplayContext": "READONLY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageLabel": "Update claimant email",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "updateClaimantEmail",
+    "CaseFieldID": "newClaimantEmail",
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "CallBackURLMidEvent": "${ET_COS_URL}/updateClaimantEmail/validate",
+    "ShowSummaryChangeOption": "Y"
   }
 ]

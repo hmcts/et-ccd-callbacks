@@ -3,6 +3,9 @@ const parseArgs = require('minimist');
 const run = require('../src/main/json2xlsx');
 
 run(parseArgs(process.argv.slice(2), {
+  boolean: [
+    'silent'
+  ],
   string: [
     'D',
     'o',
@@ -15,4 +18,7 @@ run(parseArgs(process.argv.slice(2), {
     excludedFilenamePatterns: 'e',
     template: 't'
   }
-})).catch(err => console.log(err.toString()));
+})).catch(err => {
+  console.error(err.stack || err.toString());
+  process.exitCode = 1;
+});

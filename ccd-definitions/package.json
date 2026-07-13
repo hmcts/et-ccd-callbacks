@@ -42,6 +42,8 @@
     "generate-json": "yarn workspace admin generate-json",
     "lint": "yarn workspaces foreach --parallel run lint",
     "lint:fix": "yarn workspaces foreach --parallel run lint:fix",
+    "migration:progress": "yarn workspace et-migration-progress progress",
+    "migration:progress:test": "yarn workspace et-migration-progress test",
     "format": "prettier --write \"**/*.{js,json,md,yml,yaml}\"",
     "format:check": "prettier --check \"**/*.{js,json,md,yml,yaml}\"",
     "clean": "yarn workspaces foreach --parallel run clean && rimraf dist/",

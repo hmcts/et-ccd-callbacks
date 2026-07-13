@@ -84,6 +84,13 @@ sonarqube {
 }
 
 sourceSets {
+    ccdMigration {
+        java {
+            srcDir 'src/ccdMigration/java'
+        }
+        compileClasspath += main.output
+        runtimeClasspath += main.output
+    }
     test {
         java {
             srcDir 'src/test/java'
@@ -129,6 +136,11 @@ sourceSets {
         }
         resources.srcDir file('src/test/integration/resources')
     }
+}
+
+configurations {
+    ccdMigrationImplementation.extendsFrom implementation
+    ccdMigrationRuntimeOnly.extendsFrom runtimeOnly
 }
 
 allprojects {
@@ -260,6 +272,65 @@ tasks.register('generateCftlibCcdDefinitions', Exec) {
     dependsOn 'setupCcdDefinitionsWorkspace'
     workingDir 'ccd-definitions'
     commandLine 'yarn', 'generate-excel:cftlib'
+}
+
+def etMigrationJavaDefinitions = layout.buildDirectory.dir('ccd-migration/java-definitions')
+def etMigrationOutput = layout.buildDirectory.dir('ccd-migration')
+def etMigrationSnapshot = file('ccd-definitions/migration-progress.json')
+
+tasks.register('generateEtMigrationJson', JavaExec) {
+    dependsOn tasks.named('ccdMigrationClasses')
+    group = 'CCD tasks'
+    description = 'Generate only the Java CCD definitions included in the ET JSON-to-Java migration.'
+    classpath = sourceSets.ccdMigration.runtimeClasspath
+    mainClass = 'uk.gov.hmcts.ethos.replacement.docmosis.ccd.migration.EtMigrationDefinitionGenerator'
+    outputs.dir(etMigrationJavaDefinitions)
+    outputs.upToDateWhen { false }
+
+    doFirst {
+        delete etMigrationJavaDefinitions
+        etMigrationJavaDefinitions.get().asFile.mkdirs()
+        args = [etMigrationJavaDefinitions.get().asFile.absolutePath]
+    }
+}
+
+tasks.register('testEtMigrationProgress', Exec) {
+    dependsOn 'setupCcdDefinitionsWorkspace'
+    group = 'verification'
+    description = 'Run unit tests for the ET XLSX migration progress comparator.'
+    workingDir 'ccd-definitions'
+    commandLine 'yarn', 'migration:progress:test'
+}
+
+tasks.register('etMigrationProgress', Exec) {
+    dependsOn 'generateEtMigrationJson', 'setupCcdDefinitionsWorkspace', 'testEtMigrationProgress'
+    group = 'verification'
+    description = 'Generate XLSX files and verify ET JSON-to-Java migration progress against the snapshot.'
+    workingDir 'ccd-definitions'
+    commandLine 'yarn', 'migration:progress',
+        '--java-dir', etMigrationJavaDefinitions.get().asFile.absolutePath,
+        '--output-dir', etMigrationOutput.get().asFile.absolutePath,
+        '--repo-root', rootProject.projectDir.absolutePath,
+        '--snapshot', etMigrationSnapshot.absolutePath
+    outputs.upToDateWhen { false }
+}
+
+tasks.register('updateEtMigrationProgress', Exec) {
+    dependsOn 'generateEtMigrationJson', 'setupCcdDefinitionsWorkspace', 'testEtMigrationProgress'
+    group = 'verification'
+    description = 'Regenerate the committed ET JSON-to-Java migration progress snapshot.'
+    workingDir 'ccd-definitions'
+    commandLine 'yarn', 'migration:progress',
+        '--java-dir', etMigrationJavaDefinitions.get().asFile.absolutePath,
+        '--output-dir', etMigrationOutput.get().asFile.absolutePath,
+        '--repo-root', rootProject.projectDir.absolutePath,
+        '--snapshot', etMigrationSnapshot.absolutePath,
+        '--write-snapshot'
+    outputs.upToDateWhen { false }
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('etMigrationProgress')
 }
 
 tasks.register('yarnAudit', Exec) {

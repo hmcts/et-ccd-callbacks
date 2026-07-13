@@ -1,0 +1,20 @@
+{
+  "name": "et-migration-progress",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "matcher": "4.0.0",
+    "minimist": "^1.2.8",
+    "xlsx": "^0.18.5",
+    "xlsx-populate": "^1.21.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.23.1",
+    "eslint-plugin-mocha": "^10.1.0"
+  },
+  "scripts": {
+    "lint": "eslint bin src",
+    "progress": "node bin/et-migration-progress.js",
+    "test": "node --test src/test/*.test.js"
+  }
+}

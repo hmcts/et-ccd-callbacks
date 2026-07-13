@@ -23,9 +23,10 @@ const validateArgs = (args) => {
 
 const run = async (args) => {
   validateArgs(args);
+  const log = args.silent ? () => {} : console.log;
 
   const sourceXlsx = args.template || defaultTemplateXlsx;
-  console.log(`Import...\n loading workbook: ${sourceXlsx}`);
+  log(`Import...\n loading workbook: ${sourceXlsx}`);
   const builder = new ccdUtils.SpreadsheetBuilder(sourceXlsx);
   await builder.loadAsync();
 
@@ -37,7 +38,7 @@ const run = async (args) => {
 
   for (const sheetName in sheetToFragmentsMap) {
     const readSheetData = async (relativeFilePath) => {
-      console.log(`  - reading sheet data from ${relativeFilePath}`);
+      log(`  - reading sheet data from ${relativeFilePath}`);
       return fileUtils.readJson(
         path.join(args.sheetsDir, relativeFilePath), Substitutor.injectEnvironmentVariables);
     };
@@ -48,7 +49,7 @@ const run = async (args) => {
       return jsonFragments.flat();
     };
 
-    console.log(`  importing ${sheetName}`);
+    log(`  importing ${sheetName}`);
 
     const json = await (sheetToFragmentsMap[sheetName].length === 0 ?
       readSheetData(sheetName) : readSheetDataFromFragments(sheetName, sheetToFragmentsMap[sheetName]));
@@ -58,10 +59,10 @@ const run = async (args) => {
     builder.updateSheetDataJson(path.basename(sheetName, '.json'), transformedJson);
   }
 
-  console.log(` saving workbook: ${args.destinationXlsx}`);
+  log(` saving workbook: ${args.destinationXlsx}`);
   await builder.saveAsAsync(args.destinationXlsx);
 
-  console.log('done.');
+  log('done.');
 };
 
 module.exports = run;

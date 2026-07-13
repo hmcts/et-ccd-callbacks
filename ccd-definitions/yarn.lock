@@ -1538,6 +1538,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"et-migration-progress@workspace:tools/et-migration-progress":
+  version: 0.0.0-use.local
+  resolution: "et-migration-progress@workspace:tools/et-migration-progress"
+  dependencies:
+    eslint: "npm:^8.23.1"
+    eslint-plugin-mocha: "npm:^10.1.0"
+    matcher: "npm:4.0.0"
+    minimist: "npm:^1.2.8"
+    xlsx: "npm:^0.18.5"
+    xlsx-populate: "npm:^1.21.0"
+  languageName: unknown
+  linkType: soft
+
 "etag@npm:~1.8.1":
   version: 1.8.1
   resolution: "etag@npm:1.8.1"

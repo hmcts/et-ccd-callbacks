@@ -49,7 +49,6 @@ public class EmailNotificationService {
                 emailAddresses.add(userDetails.getEmail());
             }
         }
-        log.info("Respondent solicitor emails: {}", emailAddresses);
         return emailAddresses;
     }
 

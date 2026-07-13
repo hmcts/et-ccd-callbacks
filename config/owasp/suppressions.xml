@@ -30,5 +30,99 @@
         <packageUrl regex="true">^pkg:maven/commons\-validator/commons\-validator@.*$</packageUrl>
         <cpe>cpe:/a:validator:validator</cpe>
     </suppress>
+    <!-- Azure Service Bus SDK transitive dependencies. These are already on the latest Azure SDK BOM/MSAL stable versions. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: azure-core-1.58.0.jar, azure-core-amqp-2.11.4.jar, azure-core-http-netty-1.16.4.jar,
+   azure-core-management-1.19.4.jar, azure-identity-1.18.3.jar, azure-identity-extensions-1.2.8.jar,
+   azure-json-1.5.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.azure/azure\-(core|core\-amqp|core\-http\-netty|core\-management|identity|identity\-extensions|json)@.*$</packageUrl>
+        <cve>CVE-2026-33117</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: azure-identity-1.18.3.jar and azure-identity-extensions-1.2.8.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.azure/azure\-identity(\-extensions)?@.*$</packageUrl>
+        <cve>CVE-2023-36415</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: azure-identity-extensions-1.2.8.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.azure/azure\-identity\-extensions@.*$</packageUrl>
+        <cve>CVE-2023-36414</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: azure-identity-1.18.3.jar, azure-identity-extensions-1.2.8.jar and msal4j-1.25.0.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/(com\.azure/azure\-identity(\-extensions)?|com\.microsoft\.azure/msal4j)@.*$</packageUrl>
+        <cve>CVE-2024-35255</cve>
+    </suppress>
+    <!-- OpenTelemetry semconv is already forced to the latest published version; these match the broad OpenTelemetry CPE. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: opentelemetry-semconv-1.42.0.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.opentelemetry\.semconv/opentelemetry\-semconv@.*$</packageUrl>
+        <cve>CVE-2026-39882</cve>
+        <cve>CVE-2026-39883</cve>
+    </suppress>
+    <!-- Suppress Apache HttpComponents CVEs until patched dependency versions are agreed. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: httpcore-4.4.16.jar, httpcore5-5.4.2.jar, httpcore5-h2-5.3.6.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/(org\.apache\.httpcomponents/httpcore@4\.4\.16|org\.apache\.httpcomponents\.core5/httpcore5@5\.4\.2|org\.apache\.httpcomponents\.core5/httpcore5\-h2@5\.3\.6)$</packageUrl>
+        <cve>CVE-2026-54399</cve>
+        <cve>CVE-2026-54428</cve>
+    </suppress>
+    <!-- CCD SDK 6.19.0 pins Elasticsearch client 9.4.2 through ccd-runtime-indexing Gradle metadata.
+         Suppress until the SDK publishes a patched runtime dependency. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: elasticsearch-java-9.4.2.jar, elasticsearch-rest5-client-9.4.2.jar
+   Transitive dependency from com.github.hmcts:ccd-runtime-indexing:6.19.0.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/co\.elastic\.clients/elasticsearch\-(java|rest5\-client)@9\.4\.2$</packageUrl>
+        <cve>CVE-2026-56148</cve>
+        <cve>CVE-2026-56149</cve>
+    </suppress>
     <!-- All other CVEs below -->
+    <!-- CVE-2026-54515 affects jackson-databind 2.22.0 which is the latest available version.
+         No fixed version exists. Suppress until a patched release is available. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: jackson-databind-2.22.0.jar
+   Latest available version. No fix released for CVE-2026-54515 as of 2026-07-01.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+        <cve>CVE-2026-54515</cve>
+    </suppress>
+    <!-- CVE-2026-53914 affects kotlin-stdlib 2.2.0 which is the latest available version.
+         No fixed version exists. Suppress until a patched release is available. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: kotlin-stdlib-2.2.0.jar, kotlin-stdlib-jdk7-2.2.0.jar, kotlin-stdlib-jdk8-2.2.0.jar
+   Latest available version. No fix released for CVE-2026-53914 as of 2026-07-01.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-stdlib.*@.*$</packageUrl>
+        <cve>CVE-2026-53914</cve>
+    </suppress>
+    <!-- cucumber-core-7.18.0.jar shades jackson-databind:2.17.1 internally; the resolution strategy
+         cannot override bundled/shaded jars. cucumber is a test-only dependency and these CVEs do not
+         affect production runtime. Suppress until cucumber-core ships a newer embedded jackson. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: cucumber-core-7.18.0.jar (shaded: com.fasterxml.jackson.core:jackson-databind:2.17.1)
+   Bundled/shaded jackson inside cucumber-core test dependency. Not exploitable in production.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@2\.17\.1$</packageUrl>
+        <cve>CVE-2026-54512</cve>
+        <cve>CVE-2026-54513</cve>
+        <cve>CVE-2026-54514</cve>
+        <cve>CVE-2026-54515</cve>
+    </suppress>
 </suppressions>

@@ -350,10 +350,11 @@ class Et3VettingHelperTest {
             .build();
 
         Et3VettingHelper.setRespondentNameAndAddress(caseData);
-        String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; John<br><br>Contact "
-            + "address &#09&#09 32 Bridge Road<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Erith<br>&#09&#09&#09&#09&#09"
-            + "&#09&#09&#09&#09 <br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 DA8 2DE</pre><hr>";
 
+        String expected = "| <h2>Respondent</h2> | | \r\n"
+            + "|--|--|\r\n"
+            + "| Name | John |\r\n"
+            + "| Contact address | 32 Bridge Road<br>Erith<br><br>DA8 2DE |";
         assertThat(caseData.getEt3NameAddressRespondent(), is(expected));
     }
 
@@ -372,9 +373,11 @@ class Et3VettingHelperTest {
             .build();
 
         Et3VettingHelper.setRespondentNameAndAddress(caseData);
-        String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; John<br><br>Contact "
-            + "address &#09&#09 None Given</pre><hr>";
 
+        String expected = "| <h2>Respondent</h2> | | \r\n"
+            + "|--|--|\r\n"
+            + "| Name | John |\r\n"
+            + "| Contact address | None Given |";
         assertThat(caseData.getEt3NameAddressRespondent(), is(expected));
     }
 
@@ -394,10 +397,11 @@ class Et3VettingHelperTest {
             .build();
 
         Et3VettingHelper.setRespondentNameAndAddress(caseData);
-        String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; None Given<br><br>"
-            + "Contact address &#09&#09 32 Bridge Road<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Erith<br>&#09&#09&#09"
-            + "&#09&#09&#09&#09&#09&#09 <br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 DA8 2DE</pre><hr>";
 
+        String expected = "| <h2>Respondent</h2> | | \r\n"
+            + "|--|--|\r\n"
+            + "| Name | None Given |\r\n"
+            + "| Contact address | 32 Bridge Road<br>Erith<br><br>DA8 2DE |";
         assertThat(caseData.getEt3NameAddressRespondent(), is(expected));
     }
 
@@ -410,18 +414,18 @@ class Et3VettingHelperTest {
                 .withReceived(YES, "2022-02-05")
                 .withExtension()
                 .withET3ResponseRespondentName("John")
-                .withET3ResponseRespondentAddress("32 Bridge Road", "Erith", "Erith", "Erith", "DA8 2DE")
+                .withET3ResponseRespondentAddress("32 Bridge Road", "Line-2", "Line-3", "Post-Town", "DA8 2DE")
                 .build()
             )
             .withClaimServedDate("2022-01-01")
             .build();
 
         Et3VettingHelper.setRespondentNameAndAddress(caseData);
-        String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; John<br><br>Contact "
-            + "address &#09&#09 32 Bridge Road<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Erith<br>&#09&#09&#09&#09&#09"
-            + "&#09&#09&#09&#09 Erith<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Erith<br>&#09&#09&#09&#09&#09&#09&#09&#09"
-            + "&#09 DA8 2DE</pre><hr>";
 
+        String expected = "| <h2>Respondent</h2> | | \r\n"
+            + "|--|--|\r\n"
+            + "| Name | John |\r\n"
+            + "| Contact address | 32 Bridge Road<br>Line-2<br>Line-3<br>Post-Town<br>DA8 2DE |";
         assertThat(caseData.getEt3NameAddressRespondent(), is(expected));
     }
 
@@ -442,10 +446,10 @@ class Et3VettingHelperTest {
 
         Et3VettingHelper.setRespondentNameAndAddress(caseData);
 
-        String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; John<br><br>Contact"
-            + " address &#09&#09 32 Bridge Road<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Erith<br>&#09&#09&#09&#09&#09"
-            + "&#09&#09&#09&#09 <br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 DA8 2DE</pre><hr>";
-
+        String expected = "| <h2>Respondent</h2> | | \r\n"
+            + "|--|--|\r\n"
+            + "| Name | John |\r\n"
+            + "| Contact address | 32 Bridge Road<br>Erith<br><br>DA8 2DE |";
         assertThat(caseData.getEt3NameAddressRespondent(), is(expected));
     }
 

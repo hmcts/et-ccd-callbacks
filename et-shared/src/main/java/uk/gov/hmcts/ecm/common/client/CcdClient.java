@@ -127,6 +127,14 @@ public class CcdClient {
         return restTemplate.exchange(uri, HttpMethod.GET, getRequest(authToken), CCDRequest.class).getBody();
     }
 
+    public CCDRequest startMultipleCaseCreation(String authToken, CaseDetails caseDetails) throws IOException {
+        String uri = ccdClientConfig.buildStartMultipleCaseCreationUrl(
+                userService.getUserDetails(authToken).getUid(),
+                caseDetails.getJurisdiction(),
+                caseDetails.getCaseTypeId());
+        return restTemplate.exchange(uri, HttpMethod.GET, getRequest(authToken), CCDRequest.class).getBody();
+    }
+
     public uk.gov.hmcts.ecm.common.model.ccd.CCDRequest startEcmCaseCreationTransfer(String authToken,
                                                    uk.gov.hmcts.ecm.common.model.ccd.CaseDetails caseDetails)
         throws IOException {

@@ -35,12 +35,12 @@ class DocumentUtilTest {
         DocumentUtil.filterCasesDocumentsByCaseUserRole(caseDetailsList, caseRole);
         assertAll(
             () -> assertThat((List<LinkedHashMap<String, Object>>)caseDetailsFull.getData()
-                .get(DOCUMENT_COLLECTION)).isNotNull().hasSize(2),
+                .get(DOCUMENT_COLLECTION)).isNotNull().hasSize(3),
             () -> assertThat(emptyCaseDetails.getData()).isNull(),
             () -> assertThat((List<LinkedHashMap<String, Object>>)caseDetailsWithoutId.getData()
-                .get(DOCUMENT_COLLECTION)).isNotNull().hasSize(2),
+                .get(DOCUMENT_COLLECTION)).isNotNull().hasSize(3),
             () -> assertThat((List<LinkedHashMap<String, Object>>)caseDetailsWithoutId.getData()
-                .get(DOCUMENT_COLLECTION)).isNotNull().hasSize(2)
+                .get(DOCUMENT_COLLECTION)).isNotNull().hasSize(3)
         );
     }
 }

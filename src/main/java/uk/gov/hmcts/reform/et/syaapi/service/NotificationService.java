@@ -41,9 +41,11 @@ import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.APP_
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_ABBREVIATED_MONTHS_MAP;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_APP_TYPE_MAP;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.CASE_ID_NOT_FOUND;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.FILE_NOT_EXISTS;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.HEARING_DOCUMENTS_PATH;
+import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.MULTIPLE_ID_NOT_FOUND;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.NOT_SET;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_PARAMS_ACAS_PDF1_LINK_KEY;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_PARAMS_ACAS_PDF2_LINK_KEY;
@@ -69,6 +71,7 @@ import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_PARAMS_LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_PARAMS_LINK_TO_PORTAL;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_PARAMS_LIST_OF_RESPONDENTS;
+import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_PARAMS_MULTIPLE_CASE_NUMBER_KEY;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_PARAMS_RESPONDING_USER_NAME_KEY;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_PARAMS_SHORTTEXT_KEY;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_SERVICE_OWNER_NAME_KEY;
@@ -288,6 +291,75 @@ public class NotificationService {
             );
         }
         return sendEmailResponse;
+    }
+
+    public void sendFailedAdditionalClaimantsEmail(String leadEthosCaseRef,
+                                                   String multipleReference, long multipleCaseId) {
+        String caseNumber = Objects.requireNonNullElse(leadEthosCaseRef, CASE_ID_NOT_FOUND);
+        String multipleCaseNumber = Objects.requireNonNullElse(multipleReference, MULTIPLE_ID_NOT_FOUND);
+
+        try {
+            Map<String, Object> parameters = new ConcurrentHashMap<>();
+            parameters.put(SEND_EMAIL_PARAMS_CASE_NUMBER_KEY, caseNumber);
+            parameters.put(SEND_EMAIL_PARAMS_MULTIPLE_CASE_NUMBER_KEY, multipleCaseNumber);
+            parameters.put(LINK_TO_EXUI,  notificationsProperties.getExuiCaseDetailsLink() + multipleCaseId);
+            String emailTemplateId = notificationsProperties.getAdditionalClaimantCaseCreationErrorEmailTemplateId();
+
+            // Send an alert email to the service owner
+            notificationClient.sendEmail(
+                    emailTemplateId,
+                    notificationsProperties.getEt1ServiceOwnerNotificationEmail(),
+                    parameters,
+                    caseNumber
+            );
+
+            // Send a copy alert email to ECM DTS core team
+            notificationClient.sendEmail(
+                    emailTemplateId,
+                    notificationsProperties.getEt1EcmDtsCoreTeamSlackNotificationEmail(),
+                    parameters,
+                    caseNumber
+            );
+        } catch (NotificationClientException ne) {
+            GenericServiceUtil.logException(
+                    "Create-multiples - Failed to send additional claimant creation error email",
+                    caseNumber, ne.getMessage(),
+                    this.getClass().getName(), "sendFailedAdditionalClaimantsEmail"
+            );
+        }
+    }
+
+    public void sendFailedMultiplesShellCreationEmail(String leadEthosCaseRef, long caseId) {
+        String caseNumber = leadEthosCaseRef == null ? CASE_ID_NOT_FOUND : leadEthosCaseRef;
+
+        try {
+            Map<String, Object> parameters = new ConcurrentHashMap<>();
+            parameters.put(SEND_EMAIL_PARAMS_CASE_NUMBER_KEY, caseNumber);
+            parameters.put(LINK_TO_EXUI,  notificationsProperties.getExuiCaseDetailsLink() + caseId);
+            String emailTemplateId = notificationsProperties.getMultipleShellCaseCreationErrorEmailTemplateId();
+
+            // Send an alert email to the service owner
+            notificationClient.sendEmail(
+                    emailTemplateId,
+                    notificationsProperties.getEt1ServiceOwnerNotificationEmail(),
+                    parameters,
+                    caseNumber
+            );
+
+            // Send a copy alert email to ECM DTS core team
+            notificationClient.sendEmail(
+                    emailTemplateId,
+                    notificationsProperties.getEt1EcmDtsCoreTeamSlackNotificationEmail(),
+                    parameters,
+                    caseNumber
+            );
+        } catch (NotificationClientException ne) {
+            GenericServiceUtil.logException(
+                    "Create-multiples - Failed to send additional claimant creation error email",
+                    caseNumber, ne.getMessage(),
+                    this.getClass().getName(), "sendFailedAdditionalClaimantsEmail"
+            );
+        }
     }
 
     /**

@@ -16,7 +16,7 @@ provider "azurerm" {
 }
 
 locals {
-  tagEnv = var.env == "aat" ? "staging" : var.env == "perftest" ? "testing" : var.env
+  tagEnv = var.env == "aat" ? "staging" : var.env == "perftest" ? "testing" : var.env == "prod" ? "production" : var.env
   tags = merge(var.common_tags,
     tomap({
       "environment"  = local.tagEnv,

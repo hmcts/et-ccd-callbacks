@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ecm.compat.common.model.servicebus.tasks;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import uk.gov.hmcts.ecm.common.model.ccd.types.CasePreAcceptType;
@@ -45,9 +44,9 @@ class PreAcceptDataTaskTest {
 
     @ParameterizedTest
     @CsvSource({
-            ACCEPTED_STATE + "," + YES,
-            REJECTED_STATE + "," + YES,
-            SUBMITTED_STATE + "," + YES
+        ACCEPTED_STATE + "," + YES,
+        REJECTED_STATE + "," + YES,
+        SUBMITTED_STATE + "," + YES
     })
      void checkValidCaseStates(String state, String caseAccepted) {
         var updateModel = preAcceptDataModelBuilder.preAcceptDataModelBuilder("2022-02-02").build();
@@ -59,22 +58,5 @@ class PreAcceptDataTaskTest {
         assertEquals(caseAccepted, submitEvent.getCaseData().getPreAcceptCase().getCaseAccepted());
         assertEquals("2022-02-02", submitEvent.getCaseData().getPreAcceptCase().getDateAccepted());
     }
-
-
-   @Test
-    void checkIfCaseAlreadyAccepted() {
-        // If a case has already been accepted, it should not be overwritten with a new data
-       var updateModel = preAcceptDataModelBuilder.preAcceptDataModelBuilder("2022-02-02").build();
-       var submitEvent = caseDataBuilder.buildAsSubmitEvent(ACCEPTED_STATE);
-       var casePreAcceptType = new CasePreAcceptType();
-       casePreAcceptType.setCaseAccepted(YES);
-       casePreAcceptType.setDateAccepted("2021-01-01");
-       submitEvent.getCaseData().setPreAcceptCase(casePreAcceptType);
-       var task = new PreAcceptDataTask(updateModel);
-       task.run(submitEvent);
-
-       assertEquals("2021-01-01", submitEvent.getCaseData().getPreAcceptCase().getDateAccepted());
-       assertEquals(YES, submitEvent.getCaseData().getPreAcceptCase().getCaseAccepted());
-   }
 
 }

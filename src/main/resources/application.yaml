@@ -58,12 +58,26 @@ ccd:
   client:
     timeout: '60000'
   data-store-api-url: ${CCD_DATA_STORE_API_URL:http://ccd-data-store-api:4452}
+  data-migration:
+    enabled: ${ET_CCD_DATA_MIGRATION_ENABLED:false}
+    task-name: ${ET_CCD_DATA_MIGRATION_TASK_NAME:et-ccd-data-migration}
+    mode: ${ET_CCD_DATA_MIGRATION_MODE:PRELOAD_EVENTS}
+    case-type-ids: ${ET_CCD_DATA_MIGRATION_CASE_TYPE_IDS:ET_EnglandWales,ET_Scotland,ET_Admin,ET_EnglandWales_Multiple,ET_Scotland_Multiple,ET_EnglandWales_Listings,ET_Scotland_Listings}
+    event-batch-size: ${ET_CCD_DATA_MIGRATION_EVENT_BATCH_SIZE:10000}
+    max-batches-per-run: ${ET_CCD_DATA_MIGRATION_MAX_BATCHES_PER_RUN:100}
+    max-run-time: ${ET_CCD_DATA_MIGRATION_MAX_RUN_TIME:2h}
+    case-revision-offset: ${ET_CCD_DATA_MIGRATION_CASE_REVISION_OFFSET:1000000000}
   servicebus:
     destination: ${CCD_SERVICEBUS_DESTINATION:${AZURE_SERVICE_BUS_TOPIC_NAME:ccd-case-events-aat}}
     scheduler-enabled: ${ET_SERVICEBUS_SCHEDULER_ENABLED:false}
     batch-size: ${ET_SERVICEBUS_BATCH_SIZE:1000}
     published-retention-days: ${ET_SERVICEBUS_PUBLISHED_RETENTION_DAYS:7}
     schedule: ${ET_SERVICEBUS_SCHEDULE:*/30 * * * * *}
+
+migration:
+  ccd-data:
+    enabled: ${ET_CCD_DATA_MIGRATION_ENABLED:false}
+    cron: ${ET_CCD_DATA_MIGRATION_CRON:0 0 15,17 * * *}
 
 core_case_data:
   api:
@@ -78,6 +92,10 @@ document_management:
 
 decentralisation:
   legacy-json-service: true
+  local-callback-placeholder: ET_COS_URL
+  local-callback-base-url: ${ET_COS_URL:http://localhost:8081}
+  external-callback-base-urls:
+    "[CCD_DEF_AAC_URL]": ${AAC_URL:http://localhost:4454}
 
 idam:
   s2s-auth:
@@ -317,6 +335,8 @@ notifications:
   submitCaseEmailTemplateId: ${SUBMIT_CASE_EMAIL_TEMPLATE_ID:a4045b26-3914-4c13-a06e-6fb64a99ee2f}
   cySubmitCaseEmailTemplateId: ${CY_SUBMIT_CASE_EMAIL_TEMPLATE_ID:17ff79da-3bbf-4c82-ab44-48038c792d23}
   submitCaseDocUploadErrorEmailTemplateId: ${SUBMIT_CASE_DOC_UPLOAD_ERROR_EMAIL_TEMPLATE_ID:10a82e6a-5020-4756-9512-eb391b8c46e3}
+  additionalClaimantCaseCreationErrorEmailTemplateId: ${ADDITIONAL_CLAIMANT_CASE_CREATION_ERROR_EMAIL_TEMPLATE_ID:fa0f191f-900d-47c3-aab1-b2f5a4a696d4}
+  multipleShellCaseCreationErrorEmailTemplateId: ${MULTIPLE_SHELL_CASE_CREATION_ERROR_EMAIL_TEMPLATE_ID:1d72bae1-8426-49bf-98a2-15abd3de50d3}
   applicationAcknowledgementTypeA: ${APPLICATION_ACKNOWLEDGEMENT_TYPE_A:1892837f-2a5e-47b9-9d73-29ccffbac8d8}
   cyApplicationAcknowledgementTypeA: ${CY_APPLICATION_ACKNOWLEDGEMENT_TYPE_A:aa5c5e79-bb2b-49b7-a0d3-42a1ca2ab412}
   applicationAcknowledgementTypeB: ${APPLICATION_ACKNOWLEDGEMENT_TYPE_B:59ea1be0-882c-4059-8a9b-229f2ec2cd96}

@@ -29,7 +29,7 @@ dependencyManagement {
         dependency 'commons-fileupload:commons-fileupload:1.6.0'
         dependency 'org.apache.httpcomponents:httpclient:4.5.14'
         dependency 'org.apache.logging.log4j:log4j-core:2.25.4'
-        dependency 'com.nimbusds:nimbus-jose-jwt:10.9'
+        dependency 'com.nimbusds:nimbus-jose-jwt:10.9.1'
         dependency 'net.minidev:json-smart:2.5.2'
         dependency 'com.squareup.okhttp3:logging-interceptor:4.12.0'
         dependency 'com.squareup.okhttp3:okhttp:4.12.0'
@@ -127,7 +127,7 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.17'
 
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.1'
-    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.13.4'
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.14.0'
 
     implementation 'org.springframework:spring-web'
     implementation 'org.springframework:spring-context'
@@ -138,12 +138,11 @@ dependencies {
 
     implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.0.2'
     implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: '8.0.3.Final'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.18.3'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.18.3'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.18.3'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.3'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: jacksonVersion
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jacksonAnnotationsVersion
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: jacksonVersion
     implementation group: 'org.springframework', name: 'spring-core'
-    implementation 'com.github.hmcts:decentralised-runtime:callback-dispatch-refactor-20260415-1610'
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
@@ -182,7 +181,7 @@ configurations.configureEach {
         'commons-fileupload:commons-fileupload:1.6.0',
         'org.apache.httpcomponents:httpclient:4.5.14',
         'org.apache.logging.log4j:log4j-core:2.25.4',
-        'com.nimbusds:nimbus-jose-jwt:10.9',
+        'com.nimbusds:nimbus-jose-jwt:10.9.1',
         'net.minidev:json-smart:2.5.2',
         'com.squareup.okhttp3:logging-interceptor:4.12.0',
         'com.squareup.okhttp3:okhttp:4.12.0',

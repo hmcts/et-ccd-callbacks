@@ -7,13 +7,17 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import uk.gov.dwp.regex.InvalidPostcodeException;
+import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesMsg;
+import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreateMultiplesDataModel;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
 import uk.gov.hmcts.ecm.common.service.pdf.PdfDecodedMultipartFile;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -22,6 +26,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
+import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -42,6 +48,7 @@ import uk.gov.service.notify.SendEmailResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -51,16 +58,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -111,6 +122,10 @@ class CaseServiceTest {
     private FeatureToggleService featureToggle;
     @Mock
     private ManageCaseRoleService manageCaseRoleService;
+    @Mock
+    private CreateUpdatesBusSender createUpdatesBusSender;
+    @Mock
+    private UserIdamService userIdamService;
     @Spy
     private NotificationsProperties notificationsProperties;
     @InjectMocks
@@ -456,6 +471,38 @@ class CaseServiceTest {
         );
 
         assertEquals(YES, caseDetails.getData().get(ET1_ONLINE_SUBMISSION));
+    }
+
+    @Test
+    void triggerMultipleCreationSendsSingleMessageWithAllClaimants() {
+        UserDetails userDetails = mock(UserDetails.class);
+        when(userDetails.getEmail()).thenReturn("test@test.com");
+        when(userIdamService.getUserDetails(TEST_SERVICE_AUTH_TOKEN)).thenReturn(userDetails);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(CASE_TYPE, MULTIPLE_CASE_TYPE);
+        data.put("ethosCaseReference", "6000001/2024");
+        data.put("addClaimantMethod", "manually");
+        data.put("additionalClaimants", List.of(
+            Map.of("id", "1", "value", Map.of("firstName", "Alice", "lastName", "One")),
+            Map.of("id", "2", "value", Map.of("firstName", "Bob", "lastName", "Two")),
+            Map.of("id", "3", "value", Map.of("firstName", "Carol", "lastName", "Three"))
+        ));
+        CaseDetails caseDetails = CaseDetails.builder()
+            .caseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+            .data(data)
+            .build();
+
+        ReflectionTestUtils.invokeMethod(caseService, "triggerMultipleCreation", TEST_SERVICE_AUTH_TOKEN, caseDetails);
+
+        ArgumentCaptor<CreateUpdatesMsg> captor = ArgumentCaptor.forClass(CreateUpdatesMsg.class);
+        verify(createUpdatesBusSender, times(1)).sendSingleMessage(captor.capture(), anyList());
+        CreateUpdatesMsg sent = captor.getValue();
+        assertEquals("3", sent.getTotalCases());
+        assertEquals(List.of("6000001/2024"), sent.getEthosCaseRefCollection());
+        assertEquals(ENGLANDWALES_CASE_TYPE_ID, sent.getCaseTypeId());
+        CreateMultiplesDataModel sentDataModel = (CreateMultiplesDataModel) sent.getDataModelParent();
+        assertEquals(3, sentDataModel.getAdditionalClaimants().size());
     }
 
     private DocumentTypeItem createDocumentTypeItem() {

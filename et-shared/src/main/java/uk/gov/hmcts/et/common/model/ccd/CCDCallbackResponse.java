@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.gov.hmcts.ccd.sdk.CallbackResponse;
-import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
 
 import java.util.Map;
@@ -18,7 +16,7 @@ import java.util.Map;
 @AllArgsConstructor
 @SuperBuilder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CCDCallbackResponse extends GenericCallbackResponse implements CallbackResponse<CaseData>, SubmittedCallbackResponse {
+public class CCDCallbackResponse extends GenericCallbackResponse {
 
     private CaseData data;
     private Map<String, Object> dataClassification;
@@ -29,12 +27,10 @@ public class CCDCallbackResponse extends GenericCallbackResponse implements Call
         this.data = data;
     }
 
-    @Override
     public String getConfirmationHeader() {
         return this.getConfirmation_header();
     }
 
-    @Override
     public String getConfirmationBody() {
         return this.getConfirmation_body();
     }

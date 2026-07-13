@@ -104,7 +104,20 @@ public class Constants {
     public static final String NEWCASTLE_CASE_TYPE_ID = "Newcastle";
     public static final String WALES_CASE_TYPE_ID = "Wales";
     public static final String WATFORD_CASE_TYPE_ID = "Watford";
-
+    public static final List<String> ECM_CASE_TYPES = List.of(
+        BRISTOL_CASE_TYPE_ID,
+        LEEDS_CASE_TYPE_ID,
+        LONDON_CENTRAL_CASE_TYPE_ID,
+        LONDON_EAST_CASE_TYPE_ID,
+        LONDON_SOUTH_CASE_TYPE_ID,
+        MANCHESTER_CASE_TYPE_ID,
+        MIDLANDS_EAST_CASE_TYPE_ID,
+        MIDLANDS_WEST_CASE_TYPE_ID,
+        NEWCASTLE_CASE_TYPE_ID,
+        SCOTLAND_CASE_TYPE_ID,
+        WALES_CASE_TYPE_ID,
+        WATFORD_CASE_TYPE_ID
+    );
     public static final String PENDING_STATE = "Pending";
     public static final String SUBMITTED_STATE = "Submitted";
     public static final String ACCEPTED_STATE = "Accepted";

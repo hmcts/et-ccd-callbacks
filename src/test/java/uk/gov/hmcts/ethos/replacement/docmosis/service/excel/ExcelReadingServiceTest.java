@@ -16,6 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.types.multiples.AdditionalClaimant;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
@@ -25,9 +26,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
@@ -36,6 +39,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.CONSTRAINT_KEY;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_3;
@@ -262,6 +268,143 @@ class ExcelReadingServiceTest {
         assertEquals(" ", caseData.getSubMultipleName());
     }
 
+    @Test
+    void readClaimantsFromSpreadsheetShouldParseRowsAndSkipBlankRow() throws IOException {
+        when(excelDocManagementService.downloadExcelDocument(userToken, documentBinaryUrl))
+            .thenReturn(buildClaimantsWorkbookStream(
+                List.of("Teitl", "First Name", "last_name", "DOB", "e-bost", "Address Line 1",
+                    "Address Line 2", "Town or City", "Gwlad", "Cod Post"),
+                List.of("Mr", "John", "Doe", "1990-01-01", "john@example.com", "1 Main St", "Flat 1",
+                    "Cardiff", "Wales", "CF10 1AA"),
+                List.of("", "", "", "", "", "", "", "", "", "")
+            ));
+
+        List<AdditionalClaimant> claimants = excelReadingService.readClaimantsFromSpreadsheet(
+            userToken, documentBinaryUrl, errors);
+
+        assertEquals(1, claimants.size());
+        AdditionalClaimant claimant = claimants.getFirst();
+        assertEquals("Mr", claimant.getTitle());
+        assertEquals("John", claimant.getFirstName());
+        assertEquals("Doe", claimant.getLastName());
+        assertEquals("1990-01-01", claimant.getDob());
+        assertEquals("john@example.com", claimant.getEmail());
+        assertEquals("1 Main St", claimant.getAddress().getAddressLine1());
+        assertEquals("Flat 1", claimant.getAddress().getAddressLine2());
+        assertEquals("Cardiff", claimant.getAddress().getPostTown());
+        assertEquals("Wales", claimant.getAddress().getCountry());
+        assertEquals("CF10 1AA", claimant.getAddress().getPostCode());
+        Assertions.assertTrue(errors.isEmpty());
+    }
+
+    @Test
+    void readClaimantsFromSpreadsheetShouldParseExcelDateCellAsIso() throws IOException {
+        when(excelDocManagementService.downloadExcelDocument(userToken, documentBinaryUrl))
+            .thenReturn(buildClaimantsWorkbookStreamWithDateCell(
+                List.of("firstName", "lastName", "dob"),
+                    LocalDate.of(2001, 2, 3)
+            ));
+
+        List<AdditionalClaimant> claimants = excelReadingService.readClaimantsFromSpreadsheet(
+            userToken, documentBinaryUrl, errors);
+
+        assertEquals(1, claimants.size());
+        assertEquals("2001-02-03", claimants.getFirst().getDob());
+    }
+
+    @Test
+    void readClaimantsFromSpreadsheetShouldHandleWorkbookWithoutHeaderRowZero() throws IOException {
+        when(excelDocManagementService.downloadExcelDocument(userToken, documentBinaryUrl))
+            .thenReturn(buildClaimantsWorkbookWithoutHeaderRowZero());
+
+        List<AdditionalClaimant> claimants = excelReadingService.readClaimantsFromSpreadsheet(
+            userToken, documentBinaryUrl, errors);
+
+        assertEquals(0, claimants.size());
+        Assertions.assertTrue(errors.isEmpty());
+    }
+
+    @Test
+    void readClaimantsFromSpreadsheetShouldAppendErrorOnIoException() throws IOException {
+        when(excelDocManagementService.downloadExcelDocument(userToken, documentBinaryUrl))
+            .thenThrow(new IOException("cannot read"));
+
+        List<AdditionalClaimant> claimants = excelReadingService.readClaimantsFromSpreadsheet(
+            userToken, documentBinaryUrl, errors);
+
+        assertEquals(0, claimants.size());
+        assertEquals(1, errors.size());
+        Assertions.assertTrue(errors.getFirst().startsWith("Error reading additional claimant spreadsheet:"));
+    }
+
+    @Test
+    void readClaimantsFromSpreadsheetShouldHandleNullSheet() throws IOException {
+        ExcelReadingService serviceSpy = spy(excelReadingService);
+        XSSFWorkbook workbook = mock(XSSFWorkbook.class);
+        doReturn(workbook).when(serviceSpy).readWorkbook(userToken, documentBinaryUrl);
+        when(workbook.getSheetAt(0)).thenReturn(null);
+
+        List<AdditionalClaimant> claimants = serviceSpy.readClaimantsFromSpreadsheet(
+            userToken, documentBinaryUrl, errors);
+
+        assertEquals(0, claimants.size());
+        assertEquals(List.of("No worksheet found in additional claimant spreadsheet"), errors);
+    }
+
+    @Test
+    void buildHeaderMapShouldMapKnownHeadersAndSkipUnknownOnes() throws IOException {
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            XSSFSheet sheet = workbook.createSheet("claimants");
+            Row header = sheet.createRow(0);
+            header.createCell(0).setCellValue("Teitl");
+            header.createCell(1).setCellValue("first_name");
+            header.createCell(2).setCellValue("cyfenw");
+            header.createCell(3).setCellValue("dyddiad geni");
+            header.createCell(4).setCellValue("e-bost");
+            header.createCell(5).setCellValue("llinell cyfeiriad 1");
+            header.createCell(6).setCellValue("llinellcyfeiriad2");
+            header.createCell(7).setCellValue("tref neu ddinas");
+            header.createCell(8).setCellValue("gwlad");
+            header.createCell(9).setCellValue("codpost");
+            header.createCell(10).setCellValue("unknown-column");
+
+            Map<String, Integer> headerMap = excelReadingService.buildHeaderMap(header);
+
+            assertEquals(0, headerMap.get("title"));
+            assertEquals(1, headerMap.get("firstName"));
+            assertEquals(2, headerMap.get("lastName"));
+            assertEquals(3, headerMap.get("dob"));
+            assertEquals(4, headerMap.get("email"));
+            assertEquals(5, headerMap.get("address1"));
+            assertEquals(6, headerMap.get("address2"));
+            assertEquals(7, headerMap.get("town"));
+            assertEquals(8, headerMap.get("country"));
+            assertEquals(9, headerMap.get("postcode"));
+            Assertions.assertFalse(headerMap.containsKey("unknown-column"));
+        }
+    }
+
+    @Test
+    void readClaimantsFromSpreadsheetShouldHandleMissingOptionalColumns() throws IOException {
+        when(excelDocManagementService.downloadExcelDocument(userToken, documentBinaryUrl))
+            .thenReturn(buildClaimantsWorkbookStream(
+                List.of("firstName", "lastName"),
+                List.of("Alex", "Taylor"),
+                List.of("", "")
+            ));
+
+        List<AdditionalClaimant> claimants = excelReadingService.readClaimantsFromSpreadsheet(
+            userToken, documentBinaryUrl, errors);
+
+        assertEquals(1, claimants.size());
+        AdditionalClaimant claimant = claimants.getFirst();
+        assertEquals("Alex", claimant.getFirstName());
+        assertEquals("Taylor", claimant.getLastName());
+        assertEquals("", claimant.getDob());
+        assertEquals("", claimant.getEmail());
+        assertEquals("", claimant.getAddress().getAddressLine1());
+    }
+
     private ByteArrayInputStream buildWorkbookStreamWithSingleDataRow(
         String sheetName,
         boolean protectSheet,
@@ -286,6 +429,65 @@ class ExcelReadingServiceTest {
             if (protectSheet) {
                 sheet.protectSheet(CONSTRAINT_KEY);
             }
+            workbook.write(outputStream);
+            return new ByteArrayInputStream(outputStream.toByteArray());
+        }
+    }
+
+    private ByteArrayInputStream buildClaimantsWorkbookStream(
+        List<String> headerValues,
+        List<String>... dataRows
+    ) throws IOException {
+        try (XSSFWorkbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            XSSFSheet sheet = workbook.createSheet("claimants");
+            Row header = sheet.createRow(0);
+            for (int i = 0; i < headerValues.size(); i++) {
+                header.createCell(i).setCellValue(headerValues.get(i));
+            }
+            for (int r = 0; r < dataRows.length; r++) {
+                Row row = sheet.createRow(r + 1);
+                List<String> values = dataRows[r];
+                for (int c = 0; c < values.size(); c++) {
+                    row.createCell(c).setCellValue(values.get(c));
+                }
+            }
+            workbook.write(outputStream);
+            return new ByteArrayInputStream(outputStream.toByteArray());
+        }
+    }
+
+    private ByteArrayInputStream buildClaimantsWorkbookStreamWithDateCell(
+        List<String> headerValues,
+        LocalDate dob
+    ) throws IOException {
+        try (XSSFWorkbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            XSSFSheet sheet = workbook.createSheet("claimants");
+            Row header = sheet.createRow(0);
+            for (int i = 0; i < headerValues.size(); i++) {
+                header.createCell(i).setCellValue(headerValues.get(i));
+            }
+            Row row = sheet.createRow(1);
+            row.createCell(0).setCellValue("Jane");
+            row.createCell(1).setCellValue("Smith");
+            Cell dobCell = row.createCell(2);
+            dobCell.setCellValue(java.sql.Date.valueOf(dob));
+            org.apache.poi.ss.usermodel.CellStyle style = workbook.createCellStyle();
+            style.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat("yyyy-mm-dd"));
+            dobCell.setCellStyle(style);
+            workbook.write(outputStream);
+            return new ByteArrayInputStream(outputStream.toByteArray());
+        }
+    }
+
+    private ByteArrayInputStream buildClaimantsWorkbookWithoutHeaderRowZero() throws IOException {
+        try (XSSFWorkbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            XSSFSheet sheet = workbook.createSheet("claimants");
+            Row rowOne = sheet.createRow(1);
+            rowOne.createCell(0).setCellValue("John");
+            rowOne.createCell(1).setCellValue("Doe");
             workbook.write(outputStream);
             return new ByteArrayInputStream(outputStream.toByteArray());
         }

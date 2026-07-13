@@ -123,6 +123,12 @@ withPipeline(type, product, component) {
   syncBranchesWithMaster(branchesToSync)
   enableSlackNotifications('#et-builds')
 
+  before('build') {
+    sh '''
+      env AZURE_CONFIG_DIR=/opt/jenkins/.azure-nonprod az acr login --name hmctsprod
+    '''
+  }
+
   // Enable Performance Test Stages
   enablePerformanceTestStages(timeout: 10, perfTestEnvironments: ['preview','aat','perftest'])
   enableGatlingLoadTests([

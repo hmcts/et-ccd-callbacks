@@ -53,6 +53,35 @@ class CreateMultiplesServiceTest {
     private CreateMultiplesService createMultiplesService;
 
     @Test
+    void retrieveLeadCaseReturnsNullWhenNoCasesFound() throws IOException {
+        CreateUpdatesMsg msg = CreateUpdatesMsg.builder()
+                .caseTypeId("ET_EnglandWales")
+                .ethosCaseRefCollection(List.of("6000001/2024"))
+                .build();
+        when(ccdClient.retrieveCasesElasticSearch(TOKEN, "ET_EnglandWales", List.of("6000001/2024")))
+                .thenReturn(List.of());
+
+        SubmitEvent result = createMultiplesService.retrieveLeadCase(TOKEN, msg);
+
+        assertNull(result);
+    }
+
+    @Test
+    void retrieveLeadCaseReturnsFirstCaseWhenFound() throws IOException {
+        CreateUpdatesMsg msg = CreateUpdatesMsg.builder()
+                .caseTypeId("ET_EnglandWales")
+                .ethosCaseRefCollection(List.of("6000001/2024"))
+                .build();
+        SubmitEvent submitEvent = new SubmitEvent();
+        when(ccdClient.retrieveCasesElasticSearch(TOKEN, "ET_EnglandWales", List.of("6000001/2024")))
+                .thenReturn(List.of(submitEvent));
+
+        SubmitEvent result = createMultiplesService.retrieveLeadCase(TOKEN, msg);
+
+        assertEquals(submitEvent, result);
+    }
+
+    @Test
     void createCaseReturnsCreatedEthosReference() throws IOException {
         SubmitEvent leadCase = new SubmitEvent();
         CaseData leadData = new CaseData();
@@ -97,6 +126,33 @@ class CreateMultiplesServiceTest {
     void createCaseReturnsNullWhenNoClaimant() throws IOException {
         CreateUpdatesMsg msg = CreateUpdatesMsg.builder().build();
         assertNull(createMultiplesService.createCase(new SubmitEvent(), TOKEN, msg, null));
+    }
+
+    @Test
+    void createCaseReturnsNullWhenCcdReturnsEmptyCase() throws IOException {
+        SubmitEvent leadCase = new SubmitEvent();
+        CaseData leadData = new CaseData();
+        leadData.setEthosCaseReference("6000001/2024");
+        leadCase.setCaseData(leadData);
+        leadCase.setCaseId(11L);
+
+        CCDRequest startRequest = new CCDRequest();
+        when(ccdClient.startMultipleCaseCreation(anyString(), any(CaseDetails.class))).thenReturn(startRequest);
+        when(ccdClient.submitCaseCreation(anyString(), any(CaseDetails.class), eq(startRequest), anyString()))
+                .thenReturn(null);
+
+        CreateUpdatesMsg msg = CreateUpdatesMsg.builder()
+                .caseTypeId("ET_EnglandWales")
+                .jurisdiction("EMPLOYMENT")
+                .build();
+        AdditionalClaimant claimant = AdditionalClaimant.builder()
+                .firstName("Alice")
+                .lastName("One")
+                .build();
+
+        String result = createMultiplesService.createCase(leadCase, TOKEN, msg, claimant);
+
+        assertNull(result);
     }
 
     @Test
@@ -179,6 +235,46 @@ class CreateMultiplesServiceTest {
         assertTrue(captor.getValue().getMultipleNote().contains("manual entry"));
         assertTrue(captor.getValue().getMultipleNote().contains("Additional claimant 1 (Jane Doe)"));
         verify(notificationService).sendFailedAdditionalClaimantsEmail("6000001/2024", "6000123/2024", 4444L);
+    }
+
+    @Test
+    void createMultipleShellAddsFailedClaimantNoteForSpreadsheetUploadWithMissingData() throws IOException {
+        CaseData leadData = new CaseData();
+        leadData.setEthosCaseReference("6000001/2024");
+        leadData.setManagingOffice("Leeds");
+        leadData.setRespondent("Respondent 1");
+        leadData.setAddClaimantMethod("spreadsheet");
+        SubmitEvent leadCase = new SubmitEvent();
+        leadCase.setCaseData(leadData);
+
+        CCDRequest request = new CCDRequest();
+        when(ccdClient.startCaseMultipleCreation(eq(TOKEN), anyString(), eq("EMPLOYMENT"))).thenReturn(request);
+        SubmitMultipleEvent createdMultiple = new SubmitMultipleEvent();
+        MultipleData createdMultipleData = new MultipleData();
+        createdMultipleData.setLeadEthosCaseRef("6000001/2024");
+        createdMultipleData.setMultipleReference("6000123/2024");
+        createdMultiple.setCaseData(createdMultipleData);
+        createdMultiple.setCaseId(5555L);
+        when(ccdClient.submitMultipleCreation(eq(TOKEN), any(MultipleData.class), anyString(), eq("EMPLOYMENT"),
+                eq(request))).thenReturn(createdMultiple);
+
+        Map<Integer, AdditionalClaimant> failedCases = new LinkedHashMap<>();
+        failedCases.put(0, null);
+
+        CreateUpdatesMsg msg = CreateUpdatesMsg.builder()
+                .caseTypeId("ET_EnglandWales")
+                .jurisdiction("EMPLOYMENT")
+                .ethosCaseRefCollection(List.of("6000001/2024"))
+                .build();
+        createMultiplesService.createMultipleShell(
+                TOKEN, msg, leadCase, List.of("6000002/2024"), failedCases);
+
+        ArgumentCaptor<MultipleData> captor = ArgumentCaptor.forClass(MultipleData.class);
+        verify(ccdClient).submitMultipleCreation(eq(TOKEN), captor.capture(), anyString(), eq("EMPLOYMENT"),
+                eq(request));
+        assertTrue(captor.getValue().getMultipleNote().contains("spreadsheet upload"));
+        assertTrue(captor.getValue().getMultipleNote().contains("Row 1: no claimant data supplied"));
+        verify(notificationService).sendFailedAdditionalClaimantsEmail("6000001/2024", "6000123/2024", 5555L);
     }
 
     @Test

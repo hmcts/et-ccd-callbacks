@@ -121,6 +121,32 @@ class CreateUpdatesBusSenderTest {
         assertEquals(List.of("Failed to send the message to the queue"), errors);
     }
 
+    @Test
+    void sendSingleMessageShouldSaveWhenSerializationSucceeds() throws Exception {
+        CreateUpdatesMsg msg = new CreateUpdatesMsg();
+        msg.setMsgId("single-msg-id");
+        List<String> errors = new ArrayList<>();
+        when(objectMapper.writeValueAsString(msg)).thenReturn("{\"msgId\":\"single-msg-id\"}");
+
+        createUpdatesBusSender.sendSingleMessage(msg, errors);
+
+        verify(createUpdatesQueueRepository).save(any());
+        assertEquals(0, errors.size());
+    }
+
+    @Test
+    void sendSingleMessageShouldAppendErrorWhenSerializationFails() throws Exception {
+        CreateUpdatesMsg msg = new CreateUpdatesMsg();
+        msg.setMsgId("single-msg-id");
+        List<String> errors = new ArrayList<>();
+        when(objectMapper.writeValueAsString(msg)).thenThrow(new RuntimeException("boom"));
+
+        createUpdatesBusSender.sendSingleMessage(msg, errors);
+
+        verify(createUpdatesQueueRepository, never()).save(any());
+        assertEquals(List.of("Failed to send the message to the queue"), errors);
+    }
+
     private CreateUpdatesDto getCreateUpdatesDto(List<String> ethosCaseRefCollection) {
         return CreateUpdatesDto.builder()
                 .caseTypeId(SCOTLAND_BULK_CASE_TYPE_ID)

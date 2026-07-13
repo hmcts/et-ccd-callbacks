@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.PageRequest;
@@ -25,7 +26,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageS
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.messagequeue.CreateUpdatesQueueRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.messagehandler.CreateMultiplesService;
-
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -88,6 +90,19 @@ class CreateUpdatesQueueProcessorTest {
         ReflectionTestUtils.setField(processor, "threadCount", 5);
         ReflectionTestUtils.setField(processor, "batchSize", 10);
         processor.init(); // Initialize processor ID and executor
+    }
+
+    @Test
+    void initShouldSetFallbackProcessorIdWhenHostnameLookupFails() throws Exception {
+        ReflectionTestUtils.setField(processor, "executor", null);
+        try (MockedStatic<InetAddress> inetAddressMockedStatic = org.mockito.Mockito.mockStatic(InetAddress.class)) {
+            inetAddressMockedStatic.when(InetAddress::getLocalHost).thenThrow(new UnknownHostException("boom"));
+
+            processor.init();
+        }
+
+        String processorId = (String) ReflectionTestUtils.getField(processor, "processorId");
+        org.junit.jupiter.api.Assertions.assertTrue(processorId.startsWith("processor-"));
     }
 
     @Test

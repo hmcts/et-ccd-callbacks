@@ -27,7 +27,9 @@ import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.multiples.AdditionalClaimant;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -125,6 +127,8 @@ class CaseServiceTest {
     private ManageCaseRoleService manageCaseRoleService;
     @Mock
     private CreateUpdatesBusSender createUpdatesBusSender;
+    @Mock
+    private ExcelReadingService excelReadingService;
     @Mock
     private UserIdamService userIdamService;
     @Spy
@@ -505,6 +509,65 @@ class CaseServiceTest {
         assertEquals(ENGLANDWALES_CASE_TYPE_ID, sent.getCaseTypeId());
         CreateMultiplesDataModel sentDataModel = (CreateMultiplesDataModel) sent.getDataModelParent();
         assertEquals(3, sentDataModel.getAdditionalClaimants().size());
+    }
+
+    @Test
+    void triggerMultipleCreationSpreadsheetReadsClaimantsAndQueuesSingleMessage() {
+        UserDetails userDetails = mock(UserDetails.class);
+        when(userDetails.getEmail()).thenReturn("test@test.com");
+        when(userIdamService.getUserDetails(TEST_SERVICE_AUTH_TOKEN)).thenReturn(userDetails);
+        when(excelReadingService.readClaimantsFromSpreadsheet(anyString(), anyString(), anyList()))
+            .thenReturn(List.of(AdditionalClaimant.builder().firstName("Anne").lastName("Lee").build()));
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(CASE_TYPE, MULTIPLE_CASE_TYPE);
+        data.put("ethosCaseReference", "6000001/2024");
+        data.put("addClaimantMethod", "spreadsheet");
+        data.put("additionalClaimantSpreadsheet", Map.of("document_binary_url", "http://doc/binary"));
+        CaseDetails caseDetails = CaseDetails.builder()
+            .caseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+            .data(data)
+            .build();
+
+        ReflectionTestUtils.invokeMethod(caseService, "triggerMultipleCreation", TEST_SERVICE_AUTH_TOKEN, caseDetails);
+
+        verify(excelReadingService, times(1))
+            .readClaimantsFromSpreadsheet(eq(TEST_SERVICE_AUTH_TOKEN), nullable(String.class), anyList());
+        verify(createUpdatesBusSender, times(1)).sendSingleMessage(any(CreateUpdatesMsg.class), anyList());
+    }
+
+    @Test
+    void triggerMultipleCreationUnknownMethodDoesNotQueue() {
+        Map<String, Object> data = new HashMap<>();
+        data.put(CASE_TYPE, MULTIPLE_CASE_TYPE);
+        data.put("ethosCaseReference", "6000001/2024");
+        data.put("addClaimantMethod", "something-else");
+        CaseDetails caseDetails = CaseDetails.builder()
+            .caseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+            .data(data)
+            .build();
+
+        ReflectionTestUtils.invokeMethod(caseService, "triggerMultipleCreation", TEST_SERVICE_AUTH_TOKEN, caseDetails);
+
+        verify(createUpdatesBusSender, never()).sendSingleMessage(any(CreateUpdatesMsg.class), anyList());
+        verify(userIdamService, never()).getUserDetails(anyString());
+    }
+
+    @Test
+    void triggerMultipleCreationManualWithoutClaimantsDoesNotQueue() {
+        Map<String, Object> data = new HashMap<>();
+        data.put(CASE_TYPE, MULTIPLE_CASE_TYPE);
+        data.put("ethosCaseReference", "6000001/2024");
+        data.put("addClaimantMethod", "manually");
+        data.put("additionalClaimants", List.of());
+        CaseDetails caseDetails = CaseDetails.builder()
+            .caseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+            .data(data)
+            .build();
+
+        ReflectionTestUtils.invokeMethod(caseService, "triggerMultipleCreation", TEST_SERVICE_AUTH_TOKEN, caseDetails);
+
+        verify(createUpdatesBusSender, never()).sendSingleMessage(any(CreateUpdatesMsg.class), anyList());
     }
 
     private DocumentTypeItem createDocumentTypeItem() {

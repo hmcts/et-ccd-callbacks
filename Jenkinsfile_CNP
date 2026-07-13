@@ -228,11 +228,13 @@ withPipeline(type, product, component) {
               reportName : "ET Smoke test report"
       ]
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/test-results/**'
     }
 
     afterAlways('functionalTest:preview') {
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/test-results/**'
 
       stage('Functional UI tests chromium') {
         try {
@@ -290,11 +292,13 @@ withPipeline(type, product, component) {
             reportName : "ET Smoke test report"
     ]
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/test-results/**'
   }
 
   afterAlways('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/test-results/**'
     stage('Functional UI tests chromium') {
       try {
         yarnBuilder.yarn('test:functional-chromium')

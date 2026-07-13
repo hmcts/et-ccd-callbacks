@@ -65,6 +65,7 @@ class CaseDocumentServiceTest {
     private static final String CASE_TYPE = "ET_EnglandWales";
     private static final String MOCK_TOKEN = "Bearer Token";
     private static final String MOCK_HREF = "http://test:8080/img";
+    private static final String MOCK_HASH_TOKEN = "b796d5095334b580159ce5efb00e6613065ac40e2ce91e818efb7ac93619d386";
     private static final String EMPTY_DOCUMENT_MESSAGE = "Document management failed uploading file: " + DOCUMENT_NAME;
     private static final String SERVER_ERROR_MESSAGE = "Failed to upload Case Document";
     private static final String FILE_DOES_NOT_PASS_VALIDATION = "File does not pass validation";
@@ -168,11 +169,12 @@ class CaseDocumentServiceTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .body(fullJsonResponse));
 
-        URI documentEndpoint =
-            caseDocumentService.uploadDocument(MOCK_TOKEN, CASE_TYPE, MOCK_FILE).getUri();
+        CaseDocument caseDocument = caseDocumentService.uploadDocument(MOCK_TOKEN, CASE_TYPE, MOCK_FILE);
 
-        assertThat(documentEndpoint)
+        assertThat(caseDocument.getUri())
             .hasToString(MOCK_HREF);
+        assertThat(caseDocument.getHashToken())
+            .isEqualTo(MOCK_HASH_TOKEN);
     }
 
     @Test
@@ -489,7 +491,7 @@ class CaseDocumentServiceTest {
             .andExpect(method(HttpMethod.POST))
             .andRespond(withStatus(HttpStatus.OK)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .body(MOCK_RESPONSE_WITH_DOCUMENT));
+                            .body(fullJsonResponse));
 
         DocumentTypeItem documentTypeItem = DocumentTypeItem.builder()
             .value(DocumentType.builder()
@@ -513,6 +515,7 @@ class CaseDocumentServiceTest {
         assertEquals(createdDoc.getValue().getShortDescription(), documentTypeItem.getValue().getShortDescription());
         assertEquals(createdDoc.getValue().getDateOfCorrespondence(),
                      documentTypeItem.getValue().getDateOfCorrespondence());
+        assertEquals(MOCK_HASH_TOKEN, createdDoc.getValue().getUploadedDocument().getDocumentHash());
     }
 
     @Test

@@ -58,6 +58,9 @@ ccd:
   client:
     timeout: '60000'
   data-store-api-url: ${CCD_DATA_STORE_API_URL:http://ccd-data-store-api:4452}
+  decentralised-runtime:
+    cdam-attach:
+      enabled: ${CCD_DECENTRALISED_RUNTIME_CDAM_ATTACH_ENABLED:true}
   data-migration:
     enabled: ${ET_CCD_DATA_MIGRATION_ENABLED:false}
     task-name: ${ET_CCD_DATA_MIGRATION_TASK_NAME:et-ccd-data-migration}
@@ -123,7 +126,7 @@ rd_professional-api-url: ${RD_PROFESSIONAL_API_URL:http://localhost:4507}
 
 feature:
   secure-doc-store:
-    enabled: 'false'
+    enabled: ${SECURE_DOC_STORE_FEATURE:false}
 
 queue:
   create-updates:

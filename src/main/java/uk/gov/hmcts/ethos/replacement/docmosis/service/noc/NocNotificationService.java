@@ -476,8 +476,9 @@ public class NocNotificationService {
     }
 
     public void sendNotificationOfChangeEmails(CaseDetails caseDetailsPrevious,
-                             CaseDetails caseDetailsNew,
-                             ChangeOrganisationRequest changeRequest) {
+                                               CaseDetails caseDetailsNew,
+                                               ChangeOrganisationRequest changeRequest,
+                                               boolean sendToOtherParty) {
         DynamicFixedListType caseRoleId = changeRequest.getCaseRoleId();
         CaseData caseDataNew = caseDetailsNew.getCaseData();
         CaseData caseDataPrevious = caseDetailsPrevious.getCaseData();
@@ -495,10 +496,11 @@ public class NocNotificationService {
                     nocType = NOC_TYPE_ADDITION;
                 }
                 handleClaimantNocEmails(caseDetailsNew, partyName, nocType);
+                handleClaimantNocEmails(caseDetailsNew, partyName, sendToOtherParty);
             }
         } else {
             // send respondent noc change email
-            handleRespondentNocEmails(caseDetailsPrevious, caseDetailsNew, changeRequest);
+            handleRespondentNocEmails(caseDetailsPrevious, caseDetailsNew, changeRequest, sendToOtherParty);
             partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
         }
 
@@ -510,6 +512,7 @@ public class NocNotificationService {
     }
 
     private void handleClaimantNocEmails(CaseDetails caseDetailsNew, String partyName, String nocType) {
+    private void handleClaimantNocEmails(CaseDetails caseDetailsNew, String partyName, boolean sendToOtherParty) {
         CaseData caseDataNew = caseDetailsNew.getCaseData();
 
         List<CaseUserAssignment> caseUserAssignments =
@@ -538,6 +541,22 @@ public class NocNotificationService {
                 log.warn("missing claimantEmail");
                 return;
             }
+        if (sendToOtherParty) {
+            emailNotificationService.getRespondentsAndRepsEmailAddresses(caseDataNew, caseUserAssignments)
+                    .forEach((email, respondentId) -> {
+                        String caseLink = StringUtils.isNotBlank(respondentId)
+                                ? emailService.getSyrCaseLink(caseDetailsNew.getCaseId(), respondentId)
+                                : emailService.getExuiCaseLink(caseDetailsNew.getCaseId());
+                        emailService.sendEmail(claimantTemplateId, email,
+                                buildPersonalisationWithPartyName(caseDetailsNew, partyName, caseLink));
+                    });
+        }
+        // send claimant noc change email
+        String claimantEmail = ClaimantUtils.getClaimantEmailAddress(caseDataNew);
+        if (isNullOrEmpty(claimantEmail)) {
+            log.warn("missing claimantEmail");
+            return;
+        }
 
             Map<String, String> personalisation = buildNoCPersonalisation(caseDetailsNew, partyName);
             personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetailsNew.getCaseId()));
@@ -546,14 +565,15 @@ public class NocNotificationService {
     }
 
     private void handleRespondentNocEmails(CaseDetails caseDetailsPrevious,
-                                          CaseDetails caseDetailsNew,
-                                          ChangeOrganisationRequest changeRequest) {
+                                           CaseDetails caseDetailsNew,
+                                           ChangeOrganisationRequest changeRequest,
+                                           boolean sendToOtherParty) {
         CaseData caseDataNew = caseDetailsNew.getCaseData();
         CaseData caseDataPrevious = caseDetailsPrevious.getCaseData();
         String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
         // send claimant or claimant solicitor noc change email
-        if (!isClaimantNonSystemUser(caseDataPrevious)
-                || isClaimantRepresentedByMyHmctsOrganisation(caseDataPrevious)) {
+        if ((!isClaimantNonSystemUser(caseDataPrevious)
+                || isClaimantRepresentedByMyHmctsOrganisation(caseDataPrevious) && sendToOtherParty)) {
             sendClaimantEmail(caseDetailsPrevious, caseDetailsNew, partyName);
         }
 

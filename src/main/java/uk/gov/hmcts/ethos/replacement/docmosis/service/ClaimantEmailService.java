@@ -63,7 +63,7 @@ public class ClaimantEmailService {
         }
 
         Optional<UserDetails> newUser = findUserByEmail(caseData.getNewClaimantEmail(), errors);
-        if (!errors.isEmpty() || newUser.isEmpty()) {
+        if (newUser.isEmpty()) {
             return errors;
         }
 

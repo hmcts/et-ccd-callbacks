@@ -229,17 +229,17 @@ public class HelperTest {
     }
 
     @ParameterizedTest
-    @MethodSource("isRepresentedClaimantWithMyHmctsCaseParameter")
-    void isRepresentedClaimantWithMyHmctsCase(String caseSource, String claimantRepresentedQuestion,
-                                              RepresentedTypeC representedTypeC, boolean expected) {
+    @MethodSource("isClaimantRepresentedByMyHmctsOrganisationParameter")
+    void isClaimantRepresentedByMyHmctsOrganisation(String caseSource, String claimantRepresentedQuestion,
+                                                    RepresentedTypeC representedTypeC, boolean expected) {
         CaseData caseData = new CaseData();
         caseData.setCaseSource(caseSource);
         caseData.setClaimantRepresentedQuestion(claimantRepresentedQuestion);
         caseData.setRepresentativeClaimantType(representedTypeC);
-        assertEquals(expected, Helper.isRepresentedClaimantWithMyHmctsCase(caseData));
+        assertEquals(expected, Helper.isClaimantRepresentedByMyHmctsOrganisation(caseData));
     }
 
-    private static Stream<Arguments> isRepresentedClaimantWithMyHmctsCaseParameter() {
+    private static Stream<Arguments> isClaimantRepresentedByMyHmctsOrganisationParameter() {
         Organisation organisation = Organisation.builder()
                 .organisationID("dummyId")
                 .build();
@@ -345,6 +345,7 @@ public class HelperTest {
 
         Helper.removeSpacesFromPartyNames(caseData);
 
-        assertEquals("Representative Name", caseData.getRepCollection().get(0).getValue().getNameOfRepresentative());
+        assertEquals("Representative Name", caseData.getRepCollection().getFirst().getValue()
+                .getNameOfRepresentative());
     }
 }

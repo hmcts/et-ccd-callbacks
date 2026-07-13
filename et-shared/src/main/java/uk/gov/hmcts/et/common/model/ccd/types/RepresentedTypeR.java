@@ -59,4 +59,8 @@ public class RepresentedTypeR {
     private String representativeContactLanguage;
     @JsonProperty("organisationUsers")
     private List<GenericTypeItem<OrganisationUsersIdamUser>> organisationUsers;
+    @JsonProperty("role")
+    private String role;
+    @JsonProperty("idamId")
+    private String idamId;
 }

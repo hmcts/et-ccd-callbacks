@@ -19,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
 
 import java.io.IOException;
 import java.util.ArrayList;

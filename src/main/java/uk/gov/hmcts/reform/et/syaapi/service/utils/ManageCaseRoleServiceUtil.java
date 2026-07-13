@@ -5,6 +5,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
@@ -89,7 +90,7 @@ public final class ManageCaseRoleServiceUtil {
         }
         String aacApiUriAsString = aacUrl + CASE_USERS_API_URL + STRING_QUESTION_MARK + caseIdsUri;
         aacApiUriAsString = aacApiUriAsString + generateUriByUserInfoList(userInfoList);
-        aacApiUriAsString = StringUtils.removeEnd(aacApiUriAsString, STRING_AMPERSAND);
+        aacApiUriAsString = Strings.CS.removeEnd(aacApiUriAsString, STRING_AMPERSAND);
         return aacApiUriAsString;
     }
 
@@ -170,8 +171,7 @@ public final class ManageCaseRoleServiceUtil {
     public static void checkModifyCaseUserRolesRequest(ModifyCaseUserRolesRequest modifyCaseUserRolesRequest) {
         if (ObjectUtils.isEmpty(modifyCaseUserRolesRequest)
             || CollectionUtils.isEmpty(modifyCaseUserRolesRequest.getModifyCaseUserRoles())) {
-            throw new ManageCaseRoleException(new Exception(
-                MODIFY_CASE_ROLE_EMPTY_REQUEST));
+            throw new ManageCaseRoleException(new Exception(MODIFY_CASE_ROLE_EMPTY_REQUEST));
         }
         for (ModifyCaseUserRole modifyCaseUserRole : modifyCaseUserRolesRequest.getModifyCaseUserRoles()) {
             checkModifyCaseUserRole(modifyCaseUserRole);
@@ -331,8 +331,8 @@ public final class ManageCaseRoleServiceUtil {
      *      </ul>
      *
      * @see RespondentSolicitorType
-     * @see NoticeOfChangeUtil#findNoticeOfChangeAnswerIndex(CaseData, String)
-     * @see NoticeOfChangeUtil#findRespondentSolicitorTypeByIndex(int)
+     * @see NoticeOfChangeUtils#findNoticeOfChangeAnswerIndex(CaseData, String)
+     * @see NoticeOfChangeUtils#findRespondentSolicitorTypeByIndex(int)
      */
     public static RespondentSolicitorType getRespondentSolicitorType(CaseDetails caseDetails, String respondentIndex) {
         // Check if caseDetails is null or empty
@@ -340,7 +340,6 @@ public final class ManageCaseRoleServiceUtil {
             throw new ManageCaseRoleException(new Exception(String.format(EXCEPTION_CASE_DETAILS_NOT_FOUND,
                                                                           StringUtils.EMPTY)));
         }
-
         String caseId = ObjectUtils.isNotEmpty(
             caseDetails.getId()) ? caseDetails.getId().toString() : StringUtils.EMPTY;
         // Check if caseDetails has no case data
@@ -348,7 +347,6 @@ public final class ManageCaseRoleServiceUtil {
             throw new ManageCaseRoleException(new Exception(String.format(EXCEPTION_CASE_DETAILS_NOT_HAVE_CASE_DATA,
                                                                           caseId)));
         }
-
         // Check if respondentIndex is blank or not a valid number
         if (StringUtils.isBlank(respondentIndex)
             || !NumberUtils.isCreatable(respondentIndex)
@@ -363,13 +361,11 @@ public final class ManageCaseRoleServiceUtil {
             throw new ManageCaseRoleException(new Exception(String.format(EXCEPTION_CASE_DETAILS_NOT_HAVE_CASE_DATA,
                                                                           caseId)));
         }
-
         // Check if respondentCollection is null or empty
         if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
             throw new ManageCaseRoleException(new Exception(String.format(EXCEPTION_EMPTY_RESPONDENT_COLLECTION,
                                                                           caseId)));
         }
-
         // Check if respondentIndex is within bounds of respondentCollection
         if (NumberUtils.createInteger(respondentIndex) >= caseData.getRespondentCollection().size()) {
             throw new ManageCaseRoleException(new Exception(String.format(EXCEPTION_INVALID_RESPONDENT_INDEX,
@@ -387,7 +383,7 @@ public final class ManageCaseRoleServiceUtil {
                                                                           caseId)));
         }
 
-        int noticeOfChangeAnswerIndex = NoticeOfChangeUtil
+        int noticeOfChangeAnswerIndex = NoticeOfChangeUtils
             .findNoticeOfChangeAnswerIndex(caseData, respondentSumTypeItem.getValue().getRespondentName());
         if (noticeOfChangeAnswerIndex == -1) {
             throw new ManageCaseRoleException(new Exception(
@@ -395,7 +391,7 @@ public final class ManageCaseRoleServiceUtil {
                               respondentSumTypeItem.getValue().getRespondentName(),
                               caseId)));
         }
-        RespondentSolicitorType respondentSolicitorType = NoticeOfChangeUtil
+        RespondentSolicitorType respondentSolicitorType = NoticeOfChangeUtils
             .findRespondentSolicitorTypeByIndex(noticeOfChangeAnswerIndex);
         if (ObjectUtils.isEmpty(respondentSolicitorType)) {
             throw new ManageCaseRoleException(new Exception(String.format(

@@ -1350,6 +1350,23 @@
     "SecurityClassification": "Public"
   },
   {
+    "ID": "RespondentRepresentative",
+    "ListElementCode": "role",
+    "FieldType": "Text",
+    "ElementLabel": "Respondent representative role",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RespondentRepresentative",
+    "ListElementCode": "idamId",
+    "FieldType": "Text",
+    "ElementLabel": "Respondent representative idam id",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "role=\"dummy\"",
+    "Searchable": "N"
+  },
+  {
     "ID": "ClaimantRequest",
     "ListElementCode": "claim_outcome",
     "FieldType": "MultiSelectList",
@@ -5114,6 +5131,14 @@
     "ListElementCode": "respondentRepresentative",
     "FieldType": "Text",
     "ElementLabel": "Representative",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "RespondentRepresentative",
+    "ListElementCode": "nonMyHmctsOrganisationId",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "FieldShowCondition": "myHmctsYesNo=\"dummy\"",
     "SecurityClassification": "Public"
   },
   {

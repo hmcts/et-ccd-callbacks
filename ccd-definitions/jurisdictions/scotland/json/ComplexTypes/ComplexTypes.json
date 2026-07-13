@@ -1448,6 +1448,23 @@
     "SecurityClassification": "Public"
   },
   {
+    "ID": "RespondentRepresentative",
+    "ListElementCode": "role",
+    "FieldType": "Text",
+    "ElementLabel": "Respondent representative role",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RespondentRepresentative",
+    "ListElementCode": "idamId",
+    "FieldType": "Text",
+    "ElementLabel": "Respondent representative idam id",
+    "FieldShowCondition": "role=\"dummy\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
     "ID": "acceptOrRejectCase",
     "ListElementCode": "caseAccepted",
     "FieldType": "YesOrNo",
@@ -4972,6 +4989,14 @@
     "ListElementCode": "respondentRepresentative",
     "FieldType": "Text",
     "ElementLabel": "Representative",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "RespondentRepresentative",
+    "ListElementCode": "nonMyHmctsOrganisationId",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "FieldShowCondition": "myHmctsYesNo=\"dummy\"",
     "SecurityClassification": "Public"
   },
   {

@@ -340,15 +340,16 @@ class ExcelReadingServiceTest {
     @Test
     void readClaimantsFromSpreadsheetShouldHandleNullSheet() throws IOException {
         ExcelReadingService serviceSpy = spy(excelReadingService);
-        XSSFWorkbook workbook = mock(XSSFWorkbook.class);
-        doReturn(workbook).when(serviceSpy).readWorkbook(userToken, documentBinaryUrl);
-        when(workbook.getSheetAt(0)).thenReturn(null);
+        try (XSSFWorkbook workbook = mock(XSSFWorkbook.class)) {
+            doReturn(workbook).when(serviceSpy).readWorkbook(userToken, documentBinaryUrl);
+            when(workbook.getSheetAt(0)).thenReturn(null);
 
-        List<AdditionalClaimant> claimants = serviceSpy.readClaimantsFromSpreadsheet(
-            userToken, documentBinaryUrl, errors);
+            List<AdditionalClaimant> claimants = serviceSpy.readClaimantsFromSpreadsheet(
+                userToken, documentBinaryUrl, errors);
 
-        assertEquals(0, claimants.size());
-        assertEquals(List.of("No worksheet found in additional claimant spreadsheet"), errors);
+            assertEquals(0, claimants.size());
+            assertEquals(List.of("No worksheet found in additional claimant spreadsheet"), errors);
+        }
     }
 
     @Test

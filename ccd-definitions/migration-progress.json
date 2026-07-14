@@ -223,13 +223,13 @@
           "england-wales": {
             "totals": {
               "goldenRows": 13606,
-              "javaRows": 10674,
-              "exact": 10674,
+              "javaRows": 10939,
+              "exact": 10939,
               "changed": 0,
               "changedCells": 0,
-              "missing": 2932,
+              "missing": 2667,
               "unexpected": 0,
-              "remaining": 2932
+              "remaining": 2667
             },
             "sheets": {
               "SearchCriteria": {
@@ -294,23 +294,23 @@
               },
               "CaseEvent": {
                 "goldenRows": 180,
-                "javaRows": 48,
-                "exact": 48,
+                "javaRows": 56,
+                "exact": 56,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 132,
+                "missing": 124,
                 "unexpected": 0,
-                "remaining": 132
+                "remaining": 124
               },
               "CaseEventToFields": {
                 "goldenRows": 1197,
-                "javaRows": 268,
-                "exact": 268,
+                "javaRows": 482,
+                "exact": 482,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 929,
+                "missing": 715,
                 "unexpected": 0,
-                "remaining": 929
+                "remaining": 715
               },
               "CaseField": {
                 "goldenRows": 1185,
@@ -354,13 +354,13 @@
               },
               "EventToComplexTypes": {
                 "goldenRows": 1004,
-                "javaRows": 361,
-                "exact": 361,
+                "javaRows": 385,
+                "exact": 385,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 643,
+                "missing": 619,
                 "unexpected": 0,
-                "remaining": 643
+                "remaining": 619
               },
               "RoleToAccessProfiles": {
                 "goldenRows": 64,
@@ -474,13 +474,13 @@
               },
               "AuthorisationCaseEvent": {
                 "goldenRows": 706,
-                "javaRows": 152,
-                "exact": 152,
+                "javaRows": 171,
+                "exact": 171,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 554,
+                "missing": 535,
                 "unexpected": 0,
-                "remaining": 554
+                "remaining": 535
               },
               "AuthorisationCaseState": {
                 "goldenRows": 112,
@@ -497,13 +497,13 @@
           "scotland": {
             "totals": {
               "goldenRows": 13161,
-              "javaRows": 10252,
-              "exact": 10252,
+              "javaRows": 10513,
+              "exact": 10513,
               "changed": 0,
               "changedCells": 0,
-              "missing": 2909,
+              "missing": 2648,
               "unexpected": 0,
-              "remaining": 2909
+              "remaining": 2648
             },
             "sheets": {
               "SearchParty": {
@@ -578,23 +578,23 @@
               },
               "CaseEvent": {
                 "goldenRows": 176,
-                "javaRows": 47,
-                "exact": 47,
+                "javaRows": 55,
+                "exact": 55,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 129,
+                "missing": 121,
                 "unexpected": 0,
-                "remaining": 129
+                "remaining": 121
               },
               "CaseEventToFields": {
                 "goldenRows": 1207,
-                "javaRows": 278,
-                "exact": 278,
+                "javaRows": 488,
+                "exact": 488,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 929,
+                "missing": 719,
                 "unexpected": 0,
-                "remaining": 929
+                "remaining": 719
               },
               "CaseField": {
                 "goldenRows": 1176,
@@ -638,13 +638,13 @@
               },
               "EventToComplexTypes": {
                 "goldenRows": 1014,
-                "javaRows": 356,
-                "exact": 356,
+                "javaRows": 380,
+                "exact": 380,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 658,
+                "missing": 634,
                 "unexpected": 0,
-                "remaining": 658
+                "remaining": 634
               },
               "RoleToAccessProfiles": {
                 "goldenRows": 64,
@@ -748,13 +748,13 @@
               },
               "AuthorisationCaseEvent": {
                 "goldenRows": 704,
-                "javaRows": 149,
-                "exact": 149,
+                "javaRows": 168,
+                "exact": 168,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 555,
+                "missing": 536,
                 "unexpected": 0,
-                "remaining": 555
+                "remaining": 536
               },
               "AuthorisationCaseState": {
                 "goldenRows": 112,
@@ -771,13 +771,13 @@
         },
         "totals": {
           "goldenRows": 27072,
-          "javaRows": 21231,
-          "exact": 21231,
+          "javaRows": 21757,
+          "exact": 21757,
           "changed": 0,
           "changedCells": 0,
-          "missing": 5841,
+          "missing": 5315,
           "unexpected": 0,
-          "remaining": 5841
+          "remaining": 5315
         }
       },
       "prod": {
@@ -989,13 +989,13 @@
           "england-wales": {
             "totals": {
               "goldenRows": 12638,
-              "javaRows": 9712,
-              "exact": 9712,
+              "javaRows": 9977,
+              "exact": 9977,
               "changed": 0,
               "changedCells": 0,
-              "missing": 2926,
+              "missing": 2661,
               "unexpected": 0,
-              "remaining": 2926
+              "remaining": 2661
             },
             "sheets": {
               "SearchCriteria": {
@@ -1060,23 +1060,23 @@
               },
               "CaseEvent": {
                 "goldenRows": 164,
-                "javaRows": 37,
-                "exact": 37,
+                "javaRows": 45,
+                "exact": 45,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 127,
+                "missing": 119,
                 "unexpected": 0,
-                "remaining": 127
+                "remaining": 119
               },
               "CaseEventToFields": {
                 "goldenRows": 1108,
-                "javaRows": 185,
-                "exact": 185,
+                "javaRows": 399,
+                "exact": 399,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 923,
+                "missing": 709,
                 "unexpected": 0,
-                "remaining": 923
+                "remaining": 709
               },
               "CaseField": {
                 "goldenRows": 1077,
@@ -1120,13 +1120,13 @@
               },
               "EventToComplexTypes": {
                 "goldenRows": 979,
-                "javaRows": 303,
-                "exact": 303,
+                "javaRows": 327,
+                "exact": 327,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 676,
+                "missing": 652,
                 "unexpected": 0,
-                "remaining": 676
+                "remaining": 652
               },
               "RoleToAccessProfiles": {
                 "goldenRows": 62,
@@ -1240,13 +1240,13 @@
               },
               "AuthorisationCaseEvent": {
                 "goldenRows": 643,
-                "javaRows": 103,
-                "exact": 103,
+                "javaRows": 122,
+                "exact": 122,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 540,
+                "missing": 521,
                 "unexpected": 0,
-                "remaining": 540
+                "remaining": 521
               },
               "AuthorisationCaseState": {
                 "goldenRows": 111,
@@ -1263,13 +1263,13 @@
           "scotland": {
             "totals": {
               "goldenRows": 12212,
-              "javaRows": 9311,
-              "exact": 9311,
+              "javaRows": 9572,
+              "exact": 9572,
               "changed": 0,
               "changedCells": 0,
-              "missing": 2901,
+              "missing": 2640,
               "unexpected": 0,
-              "remaining": 2901
+              "remaining": 2640
             },
             "sheets": {
               "SearchParty": {
@@ -1344,23 +1344,23 @@
               },
               "CaseEvent": {
                 "goldenRows": 161,
-                "javaRows": 37,
-                "exact": 37,
+                "javaRows": 45,
+                "exact": 45,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 124,
+                "missing": 116,
                 "unexpected": 0,
-                "remaining": 124
+                "remaining": 116
               },
               "CaseEventToFields": {
                 "goldenRows": 1118,
-                "javaRows": 195,
-                "exact": 195,
+                "javaRows": 405,
+                "exact": 405,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 923,
+                "missing": 713,
                 "unexpected": 0,
-                "remaining": 923
+                "remaining": 713
               },
               "CaseField": {
                 "goldenRows": 1068,
@@ -1404,13 +1404,13 @@
               },
               "EventToComplexTypes": {
                 "goldenRows": 989,
-                "javaRows": 300,
-                "exact": 300,
+                "javaRows": 324,
+                "exact": 324,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 689,
+                "missing": 665,
                 "unexpected": 0,
-                "remaining": 689
+                "remaining": 665
               },
               "RoleToAccessProfiles": {
                 "goldenRows": 62,
@@ -1514,13 +1514,13 @@
               },
               "AuthorisationCaseEvent": {
                 "goldenRows": 640,
-                "javaRows": 99,
-                "exact": 99,
+                "javaRows": 118,
+                "exact": 118,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 541,
+                "missing": 522,
                 "unexpected": 0,
-                "remaining": 541
+                "remaining": 522
               },
               "AuthorisationCaseState": {
                 "goldenRows": 111,
@@ -1537,49 +1537,49 @@
         },
         "totals": {
           "goldenRows": 25155,
-          "javaRows": 19328,
-          "exact": 19328,
+          "javaRows": 19854,
+          "exact": 19854,
           "changed": 0,
           "changedCells": 0,
-          "missing": 5827,
+          "missing": 5301,
           "unexpected": 0,
-          "remaining": 5827
+          "remaining": 5301
         }
       }
     },
     "totals": {
       "goldenRows": 52227,
-      "javaRows": 40559,
-      "exact": 40559,
+      "javaRows": 41611,
+      "exact": 41611,
       "changed": 0,
       "changedCells": 0,
-      "missing": 11668,
+      "missing": 10616,
       "unexpected": 0,
-      "remaining": 11668
+      "remaining": 10616
     },
     "completion": {
       "baselineRemainingDifferences": 52227,
-      "completedDifferences": 40559,
-      "percentage": 77.66
+      "completedDifferences": 41611,
+      "percentage": 79.67
     },
     "javaLines": {
       "current": {
-        "etMain": 174602,
+        "etMain": 179171,
         "etVerification": 132108,
-        "sdkMain": 17095,
-        "sdkVerification": 12338,
-        "mainTotal": 191697,
-        "verificationTotal": 144446
+        "sdkMain": 17122,
+        "sdkVerification": 12372,
+        "mainTotal": 196293,
+        "verificationTotal": 144480
       },
       "deltaFromBaseline": {
-        "etMain": 57382,
+        "etMain": 61951,
         "etVerification": 0,
-        "sdkMain": 1319,
-        "sdkVerification": 1016,
-        "mainTotal": 58701,
-        "verificationTotal": 1016
+        "sdkMain": 1346,
+        "sdkVerification": 1050,
+        "mainTotal": 63297,
+        "verificationTotal": 1050
       },
-      "mainLinesPerCompletedDifference": 1.45
+      "mainLinesPerCompletedDifference": 1.52
     }
   }
 }

@@ -41,7 +41,45 @@ final class SingleDefinitionRows {
             String ttl,
             String aboutToStart,
             String aboutToSubmit,
-            String submitted) {}
+            String submitted,
+            String endButtonLabel) {
+        EventSpec(
+                int mask,
+                String id,
+                String name,
+                String description,
+                Integer displayOrder,
+                String preState,
+                String postState,
+                String condition,
+                String showSummary,
+                String showNotes,
+                String publish,
+                boolean significant,
+                String ttl,
+                String aboutToStart,
+                String aboutToSubmit,
+                String submitted) {
+            this(
+                    mask,
+                    id,
+                    name,
+                    description,
+                    displayOrder,
+                    preState,
+                    postState,
+                    condition,
+                    showSummary,
+                    showNotes,
+                    publish,
+                    significant,
+                    ttl,
+                    aboutToStart,
+                    aboutToSubmit,
+                    submitted,
+                    null);
+        }
+    }
 
     record EventFieldSpec(
             int mask,

@@ -495,6 +495,7 @@ public class NocNotificationService {
                     nocType = NOC_TYPE_ADDITION;
                 }
                 handleClaimantNocEmails(caseDetailsNew, partyName, nocType, sendToOtherParty);
+                handleClaimantNocEmails(caseDetailsNew, partyName, sendToOtherParty);
             }
         } else {
             // send respondent noc change email
@@ -513,6 +514,7 @@ public class NocNotificationService {
                                          String partyName,
                                          String nocType,
                                          boolean sendToOtherParty) {
+    private void handleClaimantNocEmails(CaseDetails caseDetailsNew, String partyName, boolean sendToOtherParty) {
         CaseData caseDataNew = caseDetailsNew.getCaseData();
 
         List<CaseUserAssignment> caseUserAssignments =
@@ -523,6 +525,7 @@ public class NocNotificationService {
                     caseDetailsNew.getCaseId());
             return;
         }
+
         // send respondents or respondent solicitors the claimant noc change email
         if (sendToOtherParty) {
             emailNotificationService.getRespondentsAndRepsEmailAddresses(caseDataNew, caseUserAssignments)
@@ -541,11 +544,21 @@ public class NocNotificationService {
                 log.warn("missing claimantEmail");
                 return;
             }
+        // send claimant noc change email
+        String claimantEmail = ClaimantUtils.getClaimantEmailAddress(caseDataNew);
+        if (isNullOrEmpty(claimantEmail)) {
+            log.warn("missing claimantEmail");
+            return;
+        }
 
             Map<String, String> personalisation = buildNoCPersonalisation(caseDetailsNew, partyName);
             personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetailsNew.getCaseId()));
             emailService.sendEmail(claimantRepAssignedTemplateId, claimantEmail, personalisation);
         }
+    }
+        Map<String, String> personalisation = buildNoCPersonalisation(caseDetailsNew, partyName);
+        personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetailsNew.getCaseId()));
+        emailService.sendEmail(claimantRepAssignedTemplateId, claimantEmail, personalisation);
     }
 
     private void handleRespondentNocEmails(CaseDetails caseDetailsPrevious,

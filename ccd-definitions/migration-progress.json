@@ -1564,22 +1564,22 @@
     },
     "javaLines": {
       "current": {
-        "etMain": 182786,
+        "etMain": 182119,
         "etVerification": 132108,
         "sdkMain": 17122,
         "sdkVerification": 12372,
-        "mainTotal": 199908,
+        "mainTotal": 199241,
         "verificationTotal": 144480
       },
       "deltaFromBaseline": {
-        "etMain": 65566,
+        "etMain": 64899,
         "etVerification": 0,
         "sdkMain": 1346,
         "sdkVerification": 1050,
-        "mainTotal": 66912,
+        "mainTotal": 66245,
         "verificationTotal": 1050
       },
-      "mainLinesPerCompletedDifference": 1.55
+      "mainLinesPerCompletedDifference": 1.53
     }
   }
 }

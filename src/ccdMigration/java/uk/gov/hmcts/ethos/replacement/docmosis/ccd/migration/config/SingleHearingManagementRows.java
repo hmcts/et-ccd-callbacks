@@ -10,6 +10,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.ccd.migration.config.SingleDefini
 import uk.gov.hmcts.ethos.replacement.docmosis.ccd.migration.config.SingleDefinitionRows.GrantSpec;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.CaseState;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings({
@@ -34,6 +36,10 @@ final class SingleHearingManagementRows {
     private static final String PRINT_HEARING = "printHearing";
     private static final String ADD_AMEND_HEARING = "addAmendHearing";
     private static final String UPDATE_HEARING = "updateHearing";
+    private static final String PRE_STATES = "Accepted;Rejected";
+    private static final String POST_STATE =
+            "Accepted(preAcceptCase.caseAccepted=\"Yes\"):1;Rejected";
+    private static final String HEARING_CONDITION = "managingOffice !=\"Unassigned\"";
     private static final Set<Permission> READ = Set.of(Permission.R);
     private static final Set<Permission> DELETE = Set.of(Permission.D);
     private static final String[] COMMON_HEARING_ELEMENTS = {
@@ -79,766 +85,335 @@ final class SingleHearingManagementRows {
         "hearingDetailsTimingStart"
     };
 
-    static final GrantSpec[] EVENT_GRANTS = {
-        new GrantSpec(ALL, ALLOCATE_HEARING, SingleRole.CASEWORKER_EMPLOYMENT, "R"),
-        new GrantSpec(ALL, ALLOCATE_HEARING, SingleRole.CASEWORKER_EMPLOYMENT_API, "CRUD"),
-        new GrantSpec(
-                ENGLAND_WALES,
-                ALLOCATE_HEARING,
-                SingleRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES,
-                "CRU"),
-        new GrantSpec(ALL, ALLOCATE_HEARING, SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE, "R"),
-        new GrantSpec(
-                ENGLAND_WALES,
-                ALLOCATE_HEARING,
-                SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
-                "CRU"),
-        new GrantSpec(
-                SCOTLAND,
-                ALLOCATE_HEARING,
-                SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND,
-                "CRU"),
-        new GrantSpec(SCOTLAND, ALLOCATE_HEARING, SingleRole.CASEWORKER_EMPLOYMENT_SCOTLAND, "CRU"),
-        new GrantSpec(ALL, PRINT_HEARING, SingleRole.CASEWORKER_EMPLOYMENT, "R"),
-        new GrantSpec(ALL, PRINT_HEARING, SingleRole.CASEWORKER_EMPLOYMENT_API, "CRUD"),
-        new GrantSpec(
-                ENGLAND_WALES, PRINT_HEARING, SingleRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES, "CRU"),
-        new GrantSpec(ALL, PRINT_HEARING, SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE, "R"),
-        new GrantSpec(
-                ENGLAND_WALES,
-                PRINT_HEARING,
-                SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
-                "CRU"),
-        new GrantSpec(
-                SCOTLAND, PRINT_HEARING, SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND, "CRU"),
-        new GrantSpec(SCOTLAND, PRINT_HEARING, SingleRole.CASEWORKER_EMPLOYMENT_SCOTLAND, "CRU"),
-        new GrantSpec(ALL, ADD_AMEND_HEARING, SingleRole.CASEWORKER_EMPLOYMENT, "R"),
-        new GrantSpec(ALL, ADD_AMEND_HEARING, SingleRole.CASEWORKER_EMPLOYMENT_API, "CRUD"),
-        new GrantSpec(
-                ENGLAND_WALES,
-                ADD_AMEND_HEARING,
-                SingleRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES,
-                "CRU"),
-        new GrantSpec(ALL, ADD_AMEND_HEARING, SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE, "R"),
-        new GrantSpec(
-                ENGLAND_WALES,
-                ADD_AMEND_HEARING,
-                SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
-                "CRU"),
-        new GrantSpec(
-                SCOTLAND,
-                ADD_AMEND_HEARING,
-                SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND,
-                "CRU"),
-        new GrantSpec(
-                SCOTLAND, ADD_AMEND_HEARING, SingleRole.CASEWORKER_EMPLOYMENT_SCOTLAND, "CRU"),
-        new GrantSpec(ALL, UPDATE_HEARING, SingleRole.CASEWORKER_EMPLOYMENT, "R"),
-        new GrantSpec(ALL, UPDATE_HEARING, SingleRole.CASEWORKER_EMPLOYMENT_API, "CRUD"),
-        new GrantSpec(
-                ENGLAND_WALES,
-                UPDATE_HEARING,
-                SingleRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES,
-                "CRU"),
-        new GrantSpec(ALL, UPDATE_HEARING, SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE, "R"),
-        new GrantSpec(
-                ENGLAND_WALES,
-                UPDATE_HEARING,
-                SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
-                "CRU"),
-        new GrantSpec(
-                SCOTLAND, UPDATE_HEARING, SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND, "CRU"),
-        new GrantSpec(SCOTLAND, UPDATE_HEARING, SingleRole.CASEWORKER_EMPLOYMENT_SCOTLAND, "CRU"),
-        new GrantSpec(ALL, UPDATE_HEARING, SingleRole.CASEWORKER_WA_TASK_CONFIGURATION, "CRU")
-    };
+    static final GrantSpec[] EVENT_GRANTS = eventGrants();
 
     static final EventSpec[] EVENTS = {
-        new EventSpec(
-                CFTLIB,
-                ALLOCATE_HEARING,
-                "Allocate Hearing",
-                "Allocate a Hearing",
-                23,
-                "Accepted;Rejected",
-                "Accepted(preAcceptCase.caseAccepted=\"Yes\"):1;Rejected",
-                "managingOffice !=\"Unassigned\"",
-                "N",
-                "N",
-                null,
-                false,
-                null,
-                LOCALHOST + "/allocatehearing/initialiseHearings",
-                LOCALHOST + "/allocatehearing/aboutToSubmit",
-                null,
-                null),
-        new EventSpec(
-                PROD,
-                ALLOCATE_HEARING,
-                "Allocate Hearing",
-                "Allocate a Hearing",
-                23,
-                "Accepted;Rejected",
-                "Accepted(preAcceptCase.caseAccepted=\"Yes\"):1;Rejected",
-                "managingOffice !=\"Unassigned\"",
-                "N",
-                "N",
-                null,
-                false,
-                null,
-                PRODUCTION + "/allocatehearing/initialiseHearings",
-                PRODUCTION + "/allocatehearing/aboutToSubmit",
-                null,
-                null),
-        new EventSpec(
-                CFTLIB,
-                PRINT_HEARING,
-                "Print Hearing lists",
-                "Print Hearing documents",
-                25,
-                "Accepted;Rejected",
-                "Accepted(preAcceptCase.caseAccepted=\"Yes\"):1;Rejected",
-                "managingOffice !=\"Unassigned\"",
-                "N",
-                "N",
-                null,
-                false,
-                null,
-                LOCALHOST + "/initPrintHearingLists",
-                LOCALHOST + "/generateListingsDocSingleCases",
-                LOCALHOST + "/generateListingsDocSingleCasesConfirmation",
-                "Print List"),
-        new EventSpec(
-                PROD,
-                PRINT_HEARING,
-                "Print Hearing lists",
-                "Print Hearing documents",
-                25,
-                "Accepted;Rejected",
-                "Accepted(preAcceptCase.caseAccepted=\"Yes\"):1;Rejected",
-                "managingOffice !=\"Unassigned\"",
-                "N",
-                "N",
-                null,
-                false,
-                null,
-                PRODUCTION + "/initPrintHearingLists",
-                PRODUCTION + "/generateListingsDocSingleCases",
-                PRODUCTION + "/generateListingsDocSingleCasesConfirmation",
-                "Print List"),
-        new EventSpec(
-                CFTLIB,
-                ADD_AMEND_HEARING,
-                "List Hearing",
-                "List a Hearing",
-                22,
-                "Accepted;Rejected",
-                "Accepted(preAcceptCase.caseAccepted=\"Yes\"):1;Rejected",
-                "managingOffice !=\"Unassigned\"",
-                "N",
-                "N",
-                "Y",
-                false,
-                null,
-                LOCALHOST + "/initialiseHearings",
-                LOCALHOST + "/amendHearing",
-                null,
-                null),
-        new EventSpec(
-                PROD,
-                ADD_AMEND_HEARING,
-                "List Hearing",
-                "List a Hearing",
-                22,
-                "Accepted;Rejected",
-                "Accepted(preAcceptCase.caseAccepted=\"Yes\"):1;Rejected",
-                "managingOffice !=\"Unassigned\"",
-                "N",
-                "N",
-                "Y",
-                false,
-                null,
-                PRODUCTION + "/initialiseHearings",
-                PRODUCTION + "/amendHearing",
-                null,
-                null),
-        new EventSpec(
-                CFTLIB,
-                UPDATE_HEARING,
-                "Hearing Details",
-                "Update post Hearing details",
-                24,
-                "Accepted;Rejected",
-                "Accepted(preAcceptCase.caseAccepted=\"Yes\"):1;Rejected",
-                "managingOffice !=\"Unassigned\"",
-                "N",
-                "N",
-                "Y",
-                false,
-                null,
-                LOCALHOST + "/hearingdetails/initialiseHearings",
-                LOCALHOST + "/hearingdetails/aboutToSubmit",
-                null,
-                null),
-        new EventSpec(
-                PROD,
-                UPDATE_HEARING,
-                "Hearing Details",
-                "Update post Hearing details",
-                24,
-                "Accepted;Rejected",
-                "Accepted(preAcceptCase.caseAccepted=\"Yes\"):1;Rejected",
-                "managingOffice !=\"Unassigned\"",
-                "N",
-                "N",
-                "Y",
-                false,
-                null,
-                PRODUCTION + "/hearingdetails/initialiseHearings",
-                PRODUCTION + "/hearingdetails/aboutToSubmit",
-                null,
-                null)
+        allocate(CFTLIB, LOCALHOST),
+        allocate(PROD, PRODUCTION),
+        print(CFTLIB, LOCALHOST),
+        print(PROD, PRODUCTION),
+        list(CFTLIB, LOCALHOST),
+        list(PROD, PRODUCTION),
+        update(CFTLIB, LOCALHOST),
+        update(PROD, PRODUCTION)
     };
 
     static final EventFieldSpec[] EVENT_FIELDS = {
-        field(
+        mandatory(
                 CFTLIB,
                 ALLOCATE_HEARING,
                 "allocateHearingHearing",
-                "MANDATORY",
                 1,
                 1,
-                true,
-                "Y",
                 null,
                 null,
                 null,
-                null,
-                LOCALHOST + "/allocatehearing/handleListingSelected",
-                null),
-        field(
+                LOCALHOST + "/allocatehearing/handleListingSelected"),
+        mandatory(
                 PROD,
                 ALLOCATE_HEARING,
                 "allocateHearingHearing",
-                "MANDATORY",
                 1,
                 1,
-                true,
-                "Y",
                 null,
                 null,
                 null,
-                null,
-                PRODUCTION + "/allocatehearing/handleListingSelected",
-                null),
-        field(
+                PRODUCTION + "/allocatehearing/handleListingSelected"),
+        mandatory(
                 CFTLIB_SCOTLAND,
                 ALLOCATE_HEARING,
                 "allocateHearingManagingOffice",
-                "MANDATORY",
                 2,
                 1,
-                true,
-                "Y",
                 null,
                 null,
                 null,
-                null,
-                LOCALHOST + "/allocatehearing/handleManagingOfficeSelected",
-                null),
-        field(
+                LOCALHOST + "/allocatehearing/handleManagingOfficeSelected"),
+        mandatory(
                 PROD_SCOTLAND,
                 ALLOCATE_HEARING,
                 "allocateHearingManagingOffice",
-                "MANDATORY",
                 2,
                 1,
-                true,
-                "Y",
                 null,
                 null,
                 null,
-                null,
-                PRODUCTION + "/allocatehearing/handleManagingOfficeSelected",
-                null),
-        field(
+                PRODUCTION + "/allocatehearing/handleManagingOfficeSelected"),
+        mandatory(
                 ENGLAND_WALES,
                 ALLOCATE_HEARING,
                 "allocateHearingSitAlone",
-                "MANDATORY",
                 2,
                 1,
-                true,
-                "Y",
-                null,
-                null,
                 null,
                 null,
                 null,
                 null),
-        field(
+        optional(
                 ENGLAND_WALES,
                 ALLOCATE_HEARING,
                 "allocateHearingJudge",
-                "OPTIONAL",
                 2,
                 2,
-                true,
-                "Y",
-                null,
-                null,
                 null,
                 null,
                 null,
                 null),
-        field(
+        optional(
                 ENGLAND_WALES,
                 ALLOCATE_HEARING,
                 "allocateHearingAdditionalJudge",
-                "OPTIONAL",
                 2,
                 3,
-                true,
-                "Y",
                 "allocateHearingSitAlone=\"Two Judges\"",
                 null,
                 null,
-                null,
-                null,
                 null),
-        field(
+        optional(
                 ENGLAND_WALES,
                 ALLOCATE_HEARING,
                 "allocateHearingEmployerMember",
-                "OPTIONAL",
                 2,
                 3,
-                true,
-                "Y",
                 "allocateHearingSitAlone=\"Full Panel\"",
                 null,
                 null,
-                null,
-                null,
                 null),
-        field(
+        optional(
                 ENGLAND_WALES,
                 ALLOCATE_HEARING,
                 "allocateHearingEmployeeMember",
-                "OPTIONAL",
                 2,
                 4,
-                true,
-                "Y",
                 "allocateHearingSitAlone=\"Full Panel\"",
                 null,
                 null,
-                null,
-                null,
                 null),
-        field(
+        optional(
                 ENGLAND_WALES,
                 ALLOCATE_HEARING,
                 "allocateHearingStatus",
-                "OPTIONAL",
                 2,
                 5,
-                true,
-                "Y",
-                null,
-                null,
                 null,
                 null,
                 null,
                 null),
-        field(
+        mandatory(
                 ENGLAND_WALES,
                 ALLOCATE_HEARING,
                 "allocateHearingPostponedBy",
-                "MANDATORY",
                 2,
                 6,
-                true,
-                "Y",
                 "allocateHearingStatus=\"Postponed\"",
                 null,
                 null,
-                null,
-                null,
                 null),
-        field(
+        mandatory(
                 CFTLIB_ENGLAND_WALES,
                 ALLOCATE_HEARING,
                 "allocateHearingVenue",
-                "MANDATORY",
                 2,
                 7,
-                true,
-                "Y",
                 null,
                 null,
                 null,
-                null,
-                LOCALHOST + "/allocatehearing/populateRooms",
-                null),
-        field(
+                LOCALHOST + "/allocatehearing/populateRooms"),
+        mandatory(
                 PROD_ENGLAND_WALES,
                 ALLOCATE_HEARING,
                 "allocateHearingVenue",
-                "MANDATORY",
                 2,
                 7,
-                true,
-                "Y",
                 null,
                 null,
                 null,
-                null,
-                PRODUCTION + "/allocatehearing/populateRooms",
-                null),
-        field(
+                PRODUCTION + "/allocatehearing/populateRooms"),
+        optional(
                 ENGLAND_WALES,
                 ALLOCATE_HEARING,
                 "allocateHearingClerk",
-                "OPTIONAL",
                 2,
                 8,
-                true,
-                "Y",
-                null,
-                null,
                 null,
                 null,
                 null,
                 null),
-        field(
+        optional(
                 ENGLAND_WALES,
                 ALLOCATE_HEARING,
                 "allocateHearingRoom",
-                "OPTIONAL",
                 3,
                 1,
-                true,
-                "Y",
-                null,
-                null,
                 null,
                 null,
                 null,
                 null),
-        field(
+        mandatory(
                 SCOTLAND,
                 ALLOCATE_HEARING,
                 "allocateHearingSitAlone",
-                "MANDATORY",
                 3,
                 1,
-                true,
-                "Y",
-                null,
-                null,
                 null,
                 null,
                 null,
                 null),
-        field(
-                SCOTLAND,
-                ALLOCATE_HEARING,
-                "allocateHearingJudge",
-                "OPTIONAL",
-                3,
-                2,
-                true,
-                "Y",
-                null,
-                null,
-                null,
-                null,
-                null,
-                null),
-        field(
+        optional(SCOTLAND, ALLOCATE_HEARING, "allocateHearingJudge", 3, 2, null, null, null, null),
+        optional(
                 SCOTLAND,
                 ALLOCATE_HEARING,
                 "allocateHearingAdditionalJudge",
-                "OPTIONAL",
                 3,
                 3,
-                true,
-                "Y",
                 "allocateHearingSitAlone=\"Two Judges\"",
                 null,
                 null,
-                null,
-                null,
                 null),
-        field(
+        optional(
                 SCOTLAND,
                 ALLOCATE_HEARING,
                 "allocateHearingReadingDeliberation",
-                "OPTIONAL",
                 3,
                 3,
-                true,
-                "Y",
-                null,
-                null,
                 null,
                 null,
                 null,
                 null),
-        field(
+        optional(
                 SCOTLAND,
                 ALLOCATE_HEARING,
                 "allocateHearingEmployerMember",
-                "OPTIONAL",
                 3,
                 4,
-                true,
-                "Y",
                 "allocateHearingSitAlone=\"Full Panel\"",
                 null,
                 null,
-                null,
-                null,
                 null),
-        field(
+        optional(
                 SCOTLAND,
                 ALLOCATE_HEARING,
                 "allocateHearingEmployeeMember",
-                "OPTIONAL",
                 3,
                 5,
-                true,
-                "Y",
                 "allocateHearingSitAlone=\"Full Panel\"",
                 null,
                 null,
-                null,
-                null,
                 null),
-        field(
-                SCOTLAND,
-                ALLOCATE_HEARING,
-                "allocateHearingStatus",
-                "OPTIONAL",
-                3,
-                6,
-                true,
-                "Y",
-                null,
-                null,
-                null,
-                null,
-                null,
-                null),
-        field(
+        optional(SCOTLAND, ALLOCATE_HEARING, "allocateHearingStatus", 3, 6, null, null, null, null),
+        mandatory(
                 SCOTLAND,
                 ALLOCATE_HEARING,
                 "allocateHearingPostponedBy",
-                "MANDATORY",
                 3,
                 7,
-                true,
-                "Y",
                 "allocateHearingStatus=\"Postponed\"",
                 null,
                 null,
-                null,
-                null,
                 null),
-        field(
+        mandatory(
                 CFTLIB_SCOTLAND,
                 ALLOCATE_HEARING,
                 "allocateHearingVenue",
-                "MANDATORY",
                 3,
                 8,
-                true,
-                "Y",
                 null,
                 null,
                 null,
-                null,
-                LOCALHOST + "/allocatehearing/populateRooms",
-                null),
-        field(
+                LOCALHOST + "/allocatehearing/populateRooms"),
+        mandatory(
                 PROD_SCOTLAND,
                 ALLOCATE_HEARING,
                 "allocateHearingVenue",
-                "MANDATORY",
                 3,
                 8,
-                true,
-                "Y",
                 null,
                 null,
                 null,
-                null,
-                PRODUCTION + "/allocatehearing/populateRooms",
-                null),
-        field(
-                SCOTLAND,
-                ALLOCATE_HEARING,
-                "allocateHearingClerk",
-                "OPTIONAL",
-                3,
-                9,
-                true,
-                "Y",
-                null,
-                null,
-                null,
-                null,
-                null,
-                null),
-        field(
-                SCOTLAND,
-                ALLOCATE_HEARING,
-                "allocateHearingRoom",
-                "OPTIONAL",
-                4,
-                1,
-                true,
-                "Y",
-                null,
-                null,
-                null,
-                null,
-                null,
-                null),
-        field(
+                PRODUCTION + "/allocatehearing/populateRooms"),
+        optional(SCOTLAND, ALLOCATE_HEARING, "allocateHearingClerk", 3, 9, null, null, null, null),
+        optional(SCOTLAND, ALLOCATE_HEARING, "allocateHearingRoom", 4, 1, null, null, null, null),
+        complex(
                 CFTLIB,
                 PRINT_HEARING,
                 "printHearingDetails",
-                "COMPLEX",
                 1,
                 1,
-                true,
-                "Y",
                 null,
                 null,
                 null,
-                null,
-                LOCALHOST + "/listingSingleCases",
-                null),
-        field(
+                LOCALHOST + "/listingSingleCases"),
+        complex(
                 PROD,
                 PRINT_HEARING,
                 "printHearingDetails",
-                "COMPLEX",
                 1,
                 1,
-                true,
-                "Y",
                 null,
                 null,
                 null,
-                null,
-                PRODUCTION + "/listingSingleCases",
-                null),
-        field(
-                ALL,
-                PRINT_HEARING,
-                "printHearingCollection",
-                "COMPLEX",
-                2,
-                1,
-                true,
-                "Y",
-                null,
-                null,
-                null,
-                null,
-                null,
-                null),
-        field(
+                PRODUCTION + "/listingSingleCases"),
+        complex(ALL, PRINT_HEARING, "printHearingCollection", 2, 1, null, null, null, null),
+        complex(
                 CFTLIB,
                 ADD_AMEND_HEARING,
                 "hearingCollection",
-                "COMPLEX",
                 1,
                 1,
-                true,
-                "Y",
                 null,
                 null,
                 null,
-                null,
-                LOCALHOST + "/midEventAmendHearing",
-                null),
-        field(
+                LOCALHOST + "/midEventAmendHearing"),
+        complex(
                 PROD,
                 ADD_AMEND_HEARING,
                 "hearingCollection",
-                "COMPLEX",
                 1,
                 1,
-                true,
-                "Y",
                 null,
                 null,
                 null,
-                null,
-                PRODUCTION + "/midEventAmendHearing",
-                null),
-        field(
+                PRODUCTION + "/midEventAmendHearing"),
+        readOnly(
                 ALL,
                 ADD_AMEND_HEARING,
                 "listedDateInPastWarning",
-                "READONLY",
                 2,
                 1,
-                true,
-                "Y",
                 "hearingCollection=\"dummy\"",
                 null,
                 null,
-                null,
-                null,
                 null),
-        field(
+        readOnly(
                 ALL,
                 ADD_AMEND_HEARING,
                 "listedDateInPastWarningLabel",
-                "READONLY",
                 2,
                 1,
-                true,
-                "Y",
                 "listedDateInPastWarning=\"Yes\"",
-                null,
                 "listedDateInPastWarning=\"Yes\"",
-                null,
                 null,
                 null),
-        field(
+        mandatory(
                 CFTLIB,
                 UPDATE_HEARING,
                 "hearingDetailsHearing",
-                "MANDATORY",
                 1,
                 1,
-                true,
-                "Y",
                 null,
                 null,
                 null,
-                null,
-                LOCALHOST + "/hearingdetails/handleListingSelected",
-                null),
-        field(
+                LOCALHOST + "/hearingdetails/handleListingSelected"),
+        mandatory(
                 PROD,
                 UPDATE_HEARING,
                 "hearingDetailsHearing",
-                "MANDATORY",
                 1,
                 1,
-                true,
-                "Y",
                 null,
                 null,
                 null,
-                null,
-                PRODUCTION + "/hearingdetails/handleListingSelected",
-                null),
+                PRODUCTION + "/hearingdetails/handleListingSelected"),
         field(
                 ALL,
                 UPDATE_HEARING,
@@ -854,100 +429,52 @@ final class SingleHearingManagementRows {
                 null,
                 null,
                 "Y"),
-        field(
-                ALL,
-                UPDATE_HEARING,
-                "uploadHearingNotesDocument",
-                "OPTIONAL",
-                2,
-                1,
-                true,
-                "Y",
-                null,
-                null,
-                null,
-                null,
-                null,
-                null),
-        field(
+        optional(ALL, UPDATE_HEARING, "uploadHearingNotesDocument", 2, 1, null, null, null, null),
+        optional(
                 ALL,
                 UPDATE_HEARING,
                 "doesHearingNotesDocExist",
-                "OPTIONAL",
                 2,
                 2,
-                true,
-                "Y",
                 "uploadHearingNotesDocument=\"dummy\"",
                 null,
                 null,
-                null,
-                null,
                 null),
-        field(
+        optional(
                 ALL,
                 UPDATE_HEARING,
                 "removeHearingNotesDocument",
-                "OPTIONAL",
                 2,
                 3,
-                true,
-                "Y",
                 "doesHearingNotesDocExist=\"Yes\"",
                 null,
                 null,
-                null,
-                null,
                 null),
-        field(
+        complex(
                 CFTLIB_ENGLAND_WALES,
                 UPDATE_HEARING,
                 "hearingDetailsCollection",
-                "COMPLEX",
                 2,
                 4,
-                true,
-                "Y",
                 null,
                 null,
                 null,
-                null,
-                LOCALHOST + "/hearingdetails/hearingMidEventValidation",
-                null),
-        field(
+                LOCALHOST + "/hearingdetails/hearingMidEventValidation"),
+        complex(
                 PROD_ENGLAND_WALES,
                 UPDATE_HEARING,
                 "hearingDetailsCollection",
-                "COMPLEX",
                 2,
                 4,
-                true,
-                "Y",
                 null,
                 null,
                 null,
-                null,
-                PRODUCTION + "/hearingdetails/hearingMidEventValidation",
-                null),
-        field(
-                SCOTLAND,
-                UPDATE_HEARING,
-                "hearingDetailsCollection",
-                "COMPLEX",
-                2,
-                4,
-                true,
-                "Y",
-                null,
-                null,
-                null,
-                null,
-                null,
-                null)
+                PRODUCTION + "/hearingdetails/hearingMidEventValidation"),
+        complex(SCOTLAND, UPDATE_HEARING, "hearingDetailsCollection", 2, 4, null, null, null, null)
     };
 
     static final ComplexFieldSpec[] COMPLEX_FIELDS = {
-        complexField(
+        element(
                 ALL,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -956,12 +483,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 1,
                 "Hearing Date",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ALL,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -970,12 +493,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 1,
                 "Hearing number",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ALL,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -984,12 +503,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 2,
                 "Hearing type",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -998,12 +513,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 2,
                 "Reading Day, Deliberation Day, Members Meeting or In Chambers?",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ALL,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -1012,12 +523,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 3,
                 "Public or Private?",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ALL,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -1026,12 +533,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 4,
                 "Hearing Format",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ALL,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -1040,12 +543,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 5,
                 "Judicial Mediation",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -1054,12 +553,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 6,
                 "Hearing Venue",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -1068,12 +563,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 6,
                 "Managing Office",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -1082,12 +573,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 7,
                 "Venue",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -1096,12 +583,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 7,
                 "Venue",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -1110,12 +593,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 7,
                 "Venue",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -1124,12 +603,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 7,
                 "Venue",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -1138,12 +613,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 7,
                 "Estimated hearing length",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -1152,12 +623,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 8,
                 "Estimated hearing length",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -1166,12 +633,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 8,
                 "Days, Hours or Minutes",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -1180,12 +643,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 9,
                 "Days, Hours or Minutes",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -1194,12 +653,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 9,
                 "Panel Type",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -1208,12 +663,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 10,
                 "EQP Stage Hearing",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -1222,12 +673,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 10,
                 "Panel Type",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -1236,12 +683,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 11,
                 "Hearing Notes",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -1250,12 +693,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 11,
                 "EQP Stage Hearing",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Hearing",
                 ADD_AMEND_HEARING,
@@ -1264,12 +703,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 12,
                 "Hearing Notes",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ALL,
                 "HearingDetails",
                 UPDATE_HEARING,
@@ -1278,12 +713,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 1,
                 "Hearing Date",
-                null,
-                null,
-                null,
-                null,
                 "Y"),
-        complexField(
+        element(
                 ALL,
                 "HearingDetails",
                 UPDATE_HEARING,
@@ -1292,12 +723,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 2,
                 "Hearing Status",
-                null,
-                null,
-                null,
-                null,
                 "Y"),
-        complexField(
+        element(
                 ALL,
                 "HearingDetails",
                 UPDATE_HEARING,
@@ -1306,12 +733,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 3,
                 "Postponed by",
-                null,
-                null,
-                null,
-                null,
                 "Y"),
-        complexField(
+        element(
                 ALL,
                 "HearingDetails",
                 UPDATE_HEARING,
@@ -1320,12 +743,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 4,
                 "Has the case or part of the case been disposed?",
-                null,
-                null,
-                null,
-                null,
                 "Y"),
-        complexField(
+        element(
                 ALL,
                 "HearingDetails",
                 UPDATE_HEARING,
@@ -1334,12 +753,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 5,
                 "Has the hearing been part heard?",
-                null,
-                null,
-                null,
-                null,
                 "Y"),
-        complexField(
+        element(
                 ALL,
                 "HearingDetails",
                 UPDATE_HEARING,
@@ -1348,12 +763,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 6,
                 "Is there a reserved Judgment?",
-                null,
-                null,
-                null,
-                null,
                 "Y"),
-        complexField(
+        element(
                 ALL,
                 "HearingDetails",
                 UPDATE_HEARING,
@@ -1362,12 +773,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 7,
                 "Attendees (Claimant)",
-                null,
-                null,
-                null,
-                null,
                 "Y"),
-        complexField(
+        element(
                 ALL,
                 "HearingDetails",
                 UPDATE_HEARING,
@@ -1376,12 +783,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 8,
                 "Number of Non Attendees (Respondent) ",
-                null,
-                null,
-                null,
-                null,
                 "Y"),
-        complexField(
+        element(
                 ALL,
                 "HearingDetails",
                 UPDATE_HEARING,
@@ -1390,12 +793,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 9,
                 "Respondent Attended - No Representative",
-                null,
-                null,
-                null,
-                null,
                 "Y"),
-        complexField(
+        element(
                 ALL,
                 "HearingDetails",
                 UPDATE_HEARING,
@@ -1404,12 +803,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 10,
                 "Respondent and Representative Attended",
-                null,
-                null,
-                null,
-                null,
                 "Y"),
-        complexField(
+        element(
                 ALL,
                 "HearingDetails",
                 UPDATE_HEARING,
@@ -1418,12 +813,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 11,
                 "Respondent representative only attended",
-                null,
-                null,
-                null,
-                null,
                 "Y"),
-        complexField(
+        element(
                 ALL,
                 "HearingDetails",
                 UPDATE_HEARING,
@@ -1432,12 +823,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 12,
                 "Start Time",
-                null,
-                null,
-                null,
-                null,
                 "Y"),
-        complexField(
+        element(
                 ALL,
                 "HearingDetails",
                 UPDATE_HEARING,
@@ -1446,12 +833,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 13,
                 "Break",
-                null,
-                null,
-                null,
-                null,
                 "Y"),
-        complexField(
+        element(
                 ALL,
                 "HearingDetails",
                 UPDATE_HEARING,
@@ -1460,12 +843,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 14,
                 "Resume",
-                null,
-                null,
-                null,
-                null,
                 "Y"),
-        complexField(
+        element(
                 ALL,
                 "HearingDetails",
                 UPDATE_HEARING,
@@ -1474,12 +853,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 15,
                 "Finish",
-                null,
-                null,
-                null,
-                null,
                 "Y"),
-        complexField(
+        element(
                 ALL,
                 "HearingDetails",
                 UPDATE_HEARING,
@@ -1488,12 +863,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 16,
                 "Duration",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ALL,
                 "HearingDetails",
                 UPDATE_HEARING,
@@ -1502,12 +873,8 @@ final class SingleHearingManagementRows {
                 "OPTIONAL",
                 17,
                 "Hearing Notes",
-                null,
-                null,
-                null,
-                null,
                 "Y"),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1516,12 +883,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 1,
                 null,
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1530,12 +893,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 1,
                 "Date",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1544,12 +903,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 2,
                 "Date",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1558,12 +913,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 2,
                 "Time",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1572,12 +923,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 3,
                 "Time",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1586,12 +933,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 3,
                 "Location",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1600,12 +943,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 4,
                 "Location",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1614,12 +953,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 4,
                 "Case Number",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1628,12 +963,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 5,
                 "Case Number",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1642,12 +973,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 5,
                 "Jurisdiction",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1656,12 +983,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 6,
                 "Case Type",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1670,12 +993,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 6,
                 "Jurisdiction",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1684,12 +1003,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 7,
                 "Case Type",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1698,12 +1013,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 7,
                 "Position",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1712,12 +1023,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 8,
                 "Employment Judge",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1726,12 +1033,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 8,
                 "Position",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1740,12 +1043,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 9,
                 "Employment Judge",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1754,12 +1053,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 9,
                 "Employment Judge",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1768,12 +1063,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 10,
                 "Employment Judge",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1782,12 +1073,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 10,
                 "Employee Member",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1796,12 +1083,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 11,
                 "Employee Member",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1810,12 +1093,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 11,
                 "Employer Member",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1824,12 +1103,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 12,
                 "Hearing Clerk",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1838,12 +1113,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 12,
                 "Employer Member",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1852,12 +1123,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 13,
                 "Hearing Clerk",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1866,12 +1133,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 13,
                 "Hearing Day",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1880,12 +1143,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 14,
                 "Claimant",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1894,12 +1153,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 14,
                 "Hearing Day",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1908,12 +1163,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 15,
                 "Claimant",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1922,12 +1173,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 15,
                 "Claimant Town",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1936,12 +1183,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 16,
                 "Representative",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1950,12 +1193,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 16,
                 "Claimant Town",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1964,12 +1203,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 17,
                 "Representative",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1978,12 +1213,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 17,
                 "Respondent",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -1992,12 +1223,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 18,
                 "Respondent",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2006,12 +1233,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 18,
                 "Respondent Town",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2020,12 +1243,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 19,
                 "Representative",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2034,12 +1253,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 19,
                 "Respondent Town",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2048,12 +1263,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 20,
                 "Estimated Duration",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2062,12 +1273,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 20,
                 "Representative",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2076,12 +1283,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 21,
                 "Estimated Duration",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2090,12 +1293,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 21,
                 "Hearing Panel",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2104,12 +1303,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 22,
                 "Hearing Panel",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2118,12 +1313,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 22,
                 "Room",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2132,12 +1323,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 23,
                 "Hearing Notes",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2146,12 +1333,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 23,
                 "Room",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2160,12 +1343,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 24,
                 "Hearing Notes",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2174,12 +1353,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 24,
                 "Respondent Others",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2188,12 +1363,8 @@ final class SingleHearingManagementRows {
                 "READONLY",
                 25,
                 "Respondent Others",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ALL,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2202,12 +1373,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 1,
                 "Single or Range",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ALL,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2216,12 +1383,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 2,
                 "Hearing From",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ALL,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2230,12 +1393,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 3,
                 "Hearing To",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ALL,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2244,12 +1403,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 4,
                 "Hearing Date",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2258,12 +1413,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 5,
                 "Hearing Venue",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2272,12 +1423,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 5,
                 "Managing Office",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2286,12 +1433,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 6,
                 "Hearing Document",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2300,12 +1443,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 6,
                 "Hearing Venue",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2314,12 +1453,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 6,
                 "Hearing Venue",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2328,12 +1463,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 6,
                 "Hearing Venue",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2342,12 +1473,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 6,
                 "Hearing Venue",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2356,12 +1483,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 7,
                 "Type",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2370,12 +1493,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 7,
                 "Hearing Document",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2384,12 +1503,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 8,
                 "Type",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 ENGLAND_WALES,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2398,12 +1513,8 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 8,
                 "Split by room",
-                null,
-                null,
-                null,
-                null,
                 null),
-        complexField(
+        element(
                 SCOTLAND,
                 "Scheduling",
                 PRINT_HEARING,
@@ -2412,14 +1523,132 @@ final class SingleHearingManagementRows {
                 "MANDATORY",
                 9,
                 "Split by room",
-                null,
-                null,
-                null,
-                null,
                 null)
     };
 
     private SingleHearingManagementRows() {}
+
+    private static GrantSpec[] eventGrants() {
+        List<GrantSpec> grants = new ArrayList<>();
+        addTribunalGrants(grants, ALLOCATE_HEARING);
+        addTribunalGrants(grants, PRINT_HEARING);
+        addTribunalGrants(grants, ADD_AMEND_HEARING);
+        addTribunalGrants(grants, UPDATE_HEARING);
+        grants.add(
+                new GrantSpec(
+                        ALL, UPDATE_HEARING, SingleRole.CASEWORKER_WA_TASK_CONFIGURATION, "CRU"));
+        return grants.toArray(GrantSpec[]::new);
+    }
+
+    private static void addTribunalGrants(List<GrantSpec> grants, String eventId) {
+        grants.add(new GrantSpec(ALL, eventId, SingleRole.CASEWORKER_EMPLOYMENT, "R"));
+        grants.add(new GrantSpec(ALL, eventId, SingleRole.CASEWORKER_EMPLOYMENT_API, "CRUD"));
+        grants.add(
+                new GrantSpec(
+                        ENGLAND_WALES,
+                        eventId,
+                        SingleRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES,
+                        "CRU"));
+        grants.add(new GrantSpec(ALL, eventId, SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE, "R"));
+        grants.add(
+                new GrantSpec(
+                        ENGLAND_WALES,
+                        eventId,
+                        SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
+                        "CRU"));
+        grants.add(
+                new GrantSpec(
+                        SCOTLAND,
+                        eventId,
+                        SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND,
+                        "CRU"));
+        grants.add(
+                new GrantSpec(SCOTLAND, eventId, SingleRole.CASEWORKER_EMPLOYMENT_SCOTLAND, "CRU"));
+    }
+
+    private static EventSpec allocate(int mask, String callbackBase) {
+        return new EventSpec(
+                mask,
+                ALLOCATE_HEARING,
+                "Allocate Hearing",
+                "Allocate a Hearing",
+                23,
+                PRE_STATES,
+                POST_STATE,
+                HEARING_CONDITION,
+                "N",
+                "N",
+                null,
+                false,
+                null,
+                callbackBase + "/allocatehearing/initialiseHearings",
+                callbackBase + "/allocatehearing/aboutToSubmit",
+                null,
+                null);
+    }
+
+    private static EventSpec print(int mask, String callbackBase) {
+        return new EventSpec(
+                mask,
+                PRINT_HEARING,
+                "Print Hearing lists",
+                "Print Hearing documents",
+                25,
+                PRE_STATES,
+                POST_STATE,
+                HEARING_CONDITION,
+                "N",
+                "N",
+                null,
+                false,
+                null,
+                callbackBase + "/initPrintHearingLists",
+                callbackBase + "/generateListingsDocSingleCases",
+                callbackBase + "/generateListingsDocSingleCasesConfirmation",
+                "Print List");
+    }
+
+    private static EventSpec list(int mask, String callbackBase) {
+        return new EventSpec(
+                mask,
+                ADD_AMEND_HEARING,
+                "List Hearing",
+                "List a Hearing",
+                22,
+                PRE_STATES,
+                POST_STATE,
+                HEARING_CONDITION,
+                "N",
+                "N",
+                "Y",
+                false,
+                null,
+                callbackBase + "/initialiseHearings",
+                callbackBase + "/amendHearing",
+                null,
+                null);
+    }
+
+    private static EventSpec update(int mask, String callbackBase) {
+        return new EventSpec(
+                mask,
+                UPDATE_HEARING,
+                "Hearing Details",
+                "Update post Hearing details",
+                24,
+                PRE_STATES,
+                POST_STATE,
+                HEARING_CONDITION,
+                "N",
+                "N",
+                "Y",
+                false,
+                null,
+                callbackBase + "/hearingdetails/initialiseHearings",
+                callbackBase + "/hearingdetails/aboutToSubmit",
+                null,
+                null);
+    }
 
     static void configureComplexTypeAccess(
             ConfigBuilder<CaseData, CaseState, SingleRole> builder,
@@ -2467,6 +1696,87 @@ final class SingleHearingManagementRows {
         }
     }
 
+    private static EventFieldSpec readOnly(
+            int mask,
+            String eventId,
+            String fieldId,
+            int page,
+            int order,
+            String condition,
+            String pageCondition,
+            String pageLabel,
+            String midEvent) {
+        return field(
+                mask,
+                eventId,
+                fieldId,
+                "READONLY",
+                page,
+                order,
+                true,
+                "Y",
+                condition,
+                null,
+                pageCondition,
+                pageLabel,
+                midEvent,
+                null);
+    }
+
+    private static EventFieldSpec mandatory(
+            int mask,
+            String eventId,
+            String fieldId,
+            int page,
+            int order,
+            String condition,
+            String pageCondition,
+            String pageLabel,
+            String midEvent) {
+        return field(
+                mask,
+                eventId,
+                fieldId,
+                "MANDATORY",
+                page,
+                order,
+                true,
+                "Y",
+                condition,
+                null,
+                pageCondition,
+                pageLabel,
+                midEvent,
+                null);
+    }
+
+    private static EventFieldSpec optional(
+            int mask,
+            String eventId,
+            String fieldId,
+            int page,
+            int order,
+            String condition,
+            String pageCondition,
+            String pageLabel,
+            String midEvent) {
+        return field(
+                mask,
+                eventId,
+                fieldId,
+                "OPTIONAL",
+                page,
+                order,
+                true,
+                "Y",
+                condition,
+                null,
+                pageCondition,
+                pageLabel,
+                midEvent,
+                null);
+    }
+
     private static EventFieldSpec field(
             int mask,
             String eventId,
@@ -2500,7 +1810,34 @@ final class SingleHearingManagementRows {
                 publish);
     }
 
-    private static ComplexFieldSpec complexField(
+    private static EventFieldSpec complex(
+            int mask,
+            String eventId,
+            String fieldId,
+            int page,
+            int order,
+            String condition,
+            String pageCondition,
+            String pageLabel,
+            String midEvent) {
+        return field(
+                mask,
+                eventId,
+                fieldId,
+                "COMPLEX",
+                page,
+                order,
+                true,
+                "Y",
+                condition,
+                null,
+                pageCondition,
+                pageLabel,
+                midEvent,
+                null);
+    }
+
+    private static ComplexFieldSpec element(
             int mask,
             String rowId,
             String eventId,
@@ -2509,10 +1846,6 @@ final class SingleHearingManagementRows {
             String context,
             int order,
             String label,
-            String hint,
-            String condition,
-            String retainHidden,
-            String defaultValue,
             String publish) {
         return new ComplexFieldSpec(
                 mask,
@@ -2523,10 +1856,10 @@ final class SingleHearingManagementRows {
                 context,
                 order,
                 label,
-                hint,
-                condition,
-                retainHidden,
-                defaultValue,
+                null,
+                null,
+                null,
+                null,
                 publish);
     }
 }

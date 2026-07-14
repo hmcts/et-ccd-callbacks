@@ -29,6 +29,8 @@ public final class NotificationServiceConstants {
     public static final String EMAIL_ADDRESS = "emailAddress";
     public static final String NAME = "name";
     public static final String APPLICANT_NAME = "applicantName";
+    public static final String LINK_TO_CIT_UI = "linkToCitUI";
+    public static final String PARTY_NAME = "party_name";
 
     private NotificationServiceConstants() {
         // restrict instantiation

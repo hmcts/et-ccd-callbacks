@@ -6,7 +6,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfBoxServiceUtil.correctCurrency;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtil.logException;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils.logException;
 
 class PdfBoxServiceUtilTest {
 

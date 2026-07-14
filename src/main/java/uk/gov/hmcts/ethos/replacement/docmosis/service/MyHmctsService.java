@@ -43,8 +43,7 @@ public class MyHmctsService {
      * @return the first {@link OrganisationAddress} found in the organisation's contact information
      * @throws GenericServiceException if the organisation details or contact information cannot be retrieved
      */
-    public OrganisationAddress getOrganisationAddress(String userToken) throws GenericServiceException {
-
+    public OrganisationAddress getUserOrganisationAddress(String userToken) throws GenericServiceException {
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
         ResponseEntity<OrganisationsResponse> response =
                 organisationClient.retrieveOrganisationDetailsByUserId(adminUserService.getAdminUserToken(),
@@ -59,7 +58,7 @@ public class MyHmctsService {
                     ERROR_ORGANISATION_DETAILS_NOT_FOUND,
                     StringUtils.EMPTY,
                     "MyHmctsService",
-                    "getOrganisationAddress - organisation details not found");
+                    "getUserOrganisationAddress - organisation details not found");
         }
         return response.getBody().getContactInformation().getFirst();
     }

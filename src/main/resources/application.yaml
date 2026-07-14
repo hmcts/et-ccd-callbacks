@@ -62,6 +62,8 @@ ccd:
     api:
       url: ${CCD_DATA_STORE_API_URL:http://ccd-data-store-api:4452}
   decentralised-runtime:
+    cdam-attach:
+      enabled: ${CCD_DECENTRALISED_RUNTIME_CDAM_ATTACH_ENABLED:true}
     retention:
       enabled: ${CCD_DECENTRALISED_RUNTIME_RETENTION_ENABLED:false}
       disposal:
@@ -136,7 +138,7 @@ rd_professional-api-url: ${RD_PROFESSIONAL_API_URL:http://localhost:4507}
 
 feature:
   secure-doc-store:
-    enabled: 'false'
+    enabled: ${SECURE_DOC_STORE_FEATURE:false}
 
 queue:
   create-updates:

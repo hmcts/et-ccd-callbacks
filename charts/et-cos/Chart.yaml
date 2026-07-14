@@ -99,6 +99,6 @@ dependencies:
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: et-migration.enabled
   - name: em-ccdorc
-    version: 2.1.2
+    version: 2.1.4
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: em-ccdorc.enabled

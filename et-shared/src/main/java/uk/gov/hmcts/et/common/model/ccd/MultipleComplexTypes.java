@@ -39,60 +39,35 @@ public final class MultipleComplexTypes {
                 id = "id",
                 label = "Bundle ID",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field01;
 
         @CCD(
                 id = "title",
                 label = "Name of bundle",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field02;
 
         @CCD(
                 id = "description",
                 label = "Description",
                 typeOverride = FieldType.TextArea,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field03;
 
         @CCD(
                 id = "eligibleForStitching",
                 label = "Is this the bundle you want to stitch?",
                 typeOverride = FieldType.YesOrNo,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field04;
 
         @CCD(
                 id = "eligibleForCloning",
                 label = "Is this the bundle you want to clone?",
                 typeOverride = FieldType.YesOrNo,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field05;
 
         @CCD(
@@ -100,12 +75,7 @@ public final class MultipleComplexTypes {
                 label = "Bundle document",
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "BundleDocument",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field06;
 
         @CCD(
@@ -113,108 +83,63 @@ public final class MultipleComplexTypes {
                 label = "Bundle folder",
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "BundleFolder",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field07;
 
         @CCD(
                 id = "stitchStatus",
                 label = "Stitch Status",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field08;
 
         @CCD(
                 id = "stitchedDocument",
                 label = "Stitched Document",
                 typeOverride = FieldType.Document,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field09;
 
         @CCD(
                 id = "hasCoversheets",
                 label = "Should this bundle have coversheets separating each document?",
                 typeOverride = FieldType.YesOrNo,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field10;
 
         @CCD(
                 id = "hasTableOfContents",
                 label = "Should this bundle have a title page with a table of contents?",
                 typeOverride = FieldType.YesOrNo,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field11;
 
         @CCD(
                 id = "hasFolderCoversheets",
                 label = "Should this bundle’s folders have a coversheet?",
                 typeOverride = FieldType.YesOrNo,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field12;
 
         @CCD(
                 id = "stitchingFailureMessage",
                 label = "Error from Stitching service",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field13;
 
         @CCD(
                 id = "fileName",
                 label = "Name of the PDF",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field14;
 
         @CCD(
                 id = "fileNameIdentifier",
                 label = "Unique filename identifier",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field15;
 
         @CCD(
@@ -222,24 +147,14 @@ public final class MultipleComplexTypes {
                 label = "Pagination Style",
                 typeOverride = FieldType.FixedList,
                 typeParameterOverride = "paginationStyle",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field16;
 
         @CCD(
                 id = "coverpageTemplate",
                 label = "Cover page template",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field17;
 
         @CCD(
@@ -247,24 +162,14 @@ public final class MultipleComplexTypes {
                 label = "Page Number Format",
                 typeOverride = FieldType.FixedList,
                 typeParameterOverride = "pageNumberFormat",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field18;
 
         @CCD(
                 id = "enableEmailNotification",
                 label = "Enable Email Notification?",
                 typeOverride = FieldType.YesOrNo,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field19;
 
         @CCD(
@@ -272,12 +177,7 @@ public final class MultipleComplexTypes {
                 label = "Configure image for stitched PDF?",
                 typeNameOverride = "DocumentImage",
                 typeParameterOverride = "DocumentImage",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field20;
     }
 
@@ -287,48 +187,28 @@ public final class MultipleComplexTypes {
                 id = "name",
                 label = "Document Name",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field01;
 
         @CCD(
                 id = "sortIndex",
                 label = "Sort Index",
                 typeNameOverride = "Number",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field02;
 
         @CCD(
                 id = "description",
                 label = "Description",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field03;
 
         @CCD(
                 id = "sourceDocument",
                 label = "Source Document",
                 typeOverride = FieldType.Document,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field04;
     }
 
@@ -338,12 +218,7 @@ public final class MultipleComplexTypes {
                 id = "name",
                 label = "Folder Name",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field01;
 
         @CCD(
@@ -351,12 +226,7 @@ public final class MultipleComplexTypes {
                 label = "Folder Documents",
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "BundleDocument",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field02;
 
         @CCD(
@@ -364,24 +234,14 @@ public final class MultipleComplexTypes {
                 label = "Subfolders",
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "BundleSubfolder",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field03;
 
         @CCD(
                 id = "sortIndex",
                 label = "Sort Index",
                 typeNameOverride = "Number",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field04;
     }
 
@@ -391,12 +251,7 @@ public final class MultipleComplexTypes {
                 id = "name",
                 label = "Subfolder Name",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field01;
 
         @CCD(
@@ -404,12 +259,7 @@ public final class MultipleComplexTypes {
                 label = "Folder Documents",
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "BundleDocument",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field02;
 
         @CCD(
@@ -417,24 +267,14 @@ public final class MultipleComplexTypes {
                 label = "Subfolders",
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "BundleSubfolder2",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field03;
 
         @CCD(
                 id = "sortIndex",
                 label = "Sort Index",
                 typeNameOverride = "Number",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field04;
     }
 
@@ -444,12 +284,7 @@ public final class MultipleComplexTypes {
                 id = "name",
                 label = "Subfolder Name",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field01;
 
         @CCD(
@@ -457,24 +292,14 @@ public final class MultipleComplexTypes {
                 label = "Folder Documents",
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "BundleDocument",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field02;
 
         @CCD(
                 id = "sortIndex",
                 label = "Sort Index",
                 typeNameOverride = "Number",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field03;
     }
 
@@ -484,12 +309,7 @@ public final class MultipleComplexTypes {
                 id = "ethos_CaseReference ",
                 label = "Case Number",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field01;
     }
 
@@ -500,12 +320,7 @@ public final class MultipleComplexTypes {
                 label = "How would you like to have the image rendered?",
                 typeOverride = FieldType.FixedList,
                 typeParameterOverride = "imageRendering",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field01;
 
         @CCD(
@@ -513,48 +328,28 @@ public final class MultipleComplexTypes {
                 label = "Where would you like to embed the image in the stitched document?",
                 typeOverride = FieldType.FixedList,
                 typeParameterOverride = "imageRenderingLocation",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field02;
 
         @CCD(
                 id = "docmosisAssetId",
                 label = "The filename of the image you wish to embed",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field03;
 
         @CCD(
                 id = "coordinateX",
                 label = "X position of the image",
                 typeNameOverride = "Number",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field04;
 
         @CCD(
                 id = "coordinateY",
                 label = "Y position of the image",
                 typeNameOverride = "Number",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field05;
     }
 
@@ -565,12 +360,7 @@ public final class MultipleComplexTypes {
                 label = "Document Category",
                 typeOverride = FieldType.FixedList,
                 typeParameterOverride = "fl_DocumentCategories",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field01;
 
         @CCD(
@@ -579,12 +369,7 @@ public final class MultipleComplexTypes {
                 showCondition = "topLevelDocuments=\"Starting a Claim\"",
                 typeOverride = FieldType.FixedList,
                 typeParameterOverride = "fl_StartingAClaim",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field02;
 
         @CCD(
@@ -593,12 +378,7 @@ public final class MultipleComplexTypes {
                 showCondition = "topLevelDocuments=\"Response to a Claim\"",
                 typeOverride = FieldType.FixedList,
                 typeParameterOverride = "fl_ResponseToAClaim",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field03;
 
         @CCD(
@@ -607,12 +387,7 @@ public final class MultipleComplexTypes {
                 showCondition = "topLevelDocuments=\"Initial Consideration\"",
                 typeOverride = FieldType.FixedList,
                 typeParameterOverride = "fl_InitialConsideration",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field04;
 
         @CCD(
@@ -621,12 +396,7 @@ public final class MultipleComplexTypes {
                 showCondition = "topLevelDocuments=\"Case Management\"",
                 typeOverride = FieldType.FixedList,
                 typeParameterOverride = "fl_CaseManagement",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field05;
 
         @CCD(
@@ -635,12 +405,7 @@ public final class MultipleComplexTypes {
                 showCondition = "topLevelDocuments=\"Employer Contract Claim\"",
                 typeOverride = FieldType.FixedList,
                 typeParameterOverride = "fl_EmployerContractClaim",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field06;
 
         @CCD(
@@ -649,12 +414,7 @@ public final class MultipleComplexTypes {
                 showCondition = "topLevelDocuments=\"Withdrawal/Settled\"",
                 typeOverride = FieldType.FixedList,
                 typeParameterOverride = "fl_WithdrawalSettled",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field07;
 
         @CCD(
@@ -663,12 +423,7 @@ public final class MultipleComplexTypes {
                 showCondition = "topLevelDocuments=\"Hearings\"",
                 typeOverride = FieldType.FixedList,
                 typeParameterOverride = "fl_Hearings",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field08;
 
         @CCD(
@@ -677,12 +432,7 @@ public final class MultipleComplexTypes {
                 showCondition = "topLevelDocuments=\"Judgment and Reasons\"",
                 typeOverride = FieldType.FixedList,
                 typeParameterOverride = "fl_JudgmentAndReasons",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field09;
 
         @CCD(
@@ -691,12 +441,7 @@ public final class MultipleComplexTypes {
                 showCondition = "topLevelDocuments=\"Reconsideration\"",
                 typeOverride = FieldType.FixedList,
                 typeParameterOverride = "fl_Reconsideration",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field10;
 
         @CCD(
@@ -705,12 +450,7 @@ public final class MultipleComplexTypes {
                 showCondition = "topLevelDocuments=\"Misc\"",
                 typeOverride = FieldType.FixedList,
                 typeParameterOverride = "fl_Misc",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field11;
 
         @CCD(
@@ -719,10 +459,7 @@ public final class MultipleComplexTypes {
                 showCondition = "topLevelDocuments=\"Legacy Document Names\"",
                 typeOverride = FieldType.FixedList,
                 typeParameterOverride = "fl_DocumentType",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class
-                })
+                includeInProfiles = EnglandWalesMultipleDefinition.class)
         @CCD(
                 id = "typeOfDocument",
                 label = "Type of Document",
@@ -730,82 +467,49 @@ public final class MultipleComplexTypes {
                         "topLevelDocuments=\"Legacy Document Names\" OR topLevelDocuments != \"*\"",
                 typeOverride = FieldType.FixedList,
                 typeParameterOverride = "fl_DocumentType",
-                includeInProfiles = {
-                    ScotlandMultipleCftlibDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = ScotlandMultipleDefinition.class)
         private Object field12;
 
         @CCD(
                 id = "uploadedDocument",
                 label = "Document",
                 typeOverride = FieldType.Document,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field13;
 
         @CCD(
                 id = "shortDescription",
                 label = "Short Description",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field14;
 
         @CCD(
                 id = "documentType",
                 label = "Type of Document",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field15;
 
         @CCD(
                 id = "dateOfCorrespondence",
                 label = "Date of Correspondence",
                 typeOverride = FieldType.Date,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field16;
 
         @CCD(
                 id = "docNumber",
                 label = "Number",
                 typeNameOverride = "Number",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field17;
 
         @CCD(
                 id = "documentIndex",
                 label = "Document Number",
                 typeNameOverride = "Number",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field18;
 
         @CCD(
@@ -813,12 +517,7 @@ public final class MultipleComplexTypes {
                 label = "Exclude from Digital Case File",
                 typeOverride = FieldType.MultiSelectList,
                 typeParameterOverride = "msl_Yes",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field19;
     }
 
@@ -827,12 +526,7 @@ public final class MultipleComplexTypes {
         @CCD(
                 id = "dynamicList",
                 typeOverride = FieldType.DynamicList,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field01;
     }
 
@@ -842,10 +536,7 @@ public final class MultipleComplexTypes {
                 id = "caseReference",
                 label = "caseReference",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class
-                })
+                includeInProfiles = MultipleCftlibDefinition.class)
         private Object field01;
 
         @CCD(
@@ -853,10 +544,7 @@ public final class MultipleComplexTypes {
                 label = "legalRepIds",
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "Text",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class
-                })
+                includeInProfiles = MultipleCftlibDefinition.class)
         private Object field02;
     }
 
@@ -866,48 +554,28 @@ public final class MultipleComplexTypes {
                 id = "title",
                 label = "Title",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field01;
 
         @CCD(
                 id = "note",
                 label = "Note",
                 typeOverride = FieldType.TextArea,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field02;
 
         @CCD(
                 id = "author",
                 label = "Author",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field03;
 
         @CCD(
                 id = "date",
                 label = "Date",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field04;
     }
 
@@ -917,72 +585,42 @@ public final class MultipleComplexTypes {
                 id = "ethosCaseRef",
                 label = "Ethos Case Reference",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field01;
 
         @CCD(
                 id = "subMultiple",
                 label = "Sub Multiple",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field02;
 
         @CCD(
                 id = "flag1",
                 label = "Flag 1",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field03;
 
         @CCD(
                 id = "flag2",
                 label = "Flag 2",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field04;
 
         @CCD(
                 id = "flag3",
                 label = "Flag 3",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field05;
 
         @CCD(
                 id = "flag4",
                 label = "Flag 4",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field06;
     }
 
@@ -993,12 +631,7 @@ public final class MultipleComplexTypes {
                 label = "Response date",
                 displayOrder = 2,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field01;
 
         @CCD(
@@ -1006,12 +639,7 @@ public final class MultipleComplexTypes {
                 label = "Response from",
                 displayOrder = 1,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field02;
 
         @CCD(
@@ -1019,12 +647,7 @@ public final class MultipleComplexTypes {
                 label = "What's your response to the tribunal?",
                 displayOrder = 3,
                 typeOverride = FieldType.TextArea,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field03;
 
         @CCD(
@@ -1032,12 +655,7 @@ public final class MultipleComplexTypes {
                 label = "Response from Idam id",
                 showCondition = "date=\"dummy\"",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field04;
 
         @CCD(
@@ -1045,12 +663,7 @@ public final class MultipleComplexTypes {
                 label = "Has supporting material",
                 showCondition = "date=\"dummy\"",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field05;
 
         @CCD(
@@ -1059,64 +672,39 @@ public final class MultipleComplexTypes {
                 displayOrder = 4,
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "DocumentUpload",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field06;
 
         @CCD(
                 id = "copyToOtherParty",
                 label =
                         "Do you want to copy this correspondence to the other party to satisfy the"
-                            + " Rules of Procedure?",
+                                + " Rules of Procedure?",
                 showCondition = " ",
                 displayOrder = 5,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field07;
 
         @CCD(
                 id = "copyNoGiveDetails",
                 showCondition = "copyToOtherParty=\"dummy\"",
                 typeOverride = FieldType.TextArea,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field08;
 
         @CCD(
                 id = "responseState",
                 showCondition = "date=\"dummy\"",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field09;
 
         @CCD(
                 id = "author",
                 showCondition = "date=\"dummy\"",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field10;
 
         @CCD(
@@ -1124,19 +712,13 @@ public final class MultipleComplexTypes {
                 showCondition = "copyToOtherParty = \"dummy\"",
                 retainHiddenValueValue = "Yes",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class
-                })
+                includeInProfiles = EnglandWalesMultipleDefinition.class)
         @CCD(
                 id = "dateTime",
                 showCondition = "copyToOtherParty=\"dummy\"",
                 retainHiddenValueValue = "Yes",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    ScotlandMultipleCftlibDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = ScotlandMultipleDefinition.class)
         private Object field11;
 
         @CCD(
@@ -1144,12 +726,7 @@ public final class MultipleComplexTypes {
                 showCondition = "copyToOtherParty=\"dummy\"",
                 retainHiddenValueValue = "Yes",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field12;
     }
 
@@ -1159,36 +736,21 @@ public final class MultipleComplexTypes {
                 id = "userIdamId",
                 label = "User Idam Id",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field01;
 
         @CCD(
                 id = "notificationState",
                 label = "Notification state",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field02;
 
         @CCD(
                 id = "dateTime",
                 label = "Updated date time",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field03;
     }
 
@@ -1198,96 +760,56 @@ public final class MultipleComplexTypes {
                 id = "referralNumber",
                 label = "No",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field01;
 
         @CCD(
                 id = "referralHearingDate",
                 label = "Hearing date",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field02;
 
         @CCD(
                 id = "referCaseTo",
                 label = "Referred to",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field03;
 
         @CCD(
                 id = "referentEmail",
                 label = "Email address",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field04;
 
         @CCD(
                 id = "isUrgent",
                 label = "Urgent",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field05;
 
         @CCD(
                 id = "referralSubject",
                 label = "Subject",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field06;
 
         @CCD(
                 id = "referralSubjectSpecify",
                 label = "Referral subject",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field07;
 
         @CCD(
                 id = "referralDetails",
                 label = "Details of the referral",
                 typeOverride = FieldType.TextArea,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field08;
 
         @CCD(
@@ -1295,72 +817,42 @@ public final class MultipleComplexTypes {
                 label = "Documents",
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "DocumentUpload",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field09;
 
         @CCD(
                 id = "referralInstruction",
                 label = "Recommended instructions",
                 typeOverride = FieldType.TextArea,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field10;
 
         @CCD(
                 id = "referredBy",
                 label = "Referred by",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field11;
 
         @CCD(
                 id = "referralDate",
                 label = "Referral date",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field12;
 
         @CCD(
                 id = "referralStatus",
                 label = "Status",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field13;
 
         @CCD(
                 id = "closeReferralGeneralNotes",
                 label = "General notes",
                 typeOverride = FieldType.TextArea,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field14;
 
         @CCD(
@@ -1368,12 +860,7 @@ public final class MultipleComplexTypes {
                 label = "Updates",
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "updateReferralDetails",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field15;
 
         @CCD(
@@ -1381,12 +868,7 @@ public final class MultipleComplexTypes {
                 label = "Reply",
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "referralReply",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field16;
 
         @CCD(
@@ -1394,12 +876,7 @@ public final class MultipleComplexTypes {
                 label = "Referral Document",
                 categoryID = "C4",
                 typeOverride = FieldType.Document,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field17;
     }
 
@@ -1409,72 +886,42 @@ public final class MultipleComplexTypes {
                 id = "replyBy",
                 label = "Reply by",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field01;
 
         @CCD(
                 id = "directionTo",
                 label = "Reply to",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field02;
 
         @CCD(
                 id = "replyToEmailAddress",
                 label = "Email address",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field03;
 
         @CCD(
                 id = "replyDate",
                 label = "Date",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field04;
 
         @CCD(
                 id = "isUrgentReply",
                 label = "Urgent",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field05;
 
         @CCD(
                 id = "directionDetails",
                 label = "Directions",
                 typeOverride = FieldType.TextArea,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field06;
 
         @CCD(
@@ -1482,60 +929,35 @@ public final class MultipleComplexTypes {
                 label = "Documents",
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "DocumentUpload",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field07;
 
         @CCD(
                 id = "replyGeneralNotes",
                 label = "General notes",
                 typeOverride = FieldType.TextArea,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field08;
 
         @CCD(
                 id = "replyDateTime",
                 showCondition = "replyDateTime = \"dummy\"",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field09;
 
         @CCD(
                 id = "referralSubject",
                 showCondition = "replyDateTime = \"dummy\"",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field10;
 
         @CCD(
                 id = "referralNumber",
                 showCondition = "replyDateTime = \"dummy\"",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field11;
     }
 
@@ -1546,12 +968,7 @@ public final class MultipleComplexTypes {
                 label = "Is this a case management order or request?",
                 displayOrder = 5,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field01;
 
         @CCD(
@@ -1559,12 +976,7 @@ public final class MultipleComplexTypes {
                 label = "Date",
                 displayOrder = 2,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field02;
 
         @CCD(
@@ -1572,48 +984,28 @@ public final class MultipleComplexTypes {
                 label = "Request made by",
                 displayOrder = 7,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field03;
 
         @CCD(
                 id = "state",
                 showCondition = "respondNotificationDate=\"dummy\"",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field04;
 
         @CCD(
                 id = "isClaimantResponseDue",
                 showCondition = "state=\"dummy\"",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field05;
 
         @CCD(
                 id = "dateTime",
                 label = "Updated date time",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field06;
 
         @CCD(
@@ -1621,12 +1013,7 @@ public final class MultipleComplexTypes {
                 label = "Response title",
                 displayOrder = 1,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field07;
 
         @CCD(
@@ -1634,12 +1021,7 @@ public final class MultipleComplexTypes {
                 label = "Additional information",
                 displayOrder = 4,
                 typeOverride = FieldType.TextArea,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field08;
 
         @CCD(
@@ -1648,12 +1030,7 @@ public final class MultipleComplexTypes {
                 displayOrder = 3,
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "DocumentUpload",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field09;
 
         @CCD(
@@ -1661,12 +1038,7 @@ public final class MultipleComplexTypes {
                 label = "Response due",
                 displayOrder = 8,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field10;
 
         @CCD(
@@ -1674,12 +1046,7 @@ public final class MultipleComplexTypes {
                 label = "Party or parties to respoond",
                 displayOrder = 9,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field11;
 
         @CCD(
@@ -1687,12 +1054,7 @@ public final class MultipleComplexTypes {
                 label = "Case management order made by",
                 displayOrder = 6,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field12;
 
         @CCD(
@@ -1700,12 +1062,7 @@ public final class MultipleComplexTypes {
                 label = "Full name",
                 displayOrder = 7,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field13;
 
         @CCD(
@@ -1713,12 +1070,7 @@ public final class MultipleComplexTypes {
                 label = "Sent to",
                 displayOrder = 10,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field14;
     }
 
@@ -1729,24 +1081,14 @@ public final class MultipleComplexTypes {
                 label = "Notification",
                 displayOrder = 1,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field01;
 
         @CCD(
                 id = "sendNotificationLetter",
                 showCondition = "date=\"dummy\"",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field02;
 
         @CCD(
@@ -1755,12 +1097,7 @@ public final class MultipleComplexTypes {
                 displayOrder = 7,
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "DocumentUpload",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field03;
 
         @CCD(
@@ -1768,12 +1105,7 @@ public final class MultipleComplexTypes {
                 showCondition = "date=\"dummy\"",
                 typeOverride = FieldType.MultiSelectList,
                 typeParameterOverride = "fl_sendNotificationSubject",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field04;
 
         @CCD(
@@ -1781,36 +1113,21 @@ public final class MultipleComplexTypes {
                 label = "Additional information",
                 displayOrder = 6,
                 typeOverride = FieldType.TextArea,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field05;
 
         @CCD(
                 id = "sendNotificationNotify",
                 label = "To party",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field06;
 
         @CCD(
                 id = "sendNotificationAnotherLetter",
                 label = "sendNotificationAnotherLetter",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field07;
 
         @CCD(
@@ -1818,12 +1135,7 @@ public final class MultipleComplexTypes {
                 label = "Hearing",
                 displayOrder = 2,
                 typeOverride = FieldType.DynamicList,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field08;
 
         @CCD(
@@ -1831,12 +1143,7 @@ public final class MultipleComplexTypes {
                 label = "Case management order or request",
                 displayOrder = 4,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field09;
 
         @CCD(
@@ -1844,12 +1151,7 @@ public final class MultipleComplexTypes {
                 label = "Response due",
                 displayOrder = 4,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field10;
 
         @CCD(
@@ -1857,12 +1159,7 @@ public final class MultipleComplexTypes {
                 label = "Case management order made by",
                 displayOrder = 8,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field11;
 
         @CCD(
@@ -1870,12 +1167,7 @@ public final class MultipleComplexTypes {
                 label = "Party or parties to respond",
                 displayOrder = 5,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field12;
 
         @CCD(
@@ -1883,12 +1175,7 @@ public final class MultipleComplexTypes {
                 label = "Full name",
                 displayOrder = 9,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field13;
 
         @CCD(
@@ -1896,12 +1183,7 @@ public final class MultipleComplexTypes {
                 label = "Full name",
                 displayOrder = 11,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field14;
 
         @CCD(
@@ -1909,12 +1191,7 @@ public final class MultipleComplexTypes {
                 label = "Decision",
                 showCondition = "date=\"dummy\"",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field15;
 
         @CCD(
@@ -1922,36 +1199,21 @@ public final class MultipleComplexTypes {
                 label = "Details",
                 showCondition = "date=\"dummy\"",
                 typeOverride = FieldType.TextArea,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field16;
 
         @CCD(
                 id = "number",
                 label = "No",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field17;
 
         @CCD(
                 id = "date",
                 label = "Date sent",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field18;
 
         @CCD(
@@ -1960,12 +1222,7 @@ public final class MultipleComplexTypes {
                 displayOrder = 12,
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "pseRespondCollection",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field19;
 
         @CCD(
@@ -1973,12 +1230,7 @@ public final class MultipleComplexTypes {
                 label = "Notification State",
                 showCondition = "number=\"dummy\"",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field20;
 
         @CCD(
@@ -1987,36 +1239,21 @@ public final class MultipleComplexTypes {
                 showCondition = "number=\"dummy\"",
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "pseStatus",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field21;
 
         @CCD(
                 id = "sendNotificationResponsesCount",
                 label = "Number of responses",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field22;
 
         @CCD(
                 id = "sendNotificationSubjectString",
                 label = "Subject",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field23;
 
         @CCD(
@@ -2024,24 +1261,14 @@ public final class MultipleComplexTypes {
                 label = "Sent by",
                 displayOrder = 3,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field24;
 
         @CCD(
                 id = "sendNotificationEccQuestion",
                 showCondition = "date=\"dummy\"",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field25;
 
         @CCD(
@@ -2049,24 +1276,14 @@ public final class MultipleComplexTypes {
                 label = "Judgment made by",
                 displayOrder = 10,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field26;
 
         @CCD(
                 id = "sendNotificationResponseTribunalTable",
                 label = "Response due",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field27;
 
         @CCD(
@@ -2074,12 +1291,7 @@ public final class MultipleComplexTypes {
                 label = "Request made by",
                 displayOrder = 8,
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field28;
 
         @CCD(
@@ -2087,12 +1299,7 @@ public final class MultipleComplexTypes {
                 label = "Tribunal Responses",
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "respondNotificationTypeCollection",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field29;
 
         @CCD(
@@ -2100,10 +1307,7 @@ public final class MultipleComplexTypes {
                 label = "To",
                 showCondition = "sendNotificationNotify=\"Lead case\"",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class
-                })
+                includeInProfiles = MultipleCftlibDefinition.class)
         private Object field30;
 
         @CCD(
@@ -2111,10 +1315,7 @@ public final class MultipleComplexTypes {
                 label = "To",
                 showCondition = "sendNotificationNotify=\"Lead and sub cases\"",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class
-                })
+                includeInProfiles = MultipleCftlibDefinition.class)
         private Object field31;
 
         @CCD(
@@ -2122,10 +1323,7 @@ public final class MultipleComplexTypes {
                 label = "To",
                 showCondition = "sendNotificationNotify=\"Selected cases\"",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class
-                })
+                includeInProfiles = MultipleCftlibDefinition.class)
         private Object field32;
 
         @CCD(
@@ -2133,10 +1331,7 @@ public final class MultipleComplexTypes {
                 label = "Multiple ref",
                 showCondition = "sendNotificationNotify=\"dummy\"",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class
-                })
+                includeInProfiles = MultipleCftlibDefinition.class)
         private Object field33;
 
         @CCD(
@@ -2145,12 +1340,7 @@ public final class MultipleComplexTypes {
                 showCondition = "date=\"dummy\"",
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "pseRespondCollection",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field34;
 
         @CCD(
@@ -2159,12 +1349,7 @@ public final class MultipleComplexTypes {
                 showCondition = "date=\"dummy\"",
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "pseRespondCollection",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field35;
     }
 
@@ -2174,24 +1359,14 @@ public final class MultipleComplexTypes {
                 id = "subMultipleName",
                 label = "Submultiple Name",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field01;
 
         @CCD(
                 id = "subMultipleRef",
                 label = "Submultiple Reference",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field02;
     }
 
@@ -2201,96 +1376,56 @@ public final class MultipleComplexTypes {
                 id = "updateReferralNumber",
                 label = "No",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field01;
 
         @CCD(
                 id = "updateReferralHearingDate",
                 label = "Hearing date",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field02;
 
         @CCD(
                 id = "updateReferCaseTo",
                 label = "Referred to",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field03;
 
         @CCD(
                 id = "updateReferentEmail",
                 label = "Email address",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field04;
 
         @CCD(
                 id = "updateReferralDetails",
                 label = "Details of the referral",
                 typeOverride = FieldType.TextArea,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field05;
 
         @CCD(
                 id = "updateIsUrgent",
                 label = "Urgent",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field06;
 
         @CCD(
                 id = "updateReferralSubject",
                 label = "Subject",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field07;
 
         @CCD(
                 id = "updateReferralSubjectSpecify",
                 label = "Referral subject",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field08;
 
         @CCD(
@@ -2298,60 +1433,35 @@ public final class MultipleComplexTypes {
                 label = "Documents",
                 typeOverride = FieldType.Collection,
                 typeParameterOverride = "DocumentUpload",
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field09;
 
         @CCD(
                 id = "updateReferralInstruction",
                 label = "Recommended instructions",
                 typeOverride = FieldType.TextArea,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field10;
 
         @CCD(
                 id = "updateReferredBy",
                 label = "Updated by",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field11;
 
         @CCD(
                 id = "updateReferralDate",
                 label = "Updated date",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field12;
 
         @CCD(
                 id = "updateReferralDateTime",
                 label = "Update Referral DateTime",
                 typeOverride = FieldType.Text,
-                includeInProfiles = {
-                    EnglandWalesMultipleCftlibDefinition.class,
-                    ScotlandMultipleCftlibDefinition.class,
-                    EnglandWalesMultipleProdDefinition.class,
-                    ScotlandMultipleProdDefinition.class
-                })
+                includeInProfiles = MultipleDefinition.class)
         private Object field13;
     }
 }

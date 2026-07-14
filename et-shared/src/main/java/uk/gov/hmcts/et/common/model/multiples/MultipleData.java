@@ -15,9 +15,13 @@ import uk.gov.hmcts.et.common.model.bulk.items.CaseIdTypeItem;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicMultiSelectListType;
 import uk.gov.hmcts.et.common.model.ccd.EnglandWalesMultipleCftlibDefinition;
+import uk.gov.hmcts.et.common.model.ccd.EnglandWalesMultipleDefinition;
 import uk.gov.hmcts.et.common.model.ccd.EnglandWalesMultipleProdDefinition;
 import uk.gov.hmcts.et.common.model.ccd.MultipleAccess;
+import uk.gov.hmcts.et.common.model.ccd.MultipleCftlibDefinition;
+import uk.gov.hmcts.et.common.model.ccd.MultipleDefinition;
 import uk.gov.hmcts.et.common.model.ccd.ScotlandMultipleCftlibDefinition;
+import uk.gov.hmcts.et.common.model.ccd.ScotlandMultipleDefinition;
 import uk.gov.hmcts.et.common.model.ccd.ScotlandMultipleProdDefinition;
 import uk.gov.hmcts.et.common.model.ccd.items.AddressLabelTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -55,20 +59,14 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.Collection,
             typeParameterOverride = "CaseNumber",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Case Numbers",
             hint = "The first case will be assigned as the lead for this multiple",
             typeOverride = FieldType.Collection,
             typeParameterOverride = "CaseNumber",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("caseIdCollection")
     private List<CaseIdTypeItem> caseIdCollection;
 
@@ -77,19 +75,13 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.Collection,
             typeParameterOverride = "multipleMigrationData",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Multiple Information",
             typeOverride = FieldType.Collection,
             typeParameterOverride = "multipleMigrationData",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("caseMultipleCollection")
     private List<CaseMultipleTypeItem> caseMultipleCollection;
 
@@ -147,18 +139,12 @@ public class MultipleData extends BaseCaseData {
             label = "Selection Criteria",
             typeNameOverride = "importerFileUpload",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Selection Criteria",
             typeNameOverride = "importerFileUpload",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("caseImporterFile")
     private CaseImporterFile caseImporterFile;
 
@@ -166,18 +152,12 @@ public class MultipleData extends BaseCaseData {
             label = "state is $[STATE]",
             typeOverride = FieldType.Text,
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "state is $[STATE]",
             typeOverride = FieldType.Text,
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("state")
     private String state;
 
@@ -186,19 +166,13 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.FixedList,
             typeParameterOverride = "caseSourceList",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Source",
             typeOverride = FieldType.FixedList,
             typeParameterOverride = "caseSourceList",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("multipleSource")
     private String multipleSource;
 
@@ -252,18 +226,12 @@ public class MultipleData extends BaseCaseData {
             label = "New lead case",
             typeOverride = FieldType.Text,
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "New lead case",
             typeOverride = FieldType.Text,
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("newLeadCase")
     private String amendLeadCase;
 
@@ -294,18 +262,12 @@ public class MultipleData extends BaseCaseData {
             label = "preAccept system field",
             typeOverride = FieldType.Text,
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "preAccept system field",
             typeOverride = FieldType.Text,
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("preAcceptDone")
     private String preAcceptDone;
 
@@ -314,19 +276,13 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Submultiple Name",
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("subMultiple")
     private DynamicFixedListType subMultiple;
 
@@ -335,19 +291,13 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Flag 1",
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("flag1")
     private DynamicFixedListType flag1;
 
@@ -356,19 +306,13 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Flag 2",
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("flag2")
     private DynamicFixedListType flag2;
 
@@ -377,19 +321,13 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Flag 3",
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("flag3")
     private DynamicFixedListType flag3;
 
@@ -398,19 +336,13 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Flag 4",
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("flag4")
     private DynamicFixedListType flag4;
 
@@ -419,19 +351,13 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.FixedList,
             typeParameterOverride = "fl_scheduleDoc",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Select schedule to print",
             typeOverride = FieldType.FixedList,
             typeParameterOverride = "fl_scheduleDoc",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("scheduleDocName")
     private String scheduleDocName;
 
@@ -450,19 +376,13 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.FixedList,
             typeParameterOverride = "fl_batchUpdate",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Batch Update",
             typeOverride = FieldType.FixedList,
             typeParameterOverride = "fl_batchUpdate",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("batchUpdateType")
     private String batchUpdateType;
 
@@ -470,18 +390,12 @@ public class MultipleData extends BaseCaseData {
             label = "Case Number",
             typeOverride = FieldType.Text,
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Case Number",
             typeOverride = FieldType.Text,
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("batchUpdateCase")
     private String batchUpdateCase;
 
@@ -505,48 +419,36 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Claimant Representative Name",
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("batchUpdateClaimantRep")
     private DynamicFixedListType batchUpdateClaimantRep;
 
     @CCD(
             label =
                     "Do you wish to remove or add the representative from all the filtered cases ?"
-                        + " (Yes = Remove, No = Add)",
+                            + " (Yes = Remove, No = Add)",
             hint =
                     "If the representative is to be removed then it is also removed from the case"
-                        + " driving the batch update",
+                            + " driving the batch update",
             typeOverride = FieldType.YesOrNo,
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label =
                     "Do you wish to remove or add the representative from all the filtered cases ?"
-                        + " (Yes = Remove, No = Add)",
+                            + " (Yes = Remove, No = Add)",
             hint =
                     "If the representative is to be removed then it is also removed from the case"
-                        + " driving the batch update",
+                            + " driving the batch update",
             typeOverride = FieldType.YesOrNo,
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("batchRemoveClaimantRep")
     private String batchRemoveClaimantRep;
 
@@ -555,19 +457,13 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.Collection,
             typeParameterOverride = "DynamicListCollection",
             access = MultipleAccess.Access04.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Jurisdictions",
             typeOverride = FieldType.Collection,
             typeParameterOverride = "DynamicListCollection",
             access = MultipleAccess.Access33.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     private ListTypeItem<DynamicListType> batchUpdateJurisdictionList;
 
     @CCD(
@@ -575,19 +471,13 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Jurisdiction",
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("batchUpdateJurisdiction")
     private DynamicFixedListType batchUpdateJurisdiction;
 
@@ -596,19 +486,13 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Respondent",
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("batchUpdateRespondent")
     private DynamicFixedListType batchUpdateRespondent;
 
@@ -617,19 +501,13 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Judgment",
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("batchUpdateJudgment")
     private DynamicFixedListType batchUpdateJudgment;
 
@@ -638,48 +516,36 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Respondent Representative",
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("batchUpdateRespondentRep")
     private DynamicFixedListType batchUpdateRespondentRep;
 
     @CCD(
             label =
                     "Do you wish to remove or add the representative from all the filtered cases ?"
-                        + " (Yes = Remove, No = Add)",
+                            + " (Yes = Remove, No = Add)",
             hint =
                     "If the representative is to be removed then it is also removed from the case"
-                        + " driving the batch update",
+                            + " driving the batch update",
             typeOverride = FieldType.YesOrNo,
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label =
                     "Do you wish to remove or add the representative from all the filtered cases ?"
-                        + " (Yes = Remove, No = Add)",
+                            + " (Yes = Remove, No = Add)",
             hint =
                     "If the representative is to be removed then it is also removed from the case"
-                        + " driving the batch update",
+                            + " driving the batch update",
             typeOverride = FieldType.YesOrNo,
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("batchRemoveRespondentRep")
     private String batchRemoveRespondentRep;
 
@@ -687,10 +553,7 @@ public class MultipleData extends BaseCaseData {
             label = "Physical Location",
             typeOverride = FieldType.DynamicList,
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @JsonProperty("fileLocation")
     private DynamicFixedListType fileLocation;
 
@@ -698,10 +561,7 @@ public class MultipleData extends BaseCaseData {
             label = "Physical Location",
             typeOverride = FieldType.DynamicList,
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("fileLocationGlasgow")
     private DynamicFixedListType fileLocationGlasgow;
 
@@ -709,10 +569,7 @@ public class MultipleData extends BaseCaseData {
             label = "Physical Location",
             typeOverride = FieldType.DynamicList,
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("fileLocationAberdeen")
     private DynamicFixedListType fileLocationAberdeen;
 
@@ -720,10 +577,7 @@ public class MultipleData extends BaseCaseData {
             label = "Physical Location",
             typeOverride = FieldType.DynamicList,
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("fileLocationDundee")
     private DynamicFixedListType fileLocationDundee;
 
@@ -731,10 +585,7 @@ public class MultipleData extends BaseCaseData {
             label = "Physical Location",
             typeOverride = FieldType.DynamicList,
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("fileLocationEdinburgh")
     private DynamicFixedListType fileLocationEdinburgh;
 
@@ -743,19 +594,13 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.FixedList,
             typeParameterOverride = "fl_Position",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Current Position",
             typeOverride = FieldType.FixedList,
             typeParameterOverride = "fl_Position",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("positionType")
     private String positionType;
 
@@ -763,18 +608,12 @@ public class MultipleData extends BaseCaseData {
             label = "Clerk Responsible",
             typeOverride = FieldType.DynamicList,
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Clerk Responsible",
             typeOverride = FieldType.DynamicList,
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("clerkResponsible")
     private DynamicFixedListType clerkResponsible;
 
@@ -782,18 +621,12 @@ public class MultipleData extends BaseCaseData {
             label = "Date of Receipt",
             typeOverride = FieldType.Date,
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Date of Receipt",
             typeOverride = FieldType.Date,
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("receiptDate")
     private String receiptDate;
 
@@ -802,36 +635,24 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.FixedList,
             typeParameterOverride = "fl_Stage",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "EQP Stage Hearing",
             typeOverride = FieldType.FixedList,
             typeParameterOverride = "fl_Stage",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("hearingStageEQP")
     private String hearingStage;
 
     @CCD(
             typeNameOverride = "moveCases",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             typeNameOverride = "moveCases",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("batchMoveCases")
     private MoveCasesType moveCases;
 
@@ -839,35 +660,23 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.Collection,
             typeParameterOverride = "subMultipleType",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             typeOverride = FieldType.Collection,
             typeParameterOverride = "subMultipleType",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("subMultipleCollection")
     private List<SubMultipleTypeItem> subMultipleCollection;
 
     @CCD(
             typeNameOverride = "subMultipleActionType",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             typeNameOverride = "subMultipleActionType",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("subMultipleAction")
     private SubMultipleActionType subMultipleAction;
 
@@ -875,10 +684,7 @@ public class MultipleData extends BaseCaseData {
             label = "List of correspondence items",
             typeNameOverride = "LettersMultiples",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("correspondenceScotType")
     private CorrespondenceScotType correspondenceScotType;
 
@@ -886,10 +692,7 @@ public class MultipleData extends BaseCaseData {
             label = "List of correspondence items",
             typeNameOverride = "LettersMultiples",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @JsonProperty("correspondenceType")
     private CorrespondenceType correspondenceType;
 
@@ -898,19 +701,13 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.MultiSelectList,
             typeParameterOverride = "msl_SelectLabels",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Select the labels you wish to print",
             typeOverride = FieldType.MultiSelectList,
             typeParameterOverride = "msl_SelectLabels",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("addressLabelsSelectionTypeMSL")
     private List<String> addressLabelsSelectionTypeMSL;
 
@@ -928,18 +725,12 @@ public class MultipleData extends BaseCaseData {
             label = "Address labels attributes",
             typeNameOverride = "addressLabelsAttributes",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Address labels attributes",
             typeNameOverride = "addressLabelsAttributes",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("addressLabelsAttributesType")
     private AddressLabelsAttributesType addressLabelsAttributesType;
 
@@ -948,19 +739,13 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.MultiSelectList,
             typeParameterOverride = "multiplesAmendment",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Select the amendments you wish to make:",
             typeOverride = FieldType.MultiSelectList,
             typeParameterOverride = "multiplesAmendment",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("typeOfAmendment")
     private List<String> typeOfAmendmentMSL;
 
@@ -969,19 +754,13 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Select office to transfer case to",
             typeOverride = FieldType.DynamicList,
             typeParameterOverride = "Text",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("officeMultipleCT")
     private DynamicFixedListType officeMultipleCT;
 
@@ -989,18 +768,12 @@ public class MultipleData extends BaseCaseData {
             label = "Reason for Case Transfer",
             typeOverride = FieldType.TextArea,
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Reason for Case Transfer",
             typeOverride = FieldType.TextArea,
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("reasonForCT")
     private String reasonForCT;
 
@@ -1008,18 +781,12 @@ public class MultipleData extends BaseCaseData {
             label = "Link to related multiple",
             typeOverride = FieldType.Text,
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Link to related multiple",
             typeOverride = FieldType.Text,
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("linkedMultipleCT")
     private String linkedMultipleCT;
 
@@ -1028,19 +795,13 @@ public class MultipleData extends BaseCaseData {
             typeOverride = FieldType.FixedList,
             typeParameterOverride = "fl_PositionCT",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Current Position",
             typeOverride = FieldType.FixedList,
             typeParameterOverride = "fl_PositionCT",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("positionTypeCT")
     private String positionTypeCT;
 
@@ -1048,18 +809,12 @@ public class MultipleData extends BaseCaseData {
             label = "Accept/Reject",
             typeNameOverride = "acceptOrRejectCase",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Accept/Reject",
             typeNameOverride = "acceptOrRejectCase",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("preAcceptMultiple")
     private CasePreAcceptType preAcceptCase;
 
@@ -1067,18 +822,12 @@ public class MultipleData extends BaseCaseData {
             label = "Notes",
             typeOverride = FieldType.TextArea,
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Notes",
             typeOverride = FieldType.TextArea,
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("notes")
     private String notes;
 
@@ -1086,12 +835,7 @@ public class MultipleData extends BaseCaseData {
             label = "Select import file",
             typeNameOverride = "importerFileUpload",
             access = MultipleAccess.Access55.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                ScotlandMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = MultipleDefinition.class)
     @JsonProperty("bulkAddSingleCasesImportFile")
     private CaseImporterFile bulkAddSingleCasesImportFile;
 
@@ -1099,17 +843,11 @@ public class MultipleData extends BaseCaseData {
             label = "Fix Case",
             typeOverride = FieldType.Text,
             access = MultipleAccess.Access55.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             label = "Fix Case",
             typeOverride = FieldType.Text,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("isFixCase")
     private String isFixCase;
 
@@ -2141,10 +1879,7 @@ public class MultipleData extends BaseCaseData {
             id = "  leadEthosCaseRef",
             label = "Lead ethos case reference",
             typeOverride = FieldType.Text,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                ScotlandMultipleCftlibDefinition.class
-            })
+            includeInProfiles = MultipleCftlibDefinition.class)
     @JsonProperty("  leadEthosCaseRef")
     private Object migrationDefinitionField01;
 
@@ -2153,19 +1888,13 @@ public class MultipleData extends BaseCaseData {
             label = "**Press Continue to add cases to this Multiple on the next page**",
             typeOverride = FieldType.Label,
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             id = "addCasesLabel",
             label = "**Press Continue to add cases to this Multiple on the next page**",
             typeOverride = FieldType.Label,
             access = MultipleAccess.Access60.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("addCasesLabel")
     private Object migrationDefinitionField02;
 
@@ -2178,10 +1907,7 @@ public class MultipleData extends BaseCaseData {
                         + " an application</a>",
             typeOverride = FieldType.Label,
             access = MultipleAccess.Access61.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                ScotlandMultipleCftlibDefinition.class
-            })
+            includeInProfiles = MultipleCftlibDefinition.class)
     @JsonProperty("applicationsLinks")
     private Object migrationDefinitionField03;
 
@@ -2190,10 +1916,7 @@ public class MultipleData extends BaseCaseData {
             label = "### Applications",
             typeOverride = FieldType.Label,
             access = MultipleAccess.Access61.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                ScotlandMultipleCftlibDefinition.class
-            })
+            includeInProfiles = MultipleCftlibDefinition.class)
     @JsonProperty("applicationsTab")
     private Object migrationDefinitionField04;
 
@@ -2278,19 +2001,13 @@ public class MultipleData extends BaseCaseData {
             label = "My history",
             typeNameOverride = "CaseHistoryViewer",
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             id = "customHistoryViewer",
             label = "My history",
             typeNameOverride = "CaseHistoryViewer",
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("customHistoryViewer")
     private Object migrationDefinitionField09;
 
@@ -2313,12 +2030,7 @@ public class MultipleData extends BaseCaseData {
             id = "docMarkUp ",
             label = "Doc MarkUp",
             typeOverride = FieldType.Text,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                ScotlandMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = MultipleDefinition.class)
     @JsonProperty("docMarkUp ")
     private Object migrationDefinitionField11;
 
@@ -2390,19 +2102,13 @@ public class MultipleData extends BaseCaseData {
             label = "Multiple Transfer: ${linkedMultipleCT}",
             typeOverride = FieldType.Label,
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             id = "linkedMultipleCTLabel",
             label = "Multiple Transfer: ${linkedMultipleCT}",
             typeOverride = FieldType.Label,
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("linkedMultipleCTLabel")
     private Object migrationDefinitionField15;
 
@@ -2449,19 +2155,13 @@ public class MultipleData extends BaseCaseData {
             label = "The position will be set to: **Case closed**",
             typeOverride = FieldType.Label,
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             id = "positionLabel",
             label = "The position will be set to: **Case closed**",
             typeOverride = FieldType.Label,
             access = MultipleAccess.Access60.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("positionLabel")
     private Object migrationDefinitionField18;
 
@@ -2545,8 +2245,8 @@ public class MultipleData extends BaseCaseData {
             id = "sendNotificationInfo",
             label =
                     "Use this service to send a notification to parties within this multiple. You"
-                        + " can do this by uploading standard letter documents.\n\n"
-                        + " You can send multiple letters in one notification\n\n",
+                            + " can do this by uploading standard letter documents.\n\n"
+                            + " You can send multiple letters in one notification\n\n",
             typeOverride = FieldType.Label,
             access = MultipleAccess.Access02.class,
             includeInProfiles = {EnglandWalesMultipleCftlibDefinition.class})
@@ -2554,8 +2254,8 @@ public class MultipleData extends BaseCaseData {
             id = "sendNotificationInfo",
             label =
                     "Use this service to send a notification to parties within this multiple. You"
-                        + " can do this by uploading standard letter documents.\n\n"
-                        + " You can send multiple letters in one notification\n\n",
+                            + " can do this by uploading standard letter documents.\n\n"
+                            + " You can send multiple letters in one notification\n\n",
             typeOverride = FieldType.Label,
             access = MultipleAccess.Access33.class,
             includeInProfiles = {ScotlandMultipleCftlibDefinition.class})
@@ -2567,19 +2267,13 @@ public class MultipleData extends BaseCaseData {
             label = "#### Case Status:  ${[STATE]} ",
             typeOverride = FieldType.Label,
             access = MultipleAccess.Access14.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                EnglandWalesMultipleProdDefinition.class
-            })
+            includeInProfiles = EnglandWalesMultipleDefinition.class)
     @CCD(
             id = "stateLabel",
             label = "#### Case Status:  ${[STATE]} ",
             typeOverride = FieldType.Label,
             access = MultipleAccess.Access41.class,
-            includeInProfiles = {
-                ScotlandMultipleCftlibDefinition.class,
-                ScotlandMultipleProdDefinition.class
-            })
+            includeInProfiles = ScotlandMultipleDefinition.class)
     @JsonProperty("stateLabel")
     private Object migrationDefinitionField24;
 }

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.ccd.migration.config;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import uk.gov.hmcts.ccd.sdk.api.CCD;
 import uk.gov.hmcts.ccd.sdk.api.ConfigBuilder;
 import uk.gov.hmcts.ccd.sdk.api.HasCode;
@@ -21,8 +23,7 @@ final class MultipleFixedLists {
         builder.registerFixedList("fl_CaseManagement", FlCaseManagement.values());
         builder.registerFixedList("fl_DocumentCategories", FlDocumentCategories.values());
         builder.registerFixedList("fl_DocumentType", FlDocumentTypeEnglandWales.values());
-        builder.registerFixedList(
-                "fl_EmployerContractClaim", FlEmployerContractClaim.values());
+        builder.registerFixedList("fl_EmployerContractClaim", FlEmployerContractClaim.values());
         builder.registerFixedList("fl_Hearings", FlHearings.values());
         builder.registerFixedList("fl_InitialConsideration", FlInitialConsideration.values());
         builder.registerFixedList("fl_JudgmentAndReasons", FlJudgmentAndReasons.values());
@@ -39,30 +40,24 @@ final class MultipleFixedLists {
         builder.registerFixedList("fl_batchUpdate", FlBatchUpdate.values());
         builder.registerFixedList("fl_scheduleDoc", FlScheduleDoc.values());
         builder.registerFixedList(
-                "fl_sendNotificationCaseManagement",
-                FlSendNotificationCaseManagement.values());
+                "fl_sendNotificationCaseManagement", FlSendNotificationCaseManagement.values());
         builder.registerFixedList(
                 "fl_sendNotificationDecision", FlSendNotificationDecision.values());
-        builder.registerFixedList(
-                "fl_sendNotificationParties", FlSendNotificationParties.values());
-        builder.registerFixedList(
-                "fl_sendNotificationSubject", FlSendNotificationSubject.values());
+        builder.registerFixedList("fl_sendNotificationParties", FlSendNotificationParties.values());
+        builder.registerFixedList("fl_sendNotificationSubject", FlSendNotificationSubject.values());
         builder.registerFixedList(
                 "fl_sendNotificationWhoCaseOrder", FlSendNotificationWhoCaseOrder.values());
         builder.registerFixedList(
-                "fl_sendNotificationWhoMadeJudgement",
-                FlSendNotificationWhoMadeJudgement.values());
+                "fl_sendNotificationWhoMadeJudgement", FlSendNotificationWhoMadeJudgement.values());
         builder.registerFixedList("frl_ReferCaseTo", FrlReferCaseTo.values());
         builder.registerFixedList("frl_liveCases", FrlLiveCases.values());
         builder.registerFixedList(
-                "frl_sendNotificationRequestMadeBy",
-                FrlSendNotificationRequestMadeBy.values());
+                "frl_sendNotificationRequestMadeBy", FrlSendNotificationRequestMadeBy.values());
         builder.registerFixedList("imageRendering", ListimageRendering.values());
         builder.registerFixedList("imageRenderingLocation", ListimageRenderingLocation.values());
         builder.registerFixedList("msl_SelectLabels", MslSelectLabels.values());
         builder.registerFixedList("msl_Yes", MslYes.values());
-        builder.registerFixedList(
-                "msl_confirmCloseReferral", MslConfirmCloseReferral.values());
+        builder.registerFixedList("msl_confirmCloseReferral", MslConfirmCloseReferral.values());
         builder.registerFixedList("multiplesAmendment", ListmultiplesAmendment.values());
         builder.registerFixedList("notifyMultiple", ListnotifyMultiple.values());
         builder.registerFixedList("pageNumberFormat", ListpageNumberFormat.values());
@@ -87,8 +82,7 @@ final class MultipleFixedLists {
         builder.registerFixedList("fl_CaseManagement", FlCaseManagement.values());
         builder.registerFixedList("fl_DocumentCategories", FlDocumentCategories.values());
         builder.registerFixedList("fl_DocumentType", FlDocumentTypeScotland.values());
-        builder.registerFixedList(
-                "fl_EmployerContractClaim", FlEmployerContractClaim.values());
+        builder.registerFixedList("fl_EmployerContractClaim", FlEmployerContractClaim.values());
         builder.registerFixedList("fl_Hearings", FlHearings.values());
         builder.registerFixedList("fl_InitialConsideration", FlInitialConsideration.values());
         builder.registerFixedList("fl_JudgmentAndReasons", FlJudgmentAndReasons.values());
@@ -105,30 +99,24 @@ final class MultipleFixedLists {
         builder.registerFixedList("fl_batchUpdate", FlBatchUpdate.values());
         builder.registerFixedList("fl_scheduleDoc", FlScheduleDoc.values());
         builder.registerFixedList(
-                "fl_sendNotificationCaseManagement",
-                FlSendNotificationCaseManagement.values());
+                "fl_sendNotificationCaseManagement", FlSendNotificationCaseManagement.values());
         builder.registerFixedList(
                 "fl_sendNotificationDecision", FlSendNotificationDecision.values());
-        builder.registerFixedList(
-                "fl_sendNotificationParties", FlSendNotificationParties.values());
-        builder.registerFixedList(
-                "fl_sendNotificationSubject", FlSendNotificationSubject.values());
+        builder.registerFixedList("fl_sendNotificationParties", FlSendNotificationParties.values());
+        builder.registerFixedList("fl_sendNotificationSubject", FlSendNotificationSubject.values());
         builder.registerFixedList(
                 "fl_sendNotificationWhoCaseOrder", FlSendNotificationWhoCaseOrder.values());
         builder.registerFixedList(
-                "fl_sendNotificationWhoMadeJudgement",
-                FlSendNotificationWhoMadeJudgement.values());
+                "fl_sendNotificationWhoMadeJudgement", FlSendNotificationWhoMadeJudgement.values());
         builder.registerFixedList("frl_ReferCaseTo", FrlReferCaseTo.values());
         builder.registerFixedList("frl_liveCases", FrlLiveCases.values());
         builder.registerFixedList(
-                "frl_sendNotificationRequestMadeBy",
-                FrlSendNotificationRequestMadeBy.values());
+                "frl_sendNotificationRequestMadeBy", FrlSendNotificationRequestMadeBy.values());
         builder.registerFixedList("imageRendering", ListimageRendering.values());
         builder.registerFixedList("imageRenderingLocation", ListimageRenderingLocation.values());
         builder.registerFixedList("msl_SelectLabels", MslSelectLabels.values());
         builder.registerFixedList("msl_Yes", MslYes.values());
-        builder.registerFixedList(
-                "msl_confirmCloseReferral", MslConfirmCloseReferral.values());
+        builder.registerFixedList("msl_confirmCloseReferral", MslConfirmCloseReferral.values());
         builder.registerFixedList("multiplesAmendment", ListmultiplesAmendment.values());
         builder.registerFixedList("notifyMultiple", ListnotifyMultiple.values());
         builder.registerFixedList("pageNumberFormat", ListpageNumberFormat.values());
@@ -179,6 +167,8 @@ final class MultipleFixedLists {
                 ListmultiplesAmendment.V03);
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum ListDocumentAccess implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Citizens", "Citizens"),
@@ -191,23 +181,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        ListDocumentAccess(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum ListVenueScotland implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Glasgow", "Glasgow"),
@@ -222,23 +199,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        ListVenueScotland(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum ListcaseSourceList implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("ET1 Online", "ET1 Online"),
@@ -253,23 +217,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        ListcaseSourceList(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum ListconfigurationFiles implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("et-dcf-2.yaml", "ET Digital Case File"),
@@ -278,23 +229,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        ListconfigurationFiles(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlCaseManagement implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Tribunal Order", "Tribunal Order"),
@@ -365,23 +303,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlCaseManagement(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlDocumentCategories implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Starting a Claim", "Starting a Claim"),
@@ -408,23 +333,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlDocumentCategories(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlDocumentTypeEnglandWales implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("ET1", "ET1"),
@@ -465,23 +377,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlDocumentTypeEnglandWales(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlDocumentTypeScotland implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("ET1", "ET1"),
@@ -522,23 +421,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlDocumentTypeScotland(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlEmployerContractClaim implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Notice of Employer Contract Claim", "Notice of Employer Contract Claim"),
@@ -549,23 +435,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlEmployerContractClaim(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlHearings implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("App to restrict publicity - C", "App to restrict publicity - C"),
@@ -588,23 +461,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlHearings(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlInitialConsideration implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Initial Consideration", "Initial Consideration"),
@@ -615,23 +475,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlInitialConsideration(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlJudgmentAndReasons implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Judgment", "Judgment"),
@@ -644,23 +491,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlJudgmentAndReasons(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlMisc implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Certificate of Correction", "Certificate of Correction"),
@@ -673,23 +507,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlMisc(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlPosition implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Awaiting appeal judgment", "Awaiting appeal judgment"),
@@ -826,23 +647,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlPosition(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlPositionCT implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Case transferred - same country", "Case transferred - same country"),
@@ -851,23 +659,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlPositionCT(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlReconsideration implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01(
@@ -888,23 +683,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlReconsideration(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlReferralSubject implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("ET1", "ET1"),
@@ -953,23 +735,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlReferralSubject(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlResponseToAClaim implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("ET3", "ET3"),
@@ -986,23 +755,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlResponseToAClaim(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlStage implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Stage 1", "Stage 1"),
@@ -1013,23 +769,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlStage(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlStartingAClaim implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("ET1", "ET1"),
@@ -1050,23 +793,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlStartingAClaim(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlTribunalOffice implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Bristol", "Bristol"),
@@ -1095,23 +825,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlTribunalOffice(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlWithdrawalSettled implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Withdrawal of entire claim", "Withdrawal of entire claim"),
@@ -1124,23 +841,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlWithdrawalSettled(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlBatchUpdate implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("batchUpdateType1", "Batch update based on flag criteria"),
@@ -1151,23 +855,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlBatchUpdate(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlScheduleDoc implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("List Cases", "List Cases"),
@@ -1178,23 +869,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlScheduleDoc(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlSendNotificationCaseManagement implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Case management order", "Case management order"),
@@ -1203,23 +881,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlSendNotificationCaseManagement(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlSendNotificationDecision implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Granted", "Granted"),
@@ -1232,23 +897,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlSendNotificationDecision(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlSendNotificationParties implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Both parties", "Both parties"),
@@ -1259,23 +911,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlSendNotificationParties(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlSendNotificationSubject implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Claimant / Respondent details", "Claimant / Respondent details"),
@@ -1296,23 +935,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlSendNotificationSubject(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlSendNotificationWhoCaseOrder implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Legal officer", "Legal officer"),
@@ -1321,23 +947,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlSendNotificationWhoCaseOrder(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FlSendNotificationWhoMadeJudgement implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Judge", "Judge"),
@@ -1346,23 +959,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FlSendNotificationWhoMadeJudgement(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FrlReferCaseTo implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Admin", "Admin"),
@@ -1373,23 +973,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FrlReferCaseTo(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FrlLiveCases implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Yes", "Yes"),
@@ -1398,23 +985,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FrlLiveCases(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum FrlSendNotificationRequestMadeBy implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Legal officer", "Legal officer"),
@@ -1425,23 +999,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        FrlSendNotificationRequestMadeBy(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum ListimageRendering implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("opaque", "Opaque"),
@@ -1450,23 +1011,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        ListimageRendering(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum ListimageRenderingLocation implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("allPages", "Image on all pages of the Document"),
@@ -1475,23 +1023,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        ListimageRenderingLocation(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum MslSelectLabels implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("claimantAddressLabel", "Claimant"),
@@ -1504,69 +1039,30 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        MslSelectLabels(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum MslYes implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Yes", "Yes");
 
         private final String code;
         private final String label;
-
-        MslYes(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum MslConfirmCloseReferral implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Yes", "Yes");
 
         private final String code;
         private final String label;
-
-        MslConfirmCloseReferral(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum ListmultiplesAmendment implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Amend multiple name", "Amend multiple name"),
@@ -1581,23 +1077,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        ListmultiplesAmendment(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum ListnotifyMultiple implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Lead case", "Parties from lead case"),
@@ -1608,23 +1091,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        ListnotifyMultiple(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum ListpageNumberFormat implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("pageRange", "Page Range"),
@@ -1633,23 +1103,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        ListpageNumberFormat(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum ListpaginationStyle implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("off", "Off"),
@@ -1668,23 +1125,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        ListpaginationStyle(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum ListsendNotificationEccQuestion implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Notice of Employer Contract Claim", "Notice of Employer Contract Claim"),
@@ -1695,23 +1139,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        ListsendNotificationEccQuestion(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum ListsendNotificationNotifyAll implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Both parties", "All parties from lead case and sub cases"),
@@ -1722,23 +1153,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        ListsendNotificationNotifyAll(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum ListsendNotificationNotifyLead implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Both parties", "Both parties from Lead Case"),
@@ -1749,23 +1167,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        ListsendNotificationNotifyLead(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum ListsendNotificationNotifySelected implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Claimant only", "Claimants from selected cases"),
@@ -1776,23 +1181,10 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        ListsendNotificationNotifySelected(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum ListsendNotificationResponseTribunal implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V01("Yes - view document for details", "Yes - view document for details"),
@@ -1801,20 +1193,5 @@ final class MultipleFixedLists {
 
         private final String code;
         private final String label;
-
-        ListsendNotificationResponseTribunal(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
     }
 }

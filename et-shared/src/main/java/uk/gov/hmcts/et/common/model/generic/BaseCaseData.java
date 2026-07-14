@@ -12,6 +12,7 @@ import uk.gov.hmcts.et.common.model.bundle.Bundle;
 import uk.gov.hmcts.et.common.model.ccd.EnglandWalesMultipleCftlibDefinition;
 import uk.gov.hmcts.et.common.model.ccd.EnglandWalesMultipleProdDefinition;
 import uk.gov.hmcts.et.common.model.ccd.MultipleAccess;
+import uk.gov.hmcts.et.common.model.ccd.MultipleCftlibDefinition;
 import uk.gov.hmcts.et.common.model.ccd.ScotlandMultipleCftlibDefinition;
 import uk.gov.hmcts.et.common.model.ccd.ScotlandMultipleProdDefinition;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -222,10 +223,7 @@ public class BaseCaseData {
             typeOverride = FieldType.CaseLocation,
             includeSearchable = true,
             access = MultipleAccess.Access54.class,
-            includeInProfiles = {
-                EnglandWalesMultipleCftlibDefinition.class,
-                ScotlandMultipleCftlibDefinition.class
-            })
+            includeInProfiles = MultipleCftlibDefinition.class)
     @JsonProperty("caseManagementLocation")
     private CaseLocation caseManagementLocation;
 

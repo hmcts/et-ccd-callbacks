@@ -1564,22 +1564,22 @@
     },
     "javaLines": {
       "current": {
-        "etMain": 133567,
+        "etMain": 131048,
         "etVerification": 132108,
-        "sdkMain": 16881,
-        "sdkVerification": 12165,
-        "mainTotal": 150448,
-        "verificationTotal": 144273
+        "sdkMain": 16883,
+        "sdkVerification": 12185,
+        "mainTotal": 147931,
+        "verificationTotal": 144293
       },
       "deltaFromBaseline": {
-        "etMain": 16347,
+        "etMain": 13828,
         "etVerification": 0,
-        "sdkMain": 1105,
-        "sdkVerification": 843,
-        "mainTotal": 17452,
-        "verificationTotal": 843
+        "sdkMain": 1107,
+        "sdkVerification": 863,
+        "mainTotal": 14935,
+        "verificationTotal": 863
       },
-      "mainLinesPerCompletedDifference": 2.26
+      "mainLinesPerCompletedDifference": 1.93
     }
   }
 }

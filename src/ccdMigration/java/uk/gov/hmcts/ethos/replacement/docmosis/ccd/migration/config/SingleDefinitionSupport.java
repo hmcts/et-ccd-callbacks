@@ -122,6 +122,14 @@ final class SingleDefinitionSupport {
                 SingleEt3ResponseIntakeRows.EVENT_FIELDS,
                 SingleEt3ResponseIntakeRows.COMPLEX_FIELDS,
                 SingleEt3ResponseIntakeRows.EVENT_GRANTS);
+        configureEvents(
+                builder,
+                variant,
+                SingleEt3ProcessingRows.EVENTS,
+                SingleEt3ProcessingRows.EVENT_FIELDS,
+                SingleEt3ProcessingRows.COMPLEX_FIELDS,
+                SingleEt3ProcessingRows.EVENT_GRANTS);
+        SingleEt3ProcessingRows.configureComplexTypeAccess(builder);
     }
 
     private static Class<?> profile(Variant variant) {

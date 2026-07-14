@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.ccd.migration.config;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import uk.gov.hmcts.ccd.sdk.api.CCD;
 import uk.gov.hmcts.ccd.sdk.api.ConfigBuilder;
 import uk.gov.hmcts.ccd.sdk.api.HasCode;
@@ -1239,6 +1241,8 @@ final class SingleFixedLists {
                 List214SendNotificationResponseTribunal.values());
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List001FlRespondNotificationResponseRequired implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes", "Yes - view document for details"),
@@ -1247,23 +1251,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List001FlRespondNotificationResponseRequired(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List002VenueScotland implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Glasgow", "Glasgow"),
@@ -1278,23 +1269,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List002VenueScotland(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List003CaseSourceList implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("ET1 Online", "ET1 Online"),
@@ -1309,23 +1287,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List003CaseSourceList(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List004ClaimantHearingPanelPreference implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("No preference", "No preference"),
@@ -1336,23 +1301,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List004ClaimantHearingPanelPreference(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List005ConfigurationFiles implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("et-dcf-2.yaml", "ET Digital Case File"),
@@ -1361,23 +1313,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List005ConfigurationFiles(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List006CreateUploadOrRemove implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Create", "Create"),
@@ -1388,23 +1327,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List006CreateUploadOrRemove(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List007FlAddressLabelNumber implements HasLabel, HasCode {
         @CCD(displayOrder = 1, numericListElementCode = "1", numericListElement = 1)
         V001("1", "1"),
@@ -1437,23 +1363,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List007FlAddressLabelNumber(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List008FlAdjustment implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Mitigation (Old regs)", "Mitigation (Old regs)"),
@@ -1468,23 +1381,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List008FlAdjustment(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List009FlAttendee implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Claimant and representative", "Claimant and Representative"),
@@ -1497,23 +1397,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List009FlAttendee(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List010FlBFActionsCWV1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Application of letter to ACAS/RPO", "Application of letter to ACAS/RPO"),
@@ -1552,23 +1439,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List010FlBFActionsCWV1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List010FlBFActionsCWV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Case listed", "Case listed"),
@@ -1607,23 +1481,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List010FlBFActionsCWV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List011FlCaseManagement implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Tribunal Order", "Tribunal Order"),
@@ -1694,23 +1555,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List011FlCaseManagement(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List012FlCaseType implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Single", "Single"),
@@ -1719,23 +1567,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List012FlCaseType(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List013FlClaimantOrRespondent implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Claimant", "Claimant"),
@@ -1744,23 +1579,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List013FlClaimantOrRespondent(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List014FlClaimantRespondentBothParties implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Both parties", "Both parties"),
@@ -1771,23 +1593,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List014FlClaimantRespondentBothParties(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List015FlConciliationV1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("No Conciliation", "No Track"),
@@ -1800,23 +1609,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List015FlConciliationV1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List015FlConciliationV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("No Conciliation", "No track"),
@@ -1829,23 +1625,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List015FlConciliationV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List016FlContactPreference implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Email", "Email"),
@@ -1854,23 +1637,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List016FlContactPreference(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List017FlDepositCovers implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("All", "All"),
@@ -1879,23 +1649,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List017FlDepositCovers(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List018FlDepositRequestedBy implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Tribunal", "Tribunal"),
@@ -1906,23 +1663,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List018FlDepositRequestedBy(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List019FlDocumentCategories implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Starting a Claim", "Starting a Claim"),
@@ -1949,23 +1693,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List019FlDocumentCategories(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List020FlDocumentTypeV1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("ET1", "ET1"),
@@ -2006,23 +1737,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List020FlDocumentTypeV1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List020FlDocumentTypeV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("ET1", "ET1"),
@@ -2063,23 +1781,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List020FlDocumentTypeV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List021FlEmployerContractClaim implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Notice of Employer Contract Claim", "Notice of Employer Contract Claim"),
@@ -2090,23 +1795,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List021FlEmployerContractClaim(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List022FlEt3NotificationDocTypeV1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("2.11", "2.11 Response accepted"),
@@ -2121,23 +1813,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List022FlEt3NotificationDocTypeV1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List022FlEt3NotificationDocTypeV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Letter 10", "Letter 10 Rejection of response by staff"),
@@ -2150,36 +1829,23 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List022FlEt3NotificationDocTypeV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List023FlFinalHearingIsEJSitAloneReason implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001(
                 "Members experience is likely to add significant value to the process of"
-                    + " adjudication",
+                        + " adjudication",
                 "Members experience is likely to add significant value to the adjudication"
-                    + " process"),
+                        + " process"),
         @CCD(displayOrder = 2)
         V002(
                 "Members experience is not likely to add significant value to the process of"
-                    + " adjudication",
+                        + " adjudication",
                 "Members experience is not likely to add significant value to the adjudication"
-                    + " process"),
+                        + " process"),
         @CCD(displayOrder = 3)
         V003("No views expressed by parties", "No views expressed by parties"),
         @CCD(displayOrder = 4)
@@ -2187,23 +1853,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List023FlFinalHearingIsEJSitAloneReason(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List024FlGender implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Male", "Male"),
@@ -2216,23 +1869,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List024FlGender(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List025FlHearingV1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Costs Hearing", "Costs Hearing"),
@@ -2249,23 +1889,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List025FlHearingV1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List025FlHearingV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Expenses/Wasted Costs Hearing", "Expenses/Wasted Costs Hearing"),
@@ -2282,23 +1909,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List025FlHearingV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List026FlHearingDateType implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Single", "Single"),
@@ -2307,23 +1921,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List026FlHearingDateType(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List027FlHearingDocETCL implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Public", "Public"),
@@ -2334,23 +1935,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List027FlHearingDocETCL(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List028FlHearingDocType implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("IT56 - List of Exhibits", "IT56 - List of Exhibits"),
@@ -2361,23 +1949,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List028FlHearingDocType(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List029FlHearingLength implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Days", "Days"),
@@ -2388,23 +1963,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List029FlHearingLength(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List030FlHearingPanelPreference implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("No preference", "No preference"),
@@ -2415,23 +1977,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List030FlHearingPanelPreference(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List031FlHearingReadingDelib implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Reading Day", "Reading Day"),
@@ -2446,23 +1995,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List031FlHearingReadingDelib(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List032FlHearingStatusV1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Postponed", "Postponed"),
@@ -2479,23 +2015,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List032FlHearingStatusV1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List032FlHearingStatusV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Listed", "Listed"),
@@ -2512,23 +2035,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List032FlHearingStatusV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List033FlHearings implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("App to restrict publicity - C", "App to restrict publicity - C"),
@@ -2551,23 +2061,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List033FlHearings(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List034FlInitialConsideration implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Initial Consideration", "Initial Consideration"),
@@ -2578,23 +2075,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List034FlInitialConsideration(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List035FlJudgeDecision implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Judgment Confirmed", "Judgment confirmed"),
@@ -2607,23 +2091,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List035FlJudgeDecision(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List036FlJudgeDirection implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001(
@@ -2638,23 +2109,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List036FlJudgeDirection(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List037FlJudgementType implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Case Management", "Case Management"),
@@ -2671,23 +2129,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List037FlJudgementType(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List038FlJudgmentAndReasons implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Judgment", "Judgment"),
@@ -2700,23 +2145,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List038FlJudgmentAndReasons(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List039FlJudgmentOutcome implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Not allocated", "Not allocated"),
@@ -2749,23 +2181,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List039FlJudgmentOutcome(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List040FlLiabilityV1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Liability", "Liability"),
@@ -2776,23 +2195,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List040FlLiabilityV1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List040FlLiabilityV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Liability", "Liability"),
@@ -2803,23 +2209,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List040FlLiabilityV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List041FlMisc implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Certificate of Correction", "Certificate of Correction"),
@@ -2832,23 +2225,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List041FlMisc(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List042FlPart0 implements HasLabel, HasCode {
         @CCD(displayOrder = 1, numericListElementCode = "0.1")
         V001("0.1", "0.1 - Customise selected addresses"),
@@ -2877,23 +2257,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List042FlPart0(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List043FlPart1V1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("1.1", "1.1 - ET5 Acknowledgment of claim"),
@@ -2923,7 +2290,7 @@ final class SingleFixedLists {
         V012(
                 "1.6B",
                 "1.6B - Claim rejection in part – lack of early conciliation information Rule"
-                    + " 12(1)(c)"),
+                        + " 12(1)(c)"),
         @CCD(displayOrder = 13)
         V013("1.7", "1.7 - Claim rejection - no jurisdiction – whole claim - Rule 13(1)(a)"),
         @CCD(displayOrder = 14)
@@ -2936,7 +2303,7 @@ final class SingleFixedLists {
         V017(
                 "1.9B",
                 "1.9B - Claim rejection - early conciliation exemption does not apply - Rule"
-                    + " 13(1)(d)"),
+                        + " 13(1)(d)"),
         @CCD(displayOrder = 18)
         V018("1.9C", "1.9C - Claim rejection - Rule 13(1)(g) - name of respondent differs"),
         @CCD(displayOrder = 19)
@@ -2951,7 +2318,7 @@ final class SingleFixedLists {
         V023(
                 "1.11A",
                 "1.11A - \tClaim rejection - Your Questions Answered (Requirement to Contact ACAS)"
-                    + " "),
+                        + " "),
         @CCD(displayOrder = 24)
         V024("1.12", "1.12 - Claim rejection - reconsideration - apply again - Rule 14"),
         @CCD(displayOrder = 25)
@@ -2983,23 +2350,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List043FlPart1V1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List043FlPart1V2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("1", "1 Rejection of claim by staff"),
@@ -3015,7 +2369,7 @@ final class SingleFixedLists {
         V006(
                 "4",
                 "4 Application for reconsideration not considered – failure to comply with rule"
-                    + " 14(2)"),
+                        + " 14(2)"),
         @CCD(displayOrder = 7)
         V007("5", "5 Application for reconsideration granted"),
         @CCD(displayOrder = 8)
@@ -3029,23 +2383,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List043FlPart1V2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List044FlPart10V1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("10.1", "10.1 Judgment after oral summary reasons given Rule 59"),
@@ -3071,7 +2412,7 @@ final class SingleFixedLists {
         V010(
                 "10.7A",
                 "10.7A Judgment plus summary reasons template (reasons requested at hearing) Rule"
-                    + " 60"),
+                        + " 60"),
         @CCD(displayOrder = 11)
         V011("10.8", "10.8 Written full reasons template Rule 60"),
         @CCD(displayOrder = 12)
@@ -3084,12 +2425,12 @@ final class SingleFixedLists {
         V015(
                 "10.11",
                 "10.11 Letter confirming refusal of extension of time to request written summary"
-                    + " reasons"),
+                        + " reasons"),
         @CCD(displayOrder = 16)
         V016(
                 "10.12",
                 "10.12 Letter confirming refusal of extension of time to request written full"
-                    + " reasons"),
+                        + " reasons"),
         @CCD(displayOrder = 17)
         V017("10.13", "10.13 Consent judgment Rule 62"),
         @CCD(displayOrder = 18)
@@ -3105,23 +2446,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List044FlPart10V1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List044FlPart10V2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("92", "92 Cover letter for judgment"),
@@ -3158,23 +2486,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List044FlPart10V2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List045FlPart11V1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("11.1C", "11.1C - Reconsideration - non-compliance - claimant - Rule 69"),
@@ -3219,23 +2534,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List045FlPart11V1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List045FlPart11V2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("99", "99 Application refused for noncompliance"),
@@ -3252,23 +2554,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List045FlPart11V2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List046FlPart12V1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("12.1C", "12.1C - Costs - party to give reasons - claimant - Rule 75"),
@@ -3298,17 +2587,17 @@ final class SingleFixedLists {
         V012(
                 "12.6R",
                 "12.6R - Wasted costs - party to give reasons - tribunal's initiative- resp rep -"
-                    + " Rule 80"),
+                        + " Rule 80"),
         @CCD(displayOrder = 13)
         V013(
                 "12.7C",
                 "12.7C - Wasted costs application - out of time - rejected - claimant's rep - Rule"
-                    + " 80"),
+                        + " 80"),
         @CCD(displayOrder = 14)
         V014(
                 "12.7R",
                 "12.7R - Wasted costs application - out of time - rejected - respondent's rep -"
-                    + " Rule 80"),
+                        + " Rule 80"),
         @CCD(displayOrder = 15)
         V015("12.8C", "12.8C - Wasted costs order - out of time -rejected - claimant - Rule 80"),
         @CCD(displayOrder = 16)
@@ -3316,23 +2605,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List046FlPart12V1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List046FlPart12V2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("104", "104 Application for expenses/prep time/wasted costs refused as out of time"),
@@ -3347,23 +2623,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List046FlPart12V2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List047FlPart13V1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("13.1C", "13.1C - Listing stencil - claimant"),
@@ -3440,23 +2703,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List047FlPart13V1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List047FlPart13V2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("110", "110 Acknowledgment of correspondence"),
@@ -3561,23 +2811,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List047FlPart13V2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List048FlPart14V1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("14.1", "14.1 - Insolvency - RPO claims enquiry"),
@@ -3602,23 +2839,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List048FlPart14V1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List048FlPart14V2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("159", "159 Judicial mediation information pack"),
@@ -3651,23 +2875,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List048FlPart14V2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List049FlPart15V1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("15.1", "15.1 - JM by video Notice of hearing and CMOs"),
@@ -3682,23 +2893,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List049FlPart15V1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List049FlPart15V2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("180", "180 Receipt of interim relief"),
@@ -3729,23 +2927,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List049FlPart15V2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List050FlPart16V1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("16.1", "16.1 - Notice of Stage 1 EQV hearing "),
@@ -3760,23 +2945,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List050FlPart16V1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List050FlPart16V2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("LO1", "LO1 Rejection rule 13"),
@@ -3811,23 +2983,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List050FlPart16V2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List051FlPart17 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("17.1", "17.1 - Acknowledgment of appeal "),
@@ -3839,36 +2998,23 @@ final class SingleFixedLists {
         V004(
                 "17.4",
                 "17.4 - H & S appeal  - suspension of prohibition notice - written"
-                    + " representations "),
+                        + " representations "),
         @CCD(displayOrder = 5)
         V005("17.5", "17.5 - H & S appeal -  direction - prohibition notice suspended "),
         @CCD(displayOrder = 6)
         V006(
                 "17.6",
                 "17.6 - Notes for H & S or Training Levy Appeal Judgment                           "
-                    + "                                         "),
+                        + "                                         "),
         @CCD(displayOrder = 7)
         V007("17.7", "17.7 - Acknowledgement of withdrawal of appeal ");
 
         private final String code;
         private final String label;
-
-        List051FlPart17(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List052FlPart18 implements HasLabel, HasCode {
         @CCD(displayOrder = 1, numericListElementCode = "18.1")
         V001("18.1", "18.1 – Recoupment Annex (Reg 4). Monetary Awards"),
@@ -3885,23 +3031,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List052FlPart18(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List053FlPart2V1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("2.1", "2.1 - UDL - length of service - no response required - whole claim"),
@@ -3963,19 +3096,19 @@ final class SingleFixedLists {
         V028(
                 "2.20",
                 "2.20 - Response - extension of time - time limit not yet expired - granted – Rules"
-                    + " 5 & 21"),
+                        + " 5 & 21"),
         @CCD(displayOrder = 29)
         V029(
                 "2.21",
                 "2.21 - Response - extension of time - time limit not yet expired - refused – Rules"
-                    + " 5 & 21"),
+                        + " 5 & 21"),
         @CCD(displayOrder = 30)
         V030("2.22", "2.22 - Response submitted late - extension of time - refused – Rules 5 & 21"),
         @CCD(displayOrder = 31)
         V031(
                 "2.23",
                 "2.23 - Response submitted late - extension of time – copy to claimant – Rules 5 &"
-                    + " 21"),
+                        + " 21"),
         @CCD(displayOrder = 32)
         V032("2.24", "2.24 - Response submitted late - extension of time – granted – Rules 5 & 21"),
         @CCD(displayOrder = 33)
@@ -3991,23 +3124,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List053FlPart2V1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List053FlPart2V2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("8", "8 Extension of time for response granted"),
@@ -4030,23 +3150,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List053FlPart2V2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List054FlPart20 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("LO1", "R21 EOT Granted"),
@@ -4061,23 +3168,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List054FlPart20(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List055FlPart3V1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("3.1", "3.1 - Employer's contract claim rejected - jurisdiction - Rule 24"),
@@ -4085,7 +3179,7 @@ final class SingleFixedLists {
         V002(
                 "3.2",
                 "3.2 - Employer's contract claim rejected - out of time - not part of response – r."
-                    + " 24"),
+                        + " 24"),
         @CCD(displayOrder = 3)
         V003("3.3", "3.3 - Employer's contract claim rejected - Rule 24"),
         @CCD(displayOrder = 4)
@@ -4098,7 +3192,7 @@ final class SingleFixedLists {
         V006(
                 "3.6",
                 "3.6 - Employer's contract claim rejection - reconsideration - claim accepted – r."
-                    + " 14"),
+                        + " 14"),
         @CCD(displayOrder = 7)
         V007(
                 "3.7",
@@ -4115,32 +3209,32 @@ final class SingleFixedLists {
         V012(
                 "3.12",
                 "3.12 - Response to employer's contract claim - extension of time - apply again -"
-                    + " Rules 26 & 21"),
+                        + " Rules 26 & 21"),
         @CCD(displayOrder = 13)
         V013(
                 "3.13",
                 "3.13 - Response to employer's contract claim - extension of time - time limit not"
-                    + " yet expired - granted - Rules 26 & 21"),
+                        + " yet expired - granted - Rules 26 & 21"),
         @CCD(displayOrder = 14)
         V014(
                 "3.14",
                 "3.14 - Response to employer's contract claim- extension of time - time limit not"
-                    + " yet expired - refused -Rules 26 & 21"),
+                        + " yet expired - refused -Rules 26 & 21"),
         @CCD(displayOrder = 15)
         V015(
                 "3.15",
                 "3.15 - Response to employer's contract claim submitted late - extension of"
-                    + " time-refused - Rules 26 & 21"),
+                        + " time-refused - Rules 26 & 21"),
         @CCD(displayOrder = 16)
         V016(
                 "3.16",
-                "3.16 - \tResponse to employer's contract claim submitted late - extension of time -"
-                    + " granted - Rules 26 & 21"),
+                "3.16 - \tResponse to employer's contract claim submitted late - extension of time"
+                    + " - granted - Rules 26 & 21"),
         @CCD(displayOrder = 17)
         V017(
                 "3.17",
                 "3.17 - Reply to employer's contract claim-extension of time-hearing required- Rule"
-                    + " 21"),
+                        + " 21"),
         @CCD(displayOrder = 18)
         V018("3.18", "3.18 - Employer's contract claim - no reply received- Rule 22"),
         @CCD(displayOrder = 19)
@@ -4160,23 +3254,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List055FlPart3V1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List055FlPart3V2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("18", "18 Acknowledgement of employer's contract claim (ECC accepted)"),
@@ -4199,23 +3280,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List055FlPart3V2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List056FlPart4V1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("4.1", "4.1 - Further information - Rule 27"),
@@ -4231,7 +3299,7 @@ final class SingleFixedLists {
         V006(
                 "4.5",
                 "4.5 - Notice of preliminary hearing after initial consideration of claim - Rule"
-                    + " 28(3)"),
+                        + " 28(3)"),
         @CCD(displayOrder = 7)
         V007("4.6", "4.6 - Notice and order-whole response- both parties - Rule 29(1) "),
         @CCD(displayOrder = 8)
@@ -4242,7 +3310,7 @@ final class SingleFixedLists {
         V010(
                 "4.8A",
                 "4.8A - Notice of preliminary hearing after initial consideration of response -"
-                    + " Rule 29(3)"),
+                        + " Rule 29(3)"),
         @CCD(displayOrder = 11)
         V011("4.9", "4.9 - Trading name of respondent "),
         @CCD(displayOrder = 12)
@@ -4272,23 +3340,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List056FlPart4V1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List056FlPart4V2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("15", "15 Further information required"),
@@ -4303,23 +3358,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List056FlPart4V2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List057FlPart5V1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("5.1A", "5.1A - Application not copied – not considered = rules 31 and 90"),
@@ -4327,7 +3369,7 @@ final class SingleFixedLists {
         V002(
                 "5.1B",
                 "5.1B - Correspondence not copied – sent to other party(ies) by Tribunal office -"
-                    + " rule 90"),
+                        + " rule 90"),
         @CCD(displayOrder = 3)
         V003("5.1C", "5.1C - Application not copied - claimant - Rule 31"),
         @CCD(displayOrder = 4)
@@ -4441,23 +3483,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List057FlPart5V1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List057FlPart5V2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("26", "26 Further information required"),
@@ -4481,7 +3510,7 @@ final class SingleFixedLists {
         V009(
                 "32.1",
                 "32.1 Short and Standard version - Response allowed to proceed after"
-                    + " representations"),
+                        + " representations"),
         @CCD(displayOrder = 10)
         V010(
                 "33",
@@ -4490,12 +3519,12 @@ final class SingleFixedLists {
         V011(
                 "33.1",
                 "33.1 Short and Standard version - Initial consideration, claim and response"
-                    + " allowed to proceed - orders issued"),
+                        + " allowed to proceed - orders issued"),
         @CCD(displayOrder = 12)
         V012(
                 "33.A",
                 "33A Initial consideration, claim, response, employers contract claim and reply"
-                    + " allowed to proceed – orders issued"),
+                        + " allowed to proceed – orders issued"),
         @CCD(displayOrder = 13)
         V013(
                 "33.A.1",
@@ -4504,23 +3533,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List057FlPart5V2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List058FlPart6V1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("6.1C", "6.1C - Strike out warning - claimant - Rule 38"),
@@ -4551,23 +3567,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List058FlPart6V1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List058FlPart6V2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("34", "34 Case management order including option for unless order"),
@@ -4650,23 +3653,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List058FlPart6V2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List059FlPart7V1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001(
@@ -4688,12 +3678,12 @@ final class SingleFixedLists {
         V007(
                 "7.7",
                 "7.7 - Notice of attended preliminary hearing for case management listed on"
-                    + " service"),
+                        + " service"),
         @CCD(displayOrder = 8)
         V008(
                 "7.8",
                 "7.8 - Notice of telephone preliminary hearing for case management listed on"
-                    + " service"),
+                        + " service"),
         @CCD(displayOrder = 9)
         V009(
                 "7.8A",
@@ -4709,23 +3699,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List059FlPart7V1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List059FlPart7V2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("58", "58 Strike out warning to claimant"),
@@ -4742,23 +3719,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List059FlPart7V2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List060FlPart8V1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("8.1", "8.1 - Notice of attended final hearing"),
@@ -4801,23 +3765,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List060FlPart8V1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List060FlPart8V2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("64", "64 Acknowledgment of withdrawal - options "),
@@ -4832,23 +3783,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List060FlPart8V2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List061FlPart9V1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("9.1A", "9.1A - Hearing in private - interest of justice - Rule 49(3)(a)"),
@@ -4870,22 +3808,22 @@ final class SingleFixedLists {
         V009(
                 "9.6A",
                 "9.6A - RRO - sexual misconduct – indefinite duration/scope - interests of justice"
-                    + " - Rule 49(3)(e) + s. 11 ETA"),
+                        + " - Rule 49(3)(e) + s. 11 ETA"),
         @CCD(displayOrder = 10)
         V010(
                 "9.6B",
                 "9.6B - RRO - sexual misconduct – indefinite duration/scope - other specified"
-                    + " provision - Rule 49(3)(e) + s. 11 ETA"),
+                        + " provision - Rule 49(3)(e) + s. 11 ETA"),
         @CCD(displayOrder = 11)
         V011(
                 "9.7A",
                 "9.7A - RRO – disability - indefinite duration - interests of justice - Rule"
-                    + " 49(3)(e) + s.12 ETA "),
+                        + " 49(3)(e) + s.12 ETA "),
         @CCD(displayOrder = 12)
         V012(
                 "9.7B",
                 "9.7B - RRO – disability - indefinite duration - other specified provision – Rule"
-                    + " 49(3)(e) + s. 12 ETA +"),
+                        + " 49(3)(e) + s. 12 ETA +"),
         @CCD(displayOrder = 13)
         V013("9.8A", "9.8A - RRO – other cases – interests of justice - Rule 49"),
         @CCD(displayOrder = 14)
@@ -4895,23 +3833,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List061FlPart9V1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List061FlPart9V2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("71", "71 Date listing letters preliminary hearing"),
@@ -4943,7 +3868,7 @@ final class SingleFixedLists {
         V014(
                 "81",
                 "81 Notice of hearing to reconsider rejection of claim/response/employer’s contract"
-                    + " claim/reply to contract claim"),
+                        + " claim/reply to contract claim"),
         @CCD(displayOrder = 15)
         V015("82", "82 Notice of hearing to consider dismissal of claim response under Rule 28"),
         @CCD(displayOrder = 16)
@@ -4964,12 +3889,12 @@ final class SingleFixedLists {
         V023(
                 "91.A",
                 "91A Notice of hearing to consider respondent’s application for extension of time"
-                    + " to submit a response"),
+                        + " to submit a response"),
         @CCD(displayOrder = 24)
         V024(
                 "91.B",
                 "91B Notice of hearing to consider claimant’s application for extension of time to"
-                    + " submit a reply to an employer’s contract claim"),
+                        + " submit a reply to an employer’s contract claim"),
         @CCD(displayOrder = 25)
         V025("195", "195 Acknowledgement of appeal and notice of preliminary hearing"),
         @CCD(displayOrder = 26)
@@ -4995,23 +3920,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List061FlPart9V2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List062FlPosition implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Awaiting appeal judgment", "Awaiting appeal judgment"),
@@ -5154,23 +4066,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List062FlPosition(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List063FlPositionCT implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Case transferred - same country", "Case transferred - same country"),
@@ -5179,23 +4078,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List063FlPositionCT(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List064FlPostponedBy implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Claimant", "Claimant"),
@@ -5208,23 +4094,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List064FlPostponedBy(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List065FlPreferredTitle implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Mr", "Mr"),
@@ -5243,23 +4116,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List065FlPreferredTitle(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List066FlPublicPrivate implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Public", "Public"),
@@ -5268,23 +4128,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List066FlPublicPrivate(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List067FlReconsideration implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001(
@@ -5305,23 +4152,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List067FlReconsideration(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List068FlReferralSubject implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("ET1", "ET1"),
@@ -5370,23 +4204,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List068FlReferralSubject(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List069FlReinstate implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Neither", "Neither"),
@@ -5397,23 +4218,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List069FlReinstate(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List070FlReinstated implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Neither", "Neither"),
@@ -5424,23 +4232,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List070FlReinstated(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List071FlRepresentativeContact implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Email", "Email"),
@@ -5451,23 +4246,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List071FlRepresentativeContact(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List072FlRepresentativeOccupation implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Solicitor", "Solicitor"),
@@ -5496,23 +4278,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List072FlRepresentativeOccupation(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List073FlResponseStatus implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Accepted", "Accepted"),
@@ -5525,23 +4294,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List073FlResponseStatus(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List074FlResponseToAClaim implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("ET3", "ET3"),
@@ -5560,23 +4316,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List074FlResponseToAClaim(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List075FlRestrictedExcludedRegister implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("No", "No"),
@@ -5587,23 +4330,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List075FlRestrictedExcludedRegister(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List076FlRestrictedRequestedBy implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Respondent", "Respondent"),
@@ -5620,23 +4350,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List076FlRestrictedRequestedBy(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List077FlServingDocumentRecipient implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Acas", "Acas"),
@@ -5647,23 +4364,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List077FlServingDocumentRecipient(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List078FlServingDocumentTypeV1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("1.1", "1.1 ET5 Acknowledgment of Claim"),
@@ -5682,23 +4386,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List078FlServingDocumentTypeV1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List078FlServingDocumentTypeV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("1.1", "1.1 ET5 Acknowledgement of Claim"),
@@ -5755,23 +4446,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List078FlServingDocumentTypeV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List079FlSex implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Male", "Male"),
@@ -5782,23 +4460,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List079FlSex(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List080FlStage implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Stage 1", "Stage 1"),
@@ -5809,23 +4474,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List080FlStage(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List081FlStartingAClaim implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("ET1", "ET1"),
@@ -5846,23 +4498,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List081FlStartingAClaim(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List082FlStillWorking implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Working", "Working"),
@@ -5873,23 +4512,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List082FlStillWorking(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List083FlTitle implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Mr", "Mr"),
@@ -5924,23 +4550,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List083FlTitle(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List084FlTopLevelV1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("EM-TRB-LET-ENG-00544", "PART 0 – Print Address Labels"),
@@ -5954,7 +4567,7 @@ final class SingleFixedLists {
         V005(
                 "EM-TRB-EGW-ENG-00029",
                 "PART 4 – Initial Consideration of Claim and Response (including Rule 22"
-                    + " Judgments): Rules 27 - 29"),
+                        + " Judgments): Rules 27 - 29"),
         @CCD(displayOrder = 6)
         V006("EM-TRB-EGW-ENG-00030", "PART 5 – Case management orders & other powers: Rules 29-40"),
         @CCD(displayOrder = 7)
@@ -5992,23 +4605,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List084FlTopLevelV1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List084FlTopLevelV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("EM-TRB-LET-ENG-00544", "PART 0 – Print Address Labels"),
@@ -6049,23 +4649,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List084FlTopLevelV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List085FlTribunalOfficeV1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Bristol", "Bristol"),
@@ -6094,23 +4681,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List085FlTribunalOfficeV1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List085FlTribunalOfficeV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Glasgow", "Glasgow"),
@@ -6125,23 +4699,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List085FlTribunalOfficeV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List086FlWithdrawalSettled implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Withdrawal of entire claim", "Withdrawal of entire claim"),
@@ -6154,23 +4715,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List086FlWithdrawalSettled(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List087FlYesOrNoOrPreferNot implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes", "Yes"),
@@ -6181,23 +4729,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List087FlYesOrNoOrPreferNot(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List088FlClaimantTseSelectApp implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Amend claim", "Amend claim"),
@@ -6230,23 +4765,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List088FlClaimantTseSelectApp(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List089FlContestClaimStatus implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes", "Yes"),
@@ -6257,46 +4779,20 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List089FlContestClaimStatus(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List090FlCostsProBonoAwardedTo implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Access to Justice Foundation", "Access to Justice Foundation");
 
         private final String code;
         private final String label;
-
-        List090FlCostsProBonoAwardedTo(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List091FlEmployerType implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Individual", "Individual"),
@@ -6311,23 +4807,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List091FlEmployerType(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List092FlEt3Struckout implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Chairman's decision", "Judge's decision"),
@@ -6336,23 +4819,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List092FlEt3Struckout(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List093FlEt3PayFrequency implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Weekly", "Weekly"),
@@ -6363,23 +4833,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List093FlEt3PayFrequency(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List094FlEt3SuggestedIssues implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Applications for strike out or deposit", "Applications for strike out or deposit"),
@@ -6396,23 +4853,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List094FlEt3SuggestedIssues(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List095FlEt3TribunalLocationChange implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes", "Yes"),
@@ -6421,23 +4865,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List095FlEt3TribunalLocationChange(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List096FlEtICUDLHearingFormatV1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Video hearing", "Video hearing"),
@@ -6446,23 +4877,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List096FlEtICUDLHearingFormatV1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List096FlEtICUDLHearingFormatV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("CVP hearing", "CVP hearing"),
@@ -6471,23 +4889,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List096FlEtICUDLHearingFormatV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List097FlHearingJudgeAloneOrWithMembers implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("JSA", "JSA"),
@@ -6496,23 +4901,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List097FlHearingJudgeAloneOrWithMembers(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List098FlIsLocationCorrect implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes", "Yes"),
@@ -6521,23 +4913,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List098FlIsLocationCorrect(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List099FlIsTrackAllocationCorrect implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes", "Yes"),
@@ -6546,23 +4925,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List099FlIsTrackAllocationCorrect(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List100FlJurisdictionCodes implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("ADT", "ADT"),
@@ -6719,23 +5085,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List100FlJurisdictionCodes(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List101FlLanguages implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("English", "English"),
@@ -6744,23 +5097,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List101FlLanguages(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List102FlLetterAddress implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Managing Office", "Managing Office"),
@@ -6769,23 +5109,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List102FlLetterAddress(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List103FlNoticePeriodUnit implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Weeks", "Weeks"),
@@ -6794,23 +5121,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List103FlNoticePeriodUnit(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List104FlPayCycle implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Weeks", "Weeks"),
@@ -6821,23 +5135,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List104FlPayCycle(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List105FlPensionContribution implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes", "Yes"),
@@ -6848,23 +5149,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List105FlPensionContribution(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List106FlProBonoAwardedAgainst implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Claimant's Representative", "Claimant's Representative"),
@@ -6873,23 +5161,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List106FlProBonoAwardedAgainst(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List107FlRepresentativeContactChangeOptions implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Amend contact details", "Amend contact details"),
@@ -6898,23 +5173,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List107FlRepresentativeContactChangeOptions(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List108FlResTseSelectApp implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Amend response", "Amend response"),
@@ -6945,23 +5207,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List108FlResTseSelectApp(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List109FlRespondentLegalEntity implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes", "Yes"),
@@ -6972,23 +5221,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List109FlRespondentLegalEntity(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List110FlRule2728ClaimToBe implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Dismissed in full", "Dismissed in full"),
@@ -6997,23 +5233,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List110FlRule2728ClaimToBe(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List111FlSelectHearingBundlesCollection implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("selectClaimantHearingBundles", "Claimant's Hearing Bundles"),
@@ -7022,23 +5245,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List111FlSelectHearingBundlesCollection(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List112FlSendNotificationCaseManagement implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Case management order", "Case management order"),
@@ -7047,23 +5257,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List112FlSendNotificationCaseManagement(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List113FlSendNotificationDecision implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Granted", "Granted"),
@@ -7076,23 +5273,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List113FlSendNotificationDecision(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List114FlSendNotificationParties implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Both parties", "Both parties"),
@@ -7103,23 +5287,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List114FlSendNotificationParties(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List115FlSendNotificationSubject implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Claimant / Respondent details", "Claimant / Respondent details"),
@@ -7140,23 +5311,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List115FlSendNotificationSubject(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List116FlSendNotificationWhoCaseOrder implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Legal officer", "Legal officer"),
@@ -7165,23 +5323,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List116FlSendNotificationWhoCaseOrder(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List117FlSendNotificationWhoMadeJudgement implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Judge", "Judge"),
@@ -7190,23 +5335,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List117FlSendNotificationWhoMadeJudgement(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List118FlSuggestAnotherTrack implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Open", "Open"),
@@ -7219,23 +5351,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List118FlSuggestAnotherTrack(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List119FlTseAdmReplyCmoMadeBy implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Legal officer", "Legal officer"),
@@ -7244,23 +5363,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List119FlTseAdmReplyCmoMadeBy(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List120FlTseAdmReplyRequestMadeBy implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Legal officer", "Legal officer"),
@@ -7271,29 +5377,16 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List120FlTseAdmReplyRequestMadeBy(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List121FrlACAS implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001(
                 "Another person",
                 "Another Person I'm making the claim with has an early ACAS concilication"
-                    + " certificate number"),
+                        + " certificate number"),
         @CCD(displayOrder = 2)
         V002("No Power", "ACAS doesn't have the power to conciliate on all or part of my claim"),
         @CCD(displayOrder = 3)
@@ -7302,29 +5395,16 @@ final class SingleFixedLists {
         V004(
                 "Unfair Dismissal",
                 "My claim consists only of a claim of unfair dismissal which contains an"
-                    + " application for interim relief"),
+                        + " application for interim relief"),
         @CCD(displayOrder = 5)
         V005("ECC", "Claim type is Employer Contract Claim");
 
         private final String code;
         private final String label;
-
-        List121FrlACAS(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List122FrlClaimantCopyToOtherPartyYesOrNo implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001(
@@ -7343,23 +5423,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List122FrlClaimantCopyToOtherPartyYesOrNo(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List123FrlClaimantOrRespondents implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Claimant", "Claimant"),
@@ -7368,23 +5435,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List123FrlClaimantOrRespondents(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List124FrlClaimantTseCopyToOtherPartyYesOrNo implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001(
@@ -7403,23 +5457,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List124FrlClaimantTseCopyToOtherPartyYesOrNo(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List125FrlClaimantType implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Individual", "Individual"),
@@ -7428,23 +5469,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List125FrlClaimantType(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List126FrlCopyToOtherPartyYesOrNo implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001(
@@ -7465,23 +5493,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List126FrlCopyToOtherPartyYesOrNo(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List127FrlReferCaseTo implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Admin", "Admin"),
@@ -7492,23 +5507,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List127FrlReferCaseTo(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List128FrlSitAlone implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Sit Alone", "Sit Alone"),
@@ -7519,23 +5521,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List128FrlSitAlone(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List129FrlBundleType implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Hearing Bundle", "Hearing Bundle"),
@@ -7548,23 +5537,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List129FrlBundleType(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List130FrlBundlesRespondentAgreedDocWith implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes", "Yes"),
@@ -7572,40 +5548,27 @@ final class SingleFixedLists {
         V002(
                 "But",
                 "We have agreed that this set of documents will be uploaded but we disagree about"
-                    + " whether some of the documents should be referred to at the hearing."),
+                        + " whether some of the documents should be referred to at the hearing."),
         @CCD(displayOrder = 3)
         V003("No", "No, we have not agreed and I want to provide my own documents");
 
         private final String code;
         private final String label;
-
-        List130FrlBundlesRespondentAgreedDocWith(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List131FrlBundlesWhatDocuments implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001(
                 "Supplementary hearing documents",
                 "Documents that will be referred to by witnesses when giving evidence, sometimes"
-                    + " called the \"hearing bundle\""),
+                        + " called the \"hearing bundle\""),
         @CCD(displayOrder = 2)
         V002(
                 "Witness statements only",
                 "Witness statements (only upload these if the tribunal has said witness statements"
-                    + " are to be used)"),
+                        + " are to be used)"),
         @CCD(displayOrder = 3)
         V003(
                 "Hearing documents, including witness statements",
@@ -7613,23 +5576,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List131FrlBundlesWhatDocuments(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List132FrlBundlesWhoseDocuments implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Respondent's documents only", "Respondent's documents only"),
@@ -7640,23 +5590,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List132FrlBundlesWhoseDocuments(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List133FrlEditOrDelete implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Edit", "Edit"),
@@ -7665,23 +5602,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List133FrlEditOrDelete(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List134FrlEt3ContactPreference implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Email", "Email"),
@@ -7690,23 +5614,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List134FrlEt3ContactPreference(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List135FrlEt3ContestClaim implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes", "Yes - the respondent contests all or part of the claim"),
@@ -7715,23 +5626,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List135FrlEt3ContestClaim(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List136FrlEt3YesNoNotSureYet implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes", "Yes"),
@@ -7742,23 +5640,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List136FrlEt3YesNoNotSureYet(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List137FrlEtICRule27ClaimToBe implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Dismissed in full", "Dismissed in full"),
@@ -7767,23 +5652,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List137FrlEtICRule27ClaimToBe(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List138FrlEtICRule28ClaimToBe implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Dismissed in full", "Dismissed in full"),
@@ -7792,23 +5664,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List138FrlEtICRule28ClaimToBe(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List139FrlFinalHearingListedJudgeOrMembers implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("JSA", "JSA"),
@@ -7817,23 +5676,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List139FrlFinalHearingListedJudgeOrMembers(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List140FrlFutureOrPastHearing implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Past", "Past"),
@@ -7842,23 +5688,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List140FrlFutureOrPastHearing(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List141FrlListedCmPreliminaryHearingJsa implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Case management only", "Case management only"),
@@ -7869,23 +5702,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List141FrlListedCmPreliminaryHearingJsa(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List142FrlNoAcasReason implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Another person", "Another person making the claim has an Acas certificate number"),
@@ -7897,27 +5717,14 @@ final class SingleFixedLists {
         V004(
                 "Unfair Dismissal",
                 "The claim consists only of a complaint of unfair dismissal which contains an"
-                    + " application for interim relief");
+                        + " application for interim relief");
 
         private final String code;
         private final String label;
-
-        List142FrlNoAcasReason(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List143FrlPartyUnavailability implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("claimant", "Claimant"),
@@ -7926,23 +5733,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List143FrlPartyUnavailability(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List144FrlRespondNotificationCmoRequestBy implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Legal officer", "Legal officer"),
@@ -7951,23 +5745,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List144FrlRespondNotificationCmoRequestBy(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List145FrlRespondNotificationRequestBy implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Legal officer", "Legal officer"),
@@ -7978,23 +5759,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List145FrlRespondNotificationRequestBy(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List146FrlRespondentType implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Organisation", "Organisation"),
@@ -8003,23 +5771,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List146FrlRespondentType(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List147FrlSendNotificationRequestMadeBy implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Legal officer", "Legal officer"),
@@ -8030,23 +5785,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List147FrlSendNotificationRequestMadeBy(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List148FrlTseAdmReplyIsCmoOrRequest implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Case management order", "Case management order"),
@@ -8057,23 +5799,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List148FrlTseAdmReplyIsCmoOrRequest(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List149FrlTseAdminDecision implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Granted", "Granted"),
@@ -8086,23 +5815,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List149FrlTseAdminDecision(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List150FrlTseAdminDecisionMadeBy implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Legal officer", "Legal officer"),
@@ -8111,23 +5827,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List150FrlTseAdminDecisionMadeBy(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List151FrlTseAdminIsResponseRequired implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes", "Yes - view document for details"),
@@ -8136,23 +5839,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List151FrlTseAdminIsResponseRequired(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List152FrlTseAdminSelectPartyNotify implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Both parties", "Both parties"),
@@ -8163,23 +5853,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List152FrlTseAdminSelectPartyNotify(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List153FrlTseAdminTypeOfDecision implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Judgment", "Judgment"),
@@ -8188,23 +5865,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List153FrlTseAdminTypeOfDecision(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List154FrlTseApplicationsOpenOrClosed implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Open", "Open"),
@@ -8213,23 +5877,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List154FrlTseApplicationsOpenOrClosed(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List155FrlYesNoNotApplicable implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes", "Yes"),
@@ -8240,23 +5891,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List155FrlYesNoNotApplicable(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List156ImageRendering implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("opaque", "Opaque"),
@@ -8265,23 +5903,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List156ImageRendering(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List157ImageRenderingLocation implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("allPages", "Image on all pages of the Document"),
@@ -8290,29 +5915,16 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List157ImageRenderingLocation(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List158MsFinalHearingIsEJSitAloneReasonNo implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001(
                 "Members experience is likely to add significant value to the adjudication process",
                 "Members experience is likely to add significant value to the adjudication"
-                    + " process"),
+                        + " process"),
         @CCD(displayOrder = 2)
         V002("No views expressed by parties", "No views expressed by parties"),
         @CCD(displayOrder = 3)
@@ -8320,30 +5932,17 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List158MsFinalHearingIsEJSitAloneReasonNo(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List159MsFinalHearingIsEJSitAloneReasonYes implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001(
                 "Members experience is not likely to add significant value to the adjudication"
-                    + " process",
+                        + " process",
                 "Members experience is not likely to add significant value to the adjudication"
-                    + " process"),
+                        + " process"),
         @CCD(displayOrder = 2)
         V002("No views expressed by parties", "No views expressed by parties"),
         @CCD(displayOrder = 3)
@@ -8351,23 +5950,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List159MsFinalHearingIsEJSitAloneReasonYes(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List160MslDefectsV1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("rule121a", "The tribunal has no jurisdiction to consider - Rule 13(1)(a)"),
@@ -8375,7 +5961,7 @@ final class SingleFixedLists {
         V002(
                 "rule121b",
                 "Is in a form which cannot sensibly be responded to or otherwise an abuse of"
-                    + " process - Rule 13(1)(b)"),
+                        + " process - Rule 13(1)(b)"),
         @CCD(displayOrder = 3)
         V003(
                 "rule121c",
@@ -8388,37 +5974,24 @@ final class SingleFixedLists {
         V005(
                 "rule121 da",
                 "Institutes relevant proceedings and the EC number on the claim form does not match"
-                    + " the EC number on the Acas certificate - Rule 13(1)(e)"),
+                        + " the EC number on the Acas certificate - Rule 13(1)(e)"),
         @CCD(displayOrder = 6)
         V006(
                 "rule121e",
                 "Has a different claimant name on the ET1 to the claimant name on the Acas"
-                    + " certificate - Rule 13(1)(f)"),
+                        + " certificate - Rule 13(1)(f)"),
         @CCD(displayOrder = 7)
         V007(
                 "rule121f",
                 "Has a different respondent name on the ET1 to the respondent name on the Acas"
-                    + " certificate - Rule 13(1)(g)");
+                        + " certificate - Rule 13(1)(g)");
 
         private final String code;
         private final String label;
-
-        List160MslDefectsV1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List160MslDefectsV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("rule121a", "The tribunal has no jurisdiction to consider - Rule 13 (1)(a)"),
@@ -8426,7 +5999,7 @@ final class SingleFixedLists {
         V002(
                 "rule121b",
                 "Is in a form which cannot sensibly be responded to or otherwise an abuse of"
-                    + " process - Rule 13 (1)(b)"),
+                        + " process - Rule 13 (1)(b)"),
         @CCD(displayOrder = 3)
         V003(
                 "rule121c",
@@ -8439,37 +6012,24 @@ final class SingleFixedLists {
         V005(
                 "rule121 da",
                 "Institutes relevant proceedings and the EC number on the claim form does not match"
-                    + " the EC number on the Acas certificate - Rule 13 (1)(e)"),
+                        + " the EC number on the Acas certificate - Rule 13 (1)(e)"),
         @CCD(displayOrder = 6)
         V006(
                 "rule121e",
                 "Has a different claimant name on the ET1 to the claimant name on the Acas"
-                    + " certificate - Rule 13 (1)(f)"),
+                        + " certificate - Rule 13 (1)(f)"),
         @CCD(displayOrder = 7)
         V007(
                 "rule121f",
                 "Has a different respondent name on the ET1 to the respondent name on the Acas"
-                    + " certificate - Rule 13 (1)(g)");
+                        + " certificate - Rule 13 (1)(g)");
 
         private final String code;
         private final String label;
-
-        List160MslDefectsV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List161MslHearingAttendence implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Phone", "Phone hearings"),
@@ -8480,23 +6040,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List161MslHearingAttendence(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List162MslHearingFormat implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("In person", "In person"),
@@ -8509,23 +6056,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List162MslHearingFormat(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List163MslHearingPreferences implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Video", "Video"),
@@ -8536,23 +6070,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List163MslHearingPreferences(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List164MslIcF2FOrders implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("1 Disclosure", "1 Documents"),
@@ -8567,23 +6088,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List164MslIcF2FOrders(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List165MslIcVideoOrders implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("1 Disclosure and Productions", "1 Disclosure and Productions"),
@@ -8596,23 +6104,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List165MslIcVideoOrders(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List166MslNoticePeriod implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Months", "Yes, in months"),
@@ -8623,23 +6118,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List166MslNoticePeriod(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List167MslNoticePeriodLength implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Months", "Notice period was in months"),
@@ -8648,23 +6130,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List167MslNoticePeriodLength(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List168MslPayFrequency implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Weekly", "Weekly"),
@@ -8677,23 +6146,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List168MslPayFrequency(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List169MslPreAcceptanceResponseV1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Not on Prescribed Form", "Not on Prescribed Form"),
@@ -8710,23 +6166,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List169MslPreAcceptanceResponseV1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List169MslPreAcceptanceResponseV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Not on Prescribed Form", "Not on Prescribed Form"),
@@ -8741,23 +6184,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List169MslPreAcceptanceResponseV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List170MslREJOrVP implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("vexatiousLitigantOrder", "A claimant covered by vexatious litigant order"),
@@ -8775,7 +6205,7 @@ final class SingleFixedLists {
         V006(
                 "aSensitiveIssue",
                 "A sensitive issue which may attract publicity or need early allocation to a"
-                    + " specific judge"),
+                        + " specific judge"),
         @CCD(displayOrder = 7)
         V007(
                 "anyPotentialConflict",
@@ -8787,23 +6217,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List170MslREJOrVP(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List171MslResponse implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Out of Time", "Out of Time"),
@@ -8816,23 +6233,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List171MslResponse(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List172MslStillWorking implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Working", "Yes, they are still working for the respondent "),
@@ -8843,23 +6247,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List172MslStillWorking(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List173MslWorkPayNoticePeriod implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Worked", "Yes, the claimant worked a notice period"),
@@ -8868,46 +6259,20 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List173MslWorkPayNoticePeriod(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List174MslYes implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes", "Yes");
 
         private final String code;
         private final String label;
-
-        List174MslYes(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List175MslYesNo implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes", "Yes"),
@@ -8916,23 +6281,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List175MslYesNo(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List176MslClaimOutcomes implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("compensation", "Compensation only"),
@@ -8944,96 +6296,44 @@ final class SingleFixedLists {
         V004(
                 "anotherJob",
                 "If claiming unfair dismissal, to get another job with the same employer or"
-                    + " associated employer and compensation(re-engagement)");
+                        + " associated employer and compensation(re-engagement)");
 
         private final String code;
         private final String label;
-
-        List176MslClaimOutcomes(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List177MslCloseApplicationYes implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes", "Yes");
 
         private final String code;
         private final String label;
-
-        List177MslCloseApplicationYes(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List178MslConfirmCloseReferral implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes", "Yes");
 
         private final String code;
         private final String label;
-
-        List178MslConfirmCloseReferral(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List179MslConfirmSubmitEt3 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes", "Yes - I want to submit this ET3");
 
         private final String code;
         private final String label;
-
-        List179MslConfirmSubmitEt3(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List180MslDiscriminationClaims implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Age", "Age"),
@@ -9058,23 +6358,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List180MslDiscriminationClaims(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List181MslEt1DiscriminationClaims implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Age", "Age"),
@@ -9097,23 +6384,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List181MslEt1DiscriminationClaims(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List182MslEt1TypesOfClaim implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("discrimination", "Discrimination of any type"),
@@ -9128,23 +6402,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List182MslEt1TypesOfClaim(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List183MslEt3HearingType implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Phone hearings", "Phone hearings"),
@@ -9153,23 +6414,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List183MslEt3HearingType(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List184MslEtICFurtherInformation implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("furtherInformationRequired", "Further information required"),
@@ -9180,23 +6428,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List184MslEtICFurtherInformation(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List185MslEtICHearingAlreadyListedV1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Proceed to the hearing already listed", "Proceed to the hearing already listed"),
@@ -9215,23 +6450,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List185MslEtICHearingAlreadyListedV1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List185MslEtICHearingAlreadyListedV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("proceedToHearing", "Proceed to the hearing already listed"),
@@ -9248,23 +6470,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List185MslEtICHearingAlreadyListedV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List186MslEtICHearingNotListedV1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Seek comments on the video hearing", "Seek comments on the video hearing"),
@@ -9277,23 +6486,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List186MslEtICHearingNotListedV1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List186MslEtICHearingNotListedV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Seek comments on CVP hearing", "Seek comments on CVP hearing"),
@@ -9306,23 +6502,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List186MslEtICHearingNotListedV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List187MslEtICHearingNotListedUpdated implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("List for preliminary hearing", "List for preliminary hearing"),
@@ -9335,23 +6518,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List187MslEtICHearingNotListedUpdated(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List188MslEtICHearingNotListedV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("List for preliminary hearing", "List for preliminary hearing"),
@@ -9364,23 +6534,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List188MslEtICHearingNotListedV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List189MslEtICPurposeOfPrelimHearing implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Case management", "Case management"),
@@ -9393,23 +6550,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List189MslEtICPurposeOfPrelimHearing(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List190MslEtICPurposeOfPrelimHearingV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Case management", "Case management"),
@@ -9422,23 +6566,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List190MslEtICPurposeOfPrelimHearingV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List191MslEtICRule27Direction implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("noJurisdiction", "No jurisdiction"),
@@ -9447,23 +6578,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List191MslEtICRule27Direction(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List192MslEtICTypeOfCvpHearing implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Final", "Final"),
@@ -9472,23 +6590,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List192MslEtICTypeOfCvpHearing(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List193MslEtICTypeOfHearingV1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Telephone", "Telephone"),
@@ -9499,23 +6604,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List193MslEtICTypeOfHearingV1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List193MslEtICTypeOfHearingV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Telephone", "Telephone"),
@@ -9526,23 +6618,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List193MslEtICTypeOfHearingV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List194MslEtICTypeOfHearingUpdated implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Video", "Video"),
@@ -9551,23 +6630,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List194MslEtICTypeOfHearingUpdated(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List195MslEtICTypeOfHearingV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Video", "Video"),
@@ -9576,23 +6642,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List195MslEtICTypeOfHearingV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List196MslEtICUDLCVPIssue implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("1 Disclosure and Productions", "1 Disclosure and Productions"),
@@ -9605,23 +6658,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List196MslEtICUDLCVPIssue(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List197MslEtICUDLFinalF2FIssueV1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("1 Disclosure", "1 Disclosure"),
@@ -9636,23 +6676,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List197MslEtICUDLFinalF2FIssueV1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List197MslEtICUDLFinalF2FIssueV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("1 Disclosure", "1 Disclosure"),
@@ -9667,23 +6694,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List197MslEtICUDLFinalF2FIssueV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List198MslEtICUDLGiveReasons implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001(
@@ -9706,32 +6720,19 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List198MslEtICUDLGiveReasons(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List199MslFinalHearingWithJudgeOrMembersReasonsJsa implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Already decided", "Already decided"),
         @CCD(displayOrder = 2)
         V002(
                 "Members' experience is not likely to add significant value to the adjudication"
-                    + " process",
+                        + " process",
                 "Members' experience is not likely to add significant value to the adjudication"
-                    + " process"),
+                        + " process"),
         @CCD(displayOrder = 3)
         V003("No views expressed by parties", "No views expressed by parties"),
         @CCD(displayOrder = 4)
@@ -9739,23 +6740,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List199MslFinalHearingWithJudgeOrMembersReasonsJsa(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List200MslFinalHearingWithJudgeOrMembersReasonsMembers
             implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
@@ -9763,9 +6751,9 @@ final class SingleFixedLists {
         @CCD(displayOrder = 2)
         V002(
                 "Members' experience is likely to add significant value to the adjudication"
-                    + " process",
+                        + " process",
                 "Members' experience is likely to add significant value to the adjudication"
-                    + " process"),
+                        + " process"),
         @CCD(displayOrder = 3)
         V003("No views expressed by parties", "No views expressed by parties"),
         @CCD(displayOrder = 4)
@@ -9773,23 +6761,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List200MslFinalHearingWithJudgeOrMembersReasonsMembers(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List201MslFurtherInformation implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Further information required", "Further information required"),
@@ -9800,38 +6775,25 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List201MslFurtherInformation(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List202MslHearingWithJudgeOrMembersReasonsV1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Already decided", "Already decided"),
         @CCD(displayOrder = 2)
         V002(
                 "Members' experience is likely to add significant value to the adjudication"
-                    + " process",
+                        + " process",
                 "Members' experience is likely to add significant value to the adjudication"
-                    + " process"),
+                        + " process"),
         @CCD(displayOrder = 3)
         V003(
                 "Members' experience is not likely to add significant value to the adjudication"
-                    + " process",
+                        + " process",
                 "Members' experience is not likely to add significant value to the adjudication"
-                    + " process"),
+                        + " process"),
         @CCD(displayOrder = 4)
         V004("No views expressed by parties", "No views expressed by parties"),
         @CCD(displayOrder = 5)
@@ -9841,15 +6803,15 @@ final class SingleFixedLists {
         @CCD(displayOrder = 2)
         V007(
                 "Members' experience is likely to add significant value to the process of"
-                    + " adjudication",
+                        + " adjudication",
                 "Members' experience is likely to add significant value to the process of"
-                    + " adjudication"),
+                        + " adjudication"),
         @CCD(displayOrder = 3)
         V008(
                 "Members' experience is not likely to add significant value to the process of"
-                    + " adjudication",
+                        + " adjudication",
                 "Members' experience is not likely to add significant value to the process of"
-                    + " adjudication"),
+                        + " adjudication"),
         @CCD(displayOrder = 4)
         V009("No views expressed by parties", "No views expressed by parties"),
         @CCD(displayOrder = 5)
@@ -9857,38 +6819,25 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List202MslHearingWithJudgeOrMembersReasonsV1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List202MslHearingWithJudgeOrMembersReasonsV2 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Already decided", "Already decided"),
         @CCD(displayOrder = 2)
         V002(
                 "Members' experience is likely to add significant value to the adjudication"
-                    + " process",
+                        + " process",
                 "Members' experience is likely to add significant value to the adjudication"
-                    + " process"),
+                        + " process"),
         @CCD(displayOrder = 3)
         V003(
                 "Members' experience is not likely to add significant value to the adjudication"
-                    + " process",
+                        + " process",
                 "Members' experience is not likely to add significant value to the adjudication"
-                    + " process"),
+                        + " process"),
         @CCD(displayOrder = 4)
         V004("No views expressed by parties", "No views expressed by parties"),
         @CCD(displayOrder = 5)
@@ -9896,23 +6845,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List202MslHearingWithJudgeOrMembersReasonsV2(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List203MslJudgeOrLO implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("aClaimOfInterimRelief", "A claim of interim relief"),
@@ -9937,23 +6873,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List203MslJudgeOrLO(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List204MslOtherFactors implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("claimOutOfTime", "The whole or any part of the claim is out of time"),
@@ -9965,7 +6888,7 @@ final class SingleFixedLists {
         V004(
                 "pidJurisdictionRegulator",
                 "The claim has PID jurisdiction and claimant wants it forwarded to relevant"
-                    + " regulator - Box 10.1"),
+                        + " regulator - Box 10.1"),
         @CCD(displayOrder = 5)
         V005("videoHearingPreference", "The claimant prefers a video hearing"),
         @CCD(displayOrder = 6)
@@ -9975,23 +6898,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List204MslOtherFactors(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List205MslPayClaims implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Arrears", "Arrears (pay you are owed)"),
@@ -10006,46 +6916,20 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List205MslPayClaims(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List206MslRemoveDocument implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes - Remove document", "Yes - Remove document");
 
         private final String code;
         private final String label;
-
-        List206MslRemoveDocument(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List207MslRule27direction implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("No jurisdiction", "No jurisdiction"),
@@ -10054,46 +6938,20 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List207MslRule27direction(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List208MslSubmitEt1 implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes", "Yes - I want to submit this ET1 claim");
 
         private final String code;
         private final String label;
-
-        List208MslSubmitEt1(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List209MslTypeOfClaim implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("discrimination", "discrimination"),
@@ -10110,23 +6968,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List209MslTypeOfClaim(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List210PageNumberFormat implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("pageRange", "Page Range"),
@@ -10135,23 +6980,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List210PageNumberFormat(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List211PaginationStyle implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("off", "Off"),
@@ -10170,23 +7002,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List211PaginationStyle(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List212SendNotificationEccQuestion implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Notice of Employer Contract Claim", "Notice of Employer Contract Claim"),
@@ -10197,23 +7016,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List212SendNotificationEccQuestion(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List213SendNotificationNotify implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Both parties", "Both parties"),
@@ -10224,23 +7030,10 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List213SendNotificationNotify(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     private enum List214SendNotificationResponseTribunal implements HasLabel, HasCode {
         @CCD(displayOrder = 1)
         V001("Yes - view document for details", "Yes - view document for details"),
@@ -10249,20 +7042,5 @@ final class SingleFixedLists {
 
         private final String code;
         private final String label;
-
-        List214SendNotificationResponseTribunal(String code, String label) {
-            this.code = code;
-            this.label = label;
-        }
-
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 }

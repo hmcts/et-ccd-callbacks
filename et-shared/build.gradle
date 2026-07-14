@@ -104,6 +104,8 @@ publishing {
 }
 
 dependencies {
+    compileOnly group: 'com.github.hmcts', name: 'ccd-config-generator', version: '6.11.0'
+
     api group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.4'
     api group: 'org.apache.poi', name: 'poi-ooxml', version: '5.4.1'
     api group: 'org.elasticsearch', name: 'elasticsearch', version: '9.2.4'

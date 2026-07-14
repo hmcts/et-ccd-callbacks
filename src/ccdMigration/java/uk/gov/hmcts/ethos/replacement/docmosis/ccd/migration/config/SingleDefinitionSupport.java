@@ -115,6 +115,13 @@ final class SingleDefinitionSupport {
                 SingleEt1ClaimIntakeRows.EVENT_FIELDS,
                 SingleEt1ClaimIntakeRows.COMPLEX_FIELDS,
                 SingleEt1ClaimIntakeRows.EVENT_GRANTS);
+        configureEvents(
+                builder,
+                variant,
+                SingleEt3ResponseIntakeRows.EVENTS,
+                SingleEt3ResponseIntakeRows.EVENT_FIELDS,
+                SingleEt3ResponseIntakeRows.COMPLEX_FIELDS,
+                SingleEt3ResponseIntakeRows.EVENT_GRANTS);
     }
 
     private static Class<?> profile(Variant variant) {

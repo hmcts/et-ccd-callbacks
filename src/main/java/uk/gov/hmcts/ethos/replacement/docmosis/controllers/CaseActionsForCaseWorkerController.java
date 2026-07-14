@@ -17,6 +17,7 @@ import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -49,6 +50,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
@@ -112,6 +114,7 @@ public class CaseActionsForCaseWorkerController {
     private final CaseManagementLocationService caseManagementLocationService;
     private final Et1SubmissionService et1SubmissionService;
     private final NocRespondentHelper nocRespondentHelper;
+    private final RespondentEmailService respondentEmailService;
 
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "create a case for a caseWorker.")
@@ -446,6 +449,45 @@ public class CaseActionsForCaseWorkerController {
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         removeSpacesFromPartyNames(caseData);
         return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    @PostMapping(value = "/updateRespondentEmail/aboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Initialise the respondent email update event.")
+    public ResponseEntity<CCDCallbackResponse> initialiseRespondentEmailUpdate(
+            @RequestBody CCDRequest ccdRequest) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        return getCallbackRespEntityErrors(respondentEmailService.initialise(caseData), caseData);
+    }
+
+    @PostMapping(value = "/updateRespondentEmail/select", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Display the selected respondent's current email address.")
+    public ResponseEntity<CCDCallbackResponse> selectRespondentForEmailUpdate(
+            @RequestBody CCDRequest ccdRequest) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        return getCallbackRespEntityErrors(respondentEmailService.populateCurrentEmail(caseData), caseData);
+    }
+
+    @PostMapping(value = "/updateRespondentEmail/validate", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Validate the respondent's new email address.")
+    public ResponseEntity<CCDCallbackResponse> validateRespondentEmailUpdate(
+            @RequestBody CCDRequest ccdRequest) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        return getCallbackRespEntityErrors(respondentEmailService.validateNewEmail(caseData), caseData);
+    }
+
+    @PostMapping(value = "/updateRespondentEmail/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Update the selected respondent's email address.")
+    public ResponseEntity<CCDCallbackResponse> updateRespondentEmail(
+            @RequestBody CCDRequest ccdRequest) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        return getCallbackRespEntityErrors(
+                respondentEmailService.prepareUpdate(ccdRequest.getCaseDetails()), caseData);
+    }
+
+    @PostMapping(value = "/updateRespondentEmail/submitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Reassign respondent case access after updating their email.")
+    public void updateRespondentEmailSubmitted(@RequestBody CallbackRequest callbackRequest) {
+        respondentEmailService.reassignDefendantAccess(callbackRequest);
     }
 
     @PostMapping(value = "/amendRespondentDetails", consumes = APPLICATION_JSON_VALUE)

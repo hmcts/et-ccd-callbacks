@@ -14,7 +14,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
@@ -95,12 +97,44 @@ class RespondentEmailServiceTest {
     }
 
     @Test
+    void initialiseExcludesRespondentLinkedToRepresentative() {
+        firstRespondent.getValue().setRepresented(null);
+        secondRespondent.getValue().setRepresented(null);
+        caseDetails.getCaseData().setRepCollection(List.of(representativeFor(RESPONDENT_ID_ONE, "First respondent")));
+
+        assertThat(service.initialise(caseDetails.getCaseData())).isEmpty();
+        assertThat(caseDetails.getCaseData().getRespondentEmailUpdateSelection().getListItems())
+                .extracting("code")
+                .containsExactly(RESPONDENT_ID_TWO);
+    }
+
+    @Test
+    void initialiseIncludesRespondentWhoseRepresentativeWasRemoved() {
+        firstRespondent.getValue().setRepresented(YES);
+        firstRespondent.getValue().setRepresentativeRemoved(YES);
+
+        assertThat(service.initialise(caseDetails.getCaseData())).isEmpty();
+        assertThat(caseDetails.getCaseData().getRespondentEmailUpdateSelection().getListItems())
+                .extracting("code")
+                .contains(RESPONDENT_ID_ONE);
+    }
+
+    @Test
     void populateCurrentEmailUsesSelectedRespondentsResponseEmail() {
         firstRespondent.getValue().setResponseRespondentEmail("portal@example.com");
         selectRespondent(RESPONDENT_ID_ONE);
 
         assertThat(service.populateCurrentEmail(caseDetails.getCaseData())).isEmpty();
         assertThat(caseDetails.getCaseData().getCurrentRespondentEmail()).isEqualTo("portal@example.com");
+    }
+
+    @Test
+    void populateCurrentEmailRejectsMissingSelection() {
+        caseDetails.getCaseData().setCurrentRespondentEmail(OLD_EMAIL);
+
+        assertThat(service.populateCurrentEmail(caseDetails.getCaseData()))
+                .containsExactly(RespondentEmailService.RESPONDENT_REQUIRED_ERROR);
+        assertThat(caseDetails.getCaseData().getCurrentRespondentEmail()).isNull();
     }
 
     @Test
@@ -126,6 +160,28 @@ class RespondentEmailServiceTest {
     }
 
     @Test
+    void validateRejectsUnchangedEmail() {
+        selectRespondent(RESPONDENT_ID_ONE);
+        caseDetails.getCaseData().setCurrentRespondentEmail(OLD_EMAIL);
+        caseDetails.getCaseData().setNewRespondentEmail("OLD@EXAMPLE.COM");
+
+        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+                .containsExactly(RespondentEmailService.EMAIL_UNCHANGED_ERROR);
+        verify(idamApi, never()).searchUsersByQuery(anyString(), anyString(), any(), any());
+    }
+
+    @Test
+    void validateRejectsAmbiguousIdamAccount() {
+        prepareSelectedEmailFields();
+        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
+        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
+                .thenReturn(List.of(user(NEW_EMAIL, "first-id"), user(NEW_EMAIL, "second-id")));
+
+        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+                .containsExactly(RespondentEmailService.IDAM_USER_AMBIGUOUS_ERROR);
+    }
+
+    @Test
     void prepareUpdateChangesOnlySelectedRespondentAndSetsNewIdWhenAccessExists() throws IOException {
         prepareSelectedEmailFields();
         mockNewIdamUser();
@@ -148,6 +204,17 @@ class RespondentEmailServiceTest {
         assertThat(service.prepareUpdate(caseDetails)).isEmpty();
         assertThat(firstRespondent.getValue().getRespondentEmail()).isEqualTo(NEW_EMAIL);
         assertThat(firstRespondent.getValue().getIdamId()).isEqualTo(OLD_USER_ID);
+    }
+
+    @Test
+    void prepareUpdateReturnsErrorWhenAccessLookupFails() throws IOException {
+        prepareSelectedEmailFields();
+        mockNewIdamUser();
+        when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenThrow(new IOException("lookup failed"));
+
+        assertThat(service.prepareUpdate(caseDetails))
+                .containsExactly(RespondentEmailService.ACCESS_LOOKUP_ERROR);
+        assertThat(firstRespondent.getValue().getRespondentEmail()).isEqualTo(OLD_EMAIL);
     }
 
     @Test
@@ -179,6 +246,42 @@ class RespondentEmailServiceTest {
         inOrder.verify(ccdCaseAssignment).removeCaseUserRole(requestForUser(OLD_USER_ID));
         inOrder.verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
         inOrder.verify(ccdCaseAssignment).addCaseUserRole(requestForUser(OLD_USER_ID));
+    }
+
+    @Test
+    void reassignDefendantAccessDoesNothingWithoutExistingOnlineAccess() throws IOException {
+        CaseData beforeData = caseDataWithSelectedRespondent(null, OLD_EMAIL);
+        CaseData afterData = caseDataWithSelectedRespondent(null, NEW_EMAIL);
+
+        service.reassignDefendantAccess(callbackRequest(beforeData, afterData));
+
+        verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
+        verify(ccdCaseAssignment, never()).addCaseUserRole(any());
+    }
+
+    @Test
+    void reassignDefendantAccessReportsRevokeFailure() throws IOException {
+        CaseData beforeData = caseDataWithSelectedRespondent(OLD_USER_ID, OLD_EMAIL);
+        CaseData afterData = caseDataWithSelectedRespondent(NEW_USER_ID, NEW_EMAIL);
+        CallbackRequest callbackRequest = callbackRequest(beforeData, afterData);
+        doThrow(new IOException("revoke failed"))
+                .when(ccdCaseAssignment).removeCaseUserRole(requestForUser(OLD_USER_ID));
+
+        assertThatThrownBy(() -> service.reassignDefendantAccess(callbackRequest))
+                .isInstanceOf(CcdInputOutputException.class)
+                .hasMessage("Failed to revoke access linked to the previous respondent email");
+        verify(ccdCaseAssignment, never()).addCaseUserRole(any());
+    }
+
+    @Test
+    void reassignDefendantAccessRejectsMissingPreviousCaseData() {
+        CallbackRequest callbackRequest = CallbackRequest.builder()
+                .caseDetails(caseDetails)
+                .build();
+
+        assertThatThrownBy(() -> service.reassignDefendantAccess(callbackRequest))
+                .isInstanceOf(CcdInputOutputException.class)
+                .hasMessage("Missing case data required to update respondent access");
     }
 
     private void prepareSelectedEmailFields() {
@@ -216,6 +319,16 @@ class RespondentEmailServiceTest {
                 .respondentEmail(email)
                 .idamId(userId)
                 .represented(represented)
+                .build());
+        return item;
+    }
+
+    private RepresentedTypeRItem representativeFor(String respondentId, String respondentName) {
+        RepresentedTypeRItem item = new RepresentedTypeRItem();
+        item.setId("representative-id");
+        item.setValue(RepresentedTypeR.builder()
+                .respondentId(respondentId)
+                .respRepName(respondentName)
                 .build());
         return item;
     }

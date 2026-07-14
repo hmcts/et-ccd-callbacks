@@ -130,6 +130,14 @@ final class SingleDefinitionSupport {
                 SingleEt3ProcessingRows.COMPLEX_FIELDS,
                 SingleEt3ProcessingRows.EVENT_GRANTS);
         SingleEt3ProcessingRows.configureComplexTypeAccess(builder);
+        configureEvents(
+                builder,
+                variant,
+                SingleHearingManagementRows.EVENTS,
+                SingleHearingManagementRows.EVENT_FIELDS,
+                SingleHearingManagementRows.COMPLEX_FIELDS,
+                SingleHearingManagementRows.EVENT_GRANTS);
+        SingleHearingManagementRows.configureComplexTypeAccess(builder, variant);
     }
 
     private static Class<?> profile(Variant variant) {

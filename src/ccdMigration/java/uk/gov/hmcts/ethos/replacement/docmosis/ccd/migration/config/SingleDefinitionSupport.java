@@ -162,6 +162,13 @@ final class SingleDefinitionSupport {
                 SingleTribunalNotificationsRows.EVENT_FIELDS,
                 SingleTribunalNotificationsRows.COMPLEX_FIELDS,
                 SingleTribunalNotificationsRows.EVENT_GRANTS);
+        configureEvents(
+                builder,
+                variant,
+                SingleReferralLifecycleRows.EVENTS,
+                SingleReferralLifecycleRows.EVENT_FIELDS,
+                SingleReferralLifecycleRows.COMPLEX_FIELDS,
+                SingleReferralLifecycleRows.EVENT_GRANTS);
     }
 
     private static Class<?> profile(Variant variant) {

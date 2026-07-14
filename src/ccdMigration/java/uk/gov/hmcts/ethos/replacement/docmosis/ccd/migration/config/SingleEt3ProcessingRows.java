@@ -10,6 +10,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.ccd.migration.config.SingleDefini
 import uk.gov.hmcts.ethos.replacement.docmosis.ccd.migration.config.SingleDefinitionRows.GrantSpec;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.CaseState;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings({
@@ -33,117 +35,13 @@ final class SingleEt3ProcessingRows {
     private static final String ET3_VETTING = "et3Vetting";
     private static final String ET3_NOTIFICATION = "et3Notification";
 
-    static final GrantSpec[] EVENT_GRANTS = {
-        new GrantSpec(ALL, ET3_VETTING, SingleRole.CASEWORKER_EMPLOYMENT, "R"),
-        new GrantSpec(ALL, ET3_VETTING, SingleRole.CASEWORKER_EMPLOYMENT_API, "CRUD"),
-        new GrantSpec(
-                ENGLAND_WALES, ET3_VETTING, SingleRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES, "CRU"),
-        new GrantSpec(ALL, ET3_VETTING, SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE, "R"),
-        new GrantSpec(
-                ENGLAND_WALES,
-                ET3_VETTING,
-                SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
-                "CRU"),
-        new GrantSpec(
-                SCOTLAND, ET3_VETTING, SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND, "CRU"),
-        new GrantSpec(SCOTLAND, ET3_VETTING, SingleRole.CASEWORKER_EMPLOYMENT_SCOTLAND, "CRU"),
-        new GrantSpec(ALL, ET3_VETTING, SingleRole.CASEWORKER_WA_TASK_CONFIGURATION, "CRU"),
-        new GrantSpec(SCOTLAND, ET3_VETTING, SingleRole.ET_ACAS_API, "R"),
-        new GrantSpec(ALL, ET3_NOTIFICATION, SingleRole.CASEWORKER_EMPLOYMENT, "R"),
-        new GrantSpec(ALL, ET3_NOTIFICATION, SingleRole.CASEWORKER_EMPLOYMENT_API, "CRUD"),
-        new GrantSpec(
-                ENGLAND_WALES,
-                ET3_NOTIFICATION,
-                SingleRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES,
-                "CRU"),
-        new GrantSpec(ALL, ET3_NOTIFICATION, SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE, "R"),
-        new GrantSpec(
-                ENGLAND_WALES,
-                ET3_NOTIFICATION,
-                SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
-                "CRU"),
-        new GrantSpec(
-                SCOTLAND,
-                ET3_NOTIFICATION,
-                SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND,
-                "CRU"),
-        new GrantSpec(SCOTLAND, ET3_NOTIFICATION, SingleRole.CASEWORKER_EMPLOYMENT_SCOTLAND, "CRU"),
-        new GrantSpec(SCOTLAND, ET3_NOTIFICATION, SingleRole.ET_ACAS_API, "R")
-    };
+    static final GrantSpec[] EVENT_GRANTS = eventGrants();
 
     static final EventSpec[] EVENTS = {
-        new EventSpec(
-                CFTLIB,
-                ET3_VETTING,
-                "ET3 Processing",
-                "ET3 Processing",
-                18,
-                "Accepted",
-                "*",
-                "managingOffice !=\"Unassigned\"",
-                "Y",
-                "N",
-                "Y",
-                false,
-                null,
-                LOCALHOST + "/et3Vetting/aboutToStart",
-                LOCALHOST + "/et3Vetting/aboutToSubmit",
-                LOCALHOST + "/et3Vetting/processingComplete",
-                null),
-        new EventSpec(
-                PROD,
-                ET3_VETTING,
-                "ET3 Processing",
-                "ET3 Processing",
-                18,
-                "Accepted",
-                "*",
-                "managingOffice !=\"Unassigned\"",
-                "Y",
-                "N",
-                "Y",
-                false,
-                null,
-                PRODUCTION + "/et3Vetting/aboutToStart",
-                PRODUCTION + "/et3Vetting/aboutToSubmit",
-                PRODUCTION + "/et3Vetting/processingComplete",
-                null),
-        new EventSpec(
-                CFTLIB,
-                ET3_NOTIFICATION,
-                "ET3 notification",
-                "ET3 notification",
-                19,
-                "Accepted",
-                "*",
-                null,
-                "N",
-                "N",
-                null,
-                false,
-                null,
-                LOCALHOST + "/et3Notification/aboutToStart",
-                LOCALHOST + "/et3Notification/aboutToSubmit",
-                LOCALHOST + "/et3Notification/submitted",
-                null),
-        new EventSpec(
-                PROD,
-                ET3_NOTIFICATION,
-                "ET3 notification",
-                "ET3 notification",
-                19,
-                "Accepted",
-                "*",
-                null,
-                "N",
-                "N",
-                null,
-                false,
-                null,
-                PRODUCTION + "/et3Notification/aboutToStart",
-                PRODUCTION + "/et3Notification/aboutToSubmit",
-                PRODUCTION + "/et3Notification/submitted",
-                null)
+        processing(CFTLIB, LOCALHOST),
+        processing(PROD, PRODUCTION),
+        notification(CFTLIB, LOCALHOST),
+        notification(PROD, PRODUCTION)
     };
 
     static final EventFieldSpec[] EVENT_FIELDS = {
@@ -704,7 +602,7 @@ final class SingleEt3ProcessingRows {
                 true,
                 "Y",
                 "et3ContestClaim=\"Yes\" OR et3ContestClaim=\"No\" OR et3ContestClaim=\"Unknown -"
-                    + " no answer given\"",
+                        + " no answer given\"",
                 "Yes",
                 null,
                 null,
@@ -1475,6 +1373,85 @@ final class SingleEt3ProcessingRows {
     };
 
     private SingleEt3ProcessingRows() {}
+
+    private static GrantSpec[] eventGrants() {
+        List<GrantSpec> grants = new ArrayList<>();
+        addTribunalGrants(grants, ET3_VETTING);
+        grants.add(
+                new GrantSpec(
+                        ALL, ET3_VETTING, SingleRole.CASEWORKER_WA_TASK_CONFIGURATION, "CRU"));
+        addTribunalGrants(grants, ET3_NOTIFICATION);
+        return grants.toArray(GrantSpec[]::new);
+    }
+
+    private static void addTribunalGrants(List<GrantSpec> grants, String eventId) {
+        grants.add(new GrantSpec(ALL, eventId, SingleRole.CASEWORKER_EMPLOYMENT, "R"));
+        grants.add(new GrantSpec(ALL, eventId, SingleRole.CASEWORKER_EMPLOYMENT_API, "CRUD"));
+        grants.add(
+                new GrantSpec(
+                        ENGLAND_WALES,
+                        eventId,
+                        SingleRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES,
+                        "CRU"));
+        grants.add(new GrantSpec(ALL, eventId, SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE, "R"));
+        grants.add(
+                new GrantSpec(
+                        ENGLAND_WALES,
+                        eventId,
+                        SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
+                        "CRU"));
+        grants.add(
+                new GrantSpec(
+                        SCOTLAND,
+                        eventId,
+                        SingleRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND,
+                        "CRU"));
+        grants.add(
+                new GrantSpec(SCOTLAND, eventId, SingleRole.CASEWORKER_EMPLOYMENT_SCOTLAND, "CRU"));
+        grants.add(new GrantSpec(SCOTLAND, eventId, SingleRole.ET_ACAS_API, "R"));
+    }
+
+    private static EventSpec processing(int mask, String callbackBase) {
+        return new EventSpec(
+                mask,
+                ET3_VETTING,
+                "ET3 Processing",
+                "ET3 Processing",
+                18,
+                "Accepted",
+                "*",
+                "managingOffice !=\"Unassigned\"",
+                "Y",
+                "N",
+                "Y",
+                false,
+                null,
+                callbackBase + "/et3Vetting/aboutToStart",
+                callbackBase + "/et3Vetting/aboutToSubmit",
+                callbackBase + "/et3Vetting/processingComplete",
+                null);
+    }
+
+    private static EventSpec notification(int mask, String callbackBase) {
+        return new EventSpec(
+                mask,
+                ET3_NOTIFICATION,
+                "ET3 notification",
+                "ET3 notification",
+                19,
+                "Accepted",
+                "*",
+                null,
+                "N",
+                "N",
+                null,
+                false,
+                null,
+                callbackBase + "/et3Notification/aboutToStart",
+                callbackBase + "/et3Notification/aboutToSubmit",
+                callbackBase + "/et3Notification/submitted",
+                null);
+    }
 
     static void configureComplexTypeAccess(ConfigBuilder<CaseData, CaseState, SingleRole> builder) {
         Set<Permission> delete = Set.of(Permission.D);

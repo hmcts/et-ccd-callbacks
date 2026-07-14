@@ -148,6 +148,13 @@ final class SingleDefinitionSupport {
                 SingleHearingDocumentsRows.COMPLEX_FIELDS,
                 SingleHearingDocumentsRows.STANDALONE_COMPLEX_FIELDS,
                 SingleHearingDocumentsRows.EVENT_GRANTS);
+        configureEvents(
+                builder,
+                variant,
+                SingleCorrespondenceDocumentsRows.EVENTS,
+                SingleCorrespondenceDocumentsRows.EVENT_FIELDS,
+                SingleCorrespondenceDocumentsRows.COMPLEX_FIELDS,
+                SingleCorrespondenceDocumentsRows.EVENT_GRANTS);
     }
 
     private static Class<?> profile(Variant variant) {

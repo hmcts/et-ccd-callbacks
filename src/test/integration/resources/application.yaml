@@ -18,6 +18,9 @@ ccd:
   client:
     timeout: '60000'
   data-store-api-url: http://localhost:4452
+  data-store:
+    api:
+      url: http://localhost:4452
 
 document_management:
   ccdCaseDocument:
@@ -29,6 +32,7 @@ idam:
     # noinspection SpringBootApplicationYaml
     url: http://localhost:8080
     totp_secret: AAAAAAAAAAAAAAAC
+    secret: AAAAAAAAAAAAAAAC
     microservice: et_cos
   api:
     url: http://localhost:5000

@@ -31,6 +31,7 @@ idam:
   s2s-auth:
     url: ${SERVICE_AUTH_PROVIDER_URL:http://localhost:8489}
     totp_secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAC}
+    secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAC}
     microservice: et_cos
   client:
     scope: openid profile roles manage-user
@@ -49,6 +50,9 @@ ccd:
   client:
     timeout: 60000
   data-store-api-url: ${CCD_DATA_STORE_API_URL:http://localhost:4452}
+  data-store:
+    api:
+      url: ${CCD_DATA_STORE_API_URL:http://localhost:4452}
 
 core_case_data:
   api:

@@ -1,10 +1,8 @@
 package uk.gov.hmcts.et.common.model.generic;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Getter;
 import lombok.Setter;
-
 import uk.gov.hmcts.ccd.sdk.api.CCD;
 import uk.gov.hmcts.ccd.sdk.type.FieldType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -15,6 +13,10 @@ import uk.gov.hmcts.et.common.model.ccd.MultipleAccess;
 import uk.gov.hmcts.et.common.model.ccd.MultipleCftlibDefinition;
 import uk.gov.hmcts.et.common.model.ccd.ScotlandMultipleCftlibDefinition;
 import uk.gov.hmcts.et.common.model.ccd.ScotlandMultipleProdDefinition;
+import uk.gov.hmcts.et.common.model.ccd.EnglandWalesSingleDefinition;
+import uk.gov.hmcts.et.common.model.ccd.ScotlandSingleDefinition;
+import uk.gov.hmcts.et.common.model.ccd.SingleAccess;
+import uk.gov.hmcts.et.common.model.ccd.SingleDefinition;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLocation;
@@ -67,7 +69,8 @@ public class BaseCaseData {
                 EnglandWalesMultipleCftlibDefinition.class,
                 ScotlandMultipleCftlibDefinition.class,
                 EnglandWalesMultipleProdDefinition.class,
-                ScotlandMultipleProdDefinition.class
+                ScotlandMultipleProdDefinition.class,
+                SingleDefinition.class
             })
     private String referredBy;
 
@@ -77,7 +80,8 @@ public class BaseCaseData {
                 EnglandWalesMultipleCftlibDefinition.class,
                 ScotlandMultipleCftlibDefinition.class,
                 EnglandWalesMultipleProdDefinition.class,
-                ScotlandMultipleProdDefinition.class
+                ScotlandMultipleProdDefinition.class,
+                SingleDefinition.class
             })
     private String referralDate;
 
@@ -88,7 +92,8 @@ public class BaseCaseData {
                 EnglandWalesMultipleCftlibDefinition.class,
                 ScotlandMultipleCftlibDefinition.class,
                 EnglandWalesMultipleProdDefinition.class,
-                ScotlandMultipleProdDefinition.class
+                ScotlandMultipleProdDefinition.class,
+                SingleDefinition.class
             })
     private String updateReferralNumber;
 
@@ -158,8 +163,58 @@ public class BaseCaseData {
     private String closeReferralGeneralNotes;
 
     // Document collection
+    @CCD(
+            label = "Case documentation",
+            hint = "Upload documentation for the case",
+            typeOverride = FieldType.Collection,
+            typeParameterOverride = "DocumentUpload",
+            searchable = false,
+            access = SingleAccess.Access013.class,
+            includeInProfiles = EnglandWalesSingleDefinition.class
+    )
+    @CCD(
+            label = "Case documentation",
+            hint = "Upload documentation for the case",
+            typeOverride = FieldType.Collection,
+            typeParameterOverride = "DocumentUpload",
+            searchable = false,
+            access = SingleAccess.Access014.class,
+            includeInProfiles = ScotlandSingleDefinition.class
+    )
     private List<DocumentTypeItem> documentCollection;
+    @CCD(
+            label = "Claimant Documents",
+            typeOverride = FieldType.Collection,
+            typeParameterOverride = "DocumentUpload",
+            searchable = false,
+            access = SingleAccess.Access056.class,
+            includeInProfiles = EnglandWalesSingleDefinition.class
+    )
+    @CCD(
+            label = "Claimant Documents",
+            typeOverride = FieldType.Collection,
+            typeParameterOverride = "DocumentUpload",
+            searchable = false,
+            access = SingleAccess.Access093.class,
+            includeInProfiles = ScotlandSingleDefinition.class
+    )
     private List<DocumentTypeItem> claimantDocumentCollection;
+    @CCD(
+            label = "Documents",
+            typeOverride = FieldType.Collection,
+            typeParameterOverride = "DocumentUpload",
+            searchable = false,
+            access = SingleAccess.Access188.class,
+            includeInProfiles = EnglandWalesSingleDefinition.class
+    )
+    @CCD(
+            label = "Documents",
+            typeOverride = FieldType.Collection,
+            typeParameterOverride = "DocumentUpload",
+            searchable = false,
+            access = SingleAccess.Access086.class,
+            includeInProfiles = ScotlandSingleDefinition.class
+    )
     private List<DocumentTypeItem> legalrepDocumentCollection;
 
     @CCD(
@@ -173,6 +228,18 @@ public class BaseCaseData {
             access = MultipleAccess.Access37.class,
             includeInProfiles = {ScotlandMultipleCftlibDefinition.class})
     @JsonProperty("digitalCaseFile")
+    @CCD(
+            label = "Digital Case File",
+            typeNameOverride = "DigitalCaseFile",
+            access = SingleAccess.Access145.class,
+            includeInProfiles = EnglandWalesSingleDefinition.class
+    )
+    @CCD(
+            label = "Digital Case File",
+            typeNameOverride = "DigitalCaseFile",
+            access = SingleAccess.Access176.class,
+            includeInProfiles = ScotlandSingleDefinition.class
+    )
     private DigitalCaseFileType digitalCaseFile;
 
     @CCD(
@@ -188,6 +255,22 @@ public class BaseCaseData {
             access = MultipleAccess.Access37.class,
             includeInProfiles = {ScotlandMultipleCftlibDefinition.class})
     @JsonProperty("bundleConfiguration")
+    @CCD(
+            label = "Digital Case File configuration",
+            typeOverride = FieldType.FixedList,
+            typeParameterOverride = "configurationFiles",
+            searchable = false,
+            access = SingleAccess.Access145.class,
+            includeInProfiles = EnglandWalesSingleDefinition.class
+    )
+    @CCD(
+            label = "Digital Case File configuration",
+            typeOverride = FieldType.FixedList,
+            typeParameterOverride = "configurationFiles",
+            searchable = false,
+            access = SingleAccess.Access176.class,
+            includeInProfiles = ScotlandSingleDefinition.class
+    )
     private String bundleConfiguration;
 
     @CCD(
@@ -205,6 +288,22 @@ public class BaseCaseData {
             access = MultipleAccess.Access37.class,
             includeInProfiles = {ScotlandMultipleCftlibDefinition.class})
     @JsonProperty("caseBundles")
+    @CCD(
+            label = "DCF",
+            hint = "DCF Collection",
+            typeOverride = FieldType.Collection,
+            typeParameterOverride = "Bundle",
+            access = SingleAccess.Access145.class,
+            includeInProfiles = EnglandWalesSingleDefinition.class
+    )
+    @CCD(
+            label = "DCF",
+            hint = "DCF Collection",
+            typeOverride = FieldType.Collection,
+            typeParameterOverride = "Bundle",
+            access = SingleAccess.Access176.class,
+            includeInProfiles = ScotlandSingleDefinition.class
+    )
     private List<Bundle> caseBundles;
 
     @CCD(
@@ -217,6 +316,20 @@ public class BaseCaseData {
             typeOverride = FieldType.Date,
             access = MultipleAccess.Access29.class,
             includeInProfiles = {ScotlandMultipleCftlibDefinition.class})
+    @CCD(
+            label = "Next Listed Date",
+            typeOverride = FieldType.Date,
+            searchable = false,
+            access = SingleAccess.Access135.class,
+            includeInProfiles = EnglandWalesSingleDefinition.class
+    )
+    @CCD(
+            label = "Next Listed Date",
+            typeOverride = FieldType.Date,
+            searchable = false,
+            access = SingleAccess.Access165.class,
+            includeInProfiles = ScotlandSingleDefinition.class
+    )
     private String nextListedDate;
 
     @CCD(
@@ -225,6 +338,20 @@ public class BaseCaseData {
             access = MultipleAccess.Access54.class,
             includeInProfiles = MultipleCftlibDefinition.class)
     @JsonProperty("caseManagementLocation")
+    @CCD(
+            label = " ",
+            typeNameOverride = "CaseLocation",
+            includeSearchable = true,
+            access = SingleAccess.Access196.class,
+            includeInProfiles = EnglandWalesSingleDefinition.class
+    )
+    @CCD(
+            label = " ",
+            typeNameOverride = "CaseLocation",
+            includeSearchable = true,
+            access = SingleAccess.Access196.class,
+            includeInProfiles = ScotlandSingleDefinition.class
+    )
     private CaseLocation caseManagementLocation;
 
     @CCD(

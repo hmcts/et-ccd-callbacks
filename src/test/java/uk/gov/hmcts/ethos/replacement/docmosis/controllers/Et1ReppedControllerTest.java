@@ -43,12 +43,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
@@ -83,7 +83,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstan
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.TRIAGE_ERROR_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_DATA_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
 import static uk.gov.hmcts.ethos.utils.CaseDataBuilder.createGenericAddress;
 
 @ExtendWith(SpringExtension.class)
@@ -1160,7 +1160,7 @@ class Et1ReppedControllerTest {
 
         // when representative contact change option is set to use my hmcts details
         ccdRequestWithClaimantRepresentative.getCaseDetails().getCaseData().setRepresentativeContactChangeOption(
-                REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS
+                REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS
         );
         doNothing().when(et1ReppedService).setMyHmctsOrganisationAddress(AUTH_TOKEN,
                 ccdRequestWithClaimantRepresentative.getCaseDetails().getCaseData());
@@ -1180,7 +1180,7 @@ class Et1ReppedControllerTest {
     void theMidEventAmendClaimantRepresentativeContact_ThrowsException() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         ccdRequestWithClaimantRepresentative.getCaseDetails().getCaseData().setRepresentativeContactChangeOption(
-                REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS
+                REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS
         );
         doThrow(new GenericServiceException(ERROR_CASE_DATA_NOT_FOUND,
                 new Exception(ERROR_CASE_DATA_NOT_FOUND),

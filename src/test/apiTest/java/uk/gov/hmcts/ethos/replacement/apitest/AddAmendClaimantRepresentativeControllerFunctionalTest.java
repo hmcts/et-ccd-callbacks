@@ -36,6 +36,7 @@ public class AddAmendClaimantRepresentativeControllerFunctionalTest extends Base
     public void setUpCaseData() throws IOException {
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(CaseDataBuilder.builder().build())
+                .withCaseId("1234567890123456")
                 .build();
         final JSONObject createdCase = createSinglesCaseDataStore();
 

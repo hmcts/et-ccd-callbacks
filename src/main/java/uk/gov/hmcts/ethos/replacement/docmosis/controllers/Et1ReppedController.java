@@ -29,7 +29,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWork
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -721,7 +721,7 @@ public class Et1ReppedController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         try {
-            if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS
+            if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS
                     .equals(caseData.getRepresentativeContactChangeOption())) {
                 et1ReppedService.setMyHmctsOrganisationAddress(userToken, caseData);
             }

@@ -118,6 +118,10 @@ function aggregateGlobalRows (sheetName, contributions) {
 
   const result = [];
   byIdentity.forEach((owners, identity) => {
+    if (owners.size === 1) {
+      result.push(...owners.values().next().value);
+      return;
+    }
     const values = new Set();
     let representative;
     let occurrences = 0;

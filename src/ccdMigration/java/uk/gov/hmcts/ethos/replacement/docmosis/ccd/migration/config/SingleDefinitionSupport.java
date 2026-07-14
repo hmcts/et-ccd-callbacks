@@ -169,6 +169,14 @@ final class SingleDefinitionSupport {
                 SingleReferralLifecycleRows.EVENT_FIELDS,
                 SingleReferralLifecycleRows.COMPLEX_FIELDS,
                 SingleReferralLifecycleRows.EVENT_GRANTS);
+        configureEvents(
+                builder,
+                variant,
+                SingleInitialConsiderationRows.EVENTS,
+                SingleInitialConsiderationRows.EVENT_FIELDS,
+                SingleInitialConsiderationRows.COMPLEX_FIELDS,
+                SingleInitialConsiderationRows.STANDALONE_COMPLEX_FIELDS,
+                SingleInitialConsiderationRows.EVENT_GRANTS);
     }
 
     private static Class<?> profile(Variant variant) {
@@ -362,6 +370,7 @@ final class SingleDefinitionSupport {
                             .context(context(spec.context()))
                             .page(spec.pageId());
             if (spec.pageOrder() != null) field.pageDisplayOrder(spec.pageOrder());
+            else field.omitPageDisplayOrder();
             if (spec.fieldOrder() != null) {
                 field.pageFieldDisplayOrder(spec.fieldOrder());
             } else {

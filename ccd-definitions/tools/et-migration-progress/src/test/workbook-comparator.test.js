@@ -224,6 +224,50 @@ describe('XLSX migration progress comparator', function () {
     await fs.rm(directory, { force: true, recursive: true });
   });
 
+  it('preserves distinct rows with one global identity from one case type', async function () {
+    const directory = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'et-migration-progress-')
+    );
+    const generated = path.join(directory, 'generated');
+    const staged = path.join(directory, 'staged');
+    const source = path.join(
+      generated,
+      'ET_Scotland',
+      'CaseEventToComplexTypes',
+      'initialConsideration.json'
+    );
+    const rows = [
+      {
+        ID: 'InitialConsideration',
+        CaseEventID: 'initialConsideration',
+        CaseFieldID: 'hearingAnswers',
+        ListElementCode: 'details',
+        FieldDisplayOrder: 2,
+      },
+      {
+        ID: 'InitialConsideration',
+        CaseEventID: 'initialConsideration',
+        CaseFieldID: 'hearingAnswers',
+        ListElementCode: 'details',
+        FieldDisplayOrder: 7,
+      },
+    ];
+    await fs.mkdir(path.dirname(source), { recursive: true });
+    await fs.writeFile(source, JSON.stringify(rows));
+
+    await stageJavaDefinitions(generated, staged);
+    const target = path.join(
+      staged,
+      'scotland',
+      'json',
+      'EventToComplexTypes',
+      '__jurisdiction-shared.json'
+    );
+
+    assert.deepStrictEqual(JSON.parse(await fs.readFile(target, 'utf8')), rows);
+    await fs.rm(directory, { force: true, recursive: true });
+  });
+
   it('rejects conflicting jurisdiction-global rows with their owners', async function () {
     const directory = await fs.mkdtemp(
       path.join(os.tmpdir(), 'et-migration-progress-')

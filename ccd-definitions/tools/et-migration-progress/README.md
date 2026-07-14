@@ -35,9 +35,10 @@ Leading-zero and non-numeric strings remain strings, and no other column receive
 legacy ET cell-type quirks without weakening row parity.
 
 `Jurisdiction`, `ComplexTypes`, `FixedLists` and event-to-complex sheets are jurisdiction-global. When multiple generated
-case types contribute the same row, staging emits it once. Duplicate occurrences within one owner remain duplicates;
-the maximum identical occurrence count across owners is retained. A shared identity with different row values fails
-staging and reports the contributing case types.
+case types contribute the same row, staging emits it once. Duplicate occurrences within one owner remain duplicates,
+including distinct legacy rows which share a sheet identity; the maximum identical occurrence count across owners is
+retained. A shared identity with different row values from multiple owners fails staging and reports the contributing
+case types.
 
 The report also records physical Java lines for ET and the SDK, split between main/generation code and verification code.
 The line counts are review signals rather than pass/fail limits.

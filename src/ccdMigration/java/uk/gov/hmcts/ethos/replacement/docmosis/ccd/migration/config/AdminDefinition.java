@@ -81,7 +81,7 @@ public class AdminDefinition implements CCDConfig<AdminData, AdminState, AdminRo
             .initialState(AdminState.Open)
             .name("Create Admin Case")
             .displayOrder(1)
-            .endButtonLabel("")
+            .omitEndButtonLabel()
             .omitShowSummary()
             .omitShowEventNotes()
             .omitPublish()

@@ -3,6 +3,7 @@ const fs = require('fs/promises');
 const os = require('os');
 const path = require('path');
 const { describe, it } = require('node:test');
+const XLSX = require('xlsx');
 const XlsxPopulate = require('xlsx-populate');
 
 const {
@@ -11,6 +12,7 @@ const {
   validateJavaInput,
 } = require('../progress');
 const { compareWorkbooks, readWorkbook } = require('../workbook-comparator');
+const { workbookToSheets } = require('../workbook-comparator');
 
 function workbook (sheetName, headers, rows) {
   return {
@@ -88,6 +90,43 @@ describe('XLSX migration progress comparator', function () {
     assert.strictEqual(result.remaining, 2);
   });
 
+  it('normalises canonical integer strings only in CCD integer columns', function () {
+    const parsed = workbookToSheets({
+      SheetNames: ['CaseEventToFields'],
+      Sheets: {
+        CaseEventToFields: XLSX.utils.aoa_to_sheet([
+          [],
+          [],
+          ['PageID', 'DisplayOrder', 'PageFieldDisplayOrder', 'Label'],
+          ['1', '2', '3', '01'],
+        ]),
+      },
+    }).CaseEventToFields.rows[0];
+
+    assert.deepStrictEqual(parsed, {
+      DisplayOrder: 2,
+      Label: '01',
+      PageFieldDisplayOrder: '3',
+      PageID: 1,
+    });
+  });
+
+  it('does not normalise non-canonical integer strings', function () {
+    const parsed = workbookToSheets({
+      SheetNames: ['SearchResultFields'],
+      Sheets: {
+        SearchResultFields: XLSX.utils.aoa_to_sheet([
+          [],
+          [],
+          ['DisplayOrder', 'PageID'],
+          ['01', 'one'],
+        ]),
+      },
+    }).SearchResultFields.rows[0];
+
+    assert.deepStrictEqual(parsed, { DisplayOrder: '01', PageID: 'one' });
+  });
+
   it('clears seeded template data without removing the CCD headers', async function () {
     const directory = await fs.mkdtemp(
       path.join(os.tmpdir(), 'et-migration-progress-')
@@ -131,10 +170,63 @@ describe('XLSX migration progress comparator', function () {
       'england-wales',
       'json',
       'EventToComplexTypes',
-      'ET_EnglandWales--CaseEventToComplexTypes--event.json'
+      '__jurisdiction-shared.json'
     );
 
     assert.strictEqual(await fs.readFile(target, 'utf8'), '[]\n');
+    await fs.rm(directory, { force: true, recursive: true });
+  });
+
+  it('coalesces identical jurisdiction-global rows across case types', async function () {
+    const directory = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'et-migration-progress-')
+    );
+    const generated = path.join(directory, 'generated');
+    const staged = path.join(directory, 'staged');
+    const shared = [
+      { ID: 'ImportFile', ListElementCode: 'file', FieldType: 'Document' },
+    ];
+    for (const caseType of ['ET_Admin', 'Pre_Hearing_Deposit']) {
+      const source = path.join(generated, caseType, 'ComplexTypes', 'ImportFile.json');
+      await fs.mkdir(path.dirname(source), { recursive: true });
+      await fs.writeFile(source, JSON.stringify(shared));
+    }
+
+    await stageJavaDefinitions(generated, staged);
+    const target = path.join(
+      staged,
+      'admin',
+      'json',
+      'ComplexTypes',
+      '__jurisdiction-shared.json'
+    );
+
+    assert.deepStrictEqual(JSON.parse(await fs.readFile(target, 'utf8')), shared);
+    await fs.rm(directory, { force: true, recursive: true });
+  });
+
+  it('rejects conflicting jurisdiction-global rows with their owners', async function () {
+    const directory = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'et-migration-progress-')
+    );
+    const generated = path.join(directory, 'generated');
+    const staged = path.join(directory, 'staged');
+    const definitions = [
+      ['ET_Admin', 'Document'],
+      ['Pre_Hearing_Deposit', 'Text'],
+    ];
+    for (const [caseType, fieldType] of definitions) {
+      const source = path.join(generated, caseType, 'ComplexTypes', 'ImportFile.json');
+      await fs.mkdir(path.dirname(source), { recursive: true });
+      await fs.writeFile(source, JSON.stringify([
+        { ID: 'ImportFile', ListElementCode: 'file', FieldType: fieldType },
+      ]));
+    }
+
+    await assert.rejects(
+      stageJavaDefinitions(generated, staged),
+      /Conflicting generated ComplexTypes rows.*ET_Admin, Pre_Hearing_Deposit/
+    );
     await fs.rm(directory, { force: true, recursive: true });
   });
 

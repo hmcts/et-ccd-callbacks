@@ -50,6 +50,14 @@ const SHEET_ALIASES = {
   },
 };
 
+const GLOBAL_SHEETS = new Set([
+  'CaseEventToComplexTypes',
+  'ComplexTypes',
+  'EventToComplexTypes',
+  'FixedLists',
+  'Jurisdiction',
+]);
+
 async function listFiles (root, predicate = () => true) {
   try {
     const entries = await fs.readdir(root, { withFileTypes: true });
@@ -80,6 +88,56 @@ function aliasedSheetName (jurisdiction, sheetName) {
   return (SHEET_ALIASES[jurisdiction] || {})[sheetName] || sheetName;
 }
 
+function globalIdentity (sheetName, row) {
+  if (sheetName === 'Jurisdiction') {
+    return stableStringify([row.ID]);
+  }
+  if (sheetName === 'ComplexTypes' || sheetName === 'FixedLists' || sheetName.endsWith(' Scrubbed')) {
+    return stableStringify([row.ID, row.ListElementCode]);
+  }
+  return stableStringify([
+    row.ID,
+    row.CaseEventID,
+    row.CaseFieldID,
+    row.ListElementCode,
+  ]);
+}
+
+function aggregateGlobalRows (sheetName, contributions) {
+  const byIdentity = new Map();
+  contributions.forEach(({ owner, rows }) => {
+    rows.forEach((row) => {
+      const identity = globalIdentity(sheetName, row);
+      const group = byIdentity.get(identity) || new Map();
+      const ownerRows = group.get(owner) || [];
+      ownerRows.push(row);
+      group.set(owner, ownerRows);
+      byIdentity.set(identity, group);
+    });
+  });
+
+  const result = [];
+  byIdentity.forEach((owners, identity) => {
+    const values = new Set();
+    let representative;
+    let occurrences = 0;
+    owners.forEach((rows) => {
+      rows.forEach((row) => values.add(stableStringify(row)));
+      representative = representative || rows[0];
+      occurrences = Math.max(occurrences, rows.length);
+    });
+    if (values.size > 1) {
+      throw new Error(
+        `Conflicting generated ${sheetName} rows for ${identity} from ${Array.from(owners.keys()).join(', ')}`
+      );
+    }
+    for (let index = 0; index < occurrences; index++) {
+      result.push(representative);
+    }
+  });
+  return result;
+}
+
 async function stageJavaDefinitions (javaDefinitionsDir, destination) {
   await fs.rm(destination, { force: true, recursive: true });
   for (const jurisdiction of Object.keys(JURISDICTIONS)) {
@@ -97,6 +155,7 @@ async function stageJavaDefinitions (javaDefinitionsDir, destination) {
       throw error;
     });
 
+  const globalContributions = new Map();
   for (const entry of caseTypeDirectories.filter((candidate) =>
     candidate.isDirectory()
   )) {
@@ -114,6 +173,17 @@ async function stageJavaDefinitions (javaDefinitionsDir, destination) {
       const relativeFilename = path.relative(caseTypeRoot, filename);
       const sourceSheet = sheetNameFor(relativeFilename);
       const targetSheet = aliasedSheetName(jurisdiction, sourceSheet);
+      if (GLOBAL_SHEETS.has(sourceSheet)) {
+        const key = `${jurisdiction}\u0000${targetSheet}`;
+        const contributions = globalContributions.get(key) || [];
+        const rows = JSON.parse(await fs.readFile(filename, 'utf8'));
+        if (!Array.isArray(rows)) {
+          throw new Error(`Generated definition must be a JSON array: ${filename}`);
+        }
+        contributions.push({ owner: entry.name, rows });
+        globalContributions.set(key, contributions);
+        continue;
+      }
       const safeFilename = relativeFilename.replaceAll(path.sep, '--');
       const target = path.join(
         destination,
@@ -125,6 +195,20 @@ async function stageJavaDefinitions (javaDefinitionsDir, destination) {
       await fs.mkdir(path.dirname(target), { recursive: true });
       await fs.copyFile(filename, target);
     }
+  }
+
+  for (const [key, contributions] of globalContributions) {
+    const [jurisdiction, targetSheet] = key.split('\u0000');
+    const target = path.join(
+      destination,
+      jurisdiction,
+      'json',
+      targetSheet,
+      '__jurisdiction-shared.json'
+    );
+    await fs.mkdir(path.dirname(target), { recursive: true });
+    const rows = aggregateGlobalRows(targetSheet, contributions);
+    await fs.writeFile(target, `${JSON.stringify(rows, null, 2)}\n`);
   }
 }
 

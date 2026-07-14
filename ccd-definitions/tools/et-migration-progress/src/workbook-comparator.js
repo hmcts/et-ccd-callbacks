@@ -93,12 +93,18 @@ const IDENTITY_COLUMNS = {
   ],
 };
 
-function normaliseValue (value) {
+const INTEGER_COLUMNS = new Set(['PageID', 'DisplayOrder']);
+
+function normaliseValue (column, value) {
   if (value instanceof Date) {
     return value.toISOString();
   }
   if (typeof value === 'string') {
-    return value.replace(/\r\n/g, '\n');
+    const lineNormalised = value.replace(/\r\n/g, '\n');
+    if (INTEGER_COLUMNS.has(column) && /^(0|[1-9]\d*)$/.test(lineNormalised)) {
+      return Number(lineNormalised);
+    }
+    return lineNormalised;
   }
   return value;
 }
@@ -107,7 +113,7 @@ function normaliseRow (row) {
   return Object.keys(row)
     .sort()
     .reduce((result, key) => {
-      const value = normaliseValue(row[key]);
+      const value = normaliseValue(key, row[key]);
       if (value !== null && value !== undefined && value !== '') {
         result[key] = value;
       }

@@ -19,7 +19,8 @@ The Gradle tasks perform the following steps:
 
 1. compile the generation-only `ccdMigration` source set;
 2. generate Java CCD definition JSON into `build/ccd-migration/java-definitions`;
-3. stage the case-type output into the three ET jurisdiction workbook layouts;
+3. stage the case-type output into the three ET jurisdiction workbook layouts, coalescing identical jurisdiction-global
+   rows and rejecting conflicting owners;
 4. create `cftlib` and `prod` golden workbooks with ET's existing definition processor;
 5. create Java-only workbooks using copies of the templates with all seeded definition rows removed;
 6. compare each sheet as a multiset of canonical row values; and
@@ -28,6 +29,15 @@ The Gradle tasks perform the following steps:
 A missing row, unexpected row, or row whose non-identity values differ counts as one remaining difference. Changes to
 external CCD identities count as a missing row and an unexpected row. Duplicate row occurrences are retained and counted
 independently. Completion is measured against the immutable initial `remainingDifferences` baseline.
+
+Workbook comparison normalises canonical unsigned-integer strings only in the CCD `PageID` and `DisplayOrder` columns.
+Leading-zero and non-numeric strings remain strings, and no other column receives numeric coercion. This covers two
+legacy ET cell-type quirks without weakening row parity.
+
+`Jurisdiction`, `ComplexTypes`, `FixedLists` and event-to-complex sheets are jurisdiction-global. When multiple generated
+case types contribute the same row, staging emits it once. Duplicate occurrences within one owner remain duplicates;
+the maximum identical occurrence count across owners is retained. A shared identity with different row values fails
+staging and reports the contributing case types.
 
 The report also records physical Java lines for ET and the SDK, split between main/generation code and verification code.
 The line counts are review signals rather than pass/fail limits.

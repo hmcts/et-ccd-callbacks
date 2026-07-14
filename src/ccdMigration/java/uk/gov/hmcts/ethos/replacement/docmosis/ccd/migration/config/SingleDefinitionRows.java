@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.ccd.migration.config;
 
+import uk.gov.hmcts.ccd.sdk.api.TypedPropertyGetter;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SingleRole;
 
 @SuppressWarnings({
@@ -112,6 +114,12 @@ final class SingleDefinitionRows {
             String retainHidden,
             String defaultValue,
             String publish) {}
+
+    record StandaloneComplexSpec(
+            int mask,
+            String eventId,
+            TypedPropertyGetter<CaseData, ?> getter,
+            Class<?> complexType) {}
 
     static final RoleSpec[] APPLICABLE_ROLES = {
         new RoleSpec(15, SingleRole.CASEWORKER_ET_PCQEXTRACTOR),

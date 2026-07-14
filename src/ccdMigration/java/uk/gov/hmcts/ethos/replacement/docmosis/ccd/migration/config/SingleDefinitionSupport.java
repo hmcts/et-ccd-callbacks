@@ -23,10 +23,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.ccd.migration.config.SingleDefini
 import uk.gov.hmcts.ethos.replacement.docmosis.ccd.migration.config.SingleDefinitionRows.EventSpec;
 import uk.gov.hmcts.ethos.replacement.docmosis.ccd.migration.config.SingleDefinitionRows.GrantSpec;
 import uk.gov.hmcts.ethos.replacement.docmosis.ccd.migration.config.SingleDefinitionRows.RoleSpec;
+import uk.gov.hmcts.ethos.replacement.docmosis.ccd.migration.config.SingleDefinitionRows.StandaloneComplexSpec;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.CaseState;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.ccd.migration.config.SingleDefinitionRows.ACCESS_PROFILES;
@@ -138,6 +140,14 @@ final class SingleDefinitionSupport {
                 SingleHearingManagementRows.COMPLEX_FIELDS,
                 SingleHearingManagementRows.EVENT_GRANTS);
         SingleHearingManagementRows.configureComplexTypeAccess(builder, variant);
+        configureEvents(
+                builder,
+                variant,
+                SingleHearingDocumentsRows.EVENTS,
+                SingleHearingDocumentsRows.EVENT_FIELDS,
+                SingleHearingDocumentsRows.COMPLEX_FIELDS,
+                SingleHearingDocumentsRows.STANDALONE_COMPLEX_FIELDS,
+                SingleHearingDocumentsRows.EVENT_GRANTS);
     }
 
     private static Class<?> profile(Variant variant) {
@@ -216,6 +226,25 @@ final class SingleDefinitionSupport {
             EventFieldSpec[] eventFields,
             ComplexFieldSpec[] complexFields,
             GrantSpec... eventGrants) {
+        configureEvents(
+                builder,
+                variant,
+                events,
+                eventFields,
+                complexFields,
+                new StandaloneComplexSpec[0],
+                eventGrants);
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static void configureEvents(
+            ConfigBuilder<CaseData, CaseState, SingleRole> builder,
+            Variant variant,
+            EventSpec[] events,
+            EventFieldSpec[] eventFields,
+            ComplexFieldSpec[] complexFields,
+            StandaloneComplexSpec[] standaloneComplexFields,
+            GrantSpec... eventGrants) {
         for (EventSpec spec : events) {
             if (!variant.includes(spec.mask())) continue;
             Event.EventBuilder<CaseData, SingleRole, CaseState> event = event(builder, spec);
@@ -230,7 +259,13 @@ final class SingleDefinitionSupport {
                 if (variant.includes(grant.mask()) && grant.id().equals(spec.id())) {
                     event.grant(permissions(grant.crud()), grant.role());
                 }
-            configureEventFields(event, spec.id(), variant, eventFields, complexFields);
+            configureEventFields(
+                    event,
+                    spec.id(),
+                    variant,
+                    eventFields,
+                    complexFields,
+                    standaloneComplexFields);
         }
     }
 
@@ -296,7 +331,8 @@ final class SingleDefinitionSupport {
             String eventId,
             Variant variant,
             EventFieldSpec[] eventFields,
-            ComplexFieldSpec... complexFields) {
+            ComplexFieldSpec[] complexFields,
+            StandaloneComplexSpec... standaloneComplexFields) {
         FieldCollection.FieldCollectionBuilder fields = event.fields();
         for (EventFieldSpec spec : eventFields) {
             if (!variant.includes(spec.mask()) || !spec.eventId().equals(eventId)) continue;
@@ -327,6 +363,16 @@ final class SingleDefinitionSupport {
             }
             configureComplexFields(field, eventId, spec.fieldId(), variant, complexFields);
         }
+        for (StandaloneComplexSpec spec : standaloneComplexFields) {
+            if (!variant.includes(spec.mask()) || !spec.eventId().equals(eventId)) continue;
+            var complex = fields.complexWithoutEventField(spec.getter(), spec.complexType());
+            configureComplexFields(
+                    complex,
+                    eventId,
+                    complex.build().getRootFieldname(),
+                    variant,
+                    complexFields);
+        }
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -347,6 +393,31 @@ final class SingleDefinitionSupport {
         if (specs.isEmpty()) return;
         FieldCollection.FieldCollectionBuilder complex =
                 root.complex(SingleComplexTypes.BundleType.class);
+        configureComplexFields(complex, specs);
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static void configureComplexFields(
+            FieldCollection.FieldCollectionBuilder complex,
+            String eventId,
+            String caseFieldId,
+            Variant variant,
+            ComplexFieldSpec... complexFields) {
+        var specs =
+                Arrays.stream(complexFields)
+                        .filter(
+                                spec ->
+                                        variant.includes(spec.mask())
+                                                && spec.eventId().equals(eventId)
+                                                && spec.caseFieldId().equals(caseFieldId))
+                        .toList();
+        configureComplexFields(complex, specs);
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static void configureComplexFields(
+            FieldCollection.FieldCollectionBuilder complex, List<ComplexFieldSpec> specs) {
+        if (specs.isEmpty()) return;
         if (specs.getFirst().rowId() != null)
             complex.eventToComplexTypeId(specs.getFirst().rowId());
         for (ComplexFieldSpec spec : specs) {

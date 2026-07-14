@@ -110,7 +110,7 @@ et-sya:
           - launch-darkly-sdk-key
     environment:
       REDIS_HOST: et-session-storage-aat.redis.cache.windows.net
-      ET_SYA_API_HOST: https://et-sya-api-${SERVICE_FQDN}
+      ET_SYA_API_HOST: https://${SERVICE_FQDN}
       PCQ_ENABLED: true
 
 et-syr:
@@ -136,11 +136,11 @@ et-syr:
           - launch-darkly-sdk-key
     environment:
       REDIS_HOST: et-session-storage-aat.redis.cache.windows.net
-      ET_SYA_API_HOST: https://et-sya-api-${SERVICE_FQDN}
+      ET_SYA_API_HOST: https://${SERVICE_FQDN}
       PCQ_ENABLED: true
 
 et-sya-api:
-  enabled: true
+  enabled: false
   java:
     imagePullPolicy: Always
     image: hmctsprod.azurecr.io/et/sya-api:latest

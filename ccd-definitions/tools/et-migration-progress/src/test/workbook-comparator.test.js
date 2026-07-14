@@ -8,6 +8,7 @@ const XlsxPopulate = require('xlsx-populate');
 
 const {
   clearTemplateData,
+  resolveJavaDefinitionsDir,
   stageJavaDefinitions,
   validateJavaInput,
 } = require('../progress');
@@ -174,6 +175,24 @@ describe('XLSX migration progress comparator', function () {
     );
 
     assert.strictEqual(await fs.readFile(target, 'utf8'), '[]\n');
+    await fs.rm(directory, { force: true, recursive: true });
+  });
+
+  it('selects environment-specific Java definitions with a flat-directory fallback', async function () {
+    const directory = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'et-migration-progress-')
+    );
+    const cftlib = path.join(directory, 'cftlib');
+    await fs.mkdir(cftlib);
+
+    assert.strictEqual(
+      await resolveJavaDefinitionsDir(directory, 'cftlib'),
+      cftlib
+    );
+    assert.strictEqual(
+      await resolveJavaDefinitionsDir(directory, 'prod'),
+      directory
+    );
     await fs.rm(directory, { force: true, recursive: true });
   });
 

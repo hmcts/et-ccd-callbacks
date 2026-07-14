@@ -223,13 +223,13 @@
           "england-wales": {
             "totals": {
               "goldenRows": 13606,
-              "javaRows": 451,
-              "exact": 451,
+              "javaRows": 2271,
+              "exact": 2271,
               "changed": 0,
               "changedCells": 0,
-              "missing": 13155,
+              "missing": 11335,
               "unexpected": 0,
-              "remaining": 13155
+              "remaining": 11335
             },
             "sheets": {
               "SearchCriteria": {
@@ -264,73 +264,73 @@
               },
               "CaseType": {
                 "goldenRows": 3,
-                "javaRows": 1,
-                "exact": 1,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 2,
-                "unexpected": 0,
-                "remaining": 2
-              },
-              "State": {
-                "goldenRows": 15,
                 "javaRows": 2,
                 "exact": 2,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 13,
+                "missing": 1,
                 "unexpected": 0,
-                "remaining": 13
+                "remaining": 1
               },
-              "CaseTypeTab": {
-                "goldenRows": 289,
-                "javaRows": 37,
-                "exact": 37,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 252,
-                "unexpected": 0,
-                "remaining": 252
-              },
-              "CaseEvent": {
-                "goldenRows": 180,
+              "State": {
+                "goldenRows": 15,
                 "javaRows": 7,
                 "exact": 7,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 173,
+                "missing": 8,
                 "unexpected": 0,
-                "remaining": 173
+                "remaining": 8
+              },
+              "CaseTypeTab": {
+                "goldenRows": 289,
+                "javaRows": 69,
+                "exact": 69,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 220,
+                "unexpected": 0,
+                "remaining": 220
+              },
+              "CaseEvent": {
+                "goldenRows": 180,
+                "javaRows": 34,
+                "exact": 34,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 146,
+                "unexpected": 0,
+                "remaining": 146
               },
               "CaseEventToFields": {
                 "goldenRows": 1197,
-                "javaRows": 21,
-                "exact": 21,
+                "javaRows": 169,
+                "exact": 169,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 1176,
+                "missing": 1028,
                 "unexpected": 0,
-                "remaining": 1176
+                "remaining": 1028
               },
               "CaseField": {
                 "goldenRows": 1185,
-                "javaRows": 30,
-                "exact": 30,
+                "javaRows": 177,
+                "exact": 177,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 1155,
+                "missing": 1008,
                 "unexpected": 0,
-                "remaining": 1155
+                "remaining": 1008
               },
               "Categories": {
                 "goldenRows": 164,
-                "javaRows": 0,
-                "exact": 0,
+                "javaRows": 82,
+                "exact": 82,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 164,
+                "missing": 82,
                 "unexpected": 0,
-                "remaining": 164
+                "remaining": 82
               },
               "ChallengeQuestion": {
                 "goldenRows": 2,
@@ -344,83 +344,83 @@
               },
               "ComplexTypes": {
                 "goldenRows": 1200,
-                "javaRows": 187,
-                "exact": 187,
+                "javaRows": 367,
+                "exact": 367,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 1013,
+                "missing": 833,
                 "unexpected": 0,
-                "remaining": 1013
+                "remaining": 833
               },
               "EventToComplexTypes": {
                 "goldenRows": 1004,
-                "javaRows": 0,
-                "exact": 0,
+                "javaRows": 53,
+                "exact": 53,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 1004,
+                "missing": 951,
                 "unexpected": 0,
-                "remaining": 1004
+                "remaining": 951
               },
               "RoleToAccessProfiles": {
                 "goldenRows": 64,
+                "javaRows": 12,
+                "exact": 12,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 52,
+                "unexpected": 0,
+                "remaining": 52
+              },
+              "EnglandWales Scrubbed": {
+                "goldenRows": 1387,
+                "javaRows": 308,
+                "exact": 308,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 1079,
+                "unexpected": 0,
+                "remaining": 1079
+              },
+              "SearchInputFields": {
+                "goldenRows": 17,
+                "javaRows": 4,
+                "exact": 4,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 13,
+                "unexpected": 0,
+                "remaining": 13
+              },
+              "SearchResultFields": {
+                "goldenRows": 10,
+                "javaRows": 3,
+                "exact": 3,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 7,
+                "unexpected": 0,
+                "remaining": 7
+              },
+              "WorkBasketInputFields": {
+                "goldenRows": 13,
                 "javaRows": 5,
                 "exact": 5,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 59,
+                "missing": 8,
                 "unexpected": 0,
-                "remaining": 59
-              },
-              "EnglandWales Scrubbed": {
-                "goldenRows": 1387,
-                "javaRows": 36,
-                "exact": 36,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 1351,
-                "unexpected": 0,
-                "remaining": 1351
-              },
-              "SearchInputFields": {
-                "goldenRows": 17,
-                "javaRows": 1,
-                "exact": 1,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 16,
-                "unexpected": 0,
-                "remaining": 16
-              },
-              "SearchResultFields": {
-                "goldenRows": 10,
-                "javaRows": 1,
-                "exact": 1,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 9,
-                "unexpected": 0,
-                "remaining": 9
-              },
-              "WorkBasketInputFields": {
-                "goldenRows": 13,
-                "javaRows": 2,
-                "exact": 2,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 11,
-                "unexpected": 0,
-                "remaining": 11
+                "remaining": 8
               },
               "WorkBasketResultFields": {
                 "goldenRows": 12,
-                "javaRows": 2,
-                "exact": 2,
+                "javaRows": 5,
+                "exact": 5,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 10,
+                "missing": 7,
                 "unexpected": 0,
-                "remaining": 10
+                "remaining": 7
               },
               "SearchCaseResultFields": {
                 "goldenRows": 5,
@@ -434,13 +434,13 @@
               },
               "CaseRoles": {
                 "goldenRows": 15,
-                "javaRows": 0,
-                "exact": 0,
+                "javaRows": 2,
+                "exact": 2,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 15,
+                "missing": 13,
                 "unexpected": 0,
-                "remaining": 15
+                "remaining": 13
               },
               "AuthorisationComplexType": {
                 "goldenRows": 233,
@@ -454,56 +454,56 @@
               },
               "AuthorisationCaseType": {
                 "goldenRows": 36,
-                "javaRows": 5,
-                "exact": 5,
+                "javaRows": 11,
+                "exact": 11,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 31,
+                "missing": 25,
                 "unexpected": 0,
-                "remaining": 31
+                "remaining": 25
               },
               "AuthorisationCaseField": {
                 "goldenRows": 5752,
-                "javaRows": 90,
-                "exact": 90,
+                "javaRows": 822,
+                "exact": 822,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 5662,
+                "missing": 4930,
                 "unexpected": 0,
-                "remaining": 5662
+                "remaining": 4930
               },
               "AuthorisationCaseEvent": {
                 "goldenRows": 706,
-                "javaRows": 13,
-                "exact": 13,
+                "javaRows": 102,
+                "exact": 102,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 693,
+                "missing": 604,
                 "unexpected": 0,
-                "remaining": 693
+                "remaining": 604
               },
               "AuthorisationCaseState": {
                 "goldenRows": 112,
-                "javaRows": 10,
-                "exact": 10,
+                "javaRows": 36,
+                "exact": 36,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 102,
+                "missing": 76,
                 "unexpected": 0,
-                "remaining": 102
+                "remaining": 76
               }
             }
           },
           "scotland": {
             "totals": {
               "goldenRows": 13161,
-              "javaRows": 468,
-              "exact": 468,
+              "javaRows": 2285,
+              "exact": 2285,
               "changed": 0,
               "changedCells": 0,
-              "missing": 12693,
+              "missing": 10876,
               "unexpected": 0,
-              "remaining": 12693
+              "remaining": 10876
             },
             "sheets": {
               "SearchParty": {
@@ -528,13 +528,13 @@
               },
               "CaseRoles": {
                 "goldenRows": 15,
-                "javaRows": 0,
-                "exact": 0,
+                "javaRows": 2,
+                "exact": 2,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 15,
+                "missing": 13,
                 "unexpected": 0,
-                "remaining": 15
+                "remaining": 13
               },
               "Jurisdiction": {
                 "goldenRows": 1,
@@ -548,73 +548,73 @@
               },
               "CaseType": {
                 "goldenRows": 3,
-                "javaRows": 1,
-                "exact": 1,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 2,
-                "unexpected": 0,
-                "remaining": 2
-              },
-              "State": {
-                "goldenRows": 15,
                 "javaRows": 2,
                 "exact": 2,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 13,
+                "missing": 1,
                 "unexpected": 0,
-                "remaining": 13
+                "remaining": 1
               },
-              "CaseTypeTab": {
-                "goldenRows": 281,
-                "javaRows": 30,
-                "exact": 30,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 251,
-                "unexpected": 0,
-                "remaining": 251
-              },
-              "CaseEvent": {
-                "goldenRows": 176,
+              "State": {
+                "goldenRows": 15,
                 "javaRows": 7,
                 "exact": 7,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 169,
+                "missing": 8,
                 "unexpected": 0,
-                "remaining": 169
+                "remaining": 8
+              },
+              "CaseTypeTab": {
+                "goldenRows": 281,
+                "javaRows": 62,
+                "exact": 62,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 219,
+                "unexpected": 0,
+                "remaining": 219
+              },
+              "CaseEvent": {
+                "goldenRows": 176,
+                "javaRows": 33,
+                "exact": 33,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 143,
+                "unexpected": 0,
+                "remaining": 143
               },
               "CaseEventToFields": {
                 "goldenRows": 1207,
-                "javaRows": 21,
-                "exact": 21,
+                "javaRows": 175,
+                "exact": 175,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 1186,
+                "missing": 1032,
                 "unexpected": 0,
-                "remaining": 1186
+                "remaining": 1032
               },
               "CaseField": {
                 "goldenRows": 1176,
-                "javaRows": 36,
-                "exact": 36,
+                "javaRows": 186,
+                "exact": 186,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 1140,
+                "missing": 990,
                 "unexpected": 0,
-                "remaining": 1140
+                "remaining": 990
               },
               "Categories": {
                 "goldenRows": 164,
-                "javaRows": 0,
-                "exact": 0,
+                "javaRows": 82,
+                "exact": 82,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 164,
+                "missing": 82,
                 "unexpected": 0,
-                "remaining": 164
+                "remaining": 82
               },
               "ChallengeQuestion": {
                 "goldenRows": 2,
@@ -628,83 +628,83 @@
               },
               "ComplexTypes": {
                 "goldenRows": 1232,
-                "javaRows": 191,
-                "exact": 191,
+                "javaRows": 371,
+                "exact": 371,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 1041,
+                "missing": 861,
                 "unexpected": 0,
-                "remaining": 1041
+                "remaining": 861
               },
               "EventToComplexTypes": {
                 "goldenRows": 1014,
-                "javaRows": 0,
-                "exact": 0,
+                "javaRows": 52,
+                "exact": 52,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 1014,
+                "missing": 962,
                 "unexpected": 0,
-                "remaining": 1014
+                "remaining": 962
               },
               "RoleToAccessProfiles": {
                 "goldenRows": 64,
-                "javaRows": 5,
-                "exact": 5,
+                "javaRows": 12,
+                "exact": 12,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 59,
+                "missing": 52,
                 "unexpected": 0,
-                "remaining": 59
+                "remaining": 52
               },
               "Scotland Scrubbed": {
                 "goldenRows": 1257,
-                "javaRows": 30,
-                "exact": 30,
+                "javaRows": 307,
+                "exact": 307,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 1227,
+                "missing": 950,
                 "unexpected": 0,
-                "remaining": 1227
+                "remaining": 950
               },
               "SearchInputFields": {
                 "goldenRows": 20,
-                "javaRows": 2,
-                "exact": 2,
+                "javaRows": 4,
+                "exact": 4,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 18,
+                "missing": 16,
                 "unexpected": 0,
-                "remaining": 18
+                "remaining": 16
               },
               "WorkBasketInputFields": {
                 "goldenRows": 11,
-                "javaRows": 2,
-                "exact": 2,
+                "javaRows": 4,
+                "exact": 4,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 9,
+                "missing": 7,
                 "unexpected": 0,
-                "remaining": 9
+                "remaining": 7
               },
               "SearchResultFields": {
                 "goldenRows": 10,
-                "javaRows": 2,
-                "exact": 2,
+                "javaRows": 4,
+                "exact": 4,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 8,
+                "missing": 6,
                 "unexpected": 0,
-                "remaining": 8
+                "remaining": 6
               },
               "WorkBasketResultFields": {
                 "goldenRows": 10,
-                "javaRows": 2,
-                "exact": 2,
+                "javaRows": 4,
+                "exact": 4,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 8,
+                "missing": 6,
                 "unexpected": 0,
-                "remaining": 8
+                "remaining": 6
               },
               "SearchCaseResultFields": {
                 "goldenRows": 5,
@@ -728,56 +728,56 @@
               },
               "AuthorisationCaseType": {
                 "goldenRows": 36,
-                "javaRows": 5,
-                "exact": 5,
+                "javaRows": 11,
+                "exact": 11,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 31,
+                "missing": 25,
                 "unexpected": 0,
-                "remaining": 31
+                "remaining": 25
               },
               "AuthorisationCaseField": {
                 "goldenRows": 5406,
-                "javaRows": 108,
-                "exact": 108,
+                "javaRows": 831,
+                "exact": 831,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 5298,
+                "missing": 4575,
                 "unexpected": 0,
-                "remaining": 5298
+                "remaining": 4575
               },
               "AuthorisationCaseEvent": {
                 "goldenRows": 704,
-                "javaRows": 13,
-                "exact": 13,
+                "javaRows": 99,
+                "exact": 99,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 691,
+                "missing": 605,
                 "unexpected": 0,
-                "remaining": 691
+                "remaining": 605
               },
               "AuthorisationCaseState": {
                 "goldenRows": 112,
-                "javaRows": 10,
-                "exact": 10,
+                "javaRows": 36,
+                "exact": 36,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 102,
+                "missing": 76,
                 "unexpected": 0,
-                "remaining": 102
+                "remaining": 76
               }
             }
           }
         },
         "totals": {
           "goldenRows": 27072,
-          "javaRows": 1224,
-          "exact": 1224,
+          "javaRows": 4861,
+          "exact": 4861,
           "changed": 0,
           "changedCells": 0,
-          "missing": 25848,
+          "missing": 22211,
           "unexpected": 0,
-          "remaining": 25848
+          "remaining": 22211
         }
       },
       "prod": {
@@ -989,13 +989,13 @@
           "england-wales": {
             "totals": {
               "goldenRows": 12638,
-              "javaRows": 451,
-              "exact": 451,
+              "javaRows": 1259,
+              "exact": 1259,
               "changed": 0,
               "changedCells": 0,
-              "missing": 12187,
+              "missing": 11379,
               "unexpected": 0,
-              "remaining": 12187
+              "remaining": 11379
             },
             "sheets": {
               "SearchCriteria": {
@@ -1030,73 +1030,73 @@
               },
               "CaseType": {
                 "goldenRows": 3,
-                "javaRows": 1,
-                "exact": 1,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 2,
-                "unexpected": 0,
-                "remaining": 2
-              },
-              "State": {
-                "goldenRows": 15,
                 "javaRows": 2,
                 "exact": 2,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 13,
+                "missing": 1,
                 "unexpected": 0,
-                "remaining": 13
+                "remaining": 1
               },
-              "CaseTypeTab": {
-                "goldenRows": 265,
-                "javaRows": 37,
-                "exact": 37,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 228,
-                "unexpected": 0,
-                "remaining": 228
-              },
-              "CaseEvent": {
-                "goldenRows": 164,
+              "State": {
+                "goldenRows": 15,
                 "javaRows": 7,
                 "exact": 7,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 157,
+                "missing": 8,
                 "unexpected": 0,
-                "remaining": 157
+                "remaining": 8
+              },
+              "CaseTypeTab": {
+                "goldenRows": 265,
+                "javaRows": 51,
+                "exact": 51,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 214,
+                "unexpected": 0,
+                "remaining": 214
+              },
+              "CaseEvent": {
+                "goldenRows": 164,
+                "javaRows": 23,
+                "exact": 23,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 141,
+                "unexpected": 0,
+                "remaining": 141
               },
               "CaseEventToFields": {
                 "goldenRows": 1108,
-                "javaRows": 21,
-                "exact": 21,
+                "javaRows": 88,
+                "exact": 88,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 1087,
+                "missing": 1020,
                 "unexpected": 0,
-                "remaining": 1087
+                "remaining": 1020
               },
               "CaseField": {
                 "goldenRows": 1077,
-                "javaRows": 30,
-                "exact": 30,
+                "javaRows": 86,
+                "exact": 86,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 1047,
+                "missing": 991,
                 "unexpected": 0,
-                "remaining": 1047
+                "remaining": 991
               },
               "Categories": {
                 "goldenRows": 164,
-                "javaRows": 0,
-                "exact": 0,
+                "javaRows": 82,
+                "exact": 82,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 164,
+                "missing": 82,
                 "unexpected": 0,
-                "remaining": 164
+                "remaining": 82
               },
               "ChallengeQuestion": {
                 "goldenRows": 2,
@@ -1110,83 +1110,83 @@
               },
               "ComplexTypes": {
                 "goldenRows": 1189,
-                "javaRows": 187,
-                "exact": 187,
+                "javaRows": 361,
+                "exact": 361,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 1002,
+                "missing": 828,
                 "unexpected": 0,
-                "remaining": 1002
+                "remaining": 828
               },
               "EventToComplexTypes": {
                 "goldenRows": 979,
-                "javaRows": 0,
-                "exact": 0,
+                "javaRows": 9,
+                "exact": 9,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 979,
+                "missing": 970,
                 "unexpected": 0,
-                "remaining": 979
+                "remaining": 970
               },
               "RoleToAccessProfiles": {
                 "goldenRows": 62,
+                "javaRows": 10,
+                "exact": 10,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 52,
+                "unexpected": 0,
+                "remaining": 52
+              },
+              "EnglandWales Scrubbed": {
+                "goldenRows": 1365,
+                "javaRows": 116,
+                "exact": 116,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 1249,
+                "unexpected": 0,
+                "remaining": 1249
+              },
+              "SearchInputFields": {
+                "goldenRows": 17,
+                "javaRows": 4,
+                "exact": 4,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 13,
+                "unexpected": 0,
+                "remaining": 13
+              },
+              "SearchResultFields": {
+                "goldenRows": 10,
+                "javaRows": 3,
+                "exact": 3,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 7,
+                "unexpected": 0,
+                "remaining": 7
+              },
+              "WorkBasketInputFields": {
+                "goldenRows": 13,
                 "javaRows": 5,
                 "exact": 5,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 57,
+                "missing": 8,
                 "unexpected": 0,
-                "remaining": 57
-              },
-              "EnglandWales Scrubbed": {
-                "goldenRows": 1365,
-                "javaRows": 36,
-                "exact": 36,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 1329,
-                "unexpected": 0,
-                "remaining": 1329
-              },
-              "SearchInputFields": {
-                "goldenRows": 17,
-                "javaRows": 1,
-                "exact": 1,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 16,
-                "unexpected": 0,
-                "remaining": 16
-              },
-              "SearchResultFields": {
-                "goldenRows": 10,
-                "javaRows": 1,
-                "exact": 1,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 9,
-                "unexpected": 0,
-                "remaining": 9
-              },
-              "WorkBasketInputFields": {
-                "goldenRows": 13,
-                "javaRows": 2,
-                "exact": 2,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 11,
-                "unexpected": 0,
-                "remaining": 11
+                "remaining": 8
               },
               "WorkBasketResultFields": {
                 "goldenRows": 12,
-                "javaRows": 2,
-                "exact": 2,
+                "javaRows": 5,
+                "exact": 5,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 10,
+                "missing": 7,
                 "unexpected": 0,
-                "remaining": 10
+                "remaining": 7
               },
               "SearchCaseResultFields": {
                 "goldenRows": 5,
@@ -1200,13 +1200,13 @@
               },
               "CaseRoles": {
                 "goldenRows": 15,
-                "javaRows": 0,
-                "exact": 0,
+                "javaRows": 2,
+                "exact": 2,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 15,
+                "missing": 13,
                 "unexpected": 0,
-                "remaining": 15
+                "remaining": 13
               },
               "AuthorisationComplexType": {
                 "goldenRows": 233,
@@ -1220,56 +1220,56 @@
               },
               "AuthorisationCaseType": {
                 "goldenRows": 35,
-                "javaRows": 5,
-                "exact": 5,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 30,
-                "unexpected": 0,
-                "remaining": 30
-              },
-              "AuthorisationCaseField": {
-                "goldenRows": 5146,
-                "javaRows": 90,
-                "exact": 90,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 5056,
-                "unexpected": 0,
-                "remaining": 5056
-              },
-              "AuthorisationCaseEvent": {
-                "goldenRows": 643,
-                "javaRows": 13,
-                "exact": 13,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 630,
-                "unexpected": 0,
-                "remaining": 630
-              },
-              "AuthorisationCaseState": {
-                "goldenRows": 111,
                 "javaRows": 10,
                 "exact": 10,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 101,
+                "missing": 25,
                 "unexpected": 0,
-                "remaining": 101
+                "remaining": 25
+              },
+              "AuthorisationCaseField": {
+                "goldenRows": 5146,
+                "javaRows": 306,
+                "exact": 306,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 4840,
+                "unexpected": 0,
+                "remaining": 4840
+              },
+              "AuthorisationCaseEvent": {
+                "goldenRows": 643,
+                "javaRows": 53,
+                "exact": 53,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 590,
+                "unexpected": 0,
+                "remaining": 590
+              },
+              "AuthorisationCaseState": {
+                "goldenRows": 111,
+                "javaRows": 35,
+                "exact": 35,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 76,
+                "unexpected": 0,
+                "remaining": 76
               }
             }
           },
           "scotland": {
             "totals": {
               "goldenRows": 12212,
-              "javaRows": 468,
-              "exact": 468,
+              "javaRows": 1294,
+              "exact": 1294,
               "changed": 0,
               "changedCells": 0,
-              "missing": 11744,
+              "missing": 10918,
               "unexpected": 0,
-              "remaining": 11744
+              "remaining": 10918
             },
             "sheets": {
               "SearchParty": {
@@ -1294,13 +1294,13 @@
               },
               "CaseRoles": {
                 "goldenRows": 15,
-                "javaRows": 0,
-                "exact": 0,
+                "javaRows": 2,
+                "exact": 2,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 15,
+                "missing": 13,
                 "unexpected": 0,
-                "remaining": 15
+                "remaining": 13
               },
               "Jurisdiction": {
                 "goldenRows": 1,
@@ -1314,73 +1314,73 @@
               },
               "CaseType": {
                 "goldenRows": 3,
-                "javaRows": 1,
-                "exact": 1,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 2,
-                "unexpected": 0,
-                "remaining": 2
-              },
-              "State": {
-                "goldenRows": 15,
                 "javaRows": 2,
                 "exact": 2,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 13,
+                "missing": 1,
                 "unexpected": 0,
-                "remaining": 13
+                "remaining": 1
               },
-              "CaseTypeTab": {
-                "goldenRows": 257,
-                "javaRows": 30,
-                "exact": 30,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 227,
-                "unexpected": 0,
-                "remaining": 227
-              },
-              "CaseEvent": {
-                "goldenRows": 161,
+              "State": {
+                "goldenRows": 15,
                 "javaRows": 7,
                 "exact": 7,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 154,
+                "missing": 8,
                 "unexpected": 0,
-                "remaining": 154
+                "remaining": 8
+              },
+              "CaseTypeTab": {
+                "goldenRows": 257,
+                "javaRows": 44,
+                "exact": 44,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 213,
+                "unexpected": 0,
+                "remaining": 213
+              },
+              "CaseEvent": {
+                "goldenRows": 161,
+                "javaRows": 23,
+                "exact": 23,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 138,
+                "unexpected": 0,
+                "remaining": 138
               },
               "CaseEventToFields": {
                 "goldenRows": 1118,
-                "javaRows": 21,
-                "exact": 21,
+                "javaRows": 94,
+                "exact": 94,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 1097,
+                "missing": 1024,
                 "unexpected": 0,
-                "remaining": 1097
+                "remaining": 1024
               },
               "CaseField": {
                 "goldenRows": 1068,
-                "javaRows": 36,
-                "exact": 36,
+                "javaRows": 95,
+                "exact": 95,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 1032,
+                "missing": 973,
                 "unexpected": 0,
-                "remaining": 1032
+                "remaining": 973
               },
               "Categories": {
                 "goldenRows": 164,
-                "javaRows": 0,
-                "exact": 0,
+                "javaRows": 82,
+                "exact": 82,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 164,
+                "missing": 82,
                 "unexpected": 0,
-                "remaining": 164
+                "remaining": 82
               },
               "ChallengeQuestion": {
                 "goldenRows": 2,
@@ -1394,83 +1394,83 @@
               },
               "ComplexTypes": {
                 "goldenRows": 1221,
-                "javaRows": 191,
-                "exact": 191,
+                "javaRows": 365,
+                "exact": 365,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 1030,
+                "missing": 856,
                 "unexpected": 0,
-                "remaining": 1030
+                "remaining": 856
               },
               "EventToComplexTypes": {
                 "goldenRows": 989,
-                "javaRows": 0,
-                "exact": 0,
+                "javaRows": 9,
+                "exact": 9,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 989,
+                "missing": 980,
                 "unexpected": 0,
-                "remaining": 989
+                "remaining": 980
               },
               "RoleToAccessProfiles": {
                 "goldenRows": 62,
-                "javaRows": 5,
-                "exact": 5,
+                "javaRows": 10,
+                "exact": 10,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 57,
+                "missing": 52,
                 "unexpected": 0,
-                "remaining": 57
+                "remaining": 52
               },
               "Scotland Scrubbed": {
                 "goldenRows": 1235,
-                "javaRows": 30,
-                "exact": 30,
+                "javaRows": 115,
+                "exact": 115,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 1205,
+                "missing": 1120,
                 "unexpected": 0,
-                "remaining": 1205
+                "remaining": 1120
               },
               "SearchInputFields": {
                 "goldenRows": 20,
-                "javaRows": 2,
-                "exact": 2,
+                "javaRows": 4,
+                "exact": 4,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 18,
+                "missing": 16,
                 "unexpected": 0,
-                "remaining": 18
+                "remaining": 16
               },
               "WorkBasketInputFields": {
                 "goldenRows": 11,
-                "javaRows": 2,
-                "exact": 2,
+                "javaRows": 4,
+                "exact": 4,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 9,
+                "missing": 7,
                 "unexpected": 0,
-                "remaining": 9
+                "remaining": 7
               },
               "SearchResultFields": {
                 "goldenRows": 10,
-                "javaRows": 2,
-                "exact": 2,
+                "javaRows": 4,
+                "exact": 4,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 8,
+                "missing": 6,
                 "unexpected": 0,
-                "remaining": 8
+                "remaining": 6
               },
               "WorkBasketResultFields": {
                 "goldenRows": 10,
-                "javaRows": 2,
-                "exact": 2,
+                "javaRows": 4,
+                "exact": 4,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 8,
+                "missing": 6,
                 "unexpected": 0,
-                "remaining": 8
+                "remaining": 6
               },
               "SearchCaseResultFields": {
                 "goldenRows": 5,
@@ -1494,92 +1494,92 @@
               },
               "AuthorisationCaseType": {
                 "goldenRows": 35,
-                "javaRows": 5,
-                "exact": 5,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 30,
-                "unexpected": 0,
-                "remaining": 30
-              },
-              "AuthorisationCaseField": {
-                "goldenRows": 4819,
-                "javaRows": 108,
-                "exact": 108,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 4711,
-                "unexpected": 0,
-                "remaining": 4711
-              },
-              "AuthorisationCaseEvent": {
-                "goldenRows": 640,
-                "javaRows": 13,
-                "exact": 13,
-                "changed": 0,
-                "changedCells": 0,
-                "missing": 627,
-                "unexpected": 0,
-                "remaining": 627
-              },
-              "AuthorisationCaseState": {
-                "goldenRows": 111,
                 "javaRows": 10,
                 "exact": 10,
                 "changed": 0,
                 "changedCells": 0,
-                "missing": 101,
+                "missing": 25,
                 "unexpected": 0,
-                "remaining": 101
+                "remaining": 25
+              },
+              "AuthorisationCaseField": {
+                "goldenRows": 4819,
+                "javaRows": 335,
+                "exact": 335,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 4484,
+                "unexpected": 0,
+                "remaining": 4484
+              },
+              "AuthorisationCaseEvent": {
+                "goldenRows": 640,
+                "javaRows": 49,
+                "exact": 49,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 591,
+                "unexpected": 0,
+                "remaining": 591
+              },
+              "AuthorisationCaseState": {
+                "goldenRows": 111,
+                "javaRows": 35,
+                "exact": 35,
+                "changed": 0,
+                "changedCells": 0,
+                "missing": 76,
+                "unexpected": 0,
+                "remaining": 76
               }
             }
           }
         },
         "totals": {
           "goldenRows": 25155,
-          "javaRows": 1224,
-          "exact": 1224,
+          "javaRows": 2858,
+          "exact": 2858,
           "changed": 0,
           "changedCells": 0,
-          "missing": 23931,
+          "missing": 22297,
           "unexpected": 0,
-          "remaining": 23931
+          "remaining": 22297
         }
       }
     },
     "totals": {
       "goldenRows": 52227,
-      "javaRows": 2448,
-      "exact": 2448,
+      "javaRows": 7719,
+      "exact": 7719,
       "changed": 0,
       "changedCells": 0,
-      "missing": 49779,
+      "missing": 44508,
       "unexpected": 0,
-      "remaining": 49779
+      "remaining": 44508
     },
     "completion": {
       "baselineRemainingDifferences": 52227,
-      "completedDifferences": 2448,
-      "percentage": 4.69
+      "completedDifferences": 7719,
+      "percentage": 14.78
     },
     "javaLines": {
       "current": {
-        "etMain": 119224,
+        "etMain": 133567,
         "etVerification": 132108,
-        "sdkMain": 16604,
-        "sdkVerification": 11997,
-        "mainTotal": 135828,
-        "verificationTotal": 144105
+        "sdkMain": 16881,
+        "sdkVerification": 12165,
+        "mainTotal": 150448,
+        "verificationTotal": 144273
       },
       "deltaFromBaseline": {
-        "etMain": 2004,
+        "etMain": 16347,
         "etVerification": 0,
-        "sdkMain": 828,
-        "sdkVerification": 675,
-        "mainTotal": 2832,
-        "verificationTotal": 675
+        "sdkMain": 1105,
+        "sdkVerification": 843,
+        "mainTotal": 17452,
+        "verificationTotal": 843
       },
-      "mainLinesPerCompletedDifference": 1.16
+      "mainLinesPerCompletedDifference": 2.26
     }
   }
 }

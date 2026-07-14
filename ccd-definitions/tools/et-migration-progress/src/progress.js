@@ -212,6 +212,13 @@ async function stageJavaDefinitions (javaDefinitionsDir, destination) {
   }
 }
 
+async function resolveJavaDefinitionsDir (javaDefinitionsDir, environment) {
+  const environmentDefinitions = path.join(javaDefinitionsDir, environment);
+  return fs.access(environmentDefinitions)
+    .then(() => environmentDefinitions)
+    .catch(() => javaDefinitionsDir);
+}
+
 async function clearTemplateData (source, destination) {
   const workbook = await XlsxPopulate.fromFileAsync(source);
   workbook.sheets().forEach((sheet) => {
@@ -573,7 +580,6 @@ async function run ({
     'json2xlsx.js'
   );
   const stagedJavaRoot = path.join(outputDir, 'staged-java');
-  await stageJavaDefinitions(javaDefinitionsDir, stagedJavaRoot);
 
   const clearedTemplates = {};
   for (const jurisdiction of Object.keys(JURISDICTIONS)) {
@@ -596,6 +602,9 @@ async function run ({
 
   const environments = {};
   for (const [environment, excludedPattern] of Object.entries(ENVIRONMENTS)) {
+    const javaSource = await resolveJavaDefinitionsDir(javaDefinitionsDir, environment);
+    const environmentStagedRoot = path.join(stagedJavaRoot, environment);
+    await stageJavaDefinitions(javaSource, environmentStagedRoot);
     const jurisdictions = {};
     for (const jurisdiction of Object.keys(JURISDICTIONS)) {
       const goldenInput = path.join(
@@ -604,7 +613,7 @@ async function run ({
         jurisdiction,
         'json'
       );
-      const javaInput = path.join(stagedJavaRoot, jurisdiction, 'json');
+      const javaInput = path.join(environmentStagedRoot, jurisdiction, 'json');
       const template = path.join(
         definitionsRoot,
         'jurisdictions',
@@ -720,6 +729,7 @@ module.exports = {
   buildCurrent,
   clearTemplateData,
   javaLineCounts,
+  resolveJavaDefinitionsDir,
   run,
   stageJavaDefinitions,
   validateJavaInput,

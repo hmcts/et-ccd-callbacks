@@ -17,18 +17,24 @@ public final class EtMigrationDefinitionGenerator {
             throw new IllegalArgumentException("Expected the generated JSON output directory");
         }
 
-        try (AnnotationConfigApplicationContext context =
-                 new AnnotationConfigApplicationContext(DefinitionConfiguration.class)) {
-            context.getBean(CCDDefinitionGenerator.class)
-                .generateAllCaseTypesToJSON(new File(args[0]));
+        for (String profile : new String[] {"cftlib", "prod"}) {
+            try (AnnotationConfigApplicationContext context =
+                    new AnnotationConfigApplicationContext()) {
+                context.getEnvironment().setActiveProfiles(profile);
+                context.register(DefinitionConfiguration.class);
+                context.refresh();
+                context.getBean(CCDDefinitionGenerator.class)
+                        .generateAllCaseTypesToJSON(new File(args[0], profile));
+            }
         }
     }
 
     @Configuration
-    @ComponentScan(basePackages = {
-        "uk.gov.hmcts.ccd.sdk.generator",
-        "uk.gov.hmcts.ethos.replacement.docmosis.ccd.migration.config"
-    })
+    @ComponentScan(
+            basePackages = {
+                "uk.gov.hmcts.ccd.sdk.generator",
+                "uk.gov.hmcts.ethos.replacement.docmosis.ccd.migration.config"
+            })
     @Import(CCDDefinitionGenerator.class)
     static class DefinitionConfiguration {
     }

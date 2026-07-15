@@ -412,9 +412,8 @@ public final class RoleUtils {
      *         returns an empty list if no matching assignments are found
      *         or if the input parameters are invalid
      */
-    public static List<String> getCaseRolesForUser(CaseData caseData,
-                                                   List<CaseUserAssignment> caseUserAssignments,
-                                                   String userId) {
+    public static List<String> getCaseRolesForUser(List<CaseUserAssignment> caseUserAssignments,
+                                                    String userId) {
         List<String> caseRoles = new ArrayList<>();
         if (CollectionUtils.isEmpty(caseUserAssignments) || StringUtils.isBlank(userId)) {
             return caseRoles;
@@ -423,7 +422,6 @@ public final class RoleUtils {
                 .filter(assignment -> userId.equals(assignment.getUserId()))
                 .map(CaseUserAssignment::getCaseRole)
                 .toList());
-        removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, userId);
         return caseRoles;
     }
 

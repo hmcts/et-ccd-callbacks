@@ -62,7 +62,7 @@ public class AmendRepresentativeContactService {
         CaseDataUtils.validateCaseData(caseData, submissionReference);
         UserUtils.validateToken(userToken, submissionReference);
         List<String> roles = nocRepresentativeService
-                .getValidatedRepresentativeRolesByUserToken(userToken, caseData, submissionReference);
+                .getValidatedRepresentativeRolesByUserToken(userToken, submissionReference);
         if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS.equals(
                 caseData.getRepresentativeContactChangeOption())) {
             setRepresentativeMyHmctsContactAddress(userToken, caseData);
@@ -146,7 +146,7 @@ public class AmendRepresentativeContactService {
         CaseDataUtils.validateCaseData(caseData, submissionReference);
         UserUtils.validateToken(userToken, submissionReference);
         List<String> roles = nocRepresentativeService
-                .getValidatedRepresentativeRolesByUserToken(userToken, caseData, submissionReference);
+                .getValidatedRepresentativeRolesByUserToken(userToken, submissionReference);
         if (roles.contains(CLAIMANTSOLICITOR.getCaseRoleLabel())) {
             ClaimantRepresentativeUtils.updateET3ResponseContactDetails(caseData);
             return;

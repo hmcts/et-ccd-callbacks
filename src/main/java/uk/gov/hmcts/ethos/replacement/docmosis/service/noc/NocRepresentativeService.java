@@ -135,14 +135,13 @@ public class NocRepresentativeService {
      *         </ul>
      */
     public List<String> getValidatedRepresentativeRolesByUserToken(String userToken,
-                                                                   CaseData caseData,
                                                                    String submissionReference)
             throws GenericServiceException {
 
-        final String methodName = "findRepresentativeRolesByUserToken";
+        final String methodName = "getValidatedRepresentativeRolesByUserToken";
         List<CaseUserAssignment> caseUserAssignments = getValidatedCaseUserAssignments(submissionReference);
         UserDetails userDetails = userService.getValidatedUserDetails(userToken, submissionReference);
-        List<String> rolesByUserId = RoleUtils.getCaseRolesForUser(caseData, caseUserAssignments, userDetails.getUid());
+        List<String> rolesByUserId = RoleUtils.getCaseRolesForUser(caseUserAssignments, userDetails.getUid());
         List<String> rolesByAssignmentOrder = RoleUtils.findFirstCaseRolesByUserId(caseUserAssignments,
                 userDetails.getUid());
         List<String> allRoles = CallbacksCollectionUtils.mergeListsWithoutDuplicates(rolesByUserId,

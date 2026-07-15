@@ -561,18 +561,16 @@ final class RoleUtilsTest {
     @Test
     void theGetCaseRolesForUser() {
         // when case user assignments is empty should return an empty list
-        CaseData caseData = CaseDataBuilder.builder().build();
-        assertThat(RoleUtils.getCaseRolesForUser(caseData, null, REPRESENTATIVE_ID_1)).isEmpty();
+        assertThat(RoleUtils.getCaseRolesForUser(null, REPRESENTATIVE_ID_1)).isEmpty();
         // when representative id is empty should return an empty list
         List<CaseUserAssignment> caseUserAssignments = List.of(CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_A)
                 .userId(REPRESENTATIVE_ID_1).build());
-        assertThat(RoleUtils.getCaseRolesForUser(caseData, caseUserAssignments, StringUtils.EMPTY)).isEmpty();
+        assertThat(RoleUtils.getCaseRolesForUser(caseUserAssignments, StringUtils.EMPTY)).isEmpty();
         // when representative id not exists in the case user assignments should return an empty list
-        assertThat(RoleUtils.getCaseRolesForUser(caseData, caseUserAssignments, REPRESENTATIVE_ID_2)).isEmpty();
+        assertThat(RoleUtils.getCaseRolesForUser(caseUserAssignments, REPRESENTATIVE_ID_2)).isEmpty();
         // when representative found should return role list
         RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
         representative.setId(REPRESENTATIVE_ID_1);
-        caseData.setRepCollection(List.of(representative));
         RepresentedTypeR representativeValue = RepresentedTypeR.builder().respondentId(RESPONDENT_ID_1)
                 .idamId(REPRESENTATIVE_ID_1).build();
         representative.setValue(representativeValue);
@@ -580,8 +578,7 @@ final class RoleUtilsTest {
         RespondentSumTypeItem respondent = new RespondentSumTypeItem();
         respondent.setValue(respondentValue);
         respondent.setId(RESPONDENT_ID_1);
-        caseData.setRespondentCollection(List.of(respondent));
-        assertThat(RoleUtils.getCaseRolesForUser(caseData, caseUserAssignments, REPRESENTATIVE_ID_1))
+        assertThat(RoleUtils.getCaseRolesForUser(caseUserAssignments, REPRESENTATIVE_ID_1))
                 .isEqualTo(List.of(ROLE_SOLICITOR_A));
     }
 

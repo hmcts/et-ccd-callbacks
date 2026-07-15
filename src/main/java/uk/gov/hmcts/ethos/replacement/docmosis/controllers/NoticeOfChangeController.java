@@ -17,10 +17,9 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRepresentativeService;
 

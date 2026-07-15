@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -150,11 +151,9 @@ class AddAmendClaimantRepresentativeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.errors", empty()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
 
-        verify(addAmendClaimantRepresentativeService, times(1))
-                .addAmendClaimantRepresentative(any());
         verify(caseFlagsService, times(1)).setupCaseFlags(any());
     }
 

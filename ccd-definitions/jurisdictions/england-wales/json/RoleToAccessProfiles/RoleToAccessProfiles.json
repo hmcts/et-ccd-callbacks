@@ -2,6 +2,13 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "ET_EnglandWales",
+    "RoleName": "idam:caseworker-employment-etjudge",
+    "ReadOnly": "N",
+    "AccessProfiles": "caseworker-employment-etjudge"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "ET_EnglandWales",
     "RoleName": "idam:caseworker-et-pcqextractor",
     "ReadOnly": "Y",
     "AccessProfiles": "caseworker-et-pcqextractor"

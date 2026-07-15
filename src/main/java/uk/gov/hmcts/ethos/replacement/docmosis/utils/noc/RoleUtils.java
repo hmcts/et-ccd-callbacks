@@ -425,38 +425,6 @@ public final class RoleUtils {
         return caseRoles;
     }
 
-    public static void removeRolesWithoutMatchingRespondentRepresentative(CaseData caseData,
-                                                                          List<String> caseRoles,
-                                                                          String userId) {
-        if (CollectionUtils.isEmpty(caseRoles)
-                || CollectionUtils.isEmpty(caseData.getRespondentCollection())
-                || CollectionUtils.isEmpty(caseData.getRepCollection())) {
-            caseRoles.clear();
-            return;
-        }
-        List<String> tmpCaseRoles = new ArrayList<>(caseRoles);
-        for (String role : tmpCaseRoles) {
-            int roleIndex = RoleUtils.findRoleIndexByRoleLabel(role);
-            if (roleIndex == -1 || roleIndex >= caseData.getRespondentCollection().size()) {
-                caseRoles.remove(role);
-                continue;
-            }
-            RespondentSumTypeItem respondent = caseData.getRespondentCollection().get(roleIndex);
-            boolean representativeFound = false;
-            for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
-                if (RespondentRepresentativeUtils.isValidRepresentative(representative)
-                        && Strings.CS.equals(representative.getValue().getIdamId(), userId)
-                        && representative.getValue().getRespondentId().equals(respondent.getId())) {
-                    representativeFound = true;
-                    break;
-                }
-            }
-            if (!representativeFound) {
-                caseRoles.remove(role);
-            }
-        }
-    }
-
     /**
      * Retrieves the case roles associated with the specified user from the
      * first matching assignment for each solicitor role.

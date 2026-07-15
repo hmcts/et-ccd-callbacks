@@ -451,7 +451,7 @@ ext {
     log4JVersion = '2.26.1'
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
-    serenity = '5.3.10'
+    serenity = '5.3.11'
     tomcatEmbedVersion = '10.1.57'
     jacksonVersion = '2.22.1'
     jacksonAnnotationsVersion = '2.22'

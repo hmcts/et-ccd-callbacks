@@ -235,6 +235,9 @@ class ManageCaseControllerTest {
             .andExpect(jsonPath("$.case_data.caseSource").value("Manually Created"))
             .andExpect(jsonPath("$.created_date").exists())
             .andExpect(jsonPath("$.last_modified").exists());
+
+        verify(manageCaseRoleService, times(1))
+            .assignClaimantNonLegalRepresentativeRole(TEST_SERVICE_AUTH_TOKEN, expectedDetails);
     }
 
     @Test

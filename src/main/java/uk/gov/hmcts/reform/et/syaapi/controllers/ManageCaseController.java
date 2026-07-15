@@ -110,6 +110,7 @@ public class ManageCaseController {
         log.info("Received initiate-case request");
 
         var caseDetails = caseService.createCase(authorization, caseRequest);
+        manageCaseRoleService.assignClaimantNonLegalRepresentativeRole(authorization, caseDetails);
         return ok(caseDetails);
     }
 
@@ -152,9 +153,7 @@ public class ManageCaseController {
         log.info("Received submit-case request - caseTypeId: {} caseId: {}",
                  caseRequest.getCaseTypeId(), caseRequest.getCaseId()
         );
-        CaseDetails caseDetails = caseService.submitCase(authorization, caseRequest);
-        manageCaseRoleService.assignClaimantNonLegalRepresentativeRole(authorization, caseDetails);
-        return ok(caseDetails);
+        return ok(caseService.submitCase(authorization, caseRequest));
     }
 
     /**

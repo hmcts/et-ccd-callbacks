@@ -29,8 +29,16 @@ spring:
       max-request-size: 300MB
   datasource:
     password: ${ET_COS_DB_PASSWORD:}
+    type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:postgresql://${ET_COS_DB_HOST:localhost}:${ET_COS_DB_PORT:5432}/${ET_COS_DB_NAME:et_cos}${ET_COS_DB_CONN_OPTIONS:}
     username: ${ET_COS_DB_USER_NAME:et_cos}
+    hikari:
+      connection-timeout: ${ET_COS_DB_CONNECTION_TIMEOUT:30000}
+      idle-timeout: ${ET_COS_DB_IDLE_TIMEOUT:300000}
+      minimum-idle: ${ET_COS_DB_MIN_IDLE:8}
+      maximum-pool-size: ${ET_COS_DB_MAX_POOL_SIZE:20}
+      max-lifetime: ${ET_COS_DB_MAX_LIFETIME:300000}
+      pool-name: ${ET_COS_DB_POOL_NAME:et-cos-db-pool}
   config:
     import: optional:configtree:/mnt/secrets/et-cos/,optional:configtree:/mnt/secrets/et/
   jms:
@@ -58,6 +66,9 @@ ccd:
   client:
     timeout: '60000'
   data-store-api-url: ${CCD_DATA_STORE_API_URL:http://ccd-data-store-api:4452}
+  decentralised-runtime:
+    cdam-attach:
+      enabled: ${CCD_DECENTRALISED_RUNTIME_CDAM_ATTACH_ENABLED:true}
   data-migration:
     enabled: ${ET_CCD_DATA_MIGRATION_ENABLED:false}
     task-name: ${ET_CCD_DATA_MIGRATION_TASK_NAME:et-ccd-data-migration}
@@ -123,7 +134,7 @@ rd_professional-api-url: ${RD_PROFESSIONAL_API_URL:http://localhost:4507}
 
 feature:
   secure-doc-store:
-    enabled: 'false'
+    enabled: ${SECURE_DOC_STORE_FEATURE:false}
 
 queue:
   create-updates:

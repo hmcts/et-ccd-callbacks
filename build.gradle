@@ -552,7 +552,7 @@ dependencies {
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.10.1'
     // 1084765
-    implementation group: 'org.webjars.npm', name: 'minimatch', version: '9.0.5'
+    implementation group: 'org.webjars.npm', name: 'minimatch', version: '9.0.9'
     implementation group: 'org.webjars', name: 'webjars-locator-core', version: '0.59'
     implementation group: 'org.asynchttpclient', name: 'async-http-client-netty-utils', version: '2.12.4'
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '7.1.1'

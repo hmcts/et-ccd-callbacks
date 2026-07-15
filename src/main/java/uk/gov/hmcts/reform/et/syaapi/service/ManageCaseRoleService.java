@@ -529,9 +529,10 @@ public class ManageCaseRoleService {
      * Assigns the {@code [CLAIMANTNONLEGALREPRESENTATIVE]} case role to the submitting user when a case is submitted
      * by a claimant who has answered "Yes" to being represented.
      *
-     * <p>The role is added for the authenticated caller (resolved from their IDAM token); the existing
-     * {@code [CREATOR]} role is left in place. Modelled on {@code Et1ReppedService.assignCaseAccess}, but without an
-     * organisation (a non-legal representative has no MyHMCTS organisation).</p>
+     * <p>The role is added for the authenticated caller (resolved from their IDAM token) and the {@code [CREATOR]}
+     * is then removed, so access is governed by the non-legal
+     * representative role. Modelled on {@code Et1ReppedService.assignCaseAccess}, but without an organisation (a
+     * non-legal representative has no MyHMCTS organisation).</p>
      *
      * <p>Assignment failures are logged and swallowed rather than rethrown: the case has already been submitted by
      * the time this runs, so a role-assignment problem must not turn a successful submission into an error.</p>
@@ -551,23 +552,32 @@ public class ManageCaseRoleService {
         String caseId = caseDetails.getId().toString();
         String userId = idamClient.getUserInfo(authorisation).getUid();
 
-        CaseAssignmentUserRolesRequest request = CaseAssignmentUserRolesRequest.builder()
+        try {
+            restCallToModifyUserCaseRoles(
+                buildCaseUserRolesRequest(caseId, userId, CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE),
+                HttpMethod.POST);
+            log.info("Successfully assigned {} role on case {}",
+                     CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE, caseId);
+
+            restCallToModifyUserCaseRoles(
+                buildCaseUserRolesRequest(caseId, userId, CASE_USER_ROLE_CREATOR),
+                HttpMethod.DELETE);
+            log.info("Successfully removed {} role on case {}", CASE_USER_ROLE_CREATOR, caseId);
+        } catch (IOException | RestClientResponseException exception) {
+            log.error("Failed to modify roles on case {}: {}", caseId, exception.getMessage());
+        }
+    }
+
+    private static CaseAssignmentUserRolesRequest buildCaseUserRolesRequest(String caseId, String userId,
+                                                                            String caseRole) {
+        return CaseAssignmentUserRolesRequest.builder()
             .caseAssignmentUserRoles(List.of(
                 CaseAssignmentUserRole.builder()
                     .caseDataId(caseId)
                     .userId(userId)
-                    .caseRole(CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE)
+                    .caseRole(caseRole)
                     .build()))
             .build();
-
-        try {
-            restCallToModifyUserCaseRoles(request, HttpMethod.POST);
-            log.info("Successfully assigned {} role on case {}",
-                     CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE, caseId);
-        } catch (IOException | RestClientResponseException exception) {
-            log.error("Failed to assign {} role on case {}: {}",
-                      CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE, caseId, exception.getMessage());
-        }
     }
 
     private List<CaseDetails> updateAllRespondentsIdamIdAndDefaultLinkStatuses(

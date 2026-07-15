@@ -19,7 +19,9 @@ document_management:
 
 ccd:
   data-store-api-url: http://localhost:4452
+  data-store:
+    api:
+      url: http://localhost:4452
 
 case_document_am:
   url: http://localhost:4455
-  

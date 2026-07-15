@@ -18,6 +18,21 @@ plugins {
 group = 'uk.gov.hmcts.et'
 version = '0.0.1'
 
+tasks.register('printVersionInit') {
+    doLast {
+        def versionLine = file('charts/et-cos/Chart.yaml')
+            .readLines()
+            .find { it.trim().startsWith('version:') }
+        def chartVersion = versionLine ? versionLine.split(':', 2)[1].trim() : null
+
+        if (!chartVersion) {
+            throw new GradleException('Unable to read chart version from charts/et-cos/Chart.yaml')
+        }
+
+        println chartVersion
+    }
+}
+
 ccd {
     configDir = file('build/definitions')
     decentralised = true

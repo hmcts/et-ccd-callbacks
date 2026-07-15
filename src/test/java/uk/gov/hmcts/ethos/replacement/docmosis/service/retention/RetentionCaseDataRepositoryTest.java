@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.retention;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,10 +13,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,15 +25,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class RetentionCaseDataRepositoryTest {
-    private static final String CASE_DATA_JSON = """
-        {
-          "TTL": {
-            "SystemTTL": "2026-06-22",
-            "Suspended": "No"
-          }
-        }
-        """;
-
     @Mock
     private NamedParameterJdbcTemplate jdbcTemplate;
     @Mock
@@ -47,22 +34,22 @@ class RetentionCaseDataRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        repository = new RetentionCaseDataRepository(jdbcTemplate, new ObjectMapper());
+        repository = new RetentionCaseDataRepository(jdbcTemplate);
     }
 
     @Test
-    void findExpiredCasesReturnsEmptyWhenNoCaseTypesOrLimit() {
-        assertThat(repository.findExpiredCases(List.of(), 100)).isEmpty();
-        assertThat(repository.findExpiredCases(List.of("ET_EnglandWales"), 0)).isEmpty();
+    void findExpiredDraftCasesReturnsEmptyWhenNoCaseTypesOrLimitIsInvalid() {
+        assertThat(repository.findExpiredDraftCases(List.of(), 100)).isEmpty();
+        assertThat(repository.findExpiredDraftCases(List.of("ET_EnglandWales"), 0)).isEmpty();
 
         verifyNoInteractions(jdbcTemplate);
     }
 
     @Test
-    void findExpiredCasesQueriesAndMapsRows() throws Exception {
+    void findExpiredDraftCasesQueriesByCaseTypeDraftStateAndResolvedTtl() throws Exception {
         mockCaseDataQuery();
 
-        List<RetentionCaseData> cases = repository.findExpiredCases(List.of("ET_EnglandWales"), 25);
+        List<RetentionCaseData> cases = repository.findExpiredDraftCases(List.of("ET_EnglandWales"), 25);
 
         assertMappedCase(cases);
         ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -70,55 +57,12 @@ class RetentionCaseDataRepositoryTest {
         verify(jdbcTemplate).query(sqlCaptor.capture(), paramsCaptor.capture(),
             ArgumentMatchers.<RowMapper<RetentionCaseData>>any());
         assertThat(sqlCaptor.getValue())
-            .contains("resolved_ttl < current_date", "order by resolved_ttl desc")
-            .doesNotContain("SystemTTL", "OverrideTTL", "Suspended");
+            .contains("state = :state", "case_type_id in (:caseTypeIds)", "resolved_ttl < current_date")
+            .contains("order by resolved_ttl desc")
+            .doesNotContain("created_date <");
+        assertThat(paramsCaptor.getValue().getValue("state")).isEqualTo("AWAITING_SUBMISSION_TO_HMCTS");
         assertThat(paramsCaptor.getValue().getValue("caseTypeIds")).isEqualTo(List.of("ET_EnglandWales"));
         assertThat(paramsCaptor.getValue().getValue("limit")).isEqualTo(25);
-    }
-
-    @Test
-    void findByReferencesReturnsEmptyWhenNoReferences() {
-        assertThat(repository.findByReferences(List.of())).isEmpty();
-
-        verifyNoInteractions(jdbcTemplate);
-    }
-
-    @Test
-    void findByReferencesQueriesAndMapsRows() throws Exception {
-        mockCaseDataQuery();
-
-        List<RetentionCaseData> cases = repository.findByReferences(List.of(111L));
-
-        assertMappedCase(cases);
-        ArgumentCaptor<MapSqlParameterSource> paramsCaptor = ArgumentCaptor.forClass(MapSqlParameterSource.class);
-        verify(jdbcTemplate).query(anyString(), paramsCaptor.capture(),
-            ArgumentMatchers.<RowMapper<RetentionCaseData>>any());
-        assertThat(paramsCaptor.getValue().getValue("references")).isEqualTo(List.of(111L));
-    }
-
-    @Test
-    void findCasesReferencingReturnsEmptyWhenNoReferences() {
-        assertThat(repository.findCasesReferencing(Set.of())).isEmpty();
-
-        verifyNoInteractions(jdbcTemplate);
-    }
-
-    @Test
-    void findCasesReferencingQueriesWithReferenceStringsAndCaseDetailsRegex() throws Exception {
-        mockCaseDataQuery();
-        Set<Long> references = new LinkedHashSet<>(List.of(111L, 222L));
-
-        List<RetentionCaseData> cases = repository.findCasesReferencing(references);
-
-        assertMappedCase(cases);
-        ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<MapSqlParameterSource> paramsCaptor = ArgumentCaptor.forClass(MapSqlParameterSource.class);
-        verify(jdbcTemplate).query(sqlCaptor.capture(), paramsCaptor.capture(),
-            ArgumentMatchers.<RowMapper<RetentionCaseData>>any());
-        assertThat(sqlCaptor.getValue()).contains("transferredCaseLinkSourceCaseId", "linkedCaseCT", "caseLinks");
-        assertThat(paramsCaptor.getValue().getValue("referenceStrings")).isEqualTo(List.of("111", "222"));
-        assertThat(paramsCaptor.getValue().getValue("caseDetailsRegex"))
-            .isEqualTo("/case-details/(111|222)([^0-9]|$)");
     }
 
     @Test
@@ -154,21 +98,15 @@ class RetentionCaseDataRepositoryTest {
 
     private void mockResultSet() throws SQLException {
         when(resultSet.getObject("reference", Long.class)).thenReturn(111L);
-        when(resultSet.getObject("id", Long.class)).thenReturn(999L);
         when(resultSet.getString("case_type_id")).thenReturn("ET_EnglandWales");
         when(resultSet.getString("jurisdiction")).thenReturn("EMPLOYMENT");
-        when(resultSet.getObject("resolved_ttl", LocalDate.class)).thenReturn(LocalDate.of(2026, 6, 22));
-        when(resultSet.getString("data")).thenReturn(CASE_DATA_JSON);
     }
 
     private void assertMappedCase(List<RetentionCaseData> cases) {
         assertThat(cases).hasSize(1);
         RetentionCaseData retentionCaseData = cases.getFirst();
         assertThat(retentionCaseData.reference()).isEqualTo(111L);
-        assertThat(retentionCaseData.id()).isEqualTo(999L);
         assertThat(retentionCaseData.caseTypeId()).isEqualTo("ET_EnglandWales");
         assertThat(retentionCaseData.jurisdiction()).isEqualTo("EMPLOYMENT");
-        assertThat(retentionCaseData.resolvedTtl()).isEqualTo(LocalDate.of(2026, 6, 22));
-        assertThat(retentionCaseData.data().path("TTL").path("SystemTTL").asText()).isEqualTo("2026-06-22");
     }
 }

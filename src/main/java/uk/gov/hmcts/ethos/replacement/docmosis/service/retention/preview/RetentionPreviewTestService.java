@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.retention.preview;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -29,7 +28,7 @@ public class RetentionPreviewTestService {
     private static final String ROLE = "retentionPreviewRole";
     private static final String DEFAULT_CASE_TYPE = "ET_EnglandWales";
     private static final String DEFAULT_JURISDICTION = "EMPLOYMENT";
-    private static final String DEFAULT_STATE = "Accepted";
+    private static final String DRAFT_STATE = "AWAITING_SUBMISSION_TO_HMCTS";
     private static final String SIMULATION_MODE = "simulation";
     private static final String DELETION_MODE = "deletion";
 
@@ -43,21 +42,11 @@ public class RetentionPreviewTestService {
         List<PreviewCase> cases = new ArrayList<>();
 
         for (int i = 0; i < options.numberOfExpiredCases(); i++) {
-            cases.add(insertPreviewCase(options, options.nextReference(), "expired", options.expiredDate(), null));
+            cases.add(insertPreviewCase(options, options.nextReference(), "expired-draft", options.expiredDate()));
         }
 
         for (int i = 0; i < options.numberOfFutureCases(); i++) {
-            cases.add(insertPreviewCase(options, options.nextReference(), "future", options.futureDate(), null));
-        }
-
-        for (int i = 0; i < options.numberOfLinkedFutureCases(); i++) {
-            long expiredReference = options.nextReference();
-            long futureReference = options.nextReference();
-            PreviewCase expired = insertPreviewCase(options, expiredReference, "linked-expired", options.expiredDate(),
-                futureReference);
-            cases.add(expired);
-            cases.add(insertPreviewCase(options, futureReference, "linked-future", options.futureDate(),
-                expiredReference));
+            cases.add(insertPreviewCase(options, options.nextReference(), "future-draft", options.futureDate()));
         }
 
         return new SeedResponse(options.seedRunId(), cases);
@@ -77,17 +66,8 @@ public class RetentionPreviewTestService {
         return jdbcTemplate.update("""
             update ccd.case_data
                set resolved_ttl = :resolvedTtl,
-                   data = jsonb_set(
-                       jsonb_set(
-                           jsonb_set(data, '{TTL,SystemTTL}', to_jsonb(cast(:ttlText as text)), true),
-                           '{TTL,OverrideTTL}',
-                           'null'::jsonb,
-                           true
-                       ),
-                       '{TTL,Suspended}',
-                       '"No"'::jsonb,
-                       true
-                   )
+                   data = jsonb_set(data, '{TTL,SystemTTL}', to_jsonb(cast(:ttlText as text)), true),
+                   last_modified = now() at time zone 'UTC'
              where """ + whereClause, parameters);
     }
 
@@ -96,8 +76,7 @@ public class RetentionPreviewTestService {
         int batchSize = request.effectiveBatchSize() <= 0 ? 25 : request.effectiveBatchSize();
         if (!request.effectiveIncludeNonPreviewCases() && hasExpiredNonPreviewCases(caseTypeIds)) {
             throw new IllegalArgumentException(
-                "Expired non-preview cases exist for the requested case types. "
-                    + "Set includeNonPreviewCases=true to run anyway."
+                "Expired non-preview draft cases exist. Set includeNonPreviewCases=true to run anyway."
             );
         }
         return switch (request.normalisedMode()) {
@@ -118,10 +97,10 @@ public class RetentionPreviewTestService {
         return jdbcTemplate.query("""
             select reference,
                    case_type_id,
+                   state,
                    resolved_ttl,
                    data ->> 'retentionPreviewRole' as role,
-                   data ->> 'retentionPreviewTestRunId' as run_id,
-                   data #>> '{caseLinks,0,value,CaseReference}' as linked_reference
+                   data ->> 'retentionPreviewTestRunId' as run_id
               from ccd.case_data
              where
             """ + whereClause + """
@@ -129,10 +108,10 @@ public class RetentionPreviewTestService {
             """, parameters, (rs, rowNum) -> new PreviewCase(
             rs.getObject("reference", Long.class),
             rs.getString("case_type_id"),
+            rs.getString("state"),
             rs.getObject("resolved_ttl", LocalDate.class),
             rs.getString("role"),
-            rs.getString("run_id"),
-            rs.getString("linked_reference")
+            rs.getString("run_id")
         ));
     }
 
@@ -151,19 +130,18 @@ public class RetentionPreviewTestService {
         Integer count = jdbcTemplate.queryForObject("""
             select count(*)
               from ccd.case_data
-             where case_type_id in (:caseTypeIds)
+             where state = :state
+               and case_type_id in (:caseTypeIds)
                and resolved_ttl < current_date
                and coalesce(data ->> 'retentionPreviewTest', 'false') <> 'true'
-            """, new MapSqlParameterSource("caseTypeIds", caseTypeIds), Integer.class);
+            """, new MapSqlParameterSource()
+            .addValue("state", DRAFT_STATE)
+            .addValue("caseTypeIds", caseTypeIds), Integer.class);
         return count != null && count > 0;
     }
 
-    private PreviewCase insertPreviewCase(SeedOptions options,
-                                          long reference,
-                                          String role,
-                                          LocalDate resolvedTtl,
-                                          Long linkedReference) {
-        String data = caseData(options.seedRunId(), role, resolvedTtl, linkedReference);
+    private PreviewCase insertPreviewCase(SeedOptions options, long reference, String role, LocalDate resolvedTtl) {
+        String data = caseData(options.seedRunId(), role, resolvedTtl);
 
         jdbcTemplate.update("""
             insert into ccd.case_data (
@@ -212,30 +190,20 @@ public class RetentionPreviewTestService {
             .addValue("state", options.selectedState())
             .addValue("data", data));
 
-        return new PreviewCase(reference, options.selectedCaseTypeId(), resolvedTtl, role, options.seedRunId(),
-            linkedReference == null ? null : String.valueOf(linkedReference));
+        return new PreviewCase(reference, options.selectedCaseTypeId(), options.selectedState(), resolvedTtl, role,
+            options.seedRunId());
     }
 
     @SneakyThrows
-    private String caseData(String runId, String role, LocalDate resolvedTtl, Long linkedReference) {
+    private String caseData(String runId, String role, LocalDate resolvedTtl) {
         ObjectNode data = objectMapper.createObjectNode();
         data.put(TEST_FLAG, true);
         data.put(RUN_ID, runId);
         data.put(ROLE, role);
-
         ObjectNode ttl = data.putObject("TTL");
         ttl.put("SystemTTL", resolvedTtl.toString());
         ttl.putNull("OverrideTTL");
         ttl.put("Suspended", "No");
-
-        if (linkedReference != null) {
-            ArrayNode caseLinks = data.putArray("caseLinks");
-            ObjectNode link = caseLinks.addObject();
-            ObjectNode value = link.putObject("value");
-            value.put("CaseReference", linkedReference);
-            value.put("CaseName", "Retention preview linked case");
-        }
-
         return objectMapper.writeValueAsString(data);
     }
 
@@ -310,10 +278,10 @@ public class RetentionPreviewTestService {
     public record PreviewCase(
         Long reference,
         String caseTypeId,
+        String state,
         LocalDate resolvedTtl,
         String role,
-        String runId,
-        String linkedReference
+        String runId
     ) {
     }
 
@@ -324,7 +292,6 @@ public class RetentionPreviewTestService {
         private final String state;
         private final int expiredCount;
         private final int futureCount;
-        private final int linkedFutureCount;
         private final LocalDate expiredTtl;
         private final LocalDate futureTtl;
         private final long referenceSeed;
@@ -334,10 +301,9 @@ public class RetentionPreviewTestService {
             runId = defaultIfBlank(request.runId(), "preview-" + System.currentTimeMillis());
             caseTypeId = defaultIfBlank(request.caseTypeId(), DEFAULT_CASE_TYPE);
             jurisdiction = defaultIfBlank(request.jurisdiction(), DEFAULT_JURISDICTION);
-            state = defaultIfBlank(request.state(), DEFAULT_STATE);
+            state = defaultIfBlank(request.state(), DRAFT_STATE);
             expiredCount = positiveOrDefault(request.expiredCount(), 2);
             futureCount = positiveOrDefault(request.futureCount(), 1);
-            linkedFutureCount = positiveOrDefault(request.linkedFutureCount(), 1);
             expiredTtl = LocalDate.now(clock).minusDays(1);
             futureTtl = LocalDate.now(clock).plusDays(30);
             referenceSeed = REFERENCE_BASE + System.currentTimeMillis() % 1_000_000_000L;
@@ -380,10 +346,6 @@ public class RetentionPreviewTestService {
 
         private int numberOfFutureCases() {
             return futureCount;
-        }
-
-        private int numberOfLinkedFutureCases() {
-            return linkedFutureCount;
         }
 
         private LocalDate expiredDate() {

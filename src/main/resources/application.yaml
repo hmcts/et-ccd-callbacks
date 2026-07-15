@@ -320,7 +320,7 @@ retention:
   disposal:
     enabled: ${RETENTION_DISPOSAL_ENABLED:true}
     caseTypeIds: ${RETENTION_DISPOSAL_CASE_TYPE_IDS:ET_Admin,ET_EnglandWales,ET_Scotland}
-    simulationCaseTypeIds: ${RETENTION_DISPOSAL_SIMULATION_CASE_TYPE_IDS:ET_Admin,ET_EnglandWales,ET_Scotland}
+    simulationCaseTypeIds: ${RETENTION_DISPOSAL_SIMULATION_CASE_TYPE_IDS:}
     batchSize: ${RETENTION_DISPOSAL_BATCH_SIZE:100}
   previewTesting:
     enabled: ${RETENTION_PREVIEW_TESTING_ENABLED:false}

@@ -13,9 +13,8 @@ Environment overrides:
   RUN_ID                      Test run id. Defaults to retention-preview-<pr-number>.
   CASE_TYPE_ID                Seeded case type. Defaults to ET_EnglandWales.
   CASE_TYPE_IDS               Comma-separated case types for run. Defaults to CASE_TYPE_ID.
-  EXPIRED_COUNT               Seeded expired standalone cases. Defaults to 2.
-  FUTURE_COUNT                Seeded future standalone cases. Defaults to 1.
-  LINKED_FUTURE_COUNT         Seeded expired+future linked pairs. Defaults to 1.
+  EXPIRED_COUNT               Seeded expired draft cases. Defaults to 2.
+  FUTURE_COUNT                Seeded future draft cases. Defaults to 1.
   DAYS_IN_PAST                Expire TTL by this many days. Defaults to 1.
   REFERENCES                  Comma-separated case references to expire. Defaults to all rows for RUN_ID.
   BATCH_SIZE                  Retention run batch size. Defaults to 25.
@@ -63,11 +62,6 @@ request() {
   fi
 }
 
-case_types_json() {
-  jq --compact-output --null-input --arg caseTypeIds "${case_type_ids}" \
-    '$caseTypeIds | split(",") | map(gsub("^\\s+|\\s+$"; "")) | map(select(length > 0))'
-}
-
 references_json() {
   if [[ -z "${REFERENCES:-}" ]]; then
     jq --compact-output --null-input '[]'
@@ -78,24 +72,27 @@ references_json() {
     '$references | split(",") | map(gsub("^\\s+|\\s+$"; "")) | map(select(length > 0)) | map(tonumber)'
 }
 
+case_types_json() {
+  jq --compact-output --null-input --arg caseTypeIds "${case_type_ids}" \
+    '$caseTypeIds | split(",") | map(gsub("^\\s+|\\s+$"; "")) | map(select(length > 0))'
+}
+
 case "${command}" in
   seed)
     payload=$(jq --null-input \
       --arg runId "${run_id}" \
       --arg caseTypeId "${case_type_id}" \
       --arg jurisdiction "${JURISDICTION:-EMPLOYMENT}" \
-      --arg state "${STATE:-Accepted}" \
+      --arg state "${STATE:-AWAITING_SUBMISSION_TO_HMCTS}" \
       --argjson expiredCount "${EXPIRED_COUNT:-2}" \
       --argjson futureCount "${FUTURE_COUNT:-1}" \
-      --argjson linkedFutureCount "${LINKED_FUTURE_COUNT:-1}" \
       '{
         runId: $runId,
         caseTypeId: $caseTypeId,
         jurisdiction: $jurisdiction,
         state: $state,
         expiredCount: $expiredCount,
-        futureCount: $futureCount,
-        linkedFutureCount: $linkedFutureCount
+        futureCount: $futureCount
       }')
     request POST /testing/retention/seed "${payload}"
     ;;

@@ -42,8 +42,8 @@ public class CaseRetentionTask implements Runnable {
             parseCaseTypes(simulationCaseTypeIds),
             batchSize
         );
-        log.info("Case retention task complete: deleted={}, simulated={}, skippedGroups={}",
-            result.deletedCases(), result.simulatedCases(), result.skippedGroups());
+        log.info("Case retention task complete: deleted={}, simulated={}, skipped={}",
+            result.deletedCases(), result.simulatedCases(), result.skippedCases());
     }
 
     private Set<String> parseCaseTypes(String configuredCaseTypes) {

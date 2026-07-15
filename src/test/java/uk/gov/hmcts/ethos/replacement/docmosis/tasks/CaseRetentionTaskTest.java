@@ -27,20 +27,18 @@ class CaseRetentionTaskTest {
         task = new CaseRetentionTask(caseRetentionService);
         ReflectionTestUtils.setField(task, "enabled", true);
         ReflectionTestUtils.setField(task, "caseTypeIds", "ET_EnglandWales, ET_Scotland");
-        ReflectionTestUtils.setField(task, "simulationCaseTypeIds", "ET_EnglandWales_Multiple");
+        ReflectionTestUtils.setField(task, "simulationCaseTypeIds", "ET_Admin");
         ReflectionTestUtils.setField(task, "batchSize", 25);
     }
 
     @Test
     void runPassesConfiguredCaseTypesToService() {
-        when(caseRetentionService.run(Set.of("ET_EnglandWales", "ET_Scotland"),
-            Set.of("ET_EnglandWales_Multiple"), 25))
+        when(caseRetentionService.run(Set.of("ET_EnglandWales", "ET_Scotland"), Set.of("ET_Admin"), 25))
             .thenReturn(new RetentionTaskResult(1, 1, 0));
 
         task.run();
 
-        verify(caseRetentionService).run(Set.of("ET_EnglandWales", "ET_Scotland"),
-            Set.of("ET_EnglandWales_Multiple"), 25);
+        verify(caseRetentionService).run(Set.of("ET_EnglandWales", "ET_Scotland"), Set.of("ET_Admin"), 25);
     }
 
     @Test
@@ -49,7 +47,6 @@ class CaseRetentionTaskTest {
 
         task.run();
 
-        verify(caseRetentionService, never()).run(Set.of("ET_EnglandWales", "ET_Scotland"),
-            Set.of("ET_EnglandWales_Multiple"), 25);
+        verify(caseRetentionService, never()).run(Set.of("ET_EnglandWales", "ET_Scotland"), Set.of("ET_Admin"), 25);
     }
 }

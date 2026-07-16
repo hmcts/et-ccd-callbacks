@@ -88,6 +88,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SCOTLAND_CO
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SCOTLAND_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SENIOR_TRIBUNAL_CASEWORKER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SOLICITOR_1_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SOLICITOR_2_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SPECIFIC_ACCESS_APPROVER_ADMIN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SPECIFIC_ACCESS_APPROVER_LEGAL_OPS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.STAFF_ADMIN;
@@ -285,6 +286,17 @@ public class CftlibConfig implements CFTLibConfigurer {
             PUI_CAA,
             CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR,
             "caseworker-divorce-solicitor");
+
+        lib.createIdamUser(SOLICITOR_2_EMAIL,
+                CASEWORKER,
+                CASEWORKER_EMPLOYMENT,
+                CASEWORKER_CAA,
+                PUI_CASE_MANAGER,
+                PUI_ORGANISATION_MANAGER,
+                PUI_USER_MANAGER,
+                PUI_CAA,
+                CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR,
+                "caseworker-divorce-solicitor");
 
         // Claimant is a citizen
         lib.createIdamUser(CITIZEN_EMAIL, CITIZEN);

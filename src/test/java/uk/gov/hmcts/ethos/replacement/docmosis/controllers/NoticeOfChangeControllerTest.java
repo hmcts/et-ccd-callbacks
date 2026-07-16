@@ -17,13 +17,12 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocClaimantRepresentativeService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRepresentativeService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocNotificationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import java.io.File;
@@ -34,6 +33,7 @@ import java.util.Objects;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -55,15 +55,11 @@ class NoticeOfChangeControllerTest {
     @MockitoBean
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
     @MockitoBean
-    private NocClaimantRepresentativeService nocClaimantRepresentativeService;
-    @MockitoBean
     private NocRepresentativeService nocRepresentativeService;
     @MockitoBean
     private CcdCaseAssignment ccdCaseAssignment;
-
     @MockitoBean
     private NocNotificationService notificationService;
-
     @MockitoBean
     private UserIdamService userIdamService;
 
@@ -93,7 +89,7 @@ class NoticeOfChangeControllerTest {
 
     @Test
     void handleAboutToSubmit_RespondentRep() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(verifyTokenService.isTokenSignatureValid(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService
             .updateRespondentRepresentation(any())).thenReturn(caseData);
         when(ccdCaseAssignment.applyNoc(any(), any())).thenReturn(CCDCallbackResponse.builder()
@@ -112,9 +108,9 @@ class NoticeOfChangeControllerTest {
 
     @Test
     void nocSubmitted() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(verifyTokenService.isTokenSignatureValid(AUTH_TOKEN)).thenReturn(true);
         doNothing().when(notificationService).sendNotificationOfChangeEmails(any(),
-            any(), any());
+            any(), any(), eq(false));
 
         mvc.perform(post(SUBMITTED_URL)
                 .content(requestContent.toString())

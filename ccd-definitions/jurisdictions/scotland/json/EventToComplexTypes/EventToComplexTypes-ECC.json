@@ -51,6 +51,106 @@
   },
   {
     "ID": "pseRespondCollection",
+    "CaseEventID": "ADD_RESPONDENT_PSE_RESPONSE",
+    "CaseFieldID": "sendNotificationCollection",
+    "ListElementCode": "sendNotificationResponsesCount",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "pseRespondCollection",
+    "CaseEventID": "ADD_RESPONDENT_PSE_RESPONSE",
+    "CaseFieldID": "sendNotificationCollection",
+    "ListElementCode": "respondCollection",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "pseRespondCollection",
+    "CaseEventID": "ADD_RESPONDENT_PSE_RESPONSE",
+    "CaseFieldID": "sendNotificationCollection",
+    "ListElementCode": "respondCollection.from",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "pseRespondCollection",
+    "CaseEventID": "ADD_RESPONDENT_PSE_RESPONSE",
+    "CaseFieldID": "sendNotificationCollection",
+    "ListElementCode": "respondCollection.dateTime",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "pseRespondCollection",
+    "CaseEventID": "ADD_RESPONDENT_PSE_RESPONSE",
+    "CaseFieldID": "sendNotificationCollection",
+    "ListElementCode": "respondCollection.isECC",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "pseRespondCollection",
+    "CaseEventID": "SUBMIT_RESPONDENT_PSE_RESPONSE",
+    "CaseFieldID": "sendNotificationCollection",
+    "ListElementCode": "sendNotificationResponsesCount",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "pseRespondCollection",
+    "CaseEventID": "SUBMIT_RESPONDENT_PSE_RESPONSE",
+    "CaseFieldID": "sendNotificationCollection",
+    "ListElementCode": "respondCollection",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "pseRespondCollection",
+    "CaseEventID": "SUBMIT_RESPONDENT_PSE_RESPONSE",
+    "CaseFieldID": "sendNotificationCollection",
+    "ListElementCode": "respondCollection.from",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "pseRespondCollection",
+    "CaseEventID": "SUBMIT_RESPONDENT_PSE_RESPONSE",
+    "CaseFieldID": "sendNotificationCollection",
+    "ListElementCode": "respondCollection.dateTime",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "pseRespondCollection",
+    "CaseEventID": "SUBMIT_RESPONDENT_PSE_RESPONSE",
+    "CaseFieldID": "sendNotificationCollection",
+    "ListElementCode": "respondCollection.isECC",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "pseRespondCollection",
     "CaseEventID": "SUBMIT_STORED_PSE_RESPONSE",
     "CaseFieldID": "sendNotificationCollection",
     "ListElementCode": "sendNotificationResponsesCount",

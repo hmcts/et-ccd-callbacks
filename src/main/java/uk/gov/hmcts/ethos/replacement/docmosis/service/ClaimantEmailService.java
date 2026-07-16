@@ -59,7 +59,7 @@ public class ClaimantEmailService {
     public List<String> prepareUpdate(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         List<String> errors = validateEmailInput(caseData);
-        if (!errors.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(errors)) {
             return errors;
         }
 

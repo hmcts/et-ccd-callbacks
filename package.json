@@ -112,7 +112,7 @@
         "http-cache-semantics": "^4.1.1",
         "json-schema": "^0.4.0",
         "lodash": "^4.17.21",
-        "mem": "^10.0.0",
+        "memoize": "^10.0.0",
         "merge": "^2.1.1",
         "minimatch": "^10.0.0",
         "minimist": "^1.2.6",

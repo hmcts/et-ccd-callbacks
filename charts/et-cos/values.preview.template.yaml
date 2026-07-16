@@ -32,7 +32,7 @@ java:
     MICRO_SERVICE: "et_cos"
     ET_COS_DB_HOST: et-preview.postgres.database.azure.com
     ET_COS_DB_PORT: 5432
-    ET_COS_DB_NAME: "pr-${CHANGE_ID}-et_cos"
+    ET_COS_DB_NAME: "${SERVICE_NAME}-et_cos"
     ET_COS_DB_USER_NAME: hmcts
     ET_COS_DB_CONN_OPTIONS: "?sslmode=require"
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
@@ -222,7 +222,7 @@ ccd:
     postgresUsername: hmcts
     postgresSecret: postgres
     postgresHostname: et-preview.postgres.database.azure.com
-    databaseNamePrefix: "pr-${CHANGE_ID}-"
+    databaseNamePrefix: "${SERVICE_NAME}-"
     s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
 
   ccd-user-profile-api:
@@ -466,7 +466,7 @@ ccd:
       01_input.conf: |
         input  {
           jdbc {
-            jdbc_connection_string => "jdbc:postgresql://et-preview.postgres.database.azure.com:5432/pr-${CHANGE_ID}-et_cos?sslmode=require"
+            jdbc_connection_string => "jdbc:postgresql://et-preview.postgres.database.azure.com:5432/${SERVICE_NAME}-et_cos?sslmode=require"
             jdbc_user => "hmcts"
             jdbc_password_filepath => "/mnt/secrets/et/ET_COS_DB_PASSWORD"
             jdbc_validate_connection => true
@@ -769,7 +769,7 @@ wa:
     postgresUsername: hmcts
     postgresSecret: postgres
     postgresHost: et-preview.postgres.database.azure.com
-    databaseNamePrefix: "pr-${CHANGE_ID}-"
+    databaseNamePrefix: "${SERVICE_NAME}-"
   wa-initiation-batch:
     job:
       releaseNameOverride: "{{ .Release.Name }}-wa-task-batch"
@@ -884,7 +884,7 @@ ccd-message-publisher:
     devmemoryLimits: 1536Mi
     environment:
       DATA_STORE_DB_HOST: et-preview.postgres.database.azure.com
-      DATA_STORE_DB_NAME: "pr-${CHANGE_ID}-et_cos"
+      DATA_STORE_DB_NAME: "${SERVICE_NAME}-et_cos"
       DATA_STORE_DB_USERNAME: hmcts
       DATA_STORE_DB_OPTIONS: "?currentSchema=ccd&stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
       CCD_CASE_EVENTS_DESTINATION: ${SERVICE_NAME}-ccd-case-events
@@ -964,7 +964,7 @@ am-org-role-mapping-service:
       AMQP_CRD_SHARED_ACCESS_KEY_VALUE: "$(SB_ACCESS_KEY)"
       AMQP_JRD_SHARED_ACCESS_KEY_VALUE: "$(SB_ACCESS_KEY)"
       ORG_ROLE_MAPPING_DB_HOST: et-preview.postgres.database.azure.com
-      ORG_ROLE_MAPPING_DB_NAME: "pr-${CHANGE_ID}-org_role_mapping"
+      ORG_ROLE_MAPPING_DB_NAME: "${SERVICE_NAME}-org_role_mapping"
       ORG_ROLE_MAPPING_DB_USERNAME: hmcts
       ORG_ROLE_MAPPING_DB_PORT: 5432
       ORG_ROLE_MAPPING_DB_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
@@ -1004,7 +1004,7 @@ rd-caseworker-ref-api:
     devmemoryLimits: 2048Mi
     environment:
       POSTGRES_HOST: et-preview.postgres.database.azure.com
-      POSTGRES_DB_NAME: "pr-${CHANGE_ID}-dbrdcaseworker"
+      POSTGRES_DB_NAME: "${SERVICE_NAME}-dbrdcaseworker"
       POSTGRES_USERNAME: hmcts
       POSTGRES_PORT: 5432
       POSTGRES_CONNECTION_OPTIONS: "?currentSchema=dbrdcaseworker&stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
@@ -1046,7 +1046,7 @@ rd-professional-api:
       POSTGRES_HOST: et-preview.postgres.database.azure.com
       POSTGRES_USERNAME: hmcts
       POSTGRES_PORT: 5432
-      POSTGRES_NAME: "pr-${CHANGE_ID}-dbrefdata"
+      POSTGRES_NAME: "${SERVICE_NAME}-dbrefdata"
       USER_PROFILE_URL: https://rd-user-profile-api-${SERVICE_FQDN}
       CCD_URL: https://ccd-data-store-api-${SERVICE_FQDN}
       POSTGRES_CONNECTION_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
@@ -1078,7 +1078,7 @@ rd-user-profile-api:
     environment:
       POSTGRES_HOST: et-preview.postgres.database.azure.com
       POSTGRES_USERNAME: hmcts
-      POSTGRES_NAME: "pr-${CHANGE_ID}-dbuserprofile"
+      POSTGRES_NAME: "${SERVICE_NAME}-dbuserprofile"
       POSTGRES_PORT: 5432
       CCD_URL: https://ccd-data-store-api-${SERVICE_FQDN}
       POSTGRES_CONNECTION_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
@@ -1128,7 +1128,7 @@ rd-judicial-api:
       SCHEDULER_ENABLED: false
       CRON_EXPRESSION: "0 0 0 25 03 ?"
       POSTGRES_USERNAME: hmcts
-      SPRING_DATASOURCE_URL: "jdbc:postgresql://et-preview.postgres.database.azure.com:5432/pr-${CHANGE_ID}-dbjuddata?currentSchema=dbjuddata&stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://et-preview.postgres.database.azure.com:5432/${SERVICE_NAME}-dbjuddata?currentSchema=dbjuddata&stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
 
 rd-judicial-data-load:
   enabled: false
@@ -1172,33 +1172,33 @@ rd-judicial-data-load:
             alias: judicial_api_elinks_api_key
     environment:
       POSTGRES_USERNAME: hmcts
-      SPRING_DATASOURCE_URL: "jdbc:postgresql://et-preview.postgres.database.azure.com:5432/pr-${CHANGE_ID}-dbjuddata?currentSchema=dbjuddata&stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://et-preview.postgres.database.azure.com:5432/${SERVICE_NAME}-dbjuddata?currentSchema=dbjuddata&stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
 
 postgresql:
   enabled: true
   flexibleserver: et-preview
   setup:
     databases:
-      - name: "pr-${CHANGE_ID}-data-store"
-      - name: "pr-${CHANGE_ID}-definition-store"
-      - name: "pr-${CHANGE_ID}-user-profile"
-      - name: "pr-${CHANGE_ID}-draftstore"
-      - name: "pr-${CHANGE_ID}-evidence"
-      - name: "pr-${CHANGE_ID}-annotation"
-      - name: "pr-${CHANGE_ID}-role-assignment"
-      - name: "pr-${CHANGE_ID}-hmc-cft-hearing-service"
-      - name: "pr-${CHANGE_ID}-cft_task_db"
-      - name: "pr-${CHANGE_ID}-wa-case-event-handler"
-      - name: "pr-${CHANGE_ID}-wa_workflow_api"
-      - name: "pr-${CHANGE_ID}-camunda"
-      - name: "pr-${CHANGE_ID}-org_role_mapping"
-      - name: "pr-${CHANGE_ID}-emstitch"
-      - name: "pr-${CHANGE_ID}-payment"
-      - name: "pr-${CHANGE_ID}-dbrdcaseworker"
-      - name: "pr-${CHANGE_ID}-et_cos"
-      - name: "pr-${CHANGE_ID}-dbrefdata"
-      - name: "pr-${CHANGE_ID}-dbuserprofile"
-      - name: "pr-${CHANGE_ID}-dbjuddata"
+      - name: "${SERVICE_NAME}-data-store"
+      - name: "${SERVICE_NAME}-definition-store"
+      - name: "${SERVICE_NAME}-user-profile"
+      - name: "${SERVICE_NAME}-draftstore"
+      - name: "${SERVICE_NAME}-evidence"
+      - name: "${SERVICE_NAME}-annotation"
+      - name: "${SERVICE_NAME}-role-assignment"
+      - name: "${SERVICE_NAME}-hmc-cft-hearing-service"
+      - name: "${SERVICE_NAME}-cft_task_db"
+      - name: "${SERVICE_NAME}-wa-case-event-handler"
+      - name: "${SERVICE_NAME}-wa_workflow_api"
+      - name: "${SERVICE_NAME}-camunda"
+      - name: "${SERVICE_NAME}-org_role_mapping"
+      - name: "${SERVICE_NAME}-emstitch"
+      - name: "${SERVICE_NAME}-payment"
+      - name: "${SERVICE_NAME}-dbrdcaseworker"
+      - name: "${SERVICE_NAME}-et_cos"
+      - name: "${SERVICE_NAME}-dbrefdata"
+      - name: "${SERVICE_NAME}-dbuserprofile"
+      - name: "${SERVICE_NAME}-dbjuddata"
 
 et-migration:
   enabled: false

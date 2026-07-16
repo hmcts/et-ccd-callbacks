@@ -178,10 +178,10 @@ withPipeline(type, product, component) {
     env.ET_COS_AAT_DB_NAME = "et_cos"
     env.ET_COS_PREVIEW_DB_HOST = "et-preview.postgres.database.azure.com"
     env.ET_COS_PREVIEW_DB_PORT = "5432"
-    env.ET_COS_PREVIEW_DB_NAME = "et-cos-pr-${CHANGE_ID}-${BUILD_NUMBER}-et_cos"
+    env.ET_COS_PREVIEW_DB_NAME = "pr-${CHANGE_ID}-et_cos"
     env.ET_COS_PREVIEW_DB_USER_NAME = "hmcts"
     env.ET_COS_PREVIEW_DB_CONN_OPTIONS = "sslmode=require"
-    env.CCD_DEFINITION_STORE_PREVIEW_DB_NAME = "et-cos-pr-${CHANGE_ID}-${BUILD_NUMBER}-definition-store"
+    env.CCD_DEFINITION_STORE_PREVIEW_DB_NAME = "pr-${CHANGE_ID}-definition-store"
 
     before('smoketest:preview') {
       env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"

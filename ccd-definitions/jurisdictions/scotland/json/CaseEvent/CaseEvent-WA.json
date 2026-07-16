@@ -499,7 +499,6 @@
     "EventEnablingCondition": "managingOffice !=\"Unassigned\"",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
-    "ShowSummary": "Y",
-    "Publish": "Y"
+    "ShowSummary": "Y"
   }
 ]

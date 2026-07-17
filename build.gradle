@@ -227,7 +227,7 @@ allprojects {
             'org.postgresql:postgresql:42.7.13',
             'org.springframework.security:spring-security-crypto:6.5.11',
             // CVE-2026-29181, CVE-2026-24051, CVE-2026-39883, CVE-2026-39882
-            'io.opentelemetry.semconv:opentelemetry-semconv:1.42.0'
+            'io.opentelemetry.semconv:opentelemetry-semconv:1.43.0'
         )
     }
 }

@@ -486,8 +486,14 @@ public class CaseActionsForCaseWorkerController {
 
     @PostMapping(value = "/updateRespondentEmail/submitted", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Reassign respondent case access after updating their email.")
-    public void updateRespondentEmailSubmitted(@RequestBody CallbackRequest callbackRequest) {
-        respondentEmailService.reassignDefendantAccess(callbackRequest);
+    public ResponseEntity<CCDCallbackResponse> updateRespondentEmailSubmitted(
+            @RequestBody CallbackRequest callbackRequest) {
+        RespondentEmailService.Confirmation confirmation =
+                respondentEmailService.reassignDefendantAccess(callbackRequest);
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+                .confirmation_header(confirmation.header())
+                .confirmation_body(confirmation.body())
+                .build());
     }
 
     @PostMapping(value = "/amendRespondentDetails", consumes = APPLICATION_JSON_VALUE)

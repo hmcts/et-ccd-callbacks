@@ -525,14 +525,47 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     @SneakyThrows
     void updateRespondentEmailSubmittedReassignsDefendantAccess() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(respondentEmailService.reassignDefendantAccess(any(CallbackRequest.class)))
+                .thenReturn(new RespondentEmailService.Confirmation(
+                        "# Respondent email updated",
+                        "The respondent email has been updated and case access has been transferred "
+                                + "to the new email address."));
 
         mvc.perform(post(UPDATE_RESPONDENT_EMAIL_SUBMITTED_URL)
                         .content(requestContent.toString())
                         .header(AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.confirmation_header", is("# Respondent email updated")))
+                .andExpect(jsonPath("$.confirmation_body",
+                        is("The respondent email has been updated and case access has been transferred "
+                                + "to the new email address.")));
 
         verify(respondentEmailService).reassignDefendantAccess(any(CallbackRequest.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void updateRespondentEmailSubmittedReturnsPartialFailureConfirmation() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(respondentEmailService.reassignDefendantAccess(any(CallbackRequest.class)))
+                .thenReturn(new RespondentEmailService.Confirmation(
+                        "# Respondent email updated, but case access was not transferred",
+                        "The respondent email was saved, but case access could not be moved "
+                                + "to the account for the new email. "
+                                + "This case has been marked so access can be retried."));
+
+        mvc.perform(post(UPDATE_RESPONDENT_EMAIL_SUBMITTED_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.confirmation_header",
+                        is("# Respondent email updated, but case access was not transferred")))
+                .andExpect(jsonPath("$.confirmation_body",
+                        is("The respondent email was saved, but case access could not be moved "
+                                + "to the account for the new email. "
+                                + "This case has been marked so access can be retried.")));
     }
 
     @Test

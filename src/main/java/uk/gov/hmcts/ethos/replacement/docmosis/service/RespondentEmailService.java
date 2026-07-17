@@ -2,13 +2,16 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -39,8 +42,6 @@ public class RespondentEmailService {
     static final String NO_UNREPRESENTED_RESPONDENTS_ERROR =
             "There are no unrepresented respondents whose email address can be updated.";
     static final String RESPONDENT_REQUIRED_ERROR = "Select a respondent.";
-    static final String RESPONDENT_NOT_FOUND_ERROR =
-            "The selected respondent could not be found. Select a respondent and try again.";
     static final String EMAIL_UNCHANGED_ERROR = "Enter an email address that is different from the current email.";
     static final String IDAM_USER_NOT_FOUND_ERROR = "No IdAM account was found for the new email address.";
     static final String IDAM_USER_AMBIGUOUS_ERROR =
@@ -48,9 +49,26 @@ public class RespondentEmailService {
     static final String ACCESS_LOOKUP_ERROR =
             "The respondent's existing case access could not be checked. Try again later.";
 
+    static final String CONFIRMATION_HEADER_SUCCESS = "# Respondent email updated";
+    static final String CONFIRMATION_BODY_SUCCESS =
+            "The respondent email has been updated.";
+    static final String CONFIRMATION_BODY_SUCCESS_WITH_ACCESS =
+            "The respondent email has been updated and case access has been transferred to the new email address.";
+    static final String CONFIRMATION_HEADER_PARTIAL_FAILURE =
+            "# Respondent email updated, but case access was not transferred";
+    static final String CONFIRMATION_BODY_PARTIAL_FAILURE =
+            "The respondent email was saved, but case access could not be moved to the account for the new email. "
+                    + "This case has been marked so access can be retried.";
+
+    static final String UPDATE_RESPONDENT_ACCESS_TRANSFER_STATE = "UPDATE_RESPONDENT_ACCESS_TRANSFER_STATE";
+
     private final IdamApi idamApi;
     private final AdminUserService adminUserService;
     private final CcdCaseAssignment ccdCaseAssignment;
+    private final CcdClient ccdClient;
+
+    public record Confirmation(String header, String body) {
+    }
 
     public List<String> initialise(CaseData caseData) {
         caseData.setCurrentRespondentEmail(null);
@@ -90,7 +108,7 @@ public class RespondentEmailService {
     public List<String> prepareUpdate(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         List<String> errors = validateInput(caseData);
-        if (!errors.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(errors)) {
             return errors;
         }
 
@@ -100,14 +118,18 @@ public class RespondentEmailService {
         }
 
         Optional<UserDetails> newUser = findUserByEmail(caseData.getNewRespondentEmail(), errors);
-        if (!errors.isEmpty() || newUser.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(errors) || newUser.isEmpty()) {
             return errors;
         }
 
         RespondentSumType respondent = selectedRespondent.get().getValue();
+        String previousIdamId = respondent.getIdamId();
         try {
-            if (getDefendantAssignment(caseDetails.getCaseId(), respondent.getIdamId()).isPresent()) {
+            if (getDefendantAssignment(caseDetails.getCaseId(), previousIdamId).isPresent()) {
                 respondent.setIdamId(newUser.get().getUid());
+                markAccessTransferPending(caseData, previousIdamId);
+            } else {
+                clearAccessTransferTracker(caseData);
             }
         } catch (IOException exception) {
             log.error("Unable to retrieve respondent access for case {}", caseDetails.getCaseId(), exception);
@@ -122,7 +144,7 @@ public class RespondentEmailService {
         return errors;
     }
 
-    public void reassignDefendantAccess(CallbackRequest callbackRequest) {
+    public Confirmation reassignDefendantAccess(CallbackRequest callbackRequest) {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
         CaseDetails caseDetailsBefore = callbackRequest.getCaseDetailsBefore();
         if (caseDetails == null || caseDetailsBefore == null
@@ -144,7 +166,8 @@ public class RespondentEmailService {
         String oldUserId = respondentBefore.getValue().getIdamId();
         String newUserId = respondentAfter.getValue().getIdamId();
         if (StringUtils.isAnyBlank(oldUserId, newUserId) || StringUtils.equals(oldUserId, newUserId)) {
-            return;
+            clearAccessTransferTracker(caseDetails.getCaseData());
+            return new Confirmation(CONFIRMATION_HEADER_SUCCESS, CONFIRMATION_BODY_SUCCESS);
         }
 
         CaseAssignmentUserRolesRequest oldAccess =
@@ -154,8 +177,9 @@ public class RespondentEmailService {
         try {
             ccdCaseAssignment.removeCaseUserRole(oldAccess);
         } catch (Exception revokeException) {
-            throw new CcdInputOutputException(
-                    "Failed to revoke access linked to the previous respondent email", revokeException);
+            log.error("Failed to revoke defendant access for case {} after email update",
+                    caseDetails.getCaseId(), revokeException);
+            return new Confirmation(CONFIRMATION_HEADER_PARTIAL_FAILURE, CONFIRMATION_BODY_PARTIAL_FAILURE);
         }
         try {
             ccdCaseAssignment.addCaseUserRole(newAccess);
@@ -166,8 +190,47 @@ public class RespondentEmailService {
                 grantException.addSuppressed(restoreException);
                 log.error("Failed to restore defendant access for case {}", caseDetails.getCaseId(), restoreException);
             }
-            throw new CcdInputOutputException(
-                    "Failed to grant case access using the new respondent email", grantException);
+            log.error("Failed to grant defendant access for case {} after email update",
+                    caseDetails.getCaseId(), grantException);
+            return new Confirmation(CONFIRMATION_HEADER_PARTIAL_FAILURE, CONFIRMATION_BODY_PARTIAL_FAILURE);
+        }
+
+        persistClearedAccessTransferTracker(caseDetails);
+        return new Confirmation(CONFIRMATION_HEADER_SUCCESS, CONFIRMATION_BODY_SUCCESS_WITH_ACCESS);
+    }
+
+    private void markAccessTransferPending(CaseData caseData, String previousIdamId) {
+        caseData.setRespondentAccessTransferPending(YES);
+        caseData.setRespondentAccessPreviousIdamId(previousIdamId);
+    }
+
+    private void clearAccessTransferTracker(CaseData caseData) {
+        caseData.setRespondentAccessTransferPending(null);
+        caseData.setRespondentAccessPreviousIdamId(null);
+    }
+
+    private void persistClearedAccessTransferTracker(CaseDetails caseDetails) {
+        clearAccessTransferTracker(caseDetails.getCaseData());
+        try {
+            String adminToken = adminUserService.getAdminUserToken();
+            CCDRequest ccdRequest = ccdClient.startEventForCase(
+                    adminToken,
+                    caseDetails.getCaseTypeId(),
+                    caseDetails.getJurisdiction(),
+                    caseDetails.getCaseId(),
+                    UPDATE_RESPONDENT_ACCESS_TRANSFER_STATE);
+            CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+            clearAccessTransferTracker(caseData);
+            ccdClient.submitEventForCase(
+                    adminToken,
+                    caseData,
+                    caseDetails.getCaseTypeId(),
+                    caseDetails.getJurisdiction(),
+                    ccdRequest,
+                    caseDetails.getCaseId());
+        } catch (Exception exception) {
+            log.error("Failed to clear respondent access transfer tracker for case {}",
+                    caseDetails.getCaseId(), exception);
         }
     }
 

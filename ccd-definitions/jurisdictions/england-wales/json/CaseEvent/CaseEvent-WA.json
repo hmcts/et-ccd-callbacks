@@ -502,22 +502,5 @@
     "ShowSummary": "Y",
     "EventEnablingCondition": "caseType=\"dummy\"",
     "Publish": "Y"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "updateRespondentEmail",
-    "Name": "Update respondent email",
-    "Description": "Update respondent email",
-    "DisplayOrder": 15,
-    "PreConditionState(s)": "Accepted;Rejected;Closed",
-    "PostConditionState": "*",
-    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/updateRespondentEmail/aboutToStart",
-    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/updateRespondentEmail/aboutToSubmit",
-    "CallBackURLSubmittedEvent": "${ET_COS_URL}/updateRespondentEmail/submitted",
-    "EventEnablingCondition": "managingOffice !=\"Unassigned\"",
-    "SecurityClassification": "Public",
-    "ShowEventNotes": "N",
-    "ShowSummary": "Y",
-    "Publish": "Y"
   }
 ]

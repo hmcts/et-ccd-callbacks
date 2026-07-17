@@ -47,6 +47,7 @@ services:
       executable: "blob"
     volumes:
       - ccd-docker-azure-blob-data:/opt/azurite/folder
+    command: azurite -l /data --skipApiVersionCheck --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0
 
   wiremock:
     container_name: wiremock

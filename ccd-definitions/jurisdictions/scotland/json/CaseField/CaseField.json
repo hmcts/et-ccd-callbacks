@@ -6757,5 +6757,22 @@
     "FieldType": "Email",
     "SecurityClassification": "Public",
     "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "respondentAccessTransferPending",
+    "Label": "Respondent access transfer pending",
+    "HintText": "Set when respondent email was updated but case access still needs transferring.",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "respondentAccessPreviousIdamId",
+    "Label": "Previous respondent IdAM id",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   }
 ]

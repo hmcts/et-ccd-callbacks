@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "et3RepresentingRespondent",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et3Response/validateRespondent"
+} ]

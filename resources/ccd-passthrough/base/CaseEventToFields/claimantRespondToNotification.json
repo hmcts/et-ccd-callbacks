@@ -1,0 +1,7 @@
+[ {
+  "CaseFieldID" : "claimantSelectNotification",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/claimantRespondNotification/midDetailsTable"
+}, {
+  "CaseFieldID" : "claimantNotificationDocuments",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/claimantRespondNotification/midValidateInput"
+} ]

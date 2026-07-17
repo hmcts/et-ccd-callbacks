@@ -1,0 +1,13 @@
+[ {
+  "CaseFieldID" : "correspondenceType",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/midAddressLabels"
+}, {
+  "CaseFieldID" : "addressLabelsSelectionType",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/midAddressLabels"
+}, {
+  "CaseFieldID" : "addressLabelCollection",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/midSelectedAddressLabels"
+}, {
+  "CaseFieldID" : "addressLabelsAttributesType",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/midValidateAddressLabels"
+} ]

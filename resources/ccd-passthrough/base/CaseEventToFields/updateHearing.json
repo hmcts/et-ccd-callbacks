@@ -1,0 +1,7 @@
+[ {
+  "CaseFieldID" : "hearingDetailsHearing",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/hearingdetails/handleListingSelected"
+}, {
+  "CaseFieldID" : "hearingDetailsCollection",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/hearingdetails/hearingMidEventValidation"
+} ]

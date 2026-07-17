@@ -1,0 +1,5 @@
+[ {
+  "ID" : "amendCaseDetails",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/initialiseAmendCaseDetails",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/amendCaseDetails"
+} ]

@@ -1,0 +1,4 @@
+[ {
+  "ID" : "claimantViewNotification",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/claimantViewNotification/aboutToStart"
+} ]

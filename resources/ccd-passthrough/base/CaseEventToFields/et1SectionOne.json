@@ -1,0 +1,13 @@
+[ {
+  "CaseFieldID" : "claimantSex",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/sectionOne/validateClaimantSex"
+}, {
+  "CaseFieldID" : "representativeAttendHearing",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/sectionOne/validateHearingPreferences"
+}, {
+  "CaseFieldID" : "claimantSupportQuestion",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/sectionOne/validateClaimantSupport"
+}, {
+  "CaseFieldID" : "representativeInformationPreamble",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/sectionOne/validateRepresentativeInformation"
+} ]

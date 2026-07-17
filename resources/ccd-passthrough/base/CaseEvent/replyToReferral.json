@@ -1,0 +1,6 @@
+[ {
+  "ID" : "replyToReferral",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/replyReferral/aboutToStart",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/replyReferral/aboutToSubmit",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/replyReferral/completeReplyToReferral"
+} ]

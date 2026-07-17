@@ -1,0 +1,4 @@
+[ {
+  "ID" : "createDcf",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/dcf/asyncAboutToSubmit"
+} ]

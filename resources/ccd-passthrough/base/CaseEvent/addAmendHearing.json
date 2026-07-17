@@ -1,0 +1,5 @@
+[ {
+  "ID" : "addAmendHearing",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/initialiseHearings",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/amendHearing"
+} ]

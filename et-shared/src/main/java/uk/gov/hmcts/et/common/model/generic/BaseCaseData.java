@@ -11,6 +11,24 @@ import uk.gov.hmcts.et.common.model.ccd.types.CaseLocation;
 import uk.gov.hmcts.et.common.model.ccd.types.DigitalCaseFileType;
 
 import java.util.List;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
+import uk.gov.hmcts.et.common.ccd.access.DefaultAccess;
+import uk.gov.hmcts.et.common.ccd.access.CREATORCudAccess;
+import uk.gov.hmcts.et.common.ccd.access.DEFENDANTCudAccess;
+import uk.gov.hmcts.et.common.ccd.access.CaseworkerEmploymentEtjudgeRAccess;
+import uk.gov.hmcts.et.common.ccd.access.CaseworkerEmploymentApiCudPlus2RolesJgoofxAccess;
+import uk.gov.hmcts.et.common.ccd.access.CitizenCuAccess;
+import uk.gov.hmcts.et.common.ccd.access.CaseworkerEmploymentApiCrudPlus2RolesKlompmAccess;
+import uk.gov.hmcts.et.common.ccd.access.CaseworkerEmploymentEnglandwalesCruPlus2RolesHenbjpAccess;
+import uk.gov.hmcts.et.common.ccd.access.CaseworkerEmploymentApiCrudAccess;
+import uk.gov.hmcts.et.common.ccd.access.CaseworkerEmploymentApiCrudEtAcasApiRAccess;
+import uk.gov.hmcts.et.common.ccd.access.CaseworkerEmploymentLegalrepSolicitorCuAccess;
+import uk.gov.hmcts.et.common.ccd.access.CaseworkerWaTaskConfigurationRAccess;
+import uk.gov.hmcts.et.common.ccd.access.CitizenCruAccess;
+import uk.gov.hmcts.et.common.ccd.access.CaseworkerEmploymentApiCrudCaseworkerWaTaskConfigurationRAccess;
+import uk.gov.hmcts.et.common.ccd.access.GSProfileRAccess;
+import uk.gov.hmcts.et.common.ccd.access.CaseworkerRasValidationRAccess;
 
 /**
  * Data common to single and multiple cases.
@@ -98,21 +116,69 @@ public class BaseCaseData {
     private String closeReferralGeneralNotes;
 
     //Document collection
+    @CCD(
+            label = "Case documentation",
+            hint = "Upload documentation for the case",
+            searchable = false,
+            typeOverride = FieldType.Collection,
+            typeParameterOverride = "DocumentUpload",
+            access = {DefaultAccess.class, CREATORCudAccess.class, DEFENDANTCudAccess.class, CaseworkerEmploymentEtjudgeRAccess.class}
+    )
     private List<DocumentTypeItem> documentCollection;
+    @CCD(
+            label = "Claimant Documents",
+            searchable = false,
+            typeOverride = FieldType.Collection,
+            typeParameterOverride = "DocumentUpload",
+            access = {CaseworkerEmploymentApiCudPlus2RolesJgoofxAccess.class, CitizenCuAccess.class}
+    )
     private List<DocumentTypeItem> claimantDocumentCollection;
+    @CCD(
+            label = "Documents",
+            searchable = false,
+            typeOverride = FieldType.Collection,
+            typeParameterOverride = "DocumentUpload",
+            access = {CaseworkerEmploymentApiCrudPlus2RolesKlompmAccess.class}
+    )
     private List<DocumentTypeItem> legalrepDocumentCollection;
 
+    @CCD(
+            label = "Digital Case File",
+            access = {CaseworkerEmploymentEnglandwalesCruPlus2RolesHenbjpAccess.class, CaseworkerEmploymentApiCrudAccess.class}
+    )
     @JsonProperty("digitalCaseFile")
     private DigitalCaseFileType digitalCaseFile;
 
+    @CCD(
+            label = "Digital Case File configuration",
+            searchable = false,
+            typeOverride = FieldType.FixedList,
+            typeParameterOverride = "configurationFiles",
+            access = {CaseworkerEmploymentEnglandwalesCruPlus2RolesHenbjpAccess.class, CaseworkerEmploymentApiCrudAccess.class}
+    )
     @JsonProperty("bundleConfiguration")
     private String bundleConfiguration;
 
+    @CCD(
+            label = "DCF",
+            hint = "DCF Collection",
+            access = {CaseworkerEmploymentEnglandwalesCruPlus2RolesHenbjpAccess.class, CaseworkerEmploymentApiCrudAccess.class}
+    )
     @JsonProperty("caseBundles")
     private List<Bundle> caseBundles;
 
+    @CCD(
+            label = "Next Listed Date",
+            searchable = false,
+            typeOverride = FieldType.Date,
+            access = {CaseworkerEmploymentEnglandwalesCruPlus2RolesHenbjpAccess.class, CaseworkerEmploymentApiCrudEtAcasApiRAccess.class, CaseworkerEmploymentLegalrepSolicitorCuAccess.class, CaseworkerWaTaskConfigurationRAccess.class, CitizenCruAccess.class}
+    )
     private String nextListedDate;
 
+    @CCD(
+            label = " ",
+            access = {CaseworkerEmploymentApiCrudCaseworkerWaTaskConfigurationRAccess.class, GSProfileRAccess.class, CaseworkerRasValidationRAccess.class}
+    )
     @JsonProperty("caseManagementLocation")
     private CaseLocation caseManagementLocation;
     @JsonProperty("managingOffice")

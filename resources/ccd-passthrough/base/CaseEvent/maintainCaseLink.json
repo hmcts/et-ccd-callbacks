@@ -1,0 +1,4 @@
+[ {
+  "ID" : "maintainCaseLink",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/caseLinks/maintain/aboutToSubmit"
+} ]

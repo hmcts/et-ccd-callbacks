@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "receiptDate",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/singleCaseMultipleMidEventValidation"
+} ]

@@ -1,0 +1,55 @@
+[ {
+  "ID" : "Et1ReppedSectionTwo",
+  "CaseEventID" : "et1SectionOne",
+  "CaseFieldID" : "claimantContactAddress",
+  "ListElementCode" : "AddressLine1",
+  "EventElementLabel" : "Building and Street",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "Et1ReppedSectionTwo",
+  "CaseEventID" : "et1SectionOne",
+  "CaseFieldID" : "claimantContactAddress",
+  "ListElementCode" : "AddressLine2",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "Et1ReppedSectionTwo",
+  "CaseEventID" : "et1SectionOne",
+  "CaseFieldID" : "claimantContactAddress",
+  "ListElementCode" : "AddressLine3",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "Et1ReppedSectionTwo",
+  "CaseEventID" : "et1SectionOne",
+  "CaseFieldID" : "claimantContactAddress",
+  "ListElementCode" : "PostTown",
+  "EventElementLabel" : "Town or City",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "Et1ReppedSectionTwo",
+  "CaseEventID" : "et1SectionOne",
+  "CaseFieldID" : "claimantContactAddress",
+  "ListElementCode" : "County",
+  "EventElementLabel" : "County",
+  "FieldDisplayOrder" : 6,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "Et1ReppedSectionTwo",
+  "CaseEventID" : "et1SectionOne",
+  "CaseFieldID" : "claimantContactAddress",
+  "ListElementCode" : "Country",
+  "EventElementLabel" : "Country",
+  "FieldDisplayOrder" : 7,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "Et1ReppedSectionTwo",
+  "CaseEventID" : "et1SectionOne",
+  "CaseFieldID" : "claimantContactAddress",
+  "ListElementCode" : "PostCode",
+  "EventElementLabel" : "Postcode",
+  "FieldDisplayOrder" : 8,
+  "DisplayContext" : "OPTIONAL"
+} ]

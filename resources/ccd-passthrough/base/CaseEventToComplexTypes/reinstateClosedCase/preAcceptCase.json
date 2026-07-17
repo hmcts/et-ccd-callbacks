@@ -1,0 +1,16 @@
+[ {
+  "CaseEventID" : "reinstateClosedCase",
+  "CaseFieldID" : "preAcceptCase",
+  "ListElementCode" : "dateAccepted",
+  "RetainHiddenValue" : "Yes"
+}, {
+  "CaseEventID" : "reinstateClosedCase",
+  "CaseFieldID" : "preAcceptCase",
+  "ListElementCode" : "dateRejected",
+  "RetainHiddenValue" : "Yes"
+}, {
+  "CaseEventID" : "reinstateClosedCase",
+  "CaseFieldID" : "preAcceptCase",
+  "ListElementCode" : "rejectReason",
+  "RetainHiddenValue" : "Yes"
+} ]

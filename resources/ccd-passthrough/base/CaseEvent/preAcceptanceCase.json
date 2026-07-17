@@ -1,0 +1,4 @@
+[ {
+  "ID" : "preAcceptanceCase",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/preAcceptanceCase/aboutToSubmit"
+} ]

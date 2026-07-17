@@ -1,0 +1,4 @@
+[ {
+  "ID" : "REMOVE_OWN_REP_AS_CLAIMANT",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/claimantRepresentative/removeOwnRepresentative"
+} ]

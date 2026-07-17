@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "submitEt3Respondent",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et3Response/reloadSubmitData"
+} ]

@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "caseNoteList",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/caseNotes/singles/manageCaseNote/midEvent"
+} ]

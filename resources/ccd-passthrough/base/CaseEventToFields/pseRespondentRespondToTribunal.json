@@ -1,0 +1,10 @@
+[ {
+  "CaseFieldID" : "respondToTribunalNotAvailableWarning",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/pseRespondToTribunal/showError"
+}, {
+  "CaseFieldID" : "pseRespondentSelectOrderOrRequest",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/pseRespondToTribunal/midDetailsTable"
+}, {
+  "CaseFieldID" : "pseRespondentOrdReqTableMarkUp",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/pseRespondToTribunal/midValidateInput"
+} ]

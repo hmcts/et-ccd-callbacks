@@ -1,0 +1,7 @@
+[ {
+  "CaseFieldID" : "tseAdminSelectApplication",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/tseAdmReply/midDetailsTable"
+}, {
+  "CaseFieldID" : "tseAdmReplyTableMarkUp",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/tseAdmReply/midValidateInput"
+} ]

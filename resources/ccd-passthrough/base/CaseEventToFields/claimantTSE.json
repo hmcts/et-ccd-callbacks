@@ -1,0 +1,40 @@
+[ {
+  "CaseFieldID" : "claimantTseGuidanceLabel1",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/claimantTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "claimantTseGuidanceLabel2",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/claimantTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "claimantTseGuidanceLabel3",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/claimantTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "claimantTseGuidanceLabel4",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/claimantTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "claimantTseGuidanceLabel5",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/claimantTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "claimantTseGuidanceLabel6",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/claimantTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "claimantTseGuidanceLabel7",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/claimantTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "claimantTseGuidanceLabel8",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/claimantTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "claimantTseGuidanceLabel9",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/claimantTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "claimantTseGuidanceLabel10",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/claimantTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "claimantTseGuidanceLabel11",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/claimantTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "claimantTseGuidanceLabel12",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/claimantTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "claimantTseGuidanceLabel13",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/claimantTSE/validateGiveDetails"
+} ]

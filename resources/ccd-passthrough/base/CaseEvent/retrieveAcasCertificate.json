@@ -1,0 +1,5 @@
+[ {
+  "ID" : "retrieveAcasCertificate",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/acasCertificate/retrieveCertificate",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/acasCertificate/confirmation"
+} ]

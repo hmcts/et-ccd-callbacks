@@ -1,0 +1,41 @@
+[ {
+  "CaseEventID" : "initialConsideration",
+  "CaseFieldID" : "etICHearingNotListedListForFinalHearingUpdated",
+  "ListElementCode" : "etICLengthOfFinalHearingV2",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "initialConsideration",
+  "CaseFieldID" : "etICHearingNotListedListForFinalHearingUpdated",
+  "ListElementCode" : "finalHearingLengthNumTypeV2",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "initialConsideration",
+  "CaseFieldID" : "etICHearingNotListedListForFinalHearingUpdated",
+  "ListElementCode" : "etICFinalHearingIsEJSitAlone",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "initialConsideration",
+  "CaseFieldID" : "etICHearingNotListedListForFinalHearingUpdated",
+  "ListElementCode" : "etICFinalHearingIsEJSitAloneReasonYes",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "initialConsideration",
+  "CaseFieldID" : "etICHearingNotListedListForFinalHearingUpdated",
+  "ListElementCode" : "etICNoLFinalHearingIsEJSitAloneReasonsJsaOther",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "initialConsideration",
+  "CaseFieldID" : "etICHearingNotListedListForFinalHearingUpdated",
+  "ListElementCode" : "etICFinalHearingIsEJSitAloneReasonNo",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "initialConsideration",
+  "CaseFieldID" : "etICHearingNotListedListForFinalHearingUpdated",
+  "ListElementCode" : "etICNoLFinalHearingIsEJSitAloneReasonsMembersOther",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "initialConsideration",
+  "CaseFieldID" : "etICHearingNotListedListForFinalHearingUpdated",
+  "ListElementCode" : "etICFinalHearingIsEJSitAloneFurtherDetails",
+  "RetainHiddenValue" : "No"
+} ]

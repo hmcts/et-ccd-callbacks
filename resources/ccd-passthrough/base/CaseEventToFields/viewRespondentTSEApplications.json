@@ -1,0 +1,7 @@
+[ {
+  "CaseFieldID" : "tseViewApplicationOpenOrClosed",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/viewRespondentTSEApplications/midPopulateChooseApplication"
+}, {
+  "CaseFieldID" : "tseViewApplicationSelect",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/viewRespondentTSEApplications/midPopulateSelectedApplicationData"
+} ]

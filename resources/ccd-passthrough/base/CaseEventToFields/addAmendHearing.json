@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "hearingCollection",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/midEventAmendHearing"
+} ]

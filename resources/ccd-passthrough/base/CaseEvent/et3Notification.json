@@ -1,0 +1,6 @@
+[ {
+  "ID" : "et3Notification",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/et3Notification/aboutToStart",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/et3Notification/aboutToSubmit",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/et3Notification/submitted"
+} ]

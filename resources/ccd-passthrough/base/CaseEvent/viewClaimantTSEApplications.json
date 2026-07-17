@@ -1,0 +1,4 @@
+[ {
+  "ID" : "viewClaimantTSEApplications",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/claimantTSE/viewApplicationsAboutToStart"
+} ]

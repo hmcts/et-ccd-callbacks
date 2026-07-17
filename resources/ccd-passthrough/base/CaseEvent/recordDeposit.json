@@ -1,0 +1,5 @@
+[ {
+  "ID" : "recordDeposit",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/dynamicDepositOrder",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/depositValidation"
+} ]

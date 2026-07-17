@@ -1,0 +1,91 @@
+[ {
+  "CaseEventID" : "addAmendClaimantRepresentative",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "myHmctsOrganisation.OrganisationID",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "addAmendClaimantRepresentative",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "myHmctsOrganisation.OrganisationName",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "addAmendClaimantRepresentative",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "name_of_representative",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "addAmendClaimantRepresentative",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "name_of_organisation",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "addAmendClaimantRepresentative",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_occupation",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "addAmendClaimantRepresentative",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_reference",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "addAmendClaimantRepresentative",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_occupation_other",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "addAmendClaimantRepresentative",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_address.AddressLine1",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "addAmendClaimantRepresentative",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_address.AddressLine2",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "addAmendClaimantRepresentative",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_address.AddressLine3",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "addAmendClaimantRepresentative",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_address.PostTown",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "addAmendClaimantRepresentative",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_address.County",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "addAmendClaimantRepresentative",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_address.Country",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "addAmendClaimantRepresentative",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_address.PostCode",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "addAmendClaimantRepresentative",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_phone_number",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "addAmendClaimantRepresentative",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_mobile_number",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "addAmendClaimantRepresentative",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_email_address",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "addAmendClaimantRepresentative",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_preference",
+  "RetainHiddenValue" : "No"
+} ]

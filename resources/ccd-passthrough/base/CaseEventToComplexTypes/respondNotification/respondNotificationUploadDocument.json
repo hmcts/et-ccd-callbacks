@@ -1,0 +1,11 @@
+[ {
+  "CaseEventID" : "respondNotification",
+  "CaseFieldID" : "respondNotificationUploadDocument",
+  "ListElementCode" : "shortDescription",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "respondNotification",
+  "CaseFieldID" : "respondNotificationUploadDocument",
+  "ListElementCode" : "uploadedDocument",
+  "RetainHiddenValue" : "No"
+} ]

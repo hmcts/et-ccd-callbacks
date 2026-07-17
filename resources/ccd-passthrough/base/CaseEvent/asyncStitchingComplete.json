@@ -1,0 +1,4 @@
+[ {
+  "ID" : "asyncStitchingComplete",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/dcf/asyncCompleteAboutToSubmit"
+} ]

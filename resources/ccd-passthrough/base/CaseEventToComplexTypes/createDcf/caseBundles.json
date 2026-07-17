@@ -1,0 +1,25 @@
+[ {
+  "ID" : "DigitalCaseFile",
+  "CaseEventID" : "createDcf",
+  "CaseFieldID" : "caseBundles",
+  "ListElementCode" : "documents",
+  "EventElementLabel" : "Digital Case File documents",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "DigitalCaseFile",
+  "CaseEventID" : "createDcf",
+  "CaseFieldID" : "caseBundles",
+  "ListElementCode" : "documents.name",
+  "EventElementLabel" : "Document name",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "DigitalCaseFile",
+  "CaseEventID" : "createDcf",
+  "CaseFieldID" : "caseBundles",
+  "ListElementCode" : "documents.sourceDocument",
+  "EventElementLabel" : "Document",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+} ]

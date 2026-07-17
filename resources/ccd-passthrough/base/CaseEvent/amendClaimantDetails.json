@@ -1,0 +1,4 @@
+[ {
+  "ID" : "amendClaimantDetails",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/amendClaimantDetails"
+} ]

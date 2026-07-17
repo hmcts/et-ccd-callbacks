@@ -1,0 +1,5 @@
+[ {
+  "ID" : "migrateCase",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/global-search-migration/about-to-submit",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/global-search-migration/submitted"
+} ]

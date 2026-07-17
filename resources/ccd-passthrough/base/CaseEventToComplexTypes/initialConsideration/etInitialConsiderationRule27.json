@@ -1,0 +1,41 @@
+[ {
+  "ID" : "InitialConsideration",
+  "CaseEventID" : "initialConsideration",
+  "CaseFieldID" : "etInitialConsiderationRule27",
+  "ListElementCode" : "etICRule27ClaimToBe",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "OPTIONAL",
+  "RetainHiddenValue" : "No"
+}, {
+  "ID" : "InitialConsideration",
+  "CaseEventID" : "initialConsideration",
+  "CaseFieldID" : "etInitialConsiderationRule27",
+  "ListElementCode" : "etICRule27WhichPart",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "OPTIONAL",
+  "RetainHiddenValue" : "No"
+}, {
+  "ID" : "InitialConsideration",
+  "CaseEventID" : "initialConsideration",
+  "CaseFieldID" : "etInitialConsiderationRule27",
+  "ListElementCode" : "etICRule27Direction",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "OPTIONAL",
+  "RetainHiddenValue" : "No"
+}, {
+  "ID" : "InitialConsideration",
+  "CaseEventID" : "initialConsideration",
+  "CaseFieldID" : "etInitialConsiderationRule27",
+  "ListElementCode" : "etICRule27DirectionReason",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "OPTIONAL",
+  "RetainHiddenValue" : "No"
+}, {
+  "ID" : "InitialConsideration",
+  "CaseEventID" : "initialConsideration",
+  "CaseFieldID" : "etInitialConsiderationRule27",
+  "ListElementCode" : "etICRule27NumberOfDays",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "OPTIONAL",
+  "RetainHiddenValue" : "No"
+} ]

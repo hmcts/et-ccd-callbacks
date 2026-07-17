@@ -1,0 +1,4 @@
+[ {
+  "ID" : "addCaseNote",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/caseNotes/singles/aboutToSubmit"
+} ]

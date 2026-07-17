@@ -1,0 +1,4 @@
+[ {
+  "ID" : "rollbackMigrateCase",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/migrate/rollback/aboutToSubmit"
+} ]

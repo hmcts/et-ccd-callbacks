@@ -1,0 +1,10 @@
+[ {
+  "CaseFieldID" : "claimantTseRespNotAvailable",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/tseClaimantRepResponse/showError"
+}, {
+  "CaseFieldID" : "claimantRepRespondSelectApplication",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/tseClaimantRepResponse/midPopulateReply"
+}, {
+  "CaseFieldID" : "claimantRepResponseIntro",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/tseClaimantRepResponse/midValidateInput"
+} ]

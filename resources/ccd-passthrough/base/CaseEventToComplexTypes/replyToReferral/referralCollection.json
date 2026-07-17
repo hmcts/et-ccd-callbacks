@@ -1,0 +1,51 @@
+[ {
+  "CaseEventID" : "replyToReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "referralSubject",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "replyToReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "referralSubjectSpecify",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "replyToReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "referCaseTo",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "replyToReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "referralNumber",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "replyToReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "referralReplyCollection",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "replyToReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "referralReplyCollection.directionTo",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "replyToReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "referralReplyCollection.isUrgentReply",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "replyToReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "referralReplyCollection.replyDateTime",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "replyToReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "referralReplyCollection.referralSubject",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "replyToReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "referralReplyCollection.referralNumber",
+  "Publish" : "Y"
+} ]

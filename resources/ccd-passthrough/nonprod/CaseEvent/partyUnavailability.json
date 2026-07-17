@@ -1,0 +1,5 @@
+[ {
+  "ID" : "partyUnavailability",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/hearingUnavailability/aboutToSubmit",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/hearingUnavailability/submitted"
+} ]

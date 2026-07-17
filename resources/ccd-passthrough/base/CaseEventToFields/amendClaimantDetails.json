@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "claimantHearingPreference",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/midEventHearingPreferences"
+} ]

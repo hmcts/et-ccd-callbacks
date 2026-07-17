@@ -1,0 +1,7 @@
+[ {
+  "CaseFieldID" : "respondentCollection",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/midRespondentAddress"
+}, {
+  "CaseFieldID" : "claimantHearingPreference",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/midEventHearingPreferences"
+} ]

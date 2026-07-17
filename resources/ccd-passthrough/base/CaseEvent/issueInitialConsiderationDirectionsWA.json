@@ -1,0 +1,6 @@
+[ {
+  "ID" : "issueInitialConsiderationDirectionsWA",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/startIssueInitialConsiderationDirectionsWA",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/submitIssueInitialConsiderationDirectionsWA",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/completeIssueInitialConsiderationDirectionsWA"
+} ]

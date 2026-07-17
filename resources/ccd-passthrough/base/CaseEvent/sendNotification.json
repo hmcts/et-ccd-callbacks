@@ -1,0 +1,6 @@
+[ {
+  "ID" : "sendNotification",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/sendNotification/aboutToStart",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/sendNotification/aboutToSubmit",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/sendNotification/submitted"
+} ]

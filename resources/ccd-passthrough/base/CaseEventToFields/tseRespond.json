@@ -1,0 +1,10 @@
+[ {
+  "CaseFieldID" : "tseRespondNotAvailableWarning",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/tseRespond/showError"
+}, {
+  "CaseFieldID" : "tseRespondSelectApplication",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/tseResponse/midPopulateReply"
+}, {
+  "CaseFieldID" : "tseResponseIntro",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/tseResponse/midValidateInput"
+} ]

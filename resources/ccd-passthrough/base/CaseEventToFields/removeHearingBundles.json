@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "removeBundleDropDownSelectedParty",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/bundlesRespondent/midPopulateRemoveHearingBundles"
+} ]

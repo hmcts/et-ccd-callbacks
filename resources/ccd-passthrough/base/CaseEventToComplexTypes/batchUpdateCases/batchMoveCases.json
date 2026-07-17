@@ -1,0 +1,26 @@
+[ {
+  "ID" : "moveCases",
+  "CaseEventID" : "batchUpdateCases",
+  "CaseFieldID" : "batchMoveCases",
+  "ListElementCode" : "convertToSingle",
+  "EventElementLabel" : "Will the cases be moved out of the multiple and treated as single cases?",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "moveCases",
+  "CaseEventID" : "batchUpdateCases",
+  "CaseFieldID" : "batchMoveCases",
+  "ListElementCode" : "updatedMultipleRef",
+  "EventElementLabel" : "Updated multiple reference number",
+  "EventHintText" : "Enter the existing multiple reference number if only the submultiple is changing",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "moveCases",
+  "CaseEventID" : "batchUpdateCases",
+  "CaseFieldID" : "batchMoveCases",
+  "ListElementCode" : "updatedSubMultipleRef",
+  "EventElementLabel" : "Updated submultiple reference number",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "OPTIONAL"
+} ]

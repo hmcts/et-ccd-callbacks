@@ -1,0 +1,81 @@
+[ {
+  "CaseEventID" : "INITIATE_CASE_DRAFT",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "name_of_representative",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "INITIATE_CASE_DRAFT",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "name_of_organisation",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "INITIATE_CASE_DRAFT",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_occupation",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "INITIATE_CASE_DRAFT",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_reference",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "INITIATE_CASE_DRAFT",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_occupation_other",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "INITIATE_CASE_DRAFT",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_address.AddressLine1",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "INITIATE_CASE_DRAFT",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_address.AddressLine2",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "INITIATE_CASE_DRAFT",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_address.AddressLine3",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "INITIATE_CASE_DRAFT",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_address.PostTown",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "INITIATE_CASE_DRAFT",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_address.County",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "INITIATE_CASE_DRAFT",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_address.Country",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "INITIATE_CASE_DRAFT",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_address.PostCode",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "INITIATE_CASE_DRAFT",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_phone_number",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "INITIATE_CASE_DRAFT",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_mobile_number",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "INITIATE_CASE_DRAFT",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_email_address",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "INITIATE_CASE_DRAFT",
+  "CaseFieldID" : "representativeClaimantType",
+  "ListElementCode" : "representative_preference",
+  "RetainHiddenValue" : "No"
+} ]

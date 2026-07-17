@@ -1,0 +1,4 @@
+[ {
+  "ID" : "pseRespondentViewNotification",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/pseRespondentView/aboutToStart"
+} ]

@@ -1,0 +1,11 @@
+[ {
+  "CaseEventID" : "tseRespond",
+  "CaseFieldID" : "tseResponseSupportingMaterial",
+  "ListElementCode" : "shortDescription",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "tseRespond",
+  "CaseFieldID" : "tseResponseSupportingMaterial",
+  "ListElementCode" : "uploadedDocument",
+  "RetainHiddenValue" : "No"
+} ]

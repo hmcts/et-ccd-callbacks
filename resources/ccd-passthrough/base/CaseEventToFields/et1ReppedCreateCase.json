@@ -1,0 +1,7 @@
+[ {
+  "CaseFieldID" : "et1ReppedTriageYesNo",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/createCase/validatePostcode"
+}, {
+  "CaseFieldID" : "et1ReppedTriageError",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/createCase/officeError"
+} ]

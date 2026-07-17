@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "preAcceptCase",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/postDefaultValues"
+} ]

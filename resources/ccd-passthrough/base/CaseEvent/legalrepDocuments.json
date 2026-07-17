@@ -1,0 +1,5 @@
+[ {
+  "ID" : "legalrepDocuments",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/legalrepDocuments/aboutToStart",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/legalrepDocuments/aboutToSubmit"
+} ]

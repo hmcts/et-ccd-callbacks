@@ -1,0 +1,86 @@
+[ {
+  "CaseEventID" : "updateReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "referralSubject",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "referralSubjectSpecify",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "referCaseTo",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "referralNumber",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "updateReferralCollection",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "updateReferralCollection.updateReferralNumber",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "updateReferralCollection.updateReferralHearingDate",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "updateReferralCollection.updateReferCaseTo",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "updateReferralCollection.updateReferentEmail",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "updateReferralCollection.updateReferralDetails",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "updateReferralCollection.updateIsUrgent",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "updateReferralCollection.updateReferralSubject",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "updateReferralCollection.updateReferralSubjectSpecify",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "updateReferralCollection.updateReferralInstruction",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "updateReferralCollection.updateReferredBy",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "updateReferralCollection.updateReferralDate",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "updateReferralCollection.updateReferralDateTime",
+  "Publish" : "Y"
+} ]

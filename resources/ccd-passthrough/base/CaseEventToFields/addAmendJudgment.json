@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "judgementCollection",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/judgmentValidation"
+} ]

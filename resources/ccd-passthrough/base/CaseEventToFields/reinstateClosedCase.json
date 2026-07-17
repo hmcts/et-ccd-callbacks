@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "positionType",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/reinstateClosedCaseMidEventValidation"
+} ]

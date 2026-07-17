@@ -1,0 +1,11 @@
+[ {
+  "CaseEventID" : "claimantRespondToNotification",
+  "CaseFieldID" : "claimantNotificationDocuments",
+  "ListElementCode" : "uploadedDocument",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "claimantRespondToNotification",
+  "CaseFieldID" : "claimantNotificationDocuments",
+  "ListElementCode" : "shortDescription",
+  "RetainHiddenValue" : "No"
+} ]

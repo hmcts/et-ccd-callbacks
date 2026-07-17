@@ -1,0 +1,5 @@
+[ {
+  "ID" : "et1SectionThree",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/et1Repped/aboutToSubmitSection",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/et1Repped/sectionCompleted"
+} ]

@@ -1,0 +1,6 @@
+[ {
+  "ID" : "initiateCase",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/preDefaultValues",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/postDefaultValues",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/addServiceId"
+} ]

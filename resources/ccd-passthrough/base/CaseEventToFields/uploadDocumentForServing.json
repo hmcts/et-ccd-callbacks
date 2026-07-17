@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "servingDocumentCollection",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/midServingDocumentOtherTypeNames"
+} ]

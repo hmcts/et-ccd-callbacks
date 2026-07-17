@@ -1,0 +1,11 @@
+[ {
+  "ID" : "disposeCaseTTL",
+  "CaseEventID" : "disposeCase",
+  "CaseFieldID" : "TTL",
+  "ListElementCode" : "Suspended",
+  "DefaultValue" : "Yes",
+  "EventElementLabel" : "Do you want to suspend case deletion?",
+  "EventHintText" : "By default, a closed case will be deleted after 365 days. If you want to retain the case, select 'Yes'. If you want to delete the case, select 'No'.",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+} ]

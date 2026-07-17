@@ -1,0 +1,10 @@
+[ {
+  "CaseFieldID" : "et1SectionThreeClaimDetails",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/validateGrounds"
+}, {
+  "CaseFieldID" : "whistleblowingYesNo",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/sectionThree/validateWhistleblowing"
+}, {
+  "CaseFieldID" : "linkedCasesYesNo",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/sectionThree/validateLinkedCases"
+} ]

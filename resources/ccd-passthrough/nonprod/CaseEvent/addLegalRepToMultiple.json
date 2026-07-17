@@ -1,0 +1,6 @@
+[ {
+  "ID" : "addLegalRepToMultiple",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/multiples/addLegalRepToMultiple/aboutToStart",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/multiples/addLegalRepToMultiple/aboutToSubmit",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/multiples/addLegalRepToMultiple/completed"
+} ]

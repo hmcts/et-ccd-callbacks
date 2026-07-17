@@ -1,0 +1,17 @@
+[ {
+  "ID" : "AmendCase",
+  "CaseEventID" : "amendCaseDetails",
+  "CaseFieldID" : "claimantHearingPreference",
+  "ListElementCode" : "hearing_preferences",
+  "EventElementLabel" : "What are the claimant's hearing preferences",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "AmendCase",
+  "CaseEventID" : "amendCaseDetails",
+  "CaseFieldID" : "claimantHearingPreference",
+  "ListElementCode" : "hearing_assistance",
+  "EventElementLabel" : "Why is the claimant unable to take part in video or phone hearings",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+} ]

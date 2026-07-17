@@ -1,0 +1,6 @@
+[ {
+  "ID" : "claimantTSE",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/claimantTSE/aboutToStart",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/claimantTSE/aboutToSubmit",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/claimantTSE/completeApplication"
+} ]

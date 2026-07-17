@@ -1,0 +1,6 @@
+[ {
+  "ID" : "tseRespond",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/tseResponse/aboutToStart",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/tseResponse/aboutToSubmit",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/tseResponse/submitted"
+} ]

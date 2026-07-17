@@ -1,0 +1,16 @@
+[ {
+  "CaseFieldID" : "et3ChooseRespondent",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et3Vetting/midPopulateRespondentEt3Response"
+}, {
+  "CaseFieldID" : "et3Date",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et3Vetting/midCalculateResponseInTime"
+}, {
+  "CaseFieldID" : "et3ResponseInTimeDateLabel",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et3Vetting/midRespondentNameAndAddressTable"
+}, {
+  "CaseFieldID" : "et3ContractClaimSection7",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et3Vetting/midHearingListedTable"
+}, {
+  "CaseFieldID" : "et3HearingDetails",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et3Vetting/midTransferApplicationTable"
+} ]

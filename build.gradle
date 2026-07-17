@@ -12,7 +12,7 @@ plugins {
     id 'org.sonarqube' version '6.3.1.5724'
     id 'pmd'
     id 'hmcts.ccd.sdk' version '6.26.0'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.2263'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.2267'
 }
 
 group = 'uk.gov.hmcts.et'
@@ -587,7 +587,7 @@ dependencies {
         exclude module: 'commons-io'
     }
 
-    testImplementation group: 'com.auth0', name: 'java-jwt', version: '4.5.2'
+    testImplementation group: 'com.auth0', name: 'java-jwt', version: '4.6.0'
     testImplementation group: 'com.warrenstrange', name: 'googleauth', version: '1.5.0'
     testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: serenity
     testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: serenity

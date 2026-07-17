@@ -1,0 +1,37 @@
+[ {
+  "ID" : "Respondent",
+  "CaseEventID" : "amendRespondentDetails",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondentType",
+  "EventElementLabel" : "Type of respondent",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "MANDATORY",
+  "FieldShowCondition" : "responseReceived=\"dummy\""
+}, {
+  "ID" : "Respondent",
+  "CaseEventID" : "amendRespondentDetails",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondentOrganisation",
+  "EventElementLabel" : "Organisation or business name",
+  "FieldDisplayOrder" : 6,
+  "DisplayContext" : "MANDATORY",
+  "FieldShowCondition" : "responseReceived=\"dummy\""
+}, {
+  "ID" : "Respondent",
+  "CaseEventID" : "amendRespondentDetails",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondentFirstName",
+  "EventElementLabel" : "Respondent first name",
+  "FieldDisplayOrder" : 7,
+  "DisplayContext" : "MANDATORY",
+  "FieldShowCondition" : "responseReceived=\"dummy\""
+}, {
+  "ID" : "Respondent",
+  "CaseEventID" : "amendRespondentDetails",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondentLastName",
+  "EventElementLabel" : "Respondent last name",
+  "FieldDisplayOrder" : 8,
+  "DisplayContext" : "MANDATORY",
+  "FieldShowCondition" : "responseReceived=\"dummy\""
+} ]

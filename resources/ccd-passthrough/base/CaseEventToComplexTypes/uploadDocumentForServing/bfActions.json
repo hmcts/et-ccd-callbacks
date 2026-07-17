@@ -1,0 +1,11 @@
+[ {
+  "CaseEventID" : "uploadDocumentForServing",
+  "CaseFieldID" : "bfActions",
+  "ListElementCode" : "bfDate",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "uploadDocumentForServing",
+  "CaseFieldID" : "bfActions",
+  "ListElementCode" : "allActions",
+  "Publish" : "Y"
+} ]

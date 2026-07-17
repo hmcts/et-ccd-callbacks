@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "pseRespondentSelectJudgmentOrderNotification",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/pseRespondentView/midDetailsTable"
+} ]

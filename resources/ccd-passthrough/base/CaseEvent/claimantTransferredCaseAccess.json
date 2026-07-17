@@ -1,0 +1,4 @@
+[ {
+  "ID" : "claimantTransferredCaseAccess",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/caseAccess/claimant/transferredCase"
+} ]

@@ -1,0 +1,11 @@
+[ {
+  "CaseEventID" : "respondentTSE",
+  "CaseFieldID" : "genericTseApplicationCollection",
+  "ListElementCode" : "type",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "respondentTSE",
+  "CaseFieldID" : "genericTseApplicationCollection",
+  "ListElementCode" : "number",
+  "Publish" : "Y"
+} ]

@@ -18,7 +18,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.MultipleCas
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
@@ -41,17 +40,6 @@ public class EtJsonCcdConfig {
           support,
           ADMIN_CASE_TYPE_ID,
           "file:ccd-definitions/jurisdictions/admin/json"
-        ) { };
-    }
-
-    @Bean
-    public CCDConfig<CaseData, CaseState, PlaceholderRole> etEnglandWalesJsonCcdConfig(
-        JsonCCDConfigSupport support
-    ) {
-        return new JsonBackedCCDConfig<>(
-          support,
-          ENGLANDWALES_CASE_TYPE_ID,
-          ENGLAND_WALES_JSON_ROOT
         ) { };
     }
 

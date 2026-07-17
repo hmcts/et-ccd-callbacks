@@ -1,0 +1,4 @@
+[ {
+  "ID" : "uploadDocumentForServing",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/et1Serving/submitted"
+} ]

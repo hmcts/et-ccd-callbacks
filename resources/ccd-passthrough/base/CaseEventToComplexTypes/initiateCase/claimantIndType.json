@@ -1,0 +1,41 @@
+[ {
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "claimantIndType",
+  "ListElementCode" : "claimant_preferred_title",
+  "RetainHiddenValue" : "Yes"
+}, {
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "claimantIndType",
+  "ListElementCode" : "claimant_title_other",
+  "RetainHiddenValue" : "Yes"
+}, {
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "claimantIndType",
+  "ListElementCode" : "claimant_first_names",
+  "RetainHiddenValue" : "Yes"
+}, {
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "claimantIndType",
+  "ListElementCode" : "claimant_last_name",
+  "RetainHiddenValue" : "Yes"
+}, {
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "claimantIndType",
+  "ListElementCode" : "claimant_date_of_birth",
+  "RetainHiddenValue" : "Yes"
+}, {
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "claimantIndType",
+  "ListElementCode" : "claimant_sex",
+  "RetainHiddenValue" : "Yes"
+}, {
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "claimantIndType",
+  "ListElementCode" : "claimant_gender_identity_same",
+  "RetainHiddenValue" : "Yes"
+}, {
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "claimantIndType",
+  "ListElementCode" : "claimant_gender_identity",
+  "RetainHiddenValue" : "Yes"
+} ]

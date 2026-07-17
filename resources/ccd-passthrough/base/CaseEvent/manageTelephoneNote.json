@@ -1,0 +1,5 @@
+[ {
+  "ID" : "manageTelephoneNote",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/caseNotes/singles/manageCaseNote/aboutToStart",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/caseNotes/singles/manageCaseNote/aboutToSubmit"
+} ]

@@ -1,0 +1,6 @@
+[ {
+  "ID" : "tseAdmReply",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/tseAdmin/aboutToStart",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/tseAdmReply/aboutToSubmit",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/tseAdmReply/submitted"
+} ]

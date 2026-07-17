@@ -1,0 +1,37 @@
+[ {
+  "ID" : "UpdateCase",
+  "CaseEventID" : "UPDATE_CASE_DRAFT",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondentType",
+  "EventElementLabel" : "Type of respondent",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY",
+  "FieldShowCondition" : "responseReceived=\"dummy\""
+}, {
+  "ID" : "UpdateCase",
+  "CaseEventID" : "UPDATE_CASE_DRAFT",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondentOrganisation",
+  "EventElementLabel" : "Organisation or business name",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY",
+  "FieldShowCondition" : "responseReceived=\"dummy\""
+}, {
+  "ID" : "UpdateCase",
+  "CaseEventID" : "UPDATE_CASE_DRAFT",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondentFirstName",
+  "EventElementLabel" : "Respondent first name",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "MANDATORY",
+  "FieldShowCondition" : "responseReceived=\"dummy\""
+}, {
+  "ID" : "UpdateCase",
+  "CaseEventID" : "UPDATE_CASE_DRAFT",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondentLastName",
+  "EventElementLabel" : "Respondent last name",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "MANDATORY",
+  "FieldShowCondition" : "responseReceived=\"dummy\""
+} ]

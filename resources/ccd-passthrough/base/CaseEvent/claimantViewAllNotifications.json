@@ -1,0 +1,5 @@
+[ {
+  "ID" : "claimantViewAllNotifications",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/claimantViewNotification/all/aboutToStart",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/claimantViewNotification/all/aboutToSubmit"
+} ]

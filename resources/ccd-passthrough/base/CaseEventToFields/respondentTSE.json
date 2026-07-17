@@ -1,0 +1,40 @@
+[ {
+  "CaseFieldID" : "resTseNotAvailableWarning",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/respondentTSE/showError"
+}, {
+  "CaseFieldID" : "resTseGuidanceLabel1",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/respondentTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "resTseGuidanceLabel2",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/respondentTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "resTseGuidanceLabel3",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/respondentTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "resTseGuidanceLabel4",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/respondentTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "resTseGuidanceLabel5",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/respondentTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "resTseGuidanceLabel6",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/respondentTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "resTseGuidanceLabel7",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/respondentTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "resTseGuidanceLabel8",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/respondentTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "resTseGuidanceLabel9",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/respondentTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "resTseGuidanceLabel10",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/respondentTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "resTseGuidanceLabel11",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/respondentTSE/validateGiveDetails"
+}, {
+  "CaseFieldID" : "resTseGuidanceLabel12",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/respondentTSE/validateGiveDetails"
+} ]

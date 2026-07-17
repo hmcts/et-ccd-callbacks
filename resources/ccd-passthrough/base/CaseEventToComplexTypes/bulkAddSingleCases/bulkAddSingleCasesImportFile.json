@@ -1,0 +1,9 @@
+[ {
+  "ID" : "bulkAddSingleCasesFileUpload",
+  "CaseEventID" : "bulkAddSingleCases",
+  "CaseFieldID" : "bulkAddSingleCasesImportFile",
+  "ListElementCode" : "uploadedDocument",
+  "EventElementLabel" : "File",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+} ]

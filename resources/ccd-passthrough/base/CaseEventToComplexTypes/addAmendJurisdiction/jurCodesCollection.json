@@ -1,0 +1,633 @@
+[ {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "juridictionCodesList",
+  "EventElementLabel" : "Jurisdiction Code",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeADT",
+  "EventElementLabel" : "Discriminatory terms or rules",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeAPA",
+  "EventElementLabel" : "Application by an employee, their representative or trade union for a protective award as a result of an employer’s failure to consult over a redundancy situation",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeCCP",
+  "EventElementLabel" : "Failure of the employer to consult with an employee representative or trade union about a proposed contracting out of a pension scheme",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeCOM",
+  "EventElementLabel" : "Application or complaint by the EHRC in respect of discriminatory advertisements or instructions or pressure to discriminate (including preliminary action before a claim to the county court)",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeEAP",
+  "EventElementLabel" : "Application by the Secretary of State for Business, Innovation & Skills to prohibit a person from running an Employment Agency",
+  "FieldDisplayOrder" : 6,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeHAS",
+  "EventElementLabel" : "Appeal against an enforcement, improvement or prohibition notice imposed by the HSE or Environmental Health Inspector, or by the Environment Agency",
+  "FieldDisplayOrder" : 7,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeISV",
+  "EventElementLabel" : "Failure by the SOS to make an insolvency payment in lieu of wages and/or redundancy",
+  "FieldDisplayOrder" : 8,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeLEV ",
+  "EventElementLabel" : "Appeal against the levy assessment of an Industrial training Board",
+  "FieldDisplayOrder" : 9,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeLSO",
+  "EventElementLabel" : "Loss of office as a result of the reorganisation of a statutory body",
+  "FieldDisplayOrder" : 10,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeMWA",
+  "EventElementLabel" : "Appeal against an enforcement or penalty notice issued by Her Majesty's Revenue & Customs",
+  "FieldDisplayOrder" : 11,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeNNA",
+  "EventElementLabel" : "Appeal against an unlawful act on a notice issued by EHRC",
+  "FieldDisplayOrder" : 12,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodePEN",
+  "EventElementLabel" : "Failure of the Secretary of State to pay unpaid contributions to a pensions scheme following an application for payment to be made",
+  "FieldDisplayOrder" : 13,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeRPT(S) ",
+  "EventElementLabel" : "Failure of the SOS to pay a redundancy payment following an application to NI fund",
+  "FieldDisplayOrder" : 14,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeRTR",
+  "EventElementLabel" : "Appeal against an improvement by a VOSA inspector (JST to be notified if claim received)",
+  "FieldDisplayOrder" : 15,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeTXC",
+  "EventElementLabel" : "Appeal against \"Failure to pay an Employment Tribunal award Penalty\"",
+  "FieldDisplayOrder" : 16,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeWTA",
+  "EventElementLabel" : "Appeal by a person who has been served with an improvement or prohibition notice under the Working Time Regulations 1998",
+  "FieldDisplayOrder" : 17,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeDAG",
+  "EventElementLabel" : "Discrimination, including harassment or discrimination based on association or perception on grounds of age",
+  "FieldDisplayOrder" : 18,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeDDA",
+  "EventElementLabel" : "Suffered a detriment, discrimination, including indirect discrimination, and discrimination based on association or perception, harassment and/or dismissal on grounds of disability or failure of employer to make reasonable adjustments",
+  "FieldDisplayOrder" : 19,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeDRB",
+  "EventElementLabel" : "Discrimination, including indirect discrimination, discrimination based on association or perception or harassment on grounds of religion or belief",
+  "FieldDisplayOrder" : 20,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeDSO",
+  "EventElementLabel" : "Discrimination, including indirect discrimination, discrimination based on association or perception or harassment on grounds of sexual orientation",
+  "FieldDisplayOrder" : 21,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeEQP",
+  "EventElementLabel" : "Failure to provide equal pay for equal value work",
+  "FieldDisplayOrder" : 22,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodePID",
+  "EventElementLabel" : "Suffered a detriment and/or dismissal due to exercising rights under the Public Interest Disclosure Act",
+  "FieldDisplayOrder" : 23,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeRRD",
+  "EventElementLabel" : "Discrimination, including indirect discrimination based on association or perception or harassment on grounds of race or ethnic origin",
+  "FieldDisplayOrder" : 24,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeSXD",
+  "EventElementLabel" : "Discrimination, including indirect discrimination, discrimination based on association or perception, or harassment on grounds of sex, marriage and civil partnership",
+  "FieldDisplayOrder" : 25,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeBOC",
+  "EventElementLabel" : "Claim of an employee for breach of contract of employment",
+  "FieldDisplayOrder" : 26,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeECC",
+  "EventElementLabel" : "Employer contract claim",
+  "FieldDisplayOrder" : 27,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeFPA",
+  "EventElementLabel" : "Application by an employee that an employer has failed to pay a protected award as ordered by a tribunal",
+  "FieldDisplayOrder" : 28,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeFPI",
+  "EventElementLabel" : "Failure of a transferor to provide employee liability information to a transferee",
+  "FieldDisplayOrder" : 29,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeFTC",
+  "EventElementLabel" : "Failure to provide a written statement of terms and conditions and any subsequent changes to those terms",
+  "FieldDisplayOrder" : 30,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeFTO",
+  "EventElementLabel" : "Failure to allow time off for trade union activities or duties, for ante-natal care, for adoption, for parental leave, for carer's leave or for public duties",
+  "FieldDisplayOrder" : 31,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeFTP",
+  "EventElementLabel" : "Failure to provide a guarantee payment",
+  "FieldDisplayOrder" : 32,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeFTR",
+  "EventElementLabel" : "Failure to pay remuneration whilst suspended for medical reasons",
+  "FieldDisplayOrder" : 33,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeFTS",
+  "EventElementLabel" : "Failure to allow time off to seek work during a redundancy situation",
+  "FieldDisplayOrder" : 34,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeFTU",
+  "EventElementLabel" : "Failure of an employer to comply with an award by a tribunal following a finding that the employer had previously failed to consult about a proposed transfer of an undertaking",
+  "FieldDisplayOrder" : 35,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeGRA",
+  "EventElementLabel" : "Discrimination, including indirect discrimination, discrimination based on association or perception, or harassment because of gender reassignment",
+  "FieldDisplayOrder" : 36,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodePAY",
+  "EventElementLabel" : "Failure of the employer to prevent unauthorised or excessive deductions in the form of union subscriptions",
+  "FieldDisplayOrder" : 37,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeRPT",
+  "EventElementLabel" : "Failure to pay a redundancy payment",
+  "FieldDisplayOrder" : 38,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeWA",
+  "EventElementLabel" : "Failure of employer to pay or unauthorised deductions have been made",
+  "FieldDisplayOrder" : 39,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeWTR(AL)",
+  "EventElementLabel" : "Complaint by a worker that employer has failed to allow them to take or to pay them for statutory annual leave entitlement",
+  "FieldDisplayOrder" : 40,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeADG",
+  "EventElementLabel" : "Suffer a detriment and/or dismissal resulting from a failure to allow an employee to be accompanied or tp accompany a fellow employee at a disciplinary/ grievance hearing",
+  "FieldDisplayOrder" : 41,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeADT(ST)",
+  "EventElementLabel" : "Application for a declaration that the inclusion of discriminatory terms/rules within certain agreements or rules causes the aforesaid to be invalid",
+  "FieldDisplayOrder" : 42,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeAWR",
+  "EventElementLabel" : "Suffered less favourable treatment and/or dismissal as an agency worker, than a directly recruited employee",
+  "FieldDisplayOrder" : 43,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeDOD",
+  "EventElementLabel" : "Suffered a detriment and/or dismissal resulting from requiring time off for other (non-work but not Health and Safety) duties, study, training or seeking work",
+  "FieldDisplayOrder" : 44,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeFCT",
+  "EventElementLabel" : "Failure of the employer to consult with an employee rep. or trade union or a transferor with a transferee about a proposed transfer",
+  "FieldDisplayOrder" : 45,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeFLW",
+  "EventElementLabel" : "Suffer a detriment and/or dismissal for claiming under the flexible working regulations or be subject to a breach of procedure",
+  "FieldDisplayOrder" : 46,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeFTE",
+  "EventElementLabel" : "Suffered less favourable treatment and/or dismissal as a fixed term employee, than a full-time employee or, on becoming permanent, failed to receive a written statement of confirmation from employer",
+  "FieldDisplayOrder" : 47,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeFT1",
+  "EventElementLabel" : "Failure to allow or to pay for a time off for care of dependants, union learning representatives' duties, pension scheme trustee duties, employee representatives' duties, young person studying/trainin",
+  "FieldDisplayOrder" : 48,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeFWP",
+  "EventElementLabel" : "Failure to provide a written pay statement or an adequate pay statement",
+  "FieldDisplayOrder" : 49,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeFWS",
+  "EventElementLabel" : "Failure to provide a written statement of reasons for dismissal or the contents of the statement are disputed",
+  "FieldDisplayOrder" : 50,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeHSD",
+  "EventElementLabel" : "Failure to pay for or allow time off to carry out Safety Rep duties or undertake training",
+  "FieldDisplayOrder" : 51,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeHSR",
+  "EventElementLabel" : "Suffer a detriment, dismissal or redundancy for health and safety reasons",
+  "FieldDisplayOrder" : 52,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeIRF",
+  "EventElementLabel" : "Application for interim relief",
+  "FieldDisplayOrder" : 53,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeMAT",
+  "EventElementLabel" : "Suffer a detriment and/or dismissal on grounds of pregnancy, child birth or maternity",
+  "FieldDisplayOrder" : 54,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeMWD",
+  "EventElementLabel" : "Suffer a detriment and/or dismissal related to failure to pay the minimum wage or allow access to records",
+  "FieldDisplayOrder" : 55,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodePAC",
+  "EventElementLabel" : "Failure of the employer to comply with a certificate of exemption or to deduct funds from employees pay in order to contribute to a trade union political fund",
+  "FieldDisplayOrder" : 56,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodePLD",
+  "EventElementLabel" : "Suffer a detriment and/or dismissal due to requesting or taking leave for family and domestic reasons including maternity, paternity, adoption, parental bereavement, ante-natal care or carers leave or time off to assist a dependant",
+  "FieldDisplayOrder" : 57,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodePTE",
+  "EventElementLabel" : "Suffer less favourable treatment and/or dismissal as a result of being a part time employee by comparison to a full-time employee",
+  "FieldDisplayOrder" : 58,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeRTR(ST)",
+  "EventElementLabel" : "Suffer a detriment or dismissal as a result of doing work under another contract or arrangement (zero hours contract exclusivity clause)",
+  "FieldDisplayOrder" : 59,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeSUN",
+  "EventElementLabel" : "Suffer a detriment and/or dismissal for refusing to work on a Sunday",
+  "FieldDisplayOrder" : 60,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeTIP",
+  "EventElementLabel" : "Suffer a failure by an employer to comply with provisions about distribution of or information about tips",
+  "FieldDisplayOrder" : 61,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeTPE",
+  "EventElementLabel" : "Suffer less favourable treatment and/or dismissal as a temp. employee than a full-time employee",
+  "FieldDisplayOrder" : 62,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeTT",
+  "EventElementLabel" : "Suffer a detriment and/or dismissal for requesting time to train. Failure of employer to follow correct procedures/reject request based on incorrect facts",
+  "FieldDisplayOrder" : 63,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeTUE",
+  "EventElementLabel" : "Suffer discrimination in obtaining employment due to membership or non-membership of a trade union; or refused employment or suffered a detriment for a reason related to a blacklist",
+  "FieldDisplayOrder" : 64,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeTUI",
+  "EventElementLabel" : "Suffer an inducement relating to union membership, activities or collective bargaining",
+  "FieldDisplayOrder" : 65,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeTUM",
+  "EventElementLabel" : "Suffer a detriment and/or dismissal relating to being, not being or proposing to become a trade union member",
+  "FieldDisplayOrder" : 66,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeTUR",
+  "EventElementLabel" : "(a) Failure of the employer to consult or report about training in relation to a bargaining unit\r\n(b) Suffered a detriment on grounds related to recognition of a trade union for collective bargaining",
+  "FieldDisplayOrder" : 67,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeTUS",
+  "EventElementLabel" : "Suffer discrimination in obtaining the services of an employment agency due to membership or non-membership of a trade union; or refused employment agency services or suffered a detriment for a reason",
+  "FieldDisplayOrder" : 68,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeTXC(ST)",
+  "EventElementLabel" : "Suffered a detriment and/or dismissal due to exercising rights under the Tax Credits Act (JST to be notified if a claim is received)",
+  "FieldDisplayOrder" : 69,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeUDC",
+  "EventElementLabel" : "Unfair dismissal after exercising or claiming a statutory right",
+  "FieldDisplayOrder" : 70,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeUDL",
+  "EventElementLabel" : "Unfair dismissal on grounds of capability, conduct or some other general reason including the result of a transfer of an undertaking",
+  "FieldDisplayOrder" : 71,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeUIA",
+  "EventElementLabel" : "unfair dismissal in connection to a lock out, strike or other industrial action",
+  "FieldDisplayOrder" : 72,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeVIC",
+  "EventElementLabel" : "Subjected to a detriment because of a protected act",
+  "FieldDisplayOrder" : 73,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeWTR",
+  "EventElementLabel" : "Failure to limit weekly or night working time, or to ensure rest breaks",
+  "FieldDisplayOrder" : 74,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeFML",
+  "EventElementLabel" : "Failure to pay remuneration whilst suspended from work for health and safety reasons whilst pregnant or on mat. Leave",
+  "FieldDisplayOrder" : 75,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "jurisdictionCodeZNON",
+  "EventElementLabel" : "Dummy code for purposes of record closure only used when undertaken as part of a reasonable and proportionate data cleansing checking exercise where the actual jurisdiction and outcome are unknown",
+  "FieldDisplayOrder" : 76,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "judgmentOutcome",
+  "EventElementLabel" : "Outcome",
+  "FieldDisplayOrder" : 77,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "dateNotified",
+  "EventElementLabel" : "Date notified",
+  "FieldDisplayOrder" : 78,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Jurisdiction",
+  "CaseEventID" : "addAmendJurisdiction",
+  "CaseFieldID" : "jurCodesCollection",
+  "ListElementCode" : "disposalDate",
+  "EventElementLabel" : "Disposal date",
+  "FieldDisplayOrder" : 79,
+  "DisplayContext" : "MANDATORY"
+} ]

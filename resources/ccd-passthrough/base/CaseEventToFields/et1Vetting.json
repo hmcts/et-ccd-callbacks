@@ -1,0 +1,7 @@
+[ {
+  "CaseFieldID" : "et1JurisdictionCodeGeneralNotes",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/jurisdictionCodes"
+}, {
+  "CaseFieldID" : "et1LocationGeneralNotes",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1HearingVenue"
+} ]

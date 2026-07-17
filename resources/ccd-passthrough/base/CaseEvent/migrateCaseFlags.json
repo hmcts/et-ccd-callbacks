@@ -1,0 +1,4 @@
+[ {
+  "ID" : "migrateCaseFlags",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/case-flags-migration/about-to-submit"
+} ]

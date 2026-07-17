@@ -1,0 +1,9 @@
+[ {
+  "ID" : "importerFileUpload",
+  "CaseEventID" : "importFile",
+  "CaseFieldID" : "caseImporterFile",
+  "ListElementCode" : "uploadedDocument",
+  "EventElementLabel" : "File",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+} ]

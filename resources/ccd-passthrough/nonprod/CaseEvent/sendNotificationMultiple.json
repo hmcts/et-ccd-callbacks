@@ -1,0 +1,4 @@
+[ {
+  "ID" : "sendNotificationMultiple",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/sendNotification/aboutToSubmit"
+} ]

@@ -1,0 +1,6 @@
+[ {
+  "ID" : "et3Response",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/et3Response/aboutToStart",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/et3Response/submitSection",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/et3Response/sectionComplete"
+} ]

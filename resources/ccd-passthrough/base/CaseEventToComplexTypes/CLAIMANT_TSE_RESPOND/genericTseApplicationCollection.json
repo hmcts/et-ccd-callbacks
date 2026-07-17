@@ -1,0 +1,31 @@
+[ {
+  "CaseEventID" : "CLAIMANT_TSE_RESPOND",
+  "CaseFieldID" : "genericTseApplicationCollection",
+  "ListElementCode" : "type",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "CLAIMANT_TSE_RESPOND",
+  "CaseFieldID" : "genericTseApplicationCollection",
+  "ListElementCode" : "number",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "CLAIMANT_TSE_RESPOND",
+  "CaseFieldID" : "genericTseApplicationCollection",
+  "ListElementCode" : "respondCollection",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "CLAIMANT_TSE_RESPOND",
+  "CaseFieldID" : "genericTseApplicationCollection",
+  "ListElementCode" : "respondCollection.from",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "CLAIMANT_TSE_RESPOND",
+  "CaseFieldID" : "genericTseApplicationCollection",
+  "ListElementCode" : "respondCollection.dateTime",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "CLAIMANT_TSE_RESPOND",
+  "CaseFieldID" : "genericTseApplicationCollection",
+  "ListElementCode" : "respondCollection.applicationType",
+  "Publish" : "Y"
+} ]

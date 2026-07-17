@@ -1,0 +1,6 @@
+[ {
+  "ID" : "SUBMIT_CASE_DRAFT",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/preDefaultValues",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/postDefaultValues",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/et1Submission/submitted"
+} ]

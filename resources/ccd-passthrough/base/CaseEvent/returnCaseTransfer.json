@@ -1,0 +1,4 @@
+[ {
+  "ID" : "returnCaseTransfer",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/postDefaultValues"
+} ]

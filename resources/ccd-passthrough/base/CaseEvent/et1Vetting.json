@@ -1,0 +1,6 @@
+[ {
+  "ID" : "et1Vetting",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/initialiseEt1Vetting",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/et1VettingAboutToSubmit",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/finishEt1Vetting"
+} ]

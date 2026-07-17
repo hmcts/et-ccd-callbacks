@@ -1,0 +1,5 @@
+[ {
+  "ID" : "createDraftEt1",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/et1Repped/createDraftEt1",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/et1Repped/createDraftEt1Submitted"
+} ]

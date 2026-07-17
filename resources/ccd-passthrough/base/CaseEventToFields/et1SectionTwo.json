@@ -1,0 +1,34 @@
+[ {
+  "CaseFieldID" : "didClaimantWorkForOrg",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/sectionTwo/validateClaimantWorked"
+}, {
+  "CaseFieldID" : "claimantStillWorking",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/sectionTwo/validateClaimantWorking"
+}, {
+  "CaseFieldID" : "claimantStillWorkingNoticePeriod",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/sectionTwo/validateClaimantWrittenNoticePeriod"
+}, {
+  "CaseFieldID" : "claimantWorkingNoticePeriod",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/sectionTwo/validateClaimantWorkingNoticePeriod"
+}, {
+  "CaseFieldID" : "claimantNoLongerWorkingQuestion",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/sectionTwo/validateClaimantNoLongerWorking"
+}, {
+  "CaseFieldID" : "claimantPayPreamble",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/sectionTwo/validateClaimantPay"
+}, {
+  "CaseFieldID" : "claimantPensionContribution",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/sectionTwo/validateClaimantPensionBenefits"
+}, {
+  "CaseFieldID" : "claimantNewJob",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/sectionTwo/validateClaimantNewJob"
+}, {
+  "CaseFieldID" : "claimantNewJobPayPreamble",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/sectionTwo/validateClaimantNewJobPay"
+}, {
+  "CaseFieldID" : "respondentNamePreamble",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/sectionTwo/generateRespondentPreamble"
+}, {
+  "CaseFieldID" : "respondentAddress",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et1Repped/sectionTwo/generateWorkAddressLabel"
+} ]

@@ -1,0 +1,6 @@
+[ {
+  "ID" : "createReferral",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/createReferral/aboutToStart",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/createReferral/aboutToSubmit",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/createReferral/completeCreateReferral"
+} ]

@@ -1,0 +1,5 @@
+[ {
+  "ID" : "addAmendClaimantRepresentative",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/addAmendClaimantRepresentative/aboutToSubmit",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/addAmendClaimantRepresentative/amendClaimantRepSubmitted"
+} ]

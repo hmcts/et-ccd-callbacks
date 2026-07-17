@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "notificationMarkdown",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/respondNotification/midValidateInput"
+} ]

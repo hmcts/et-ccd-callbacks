@@ -1,0 +1,81 @@
+[ {
+  "CaseEventID" : "updateHearing",
+  "CaseFieldID" : "hearingDetailsCollection",
+  "ListElementCode" : "hearingDetailsStatus",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateHearing",
+  "CaseFieldID" : "hearingDetailsCollection",
+  "ListElementCode" : "hearingDetailsDate",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateHearing",
+  "CaseFieldID" : "hearingDetailsCollection",
+  "ListElementCode" : "hearingDetailsPostponedBy",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateHearing",
+  "CaseFieldID" : "hearingDetailsCollection",
+  "ListElementCode" : "hearingDetailsCaseDisposed",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateHearing",
+  "CaseFieldID" : "hearingDetailsCollection",
+  "ListElementCode" : "hearingDetailsPartHeard",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateHearing",
+  "CaseFieldID" : "hearingDetailsCollection",
+  "ListElementCode" : "hearingDetailsReservedJudgment",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateHearing",
+  "CaseFieldID" : "hearingDetailsCollection",
+  "ListElementCode" : "hearingDetailsAttendeeClaimant",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateHearing",
+  "CaseFieldID" : "hearingDetailsCollection",
+  "ListElementCode" : "hearingDetailsAttendeeNonAttendees",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateHearing",
+  "CaseFieldID" : "hearingDetailsCollection",
+  "ListElementCode" : "hearingDetailsAttendeeRespNoRep",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateHearing",
+  "CaseFieldID" : "hearingDetailsCollection",
+  "ListElementCode" : "hearingDetailsAttendeeRespAndRep",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateHearing",
+  "CaseFieldID" : "hearingDetailsCollection",
+  "ListElementCode" : "hearingDetailsAttendeeRepOnly",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateHearing",
+  "CaseFieldID" : "hearingDetailsCollection",
+  "ListElementCode" : "hearingDetailsTimingStart",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateHearing",
+  "CaseFieldID" : "hearingDetailsCollection",
+  "ListElementCode" : "hearingDetailsTimingBreak",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateHearing",
+  "CaseFieldID" : "hearingDetailsCollection",
+  "ListElementCode" : "hearingDetailsTimingResume",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateHearing",
+  "CaseFieldID" : "hearingDetailsCollection",
+  "ListElementCode" : "hearingDetailsTimingFinish",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "updateHearing",
+  "CaseFieldID" : "hearingDetailsCollection",
+  "ListElementCode" : "hearingDetailsHearingNotes2",
+  "Publish" : "Y"
+} ]

@@ -1,0 +1,4 @@
+[ {
+  "ID" : "removeHearingBundles",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/bundlesRespondent/removeHearingBundle"
+} ]

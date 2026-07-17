@@ -1,0 +1,7 @@
+[ {
+  "CaseFieldID" : "allocateHearingHearing",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/allocatehearing/handleListingSelected"
+}, {
+  "CaseFieldID" : "allocateHearingVenue",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/allocatehearing/populateRooms"
+} ]

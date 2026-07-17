@@ -1,0 +1,5 @@
+[ {
+  "ID" : "caseTransferSameCountry",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/caseTransfer/initTransferToEnglandWales",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/caseTransfer/transferSameCountry"
+} ]

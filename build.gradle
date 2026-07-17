@@ -11,7 +11,7 @@ plugins {
     id 'io.freefair.lombok' version '8.14.4'
     id 'org.sonarqube' version '6.3.1.5724'
     id 'pmd'
-    id 'hmcts.ccd.sdk' version '6.25.0'
+    id 'hmcts.ccd.sdk' version 'json-definition-converter-96.1-ff547414'
     id 'com.github.hmcts.rse-cft-lib' version '0.19.2263'
 }
 
@@ -38,6 +38,17 @@ ccd {
     decentralised = true
     runtimeIndexing = true
     caseEventServiceBus = true
+}
+
+project.tasks.named("generateCCDConfig") {
+    environment 'SPRING_PROFILES_ACTIVE', 'config-gen'
+    environment 'SPRING_FLYWAY_ENABLED', 'false'
+    environment 'SPRING_JMS_SERVICEBUS_ENABLED', 'false'
+    environment 'SPRING_DATASOURCE_URL', 'jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL'
+    environment 'SPRING_DATASOURCE_USERNAME', 'sa'
+    environment 'SPRING_DATASOURCE_PASSWORD', ''
+    environment 'ET_COS_SYSTEM_USER', 'et-cos-system-user@hmcts.net'
+    environment 'ET_COS_SYSTEM_USER_PASSWORD', 'dummy'
 }
 
 pmd {
@@ -617,6 +628,7 @@ dependencies {
     testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.7'
     testImplementation group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '4.12.0'
     testRuntimeOnly 'com.h2database:h2:2.4.240'
+    configGeneration 'com.h2database:h2:2.4.240'
 
     // Contract Tests
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.20'

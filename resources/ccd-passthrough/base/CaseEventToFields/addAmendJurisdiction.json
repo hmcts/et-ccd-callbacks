@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "jurCodesCollection",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/jurisdictionValidation"
+} ]

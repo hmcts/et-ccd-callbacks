@@ -1,0 +1,5 @@
+[ {
+  "ID" : "updateHearing",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/hearingdetails/initialiseHearings",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/hearingdetails/aboutToSubmit"
+} ]

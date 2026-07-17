@@ -1,0 +1,7 @@
+[ {
+  "CaseFieldID" : "selectReferral",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/replyReferral/initHearingAndReferralDetails"
+}, {
+  "CaseFieldID" : "replyToReferralDcfLink",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/replyReferral/validateReplyToEmail"
+} ]

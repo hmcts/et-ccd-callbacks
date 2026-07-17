@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "printHearingDetails",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/listingSingleCases"
+} ]

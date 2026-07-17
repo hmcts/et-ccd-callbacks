@@ -1,0 +1,4 @@
+[ {
+  "ID" : "UPDATE_CASE_SUBMITTED",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/postDefaultValues"
+} ]

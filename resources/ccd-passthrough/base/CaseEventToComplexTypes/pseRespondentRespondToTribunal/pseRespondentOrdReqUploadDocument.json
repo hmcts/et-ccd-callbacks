@@ -1,0 +1,11 @@
+[ {
+  "CaseEventID" : "pseRespondentRespondToTribunal",
+  "CaseFieldID" : "pseRespondentOrdReqUploadDocument",
+  "ListElementCode" : "uploadedDocument",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "pseRespondentRespondToTribunal",
+  "CaseFieldID" : "pseRespondentOrdReqUploadDocument",
+  "ListElementCode" : "shortDescription",
+  "RetainHiddenValue" : "No"
+} ]

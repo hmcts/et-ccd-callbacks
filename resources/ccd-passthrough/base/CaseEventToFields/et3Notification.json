@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "et3NotificationDocCollection",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/et3Notification/midUploadDocuments"
+} ]

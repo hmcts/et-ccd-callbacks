@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "claimantSelectNotification",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/claimantViewNotification/midDetailsTable"
+} ]

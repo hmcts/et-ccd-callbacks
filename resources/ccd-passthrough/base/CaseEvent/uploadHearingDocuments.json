@@ -1,0 +1,5 @@
+[ {
+  "ID" : "uploadHearingDocuments",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/uploadHearingDocuments/aboutToStart",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/uploadHearingDocuments/aboutToSubmit"
+} ]

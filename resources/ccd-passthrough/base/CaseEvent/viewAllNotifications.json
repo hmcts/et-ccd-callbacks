@@ -1,0 +1,4 @@
+[ {
+  "ID" : "viewAllNotifications",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/pseViewNotifications/aboutToStart"
+} ]

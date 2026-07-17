@@ -1,0 +1,5 @@
+[ {
+  "ID" : "applyNocDecision",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/noc-decision/about-to-submit",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/noc-decision/submitted"
+} ]

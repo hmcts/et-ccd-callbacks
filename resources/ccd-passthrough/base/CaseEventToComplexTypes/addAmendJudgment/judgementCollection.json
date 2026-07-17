@@ -1,0 +1,16 @@
+[ {
+  "CaseEventID" : "addAmendJudgment",
+  "CaseFieldID" : "judgementCollection",
+  "ListElementCode" : "Judgement_costs.pro_bono_costs_awarded_to",
+  "RetainHiddenValue" : "Yes"
+}, {
+  "CaseEventID" : "addAmendJudgment",
+  "CaseFieldID" : "judgementCollection",
+  "ListElementCode" : "Judgement_costs.pro_bono_costs_awarded_against",
+  "RetainHiddenValue" : "Yes"
+}, {
+  "CaseEventID" : "addAmendJudgment",
+  "CaseFieldID" : "judgementCollection",
+  "ListElementCode" : "Judgement_costs.pro_bono_costs_amount_awarded",
+  "RetainHiddenValue" : "Yes"
+} ]

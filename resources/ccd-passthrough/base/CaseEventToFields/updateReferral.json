@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "selectReferral",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/updateReferral/initHearingAndReferralDetails"
+} ]

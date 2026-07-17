@@ -1,0 +1,7 @@
+[ {
+  "CaseFieldID" : "bundlesRespondentAgreedDocWith",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/bundlesRespondent/midPopulateHearings"
+}, {
+  "CaseFieldID" : "bundlesRespondentUploadFileLabel",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/bundlesRespondent/midValidateUpload"
+} ]

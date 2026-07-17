@@ -1,0 +1,11 @@
+[ {
+  "CaseEventID" : "initialConsideration",
+  "CaseFieldID" : "etICHearingNotListedListForFinalHearing",
+  "ListElementCode" : "etICLengthOfFinalHearing",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "initialConsideration",
+  "CaseFieldID" : "etICHearingNotListedListForFinalHearing",
+  "ListElementCode" : "finalHearingLengthNumType",
+  "RetainHiddenValue" : "No"
+} ]

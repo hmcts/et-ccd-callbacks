@@ -1,0 +1,26 @@
+[ {
+  "CaseEventID" : "UPDATE_NOTIFICATION_RESPONSE",
+  "CaseFieldID" : "sendNotificationCollection",
+  "ListElementCode" : "sendNotificationResponsesCount",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "UPDATE_NOTIFICATION_RESPONSE",
+  "CaseFieldID" : "sendNotificationCollection",
+  "ListElementCode" : "respondCollection",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "UPDATE_NOTIFICATION_RESPONSE",
+  "CaseFieldID" : "sendNotificationCollection",
+  "ListElementCode" : "respondCollection.from",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "UPDATE_NOTIFICATION_RESPONSE",
+  "CaseFieldID" : "sendNotificationCollection",
+  "ListElementCode" : "respondCollection.dateTime",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "UPDATE_NOTIFICATION_RESPONSE",
+  "CaseFieldID" : "sendNotificationCollection",
+  "ListElementCode" : "respondCollection.isECC",
+  "Publish" : "Y"
+} ]

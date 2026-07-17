@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "tseAdminSelectApplication",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/tseAdmin/displayCloseApplicationTable"
+} ]

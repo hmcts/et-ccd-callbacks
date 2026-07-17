@@ -1,0 +1,6 @@
+[ {
+  "ID" : "printHearing",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/initPrintHearingLists",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/generateListingsDocSingleCases",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/generateListingsDocSingleCasesConfirmation"
+} ]

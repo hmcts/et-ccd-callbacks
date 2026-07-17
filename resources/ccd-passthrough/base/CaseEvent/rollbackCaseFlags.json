@@ -1,0 +1,4 @@
+[ {
+  "ID" : "rollbackCaseFlags",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/case-flags-rollback/about-to-submit"
+} ]

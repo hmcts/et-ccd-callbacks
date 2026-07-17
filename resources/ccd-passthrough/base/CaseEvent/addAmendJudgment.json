@@ -1,0 +1,5 @@
+[ {
+  "ID" : "addAmendJudgment",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/dynamicJudgments",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/judgementSubmitted"
+} ]

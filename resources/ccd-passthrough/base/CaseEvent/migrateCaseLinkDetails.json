@@ -1,0 +1,4 @@
+[ {
+  "ID" : "migrateCaseLinkDetails",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/migrateCaseLinkDetails"
+} ]

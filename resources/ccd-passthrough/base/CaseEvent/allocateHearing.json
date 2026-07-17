@@ -1,0 +1,5 @@
+[ {
+  "ID" : "allocateHearing",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/allocatehearing/initialiseHearings",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/allocatehearing/aboutToSubmit"
+} ]

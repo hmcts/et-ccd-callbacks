@@ -1,0 +1,4 @@
+[ {
+  "ID" : "generateEt1Documents",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/et1Repped/generateDocuments"
+} ]

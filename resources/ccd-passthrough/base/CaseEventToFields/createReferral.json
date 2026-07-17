@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "referralHearingDetails",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/createReferral/validateReferentEmail"
+} ]

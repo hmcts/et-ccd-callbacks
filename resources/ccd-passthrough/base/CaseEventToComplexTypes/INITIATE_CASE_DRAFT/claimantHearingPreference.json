@@ -1,0 +1,17 @@
+[ {
+  "ID" : "CreateDraftCase",
+  "CaseEventID" : "INITIATE_CASE_DRAFT",
+  "CaseFieldID" : "claimantHearingPreference",
+  "ListElementCode" : "hearing_preferences",
+  "EventElementLabel" : "Can the claimant take part in video hearings",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "CreateDraftCase",
+  "CaseEventID" : "INITIATE_CASE_DRAFT",
+  "CaseFieldID" : "claimantHearingPreference",
+  "ListElementCode" : "hearing_assistance",
+  "EventElementLabel" : "Explain why you are unable to take part in video or phone hearings",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "OPTIONAL"
+} ]

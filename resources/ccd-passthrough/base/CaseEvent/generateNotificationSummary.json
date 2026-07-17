@@ -1,0 +1,6 @@
+[ {
+  "ID" : "generateNotificationSummary",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/notificationDocument/aboutToStart",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/notificationDocument/aboutToSubmit",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/notificationDocument/submitted"
+} ]

@@ -1,0 +1,5 @@
+[ {
+  "ID" : "amendClaimantRepresentativeContact",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/et1Repped/aboutToStartAmendClaimantRepresentativeContact",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/et1Repped/aboutToSubmitAmendClaimantRepresentativeContact"
+} ]

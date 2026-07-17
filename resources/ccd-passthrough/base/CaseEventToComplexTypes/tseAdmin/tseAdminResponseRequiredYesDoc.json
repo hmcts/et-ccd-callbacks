@@ -1,0 +1,11 @@
+[ {
+  "CaseEventID" : "tseAdmin",
+  "CaseFieldID" : "tseAdminResponseRequiredYesDoc",
+  "ListElementCode" : "uploadedDocument",
+  "RetainHiddenValue" : "No"
+}, {
+  "CaseEventID" : "tseAdmin",
+  "CaseFieldID" : "tseAdminResponseRequiredYesDoc",
+  "ListElementCode" : "shortDescription",
+  "RetainHiddenValue" : "No"
+} ]

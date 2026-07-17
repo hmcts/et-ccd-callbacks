@@ -1,0 +1,5 @@
+[ {
+  "ID" : "restrictedCases",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/dynamicRestrictedReporting",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/restrictedCases"
+} ]

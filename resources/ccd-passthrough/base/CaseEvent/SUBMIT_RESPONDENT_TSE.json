@@ -1,0 +1,4 @@
+[ {
+  "ID" : "SUBMIT_RESPONDENT_TSE",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/tseRespondent/aboutToSubmit"
+} ]

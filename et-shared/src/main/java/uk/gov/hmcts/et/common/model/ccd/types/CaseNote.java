@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
@@ -13,12 +15,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CaseNote {
+    @CCD(label = "Title")
     @JsonProperty("title")
     private String title;
+    @CCD(label = "Note", typeOverride = FieldType.TextArea)
     @JsonProperty("note")
     private String note;
+    @CCD(label = "Author")
     @JsonProperty("author")
     private String author;
+    @CCD(label = "Date")
     @JsonProperty("date")
     private String date;
 

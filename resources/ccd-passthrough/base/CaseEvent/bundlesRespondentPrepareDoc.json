@@ -1,0 +1,6 @@
+[ {
+  "ID" : "bundlesRespondentPrepareDoc",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/bundlesRespondent/aboutToStart",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/bundlesRespondent/aboutToSubmit",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/bundlesRespondent/submitted"
+} ]

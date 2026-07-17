@@ -1,0 +1,6 @@
+[ {
+  "ID" : "generateCorrespondence",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/dynamicLetters",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/generateDocument",
+  "CallBackURLSubmittedEvent" : "${ET_COS_URL}/generateDocumentConfirmation"
+} ]

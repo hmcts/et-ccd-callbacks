@@ -1,0 +1,5 @@
+[ {
+  "ID" : "uploadDocument",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/uploadDocument/aboutToStart",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/uploadDocument/aboutToSubmit"
+} ]

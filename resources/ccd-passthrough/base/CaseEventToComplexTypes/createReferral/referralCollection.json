@@ -1,0 +1,26 @@
+[ {
+  "CaseEventID" : "createReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "referCaseTo",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "createReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "referralSubject",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "createReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "referralSubjectSpecify",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "createReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "isUrgent",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "createReferral",
+  "CaseFieldID" : "referralCollection",
+  "ListElementCode" : "referralNumber",
+  "Publish" : "Y"
+} ]

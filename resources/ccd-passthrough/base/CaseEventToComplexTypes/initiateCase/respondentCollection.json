@@ -1,0 +1,103 @@
+[ {
+  "ID" : "CreateCase",
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondent_name",
+  "EventElementLabel" : "Name of respondent",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "CreateCase",
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondent_ACAS_question",
+  "EventElementLabel" : "Is there an ACAS Certificate number?",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "CreateCase",
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondent_ACAS",
+  "EventElementLabel" : "ACAS Certificate Number",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "CreateCase",
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondent_ACAS_no",
+  "EventElementLabel" : "What are the reasons for not having an ACAS Certificate number?",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "CreateCase",
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondent_address.AddressLine1",
+  "EventElementLabel" : "Building and Street",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "CreateCase",
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondent_address.AddressLine2",
+  "FieldDisplayOrder" : 6,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "CreateCase",
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondent_address.AddressLine3",
+  "FieldDisplayOrder" : 7,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "CreateCase",
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondent_address.PostTown",
+  "EventElementLabel" : "Town or City",
+  "FieldDisplayOrder" : 8,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "CreateCase",
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondent_address.County",
+  "EventElementLabel" : "County",
+  "FieldDisplayOrder" : 9,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "CreateCase",
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondent_address.Country",
+  "EventElementLabel" : "Country",
+  "FieldDisplayOrder" : 10,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "CreateCase",
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondent_address.PostCode",
+  "EventElementLabel" : "Postcode",
+  "FieldDisplayOrder" : 11,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "CreateCase",
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "respondent_phone1",
+  "EventElementLabel" : "Phone number",
+  "FieldDisplayOrder" : 12,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "CreateCase",
+  "CaseEventID" : "initiateCase",
+  "CaseFieldID" : "respondentCollection",
+  "ListElementCode" : "responseReceived",
+  "EventElementLabel" : "Has the ET3 form been received?",
+  "FieldDisplayOrder" : 13,
+  "DisplayContext" : "OPTIONAL"
+} ]

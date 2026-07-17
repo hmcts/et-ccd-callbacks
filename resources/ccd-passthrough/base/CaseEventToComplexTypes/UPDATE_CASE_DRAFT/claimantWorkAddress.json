@@ -1,0 +1,46 @@
+[ {
+  "CaseEventID" : "UPDATE_CASE_DRAFT",
+  "CaseFieldID" : "claimantWorkAddress",
+  "ListElementCode" : "claimant_work_address",
+  "RetainHiddenValue" : "Yes"
+}, {
+  "CaseEventID" : "UPDATE_CASE_DRAFT",
+  "CaseFieldID" : "claimantWorkAddress",
+  "ListElementCode" : "claimant_work_address.AddressLine1",
+  "RetainHiddenValue" : "Yes"
+}, {
+  "CaseEventID" : "UPDATE_CASE_DRAFT",
+  "CaseFieldID" : "claimantWorkAddress",
+  "ListElementCode" : "claimant_work_address.AddressLine2",
+  "RetainHiddenValue" : "Yes"
+}, {
+  "CaseEventID" : "UPDATE_CASE_DRAFT",
+  "CaseFieldID" : "claimantWorkAddress",
+  "ListElementCode" : "claimant_work_address.AddressLine3",
+  "RetainHiddenValue" : "Yes"
+}, {
+  "CaseEventID" : "UPDATE_CASE_DRAFT",
+  "CaseFieldID" : "claimantWorkAddress",
+  "ListElementCode" : "claimant_work_address.PostTown",
+  "RetainHiddenValue" : "Yes"
+}, {
+  "CaseEventID" : "UPDATE_CASE_DRAFT",
+  "CaseFieldID" : "claimantWorkAddress",
+  "ListElementCode" : "claimant_work_address.County",
+  "RetainHiddenValue" : "Yes"
+}, {
+  "CaseEventID" : "UPDATE_CASE_DRAFT",
+  "CaseFieldID" : "claimantWorkAddress",
+  "ListElementCode" : "claimant_work_address.Country",
+  "RetainHiddenValue" : "Yes"
+}, {
+  "CaseEventID" : "UPDATE_CASE_DRAFT",
+  "CaseFieldID" : "claimantWorkAddress",
+  "ListElementCode" : "claimant_work_address.PostCode",
+  "RetainHiddenValue" : "Yes"
+}, {
+  "CaseEventID" : "UPDATE_CASE_DRAFT",
+  "CaseFieldID" : "claimantWorkAddress",
+  "ListElementCode" : "claimant_work_phone_number",
+  "RetainHiddenValue" : "Yes"
+} ]

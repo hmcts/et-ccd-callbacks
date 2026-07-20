@@ -17,7 +17,6 @@ import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -471,18 +470,12 @@ public class CaseActionsForCaseWorkerController {
     }
 
     @PostMapping(value = "/updateClaimantEmail/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Update the claimant email address.")
+    @Operation(summary = "Update claimant email and case access.")
     public ResponseEntity<CCDCallbackResponse> updateClaimantEmail(
             @RequestBody CCDRequest ccdRequest) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         return getCallbackRespEntityErrors(
                 claimantEmailService.prepareUpdate(ccdRequest.getCaseDetails()), caseData);
-    }
-
-    @PostMapping(value = "/updateClaimantEmail/submitted", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Reassign claimant case access after updating their email.")
-    public void updateClaimantEmailSubmitted(@RequestBody CallbackRequest callbackRequest) {
-        claimantEmailService.reassignCreatorAccess(callbackRequest.getCaseDetails());
     }
 
     @PostMapping(value = "/amendRespondentDetails", consumes = APPLICATION_JSON_VALUE)

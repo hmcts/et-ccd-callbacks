@@ -513,7 +513,7 @@
     "PostConditionState": "*",
     "CallBackURLAboutToStartEvent": "${ET_COS_URL}/updateClaimantEmail/aboutToStart",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/updateClaimantEmail/aboutToSubmit",
-    "CallBackURLSubmittedEvent": "${ET_COS_URL}/updateClaimantEmail/submitted",
+    "CallBackURLSubmittedEvent": "",
     "EventEnablingCondition": "managingOffice !=\"Unassigned\"",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",

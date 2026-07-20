@@ -104,7 +104,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private static final String UPDATE_CLAIMANT_EMAIL_VALIDATE_URL = "/updateClaimantEmail/validate";
     private static final String UPDATE_CLAIMANT_EMAIL_ABOUT_TO_SUBMIT_URL =
             "/updateClaimantEmail/aboutToSubmit";
-    private static final String UPDATE_CLAIMANT_EMAIL_SUBMITTED_URL = "/updateClaimantEmail/submitted";
     private static final String AMEND_RESPONDENT_DETAILS_URL = "/amendRespondentDetails";
     private static final String AMEND_RESPONDENT_REPRESENTATIVE_URL = "/amendRespondentRepresentative";
     private static final String UPDATE_HEARING_URL = "/updateHearing";
@@ -502,16 +501,22 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
-    void updateClaimantEmailSubmittedReassignsCreatorAccess() {
+    void updateClaimantEmailReturnsAccessErrors() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(claimantEmailService.prepareUpdate(any(CaseDetails.class)))
+                .thenReturn(List.of("Failed to grant case access using the new claimant email. "
+                        + "The claimant email was not changed."));
 
-        mvc.perform(post(UPDATE_CLAIMANT_EMAIL_SUBMITTED_URL)
+        mvc.perform(post(UPDATE_CLAIMANT_EMAIL_ABOUT_TO_SUBMIT_URL)
                         .content(requestContent.toString())
                         .header(AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        verify(claimantEmailService).reassignCreatorAccess(any(CaseDetails.class));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]",
+                        is("Failed to grant case access using the new claimant email. "
+                                + "The claimant email was not changed.")))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test

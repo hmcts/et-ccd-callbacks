@@ -13,7 +13,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
-import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
 
@@ -22,13 +21,13 @@ import java.util.List;
 import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CREATOR;
@@ -135,31 +134,39 @@ class ClaimantEmailServiceTest {
     }
 
     @Test
-    void prepareUpdateReturnsInputErrorsWithoutCallingIdam() {
+    void prepareUpdateReturnsInputErrorsWithoutCallingIdamOrAccess() throws IOException {
         caseDetails.getCaseData().setNewClaimantEmail(OLD_EMAIL);
 
         assertThat(service.prepareUpdate(caseDetails))
                 .containsExactly(ClaimantEmailService.EMAIL_UNCHANGED_ERROR);
         verify(idamApi, never()).searchUsersByQuery(anyString(), anyString(), any(), any());
+        verify(ccdCaseAssignment, never()).getCaseUserRoles(anyString());
         assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
     }
 
     @Test
-    void prepareUpdateReturnsIdamLookupErrorsWithoutChangingCaseData() {
+    void prepareUpdateReturnsIdamLookupErrorsWithoutChangingCaseDataOrAccess() throws IOException {
         when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
         when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50)).thenReturn(List.of());
 
         assertThat(service.prepareUpdate(caseDetails))
                 .containsExactly(ClaimantEmailService.IDAM_USER_NOT_FOUND_ERROR);
         assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
+        verify(ccdCaseAssignment, never()).getCaseUserRoles(anyString());
+        verify(ccdCaseAssignment, never()).addCaseUserRole(any());
+        verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
     }
 
     @Test
-    void prepareUpdateSetsEmailAndNewClaimantIdWhenCreatorAccessExists() throws IOException {
+    void prepareUpdateReassignsCreatorAccessBeforeUpdatingEmail() throws IOException {
         mockNewIdamUser();
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(assignmentsWithCreator());
 
         assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+
+        InOrder inOrder = inOrder(ccdCaseAssignment);
+        inOrder.verify(ccdCaseAssignment).removeCaseUserRole(requestForUser(OLD_USER_ID));
+        inOrder.verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
         assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(NEW_EMAIL);
         assertThat(caseDetails.getCaseData().getClaimantId()).isEqualTo(NEW_USER_ID);
         assertThat(caseDetails.getCaseData().getCurrentClaimantEmail()).isNull();
@@ -167,25 +174,68 @@ class ClaimantEmailServiceTest {
     }
 
     @Test
-    void prepareUpdateChangesEmailOnlyWhenNoCreatorAccessExists() throws IOException {
-        caseDetails.getCaseData().setClaimantId("existing-value");
+    void prepareUpdateGrantsCreatorAccessWhenNoneExists() throws IOException {
         mockNewIdamUser();
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
                 .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(List.of()).build());
 
         assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+
+        verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
+        verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
+        assertThat(caseDetails.getCaseData().getClaimantId()).isEqualTo(NEW_USER_ID);
         assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(NEW_EMAIL);
-        assertThat(caseDetails.getCaseData().getClaimantId()).isEqualTo("existing-value");
     }
 
     @Test
-    void prepareUpdateCreatesMissingClaimantDetails() throws IOException {
-        caseDetails.getCaseData().setClaimantType(null);
+    void prepareUpdateGrantsCreatorAccessWhenAssignmentsAreMissing() throws IOException {
         mockNewIdamUser();
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(null);
 
         assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+
+        verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
+        verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
+        assertThat(caseDetails.getCaseData().getClaimantId()).isEqualTo(NEW_USER_ID);
+        assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(NEW_EMAIL);
+    }
+
+    @Test
+    void prepareUpdateGrantsCreatorAccessWhenAssignmentsListIsNull() throws IOException {
+        mockNewIdamUser();
+        when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
+                .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(null).build());
+
+        assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+
+        verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
+        assertThat(caseDetails.getCaseData().getClaimantId()).isEqualTo(NEW_USER_ID);
+    }
+
+    @Test
+    void prepareUpdateCreatesMissingClaimantDetailsAfterGrantingAccess() throws IOException {
+        caseDetails.getCaseData().setClaimantType(null);
+        mockNewIdamUser();
+        when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
+                .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(List.of()).build());
+
+        assertThat(service.prepareUpdate(caseDetails)).isEmpty();
         assertThat(caseDetails.getCaseData().getClaimantType()).isNotNull();
+        assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(NEW_EMAIL);
+        assertThat(caseDetails.getCaseData().getClaimantId()).isEqualTo(NEW_USER_ID);
+    }
+
+    @Test
+    void prepareUpdateDoesNotChangeAccessWhenCreatorAlreadyMatchesNewUser() throws IOException {
+        mockNewIdamUser();
+        when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
+                .thenReturn(assignmentsWithCreator(NEW_USER_ID));
+
+        assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+
+        verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
+        verify(ccdCaseAssignment, never()).addCaseUserRole(any());
+        assertThat(caseDetails.getCaseData().getClaimantId()).isEqualTo(NEW_USER_ID);
         assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(NEW_EMAIL);
     }
 
@@ -197,109 +247,116 @@ class ClaimantEmailServiceTest {
         assertThat(service.prepareUpdate(caseDetails))
                 .containsExactly(ClaimantEmailService.ACCESS_LOOKUP_ERROR);
         assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
+        assertThat(caseDetails.getCaseData().getClaimantId()).isNull();
+        verify(ccdCaseAssignment, never()).addCaseUserRole(any());
+        verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
     }
 
     @Test
-    void reassignCreatorAccessRevokesOldAccessBeforeGrantingNewAccess() throws IOException {
-        caseDetails.getCaseData().setClaimantId(NEW_USER_ID);
+    void prepareUpdateReturnsErrorWhenRevokeFailsAndLeavesEmailUnchanged() throws IOException {
+        mockNewIdamUser();
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(assignmentsWithCreator());
+        doThrow(new IOException("revoke failed"))
+                .when(ccdCaseAssignment).removeCaseUserRole(requestForUser(OLD_USER_ID));
 
-        service.reassignCreatorAccess(caseDetails);
-
-        InOrder inOrder = inOrder(ccdCaseAssignment);
-        inOrder.verify(ccdCaseAssignment).removeCaseUserRole(requestForUser(OLD_USER_ID));
-        inOrder.verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
+        assertThat(service.prepareUpdate(caseDetails))
+                .containsExactly(ClaimantEmailService.ACCESS_REVOKE_ERROR);
+        assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
+        assertThat(caseDetails.getCaseData().getClaimantId()).isNull();
+        verify(ccdCaseAssignment, never()).addCaseUserRole(any());
     }
 
     @Test
-    void reassignCreatorAccessRestoresOldAccessWhenGrantFails() throws IOException {
-        caseDetails.getCaseData().setClaimantId(NEW_USER_ID);
+    void prepareUpdateRestoresOldAccessWhenGrantFailsDuringReassignment() throws IOException {
+        mockNewIdamUser();
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(assignmentsWithCreator());
         doThrow(new IOException("grant failed"))
                 .when(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
 
-        assertThatThrownBy(() -> service.reassignCreatorAccess(caseDetails))
-                .isInstanceOf(CcdInputOutputException.class)
-                .hasMessage("Failed to grant case access using the new claimant email");
+        assertThat(service.prepareUpdate(caseDetails))
+                .containsExactly(ClaimantEmailService.ACCESS_GRANT_ERROR);
 
         InOrder inOrder = inOrder(ccdCaseAssignment);
         inOrder.verify(ccdCaseAssignment).removeCaseUserRole(requestForUser(OLD_USER_ID));
         inOrder.verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
         inOrder.verify(ccdCaseAssignment).addCaseUserRole(requestForUser(OLD_USER_ID));
+        assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
+        assertThat(caseDetails.getCaseData().getClaimantId()).isNull();
     }
 
     @Test
-    void reassignCreatorAccessReportsLookupFailure() throws IOException {
-        when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenThrow(new IOException("lookup failed"));
-
-        assertThatThrownBy(() -> service.reassignCreatorAccess(caseDetails))
-                .isInstanceOf(CcdInputOutputException.class)
-                .hasMessage("Failed to retrieve claimant case access")
-                .hasCauseInstanceOf(IOException.class);
-    }
-
-    @Test
-    void reassignCreatorAccessDoesNothingWhenUserIdIsUnchanged() throws IOException {
-        caseDetails.getCaseData().setClaimantId(OLD_USER_ID);
-        when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(assignmentsWithCreator());
-
-        service.reassignCreatorAccess(caseDetails);
-
-        verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
-        verify(ccdCaseAssignment, never()).addCaseUserRole(any());
-    }
-
-    @Test
-    void reassignCreatorAccessReportsRevokeFailure() throws IOException {
-        caseDetails.getCaseData().setClaimantId(NEW_USER_ID);
-        when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(assignmentsWithCreator());
-        doThrow(new IOException("revoke failed"))
-                .when(ccdCaseAssignment).removeCaseUserRole(requestForUser(OLD_USER_ID));
-
-        assertThatThrownBy(() -> service.reassignCreatorAccess(caseDetails))
-                .isInstanceOf(CcdInputOutputException.class)
-                .hasMessage("Failed to revoke access linked to the previous claimant email")
-                .hasCauseInstanceOf(IOException.class);
-        verify(ccdCaseAssignment, never()).addCaseUserRole(any());
-    }
-
-    @Test
-    void reassignCreatorAccessPreservesRestoreFailureAsSuppressed() throws IOException {
-        caseDetails.getCaseData().setClaimantId(NEW_USER_ID);
+    void prepareUpdatePreservesRestoreFailureAsSuppressedWhenGrantFails() throws IOException {
+        mockNewIdamUser();
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(assignmentsWithCreator());
         doThrow(new IOException("grant failed"))
                 .when(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
         doThrow(new IOException("restore failed"))
                 .when(ccdCaseAssignment).addCaseUserRole(requestForUser(OLD_USER_ID));
 
-        assertThatThrownBy(() -> service.reassignCreatorAccess(caseDetails))
-                .isInstanceOf(CcdInputOutputException.class)
-                .hasMessage("Failed to grant case access using the new claimant email")
-                .satisfies(exception -> assertThat(exception.getCause().getSuppressed())
-                        .singleElement()
-                        .satisfies(suppressed -> assertThat(suppressed).hasMessage("restore failed")));
+        assertThat(service.prepareUpdate(caseDetails))
+                .containsExactly(ClaimantEmailService.ACCESS_GRANT_ERROR);
+        assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
     }
 
     @Test
-    void reassignCreatorAccessDoesNothingWhenNoCreatorExists() throws IOException {
+    void prepareUpdateReturnsErrorWhenGrantOnlyFailsAndLeavesEmailUnchanged() throws IOException {
+        mockNewIdamUser();
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
                 .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(List.of()).build());
+        doThrow(new IOException("grant failed"))
+                .when(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
 
-        service.reassignCreatorAccess(caseDetails);
-
+        assertThat(service.prepareUpdate(caseDetails))
+                .containsExactly(ClaimantEmailService.ACCESS_GRANT_ERROR);
+        assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
+        assertThat(caseDetails.getCaseData().getClaimantId()).isNull();
         verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
-        verify(ccdCaseAssignment, never()).addCaseUserRole(any());
     }
 
     @Test
-    void reassignCreatorAccessHandlesMissingAssignmentsList() throws IOException {
+    void prepareUpdateReportsAccessOutcomeWhenEmailUpdateFailsAfterReassignment() throws IOException {
+        mockNewIdamUser();
+        when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(assignmentsWithCreator());
+        CaseData spyCaseData = spy(caseDetails.getCaseData());
+        caseDetails.setCaseData(spyCaseData);
+        doThrow(new RuntimeException("email update failed")).when(spyCaseData).getClaimantType();
+
+        assertThat(service.prepareUpdate(caseDetails))
+                .containsExactly(ClaimantEmailService.EMAIL_UPDATE_AFTER_REASSIGN_ERROR);
+        verify(ccdCaseAssignment).removeCaseUserRole(requestForUser(OLD_USER_ID));
+        verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
+        assertThat(spyCaseData.getClaimantId()).isEqualTo(NEW_USER_ID);
+    }
+
+    @Test
+    void prepareUpdateReportsAccessOutcomeWhenEmailUpdateFailsAfterGrant() throws IOException {
+        mockNewIdamUser();
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
-                .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(null).build());
+                .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(List.of()).build());
+        CaseData spyCaseData = spy(caseDetails.getCaseData());
+        caseDetails.setCaseData(spyCaseData);
+        doThrow(new RuntimeException("email update failed")).when(spyCaseData).getClaimantType();
 
-        service.reassignCreatorAccess(caseDetails);
+        assertThat(service.prepareUpdate(caseDetails))
+                .containsExactly(ClaimantEmailService.EMAIL_UPDATE_AFTER_GRANT_ERROR);
+        verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
+        assertThat(spyCaseData.getClaimantId()).isEqualTo(NEW_USER_ID);
+    }
 
+    @Test
+    void prepareUpdateReportsUnchangedAccessWhenEmailUpdateFailsWithoutAccessChange() throws IOException {
+        mockNewIdamUser();
+        when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
+                .thenReturn(assignmentsWithCreator(NEW_USER_ID));
+        CaseData spyCaseData = spy(caseDetails.getCaseData());
+        caseDetails.setCaseData(spyCaseData);
+        doThrow(new RuntimeException("email update failed")).when(spyCaseData).getClaimantType();
+
+        assertThat(service.prepareUpdate(caseDetails))
+                .containsExactly(ClaimantEmailService.EMAIL_UPDATE_ERROR);
         verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
         verify(ccdCaseAssignment, never()).addCaseUserRole(any());
+        assertThat(spyCaseData.getClaimantId()).isEqualTo(NEW_USER_ID);
     }
 
     private void mockNewIdamUser() {
@@ -316,9 +373,13 @@ class ClaimantEmailServiceTest {
     }
 
     private CaseUserAssignmentData assignmentsWithCreator() {
+        return assignmentsWithCreator(OLD_USER_ID);
+    }
+
+    private CaseUserAssignmentData assignmentsWithCreator(String userId) {
         CaseUserAssignment creator = CaseUserAssignment.builder()
                 .caseId(CASE_ID)
-                .userId(OLD_USER_ID)
+                .userId(userId)
                 .caseRole(CASE_USER_ROLE_CREATOR)
                 .build();
         return CaseUserAssignmentData.builder().caseUserAssignments(List.of(creator)).build();

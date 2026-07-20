@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -36,6 +37,18 @@ public class ClaimantEmailService {
             "More than one IdAM account was found for the new email address.";
     static final String ACCESS_LOOKUP_ERROR =
             "The claimant's existing case access could not be checked. Try again later.";
+    static final String ACCESS_REVOKE_ERROR =
+            "Failed to revoke access linked to the previous claimant email. The claimant email was not changed.";
+    static final String ACCESS_GRANT_ERROR =
+            "Failed to grant case access using the new claimant email. The claimant email was not changed.";
+    static final String EMAIL_UPDATE_AFTER_REASSIGN_ERROR =
+            "Case access was updated for the new email, but the claimant email could not be saved. "
+                    + "Check case access before retrying.";
+    static final String EMAIL_UPDATE_AFTER_GRANT_ERROR =
+            "Case access was granted for the new email, but the claimant email could not be saved. "
+                    + "Check case access before retrying.";
+    static final String EMAIL_UPDATE_ERROR =
+            "The claimant email could not be saved. Case access was not changed.";
 
     private final IdamApi idamApi;
     private final AdminUserService adminUserService;
@@ -68,52 +81,59 @@ public class ClaimantEmailService {
             return errors;
         }
 
+        AccessOutcome accessOutcome;
         try {
-            if (getCreatorAssignment(caseDetails.getCaseId()).isPresent()) {
-                caseData.setClaimantId(newUser.get().getUid());
-            }
-        } catch (IOException exception) {
-            log.error("Unable to retrieve creator access for case {}", caseDetails.getCaseId(), exception);
-            errors.add(ACCESS_LOOKUP_ERROR);
+            accessOutcome = ensureCreatorAccess(caseDetails, newUser.get());
+        } catch (CcdInputOutputException exception) {
+            log.error("Unable to update creator access for case {}", caseDetails.getCaseId(), exception);
+            errors.add(exception.getMessage());
             return errors;
         }
 
-        if (caseData.getClaimantType() == null) {
-            caseData.setClaimantType(new ClaimantType());
+        try {
+            applyEmailUpdate(caseData, caseData.getNewClaimantEmail());
+        } catch (RuntimeException exception) {
+            log.error("Creator access outcome {} but email could not be updated for case {}",
+                    accessOutcome, caseDetails.getCaseId(), exception);
+            errors.add(emailUpdateFailureMessage(accessOutcome));
         }
-        caseData.getClaimantType().setClaimantEmailAddress(caseData.getNewClaimantEmail());
-        caseData.setCurrentClaimantEmail(null);
-        caseData.setNewClaimantEmail(null);
         return errors;
     }
 
-    public void reassignCreatorAccess(CaseDetails caseDetails) {
+    private AccessOutcome ensureCreatorAccess(CaseDetails caseDetails, UserDetails newUser) {
         Optional<CaseUserAssignment> oldCreator;
         try {
             oldCreator = getCreatorAssignment(caseDetails.getCaseId());
         } catch (IOException exception) {
-            throw new CcdInputOutputException("Failed to retrieve claimant case access", exception);
+            throw new CcdInputOutputException(ACCESS_LOOKUP_ERROR, exception);
         }
 
+        String newUserId = newUser.getUid();
         if (oldCreator.isEmpty()) {
-            log.info("No creator access exists for case {}; email updated without changing access",
-                    caseDetails.getCaseId());
-            return;
+            grantCreatorAccess(caseDetails.getCaseId(), newUserId);
+            caseDetails.getCaseData().setClaimantId(newUserId);
+            log.info("Granted creator access to user {} for case {}", newUserId, caseDetails.getCaseId());
+            return AccessOutcome.GRANTED;
         }
 
-        String newUserId = caseDetails.getCaseData().getClaimantId();
         String oldUserId = oldCreator.get().getUserId();
         if (StringUtils.equals(oldUserId, newUserId)) {
-            return;
+            caseDetails.getCaseData().setClaimantId(newUserId);
+            return AccessOutcome.UNCHANGED;
         }
 
-        CaseAssignmentUserRolesRequest oldAccess = buildCreatorRequest(caseDetails.getCaseId(), oldUserId);
-        CaseAssignmentUserRolesRequest newAccess = buildCreatorRequest(caseDetails.getCaseId(), newUserId);
+        reassignCreatorAccess(caseDetails.getCaseId(), oldUserId, newUserId);
+        caseDetails.getCaseData().setClaimantId(newUserId);
+        return AccessOutcome.REASSIGNED;
+    }
+
+    private void reassignCreatorAccess(String caseId, String oldUserId, String newUserId) {
+        CaseAssignmentUserRolesRequest oldAccess = buildCreatorRequest(caseId, oldUserId);
+        CaseAssignmentUserRolesRequest newAccess = buildCreatorRequest(caseId, newUserId);
         try {
             ccdCaseAssignment.removeCaseUserRole(oldAccess);
         } catch (Exception revokeException) {
-            throw new CcdInputOutputException("Failed to revoke access linked to the previous claimant email",
-                    revokeException);
+            throw new CcdInputOutputException(ACCESS_REVOKE_ERROR, revokeException);
         }
         try {
             ccdCaseAssignment.addCaseUserRole(newAccess);
@@ -122,11 +142,35 @@ public class ClaimantEmailService {
                 ccdCaseAssignment.addCaseUserRole(oldAccess);
             } catch (Exception restoreException) {
                 grantException.addSuppressed(restoreException);
-                log.error("Failed to restore creator access for case {}", caseDetails.getCaseId(), restoreException);
+                log.error("Failed to restore creator access for case {}", caseId, restoreException);
             }
-            throw new CcdInputOutputException("Failed to grant case access using the new claimant email",
-                    grantException);
+            throw new CcdInputOutputException(ACCESS_GRANT_ERROR, grantException);
         }
+    }
+
+    private void grantCreatorAccess(String caseId, String userId) {
+        try {
+            ccdCaseAssignment.addCaseUserRole(buildCreatorRequest(caseId, userId));
+        } catch (Exception grantException) {
+            throw new CcdInputOutputException(ACCESS_GRANT_ERROR, grantException);
+        }
+    }
+
+    private void applyEmailUpdate(CaseData caseData, String newEmail) {
+        if (caseData.getClaimantType() == null) {
+            caseData.setClaimantType(new ClaimantType());
+        }
+        caseData.getClaimantType().setClaimantEmailAddress(newEmail);
+        caseData.setCurrentClaimantEmail(null);
+        caseData.setNewClaimantEmail(null);
+    }
+
+    private static String emailUpdateFailureMessage(AccessOutcome accessOutcome) {
+        return switch (accessOutcome) {
+            case REASSIGNED -> EMAIL_UPDATE_AFTER_REASSIGN_ERROR;
+            case GRANTED -> EMAIL_UPDATE_AFTER_GRANT_ERROR;
+            case UNCHANGED -> EMAIL_UPDATE_ERROR;
+        };
     }
 
     private List<String> validateEmailInput(CaseData caseData) {
@@ -174,5 +218,11 @@ public class ClaimantEmailService {
         return CaseAssignmentUserRolesRequest.builder()
                 .caseAssignmentUserRoles(List.of(role))
                 .build();
+    }
+
+    enum AccessOutcome {
+        UNCHANGED,
+        REASSIGNED,
+        GRANTED
     }
 }

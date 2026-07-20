@@ -134,6 +134,30 @@ class ClaimantEmailServiceTest {
     }
 
     @Test
+    void validateRejectsIdamAccountWithoutCitizenRole() {
+        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
+        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
+                .thenReturn(List.of(user(NEW_EMAIL, NEW_USER_ID, List.of("caseworker"))));
+
+        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+                .containsExactly(ClaimantEmailService.IDAM_USER_NOT_CITIZEN_ERROR);
+    }
+
+    @Test
+    void prepareUpdateReturnsCitizenRoleErrorWithoutChangingCaseDataOrAccess() throws IOException {
+        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
+        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
+                .thenReturn(List.of(user(NEW_EMAIL, NEW_USER_ID, List.of())));
+
+        assertThat(service.prepareUpdate(caseDetails))
+                .containsExactly(ClaimantEmailService.IDAM_USER_NOT_CITIZEN_ERROR);
+        assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
+        verify(ccdCaseAssignment, never()).getCaseUserRoles(anyString());
+        verify(ccdCaseAssignment, never()).addCaseUserRole(any());
+        verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
+    }
+
+    @Test
     void prepareUpdateReturnsInputErrorsWithoutCallingIdamOrAccess() throws IOException {
         caseDetails.getCaseData().setNewClaimantEmail(OLD_EMAIL);
 
@@ -366,9 +390,14 @@ class ClaimantEmailServiceTest {
     }
 
     private UserDetails user(String email, String uid) {
+        return user(email, uid, List.of("citizen"));
+    }
+
+    private UserDetails user(String email, String uid, List<String> roles) {
         UserDetails user = new UserDetails();
         user.setEmail(email);
         user.setUid(uid);
+        user.setRoles(roles);
         return user;
     }
 

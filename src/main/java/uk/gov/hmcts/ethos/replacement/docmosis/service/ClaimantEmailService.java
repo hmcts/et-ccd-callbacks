@@ -35,6 +35,9 @@ public class ClaimantEmailService {
             "No IdAM account was found for the new email address.";
     static final String IDAM_USER_AMBIGUOUS_ERROR =
             "More than one IdAM account was found for the new email address.";
+    static final String IDAM_USER_NOT_CITIZEN_ERROR =
+            "The IdAM account for the new email is not a citizen account.";
+    private static final String CITIZEN_ROLE = "citizen";
     static final String ACCESS_LOOKUP_ERROR =
             "The claimant's existing case access could not be checked. Try again later.";
     static final String ACCESS_REVOKE_ERROR =
@@ -64,7 +67,7 @@ public class ClaimantEmailService {
     public List<String> validateNewEmail(CaseData caseData) {
         List<String> errors = validateEmailInput(caseData);
         if (errors.isEmpty()) {
-            findUserByEmail(caseData.getNewClaimantEmail(), errors);
+            findCitizenIdamUserByEmail(caseData.getNewClaimantEmail(), errors);
         }
         return errors;
     }
@@ -76,7 +79,7 @@ public class ClaimantEmailService {
             return errors;
         }
 
-        Optional<UserDetails> newUser = findUserByEmail(caseData.getNewClaimantEmail(), errors);
+        Optional<UserDetails> newUser = findCitizenIdamUserByEmail(caseData.getNewClaimantEmail(), errors);
         if (newUser.isEmpty()) {
             return errors;
         }
@@ -182,7 +185,7 @@ public class ClaimantEmailService {
         return errors;
     }
 
-    private Optional<UserDetails> findUserByEmail(String email, List<String> errors) {
+    private Optional<UserDetails> findCitizenIdamUserByEmail(String email, List<String> errors) {
         List<UserDetails> exactMatches = idamApi.searchUsersByQuery(
                         adminUserService.getAdminUserToken(), email, 0, 50)
                 .stream()
@@ -196,7 +199,12 @@ public class ClaimantEmailService {
             errors.add(IDAM_USER_AMBIGUOUS_ERROR);
             return Optional.empty();
         }
-        return Optional.of(exactMatches.getFirst());
+        UserDetails user = exactMatches.getFirst();
+        if (CollectionUtils.isEmpty(user.getRoles()) || !user.getRoles().contains(CITIZEN_ROLE)) {
+            errors.add(IDAM_USER_NOT_CITIZEN_ERROR);
+            return Optional.empty();
+        }
+        return Optional.of(user);
     }
 
     private Optional<CaseUserAssignment> getCreatorAssignment(String caseId) throws IOException {

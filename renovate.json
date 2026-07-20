@@ -11,6 +11,5 @@
   "updateNotScheduled": false,
   "prConcurrentLimit": 3,
   "branchConcurrentLimit": 3,
-  "prHourlyLimit": 1,
   "automergeSchedule": ["before 12pm every weekday"]
 }

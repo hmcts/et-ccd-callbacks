@@ -68,6 +68,9 @@ public class NocRemoveRepresentationService {
             throw new IllegalStateException(String.format(EXCEPTION_REPRESENTATIVE_NOT_FOUND, caseDetails.getCaseId()));
         }
         CaseDetails caseDetailsBeforeRepUpdate = CaseDataUtils.cloneCaseDetails(caseDetails);
+        if (caseDetailsBeforeRepUpdate == null) {
+            return;
+        }
         // revoke claimant legal rep
         final String adminUserToken = adminUserService.getAdminUserToken();
         nocCcdService.revokeClaimantRepresentation(adminUserToken, caseDetails);

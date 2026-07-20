@@ -108,7 +108,7 @@ public class EmailNotificationService {
     private void getRespondentEmailAddress(RespondentSumTypeItem respondentSumTypeItem,
                                                  Map<String, String> emailAddressesMap) {
         String respondentEmail = RespondentUtils.findRespondentEmailAddress(respondentSumTypeItem);
-        if (StringUtils.isNotBlank(respondentEmail)) {
+        if (StringUtils.isNotBlank(respondentEmail) && respondentSumTypeItem != null) {
             emailAddressesMap.put(respondentEmail, respondentSumTypeItem.getId());
         }
     }

@@ -564,7 +564,7 @@ dependencies {
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.14.0'
-    implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.1'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.14.0'
     implementation 'com.google.guava:guava'
     implementation group: 'joda-time', name: 'joda-time', version: '2.12.7'
 

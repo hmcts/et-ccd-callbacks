@@ -566,7 +566,7 @@ dependencies {
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.14.0'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.1'
     implementation 'com.google.guava:guava'
-    implementation group: 'joda-time', name: 'joda-time', version: '2.12.7'
+    implementation group: 'joda-time', name: 'joda-time', version: '2.14.2'
 
     implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.7', {
         exclude group: 'org.apache.commons', module: 'commons-compress'

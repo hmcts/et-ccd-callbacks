@@ -66,6 +66,13 @@ public final class ClaimantUtils {
         return null;
     }
 
+    /**
+     * Returns the claimant associated with the supplied case data.
+     *
+     * @param caseData the case data containing the claimant
+     * @return the claimant, or an empty string if the case data is {@code null}
+     *         or the claimant is blank
+     */
     public static String getClaimant(CaseData caseData) {
         if (ObjectUtils.isEmpty(caseData)
                 || StringUtils.isBlank(caseData.getClaimant())) {

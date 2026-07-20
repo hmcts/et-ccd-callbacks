@@ -54,7 +54,6 @@ class OrganisationServiceTest {
     private static final String URL_FIND_ORGANISATION_BY_IDAM_USER_ID =
             "http://localhost:8765/refdata/internal/v1/organisations/orgDetails/" + REPRESENTATIVE_IDAM_ID;
     private static final String URL_FIND_ORGANISATION_SUPERUSER_BY_ID =
-    private static final String URL_GET_ORGANISATION_BY_ID =
             "http://localhost:8765/refdata/internal/v1/organisations?id=" + ORGANISATION_ID;
     private static final String FEIGN_EXCEPTION_USER_NOT_FOUND = "status 404 reading UserClient#getUser(String)";
     private static final String FEIGN_EXCEPTION_ORGANISATION_NOT_FOUND =
@@ -178,7 +177,6 @@ class OrganisationServiceTest {
         Request request = Request.create(
                 Request.HttpMethod.GET,
                 URL_FIND_ORGANISATION_SUPERUSER_BY_ID,
-                URL_GET_ORGANISATION_BY_ID,
                 Collections.emptyMap(),
                 new byte[0],
                 StandardCharsets.UTF_8,

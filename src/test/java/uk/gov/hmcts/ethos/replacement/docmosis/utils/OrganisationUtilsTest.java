@@ -16,7 +16,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
-import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
@@ -349,45 +348,5 @@ final class OrganisationUtilsTest {
         assertThat(OrganisationUtils.hasRemainingRespondentReps(caseData, TEST_ORGANISATION_ID_2)).isFalse();
         // when representative's organisation id is same with parameter organisation id should return true
         assertThat(OrganisationUtils.hasRemainingRespondentReps(caseData, TEST_ORGANISATION_ID_1)).isTrue();
-    }
-
-    @Test
-    void theHasUserIdentifier() {
-        organisationUtils.close();
-        // when user response is empty should return false
-        assertThat(OrganisationUtils.hasUserIdentifier(null)).isFalse();
-        // when user response not has body should return false
-        ResponseEntity<AccountIdByEmailResponse> userResponse = new ResponseEntity<>(null, HttpStatus.OK);
-        assertThat(OrganisationUtils.hasUserIdentifier(userResponse)).isFalse();
-        // when user response not has user identifier should return false
-        userResponse = new ResponseEntity<>(new AccountIdByEmailResponse(), HttpStatus.OK);
-        assertThat(OrganisationUtils.hasUserIdentifier(userResponse)).isFalse();
-        // when user response has user identifier should return true
-        AccountIdByEmailResponse accountIdByEmailResponse = new AccountIdByEmailResponse();
-        accountIdByEmailResponse.setUserIdentifier(TEST_REPRESENTATIVE_ID);
-        userResponse = new ResponseEntity<>(accountIdByEmailResponse, HttpStatus.OK);
-        assertThat(OrganisationUtils.hasUserIdentifier(userResponse)).isTrue();
-    }
-
-    @Test
-    void theHasMatchingOrganisationId() {
-        organisationUtils.close();
-        // when organisation is empty should return true
-        assertThat(OrganisationUtils.hasMatchingOrganisationId(null, null)).isTrue();
-        // when organisation response is empty should return true
-        Organisation organisation = Organisation.builder().build();
-        assertThat(OrganisationUtils.hasMatchingOrganisationId(organisation, null)).isTrue();
-        // when organisation does not have id should return true
-        OrganisationsResponse organisationsResponse = OrganisationsResponse.builder().build();
-        assertThat(OrganisationUtils.hasMatchingOrganisationId(organisation, organisationsResponse)).isTrue();
-        // when organisation response does not have id should return true
-        organisation.setOrganisationID(TEST_ORGANISATION_ID_1);
-        assertThat(OrganisationUtils.hasMatchingOrganisationId(organisation, organisationsResponse)).isTrue();
-        // when organisation id and organisation response identification are different should return false
-        organisationsResponse.setOrganisationIdentifier(TEST_ORGANISATION_ID_2);
-        assertThat(OrganisationUtils.hasMatchingOrganisationId(organisation, organisationsResponse)).isFalse();
-        // when organisation id and organisation response identification are same should return true
-        organisationsResponse.setOrganisationIdentifier(TEST_ORGANISATION_ID_1);
-        assertThat(OrganisationUtils.hasMatchingOrganisationId(organisation, organisationsResponse)).isTrue();
     }
 }

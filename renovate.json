@@ -7,5 +7,7 @@
   "ignoreDeps": [
     "aac-manage-case-assignment"
   ],
+  "schedule": ["after 7am and before 9am every weekday"],
+  "updateNotScheduled": false,
   "automergeSchedule": ["before 12pm every weekday"]
 }

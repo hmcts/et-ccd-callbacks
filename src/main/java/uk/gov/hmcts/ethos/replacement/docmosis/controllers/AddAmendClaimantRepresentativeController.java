@@ -37,6 +37,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERR
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrorsAndWarnings;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 /**
  * REST controller for the addAmendClaimantRepresentative event.
@@ -132,7 +133,7 @@ public class AddAmendClaimantRepresentativeController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public void amendClaimantRepSubmitted(
+    public ResponseEntity<CCDCallbackResponse> amendClaimantRepSubmitted(
             @RequestBody CallbackRequest callbackRequest,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken) {
 
@@ -143,5 +144,6 @@ public class AddAmendClaimantRepresentativeController {
         } catch (IOException e) {
             throw new CcdInputOutputException("Failed to update claimant representatives access", e);
         }
+        return getCallbackRespEntityNoErrors(callbackRequest.getCaseDetails().getCaseData());
     }
 }

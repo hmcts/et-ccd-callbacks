@@ -266,6 +266,14 @@ class NocRespondentHelperTest {
     }
 
     @Test
+    void amendRespondentNameRepresentativeNamesIgnoresRepresentativesWithoutRespondentId() {
+        caseData.getRespondentCollection().getFirst().setId(null);
+        caseData.getRepCollection().getFirst().getValue().setRespondentId(null);
+
+        assertDoesNotThrow(() -> nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData));
+    }
+
+    @Test
     void generateNewRepDetails() {
         UserDetails userDetails = new UserDetails();
         userDetails.setLastName("Smith");

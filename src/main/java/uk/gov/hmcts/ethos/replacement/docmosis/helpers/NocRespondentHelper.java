@@ -185,7 +185,9 @@ public class NocRespondentHelper {
             final List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
             Optional<RespondentSumTypeItem> matchedRespondent = respondentCollection.stream()
                     .filter(resp ->
-                            resp.getId().equals(respondentRep.getValue().getRespondentId())).findFirst();
+                            StringUtils.isNotBlank(respondentRep.getValue().getRespondentId())
+                                    && Objects.equals(resp.getId(), respondentRep.getValue().getRespondentId()))
+                    .findFirst();
 
             matchedRespondent.ifPresent(respondent ->
                     updateRepWithRespondentDetails(respondent, respondentRep, respondentCollection));

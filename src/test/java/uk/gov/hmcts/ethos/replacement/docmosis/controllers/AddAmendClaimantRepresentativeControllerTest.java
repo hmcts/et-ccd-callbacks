@@ -165,7 +165,10 @@ class AddAmendClaimantRepresentativeControllerTest {
                 .content(jsonMapper.toJson(callbackRequest))
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
 
         verify(nocClaimantRepresentativeService, times(1))
                 .updateClaimantRepAccess(any());
@@ -182,7 +185,10 @@ class AddAmendClaimantRepresentativeControllerTest {
                 .content(jsonMapper.toJson(callbackRequest))
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
 
         verify(nocClaimantRepresentativeService, times(1))
                 .updateClaimantRepAccess(any());

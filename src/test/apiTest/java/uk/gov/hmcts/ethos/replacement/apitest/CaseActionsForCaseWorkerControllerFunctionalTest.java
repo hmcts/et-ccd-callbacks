@@ -27,7 +27,10 @@ public class CaseActionsForCaseWorkerControllerFunctionalTest extends BaseFuncti
     private static final String RESTRICTED_CASES_URL = "/restrictedCases";
     private static final String AMEND_CLAIMANT_DETAILS_URL = "/amendClaimantDetails";
     private static final String AMEND_RESPONDENT_DETAILS_URL = "/amendRespondentDetails";
-    private static final String AMEND_RESPONDENT_REPRESENTATIVE_URL = "/amendRespondentRepresentative";
+    private static final String AMEND_RESPONDENT_REPRESENTATIVE_URL =
+            "/respondentRepresentative/amendRespondentRepresentativeAboutToSubmit";
+    private static final String RESPONDENT_ID = "respondent-id";
+    private static final String REPRESENTATIVE_ID = "representative-id";
     private static final String RESPONDENT_NAME = "Respondent Ltd";
     private CCDRequest ccdRequest;
 
@@ -39,6 +42,7 @@ public class CaseActionsForCaseWorkerControllerFunctionalTest extends BaseFuncti
                 .withRespondent(RESPONDENT_NAME, NO, null, false)
                 .build();
 
+        caseData.getRespondentCollection().getFirst().setId(RESPONDENT_ID);
         caseData.setIcListingPreliminaryHearing(YES);
         caseData.setRepCollection(List.of(createRespondentRepresentative()));
 
@@ -113,9 +117,11 @@ public class CaseActionsForCaseWorkerControllerFunctionalTest extends BaseFuncti
                 .myHmctsYesNo(NO)
                 .dynamicRespRepName(DynamicFixedListType.of(
                         DynamicValueType.create("R: " + RESPONDENT_NAME, RESPONDENT_NAME)))
+                .respondentId(RESPONDENT_ID)
                 .build();
 
         RepresentedTypeRItem item = new RepresentedTypeRItem();
+        item.setId(REPRESENTATIVE_ID);
         item.setValue(representative);
 
         return item;

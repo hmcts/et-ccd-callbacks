@@ -17,7 +17,6 @@ import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -476,24 +475,12 @@ public class CaseActionsForCaseWorkerController {
     }
 
     @PostMapping(value = "/updateRespondentEmail/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Update the selected respondent's email address.")
+    @Operation(summary = "Update the selected respondent's email address and case access.")
     public ResponseEntity<CCDCallbackResponse> updateRespondentEmail(
             @RequestBody CCDRequest ccdRequest) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         return getCallbackRespEntityErrors(
                 respondentEmailService.prepareUpdate(ccdRequest.getCaseDetails()), caseData);
-    }
-
-    @PostMapping(value = "/updateRespondentEmail/submitted", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Reassign respondent case access after updating their email.")
-    public ResponseEntity<CCDCallbackResponse> updateRespondentEmailSubmitted(
-            @RequestBody CallbackRequest callbackRequest) {
-        RespondentEmailService.Confirmation confirmation =
-                respondentEmailService.reassignDefendantAccess(callbackRequest);
-        return ResponseEntity.ok(CCDCallbackResponse.builder()
-                .confirmation_header(confirmation.header())
-                .confirmation_body(confirmation.body())
-                .build());
     }
 
     @PostMapping(value = "/amendRespondentDetails", consumes = APPLICATION_JSON_VALUE)

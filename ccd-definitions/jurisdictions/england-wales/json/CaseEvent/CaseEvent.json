@@ -1167,7 +1167,7 @@
     "PostConditionState": "*",
     "CallBackURLAboutToStartEvent": "${ET_COS_URL}/updateRespondentEmail/aboutToStart",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/updateRespondentEmail/aboutToSubmit",
-    "CallBackURLSubmittedEvent": "${ET_COS_URL}/updateRespondentEmail/submitted",
+    "CallBackURLSubmittedEvent": "",
     "EventEnablingCondition": "managingOffice !=\"Unassigned\"",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",

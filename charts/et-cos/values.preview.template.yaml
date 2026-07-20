@@ -147,7 +147,7 @@ et-syr:
       PCQ_ENABLED: true
 
 et-sya-api:
-  enabled: true
+  enabled: false
   java:
     imagePullPolicy: Always
     image: hmctsprod.azurecr.io/et/sya-api:latest

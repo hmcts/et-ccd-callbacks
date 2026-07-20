@@ -20,7 +20,6 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -106,7 +105,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private static final String UPDATE_RESPONDENT_EMAIL_VALIDATE_URL = "/updateRespondentEmail/validate";
     private static final String UPDATE_RESPONDENT_EMAIL_ABOUT_TO_SUBMIT_URL =
             "/updateRespondentEmail/aboutToSubmit";
-    private static final String UPDATE_RESPONDENT_EMAIL_SUBMITTED_URL = "/updateRespondentEmail/submitted";
     private static final String AMEND_RESPONDENT_DETAILS_URL = "/amendRespondentDetails";
     private static final String AMEND_RESPONDENT_REPRESENTATIVE_URL = "/amendRespondentRepresentative";
     private static final String UPDATE_HEARING_URL = "/updateHearing";
@@ -523,49 +521,22 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
-    void updateRespondentEmailSubmittedReassignsDefendantAccess() {
+    void updateRespondentEmailReturnsAccessErrors() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(respondentEmailService.reassignDefendantAccess(any(CallbackRequest.class)))
-                .thenReturn(new RespondentEmailService.Confirmation(
-                        "# Respondent email updated",
-                        "The respondent email has been updated and case access has been transferred "
-                                + "to the new email address."));
+        when(respondentEmailService.prepareUpdate(any(CaseDetails.class)))
+                .thenReturn(List.of("Failed to grant case access using the new respondent email. "
+                        + "The respondent email was not changed."));
 
-        mvc.perform(post(UPDATE_RESPONDENT_EMAIL_SUBMITTED_URL)
+        mvc.perform(post(UPDATE_RESPONDENT_EMAIL_ABOUT_TO_SUBMIT_URL)
                         .content(requestContent.toString())
                         .header(AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.confirmation_header", is("# Respondent email updated")))
-                .andExpect(jsonPath("$.confirmation_body",
-                        is("The respondent email has been updated and case access has been transferred "
-                                + "to the new email address.")));
-
-        verify(respondentEmailService).reassignDefendantAccess(any(CallbackRequest.class));
-    }
-
-    @Test
-    @SneakyThrows
-    void updateRespondentEmailSubmittedReturnsPartialFailureConfirmation() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(respondentEmailService.reassignDefendantAccess(any(CallbackRequest.class)))
-                .thenReturn(new RespondentEmailService.Confirmation(
-                        "# Respondent email updated, but case access was not transferred",
-                        "The respondent email was saved, but case access could not be moved "
-                                + "to the account for the new email. "
-                                + "This case has been marked so access can be retried."));
-
-        mvc.perform(post(UPDATE_RESPONDENT_EMAIL_SUBMITTED_URL)
-                        .content(requestContent.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.confirmation_header",
-                        is("# Respondent email updated, but case access was not transferred")))
-                .andExpect(jsonPath("$.confirmation_body",
-                        is("The respondent email was saved, but case access could not be moved "
-                                + "to the account for the new email. "
-                                + "This case has been marked so access can be retried.")));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]",
+                        is("Failed to grant case access using the new respondent email. "
+                                + "The respondent email was not changed.")))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test

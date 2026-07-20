@@ -140,12 +140,17 @@ public class NocRepresentativeService {
 
         final String methodName = "getValidatedRepresentativeRolesByUserToken";
         List<CaseUserAssignment> caseUserAssignments = getValidatedCaseUserAssignments(submissionReference);
+        log.info("********** Validated Representative Roles: " + caseUserAssignments);
         UserDetails userDetails = userService.getValidatedUserDetails(userToken, submissionReference);
+        log.info("********** Validated User Details: " + userDetails);
         List<String> rolesByUserId = RoleUtils.getCaseRolesForUser(caseUserAssignments, userDetails.getUid());
+        log.info("********** ROLES By USER ID: " + rolesByUserId);
         List<String> rolesByAssignmentOrder = RoleUtils.findFirstCaseRolesByUserId(caseUserAssignments,
                 userDetails.getUid());
+        log.info("********** ROLES By ASSIGNMENT ORDER: " + rolesByAssignmentOrder);
         List<String> allRoles = CallbacksCollectionUtils.mergeListsWithoutDuplicates(rolesByUserId,
                 rolesByAssignmentOrder);
+        log.info("********** All ROLES: " + allRoles);
         if (CollectionUtils.isEmpty(allRoles)) {
             throw new GenericServiceException(ERROR_CASE_ROLES_NOT_FOUND,
                     new Exception(ERROR_CASE_ROLES_NOT_FOUND),

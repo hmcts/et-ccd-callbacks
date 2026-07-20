@@ -151,6 +151,7 @@ public class AmendRepresentativeContactService {
             ClaimantRepresentativeUtils.updateET3ResponseContactDetails(caseData);
             return;
         }
+        log.info("****** FOUND ROLES FOR USER: " + roles);
         RespondentRepresentativeUtils.updateET3ResponseContactDetails(caseData, roles);
     }
 }

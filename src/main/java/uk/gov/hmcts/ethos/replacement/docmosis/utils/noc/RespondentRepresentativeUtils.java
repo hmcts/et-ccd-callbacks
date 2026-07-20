@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils.noc;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +30,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXC
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ID_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_NOT_FOUND;
 
+@Slf4j
 public final class RespondentRepresentativeUtils {
 
     private RespondentRepresentativeUtils() {
@@ -1068,14 +1070,18 @@ public final class RespondentRepresentativeUtils {
         }
         for (String role : roles) {
             int roleIndex = RoleUtils.findRoleIndexByRoleLabel(role);
+            log.info("****** ROLE INDEX: " + roleIndex);
             if (roleIndex >= caseData.getRespondentCollection().size()
                     || StringUtils.isBlank(caseData.getRespondentCollection().get(roleIndex).getId())) {
                 continue;
             }
             RespondentSumTypeItem respondentSumTypeItem = caseData.getRespondentCollection().get(roleIndex);
+            log.info("****** RESPONDENT: " + respondentSumTypeItem);
             for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
+                log.info("****** REPRESENTATIVE: " + representative);
                 if (RespondentRepresentativeUtils.isValidRepresentative(representative)
                         && representative.getValue().getRespondentId().equals(respondentSumTypeItem.getId())) {
+                    log.info("************ FOUND REPRESENTATIVE: " + representative);
                     caseData.setEt3ResponsePhone(representative.getValue().getRepresentativePhoneNumber());
                     caseData.setEt3ResponseAddress(representative.getValue().getRepresentativeAddress());
                 }

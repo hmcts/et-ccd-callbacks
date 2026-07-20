@@ -76,12 +76,7 @@ def sonarExclusions =
          'et-shared/src/main/java/**/launchdarkly/**',
          'et-shared/src/main/java/**/servicebus/**',
 		 'et-shared/src/main/java/uk/gov/hmcts/ecm/compat/common/client/CcdClient.java',
-         '**/uk/gov/hmcts/ethos/replacement/docmosis/domain/caseview/state/**',
-         '**/uk/gov/hmcts/ethos/replacement/docmosis/service/retention/preview/**'
-]
-
-def sonarCoverageExclusions = [
-        '**/uk/gov/hmcts/ethos/replacement/docmosis/service/retention/preview/**'
+         '**/uk/gov/hmcts/ethos/replacement/docmosis/domain/caseview/state/**'
 ]
 
 def duplicateCodeExclusionList = [
@@ -93,7 +88,6 @@ def duplicateCodeExclusionList = [
 sonarqube {
     properties {
         property "sonar.exclusions", sonarExclusions.join(', ')
-        property "sonar.coverage.exclusions", sonarCoverageExclusions.join(', ')
         property "sonar.cpd.exclusions", duplicateCodeExclusionList.join(", ")
         property "sonar.projectKey", "et-ccd-callbacks"
         property "sonar.dynamicAnalysis", "reuseReports"

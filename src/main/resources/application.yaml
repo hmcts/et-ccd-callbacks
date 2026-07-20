@@ -330,9 +330,6 @@ retention:
     caseTypeIds: ${RETENTION_DISPOSAL_CASE_TYPE_IDS:ET_Admin,ET_EnglandWales,ET_Scotland}
     simulationCaseTypeIds: ${RETENTION_DISPOSAL_SIMULATION_CASE_TYPE_IDS:}
     batchSize: ${RETENTION_DISPOSAL_BATCH_SIZE:100}
-  previewTesting:
-    enabled: ${RETENTION_PREVIEW_TESTING_ENABLED:false}
-    token: ${RETENTION_PREVIEW_TESTING_TOKEN:}
 
 pdf:
   english: "ET1_0224.pdf"

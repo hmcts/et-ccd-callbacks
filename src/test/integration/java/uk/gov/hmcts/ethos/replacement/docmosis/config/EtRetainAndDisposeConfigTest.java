@@ -1,13 +1,19 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.config;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.utility.DockerImageName;
+import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.ccd.sdk.config.DecentralisedDataConfiguration;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.EtCosPostgresqlContainer;
 
 import java.util.Map;
 import java.util.Set;
@@ -16,44 +22,38 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
+@SpringBootTest(
+    classes = EtRetainAndDisposeConfigTest.TestApplication.class,
+    webEnvironment = SpringBootTest.WebEnvironment.NONE
+)
+@ActiveProfiles("test")
 class EtRetainAndDisposeConfigTest {
 
-    private static final DockerImageName POSTGRES_IMAGE = DockerImageName
-        .parse("hmctspublic.azurecr.io/imported/postgres:16-alpine")
-        .asCompatibleSubstituteFor("postgres");
-    private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>(POSTGRES_IMAGE);
+    private static final EtCosPostgresqlContainer POSTGRES = EtCosPostgresqlContainer.getInstance();
 
-    private static NamedParameterJdbcTemplate jdbc;
-    private EtRetainAndDisposeConfig config;
-
-    @BeforeAll
-    static void startPostgres() {
+    static {
         POSTGRES.start();
-        jdbc = new NamedParameterJdbcTemplate(new DriverManagerDataSource(
-            POSTGRES.getJdbcUrl(),
-            POSTGRES.getUsername(),
-            POSTGRES.getPassword()
-        ));
-        jdbc.getJdbcTemplate().execute("create schema ccd");
-        jdbc.getJdbcTemplate().execute("""
-            create table ccd.case_data (
-                reference bigint primary key,
-                created_date timestamp without time zone not null,
-                case_type_id text not null,
-                state text not null
-            )
-            """);
     }
 
-    @AfterAll
-    static void stopPostgres() {
-        POSTGRES.stop();
+    @Autowired
+    private NamedParameterJdbcTemplate jdbc;
+
+    @Autowired
+    private EtRetainAndDisposeConfig config;
+
+    @SpringBootConfiguration
+    @Import({DecentralisedDataConfiguration.class, EtRetainAndDisposeConfig.class})
+    @ImportAutoConfiguration({
+        DataSourceAutoConfiguration.class,
+        FlywayAutoConfiguration.class,
+        JdbcTemplateAutoConfiguration.class
+    })
+    static class TestApplication {
     }
 
     @BeforeEach
     void setUp() {
-        jdbc.getJdbcTemplate().execute("truncate table ccd.case_data");
-        config = new EtRetainAndDisposeConfig(jdbc);
+        jdbc.getJdbcTemplate().execute("truncate table ccd.case_data cascade");
     }
 
     @Test
@@ -91,8 +91,25 @@ class EtRetainAndDisposeConfigTest {
     private void insertCase(long reference, String caseType, String state, int ageInDays) {
         jdbc.update(
             """
-            insert into ccd.case_data (reference, created_date, case_type_id, state)
-            values (:reference, current_timestamp - make_interval(days => :ageInDays), :caseType, :state)
+            insert into ccd.case_data (
+                id,
+                reference,
+                created_date,
+                security_classification,
+                jurisdiction,
+                case_type_id,
+                state,
+                data
+            ) values (
+                :reference,
+                :reference,
+                current_timestamp - make_interval(days => :ageInDays),
+                'PUBLIC',
+                'EMPLOYMENT',
+                :caseType,
+                :state,
+                '{}'::jsonb
+            )
             """,
             Map.of(
                 "reference", reference,

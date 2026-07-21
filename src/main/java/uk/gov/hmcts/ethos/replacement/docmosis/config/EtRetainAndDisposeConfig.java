@@ -4,7 +4,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import uk.gov.hmcts.ccd.sdk.RetainAndDisposeConfig;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.CaseState;
 
 import java.util.List;
 import java.util.Map;
@@ -28,9 +27,9 @@ public class EtRetainAndDisposeConfig implements RetainAndDisposeConfig {
         from ccd.case_data
         where case_type_id in (:caseTypeIds)
           and (
-            state = :deleteState
+            state = 'Delete'
             or (
-              state = :draftState
+              state = 'AWAITING_SUBMISSION_TO_HMCTS'
               and created_date::date + :retentionDays < current_date
             )
           )
@@ -67,8 +66,6 @@ public class EtRetainAndDisposeConfig implements RetainAndDisposeConfig {
             FIND_CANDIDATES,
             Map.of(
                 "caseTypeIds", CASE_TYPES,
-                "deleteState", CaseState.Delete.name(),
-                "draftState", CaseState.AWAITING_SUBMISSION_TO_HMCTS.name(),
                 "retentionDays", DRAFT_RETENTION_DAYS,
                 "maxResults", maxResults
             ),

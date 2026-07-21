@@ -78,6 +78,7 @@
     "EndButtonLabel": "Submit ET1",
     "ShowSummary": "N",
     "SignificantEvent": "Yes",
+    "TTLIncrement": "36524",
     "EventEnablingCondition": "et1ReppedSectionOne = \"Yes\" AND et1ReppedSectionTwo = \"Yes\" AND et1ReppedSectionThree = \"Yes\"",
     "Publish": "Y"
   },
@@ -96,7 +97,8 @@
     "ShowEventNotes": "N",
     "ShowSummary": "N",
     "Publish": "Y",
-    "SignificantEvent": "Yes"
+    "SignificantEvent": "Yes",
+    "TTLIncrement": "36524"
   },
   {
     "CaseTypeID": "ET_Scotland",

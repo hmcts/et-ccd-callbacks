@@ -79,7 +79,8 @@
     "ShowSummary": "N",
     "Publish": "Y",
     "EventEnablingCondition": "et1ReppedSectionOne = \"Yes\" AND et1ReppedSectionTwo = \"Yes\" AND et1ReppedSectionThree = \"Yes\"",
-    "SignificantEvent": "Yes"
+    "SignificantEvent": "Yes",
+    "TTLIncrement": "36524"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
@@ -96,7 +97,8 @@
     "ShowEventNotes": "N",
     "ShowSummary": "N",
     "Publish": "Y",
-    "SignificantEvent": "Yes"
+    "SignificantEvent": "Yes",
+    "TTLIncrement": "36524"
   },
   {
     "CaseTypeID": "ET_EnglandWales",

@@ -108,6 +108,13 @@ decentralisation:
   external-callback-base-urls:
     "[CCD_DEF_AAC_URL]": ${AAC_URL:http://localhost:4454}
 
+ccd:
+  decentralised-runtime:
+    retain-and-dispose:
+      system-user:
+        username: ${ET_COS_SYSTEM_USER}
+        password: ${ET_COS_SYSTEM_USER_PASSWORD}
+
 idam:
   s2s-auth:
     # noinspection SpringBootApplicationYaml

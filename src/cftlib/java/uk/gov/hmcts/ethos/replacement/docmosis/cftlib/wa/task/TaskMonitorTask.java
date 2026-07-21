@@ -25,19 +25,19 @@ public class TaskMonitorTask {
         this.authTokenGenerator = authTokenGenerator;
     }
 
-    @Scheduled(initialDelay = 10000, fixedRateString = "${wa.task-monitor.initiation-task.interval:5000}")
+    @Scheduled(initialDelay = 10_000, fixedRateString = "${wa.task-monitor.initiation-task.interval:5000}")
     public void runInitiationTask() {
         log.debug("Executing WA Task Monitor Initiation request");
         taskMonitorClient.taskMonitorJob(authTokenGenerator.generate(), TaskMonitorJobRequest.initiation());
     }
 
-    @Scheduled(initialDelay = 10000, fixedRateString = "${wa.task-monitor.reconfiguration-task.interval:60000}")
+    @Scheduled(initialDelay = 10_000, fixedRateString = "${wa.task-monitor.reconfiguration-task.interval:60000}")
     public void runReconfigurationTask() {
         log.debug("Executing WA Task Monitor Reconfiguration request");
         taskMonitorClient.taskMonitorJob(authTokenGenerator.generate(), TaskMonitorJobRequest.reconfiguration());
     }
 
-    @Scheduled(initialDelay = 10000, fixedRateString = "${wa.task-monitor.termination-task.interval:60000}")
+    @Scheduled(initialDelay = 10_000, fixedRateString = "${wa.task-monitor.termination-task.interval:60000}")
     public void runTerminationTask() {
         log.debug("Executing WA Task Monitor Termination request");
         taskMonitorClient.taskMonitorJob(authTokenGenerator.generate(), TaskMonitorJobRequest.termination());

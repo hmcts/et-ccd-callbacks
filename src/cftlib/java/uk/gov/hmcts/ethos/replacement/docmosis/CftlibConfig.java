@@ -185,8 +185,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.WA_TASK_CON
  */
 @Component
 @Slf4j
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "PMD.SeparateWithUnderscore"})
 public class CftlibConfig implements CFTLibConfigurer {
+
+    private static final String DEFAULT_LOCATION = "765324";
 
     @Value("${cftlib.import-ccd-defs-on-boot}")
     private boolean importCcdDefsOnBoot;
@@ -219,7 +221,7 @@ public class CftlibConfig implements CFTLibConfigurer {
     private void createUsers(CFTLib lib) {
         // Create importer user
         lib.createIdamUser(CCD_DOCKER_DEFAULT_EMAIL,
-            CCD_IMPORT);
+                CCD_IMPORT);
 
         // Create test users in the idam simulator.
         lib.createIdamUser(JUDGE_EW_EMAIL,
@@ -241,33 +243,33 @@ public class CftlibConfig implements CFTLibConfigurer {
                 CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR);
 
         lib.createIdamUser(ENGLANDWALES_EMAIL,
-            CASEWORKER,
-            CASEWORKER_EMPLOYMENT,
-            CASEWORKER_EMPLOYMENT_ENGLANDWALES, TTL_PROFILE,
-            Arrays.stream(ECM_CASEWORKER_ROLES).reduce((a, b) -> a + "," + b).orElse(""));
+                CASEWORKER,
+                CASEWORKER_EMPLOYMENT,
+                CASEWORKER_EMPLOYMENT_ENGLANDWALES, TTL_PROFILE,
+                Arrays.stream(ECM_CASEWORKER_ROLES).reduce((a, b) -> a + "," + b).orElse(""));
 
         lib.createIdamUser(SCOTLAND_EMAIL,
-            CASEWORKER,
-            CASEWORKER_EMPLOYMENT,
-            CASEWORKER_EMPLOYMENT_SCOTLAND);
+                CASEWORKER,
+                CASEWORKER_EMPLOYMENT,
+                CASEWORKER_EMPLOYMENT_SCOTLAND);
 
         lib.createIdamUser(ADMIN_EMAIL,
-            CASEWORKER,
-            CASEWORKER_EMPLOYMENT,
-            CASEWORKER_EMPLOYMENT_API,
-            CASEWORKER_WA,
-            WA_TASK_CONFIGURATION, STAFF_ADMIN, CWD_ADMIN, CASEWORKER_CAA, CASEWORKER_APPROVER,
-            Arrays.stream(ECM_CASEWORKER_ROLES).reduce((a, b) -> a + "," + b).orElse(""));
+                CASEWORKER,
+                CASEWORKER_EMPLOYMENT,
+                CASEWORKER_EMPLOYMENT_API,
+                CASEWORKER_WA,
+                WA_TASK_CONFIGURATION, STAFF_ADMIN, CWD_ADMIN, CASEWORKER_CAA, CASEWORKER_APPROVER,
+                Arrays.stream(ECM_CASEWORKER_ROLES).reduce((a, b) -> a + "," + b).orElse(""));
 
         lib.createIdamUser(SUPERUSER_EMAIL,
-            CASEWORKER_CAA,
-            PUI_CASE_MANAGER,
-            PUI_ORGANISATION_MANAGER,
-            PUI_USER_MANAGER,
-            PUI_CAA);
+                CASEWORKER_CAA,
+                PUI_CASE_MANAGER,
+                PUI_ORGANISATION_MANAGER,
+                PUI_USER_MANAGER,
+                PUI_CAA);
 
         lib.createIdamUser("et.hearingCL001@justice.gov.uk",
-            CASE_ALLOCATOR, CASEWORKER, CASEWORKER_EMPLOYMENT, CASEWORKER_EMPLOYMENT_ENGLANDWALES,
+                CASE_ALLOCATOR, CASEWORKER, CASEWORKER_EMPLOYMENT, CASEWORKER_EMPLOYMENT_ENGLANDWALES,
                 CASEWORKER_EMPLOYMENT_SCOTLAND, CASEWORKER_WA, WA_TASK_CONFIGURATION, CWD_USER,
                 HEARING_CENTRE_ADMIN, HEARING_CENTRE_TEAM_LEADER, HEARING_MANAGER, HEARING_VIEWER,
                 HMCTS_ADMIN, HMCTS_LEGAL_OPERATIONS, SENIOR_TRIBUNAL_CASEWORKER, SPECIFIC_ACCESS_APPROVER_ADMIN,
@@ -275,22 +277,23 @@ public class CftlibConfig implements CFTLibConfigurer {
                 EMPLOYMENT_TRIBUNAL_CASEWORKER, EMPLOYMENT_HEARING_CENTRE_ADMIN, EMPLOYMENT_SENIOR_TRIBUNAL_CASEWORKER,
                 EMPLOYMENT_HEARING_CENTRE_TEAM_LEADER);
 
-        // Dedicated LEGAL_OPERATIONS WA test user — can claim tribunal-caseworker tasks in XUI.
+        // Dedicated LEGAL_OPERATIONS WA test user — can claim tribunal-caseworker tasks
+        // in XUI.
         lib.createIdamUser(ET_LEGALOPS_EMAIL,
                 CASE_ALLOCATOR, CASEWORKER, CASEWORKER_EMPLOYMENT, CASEWORKER_EMPLOYMENT_API,
                 CASEWORKER_EMPLOYMENT_ENGLANDWALES, CASEWORKER_EMPLOYMENT_SCOTLAND, CASEWORKER_WA,
                 WA_TASK_CONFIGURATION, CITIZEN, TASK_SUPERVISOR, TRIBUNAL_CASEWORKER, EMPLOYMENT_TRIBUNAL_CASEWORKER);
 
         lib.createIdamUser(SOLICITOR_1_EMAIL,
-            CASEWORKER,
-            CASEWORKER_EMPLOYMENT,
-            CASEWORKER_CAA,
-            PUI_CASE_MANAGER,
-            PUI_ORGANISATION_MANAGER,
-            PUI_USER_MANAGER,
-            PUI_CAA,
-            CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR,
-            "caseworker-divorce-solicitor");
+                CASEWORKER,
+                CASEWORKER_EMPLOYMENT,
+                CASEWORKER_CAA,
+                PUI_CASE_MANAGER,
+                PUI_ORGANISATION_MANAGER,
+                PUI_USER_MANAGER,
+                PUI_CAA,
+                CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR,
+                "caseworker-divorce-solicitor");
 
         lib.createIdamUser(SOLICITOR_2_EMAIL,
                 CASEWORKER,
@@ -323,18 +326,19 @@ public class CftlibConfig implements CFTLibConfigurer {
         lib.createIdamUser(ET_SYSTEM_EMAIL, CASEWORKER, CASEWORKER_EMPLOYMENT, CASEWORKER_EMPLOYMENT_API);
         lib.createIdamUser(ACAS_EMAIL, ACAS_API);
 
-        lib.createIdamUser(ROLE_ASSIGNMENT_ADMIN_EMAIL, 
-            CASEWORKER, RAS_VALIDATION, CASEWORKER_WA, WA_TASK_CONFIGURATION);
+        lib.createIdamUser(ROLE_ASSIGNMENT_ADMIN_EMAIL,
+                CASEWORKER, RAS_VALIDATION, CASEWORKER_WA, WA_TASK_CONFIGURATION);
 
         lib.createIdamUser(ET_CASEADMIN_EMAIL, CASEWORKER, CASEWORKER_EMPLOYMENT, CASEWORKER_EMPLOYMENT_ENGLANDWALES,
-            CASEWORKER_EMPLOYMENT_SCOTLAND, CASEWORKER_WA, WA_TASK_CONFIGURATION);
+                CASEWORKER_EMPLOYMENT_SCOTLAND, CASEWORKER_WA, WA_TASK_CONFIGURATION);
 
-        lib.createIdamUser(WA_SYSTEM_USER_EMAIL, 
-            CASEWORKER, CASEWORKER_EMPLOYMENT, CASEWORKER_EMPLOYMENT_ENGLANDWALES, 
-            CASEWORKER_EMPLOYMENT_SCOTLAND, CASEWORKER_EMPLOYMENT_API, CITIZEN, CASEWORKER_WA, 
-            WA_TASK_CONFIGURATION, CASEWORKER_EMPLOYMENT_ETJUDGE, TASK_SUPERVISOR);
+        lib.createIdamUser(WA_SYSTEM_USER_EMAIL,
+                CASEWORKER, CASEWORKER_EMPLOYMENT, CASEWORKER_EMPLOYMENT_ENGLANDWALES,
+                CASEWORKER_EMPLOYMENT_SCOTLAND, CASEWORKER_EMPLOYMENT_API, CITIZEN, CASEWORKER_WA,
+                WA_TASK_CONFIGURATION, CASEWORKER_EMPLOYMENT_ETJUDGE, TASK_SUPERVISOR);
 
-        // Configure WA organisational role assignments. IDs are resolved dynamically so this
+        // Configure WA organisational role assignments. IDs are resolved dynamically so
+        // this
         // works regardless of which machine the environment is running on.
         createWaRoleAssignments(lib);
     }
@@ -348,57 +352,54 @@ public class CftlibConfig implements CFTLibConfigurer {
         var assignments = new ArrayList<Map<String, Object>>();
 
         assignments.add(buildEntry(WA_SYSTEM_USER_EMAIL, List.of(
-            role("case-allocator", "LEGAL_OPERATIONS", ENGLANDWALES_CASE_TYPE_ID),
-            role("senior-tribunal-caseworker", "LEGAL_OPERATIONS", ENGLANDWALES_CASE_TYPE_ID),
-            role("judge", "JUDICIAL", ENGLANDWALES_CASE_TYPE_ID),
-            role("hearing-centre-team-leader", "ADMIN", ENGLANDWALES_CASE_TYPE_ID),
-            role("regional-centre-team-leader", "ADMIN", ENGLANDWALES_CASE_TYPE_ID),
-            role("ctsc-team-leader", "CTSC", ENGLANDWALES_CASE_TYPE_ID),
-            role("case-allocator", "LEGAL_OPERATIONS", SCOTLAND_CASE_TYPE_ID),
-            role("senior-tribunal-caseworker", "LEGAL_OPERATIONS", SCOTLAND_CASE_TYPE_ID),
-            role("judge", "JUDICIAL", SCOTLAND_CASE_TYPE_ID),
-            role("hearing-centre-team-leader", "ADMIN", SCOTLAND_CASE_TYPE_ID),
-            role("regional-centre-team-leader", "ADMIN", SCOTLAND_CASE_TYPE_ID),
-            role("ctsc-team-leader", "CTSC", SCOTLAND_CASE_TYPE_ID),
-            role("case-allocator", "LEGAL_OPERATIONS", ENGLANDWALES_BULK_CASE_TYPE_ID),
-            role("senior-tribunal-caseworker", "LEGAL_OPERATIONS", ENGLANDWALES_BULK_CASE_TYPE_ID),
-            role("judge", "JUDICIAL", ENGLANDWALES_BULK_CASE_TYPE_ID),
-            role("hearing-centre-team-leader", "ADMIN", ENGLANDWALES_BULK_CASE_TYPE_ID),
-            role("regional-centre-team-leader", "ADMIN", ENGLANDWALES_BULK_CASE_TYPE_ID),
-            role("ctsc-team-leader", "CTSC", ENGLANDWALES_BULK_CASE_TYPE_ID)
-        )));
+                role("case-allocator", "LEGAL_OPERATIONS", ENGLANDWALES_CASE_TYPE_ID),
+                role("senior-tribunal-caseworker", "LEGAL_OPERATIONS", ENGLANDWALES_CASE_TYPE_ID),
+                role("judge", "JUDICIAL", ENGLANDWALES_CASE_TYPE_ID),
+                role("hearing-centre-team-leader", "ADMIN", ENGLANDWALES_CASE_TYPE_ID),
+                role("regional-centre-team-leader", "ADMIN", ENGLANDWALES_CASE_TYPE_ID),
+                role("ctsc-team-leader", "CTSC", ENGLANDWALES_CASE_TYPE_ID),
+                role("case-allocator", "LEGAL_OPERATIONS", SCOTLAND_CASE_TYPE_ID),
+                role("senior-tribunal-caseworker", "LEGAL_OPERATIONS", SCOTLAND_CASE_TYPE_ID),
+                role("judge", "JUDICIAL", SCOTLAND_CASE_TYPE_ID),
+                role("hearing-centre-team-leader", "ADMIN", SCOTLAND_CASE_TYPE_ID),
+                role("regional-centre-team-leader", "ADMIN", SCOTLAND_CASE_TYPE_ID),
+                role("ctsc-team-leader", "CTSC", SCOTLAND_CASE_TYPE_ID),
+                role("case-allocator", "LEGAL_OPERATIONS", ENGLANDWALES_BULK_CASE_TYPE_ID),
+                role("senior-tribunal-caseworker", "LEGAL_OPERATIONS", ENGLANDWALES_BULK_CASE_TYPE_ID),
+                role("judge", "JUDICIAL", ENGLANDWALES_BULK_CASE_TYPE_ID),
+                role("hearing-centre-team-leader", "ADMIN", ENGLANDWALES_BULK_CASE_TYPE_ID),
+                role("regional-centre-team-leader", "ADMIN", ENGLANDWALES_BULK_CASE_TYPE_ID),
+                role("ctsc-team-leader", "CTSC", ENGLANDWALES_BULK_CASE_TYPE_ID))));
 
         assignments.add(buildEntry(ADMIN_EMAIL, List.of(
-            role("case-allocator", "ADMIN", ENGLANDWALES_CASE_TYPE_ID),
-            role("task-supervisor", "ADMIN", ENGLANDWALES_CASE_TYPE_ID),
-            role("hearing-centre-team-leader", "ADMIN", ENGLANDWALES_CASE_TYPE_ID),
-            role("case-allocator", "ADMIN", SCOTLAND_CASE_TYPE_ID),
-            role("task-supervisor", "ADMIN", SCOTLAND_CASE_TYPE_ID),
-            role("hearing-centre-team-leader", "ADMIN", SCOTLAND_CASE_TYPE_ID)
-        )));
+                role("case-allocator", "ADMIN", ENGLANDWALES_CASE_TYPE_ID),
+                role("task-supervisor", "ADMIN", ENGLANDWALES_CASE_TYPE_ID),
+                role("hearing-centre-team-leader", "ADMIN", ENGLANDWALES_CASE_TYPE_ID),
+                role("case-allocator", "ADMIN", SCOTLAND_CASE_TYPE_ID),
+                role("task-supervisor", "ADMIN", SCOTLAND_CASE_TYPE_ID),
+                role("hearing-centre-team-leader", "ADMIN", SCOTLAND_CASE_TYPE_ID))));
 
         assignments.add(buildEntry(ET_CASEADMIN_EMAIL, List.of(
-            role("case-allocator", "ADMIN", ENGLANDWALES_CASE_TYPE_ID),
-            role("task-supervisor", "ADMIN", ENGLANDWALES_CASE_TYPE_ID),
-            role("hearing-centre-admin", "ADMIN", ENGLANDWALES_CASE_TYPE_ID),
-            role("hearing-centre-team-leader", "ADMIN", ENGLANDWALES_CASE_TYPE_ID),
-            role("case-allocator", "ADMIN", SCOTLAND_CASE_TYPE_ID),
-            role("task-supervisor", "ADMIN", SCOTLAND_CASE_TYPE_ID),
-            role("hearing-centre-admin", "ADMIN", SCOTLAND_CASE_TYPE_ID),
-            role("hearing-centre-team-leader", "ADMIN", SCOTLAND_CASE_TYPE_ID)
-        )));
+                role("case-allocator", "ADMIN", ENGLANDWALES_CASE_TYPE_ID),
+                role("task-supervisor", "ADMIN", ENGLANDWALES_CASE_TYPE_ID),
+                role("hearing-centre-admin", "ADMIN", ENGLANDWALES_CASE_TYPE_ID),
+                role("hearing-centre-team-leader", "ADMIN", ENGLANDWALES_CASE_TYPE_ID),
+                role("case-allocator", "ADMIN", SCOTLAND_CASE_TYPE_ID),
+                role("task-supervisor", "ADMIN", SCOTLAND_CASE_TYPE_ID),
+                role("hearing-centre-admin", "ADMIN", SCOTLAND_CASE_TYPE_ID),
+                role("hearing-centre-team-leader", "ADMIN", SCOTLAND_CASE_TYPE_ID))));
 
-        // et.legalops — LEGAL_OPERATIONS WA user; log in as this user to see/claim legal ops tasks.
+        // et.legalops — LEGAL_OPERATIONS WA user; log in as this user to see/claim
+        // legal ops tasks.
         assignments.add(buildEntry(ET_LEGALOPS_EMAIL, List.of(
-            role("tribunal-caseworker", "LEGAL_OPERATIONS", ENGLANDWALES_CASE_TYPE_ID),
-            role("senior-tribunal-caseworker", "LEGAL_OPERATIONS", ENGLANDWALES_CASE_TYPE_ID),
-            role("task-supervisor", "LEGAL_OPERATIONS", ENGLANDWALES_CASE_TYPE_ID),
-            role("case-allocator", "LEGAL_OPERATIONS", ENGLANDWALES_CASE_TYPE_ID),
-            role("tribunal-caseworker", "LEGAL_OPERATIONS", SCOTLAND_CASE_TYPE_ID),
-            role("senior-tribunal-caseworker", "LEGAL_OPERATIONS", SCOTLAND_CASE_TYPE_ID),
-            role("task-supervisor", "LEGAL_OPERATIONS", SCOTLAND_CASE_TYPE_ID),
-            role("case-allocator", "LEGAL_OPERATIONS", SCOTLAND_CASE_TYPE_ID)
-        )));
+                role("tribunal-caseworker", "LEGAL_OPERATIONS", ENGLANDWALES_CASE_TYPE_ID),
+                role("senior-tribunal-caseworker", "LEGAL_OPERATIONS", ENGLANDWALES_CASE_TYPE_ID),
+                role("task-supervisor", "LEGAL_OPERATIONS", ENGLANDWALES_CASE_TYPE_ID),
+                role("case-allocator", "LEGAL_OPERATIONS", ENGLANDWALES_CASE_TYPE_ID),
+                role("tribunal-caseworker", "LEGAL_OPERATIONS", SCOTLAND_CASE_TYPE_ID),
+                role("senior-tribunal-caseworker", "LEGAL_OPERATIONS", SCOTLAND_CASE_TYPE_ID),
+                role("task-supervisor", "LEGAL_OPERATIONS", SCOTLAND_CASE_TYPE_ID),
+                role("case-allocator", "LEGAL_OPERATIONS", SCOTLAND_CASE_TYPE_ID))));
 
         lib.configureRoleAssignments(new Gson().toJson(assignments));
     }
@@ -406,29 +407,24 @@ public class CftlibConfig implements CFTLibConfigurer {
     @SneakyThrows
     private Map<String, Object> buildEntry(String email, List<Map<String, Object>> roleAssignments) {
         return Map.of(
-            "id", lookupIdamUserId(email),
-            "overrideAll", true,
-            "roleAssignments", roleAssignments
-        );
+                "id", lookupIdamUserId(email),
+                "overrideAll", true,
+                "roleAssignments", roleAssignments);
     }
-
-    private static final String DEFAULT_LOCATION = "765324";
 
     private Map<String, Object> role(String roleName, String roleCategory, String caseType) {
         return Map.of(
-            "roleType", "ORGANISATION",
-            "roleName", roleName,
-            "grantType", "STANDARD",
-            "roleCategory", roleCategory,
-            "classification", "PUBLIC",
-            "readOnly", false,
-            "attributes", Map.of(
-                "caseType", caseType,
-                "jurisdiction", "EMPLOYMENT",
-                "primaryLocation", DEFAULT_LOCATION
-            ),
-            "authorisations", List.of()
-        );
+                "roleType", "ORGANISATION",
+                "roleName", roleName,
+                "grantType", "STANDARD",
+                "roleCategory", roleCategory,
+                "classification", "PUBLIC",
+                "readOnly", false,
+                "attributes", Map.of(
+                        "caseType", caseType,
+                        "jurisdiction", "EMPLOYMENT",
+                        "primaryLocation", DEFAULT_LOCATION),
+                "authorisations", List.of());
     }
 
     // -----------------------------------------------------------------------
@@ -436,58 +432,61 @@ public class CftlibConfig implements CFTLibConfigurer {
     // -----------------------------------------------------------------------
 
     /**
-     * Generates Wiremock stubs for rd-caseworker-ref-api endpoints with UUIDs resolved
-     * dynamically from the IDAM simulator. Files are written to the Wiremock bind-mount
-     * path before {@code startDockerCompose()} runs so Wiremock picks them up on startup.
+     * Generates Wiremock stubs for rd-caseworker-ref-api endpoints with UUIDs
+     * resolved
+     * dynamically from the IDAM simulator. Files are written to the Wiremock
+     * bind-mount
+     * path before {@code startDockerCompose()} runs so Wiremock picks them up on
+     * startup.
      */
     @SneakyThrows
     private void createWaWiremockStubs() {
-        var legalOpsId    = lookupIdamUserId(ET_LEGALOPS_EMAIL);
-        var adminId       = lookupIdamUserId(ADMIN_EMAIL);
-        var caseAdminId   = lookupIdamUserId(ET_CASEADMIN_EMAIL);
+        var legalOpsId = lookupIdamUserId(ET_LEGALOPS_EMAIL);
+        var adminId = lookupIdamUserId(ADMIN_EMAIL);
+        var caseAdminId = lookupIdamUserId(ET_CASEADMIN_EMAIL);
         var filesDir = Path.of("build/resources/cftlib/compose/mocks/wiremock/__files/prd");
         Files.createDirectories(filesDir);
 
         var gson = new Gson();
 
         var usersByServiceName = List.of(
-            buildServiceNameEntry(legalOpsId, ET_LEGALOPS_EMAIL, "ET", "LegalOps",
-                "LEGAL_OPERATIONS", true, true, true,
-                List.of(Map.of("role_id", "2", "role_name", "Legal Caseworker", "is_primary", true),
-                        Map.of("role_id", "1", "role_name", "Senior Legal Caseworker", "is_primary", false))),
-            buildServiceNameEntry(adminId, ADMIN_EMAIL, "ET", "Admin",
-                "CTSC", true, true, true,
-                List.of(Map.of("role_id", "10", "role_name", "CTSC Administrator", "is_primary", true),
-                        Map.of("role_id", "3", "role_name", "Hearing Centre Team Leader", "is_primary", false))),
-            buildServiceNameEntry(caseAdminId, ET_CASEADMIN_EMAIL, "ET", "CaseAdmin",
-                "CTSC", true, true, true,
-                List.of(Map.of("role_id", "4", "role_name", "Hearing Centre Administrator", "is_primary", true),
-                        Map.of("role_id", "3", "role_name", "Hearing Centre Team Leader", "is_primary", false)))
-        );
+                buildServiceNameEntry(legalOpsId, ET_LEGALOPS_EMAIL, "ET", "LegalOps",
+                        "LEGAL_OPERATIONS", true, true, true,
+                        List.of(Map.of("role_id", "2", "role_name", "Legal Caseworker", "is_primary", true),
+                                Map.of("role_id", "1", "role_name", "Senior Legal Caseworker", "is_primary", false))),
+                buildServiceNameEntry(adminId, ADMIN_EMAIL, "ET", "Admin",
+                        "CTSC", true, true, true,
+                        List.of(Map.of("role_id", "10", "role_name", "CTSC Administrator", "is_primary", true),
+                                Map.of("role_id", "3", "role_name", "Hearing Centre Team Leader", "is_primary",
+                                        false))),
+                buildServiceNameEntry(caseAdminId, ET_CASEADMIN_EMAIL, "ET", "CaseAdmin",
+                        "CTSC", true, true, true,
+                        List.of(Map.of("role_id", "4", "role_name", "Hearing Centre Administrator", "is_primary", true),
+                                Map.of("role_id", "3", "role_name", "Hearing Centre Team Leader", "is_primary",
+                                        false))));
         Files.writeString(filesDir.resolve("usersByServiceName.json"), gson.toJson(usersByServiceName));
 
         var caseworkerSearch = List.of(
-            buildCaseworkerEntry(legalOpsId, ET_LEGALOPS_EMAIL, "ET", "LegalOps",
-                "LEGAL_OPERATIONS", true, true, true,
-                List.of(Map.of("role_id", "2", "role", "Legal Caseworker", "is_primary", true),
-                        Map.of("role_id", "1", "role", "Senior Legal Caseworker", "is_primary", false))),
-            buildCaseworkerEntry(adminId, ADMIN_EMAIL, "ET", "Admin",
-                "CTSC", true, true, true,
-                List.of(Map.of("role_id", "10", "role", "CTSC Administrator", "is_primary", true),
-                        Map.of("role_id", "3", "role", "Hearing Centre Team Leader", "is_primary", false))),
-            buildCaseworkerEntry(caseAdminId, ET_CASEADMIN_EMAIL, "ET", "CaseAdmin",
-                "CTSC", true, true, true,
-                List.of(Map.of("role_id", "4", "role", "Hearing Centre Administrator", "is_primary", true),
-                        Map.of("role_id", "3", "role", "Hearing Centre Team Leader", "is_primary", false)))
-        );
+                buildCaseworkerEntry(legalOpsId, ET_LEGALOPS_EMAIL, "ET", "LegalOps",
+                        "LEGAL_OPERATIONS", true, true, true,
+                        List.of(Map.of("role_id", "2", "role", "Legal Caseworker", "is_primary", true),
+                                Map.of("role_id", "1", "role", "Senior Legal Caseworker", "is_primary", false))),
+                buildCaseworkerEntry(adminId, ADMIN_EMAIL, "ET", "Admin",
+                        "CTSC", true, true, true,
+                        List.of(Map.of("role_id", "10", "role", "CTSC Administrator", "is_primary", true),
+                                Map.of("role_id", "3", "role", "Hearing Centre Team Leader", "is_primary", false))),
+                buildCaseworkerEntry(caseAdminId, ET_CASEADMIN_EMAIL, "ET", "CaseAdmin",
+                        "CTSC", true, true, true,
+                        List.of(Map.of("role_id", "4", "role", "Hearing Centre Administrator", "is_primary", true),
+                                Map.of("role_id", "3", "role", "Hearing Centre Team Leader", "is_primary", false))));
         Files.writeString(filesDir.resolve("caseworkerProfileSearch.json"), gson.toJson(caseworkerSearch));
 
         log.info("Generated Wiremock caseworker stubs with IDAM-resolved UUIDs");
     }
 
     private Map<String, Object> buildServiceNameEntry(String id, String email, String firstName, String lastName,
-                                                       String userType, boolean taskSupervisor, boolean caseAllocator,
-                                                       boolean staffAdmin, List<Map<String, Object>> roles) {
+            String userType, boolean taskSupervisor, boolean caseAllocator,
+            boolean staffAdmin, List<Map<String, Object>> roles) {
         var staffProfile = new LinkedHashMap<String, Object>();
         staffProfile.put("id", id);
         staffProfile.put("first_name", firstName);
@@ -496,12 +495,12 @@ public class CftlibConfig implements CFTLibConfigurer {
         staffProfile.put("region_id", 12);
         staffProfile.put("region", "National");
         staffProfile.put("base_location",
-            List.of(Map.of("base_location_id", 36313, "location_name", "Leeds", "is_primary", true)));
+                List.of(Map.of("base_location_id", 36313, "location_name", "Leeds", "is_primary", true)));
         staffProfile.put("user_type_id", 1);
         staffProfile.put("user_type", userType);
         staffProfile.put("role", roles);
         staffProfile.put("work_area",
-            List.of(Map.of("service_code", "BHA1", "area_of_work", "Employment Claims")));
+                List.of(Map.of("service_code", "BHA1", "area_of_work", "Employment Claims")));
         staffProfile.put("suspended", "false");
         staffProfile.put("case_allocator", String.valueOf(caseAllocator));
         staffProfile.put("task_supervisor", String.valueOf(taskSupervisor));
@@ -510,8 +509,8 @@ public class CftlibConfig implements CFTLibConfigurer {
     }
 
     private Map<String, Object> buildCaseworkerEntry(String id, String email, String firstName, String lastName,
-                                                      String userType, boolean taskSupervisor, boolean caseAllocator,
-                                                      boolean staffAdmin, List<Map<String, Object>> roles) {
+            String userType, boolean taskSupervisor, boolean caseAllocator,
+            boolean staffAdmin, List<Map<String, Object>> roles) {
         var entry = new LinkedHashMap<String, Object>();
         entry.put("id", id);
         entry.put("email_id", email);
@@ -527,9 +526,9 @@ public class CftlibConfig implements CFTLibConfigurer {
         entry.put("roles", roles);
         entry.put("skills", List.of());
         entry.put("services",
-            List.of(Map.of("service", "Employment Claims", "service_code", "BHA1")));
+                List.of(Map.of("service", "Employment Claims", "service_code", "BHA1")));
         entry.put("base_locations",
-            List.of(Map.of("location_id", 36313, "location", "Leeds", "is_primary", true)));
+                List.of(Map.of("location_id", 36313, "location", "Leeds", "is_primary", true)));
         entry.put("region", "National");
         entry.put("region_id", 12);
         return entry;
@@ -541,35 +540,37 @@ public class CftlibConfig implements CFTLibConfigurer {
 
     @SneakyThrows
     private String lookupIdamUserId(String email) {
-        var client = HttpClient.newHttpClient();
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            var tokenBody = "grant_type=password"
+                    + "&username=" + URLEncoder.encode(email, StandardCharsets.UTF_8)
+                    + "&password=password"
+                    + "&client_id=xuiwebapp"
+                    + "&client_secret=AAAAAAAAAAAAAAAA"
+                    + "&scope=openid+profile+roles"
+                    + "&redirect_uri="
+                    + URLEncoder.encode("http://localhost:3000/oauth2/callback", StandardCharsets.UTF_8);
 
-        var tokenBody = "grant_type=password"
-            + "&username=" + URLEncoder.encode(email, StandardCharsets.UTF_8)
-            + "&password=password"
-            + "&client_id=xuiwebapp"
-            + "&client_secret=AAAAAAAAAAAAAAAA"
-            + "&scope=openid+profile+roles"
-            + "&redirect_uri=" + URLEncoder.encode("http://localhost:3000/oauth2/callback", StandardCharsets.UTF_8);
+            var tokenRequest = HttpRequest.newBuilder()
+                    .uri(URI.create("http://localhost:5062/o/token"))
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .POST(HttpRequest.BodyPublishers.ofString(tokenBody))
+                    .build();
 
-        var tokenRequest = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:5062/o/token"))
-            .header("Content-Type", "application/x-www-form-urlencoded")
-            .POST(HttpRequest.BodyPublishers.ofString(tokenBody))
-            .build();
+            var tokenResponse = client.send(tokenRequest, HttpResponse.BodyHandlers.ofString());
+            Map<String, Object> tokenJson = (Map<String, Object>) new Gson().fromJson(tokenResponse.body(), Map.class);
+            var accessToken = (String) tokenJson.get("access_token");
 
-        var tokenResponse = client.send(tokenRequest, HttpResponse.BodyHandlers.ofString());
-        Map<String, Object> tokenJson = (Map<String, Object>) new Gson().fromJson(tokenResponse.body(), Map.class);
-        var accessToken = (String) tokenJson.get("access_token");
+            var detailsRequest = HttpRequest.newBuilder()
+                    .uri(URI.create("http://localhost:5062/details"))
+                    .header("Authorization", "Bearer " + accessToken)
+                    .GET()
+                    .build();
 
-        var detailsRequest = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:5062/details"))
-            .header("Authorization", "Bearer " + accessToken)
-            .GET()
-            .build();
-
-        var detailsResponse = client.send(detailsRequest, HttpResponse.BodyHandlers.ofString());
-        Map<String, Object> detailsJson = (Map<String, Object>) new Gson().fromJson(detailsResponse.body(), Map.class);
-        return (String) detailsJson.get("id");
+            var detailsResponse = client.send(detailsRequest, HttpResponse.BodyHandlers.ofString());
+            Map<String, Object> detailsJson = (Map<String, Object>) new Gson().fromJson(detailsResponse.body(),
+                    Map.class);
+            return (String) detailsJson.get("id");
+        }
     }
 
     private void importCcdDefinitions(CFTLib lib) throws IOException {
@@ -620,9 +621,8 @@ public class CftlibConfig implements CFTLibConfigurer {
         }
 
         throw new IOException(
-            "Unable to locate CCD definition file '%s' from working directory '%s'"
-                .formatted(file, Path.of("").toAbsolutePath().normalize())
-        );
+                "Unable to locate CCD definition file '%s' from working directory '%s'"
+                        .formatted(file, Path.of("").toAbsolutePath().normalize()));
     }
 
     private void startDockerCompose() {

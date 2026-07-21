@@ -25,7 +25,7 @@ public class WaCaseEventHandlerTask {
         this.authTokenGenerator = authTokenGenerator;
     }
 
-    @Scheduled(initialDelay = 10000,
+    @Scheduled(initialDelay = 10_000,
                fixedRateString = "${wa.case-event-handler.find-problem-messages-task.interval:60000}")
     public void runFindProblemMessagesTask() {
         log.debug("Executing WA Case Event Handler Find Problem Messages request");

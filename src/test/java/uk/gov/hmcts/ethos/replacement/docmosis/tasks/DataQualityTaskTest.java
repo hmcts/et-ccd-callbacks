@@ -9,6 +9,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -19,13 +20,17 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
@@ -61,12 +66,19 @@ class DataQualityTaskTest {
     @MockitoBean
     private uk.gov.hmcts.ecm.compat.common.client.CcdClient ecmCcdClient;
 
+    @MockitoBean
+    private CoreCaseDataApi coreCaseDataApi;
+
+    @MockitoBean
+    private AuthTokenGenerator authTokenGenerator;
+
     @Captor
     private ArgumentCaptor<CaseData> etCaseDataCaptor;
 
     @BeforeEach
     void setUp() {
-        dataQualityTask = new DataQualityTask(adminUserService, ccdClient, ecmCcdClient);
+        dataQualityTask = new DataQualityTask(adminUserService, ccdClient, ecmCcdClient, coreCaseDataApi,
+            authTokenGenerator);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
         setEtCase();
     }
@@ -74,50 +86,56 @@ class DataQualityTaskTest {
     @Test
     void updateHearingInJudgment_doesNotUpdate_whenHearingCollectionIsEmpty() throws Exception {
         CaseData caseData = new CaseData();
-        caseData.setJudgementCollection(List.of(buildEtJudgmentItem(HEARING_DATE_INVALID, SENT_DATE)));
+        caseData.setJudgementCollection(List.of(buildEtJudgmentItem(HEARING_DATE_INVALID)));
 
         mockEtStartEvent(caseData);
         dataQualityTask.run();
 
-        captureEtCaseData();
-        assertEquals(HEARING_DATE_INVALID, capturedEtJudgmentHearingDate());
+        verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
+        assertEquals(HEARING_DATE_INVALID, caseData.getJudgementCollection().getFirst()
+            .getValue().getJudgmentHearingDate());
     }
 
     @Test
     void updateHearingInJudgment_doesNotUpdate_whenJudgementCollectionIsEmpty() throws Exception {
         CaseData caseData = new CaseData();
-        caseData.setHearingCollection(List.of(buildEtHearingItem(LISTED_DATE_LATEST_BEFORE_SENT, HEARING_STATUS_HEARD)));
+        caseData.setHearingCollection(List.of(
+            buildEtHearingItem(LISTED_DATE_LATEST_BEFORE_SENT, HEARING_STATUS_HEARD)));
 
         mockEtStartEvent(caseData);
         dataQualityTask.run();
 
-        verify(ccdClient).submitEventForCase(any(), any(), any(), any(), any(), any());
+        verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
     }
 
     @Test
     void updateHearingInJudgment_doesNotUpdate_whenNoHeardDates() throws Exception {
         CaseData caseData = new CaseData();
-        caseData.setHearingCollection(List.of(buildEtHearingItem(LISTED_DATE_LATEST_BEFORE_SENT, "Listed")));
-        caseData.setJudgementCollection(List.of(buildEtJudgmentItem(HEARING_DATE_INVALID, SENT_DATE)));
+        caseData.setHearingCollection(List.of(
+            buildEtHearingItem(LISTED_DATE_LATEST_BEFORE_SENT, "Listed")));
+        caseData.setJudgementCollection(List.of(buildEtJudgmentItem(HEARING_DATE_INVALID)));
 
         mockEtStartEvent(caseData);
         dataQualityTask.run();
 
-        captureEtCaseData();
-        assertEquals(HEARING_DATE_INVALID, capturedEtJudgmentHearingDate());
+        verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
+        assertEquals(HEARING_DATE_INVALID, caseData.getJudgementCollection().getFirst()
+            .getValue().getJudgmentHearingDate());
     }
 
     @Test
     void updateHearingInJudgment_doesNotUpdate_whenHearingDateAlreadyBeforeSentDate() throws Exception {
         CaseData caseData = new CaseData();
-        caseData.setHearingCollection(List.of(buildEtHearingItem(LISTED_DATE_LATEST_BEFORE_SENT, HEARING_STATUS_HEARD)));
-        caseData.setJudgementCollection(List.of(buildEtJudgmentItem(HEARING_DATE_VALID, SENT_DATE)));
+        caseData.setHearingCollection(List.of(
+            buildEtHearingItem(LISTED_DATE_LATEST_BEFORE_SENT, HEARING_STATUS_HEARD)));
+        caseData.setJudgementCollection(List.of(buildEtJudgmentItem(HEARING_DATE_VALID)));
 
         mockEtStartEvent(caseData);
         dataQualityTask.run();
 
-        captureEtCaseData();
-        assertEquals(HEARING_DATE_VALID, capturedEtJudgmentHearingDate());
+        verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
+        assertEquals(HEARING_DATE_VALID, caseData.getJudgementCollection().getFirst()
+            .getValue().getJudgmentHearingDate());
     }
 
     @Test
@@ -128,40 +146,47 @@ class DataQualityTaskTest {
         item.setValue(judgment);
 
         CaseData caseData = new CaseData();
-        caseData.setHearingCollection(List.of(buildEtHearingItem(LISTED_DATE_LATEST_BEFORE_SENT, HEARING_STATUS_HEARD)));
+        caseData.setHearingCollection(List.of(
+            buildEtHearingItem(LISTED_DATE_LATEST_BEFORE_SENT, HEARING_STATUS_HEARD)));
         caseData.setJudgementCollection(List.of(item));
 
         mockEtStartEvent(caseData);
         dataQualityTask.run();
 
-        captureEtCaseData();
-        assertNull(capturedEtJudgmentHearingDate());
+        verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
+        assertNull(caseData.getJudgementCollection().getFirst().getValue().getJudgmentHearingDate());
     }
 
     @Test
     void updateHearingInJudgment_doesNotUpdate_whenAllHeardDatesAreAfterSentDate() throws Exception {
         CaseData caseData = new CaseData();
-        caseData.setHearingCollection(List.of(buildEtHearingItem(LISTED_DATE_AFTER_SENT, HEARING_STATUS_HEARD)));
-        caseData.setJudgementCollection(List.of(buildEtJudgmentItem(HEARING_DATE_INVALID, SENT_DATE)));
+        caseData.setHearingCollection(List.of(
+            buildEtHearingItem(LISTED_DATE_AFTER_SENT, HEARING_STATUS_HEARD)));
+        caseData.setJudgementCollection(List.of(buildEtJudgmentItem(HEARING_DATE_INVALID)));
 
         mockEtStartEvent(caseData);
         dataQualityTask.run();
 
-        captureEtCaseData();
-        assertEquals(HEARING_DATE_INVALID, capturedEtJudgmentHearingDate());
+        verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
+        assertEquals(HEARING_DATE_INVALID, caseData.getJudgementCollection().getFirst()
+            .getValue().getJudgmentHearingDate());
     }
 
     @Test
-    void updateHearingInJudgment_updatesHearingDate_whenHearingDateIsAfterSentDate() throws Exception {
+    void updateHearingInJudgment_updatesHearingDate_andClearsDynamicHearing_whenHearingDateIsAfterSentDate()
+            throws Exception {
         CaseData caseData = new CaseData();
-        caseData.setHearingCollection(List.of(buildEtHearingItem(LISTED_DATE_LATEST_BEFORE_SENT, HEARING_STATUS_HEARD)));
-        caseData.setJudgementCollection(List.of(buildEtJudgmentItem(HEARING_DATE_INVALID, SENT_DATE)));
+        caseData.setHearingCollection(List.of(
+            buildEtHearingItem(LISTED_DATE_LATEST_BEFORE_SENT, HEARING_STATUS_HEARD)));
+        caseData.setJudgementCollection(List.of(buildEtJudgmentItem(HEARING_DATE_INVALID)));
 
         mockEtStartEvent(caseData);
         dataQualityTask.run();
 
         captureEtCaseData();
-        assertEquals("2023-01-15", capturedEtJudgmentHearingDate());
+        JudgementType judgment = etCaseDataCaptor.getValue().getJudgementCollection().getFirst().getValue();
+        assertEquals("2023-01-15", judgment.getJudgmentHearingDate());
+        assertNull(judgment.getDynamicJudgementHearing());
     }
 
     @Test
@@ -177,7 +202,7 @@ class DataQualityTaskTest {
 
         CaseData caseData = new CaseData();
         caseData.setHearingCollection(List.of(hearingItem));
-        caseData.setJudgementCollection(List.of(buildEtJudgmentItem(HEARING_DATE_INVALID, SENT_DATE)));
+        caseData.setJudgementCollection(List.of(buildEtJudgmentItem(HEARING_DATE_INVALID)));
 
         mockEtStartEvent(caseData);
         dataQualityTask.run();
@@ -189,10 +214,11 @@ class DataQualityTaskTest {
     @Test
     void updateHearingInJudgment_onlyUpdatesInvalidJudgments_whenMixedCollection() throws Exception {
         CaseData caseData = new CaseData();
-        caseData.setHearingCollection(List.of(buildEtHearingItem(LISTED_DATE_LATEST_BEFORE_SENT, HEARING_STATUS_HEARD)));
+        caseData.setHearingCollection(List.of(
+            buildEtHearingItem(LISTED_DATE_LATEST_BEFORE_SENT, HEARING_STATUS_HEARD)));
         caseData.setJudgementCollection(List.of(
-            buildEtJudgmentItem(HEARING_DATE_INVALID, SENT_DATE), // needs fixing
-            buildEtJudgmentItem(HEARING_DATE_VALID, SENT_DATE)    // already valid
+            buildEtJudgmentItem(HEARING_DATE_INVALID), // needs fixing
+            buildEtJudgmentItem(HEARING_DATE_VALID)    // already valid
         ));
 
         mockEtStartEvent(caseData);
@@ -201,7 +227,9 @@ class DataQualityTaskTest {
         captureEtCaseData();
         List<JudgementTypeItem> judgments = etCaseDataCaptor.getValue().getJudgementCollection();
         assertEquals("2023-01-15", judgments.get(0).getValue().getJudgmentHearingDate());
+        assertNull(judgments.get(0).getValue().getDynamicJudgementHearing());
         assertEquals(HEARING_DATE_VALID, judgments.get(1).getValue().getJudgmentHearingDate());
+        assertNotNull(judgments.get(1).getValue().getDynamicJudgementHearing());
     }
 
     @Test
@@ -213,7 +241,7 @@ class DataQualityTaskTest {
         ecmCaseData.setHearingCollection(
             List.of(buildEcmHearingItem(LISTED_DATE_LATEST_BEFORE_SENT, HEARING_STATUS_HEARD)));
         ecmCaseData.setJudgementCollection(
-            List.of(buildEcmJudgmentItem(HEARING_DATE_INVALID, SENT_DATE)));
+            List.of(buildEcmJudgmentItem()));
 
         when(ecmCcdClient.startEventForCase(ADMIN_TOKEN, ECM_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API_EVENT_ID))
             .thenReturn(buildEcmCcdRequest(ecmCaseData));
@@ -224,16 +252,27 @@ class DataQualityTaskTest {
             ArgumentCaptor.forClass(uk.gov.hmcts.ecm.common.model.ccd.CaseData.class);
         verify(ecmCcdClient).submitEventForCase(eq(ADMIN_TOKEN), ecmCaptor.capture(),
             eq(ECM_CASE_TYPE_ID), any(), any(), eq(CASE_ID));
-        assertEquals("2023-01-15",
-            ecmCaptor.getValue().getJudgementCollection().get(0).getValue().getJudgmentHearingDate());
+        uk.gov.hmcts.ecm.common.model.ccd.types.JudgementType ecmJudgment =
+            ecmCaptor.getValue().getJudgementCollection().getFirst().getValue();
+        assertEquals("2023-01-15", ecmJudgment.getJudgmentHearingDate());
+        assertNull(ecmJudgment.getDynamicJudgementHearing());
     }
 
     private void setEtCase() {
-        ReflectionTestUtils.setField(dataQualityTask, "casesToUpdate", CASE_ID + "," + ET_CASE_TYPE_ID);
+        ReflectionTestUtils.setField(dataQualityTask, "casesToUpdate", CASE_ID);
+        mockGetCase(ET_CASE_TYPE_ID);
     }
 
     private void setEcmCase() {
-        ReflectionTestUtils.setField(dataQualityTask, "casesToUpdate", CASE_ID + "," + ECM_CASE_TYPE_ID);
+        ReflectionTestUtils.setField(dataQualityTask, "casesToUpdate", CASE_ID);
+        mockGetCase(ECM_CASE_TYPE_ID);
+    }
+
+    private void mockGetCase(String caseTypeId) {
+        uk.gov.hmcts.reform.ccd.client.model.CaseDetails reformCaseDetails =
+            uk.gov.hmcts.reform.ccd.client.model.CaseDetails.builder().caseTypeId(caseTypeId).build();
+        when(coreCaseDataApi.getCase(eq(ADMIN_TOKEN), any(), eq(CASE_ID)))
+            .thenReturn(reformCaseDetails);
     }
 
     private void mockEtStartEvent(CaseData caseData) throws Exception {
@@ -247,7 +286,7 @@ class DataQualityTaskTest {
     }
 
     private String capturedEtJudgmentHearingDate() {
-        return etCaseDataCaptor.getValue().getJudgementCollection().get(0).getValue().getJudgmentHearingDate();
+        return etCaseDataCaptor.getValue().getJudgementCollection().getFirst().getValue().getJudgmentHearingDate();
     }
 
     private CCDRequest buildEtCcdRequest(CaseData caseData) {
@@ -276,10 +315,11 @@ class DataQualityTaskTest {
         return item;
     }
 
-    private JudgementTypeItem buildEtJudgmentItem(String judgmentHearingDate, String dateJudgmentSent) {
+    private JudgementTypeItem buildEtJudgmentItem(String judgmentHearingDate) {
         JudgementType judgment = new JudgementType();
         judgment.setJudgmentHearingDate(judgmentHearingDate);
-        judgment.setDateJudgmentSent(dateJudgmentSent);
+        judgment.setDateJudgmentSent(DataQualityTaskTest.SENT_DATE);
+        judgment.setDynamicJudgementHearing(new DynamicFixedListType());
         JudgementTypeItem item = new JudgementTypeItem();
         item.setValue(judgment);
         return item;
@@ -315,12 +355,12 @@ class DataQualityTaskTest {
         return item;
     }
 
-    private uk.gov.hmcts.ecm.common.model.ccd.items.JudgementTypeItem buildEcmJudgmentItem(
-            String judgmentHearingDate, String dateJudgmentSent) {
+    private uk.gov.hmcts.ecm.common.model.ccd.items.JudgementTypeItem buildEcmJudgmentItem() {
         uk.gov.hmcts.ecm.common.model.ccd.types.JudgementType judgment =
             new uk.gov.hmcts.ecm.common.model.ccd.types.JudgementType();
-        judgment.setJudgmentHearingDate(judgmentHearingDate);
-        judgment.setDateJudgmentSent(dateJudgmentSent);
+        judgment.setJudgmentHearingDate(DataQualityTaskTest.HEARING_DATE_INVALID);
+        judgment.setDateJudgmentSent(DataQualityTaskTest.SENT_DATE);
+        judgment.setDynamicJudgementHearing(new uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType());
         uk.gov.hmcts.ecm.common.model.ccd.items.JudgementTypeItem item =
             new uk.gov.hmcts.ecm.common.model.ccd.items.JudgementTypeItem();
         item.setValue(judgment);

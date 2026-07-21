@@ -185,7 +185,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.WA_TASK_CON
  */
 @Component
 @Slf4j
-@SuppressWarnings({"unchecked", "PMD.SeparateWithUnderscore"})
+@SuppressWarnings({"unchecked", "PMD.UseUnderscoresInNumericLiterals"})
 public class CftlibConfig implements CFTLibConfigurer {
 
     private static final String DEFAULT_LOCATION = "765324";

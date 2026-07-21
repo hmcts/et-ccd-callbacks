@@ -21,19 +21,6 @@ public class EtRetainAndDisposePolicy implements RetainAndDisposePolicy {
         ENGLANDWALES_CASE_TYPE_ID,
         SCOTLAND_CASE_TYPE_ID
     );
-    private static final String FIND_CANDIDATES = """
-        select reference
-        from ccd.case_data
-        where case_type_id in (:caseTypeIds)
-          and (
-            state = 'Delete'
-            or (
-              state = 'AWAITING_SUBMISSION_TO_HMCTS'
-              and created_date::date + :retentionDays < current_date
-            )
-          )
-        order by reference asc
-        """;
 
     private final NamedParameterJdbcTemplate jdbc;
 
@@ -45,7 +32,19 @@ public class EtRetainAndDisposePolicy implements RetainAndDisposePolicy {
     @Override
     public List<Long> findCandidatesForDisposal() {
         return jdbc.queryForList(
-            FIND_CANDIDATES,
+            """
+                select reference
+                from ccd.case_data
+                where case_type_id in (:caseTypeIds)
+                  and (
+                    state = 'Delete'
+                    or (
+                      state = 'AWAITING_SUBMISSION_TO_HMCTS'
+                      and created_date::date + :retentionDays < current_date
+                    )
+                  )
+                order by reference asc
+                """,
             Map.of(
                 "caseTypeIds", CASE_TYPES,
                 "retentionDays", DRAFT_RETENTION_DAYS

@@ -34,7 +34,7 @@ public class EtRetainAndDisposeConfig implements RetainAndDisposeConfig {
               and created_date::date + :retentionDays < current_date
             )
           )
-        order by reference
+        order by reference asc
         limit :maxResults
         """;
 

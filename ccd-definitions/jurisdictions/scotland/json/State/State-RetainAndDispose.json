@@ -4,7 +4,6 @@
     "ID": "Deleting",
     "Name": "Deleting",
     "Description": "Cases marked for disposal",
-    "DisplayOrder": 8,
-    "TitleDisplay": "# Case Number:${ethosCaseReference}</br><h1>${claimant} v ${respondent}<br>${flagsImageAltText}</h1>"
+    "DisplayOrder": 8
   }
 ]

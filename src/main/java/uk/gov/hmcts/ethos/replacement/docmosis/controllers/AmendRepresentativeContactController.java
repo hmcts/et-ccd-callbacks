@@ -74,6 +74,7 @@ public class AmendRepresentativeContactController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         try {
+            log.info("Starting amendRepresentativeContact request");
             amendRepresentativeContactService.setEt3ResponseContactAddress(userToken, caseData,
                     ccdRequest.getCaseDetails().getCaseId());
         } catch (GenericServiceException gse) {

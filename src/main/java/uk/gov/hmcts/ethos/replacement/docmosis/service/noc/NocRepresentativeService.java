@@ -139,6 +139,7 @@ public class NocRepresentativeService {
             throws GenericServiceException {
 
         final String methodName = "getValidatedRepresentativeRolesByUserToken";
+        log.info("************** Starting to getValidatedRepresentativeRolesByUserToken");
         List<CaseUserAssignment> caseUserAssignments = getValidatedCaseUserAssignments(submissionReference);
         log.info("********** Validated Representative Roles: " + caseUserAssignments);
         UserDetails userDetails = userService.getValidatedUserDetails(userToken, submissionReference);

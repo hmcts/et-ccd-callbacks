@@ -143,8 +143,11 @@ public class AmendRepresentativeContactService {
      */
     public void setEt3ResponseContactAddress(String userToken, CaseData caseData, String submissionReference)
             throws GenericServiceException {
+        log.info("************** validating case data");
         CaseDataUtils.validateCaseData(caseData, submissionReference);
+        log.info("************** validating user token");
         UserUtils.validateToken(userToken, submissionReference);
+
         List<String> roles = nocRepresentativeService
                 .getValidatedRepresentativeRolesByUserToken(userToken, submissionReference);
         if (roles.contains(CLAIMANTSOLICITOR.getCaseRoleLabel())) {

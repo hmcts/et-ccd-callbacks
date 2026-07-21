@@ -6,6 +6,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -29,6 +30,7 @@ import java.util.List;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EMAIL_TYPE_TO_ORG_ADMIN_NO_REP_LEFT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EMAIL_TYPE_TO_ORG_ADMIN_REMOVED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_INVALID_PARAMETERS_TO_REVOKE_REPRESENTATIVE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_OLD_CASE_DETAILS_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.REMOVE_ORGANISATION;
@@ -61,16 +63,17 @@ public class NocRemoveRepresentationService {
      * @throws IllegalStateException if the claimant representative is missing in the case data.
      */
     public void revokeClaimantLegalRep(CaseDetails caseDetails) {
+        CaseDetails caseDetailsBeforeRepUpdate = CaseDataUtils.cloneCaseDetails(caseDetails);
+        if (caseDetailsBeforeRepUpdate == null) {
+            throw new NotFoundException(EXCEPTION_OLD_CASE_DETAILS_NOT_FOUND);
+        }
         CaseData caseData = caseDetails.getCaseData();
         // get existing rep and organisation details for sending emails
         RepresentedTypeC existingClaimantRep = caseData.getRepresentativeClaimantType();
         if (existingClaimantRep == null) {
             throw new IllegalStateException(String.format(EXCEPTION_REPRESENTATIVE_NOT_FOUND, caseDetails.getCaseId()));
         }
-        CaseDetails caseDetailsBeforeRepUpdate = CaseDataUtils.cloneCaseDetails(caseDetails);
-        if (caseDetailsBeforeRepUpdate == null) {
-            return;
-        }
+
         // revoke claimant legal rep
         final String adminUserToken = adminUserService.getAdminUserToken();
         nocCcdService.revokeClaimantRepresentation(adminUserToken, caseDetails);

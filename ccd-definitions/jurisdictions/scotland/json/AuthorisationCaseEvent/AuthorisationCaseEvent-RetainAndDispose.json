@@ -16,5 +16,11 @@
     "CaseEventID": "rollbackMigrateCaseTTLDetails",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "MarkForDisposal",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
   }
 ]

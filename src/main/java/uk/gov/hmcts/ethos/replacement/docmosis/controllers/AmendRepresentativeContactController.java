@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,7 +42,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HT
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_TWO_HUNDRED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 
-@Slf4j
 @RequestMapping("/amendRepresentativeContact")
 @RestController
 @RequiredArgsConstructor
@@ -74,7 +72,6 @@ public class AmendRepresentativeContactController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         try {
-            log.info("Starting amendRepresentativeContact request");
             amendRepresentativeContactService.setEt3ResponseContactAddress(userToken, caseData,
                     ccdRequest.getCaseDetails().getCaseId());
         } catch (GenericServiceException gse) {

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConst
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class NocRepresentativeService {
 
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
@@ -139,19 +137,13 @@ public class NocRepresentativeService {
             throws GenericServiceException {
 
         final String methodName = "getValidatedRepresentativeRolesByUserToken";
-        log.info("************** Starting to getValidatedRepresentativeRolesByUserToken");
         List<CaseUserAssignment> caseUserAssignments = getValidatedCaseUserAssignments(submissionReference);
-        log.info("********** Validated Representative Roles: " + caseUserAssignments);
         UserDetails userDetails = userService.getValidatedUserDetails(userToken, submissionReference);
-        log.info("********** Validated User Details: " + userDetails);
         List<String> rolesByUserId = RoleUtils.getCaseRolesForUser(caseUserAssignments, userDetails.getUid());
-        log.info("********** ROLES By USER ID: " + rolesByUserId);
         List<String> rolesByAssignmentOrder = RoleUtils.findFirstCaseRolesByUserId(caseUserAssignments,
                 userDetails.getUid());
-        log.info("********** ROLES By ASSIGNMENT ORDER: " + rolesByAssignmentOrder);
         List<String> allRoles = CallbacksCollectionUtils.mergeListsWithoutDuplicates(rolesByUserId,
                 rolesByAssignmentOrder);
-        log.info("********** All ROLES: " + allRoles);
         if (CollectionUtils.isEmpty(allRoles)) {
             throw new GenericServiceException(ERROR_CASE_ROLES_NOT_FOUND,
                     new Exception(ERROR_CASE_ROLES_NOT_FOUND),

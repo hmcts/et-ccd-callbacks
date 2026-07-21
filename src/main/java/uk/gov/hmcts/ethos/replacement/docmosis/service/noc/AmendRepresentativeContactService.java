@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
@@ -19,7 +18,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRo
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.getOrganisationAddressAsText;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.mapOrganisationAddressToAddress;
 
-@Slf4j
 @Service("amendRepresentativeContactService")
 @RequiredArgsConstructor
 public class AmendRepresentativeContactService {
@@ -143,9 +141,7 @@ public class AmendRepresentativeContactService {
      */
     public void setEt3ResponseContactAddress(String userToken, CaseData caseData, String submissionReference)
             throws GenericServiceException {
-        log.info("************** validating case data");
         CaseDataUtils.validateCaseData(caseData, submissionReference);
-        log.info("************** validating user token");
         UserUtils.validateToken(userToken, submissionReference);
 
         List<String> roles = nocRepresentativeService
@@ -154,7 +150,6 @@ public class AmendRepresentativeContactService {
             ClaimantRepresentativeUtils.updateET3ResponseContactDetails(caseData);
             return;
         }
-        log.info("****** FOUND ROLES FOR USER: " + roles);
         RespondentRepresentativeUtils.updateET3ResponseContactDetails(caseData, roles);
     }
 }

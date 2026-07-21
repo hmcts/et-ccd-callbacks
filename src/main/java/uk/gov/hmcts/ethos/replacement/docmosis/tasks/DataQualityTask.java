@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -23,10 +24,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
@@ -239,47 +242,27 @@ public class DataQualityTask implements Runnable {
      *         otherwise
      */
     private boolean updateHearingInJudgment(CaseData caseData, String caseId) {
-        if (isEmpty(caseData.getHearingCollection()) || isEmpty(caseData.getJudgementCollection())) {
-            return false;
-        }
-
-        List<LocalDate> heardDates = caseData.getHearingCollection().stream()
-                .filter(h -> h.getValue() != null && isNotEmpty(h.getValue().getHearingDateCollection()))
-                .flatMap(h -> h.getValue().getHearingDateCollection().stream())
-                .filter(d -> d.getValue() != null
-                        && HEARING_STATUS_HEARD.equals(d.getValue().getHearingStatus())
-                        && !isNullOrEmpty(d.getValue().getListedDate()))
-                .map(d -> {
-                    try {
-                        return LocalDate.parse(d.getValue().getListedDate(), OLD_DATE_TIME_PATTERN);
-                    } catch (Exception e) {
-                        log.warn("Failed to parse hearing listed date for case {}: {}", caseId,
-                                d.getValue().getListedDate());
-                        return null;
+        return updateHearingInJudgmentCommon(
+                caseId,
+                caseData.getHearingCollection(),
+                caseData.getJudgementCollection(),
+                h -> h.getValue() == null ? null : h.getValue().getHearingDateCollection(),
+                d -> d.getValue() == null ? null : d.getValue().getListedDate(),
+                d -> d.getValue() == null ? null : d.getValue().getHearingStatus(),
+                j -> j.getValue() == null ? null : j.getValue().getJudgmentHearingDate(),
+                j -> j.getValue() == null ? null : j.getValue().getDateJudgmentSent(),
+                (j, date) -> {
+                    if (j.getValue() != null) {
+                        j.getValue().setJudgmentHearingDate(date);
                     }
-                })
-                .filter(Objects::nonNull)
-                .toList();
-
-        if (heardDates.isEmpty()) {
-            return false;
-        }
-
-        AtomicBoolean updated = new AtomicBoolean(false);
-        caseData.getJudgementCollection().stream()
-                .filter(item -> item.getValue() != null)
-                .forEach(item -> {
-                    var judgment = item.getValue();
-                    findCorrectedHearingDate(caseId, judgment.getJudgmentHearingDate(), judgment.getDateJudgmentSent(),
-                            heardDates)
-                            .ifPresent(correctedDate -> {
-                                log.info("Judgment {} in case {} is being updated", item.getId(), caseId);
-                                judgment.setJudgmentHearingDate(correctedDate);
-                                judgment.setDynamicJudgementHearing(null);
-                                updated.set(true);
-                            });
-                });
-        return updated.get();
+                },
+                j -> {
+                    if (j.getValue() != null) {
+                        j.getValue().setDynamicJudgementHearing(null);
+                    }
+                },
+            uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem::getId
+        );
     }
 
     /**
@@ -299,22 +282,62 @@ public class DataQualityTask implements Runnable {
      *         otherwise
      */
     private boolean updateHearingInJudgment(uk.gov.hmcts.ecm.common.model.ccd.CaseData caseData, String caseId) {
-        if (isEmpty(caseData.getHearingCollection()) || isEmpty(caseData.getJudgementCollection())) {
+        return updateHearingInJudgmentCommon(
+                caseId,
+                caseData.getHearingCollection(),
+                caseData.getJudgementCollection(),
+                h -> h.getValue() == null ? null : h.getValue().getHearingDateCollection(),
+                d -> d.getValue() == null ? null : d.getValue().getListedDate(),
+                d -> d.getValue() == null ? null : d.getValue().getHearingStatus(),
+                j -> j.getValue() == null ? null : j.getValue().getJudgmentHearingDate(),
+                j -> j.getValue() == null ? null : j.getValue().getDateJudgmentSent(),
+                (j, date) -> {
+                    if (j.getValue() != null) {
+                        j.getValue().setJudgmentHearingDate(date);
+                    }
+                },
+                j -> {
+                    if (j.getValue() != null) {
+                        j.getValue().setDynamicJudgementHearing(null);
+                    }
+                },
+            JudgementTypeItem::getId
+        );
+    }
+
+    /**
+     * Common generic method that extracts listed dates, parses they are HEARD,
+     * checks each judgment in collection, and updates if invalid.
+     */
+    private <H, D, J> boolean updateHearingInJudgmentCommon(
+            String caseId,
+            List<H> hearingCollection,
+            List<J> judgementCollection,
+            Function<H, List<D>> getHearingDates,
+            Function<D, String> getListedDate,
+            Function<D, String> getHearingStatus,
+            Function<J, String> getJudgmentHearingDate,
+            Function<J, String> getDateJudgmentSent,
+            BiConsumer<J, String> setJudgmentHearingDate,
+            Consumer<J> clearDynamicJudgementHearing,
+            Function<J, String> getJudgmentId) {
+
+        if (isEmpty(hearingCollection) || isEmpty(judgementCollection)) {
             return false;
         }
 
-        List<LocalDate> heardDates = caseData.getHearingCollection().stream()
-                .filter(h -> h.getValue() != null && isNotEmpty(h.getValue().getHearingDateCollection()))
-                .flatMap(h -> h.getValue().getHearingDateCollection().stream())
-                .filter(d -> d.getValue() != null
-                        && HEARING_STATUS_HEARD.equals(d.getValue().getHearingStatus())
-                        && !isNullOrEmpty(d.getValue().getListedDate()))
+        List<LocalDate> heardDates = hearingCollection.stream()
+                .filter(h -> h != null && getHearingDates.apply(h) != null)
+                .flatMap(h -> getHearingDates.apply(h).stream())
+                .filter(d -> d != null
+                        && HEARING_STATUS_HEARD.equals(getHearingStatus.apply(d))
+                        && !isNullOrEmpty(getListedDate.apply(d)))
                 .map(d -> {
                     try {
-                        return LocalDate.parse(d.getValue().getListedDate(), OLD_DATE_TIME_PATTERN);
+                        return LocalDate.parse(getListedDate.apply(d), OLD_DATE_TIME_PATTERN);
                     } catch (Exception e) {
                         log.warn("Failed to parse hearing listed date for case {}: {}", caseId,
-                                d.getValue().getListedDate());
+                                getListedDate.apply(d));
                         return null;
                     }
                 })
@@ -326,16 +349,17 @@ public class DataQualityTask implements Runnable {
         }
 
         AtomicBoolean updated = new AtomicBoolean(false);
-        caseData.getJudgementCollection().stream()
-                .filter(item -> item.getValue() != null)
-                .forEach(item -> {
-                    var judgment = item.getValue();
-                    findCorrectedHearingDate(caseId, judgment.getJudgmentHearingDate(), judgment.getDateJudgmentSent(),
-                            heardDates)
+        judgementCollection.stream()
+                .filter(Objects::nonNull)
+                .forEach(judgmentItem -> {
+                    String judgmentHearingDate = getJudgmentHearingDate.apply(judgmentItem);
+                    String dateJudgmentSent = getDateJudgmentSent.apply(judgmentItem);
+                    findCorrectedHearingDate(caseId, judgmentHearingDate, dateJudgmentSent, heardDates)
                             .ifPresent(correctedDate -> {
-                                log.info("Judgment {} in case {} is being updated", item.getId(), caseId);
-                                judgment.setJudgmentHearingDate(correctedDate);
-                                judgment.setDynamicJudgementHearing(null);
+                                log.info("Judgment {} in case {} is being updated",
+                                        getJudgmentId.apply(judgmentItem), caseId);
+                                setJudgmentHearingDate.accept(judgmentItem, correctedDate);
+                                clearDynamicJudgementHearing.accept(judgmentItem);
                                 updated.set(true);
                             });
                 });

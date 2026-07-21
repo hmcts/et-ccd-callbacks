@@ -23,6 +23,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -275,12 +276,12 @@ class DataQualityTaskTest {
             .thenReturn(reformCaseDetails);
     }
 
-    private void mockEtStartEvent(CaseData caseData) throws Exception {
+    private void mockEtStartEvent(CaseData caseData) throws IOException {
         when(ccdClient.startEventForCase(ADMIN_TOKEN, ET_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API_EVENT_ID))
             .thenReturn(buildEtCcdRequest(caseData));
     }
 
-    private void captureEtCaseData() throws Exception {
+    private void captureEtCaseData() throws IOException {
         verify(ccdClient).submitEventForCase(eq(ADMIN_TOKEN), etCaseDataCaptor.capture(),
             eq(ET_CASE_TYPE_ID), any(), any(), eq(CASE_ID));
     }

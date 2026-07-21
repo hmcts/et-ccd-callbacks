@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.RetainAndDisposePolicy;
@@ -12,6 +13,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
 @Component
+@RequiredArgsConstructor
 public class EtRetainAndDisposePolicy implements RetainAndDisposePolicy {
 
     private static final int DRAFT_RETENTION_DAYS = 365;
@@ -35,17 +37,13 @@ public class EtRetainAndDisposePolicy implements RetainAndDisposePolicy {
 
     private final NamedParameterJdbcTemplate jdbc;
 
-    public EtRetainAndDisposePolicy(NamedParameterJdbcTemplate jdbc) {
-        this.jdbc = jdbc;
-    }
-
     @Override
     public Set<String> caseTypes() {
         return CASE_TYPES;
     }
 
     @Override
-    public List<Long> findCandidates() {
+    public List<Long> findCandidatesForDisposal() {
         return jdbc.queryForList(
             FIND_CANDIDATES,
             Map.of(

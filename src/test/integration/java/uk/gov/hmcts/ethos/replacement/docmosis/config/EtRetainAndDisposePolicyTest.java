@@ -65,7 +65,7 @@ class EtRetainAndDisposePolicyTest {
         insertCase(5, "ET_Admin", "AWAITING_SUBMISSION_TO_HMCTS", 500);
         insertCase(7, "ET_Admin", "Delete", 0);
 
-        assertThat(policy.findCandidates()).containsExactly(1L, 2L, 6L);
+        assertThat(policy.findCandidatesForDisposal()).containsExactly(1L, 2L, 6L);
     }
 
     private void insertCase(long reference, String caseType, String state, int ageInDays) {

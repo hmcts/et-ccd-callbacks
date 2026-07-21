@@ -76,16 +76,16 @@ class EtRetainAndDisposePolicyTest {
         insertCase(6, SCOTLAND_CASE_TYPE_ID, "Delete", 0);
         insertCase(7, "ET_Admin", "Delete", 0);
 
-        assertThat(policy.findCandidates(10)).containsExactly(1L, 2L, 6L);
+        assertThat(policy.findCandidates()).containsExactly(1L, 2L, 6L);
     }
 
     @Test
-    void boundsAndOrdersTheCandidateList() {
+    void ordersTheCompleteCandidateList() {
         insertCase(3, ENGLANDWALES_CASE_TYPE_ID, "AWAITING_SUBMISSION_TO_HMCTS", 500);
         insertCase(1, ENGLANDWALES_CASE_TYPE_ID, "AWAITING_SUBMISSION_TO_HMCTS", 500);
         insertCase(2, SCOTLAND_CASE_TYPE_ID, "AWAITING_SUBMISSION_TO_HMCTS", 500);
 
-        assertThat(policy.findCandidates(2)).containsExactly(1L, 2L);
+        assertThat(policy.findCandidates()).containsExactly(1L, 2L, 3L);
     }
 
     private void insertCase(long reference, String caseType, String state, int ageInDays) {

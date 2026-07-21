@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.config;
 
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 import uk.gov.hmcts.ccd.sdk.RetainAndDisposePolicy;
 
 import java.util.List;
@@ -34,7 +33,6 @@ public class EtRetainAndDisposePolicy implements RetainAndDisposePolicy {
             )
           )
         order by reference asc
-        limit :maxResults
         """;
 
     private final NamedParameterJdbcTemplate jdbc;
@@ -59,15 +57,12 @@ public class EtRetainAndDisposePolicy implements RetainAndDisposePolicy {
     }
 
     @Override
-    public List<Long> findCandidates(int maxResults) {
-        Assert.isTrue(maxResults > 0, "maxResults must be greater than zero");
-
+    public List<Long> findCandidates() {
         return jdbc.queryForList(
             FIND_CANDIDATES,
             Map.of(
                 "caseTypeIds", CASE_TYPES,
-                "retentionDays", DRAFT_RETENTION_DAYS,
-                "maxResults", maxResults
+                "retentionDays", DRAFT_RETENTION_DAYS
             ),
             Long.class
         );

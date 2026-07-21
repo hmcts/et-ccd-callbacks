@@ -23,11 +23,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
 @SpringBootTest(
-    classes = EtRetainAndDisposeConfigTest.TestApplication.class,
+    classes = EtRetainAndDisposePolicyTest.TestApplication.class,
     webEnvironment = SpringBootTest.WebEnvironment.NONE
 )
 @ActiveProfiles("test")
-class EtRetainAndDisposeConfigTest {
+class EtRetainAndDisposePolicyTest {
 
     private static final EtCosPostgresqlContainer POSTGRES = EtCosPostgresqlContainer.getInstance();
 
@@ -39,10 +39,10 @@ class EtRetainAndDisposeConfigTest {
     private NamedParameterJdbcTemplate jdbc;
 
     @Autowired
-    private EtRetainAndDisposeConfig config;
+    private EtRetainAndDisposePolicy policy;
 
     @SpringBootConfiguration
-    @Import({DecentralisedDataConfiguration.class, EtRetainAndDisposeConfig.class})
+    @Import({DecentralisedDataConfiguration.class, EtRetainAndDisposePolicy.class})
     @ImportAutoConfiguration({
         DataSourceAutoConfiguration.class,
         FlywayAutoConfiguration.class,
@@ -58,12 +58,12 @@ class EtRetainAndDisposeConfigTest {
 
     @Test
     void describesTheSharedEnglandWalesAndScotlandDraftPolicy() {
-        assertThat(config.caseTypes()).isEqualTo(Set.of(
+        assertThat(policy.caseTypes()).isEqualTo(Set.of(
             ENGLANDWALES_CASE_TYPE_ID,
             SCOTLAND_CASE_TYPE_ID
         ));
-        assertThat(config.terminalState()).isEqualTo("Deleting");
-        assertThat(config.terminalEvent()).isEqualTo("MarkForDisposal");
+        assertThat(policy.terminalState()).isEqualTo("Deleting");
+        assertThat(policy.terminalEvent()).isEqualTo("MarkForDisposal");
     }
 
     @Test
@@ -76,7 +76,7 @@ class EtRetainAndDisposeConfigTest {
         insertCase(6, SCOTLAND_CASE_TYPE_ID, "Delete", 0);
         insertCase(7, "ET_Admin", "Delete", 0);
 
-        assertThat(config.findCandidates(10)).containsExactly(1L, 2L, 6L);
+        assertThat(policy.findCandidates(10)).containsExactly(1L, 2L, 6L);
     }
 
     @Test
@@ -85,7 +85,7 @@ class EtRetainAndDisposeConfigTest {
         insertCase(1, ENGLANDWALES_CASE_TYPE_ID, "AWAITING_SUBMISSION_TO_HMCTS", 500);
         insertCase(2, SCOTLAND_CASE_TYPE_ID, "AWAITING_SUBMISSION_TO_HMCTS", 500);
 
-        assertThat(config.findCandidates(2)).containsExactly(1L, 2L);
+        assertThat(policy.findCandidates(2)).containsExactly(1L, 2L);
     }
 
     private void insertCase(long reference, String caseType, String state, int ageInDays) {

@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.config;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import uk.gov.hmcts.ccd.sdk.RetainAndDisposeConfig;
+import uk.gov.hmcts.ccd.sdk.RetainAndDisposePolicy;
 
 import java.util.List;
 import java.util.Map;
@@ -13,7 +13,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
 @Component
-public class EtRetainAndDisposeConfig implements RetainAndDisposeConfig {
+public class EtRetainAndDisposePolicy implements RetainAndDisposePolicy {
 
     private static final int DRAFT_RETENTION_DAYS = 365;
     private static final String TERMINAL_STATE = "Deleting";
@@ -39,7 +39,7 @@ public class EtRetainAndDisposeConfig implements RetainAndDisposeConfig {
 
     private final NamedParameterJdbcTemplate jdbc;
 
-    public EtRetainAndDisposeConfig(NamedParameterJdbcTemplate jdbc) {
+    public EtRetainAndDisposePolicy(NamedParameterJdbcTemplate jdbc) {
         this.jdbc = jdbc;
     }
 

@@ -3,7 +3,7 @@ version: '3.5'
 
 services:
   dm-store:
-    image: "${DM_STORE_USE_LOCAL-hmctspublic.azurecr.io/}dm/store:${DM_STORE_TAG:-latest}"
+    image: "hmctsprod.azurecr.io/dm/store:latest"
     healthcheck:
       disable: true
     environment:

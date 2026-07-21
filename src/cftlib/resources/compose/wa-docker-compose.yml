@@ -7,7 +7,7 @@
 
 services:
   camunda:
-    image: "hmctsprivate.azurecr.io/camunda/bpm:latest"
+    image: "hmctsprod.azurecr.io/camunda/bpm:latest"
     environment:
       CAMUNDA_DB_USER_NAME: postgres
       CAMUNDA_DB_PASSWORD: postgres
@@ -28,7 +28,7 @@ services:
       - "9090:8999"
 
   wa-workflow-api:
-    image: "hmctspublic.azurecr.io/wa/workflow-api:latest"
+    image: "hmctsprod.azurecr.io/wa/workflow-api:latest"
     environment:
       SPRING_PROFILES_ACTIVE: local
       CAMUNDA_URL: http://camunda:8999/engine-rest
@@ -46,7 +46,7 @@ services:
       - camunda
 
   wa-case-event-handler:
-    image: "hmctspublic.azurecr.io/wa/case-event-handler:latest"
+    image: "hmctsprod.azurecr.io/wa/case-event-handler:latest"
     environment:
       SPRING_PROFILES_ACTIVE: cftlib
       APPLICATIONINSIGHTS_CONNECTION_STRING: InstrumentationKey=00000000-0000-0000-0000-000000000000
@@ -73,7 +73,7 @@ services:
       - wa-workflow-api
 
   wa-task-monitor:
-    image: "hmctspublic.azurecr.io/wa/task-monitor:latest"
+    image: "hmctsprod.azurecr.io/wa/task-monitor:latest"
     environment:
       APPLICATIONINSIGHTS_CONNECTION_STRING: InstrumentationKey=00000000-0000-0000-0000-000000000000
       OPEN_ID_IDAM_URL: http://host.docker.internal:5062

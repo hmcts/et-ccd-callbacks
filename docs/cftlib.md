@@ -39,6 +39,10 @@ The latest version of the RSE CFT lib can be found [here](https://github.com/hmc
 - **Java 21**: Required for Spring Boot 3 compatibility
 - **Docker**: For RSE IdAM Simulator and other containerized services
 - **Git**: For accessing CCD definition repositories
+- **Azure Container Registry (ACR) Access**: Authenticate with HMCTS ACR repositories before using CFTLib:
+  ```bash
+  az acr login --name hmctsprivate && az acr login --name hmctsprod && az acr login --name hmctspublic
+  ```
 
 ### Environment Variables
 | Variable                       | Purpose                                                                                |

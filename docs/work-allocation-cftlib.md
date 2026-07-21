@@ -27,6 +27,11 @@ live in `et_cos` too.
 
 ## Starting with Work Allocation
 
+Before starting, authenticate with HMCTS ACR registries:
+```bash
+az acr login --name hmctsprivate && az acr login --name hmctsprod && az acr login --name hmctspublic
+```
+
 ```bash
 ./gradlew bootWithCcdAndWa
 ```

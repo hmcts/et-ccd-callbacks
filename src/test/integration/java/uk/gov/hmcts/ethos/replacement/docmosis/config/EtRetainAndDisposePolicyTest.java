@@ -68,24 +68,15 @@ class EtRetainAndDisposePolicyTest {
 
     @Test
     void findsDeletedCasesImmediatelyAndDraftsPastTheExistingRetentionPeriod() {
-        insertCase(1, ENGLANDWALES_CASE_TYPE_ID, "AWAITING_SUBMISSION_TO_HMCTS", 366);
+        insertCase(6, SCOTLAND_CASE_TYPE_ID, "Delete", 0);
         insertCase(2, SCOTLAND_CASE_TYPE_ID, "AWAITING_SUBMISSION_TO_HMCTS", 500);
+        insertCase(1, ENGLANDWALES_CASE_TYPE_ID, "AWAITING_SUBMISSION_TO_HMCTS", 366);
         insertCase(3, ENGLANDWALES_CASE_TYPE_ID, "AWAITING_SUBMISSION_TO_HMCTS", 365);
         insertCase(4, ENGLANDWALES_CASE_TYPE_ID, "Submitted", 500);
         insertCase(5, "ET_Admin", "AWAITING_SUBMISSION_TO_HMCTS", 500);
-        insertCase(6, SCOTLAND_CASE_TYPE_ID, "Delete", 0);
         insertCase(7, "ET_Admin", "Delete", 0);
 
         assertThat(policy.findCandidates()).containsExactly(1L, 2L, 6L);
-    }
-
-    @Test
-    void ordersTheCompleteCandidateList() {
-        insertCase(3, ENGLANDWALES_CASE_TYPE_ID, "AWAITING_SUBMISSION_TO_HMCTS", 500);
-        insertCase(1, ENGLANDWALES_CASE_TYPE_ID, "AWAITING_SUBMISSION_TO_HMCTS", 500);
-        insertCase(2, SCOTLAND_CASE_TYPE_ID, "AWAITING_SUBMISSION_TO_HMCTS", 500);
-
-        assertThat(policy.findCandidates()).containsExactly(1L, 2L, 3L);
     }
 
     private void insertCase(long reference, String caseType, String state, int ageInDays) {

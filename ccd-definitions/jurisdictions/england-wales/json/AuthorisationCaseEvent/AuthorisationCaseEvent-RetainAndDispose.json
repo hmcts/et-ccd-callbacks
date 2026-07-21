@@ -21,6 +21,6 @@
     "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "MarkForDisposal",
     "UserRole": "caseworker-employment-api",
-    "CRUD": "CRUD"
+    "CRUD": "CRU"
   }
 ]

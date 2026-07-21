@@ -133,7 +133,7 @@
     "Description": "Mark an expired draft case for disposal",
     "DisplayOrder": 1001,
     "PreConditionState(s)": "AWAITING_SUBMISSION_TO_HMCTS;Delete",
-    "PostConditionState": "Deleting",
+    "PostConditionState": "PendingDisposal",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "N",

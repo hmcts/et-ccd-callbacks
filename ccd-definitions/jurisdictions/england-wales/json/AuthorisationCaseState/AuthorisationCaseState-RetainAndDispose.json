@@ -1,7 +1,7 @@
 [
   {
     "CaseTypeID": "ET_EnglandWales",
-    "CaseStateID": "Deleting",
+    "CaseStateID": "PendingDisposal",
     "UserRole": "caseworker-employment-api",
     "CRUD": "R"
   }

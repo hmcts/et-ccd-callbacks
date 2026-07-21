@@ -16,7 +16,6 @@ import uk.gov.hmcts.ccd.sdk.config.DecentralisedDataConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.EtCosPostgresqlContainer;
 
 import java.util.Map;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -54,16 +53,6 @@ class EtRetainAndDisposePolicyTest {
     @BeforeEach
     void setUp() {
         jdbc.getJdbcTemplate().execute("truncate table ccd.case_data cascade");
-    }
-
-    @Test
-    void describesTheSharedEnglandWalesAndScotlandDraftPolicy() {
-        assertThat(policy.caseTypes()).isEqualTo(Set.of(
-            ENGLANDWALES_CASE_TYPE_ID,
-            SCOTLAND_CASE_TYPE_ID
-        ));
-        assertThat(policy.terminalState()).isEqualTo("Deleting");
-        assertThat(policy.terminalEvent()).isEqualTo("MarkForDisposal");
     }
 
     @Test

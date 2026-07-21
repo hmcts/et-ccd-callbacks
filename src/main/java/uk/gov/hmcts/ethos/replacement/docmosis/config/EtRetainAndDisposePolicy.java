@@ -15,8 +15,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 public class EtRetainAndDisposePolicy implements RetainAndDisposePolicy {
 
     private static final int DRAFT_RETENTION_DAYS = 365;
-    private static final String TERMINAL_STATE = "Deleting";
-    private static final String TERMINAL_EVENT = "MarkForDisposal";
     private static final Set<String> CASE_TYPES = Set.of(
         ENGLANDWALES_CASE_TYPE_ID,
         SCOTLAND_CASE_TYPE_ID
@@ -44,16 +42,6 @@ public class EtRetainAndDisposePolicy implements RetainAndDisposePolicy {
     @Override
     public Set<String> caseTypes() {
         return CASE_TYPES;
-    }
-
-    @Override
-    public String terminalState() {
-        return TERMINAL_STATE;
-    }
-
-    @Override
-    public String terminalEvent() {
-        return TERMINAL_EVENT;
     }
 
     @Override

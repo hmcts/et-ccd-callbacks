@@ -22,5 +22,11 @@
     "CaseEventID": "MarkForDisposal",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "ConfirmDisposal",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRU"
   }
 ]

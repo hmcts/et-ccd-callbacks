@@ -60,7 +60,7 @@ The following environment variables can be configured when running CFTLib with W
 | Variable | Default Value | Purpose |
 |---|---|---|
 | `ET_WORK_ALLOCATION` | `false` | Set to `true` (or run `./gradlew bootWithCcdAndWa`) to enable Work Allocation mode. |
-| `WA_LAUNCH_DARKLY_SDK_KEY` | `sdk-key` | LaunchDarkly SDK key for Work Allocation services (`wa-workflow-api`, `wa-case-event-handler`). Defaults to `sdk-key` for offline development. |
+| `WA_LAUNCH_DARKLY_SDK_KEY` | `sdk-key` | LaunchDarkly SDK key for Work Allocation services (`wa-workflow-api`, `wa-case-event-handler`). Defaults to `sdk-key` for offline development. This can be retrieved from the Azure Key Vault |
 | `WA_SYSTEM_USERNAME` | `wa-system-user@fake.hmcts.net` | Internal WA system user used by `wa-task-management-api` for CCD calls. |
 | `WA_SYSTEM_PASSWORD` | `password` | Password for the WA system user. |
 | `CAMUNDA_URL` | `http://localhost:9090/engine-rest` | Camunda engine REST API endpoint (must include `/engine-rest`). |

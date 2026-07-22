@@ -21,6 +21,7 @@ export default class EmploymentAndRespDetailsPage extends CitizenHubPage {
   private readonly writtenContractNoticePeriodGroup: Locator;
   private readonly noticePeriodTypeGroup: Locator;
   private readonly noticePeriodWeeksOption: Locator;
+  private readonly noticePeriodTime:Locator;
   private readonly noticePeriodInput: Locator;
   private readonly averageWeeklyHoursHeading: Locator;
   private readonly averageWeeklyHoursPastHeading: Locator;
@@ -33,7 +34,6 @@ export default class EmploymentAndRespDetailsPage extends CitizenHubPage {
   private readonly pensionYesOption: Locator;
   private readonly pensionContributionInput: Locator;
   private readonly employeeBenefitsHeading: Locator;
-  private readonly employeeBenefitsNoLongerWorkingGroup: Locator;
   private readonly employeeBenefitsInputGroup: Locator;
   private readonly employeeBenefitsYesOption: Locator;
   // working notice period properties
@@ -68,53 +68,58 @@ export default class EmploymentAndRespDetailsPage extends CitizenHubPage {
   private readonly didYouWorkAtHeading: Locator;
   private readonly didYouWorkAtYesOption: Locator;
   private readonly checkRespondentDetailsHeading: Locator;
+  private readonly noticePeriodHeading: Locator;
+  private readonly newJobInput: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.employmentStatusLink = this.page.locator('a[href="/past-employer?lng=en"]');
+    this.employmentStatusLink = this.page.locator(
+      'a[href="/past-employer?lng=en"], a[href="/did-claimant-work-for-employer?lng=en"], a[href="/past-employer"]');
     this.workedForOrganisationGroup = this.page.locator(
-      'fieldset:has(legend:has(h1:text("Did you work for the organisation or person you’re making your claim against? (Optional)")))'
+      'fieldset:has(h1:text-matches("work for the organisation or person", "i"))'
     );
     this.stillWorkingFOrOrgGroup = this.page.locator(
-      'fieldset:has(legend:has(h1:text("Are you still working for the organisation or person you\'re making your claim against?")))'
+      'fieldset:has(h1:text-matches("still working for the organisation or person", "i"))'
     );
-    this.stillWorkingOption = this.page.locator(`#still-working`);
-    this.workingNoticePeriodOption = this.page.locator(`#still-working-2`);
-    this.noLongerWorkingOption = this.page.locator(`#still-working-3`);
+    this.stillWorkingOption = this.page.locator(`#still-working, #is-claimant-still-working`);
+    this.workingNoticePeriodOption = this.page.locator(`#still-working-2, #is-claimant-still-working-2`);
+    this.noLongerWorkingOption = this.page.locator(`#still-working-3, #is-claimant-still-working-3`);
     this.employmentDetailsHeading = this.page.getByRole('heading', { name: 'Employment details' });
     this.jobTitleInput = this.page.locator(`#jobTitle`);
     this.employmentStartDateHeading = this.page.getByRole('heading', { name: 'Employment start date' });
     this.employmentStartDateInputGroup = this.page.locator(`#startDate`);
     this.writtenContractNoticePeriodGroup = this.page.locator(
-      `fieldset:has(legend:text("Do you have a written contract with a notice period? (optional)"))`
+      'fieldset:has-text("written contract with a notice period")'
     );
     this.noticePeriodTypeGroup = this.page.locator(
-      `fieldset:has(legend:has(h1:text("Is your notice period in weeks or months? (optional)")))`
+      'fieldset:has(h1:text-matches("notice period in weeks or months", "i"))'
     );
-    this.noticePeriodWeeksOption = this.page.locator(`#notice-type`);
-    this.noticePeriodInput = this.page.locator(`#notice-length`);
+    this.noticePeriodHeading = this.page.locator(
+      'h1:text-matches("How many weeks.*notice period", "i")'
+    );
+    this.noticePeriodWeeksOption = this.page.locator(`#notice-type, #claimant-notice-type`);
+    this.noticePeriodInput = this.page.locator(`#notice-length, #claimant-notice-length`);
     this.averageWeeklyHoursHeading = this.page.getByRole('heading', {
-      name: 'What are your average weekly hours? (optional)',
+      name: /^(What are your average weekly hours\? \(optional\)|Claimant's average weekly hours \(optional\))$/,
     });
     this.averageWeeklyHoursPastHeading = this.page.getByRole('heading', {
-      name: 'What were your average weekly hours? (optional)',
+      name: /average weekly hours.*optional/i,
     });
     this.averageWeeklyHoursInput = this.page.locator('#avg-weekly-hrs');
-    this.payHeading = this.page.getByRole('heading', { name: 'Your pay (optional)' });
+    this.payHeading = this.page.getByRole('heading', {
+      name: /^(Your pay \(optional\)|Claimant's pay \(optional\))$/,
+    });
     this.payBeforeTaxInput = this.page.locator('#pay-before-tax');
     this.payAfterTaxInput = this.page.locator('#pay-after-tax');
     this.payWeeklyOption = this.page.locator('#pay-interval');
     this.pensionContributionHeading = this.page.getByRole('heading', {
-      name: 'Did the respondent make any contributions to your pension? (optional)',
+      name: /^(Did the respondent make any contributions to your pension\? \(optional\)|Does the respondent make contributions to the claimant's pension\? \(optional\))$/,
     });
-    this.pensionYesOption = this.page.locator('#pension');
+    this.pensionYesOption = this.page.locator('#pension, #claimant-pension');
     this.pensionContributionInput = this.page.locator('#pension-contributions');
     this.employeeBenefitsHeading = this.page.getByRole('heading', { name: 'Employee benefits' });
     this.employeeBenefitsInputGroup = this.page.locator(
-      `fieldset:has(legend:text("Do you or did you receive any employee benefits? (optional)"))`
-    );
-    this.employeeBenefitsNoLongerWorkingGroup = this.page.locator(
-      `fieldset:has(legend:text("Did you receive any employee benefits? (optional)"))`
+      'fieldset:has(legend:text-matches("employee benefits", "i"))'
     );
     this.employeeBenefitsYesOption = this.page.locator('#employee-benefits');
     this.endOfNoticePeriodHeading = this.page.getByRole('heading', { name: 'End of notice period' });
@@ -126,18 +131,27 @@ export default class EmploymentAndRespDetailsPage extends CitizenHubPage {
     this.employmentEndDateQuestion = this.page.locator(`fieldset:has(legend:text("When did your employment end?"))`);
     this.employmentEndDateInputGroup = this.page.locator(`#end-date`);
     this.noticePeriodTypeNoLongerWorkingGroup = this.page.locator(
-      `fieldset:has(legend:text("Did you have or work a notice period? (optional)"))`
+      'fieldset:has(legend:text-matches("have or work a notice period", "i"))'
     );
     this.noticePeriodNoLongerWorkingGroup = this.page.locator(
-      `fieldset:has(legend:has(h1:text("Was your notice period in weeks or months? (optional)")))`
+      'fieldset:has(h1:text-matches("notice period in weeks or months", "i"))'
     );
-    this.newJobHeading = this.page.locator(`fieldset:has(legend:text("Have you got a new job? (optional)"))`);
+    this.noticePeriodTime = this.page.getByRole('heading', {
+      name: /how many weeks in .* notice period/i,
+    });
+    this.newJobHeading = this.page.locator(
+      `fieldset:has(h1:text("Has the claimant got a new job? (optional)")),
+   fieldset:has(legend:text("Have you got a new job? (optional)"))`
+    );
+    this.newJobInput = this.page.locator(`#new-job, #claimant-new-job`);
     this.startOfNewJobHeading = this.page.getByRole('heading', { name: 'Start of new job' });
     this.startOfNewJobQuestion = this.page.locator(
-      `fieldset:has(legend:text("When do you start your new job? (optional)"))`
+      'fieldset:has(legend:text-matches("start.*new job", "i"))'
     );
     this.startOfNewJobInputGroup = this.page.locator(`#new-job-start-date`);
-    this.newJobPayHeading = this.page.getByRole('heading', { name: "What's your new job pay? (optional)" });
+    this.newJobPayHeading = this.page.getByRole('heading', {
+      name: /new job pay.*optional/i,
+    });
     this.newJobPayBeforeTaxInput = this.page.locator(`#new-pay-before-tax`);
     this.newJobAnnualPayRadioOption = this.page.locator(`#new-job-pay-interval-3`);
 
@@ -159,8 +173,8 @@ export default class EmploymentAndRespDetailsPage extends CitizenHubPage {
       `fieldset:has(legend:text("Why do you not have an Acas number?"))`,
     );
     this.reasonForNoAcasCertificateFirstOption = this.page.locator('#no-acas-reason');
-    this.didYouWorkAtHeading = this.page.getByRole('heading', { name: 'Did you work at' });
-    this.didYouWorkAtYesOption = this.page.locator(`#work-address`);
+    this.didYouWorkAtHeading = this.page.getByRole('heading', { name: /^Did (you|the claimant) work at/i });
+    this.didYouWorkAtYesOption = this.page.locator('#work-address, #claimant-work-address');
     this.checkRespondentDetailsHeading = this.page.getByRole('heading', { name: 'Check the respondent details' });
   }
 
@@ -177,9 +191,11 @@ export default class EmploymentAndRespDetailsPage extends CitizenHubPage {
     await expect(this.workedForOrganisationGroup).toBeVisible();
 
     if (workedForOrg === 'Yes') {
-      await this.workedForOrganisationGroup.locator('#past-employer').click();
+      await this.workedForOrganisationGroup
+        .locator('#past-employer, #did-claimant-work-for-employer')
+        .click();
     } else if (workedForOrg === 'No') {
-      await this.workedForOrganisationGroup.locator('#past-employer-2').click();
+      await this.workedForOrganisationGroup.locator('#past-employer-2, #did-claimant-work-for-employer-2').click();
     }
     await this.saveAndContinueButton();
   }
@@ -249,12 +265,8 @@ export default class EmploymentAndRespDetailsPage extends CitizenHubPage {
   }
 
   //enter notice length on /notice-length page
-  async enterNoticePeriodLength(inNoticePeriod: boolean) {
-    const noticePeriodText = inNoticePeriod
-      ? 'How many weeks of your notice period are you being paid for? (optional)'
-      : 'How many weeks in your notice period? (optional)';
-
-    await expect(this.page.getByRole('heading', { name: noticePeriodText })).toBeVisible();
+  async enterNoticePeriodLength() {
+    await expect(this.noticePeriodHeading).toBeVisible();
     await this.noticePeriodInput.fill('4');
     await this.saveAndContinueButton();
   }
@@ -292,7 +304,7 @@ export default class EmploymentAndRespDetailsPage extends CitizenHubPage {
   async selectYesNoticePeriodNoLongerWorking() {
     await this.page.waitForLoadState('load');
     await expect(this.noticePeriodTypeNoLongerWorkingGroup).toBeVisible();
-    await this.noticePeriodTypeNoLongerWorkingGroup.getByLabel('Yes').check();
+    await this.page.locator('#claimant-notice-period, #notice-period' ).check();
     await this.saveAndContinueButton();
   }
 
@@ -300,15 +312,13 @@ export default class EmploymentAndRespDetailsPage extends CitizenHubPage {
   async selectNoticeTypeNoLongerWorking() {
     await this.page.waitForLoadState('load');
     await expect(this.noticePeriodNoLongerWorkingGroup).toBeVisible();
-    await this.noticePeriodNoLongerWorkingGroup.locator('#notice-type').check();
+    await this.noticePeriodNoLongerWorkingGroup.locator('#notice-type, #claimant-past-notice-type').check();
     await this.saveAndContinueButton();
   }
 
   //enter notice length on /notice-length page
   async enterNoticePeriodLengthNoLongerWorking() {
-    await expect(
-      this.page.getByRole('heading', { name: 'How many weeks in your notice period? (optional)' }),
-    ).toBeVisible();
+    await expect(this.noticePeriodTime).toBeVisible();
     await this.noticePeriodInput.fill('4');
     await this.saveAndContinueButton();
   }
@@ -357,7 +367,7 @@ export default class EmploymentAndRespDetailsPage extends CitizenHubPage {
   async enterEmployeeBenefitsForNoLongerWorking() {
     await this.page.waitForLoadState('load');
     await expect(this.employeeBenefitsHeading).toBeVisible();
-    await expect(this.employeeBenefitsNoLongerWorkingGroup).toBeVisible();
+    await expect(this.employeeBenefitsInputGroup).toBeVisible();
     await this.employeeBenefitsYesOption.check();
     await this.saveAndContinueButton();
   }
@@ -366,7 +376,7 @@ export default class EmploymentAndRespDetailsPage extends CitizenHubPage {
   async newJobDetails() {
     await this.page.waitForLoadState('load');
     await expect(this.newJobHeading).toBeVisible();
-    await this.newJobHeading.locator(`#new-job`).check();
+    await this.newJobInput.check();
     await this.saveAndContinueButton();
   }
 
@@ -482,7 +492,7 @@ export default class EmploymentAndRespDetailsPage extends CitizenHubPage {
     await this.enterEmploymentStartDate();
     await this.selectNoticePeriodWhilstStillWorkingFlow();
     await this.selectNoticeType();
-    await this.enterNoticePeriodLength(!inNoticePeriod);
+    await this.enterNoticePeriodLength();
     await this.enterAverageWeeklyHours();
     await this.enterPay();
     await this.enterPensionContribution();
@@ -509,7 +519,7 @@ export default class EmploymentAndRespDetailsPage extends CitizenHubPage {
     await this.enterEmploymentStartDate();
     await this.noticePeriodEndDate();
     await this.selectNoticeType();
-    await this.enterNoticePeriodLength(inNoticePeriod);
+    await this.enterNoticePeriodLength();
     await this.enterAverageWeeklyHours();
     await this.enterPay();
     await this.enterPensionContribution();
@@ -563,7 +573,7 @@ export default class EmploymentAndRespDetailsPage extends CitizenHubPage {
     await this.confirmHaveYouCompletedThisSection();
   }
 
-  async multipleAcasCertificate(workPostcode: string, selectedWorkAddress: string, firstLineOfAddress: string) {
+  async multipleAcasCertificateAndMultipleRespondents(workPostcode: string, selectedWorkAddress: string, firstLineOfAddress: string) {
     await this.clickEmploymentStatusLink();
     await this.selectWorkedForOrganisation('Yes');
     await this.workingNoticePeriodForOrganisation();
@@ -571,7 +581,7 @@ export default class EmploymentAndRespDetailsPage extends CitizenHubPage {
     await this.enterEmploymentStartDate();
     await this.noticePeriodEndDate();
     await this.selectNoticeType();
-    await this.enterNoticePeriodLength(inNoticePeriod);
+    await this.enterNoticePeriodLength();
     await this.enterAverageWeeklyHours();
     await this.enterPay();
     await this.enterPensionContribution();

@@ -251,4 +251,19 @@ export abstract class BasePage {
       expect(count).toBe(0);
     }
   }
+
+  async waitForWorkAllocationTasksToDisappear() {
+    await expect
+      .poll(
+        async () => {
+          const tasks = await this.page.locator(`exui-case-task`).count();
+          return tasks === 0;
+        },
+        {
+          intervals: [10_000],
+          timeout: 100_000,
+        }
+      )
+      .toBeTruthy();
+  }
 }

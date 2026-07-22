@@ -16,20 +16,20 @@ export const CaseDetailsValues = {
 
 export const PayloadPath = {
   CaseWorker: {
-    england: './resources/payload/caseworker/et-england-case-data-caseworker.json',
-    scotland: './resources/payload/caseworker/et-scotland-case-data-caseworker.json',
+    england: './playwrighte2e/resources/payload/caseworker/et-england-case-data-caseworker.json',
+    scotland: './playwrighte2e/resources/payload/caseworker/et-scotland-case-data-caseworker.json',
   },
   LegalRep: {
-    createEnglandWalesCase: './resources/payload/legalRep/et-england-create-case-data.json',
-    et1section1: './resources/payload/legalRep/et1-claimant-details.json',
-    et1Section2: './resources/payload/legalRep/et1-employment-respondent-details.json',
-    et1Section3: './resources/payload/legalRep/et1-claim-details.json',
-    et1SubmitClaim: './resources/payload/legalRep/et1-submit-claim-details.json',
+    createEnglandWalesCase: './playwrighte2e/resources/payload/legalRep/et-england-create-case-data.json',
+    et1section1: './playwrighte2e/resources/payload/legalRep/et1-claimant-details.json',
+    et1Section2: './playwrighte2e/resources/payload/legalRep/et1-employment-respondent-details.json',
+    et1Section3: './playwrighte2e/resources/payload/legalRep/et1-claim-details.json',
+    et1SubmitClaim: './playwrighte2e/resources/payload/legalRep/et1-submit-claim-details.json',
   },
   events: {
-    et1vetting: './resources/payload/events/et1Vetting.json',
-    acceptCase: './resources/payload/events/acceptCase.json',
-    listHearingAmersham: './resources/payload/events/listHearingEnglandAmersham.json',
+    et1vetting: './playwrighte2e/resources/payload/events/et1Vetting.json',
+    acceptCase: './playwrighte2e/resources/payload/events/acceptCase.json',
+    listHearingAmersham: './playwrighte2e/resources/payload/events/listHearingEnglandAmersham.json',
   },
 };
 
@@ -211,6 +211,10 @@ export const Events: Record<string, CaseEvent> = {
     listItem: 'Case Transfer (Scotland)',
     ccdCallback: '',
   },
+  caseTransferToEcm: {
+    listItem: 'Case Transfer to ECM',
+    ccdCallback: 'caseTransferECM',
+  },
   addTelephoneNote: {
     listItem: 'Add Telephone Note',
     ccdCallback: 'addCaseNote',
@@ -230,5 +234,13 @@ export const Events: Record<string, CaseEvent> = {
   amendContactDetailsClaimant: {
     listItem: 'Amend contact details',
     ccdCallback: 'amendClaimantRepresentativeContact',
-  }
+  },
+  requestSupport: {
+    listItem: 'Request Support',
+    ccdCallback: 'requestSupport',
+  },
+  manageSupport: {
+    listItem: 'Manage Support',
+    ccdCallback: 'manageSupport',
+  },
 };

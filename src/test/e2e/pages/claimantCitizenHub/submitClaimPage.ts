@@ -13,7 +13,9 @@ export default class SubmitClaimPage extends CitizenHubPage{
 
   constructor(page: Page) {
     super(page);
-    this.checkYourAnswersLink = this.page.locator('a[href="/pcq?lng=en"]');
+    this.checkYourAnswersLink = this.page.locator(
+      'a[href="/pcq?lng=en"], a[href="/pcq"]'
+    );
     this.equalityAndDiversityHeading = this.page.getByRole('heading', { name: 'Equality and diversity questions' });
     this.noEQualityAndDiversityQuestions = this.page.locator('button[name=opt-out-button]');
     this.checkYourAnswersHeading = this.page.getByRole('heading', { name: 'Check your answers' });

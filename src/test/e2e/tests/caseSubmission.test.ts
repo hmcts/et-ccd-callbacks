@@ -28,7 +28,7 @@ test.describe('Case creation in Citizen UI', () => {
       personalDetailsPage,
       employmentAndRespondentDetailsPage,
       claimDetailsPage,
-      submitClaimPage, caseDetailsPage, manageCaseDashboardPage
+      submitClaimPage, caseDetailsPage, manageCaseDashboardPage, singleOrMultipleClaimPage
     }) => {
       ({caseId, caseNumber}  = await createCaseViaCitizenUI(
         page,
@@ -38,7 +38,8 @@ test.describe('Case creation in Citizen UI', () => {
         employmentAndRespondentDetailsPage,
         claimDetailsPage,
         submitClaimPage,
-        'EnglandWales',
+        singleOrMultipleClaimPage,
+        'EnglandWales', 'Claiming for myself', false,
         async() => { await loginPage.processLogin(users.etClaimant, config.etSyaUiUrl) },
         employmentAndRespondentDetailsPage =>
           employmentAndRespondentDetailsPage.processStillWorkingJourney(
@@ -58,15 +59,15 @@ test.describe('Case creation in Citizen UI', () => {
       );
 
       await caseDetailsPage.selectNextEvent(Events.respondentRepresentative);
-      await respondentRepPage.addRespondentRepresentative('registered', 'ET Organisation');
+      await respondentRepPage.addRespondentRepresentative('registered', 'ET Test Factory Solicitor');
 
       await citizenHubLoginPage.processCitizenHubLogin(users.etClaimant);
       await citizenHubPage.navigateToSubmittedCaseOverviewOfClaimant(caseId);
       await citizenHubPage.citizenHubCaseOverviewPage(caseNumber);
       await citizenHubPage.navigateToContactTheTribunalPage();
       await contactTheTribunalPage.makeApplicationToTribunal('withdraw', 'Citizen withdrawing an application', 'Yes');
-      await contactTheTribunalPage.clickStoreApplication();
-      await contactTheTribunalPage.assertApplicationStoredSuccessPageIsDisplayed();
+      await contactTheTribunalPage.clickSubmitButton();
+      await contactTheTribunalPage.assertApplicationSentSuccessPageIsDisplayed();
       await contactTheTribunalPage.clickCloseAndReturn();
     },
   );
@@ -82,7 +83,7 @@ test.describe('Case creation in Citizen UI', () => {
       personalDetailsPage,
       employmentAndRespondentDetailsPage,
       claimDetailsPage,
-      submitClaimPage, manageCaseDashboardPage, caseDetailsPage,
+      submitClaimPage, manageCaseDashboardPage, caseDetailsPage,singleOrMultipleClaimPage,
   }) => {
       ({caseId, caseNumber}  = await createCaseViaCitizenUI(
       page,
@@ -92,7 +93,8 @@ test.describe('Case creation in Citizen UI', () => {
       employmentAndRespondentDetailsPage,
       claimDetailsPage,
       submitClaimPage,
-      'EnglandWales',
+      singleOrMultipleClaimPage,
+      'EnglandWales','Claiming for myself', false,
       async() => { await loginPage.processLogin(users.etClaimant, config.etSyaUiUrl) },
       employmentAndRespondentDetailsPage =>
         employmentAndRespondentDetailsPage.processWorkingNoticePeriodJourney(
@@ -123,7 +125,7 @@ test.describe('Case creation in Citizen UI', () => {
       personalDetailsPage,
       employmentAndRespondentDetailsPage,
       claimDetailsPage,
-      submitClaimPage, manageCaseDashboardPage, caseDetailsPage,
+      submitClaimPage, manageCaseDashboardPage, caseDetailsPage,singleOrMultipleClaimPage,
   }) => {
       ({caseId, caseNumber}  = await createCaseViaCitizenUI(
       page,
@@ -133,7 +135,8 @@ test.describe('Case creation in Citizen UI', () => {
       employmentAndRespondentDetailsPage,
       claimDetailsPage,
       submitClaimPage,
-      'EnglandWales',
+      singleOrMultipleClaimPage,
+      'EnglandWales','Claiming for myself', false,
       async() => { await loginPage.processLogin(users.etClaimant, config.etSyaUiUrl) },
       employmentAndRespondentDetailsPage =>
         employmentAndRespondentDetailsPage.processNoLongerWorkingForOrgJourney(
@@ -163,7 +166,7 @@ test.describe('Case creation in Citizen UI', () => {
     personalDetailsPage,
     employmentAndRespondentDetailsPage,
     claimDetailsPage,
-    submitClaimPage, manageCaseDashboardPage, caseDetailsPage,
+    submitClaimPage, manageCaseDashboardPage, caseDetailsPage,singleOrMultipleClaimPage,
   }) => {
     ({caseId, caseNumber}  = await createCaseViaCitizenUI(
       page,
@@ -173,7 +176,8 @@ test.describe('Case creation in Citizen UI', () => {
       employmentAndRespondentDetailsPage,
       claimDetailsPage,
       submitClaimPage,
-      'EnglandWales',
+      singleOrMultipleClaimPage,
+      'EnglandWales','Claiming for myself', false,
       async() => { await loginPage.processLogin(users.etClaimant, config.etSyaUiUrl) },
       employmentAndRespondentDetailsPage =>
         employmentAndRespondentDetailsPage.processDidNotWorkForOrganisationMakingClaimAgainst(
@@ -202,7 +206,7 @@ test.describe('Case creation in Citizen UI', () => {
     personalDetailsPage,
     employmentAndRespondentDetailsPage,
     claimDetailsPage,
-    submitClaimPage, manageCaseDashboardPage, caseDetailsPage,
+    submitClaimPage, manageCaseDashboardPage, caseDetailsPage, singleOrMultipleClaimPage,
   }) => {
     ({caseId, caseNumber}  = await createCaseViaCitizenUI(
       page,
@@ -212,7 +216,8 @@ test.describe('Case creation in Citizen UI', () => {
       employmentAndRespondentDetailsPage,
       claimDetailsPage,
       submitClaimPage,
-      'Scotland',
+      singleOrMultipleClaimPage,
+      'Scotland','Claiming for myself', false,
       async() => { await loginPage.processLogin(users.etClaimant, config.etSyaUiUrl) },
       employmentAndRespondentDetailsPage =>
         employmentAndRespondentDetailsPage.processNoLongerWorkingForOrgJourney(
@@ -239,6 +244,7 @@ test.describe('Case creation in Citizen UI', () => {
     citizenPostLoginPage,
     personalDetailsPage,
     et1ClaimsListPage,
+
   }) => {
     await partiallyCreateCaseViaCitizenUI(
       page,
@@ -246,6 +252,7 @@ test.describe('Case creation in Citizen UI', () => {
       citizenPostLoginPage,
       personalDetailsPage,
       'EnglandWales',
+      'Claiming for myself',
       async() => { await loginPage.processLogin(users.etClaimant, config.etSyaUiUrl) }
         )
     await et1ClaimsListPage.viewYourET1Claims()

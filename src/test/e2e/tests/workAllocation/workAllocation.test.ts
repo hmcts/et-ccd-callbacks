@@ -37,10 +37,11 @@ test.describe.serial('Work Allocation', () => {
     await et1VettingPage.processET1CaseVettingPages();
   });
 
-  test('Caseworker sends Referral to Judge- Referral task generated, Judge assign and completes referral task', async ({
+  test('Caseworker sends Referral to Judge- Referral task generated, Judge assign and completes referral task',
+    async ({
     referralPage, caseDetailsPage, browserUtils, manageCaseDashboardPage
   }) => {
-    await manageCaseDashboardPage.navigateToCaseDetails(caseId, CaseTypeLocation.EnglandAndWales);
+    caseNumber = await manageCaseDashboardPage.navigateToCaseDetails(caseId, CaseTypeLocation.EnglandAndWales);
     //send referral
     await caseDetailsPage.navigateToTab('Referrals');
     await caseDetailsPage.verifyAndClickLinkInTab('Send a new referral');
@@ -61,11 +62,11 @@ test.describe.serial('Work Allocation', () => {
 
     //log in as judge & assign and completes a task
     const judgeBrowserPage = await browserUtils.openNewBrowserContext(users.etWorkAllocationJudge.sessionFile);
-    const loginPage= new LoginPage(judgeBrowserPage);
+    const loginPageJudge= new LoginPage(judgeBrowserPage);
     const manageCaseDashboardPageJudge = new ManageCaseDashboardPage(judgeBrowserPage);
     const caseDetailsPageJudge = new CaseDetailsPage(judgeBrowserPage);
     const referralPageJudge = new ReferralPage(judgeBrowserPage);
-    await loginPage.processLogin(
+    await loginPageJudge.processLogin(
       users.etWorkAllocationJudge
     );
     caseNumber = await manageCaseDashboardPageJudge.navigateToCaseDetails(caseId, CaseTypeLocation.EnglandAndWales);
@@ -177,5 +178,46 @@ test.describe('Work Allocation- Judge completes tasks', () => {
 
     await Helpers.assignTaskToMeAndTriggerNextSteps(judgeBrowserPage, 'Draft And Sign Judgment/Order', 'Draft and Sign Judgment');
     await draftJudgementPage.submitDraftJudgement();
+  });
+});
+
+test.describe.serial('Cancelling Work Allocation tasks', () => {
+  test.use({
+    storageState: users.etCaseWorker.sessionFile,
+  })
+
+  test('Caseworker transfers case to ECM and waits for all Work allocation to be closed', async ({
+                                                                          page,
+                                                                          caseDetailsPage,
+                                                                          et1VettingPage, manageCaseDashboardPage, loginPage, caseTransferToEcmPage
+                                                                        }) => {
+    caseId = await CitizenClaimantFactory.createAndSubmitClaim(CaseTypeLocation.EnglandAndWales);
+    await CaseEventApi.caseWorkerDoesEt1VettingAndAcceptCaseEngland(caseId);
+
+    await manageCaseDashboardPage.visit();
+    await loginPage.processLogin(users.etCaseWorker);
+    caseNumber = await manageCaseDashboardPage.navigateToCaseDetails(caseId, CaseTypeLocation.EnglandAndWales);
+
+    //user completes a task
+    await caseDetailsPage.navigateToTab('Tasks');
+    await Helpers.waitForTask(page, 'Et1 Vetting');
+
+    await manageCaseDashboardPage.navigateToCaseDetails(caseId, CaseTypeLocation.EnglandAndWales);
+    await caseDetailsPage.selectNextEvent(Events.caseTransferToEcm);
+    await caseTransferToEcmPage.transferCaseToEcm('Newcastle', 'Test case Transfer To ECM');
+
+    await caseDetailsPage.assertTabData([
+      {
+        tabName: 'Case Details',
+        tabContent: [
+          'Case Status: Transferred',
+          { tabItem: 'Reason for Case Transfer', value: 'Test case Transfer To ECM'},
+          'Case Transfer: Transferred to ECM'
+        ]
+      }
+    ]);
+
+    await caseDetailsPage.navigateToTab('Tasks');
+    await caseTransferToEcmPage.waitForWorkAllocationTasksToDisappear();
   });
 });

@@ -23,7 +23,7 @@ test.describe('Add & Search ACAS certificate tests', () => {
       personalDetailsPage,
       employmentAndRespondentDetailsPage,
       claimDetailsPage,
-      submitClaimPage, manageCaseDashboardPage, caseDetailsPage, citizenHubLoginPage
+      submitClaimPage, manageCaseDashboardPage, caseDetailsPage, singleOrMultipleClaimPage,citizenHubLoginPage
     }) => {
 
       ({caseId, caseNumber} = await createCaseViaCitizenUI(
@@ -34,7 +34,8 @@ test.describe('Add & Search ACAS certificate tests', () => {
         employmentAndRespondentDetailsPage,
         claimDetailsPage,
         submitClaimPage,
-        'EnglandWales',
+        singleOrMultipleClaimPage,
+        'EnglandWales','Claiming for myself', false,
         async () => { await loginPage.processLogin(users.etClaimant, config.etSyaUiUrl);},
         employmentAndRespondentDetailsPage =>
           employmentAndRespondentDetailsPage.processStillWorkingJourney(

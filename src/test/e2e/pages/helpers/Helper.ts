@@ -1,25 +1,38 @@
-import {  expect, Page } from "@playwright/test";
+import {  expect, Locator, Page } from "@playwright/test";
 import { Selectors } from "./Selectors.ts";
 
 export class Helpers {
 
+  public static async assignTaskToMeAndValidateNextSteps(
+    page: Page,
+    taskName: string,
+    nextStepsActionName: string, position: number = 0
+  ) : Promise<Locator> {
+    await this.waitForTask(page, taskName, position);
+    const taskLocator = page.locator("exui-case-task", {
+      hasText: taskName,
+    }).nth(position);
+    await taskLocator.locator(Selectors.a, { hasText: "Assign to me" }).click();
+    await page
+      .locator(Selectors.alertMessage, {
+        hasText: "You've assigned yourself a task. It's available in My tasks.",
+      })
+      .waitFor();
+    const nextStepLoc = taskLocator
+        .locator(Selectors.a, { hasText: nextStepsActionName });
+
+    await expect(nextStepLoc).toBeVisible();
+
+    await page.waitForTimeout(2000);
+    return nextStepLoc;
+  }
+
     public static async assignTaskToMeAndTriggerNextSteps(
         page: Page,
         taskName: string,
-        nextStepsActionName: string,
+        nextStepsActionName: string, position: number = 0
     ) {
-        await this.waitForTask(page, taskName);
-        const taskLocator = page.locator("exui-case-task", {
-            hasText: taskName,
-        });
-        await taskLocator.locator(Selectors.a, { hasText: "Assign to me" }).click();
-        await page
-            .locator(Selectors.alertMessage, {
-                hasText: "You've assigned yourself a task. It's available in My tasks.",
-            })
-            .waitFor();
-        await taskLocator
-            .locator(Selectors.a, { hasText: nextStepsActionName })
+        await (await this.assignTaskToMeAndValidateNextSteps(page, taskName, nextStepsActionName, position))
             .click({clickCount: 2, force: true});
         await page.waitForTimeout(2000);
     }

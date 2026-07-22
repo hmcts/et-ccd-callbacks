@@ -133,8 +133,8 @@ export default class CaseWorkerNotificationPage extends BasePage {
     await this.partiesToNotifyRadio.getByRole('radio', {name: option.toString()}).check();
   }
 
-  async sendNotification(notificationType: string, responseToTribunal: string = 'No', partiesToNotify: string = 'Both parties') {
-    const notificationTitle = `Test Notification`;
+  async sendNotification(notificationType: string, responseToTribunal: string = 'No', partiesToNotify: string = 'Both parties', notificationNumber: string = '1') {
+    const notificationTitle = `Test Notification`+ notificationNumber;
     await this.assertSendANotificationPage();
     await this.enterNotificationTitle(notificationTitle);
     await this.selectIsThereLetterToSendOut("No");

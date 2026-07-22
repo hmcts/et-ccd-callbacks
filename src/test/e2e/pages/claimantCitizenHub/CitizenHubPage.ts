@@ -243,7 +243,7 @@ export default class CitizenHubPage extends BasePage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.supportingMaterialFile,
-      `src/test/e2e/resources/test_file/welshTest.pdf`
+      `playwrighte2e/resources/test_file/welshTest.pdf`
     )
 
     await this.uploadFielButton.waitFor();
@@ -391,13 +391,13 @@ export default class CitizenHubPage extends BasePage {
     this.returntoCUIcaseOverviewButton.click();
   }
 
-  async verifyRespondToTheTribunalNotificationBanner(notificationType: string) {
+  async verifyRespondToTheTribunalNotificationBanner(notificationType: string, notificationName: string = 'Test Notification1') {
     switch (notificationType) {
       case 'ET1 claim':
       case 'CMO':
       case 'ECC':
         await expect(this.page.locator('#main-content')).toContainText('The tribunal has sent you a notification');
-        await this.page.getByText('Respond to the tribunal -').click();
+        await this.page.getByText('Respond to the tribunal - '+ notificationName).click();
         break;
       case 'Hearing':
         await expect(this.page.locator('#main-content')).toContainText(
@@ -444,7 +444,7 @@ export default class CitizenHubPage extends BasePage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.supportingMaterialFile,
-      `src/test/e2e/resources/test_file/welshTest.pdf`
+      `playwrighte2e/resources/test_file/welshTest.pdf`
     )
 
     await this.uploadFielButton.waitFor();

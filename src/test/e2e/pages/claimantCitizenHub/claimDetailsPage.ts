@@ -29,24 +29,30 @@ export default class ClaimDetailsPage extends CitizenHubPage{
 
   constructor(page: Page) {
     super(page);
-    this.tellUsAboutYourClaimLink = this.page.locator(`a[href="/type-of-claim?lng=en"]`);
-    this.whatTypeOfClaimHeading = this.page.getByRole('heading', { name: 'What type of claim are you making?' });
+    this.tellUsAboutYourClaimLink = this.page.locator(
+      'a[href="/type-of-claim?lng=en"], a[href="/claimant-type-of-claim"]'
+    );
+    this.whatTypeOfClaimHeading = this.page.getByRole('heading', {
+      name: /^(What type of claim are you making\?|What type of claim is the claimant making\?)$/,
+    });
     this.claimTypeDiscriminationOption = this.page.locator('#discrimination');
     this.claimTypeWhistleblowingOption = this.page.locator('#whistleBlowing');
-    this.yourDiscriminationClaimHeading = this.page.getByRole('heading', { name: 'Your discrimination claim' });
+    this.yourDiscriminationClaimHeading = this.page.getByRole('heading', { name: /^(?:Your\s+)?Discrimination claim\b/i });
     this.yourDiscriminationAgeOption = this.page.locator('#age');
     this.yourDiscriminationDisabilityOption = this.page.locator('#disability');
-    this.describeYourClaimHeading = this.page.getByRole('heading', { name: 'Describe your claim' });
+    this.describeYourClaimHeading = this.page.getByRole('heading', {
+      name: /^(Describe your claim|Describe the claim)$/,
+    });
     this.claimSummaryTextArea = this.page.locator(`#claim-summary-text`);
-    this.whatDoYouWantHeading = this.page.getByRole('heading', { name: 'What do you want from your claim' });
+    this.whatDoYouWantHeading = this.page.getByRole('heading', { name: /^(?:What do you want from your claim|What does the claimant want from the claim\?(?: \(optional\))?)$/i });
     this.compensationOnlyOption = this.page.locator('#compensationOnly');
     this.tribunalRecommendationOption = this.page.locator('#tribunalRecommendation');
     this.oldJobOption = this.page.locator('#oldJob');
-    this.yourCompensationHeading = this.page.getByRole('heading', { name: 'Your compensation (optional)' });
-    this.compensationOutcomeTextArea = this.page.locator('#compensationOutcome');
-    this.compensationAmountField = this.page.locator('#compensation-amount');
-    this.tribunalRecommendationHeading = this.page.getByRole('heading', { name: 'Your tribunal recommendation' });
-    this.tribunalRecommendationRequestTextArea = this.page.locator('#tribunalRecommendationRequest');
+    this.yourCompensationHeading = this.page.getByRole('heading', { name: /^(?:Your\s+)?Compensation\s+\(optional\)$/i });
+    this.compensationOutcomeTextArea = this.page.locator('#compensationOutcome, #compensationDetails');
+    this.compensationAmountField = this.page.locator('#compensation-amount, #total-compensation-amount');
+    this.tribunalRecommendationHeading = this.page.getByRole('heading', { name: /^(?:Your\s+)?Tribunal\s+recommendation(?:\s+\(optional\))?$/i });
+    this.tribunalRecommendationRequestTextArea = this.page.locator('#tribunalRecommendationRequest, #tribunalRecommendation');
     this.whistleBlowingClaimsHeading = this.page.getByRole('heading', { name: 'Whistleblowing claims (optional)' });
     this.whistleBlowingClaimYesOption = this.page.locator('#whistleblowing-claim');
     this.whistleBlowingEntityNameField = this.page.locator('#whistleblowing-entity-name');

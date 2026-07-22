@@ -15,6 +15,7 @@ import { CaseDetailsValues, CaseTypeLocation, Events } from '../../config/case-d
 import CaseDetailsPage from '../caseDetailsPage.ts';
 import DateUtilComponent from '../../data-utils/DateUtilComponent.ts';
 import { config, UserCredentials } from '../../config/config.dynamic.ts';
+import SingleOrMultipleClaimPage from '../claimantCitizenHub/singleOrMultipleClaimPage.ts';
 
 export async function createCaseViaCitizenUI(
   page: Page,
@@ -24,18 +25,43 @@ export async function createCaseViaCitizenUI(
   employmentAndRespondentDetailsPage: EmploymentAndRespDetailsPage,
   claimDetailsPage: ClaimDetailsPage,
   submitClaimPage: SubmitClaimPage,
+  singleOrMultipleClaimPage:SingleOrMultipleClaimPage,
   region: string,
+  typeOfClaim:string,
+  groupClaim:boolean,
   loginMethod: () => Promise<void>,
   employmentJourneyMethod?: (page: any) => Promise<void>,
 ) {
   await page.goto(config.etSyaUiUrl);
-  await citizenPreLoginPage.processPreLoginPagesForTheDraftApplication(region);
+  await citizenPreLoginPage.processPreLoginPagesForTheDraftApplication(region, typeOfClaim);
   await loginMethod();
   await citizenPostLoginPage.processPostLoginPagesForTheDraftApplication();
   const location = region === 'EnglandWales' ? 'England' : region;
-  await personalDetailsPage.processPersonalDetails(userDetailsData.postcode, location, userDetailsData.addressOption);
-  if (employmentJourneyMethod) await employmentJourneyMethod(employmentAndRespondentDetailsPage);
-  await claimDetailsPage.processClaimDetails();
+
+  if (typeOfClaim == 'Claiming for myself') {
+    //Section-1
+    await personalDetailsPage.processPersonalDetails(userDetailsData.postcode, location, userDetailsData.addressOption);
+    //group claim logic
+    //Section-2
+    if(groupClaim){
+      await singleOrMultipleClaimPage.processClaimingWithOthers();
+      await personalDetailsPage.addClaimantsDetailsManually();
+    }
+    //Section-3
+    if (employmentJourneyMethod) await employmentJourneyMethod(employmentAndRespondentDetailsPage);
+    await claimDetailsPage.processClaimDetails();
+  } else if (typeOfClaim == 'Claiming for someone else') {
+    //non-HMCTS- Section1,2,3,4
+    await personalDetailsPage.processRepresentativeDetails(userDetailsData.representativePostcode, location, userDetailsData.representativeAddressOption);
+    await personalDetailsPage.processClaimantDetails(userDetailsData.postcode, userDetailsData.addressOption);
+    if (employmentJourneyMethod) await employmentJourneyMethod(employmentAndRespondentDetailsPage);
+    await claimDetailsPage.processClaimDetails();
+  }else if (typeOfClaim == 'legal representative representing a claimant') {
+    // TODO: Update tests and logic here after introducing feature
+  } else {
+    throw new Error(`Option not found for who is making the claim question`);
+  }
+   //Section-5
   const caseId = await submitClaimPage.submitClaim();
   const caseNumber = await submitClaimPage.returnToCaseOverviewAndReturnCaseNumber();
   return {caseId, caseNumber};
@@ -141,10 +167,11 @@ export async function partiallyCreateCaseViaCitizenUI(
   citizenPostLoginPage: CUIPostLoginPages,
   personalDetailsPage: PersonalDetailsPage,
   region: string,
+  typeOfClaim:string,
   loginMethod: () => Promise<void>,
 ) {
   await page.goto(config.etSyaUiUrl);
-  await citizenPreLoginPage.processPreLoginPagesForTheDraftApplication(region);
+  await citizenPreLoginPage.processPreLoginPagesForTheDraftApplication(region, typeOfClaim);
   await loginMethod();
   await citizenPostLoginPage.processPostLoginPagesForTheDraftApplication();
   const location = region === 'EnglandWales' ? 'England' : region;

@@ -1292,7 +1292,7 @@ public class NocRespondentRepresentativeService {
                         representative.getValue().getRespondentOrganisation(), organisationsResponse)) {
                     errors.add(String.format(ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES,
                             representative.getValue().getNameOfRepresentative(),
-                            representative.getValue().getRespondentOrganisation().getOrganisationID()));
+                            representative.getValue().getRespondentOrganisation().getOrganisationName()));
                 }
             }
         }

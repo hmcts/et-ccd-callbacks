@@ -727,6 +727,7 @@ bootWithCCD {
     // Camunda URL for the CFTLib-embedded wa-task-management-api.
     // Must include /engine-rest suffix — without it Camunda returns 404 on all decision definition calls.
     environment 'CAMUNDA_URL', 'http://localhost:9090/engine-rest'
+    environment 'SERVICE_AUTH_PROVIDER_API_BASE_URL', 'http://localhost:8489'
 
     // xui-manage-org
     environment 'RD_PROFESSIONAL_API_URL', 'http://localhost:8765'

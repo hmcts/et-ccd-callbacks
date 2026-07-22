@@ -50,6 +50,40 @@ Either approach:
 
 Running `./gradlew bootWithCCD` without the flag starts normally with no WA containers or tasks.
 
+## Environment Variables
+
+The following environment variables can be configured when running CFTLib with Work Allocation:
+
+### Core & Integration Variables
+
+| Variable | Default Value | Purpose |
+|---|---|---|
+| `ET_WORK_ALLOCATION` | `false` | Set to `true` (or run `./gradlew bootWithCcdAndWa`) to enable Work Allocation mode. |
+| `WA_LAUNCH_DARKLY_SDK_KEY` | `sdk-key` | LaunchDarkly SDK key for Work Allocation services (`wa-workflow-api`, `wa-case-event-handler`). Defaults to `sdk-key` for offline development. |
+| `WA_SYSTEM_USERNAME` | `wa-system-user@fake.hmcts.net` | Internal WA system user used by `wa-task-management-api` for CCD calls. |
+| `WA_SYSTEM_PASSWORD` | `password` | Password for the WA system user. |
+| `CAMUNDA_URL` | `http://localhost:9090/engine-rest` | Camunda engine REST API endpoint (must include `/engine-rest`). |
+| `TASK_MONITOR_URL` | `http://localhost:9194` | `wa-task-monitor` service URL. |
+| `CASE_EVENT_HANDLER_SERVICE_URL` | `http://localhost:8088` | `wa-case-event-handler` service URL. |
+
+### Setup & Import Script Variables
+
+| Variable | Default Value | Purpose |
+|---|---|---|
+| `WA_STANDALONE_TASK_REPO_PATH` | *(none)* | Path to local `wa-standalone-task-bpmn` repository (used by `import-camunda-definitions-cftlib.sh`). |
+| `WA_TASK_CONFIGURATION_REPO_PATH` | *(none)* | Path to local `et-wa-task-configuration` repository (used by `import-camunda-definitions-cftlib.sh`). |
+
+### Scheduled Task Intervals & S2S Configuration
+
+| Variable | Default Value | Purpose |
+|---|---|---|
+| `S2S_SECRET_TASK_MONITOR` | `AAAAAAAAAAAAAAAA` | S2S secret for WA scheduled task monitor calls. |
+| `WA_MESSAGE_QUEUE_CANDIDATE_TASK_INTERVAL` | `5000` | Polling interval (ms) for the message queue candidate task. |
+| `WA_TASK_MONITOR_INITIATION_TASK_INTERVAL` | `5000` | Polling interval (ms) for WA task initiation. |
+| `WA_TASK_MONITOR_RECONFIGURATION_TASK_INTERVAL` | `60000` | Polling interval (ms) for WA task reconfiguration. |
+| `WA_TASK_MONITOR_TERMINATION_TASK_INTERVAL` | `60000` | Polling interval (ms) for WA task termination. |
+| `WA_CASE_EVENT_HANDLER_FIND_PROBLEM_MESSAGES_TASK_INTERVAL` | `60000` | Polling interval (ms) for finding problem messages. |
+
 ## One-time Setup Steps
 
 These steps need to be run **once** after the environment is first set up, or after the

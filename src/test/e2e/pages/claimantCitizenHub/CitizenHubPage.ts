@@ -243,7 +243,7 @@ export default class CitizenHubPage extends BasePage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.supportingMaterialFile,
-      `playwrighte2e/resources/test_file/welshTest.pdf`
+      `src/test/e2e/resources/test_file/welshTest.pdf`
     )
 
     await this.uploadFielButton.waitFor();
@@ -444,7 +444,7 @@ export default class CitizenHubPage extends BasePage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.supportingMaterialFile,
-      `playwrighte2e/resources/test_file/welshTest.pdf`
+      `src/test/e2e/resources/test_file/welshTest.pdf`
     )
 
     await this.uploadFielButton.waitFor();

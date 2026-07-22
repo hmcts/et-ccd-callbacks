@@ -9,7 +9,8 @@
   "scripts": {
     "pwinstall": "yarn playwright install --with-deps",
     "test:smoke": "yarn pwinstall chromium && yarn playwright test -c src/test/e2e/playwright.config.ts  --project=chromium --grep @smoke",
-    "test:functional-chromium": "yarn pwinstall chromium && yarn playwright test -c src/test/e2e/playwright.config.ts --project=chromium --grep-invert @accessibility",
+    "test:functional-chromium": "yarn pwinstall chromium && yarn test:functional-ccd-callback",
+    "test:full-functional-chromium": "yarn pwinstall chromium && yarn playwright test -c src/test/e2e/playwright.config.ts --project=chromium --grep-invert @accessibility",
     "test:functional-webkit": "yarn pwinstall webkit && yarn playwright test -c src/test/e2e/playwright.config.ts --project=webkit --grep @cx",
     "test:functional-firefox": "yarn pwinstall firefox && yarn playwright test -c src/test/e2e/playwright.config.ts --project=firefox --grep @cx",
     "test:accessibility": "yarn pwinstall && yarn playwright test -c src/test/e2e/playwright.config.ts --project=chromium --grep @accessibility",

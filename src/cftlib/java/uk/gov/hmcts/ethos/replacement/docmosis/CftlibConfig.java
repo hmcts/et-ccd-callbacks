@@ -196,11 +196,16 @@ public class CftlibConfig implements CFTLibConfigurer {
     @Value("${rse.lib.dump_definitions:false}")
     private boolean dumpDefinitions;
 
+    @Value("${et.work-allocation.enabled:false}")
+    private boolean waEnabled;
+
     @Override
     public void configure(CFTLib lib) throws IOException {
         createRoles(lib);
         createUsers(lib);
-        createWaWiremockStubs();
+        if (waEnabled) {
+            createWaWiremockStubs();
+        }
         importCcdDefinitions(lib);
         if (!dumpDefinitions) {
             startDockerCompose();

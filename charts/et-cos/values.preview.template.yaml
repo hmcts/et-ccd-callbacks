@@ -36,10 +36,10 @@ java:
     ET_COS_DB_USER_NAME: hmcts
     ET_COS_DB_CONN_OPTIONS: "?sslmode=require"
     ET_COS_DB_CONNECTION_TIMEOUT: 30000
-    ET_COS_DB_IDLE_TIMEOUT: 300000
+    ET_COS_DB_IDLE_TIMEOUT: 60000
     # ET COS also handles callbacks and background queue work, so retain limited concurrency headroom.
     ET_COS_DB_MIN_IDLE: 1
-    ET_COS_DB_MAX_POOL_SIZE: 4
+    ET_COS_DB_MAX_POOL_SIZE: 10
     ET_COS_DB_MAX_LIFETIME: 300000
     ET_COS_DB_POOL_NAME: et-cos-db-pool
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
@@ -282,6 +282,7 @@ ccd:
         # CCD needs more headroom than other services for concurrent smoke-test case operations.
         DATA_STORE_DB_MAX_POOL_SIZE: 10
         DATA_STORE_DB_MIN_IDLE: 1
+        DATA_STORE_DB_IDLE_TIMEOUT: 60000
         SPRING_APPLICATION_JSON: |
           {
             "ccd": {

@@ -162,7 +162,7 @@ class NocRespondentRepresentativeServiceTest {
     private static final String EXPECTED_ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES =
             "Failed to remove organisation policies for case 1234567890123456. Exception: Something went wrong";
     private static final String EXPECTED_ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES =
-            "Representative Name does not have a valid account with the organisation null. "
+            "Representative Name does not have a valid account with the organisation Organisation One. "
                 + "Please check the selected organisation";
 
     private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
@@ -1629,6 +1629,7 @@ class NocRespondentRepresentativeServiceTest {
         // when organisation response and representative organisation not matches should return error
         representative.getValue().setNameOfRepresentative(REPRESENTATIVE_NAME);
         representative.getValue().setRespondentOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_ONE)
+                .organisationName("Organisation One")
                 .build());
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         AccountIdByEmailResponse accountIdByEmailResponse = new AccountIdByEmailResponse();

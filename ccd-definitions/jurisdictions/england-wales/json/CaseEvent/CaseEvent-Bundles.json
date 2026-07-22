@@ -17,6 +17,22 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
+    "ID": "bundlesClaimantPrepareDoc",
+    "Name": "Upload documents for hearing",
+    "Description": "Upload documents for a hearing",
+    "DisplayOrder": 2,
+    "PreConditionState(s)": "Accepted",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "Y",
+    "EventEnablingCondition": "[STATE]!=\"AWAITING_SUBMISSION_TO_HMCTS\"",
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/bundlesClaimant/aboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/bundlesClaimant/aboutToSubmit",
+    "CallBackURLSubmittedEvent": "${ET_COS_URL}/bundlesClaimant/submitted"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
     "ID": "SUBMIT_CLAIMANT_BUNDLES",
     "Name": "Submit hearing docs",
     "Description": "Submit hearing docs",

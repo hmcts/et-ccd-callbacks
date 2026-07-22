@@ -73,6 +73,24 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "bundlesClaimantPrepareDoc",
+    "UserRole": "[CLAIMANTSOLICITOR]",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "bundlesClaimantPrepareDoc",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "bundlesClaimantPrepareDoc",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "SUBMIT_CLAIMANT_BUNDLES",
     "UserRole": "[CREATOR]",
     "CRUD": "CRUD"

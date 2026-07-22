@@ -19,4 +19,14 @@ public class EmailUtils extends EmailService {
     public String getExuiCaseLink(String caseId) {
         return "exuiUrl" + caseId;
     }
+
+    @Override
+    public String getSyrCaseLink(String caseId, String respondentId) {
+        return "syrUrl" + caseId + "/" + respondentId;
+    }
+
+    @Override
+    public String getExuiHearingDocumentsLink(String caseId) {
+        return "exuiUrl" + caseId + "#Hearing%20Documents";
+    }
 }

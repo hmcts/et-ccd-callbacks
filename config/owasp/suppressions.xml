@@ -90,6 +90,24 @@
         <cve>CVE-2026-56148</cve>
         <cve>CVE-2026-56149</cve>
     </suppress>
+    <!-- CVE-2026-53914 affects Kotlin compiler build-cache metadata (fixed in 2.4.20, not yet on Maven Central).
+         kotlin-stdlib here is a runtime transitive dependency from okhttp; this project does not use the Kotlin Gradle plugin. -->
+    <suppress until="2026-10-01">
+        <notes><![CDATA[
+   file name: kotlin-stdlib-2.3.21.jar, kotlin-stdlib-jdk7-2.3.21.jar, kotlin-stdlib-jdk8-2.3.21.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-stdlib(\-jdk[78])?@.*$</packageUrl>
+        <cve>CVE-2026-53914</cve>
+    </suppress>
+    <!-- CVE-2026-54399 and CVE-2026-54428 affect httpcore5 (5.x) only; httpcore 4.4.x is a false positive from CPE mapping. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: httpcore-4.4.16.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.httpcomponents/httpcore@4\..*$</packageUrl>
+        <cve>CVE-2026-54399</cve>
+        <cve>CVE-2026-54428</cve>
+    </suppress>
     <!-- All other CVEs below -->
     <!-- CVE-2026-54515 affects jackson-databind 2.22.0 which is the latest available version.
          No fixed version exists. Suppress until a patched release is available. -->

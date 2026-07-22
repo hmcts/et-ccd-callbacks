@@ -728,7 +728,10 @@ bootWithCCD {
     // Must include /engine-rest suffix — without it Camunda returns 404 on all decision definition calls.
     environment 'CAMUNDA_URL', 'http://localhost:9090/engine-rest'
     environment 'SERVICE_AUTH_PROVIDER_API_BASE_URL', 'http://localhost:8489'
-
+    // IDAM allowed issuers for the CFTLib-embedded wa-task-management-api.
+    environment 'IDAM_SECURITY_ALLOWED_ISSUER_0', 'http://localhost:5062/o'
+    environment 'IDAM_SECURITY_ALLOWED_ISSUER_1', 'http://localhost:5062/o'
+    environment 'IDAM_SECURITY_ALLOWED_ISSUER_2', 'http://localhost:5062/o'
     // xui-manage-org
     environment 'RD_PROFESSIONAL_API_URL', 'http://localhost:8765'
     environment 'RD_PROFESSIONAL_API_SERVICE', 'http://localhost:8765'

@@ -62,11 +62,12 @@ Run the script with source, so that the environment variables are set in your cu
 source ./bin/set_env.sh
 ```
 
-### RSE IdAM Simulator
+### Pulling Docker Images
 
-Make sure you have the latest RSE IdAM Simulator image
+Before starting CFTLib, it is recommended to run the image pull script to pre-fetch all required Docker images (IdAM Simulator, Postgres, Elasticsearch, XUI, DM Store, Wiremock, and Work Allocation containers):
+
 ```bash
-docker pull hmctspublic.azurecr.io/hmcts/rse/rse-idam-simulator:latest
+./bin/pull-cftlib-images.sh
 ```
 
 ## Run

@@ -27,9 +27,10 @@ live in `et_cos` too.
 
 ## Starting with Work Allocation
 
-Before starting, authenticate with HMCTS ACR registries:
+Before starting, authenticate with HMCTS ACR registries and pull the required Docker images:
 ```bash
 az acr login --name hmctsprivate && az acr login --name hmctsprod && az acr login --name hmctspublic
+./bin/pull-cftlib-images.sh
 ```
 
 ```bash

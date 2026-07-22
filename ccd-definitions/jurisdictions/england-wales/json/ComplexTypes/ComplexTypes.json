@@ -3447,6 +3447,14 @@
     "Searchable": "N"
   },
   {
+    "ID": "DraftAndSignJudgement",
+    "ListElementCode": "isUrgent",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Is this urgent?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
     "ID": "Letters",
     "ListElementCode": "part_1_Documents",
     "FieldType": "FixedList",

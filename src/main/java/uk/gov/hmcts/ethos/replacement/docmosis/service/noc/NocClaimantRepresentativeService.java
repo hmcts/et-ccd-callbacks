@@ -159,7 +159,7 @@ public class NocClaimantRepresentativeService {
                 representative.getMyHmctsOrganisation(), organisationsResponse)) {
             error = String.format(ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES,
                     representative.getNameOfRepresentative(),
-                    representative.getMyHmctsOrganisation().getOrganisationID());
+                    representative.getMyHmctsOrganisation().getOrganisationName());
         }
         return error;
     }

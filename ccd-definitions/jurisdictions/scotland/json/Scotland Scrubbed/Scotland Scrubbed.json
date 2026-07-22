@@ -780,6 +780,12 @@
     "DisplayOrder": 5
   },
   {
+    "ID": "msl_PreAcceptanceResponse",
+    "ListElementCode": "Case Input in Error",
+    "ListElement": "Case Input in Error",
+    "DisplayOrder": 6
+  },
+  {
     "ID": "fl_Conciliation",
     "ListElementCode": "No Conciliation",
     "ListElement": "No track",
@@ -4243,13 +4249,13 @@
   {
     "ID": "fl_pay_cycle",
     "ListElementCode": "Weeks",
-    "ListElement": "Weeks",
+    "ListElement": "Weekly",
     "DisplayOrder": 1
   },
   {
     "ID": "fl_pay_cycle",
     "ListElementCode": "Months",
-    "ListElement": "Months",
+    "ListElement": "Monthly",
     "DisplayOrder": 2
   },
   {

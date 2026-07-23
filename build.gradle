@@ -723,7 +723,8 @@ bootWithCCD {
                     ET_Scotland_Listings: 'http://localhost:8081',
                     ET_EnglandWales_Multiple: 'http://localhost:8081',
                     ET_Scotland_Multiple: 'http://localhost:8081',
-                    ET_Admin: 'http://localhost:8081'
+                    ET_Admin: 'http://localhost:8081',
+                    Pre_Hearing_Deposit: 'http://localhost:8081'
                 ]
             ]
         ]

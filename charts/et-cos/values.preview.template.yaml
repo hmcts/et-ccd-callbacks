@@ -293,7 +293,8 @@ ccd:
                   "ET_Scotland_Listings": "https://${SERVICE_FQDN}",
                   "ET_EnglandWales_Multiple": "https://${SERVICE_FQDN}",
                   "ET_Scotland_Multiple": "https://${SERVICE_FQDN}",
-                  "ET_Admin": "https://${SERVICE_FQDN}"
+                  "ET_Admin": "https://${SERVICE_FQDN}",
+                  "Pre_Hearing_Deposit": "https://${SERVICE_FQDN}"
                 }
               }
             }

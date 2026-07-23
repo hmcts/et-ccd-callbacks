@@ -57,6 +57,7 @@ public final class ManageCaseRoleConstants {
     public static final String CASE_USER_ROLE_CREATOR = "[CREATOR]";
     public static final String CASE_USER_ROLE_DEFENDANT = "[DEFENDANT]";
     public static final String CASE_USER_ROLE_CLAIMANT_SOLICITOR = "[CLAIMANTSOLICITOR]";
+    public static final String CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE = "[CLAIMANTNONLEGALREPRESENTATIVE]";
     public static final String STRING_AMPERSAND = "&";
     public static final String STRING_EQUAL = "=";
     public static final String STRING_QUESTION_MARK = "?";

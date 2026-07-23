@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignedUserRolesResponse;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesResponse;
 import uk.gov.hmcts.ecm.common.model.ccd.ModifyCaseUserRole;
@@ -66,6 +67,7 @@ import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.JURISDICTIO
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.NO;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SCOTLAND_CASE_TYPE;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.YES;
+import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_SOLICITOR;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CREATOR;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT;
@@ -521,6 +523,61 @@ public class ManageCaseRoleService {
             log.error("Error from CCD - {}", exception.getMessage());
             throw exception;
         }
+    }
+
+    /**
+     * Assigns the {@code [CLAIMANTNONLEGALREPRESENTATIVE]} case role to the submitting user when a case is submitted
+     * by a claimant who has answered "Yes" to being represented.
+     *
+     * <p>The role is added for the authenticated caller (resolved from their IDAM token) and the {@code [CREATOR]}
+     * is then removed, so access is governed by the non-legal
+     * representative role. Modelled on {@code Et1ReppedService.assignCaseAccess}, but without an organisation (a
+     * non-legal representative has no MyHMCTS organisation).</p>
+     *
+     * <p>Assignment failures are logged and swallowed rather than rethrown: the case has already been submitted by
+     * the time this runs, so a role-assignment problem must not turn a successful submission into an error.</p>
+     *
+     * @param authorisation the authorisation token of the submitting user
+     * @param caseDetails   the submitted case details
+     */
+    public void assignClaimantNonLegalRepresentativeRole(String authorisation, CaseDetails caseDetails) {
+        if (ObjectUtils.isEmpty(caseDetails) || caseDetails.getId() == null) {
+            return;
+        }
+        CaseData caseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(caseDetails.getData());
+        if (caseData == null || !YES.equals(caseData.getClaimantRepresentedQuestion())) {
+            return;
+        }
+
+        String caseId = caseDetails.getId().toString();
+        String userId = idamClient.getUserInfo(authorisation).getUid();
+
+        try {
+            restCallToModifyUserCaseRoles(
+                buildCaseUserRolesRequest(caseId, userId, CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE),
+                HttpMethod.POST);
+            log.info("Successfully assigned {} role on case {}",
+                     CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE, caseId);
+
+            restCallToModifyUserCaseRoles(
+                buildCaseUserRolesRequest(caseId, userId, CASE_USER_ROLE_CREATOR),
+                HttpMethod.DELETE);
+            log.info("Successfully removed {} role on case {}", CASE_USER_ROLE_CREATOR, caseId);
+        } catch (IOException | RestClientResponseException exception) {
+            log.error("Failed to modify roles on case {}: {}", caseId, exception.getMessage());
+        }
+    }
+
+    private static CaseAssignmentUserRolesRequest buildCaseUserRolesRequest(String caseId, String userId,
+                                                                            String caseRole) {
+        return CaseAssignmentUserRolesRequest.builder()
+            .caseAssignmentUserRoles(List.of(
+                CaseAssignmentUserRole.builder()
+                    .caseDataId(caseId)
+                    .userId(userId)
+                    .caseRole(caseRole)
+                    .build()))
+            .build();
     }
 
     private List<CaseDetails> updateAllRespondentsIdamIdAndDefaultLinkStatuses(

@@ -97,7 +97,7 @@ et-sya:
   enabled: true
   nodejs:
     imagePullPolicy: Always
-    image: hmctsprod.azurecr.io/et/sya:latest
+    image: hmctsprod.azurecr.io/et/sya:pr-2360
     releaseNameOverride: ${SERVICE_NAME}-et-sya
     ingressHost: et-sya-${SERVICE_FQDN}
     devcpuRequests: 10m

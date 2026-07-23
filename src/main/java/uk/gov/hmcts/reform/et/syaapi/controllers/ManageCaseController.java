@@ -110,6 +110,7 @@ public class ManageCaseController {
         log.info("Received initiate-case request");
 
         var caseDetails = caseService.createCase(authorization, caseRequest);
+        manageCaseRoleService.assignClaimantNonLegalRepresentativeRole(authorization, caseDetails);
         return ok(caseDetails);
     }
 

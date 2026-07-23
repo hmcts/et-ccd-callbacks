@@ -267,6 +267,30 @@ tasks.register('functional', Test) {
     maxHeapSize = '1G'
 }
 
+def isJenkinsPullRequestBuild = providers.environmentVariable('CHANGE_ID').isPresent()
+
+if (isJenkinsPullRequestBuild) {
+    def etSharedCompiledOutput = files(
+        project(':et-shared').layout.buildDirectory.dir('classes/java/main'),
+        project(':et-shared').layout.buildDirectory.dir('resources/main')
+    )
+
+    // Jenkins PR previews run these tasks after static checks have already compiled the relevant source sets.
+    // Keep --rerun-tasks from compiling the same classes again during post-deploy verification.
+    tasks.named('smoke', Test) {
+        setDependsOn([tasks.named('codeceptSmoke')])
+        testClassesDirs = files(sourceSets.functional.output.classesDirs.files)
+        classpath = files(sourceSets.functional.runtimeClasspath.files, etSharedCompiledOutput)
+        include '**/HealthCheckTest.class'
+    }
+
+    tasks.named('functional', Test) {
+        setDependsOn([])
+        testClassesDirs = files(sourceSets.apiTest.output.classesDirs.files)
+        classpath = files(sourceSets.apiTest.runtimeClasspath.files, etSharedCompiledOutput)
+        include '**/*Test.class'
+    }
+}
 def puppeteerCacheDir = layout.buildDirectory.dir('puppeteer-cache').get().asFile.absolutePath
 
 tasks.register('yarnInstall', Exec) {
@@ -294,7 +318,13 @@ tasks.register('yarnAudit', Exec) {
 
 tasks.register('codeceptSmoke', Exec) {
     dependsOn ':yarnInstall'
-    commandLine 'yarn', 'test:smoke'
+    def junitDir = file("$buildDir/test-results/codeceptSmoke")
+    doFirst {
+        junitDir.mkdirs()
+    }
+    environment 'PLAYWRIGHT_JUNIT_OUTPUT_DIR', junitDir.absolutePath
+    environment 'PLAYWRIGHT_JUNIT_OUTPUT_NAME', 'playwright-junit.xml'
+    commandLine 'yarn', 'test:smoke', '--', '--reporter=html,list,junit'
 }
 
 tasks.register('codeceptFunctional', Exec) {

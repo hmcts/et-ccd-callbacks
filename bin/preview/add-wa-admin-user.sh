@@ -17,6 +17,10 @@ SUSPENDED=${8:-false}
 UP_IDAM_STATUS=${9:-"PENDING"}
 REGION=${10:-"National"}
 SERVICE_CODE=${11:-"BHA1"}
+CURL_CONNECT_TIMEOUT_SECONDS=30
+CURL_MAX_TIME_SECONDS=120
+CURL_RETRY_COUNT=3
+CURL_RETRY_DELAY_SECONDS=5
 
 # Get the directory of this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -31,7 +35,18 @@ echo "Retrieving S2S service token for xui_webapp"
 SERVICE_TOKEN=$(get_service_token "xui_webapp")
 
 echo "Creating user ${FIRST_NAME} ${LAST_NAME} with email ${EMAIL_ID}"
-response=$(curl -s -w "\n%{http_code}" -X POST "${REF_DATA_URL}/refdata/case-worker/profile" \
+echo "Using HTTP/1.1 with ${CURL_RETRY_COUNT} retries, ${CURL_CONNECT_TIMEOUT_SECONDS}s connect timeout, ${CURL_MAX_TIME_SECONDS}s max time"
+response_body_file=$(mktemp)
+if http_code=$(curl --silent --show-error --location \
+  --http1.1 \
+  --retry "${CURL_RETRY_COUNT}" \
+  --retry-delay "${CURL_RETRY_DELAY_SECONDS}" \
+  --retry-all-errors \
+  --connect-timeout "${CURL_CONNECT_TIMEOUT_SECONDS}" \
+  --max-time "${CURL_MAX_TIME_SECONDS}" \
+  --output "${response_body_file}" \
+  --write-out "%{http_code}" \
+  -X POST "${REF_DATA_URL}/refdata/case-worker/profile" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${USER_TOKEN}" \
   -H "ServiceAuthorization: Bearer ${SERVICE_TOKEN}" \
@@ -67,11 +82,23 @@ response=$(curl -s -w "\n%{http_code}" -X POST "${REF_DATA_URL}/refdata/case-wor
       "skills": [],
       "region": "'"${REGION}"'"
     }'
-)
-echo "Response received from server. : $response"
-http_code=$(echo "$response" | tail -n1)
-body=$(echo "$response" | head -n-1)
-if [ "$http_code" -ge 400 ]; then
+); then
+  :
+else
+  curl_exit_code="$?"
+  echo "POST failed due to curl error ${curl_exit_code}"
+  if [[ -s "${response_body_file}" ]]; then
+    echo "Response: $(cat "${response_body_file}")"
+  fi
+  rm -f "${response_body_file}"
+  exit "${curl_exit_code}"
+fi
+
+body=$(cat "${response_body_file}")
+rm -f "${response_body_file}"
+echo "Response received from server. : ${body}"
+echo "${http_code}"
+if [[ "${http_code}" =~ ^[0-9]+$ ]] && [ "$http_code" -ge 400 ]; then
   echo "POST failed with status $http_code: $body"
 fi
 exit 0

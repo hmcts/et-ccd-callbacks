@@ -410,6 +410,8 @@ ccd:
   ccd-user-profile-importer:
     users:
       - et.api.1@hmcts.net|EMPLOYMENT|ET_Admin|Open
+    waitHosts: ${SERVICE_NAME}-ccd-user-profile-api:80
+    waitHostsTimeout: 600
 
   elasticsearch:
     enabled: false

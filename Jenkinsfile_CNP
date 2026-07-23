@@ -46,6 +46,8 @@ def secrets = [
     secret('et-resp-password','ET_REPSONDENT_PASSWORD'),
     secret('et-wa-legal-ops-user-name', 'ET_LEGAL_OPS_USER_NAME'),
     secret('et-wa-legal-ops-password', 'ET_LEGAL_OPS_PASSWORD'),
+    secret('et-lagl-ops-username', 'ET_LEGAL_OPS2_USER_NAME'),
+    secret('et-lega-op-password', 'ET_LEGAL_OPS2_PASSWORD'),
     secret('et-judge-user-name-wa','ET_JUDGE_USER_NAME_WORKALLOCATION'),
     secret('et-judge-user-password-wa','ET_JUDGE_USER_PASSWORD_WORKALLOCATION'),
     secret('et-lagl-ops-username', 'ET_LEGAL_OPS2_USER_NAME'),
@@ -183,14 +185,16 @@ withPipeline(type, product, component) {
     env.ET_COS_PREVIEW_DB_NAME = "pr-${CHANGE_ID}-et_cos"
     env.ET_COS_PREVIEW_DB_USER_NAME = "hmcts"
     env.ET_COS_PREVIEW_DB_CONN_OPTIONS = "sslmode=require"
+    env.CCD_DEFINITION_STORE_PREVIEW_DB_NAME = "pr-${CHANGE_ID}-definition-store"
 
     before('smoketest:preview') {
       env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
       env.CAMUNDA_BASE_URL = "https://camunda-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
       env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
       sh """
+        ./bin/preview/wait-for-http-endpoint.sh "${env.CAMUNDA_BASE_URL}/engine-rest/version" "Camunda"
         ./bin/wa/pull-latest-dmn-files.sh ${dmnBranch}
-       ./bin/wa/pull-latest-camunda-wa-files.sh ${bpmnBranch}
+        ./bin/wa/pull-latest-camunda-wa-files.sh ${bpmnBranch}
       """
 
       sh """
@@ -230,11 +234,13 @@ withPipeline(type, product, component) {
               reportName : "ET Smoke test report"
       ]
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/test-results/**'
     }
 
     afterAlways('functionalTest:preview') {
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/test-results/**'
 
       stage('Functional UI tests chromium') {
         try {
@@ -292,11 +298,13 @@ withPipeline(type, product, component) {
             reportName : "ET Smoke test report"
     ]
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/test-results/**'
   }
 
   afterAlways('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/test-results/**'
     stage('Functional UI tests chromium') {
       try {
         yarnBuilder.yarn('test:functional-chromium')

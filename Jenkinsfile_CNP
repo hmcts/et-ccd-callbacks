@@ -192,7 +192,7 @@ withPipeline(type, product, component) {
       env.CAMUNDA_BASE_URL = "https://camunda-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
       env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
       sh """
-        ./bin/wa/wait-for-camunda.sh
+        ./bin/preview/wait-for-http-endpoint.sh "${env.CAMUNDA_BASE_URL}/engine-rest/version" "Camunda"
         ./bin/wa/pull-latest-dmn-files.sh ${dmnBranch}
         ./bin/wa/pull-latest-camunda-wa-files.sh ${bpmnBranch}
       """

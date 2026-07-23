@@ -3,7 +3,7 @@ version: '3.5'
 
 services:
   dm-store:
-    image: "${DM_STORE_USE_LOCAL-hmctspublic.azurecr.io/}dm/store:${DM_STORE_TAG:-latest}"
+    image: "hmctsprod.azurecr.io/dm/store:latest"
     healthcheck:
       disable: true
     environment:
@@ -41,10 +41,9 @@ services:
 
   azure-storage-emulator-azurite:
     image: mcr.microsoft.com/azure-storage/azurite
+    command: azurite-blob --blobHost 0.0.0.0 --loose --skipApiVersionCheck
     ports:
       - "10000:10000"
-    environment:
-      executable: "blob"
     volumes:
       - ccd-docker-azure-blob-data:/opt/azurite/folder
 

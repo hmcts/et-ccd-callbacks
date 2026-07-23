@@ -39,6 +39,10 @@ The latest version of the RSE CFT lib can be found [here](https://github.com/hmc
 - **Java 21**: Required for Spring Boot 3 compatibility
 - **Docker**: For RSE IdAM Simulator and other containerized services
 - **Git**: For accessing CCD definition repositories
+- **Azure Container Registry (ACR) Access**: Authenticate with HMCTS ACR repositories before using CFTLib:
+  ```bash
+  az acr login --name hmctsprivate && az acr login --name hmctsprod && az acr login --name hmctspublic
+  ```
 
 ### Environment Variables
 | Variable                       | Purpose                                                                                |
@@ -49,6 +53,8 @@ The latest version of the RSE CFT lib can be found [here](https://github.com/hmc
 | CALLBACKS_PROJECT_PATH         | Set to the path of your local callbacks project. Used to import configuration files.   |
 | CFTLIB_IMPORT_CCD_DEFS_ON_BOOT | Optional<br/>Set to `false` to prevent CCD definitions from being imported at startup  |
 | ET_LAUNCH_DARKLY_SDK_KEY       | ET Launch Darkly SDK Key - this can be retrieved from the et-aat Key Vault             |
+| ET_WORK_ALLOCATION             | Optional<br/>Set to `true` to enable Work Allocation containers, services, and stubs (see [Work Allocation CFTLib](work-allocation-cftlib.md)) |
+| WA_LAUNCH_DARKLY_SDK_KEY       | Optional<br/>Work Allocation LaunchDarkly SDK key for `wa-workflow-api` and `wa-case-event-handler` (defaults to `sdk-key`) |
 
 These can be set with the ./bin/set_env.sh script. Edit the script to add your own path to config-repos and any missing variables.
 Run the script with source, so that the environment variables are set in your current shell that you invoke the gradle command from.
@@ -56,11 +62,12 @@ Run the script with source, so that the environment variables are set in your cu
 source ./bin/set_env.sh
 ```
 
-### RSE IdAM Simulator
+### Pulling Docker Images
 
-Make sure you have the latest RSE IdAM Simulator image
+Before starting CFTLib, it is recommended to run the image pull script to pre-fetch all required Docker images (IdAM Simulator, Postgres, Elasticsearch, XUI, DM Store, Wiremock, and Work Allocation containers):
+
 ```bash
-docker pull hmctspublic.azurecr.io/hmcts/rse/rse-idam-simulator:latest
+./bin/pull-cftlib-images.sh
 ```
 
 ## Run
@@ -145,71 +152,16 @@ Execute the following command to remove all docker resources created by the CFTl
 
 ## Work Allocation
 
-Rudimentary support has been added for WA but related pods are not spun up by default (to save system resources when not needed).
+Work Allocation support is integrated into CFTLib and can be enabled on demand. For full documentation on architecture, setup steps, environment variables, and testing, see [Work Allocation with CFTLib](work-allocation-cftlib.md).
 
-Add 'wa-docker-compose.yml' to the `CFTLIB_EXTRA_COMPOSE_FILES` environment variable. This can be done directly in the build.gradle file or wherever you prefer to set env vars (ie, ~/.bashrc)
-
-Example in .bashrc
+To start CFTLib with Work Allocation enabled:
 
 ```bash
-export CFTLIB_EXTRA_COMPOSE_FILES="wa-docker-compose.yml"
+./gradlew bootWithCcdAndWa
 ```
 
-in `build.gradle`
-
-```gradle
-bootWithCCD {
-    ...
-    environment 'CFTLIB_EXTRA_COMPOSE_FILES', 'wa-docker-compose.yml'
-}
-```
-
-**Note: CFTLIB_EXTRA_COMPOSE_FILES takes a comma seperated string of docker compose yaml files that get executed at boot**
-
-Other functionality ported over from ecm-ccd-docker is not automated and requires extra steps. After CFTLib boot is finished:
+Or using the environment variable:
 
 ```bash
-./bin/add-role-assignment.sh
-```
-
-then in the `et-wa-task-configuration` repo
-
-```bash
-./scripts/camunda-deployment.sh
-```
-
-The following env vars also need to be in place for WA related pods (WIP):
-
-**NOTE: Some values have been redacted - these can be looked up on azure or asking a teammate**
-
-```bash
-export WA_CAMUNDA_NEXUS_USER="<redacted>"
-export WA_CAMUNDA_NEXUS_PASSWORD="<redacted>"
-export WA_SYSTEM_USERNAME="wa-system-user@fake.hmcts.net"
-export WA_SYSTEM_PASSWORD="Password"
-export WA_CASEOFFICER_USERNAME="et.caseadmin@hmcts.net"
-export WA_CASEOFFICER_PASSWORD="Password"
-
-export CAMUNDA_URL="http://localhost:8999/engine-rest"
-
-export AZURE_SERVICE_BUS_CONNECTION_STRING="<redacted>"
-export AZURE_SERVICE_BUS_TOPIC_NAME="et-case-event-handler-topic-sessions-ft"
-export AZURE_SERVICE_BUS_SUBSCRIPTION_NAME="<redacted>"
-export AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME="<redacted>"
-export AZURE_SERVICE_BUS_MESSAGE_AUTHOR="<redacted>"
-
-export ET_COS_DB_PASSWORD="postgres"
-export DB_URL="localhost:6432"
-
-export IDAM_SIMULATOR_BASE_URL="http://host.docker.internal:5062"
-export DB_EXTERNAL_PORT=6432
-
-export S2S_URL="http://host.docker.internal:8489"
-export CCD_URL="http://host.docker.internal:4452"
-export ROLE_ASSIGNMENT_URL="http://host.docker.internal:4096"
-
-export CFTLIB_HOST="http://host.docker.internal" # Use your WSL IP if host.docker.internal doesn't work
-export CAMUNDA_NEXUS_PASSWORD="<redacted>"
-export CFTLIB_EXTRA_COMPOSE_FILES="wa-docker-compose.yml"
-export SERVICE_AUTH_PROVIDER_API_BASE_URL="http://localhost:8489"
+ET_WORK_ALLOCATION=true ./gradlew bootWithCCD
 ```

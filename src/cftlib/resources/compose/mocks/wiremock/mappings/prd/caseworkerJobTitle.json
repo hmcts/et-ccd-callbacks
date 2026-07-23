@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/refdata/case-worker/job-title"
+  },
+  "response": {
+    "status": 200,
+    "body": "{\"job_title\": []}",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

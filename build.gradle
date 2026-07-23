@@ -667,15 +667,23 @@ wrapper {
 
 assemble.dependsOn(dumpCCDDefinitions)
 
+// True when ET_WORK_ALLOCATION=true is set explicitly, or when the bootWithCcdAndWa task is invoked.
+def waEnabled = System.getenv('ET_WORK_ALLOCATION') == 'true'
+        || gradle.startParameter.taskNames.any { it == 'bootWithCcdAndWa' }
+
 bootWithCCD {
     // Simulates idam and s2s locally.
     // See rse-cft-lib/LibRunnerTask
     authMode = uk.gov.hmcts.rse.AuthMode.Local
 
-    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,ethos,camunda,role_assignment,wa_workflow_api,cft_task_db,wa_case_event_messages_db,ccd_data,emstitch'
+    if (waEnabled) {
+        jvmArgs '-Dspring.devtools.restart.enabled=false'
+    }
+
+    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,ethos,camunda,role_assignment,wa_workflow_api,cft_task_db,wa_case_event_messages_db,ccd_data,emstitch,cft_task_db_replica'
     environment 'CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES', 'aac_manage_case_assignment,et_cos,et_sya_api,et_msg_handler'
     // ccd-data-store-api
-    environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ethos_repl_service,ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,ccd_case_document_am_api,am_role_assignment_service,ethos_repl_docmosis_service,ecm_consumer,et_cos,et_msg_handler,et_sya_api,wa_workflow_api,wa_task_management_api,wa_task_monitor,wa_case_event_handler,em_ccd_orchestrator,em_stitching_api'
+    environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ethos_repl_service,ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,ccd_case_document_am_api,am_role_assignment_service,ethos_repl_docmosis_service,ecm_consumer,et_cos,et_msg_handler,et_sya_api,wa_workflow_api,wa_task_management_api,wa_task_monitor,wa_case_event_handler,em_ccd_orchestrator,em_stitching_api,wa_task_configuration_api'
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
 
     // ccd-definition-store-api
@@ -696,9 +704,34 @@ bootWithCCD {
     environment 'APPINSIGHTS_CONNECTION_STRING', System.getenv('APPINSIGHTS_CONNECTION_STRING')
         ?: 'InstrumentationKey=00000000-0000-0000-0000-000000000000;IngestionEndpoint=http://localhost'
     environment 'SERVICES_PRD_COMMONDATA_API', 'http://wiremock:8080'
-    // Allows latest XUI image without WA by not specifying EMPLOYMENT. Add EMPLOYMENT to enable WA.
-    environment 'WA_SUPPORTED_JURISDICTIONS', 'IA,CIVIL,PRIVATELAW,PUBLICLAW'
 
+    // Work Allocation
+    environment 'WA_SUPPORTED_JURISDICTIONS', waEnabled
+            ? 'IA,CIVIL,PRIVATELAW,PUBLICLAW,EMPLOYMENT'
+            : 'IA,CIVIL,PRIVATELAW,PUBLICLAW'
+    // Redirect caseworker, location, and judicial ref data to Wiremock — defaults are real AAT services.
+    environment 'SERVICES_CASE_CASEWORKER_API', 'http://wiremock:8080'
+    environment 'SERVICES_CASE_JUDICIAL_API', 'http://wiremock:8080'
+    environment 'SERVICES_PRD_JUDICIAL_API', 'http://wiremock:8080'
+    environment 'SERVICES_LOCATION_REF_API_URL', 'http://wiremock:8080'
+    environment 'SERVICES_LOCATION_API', 'http://wiremock:8080'
+    environment 'SERVICES_PRD_LOCATION_API', 'http://wiremock:8080'
+    environment 'SERVICES_WORK_ALLOCATION_TASK_API', 'http://host.docker.internal:8087'
+    environment 'HEALTH_WORK_ALLOCATION_TASK_API', 'http://host.docker.internal:8087/health'
+    environment 'OPEN_ID_IDAM_URL', 'http://localhost:5062'
+    environment 'IDAM_URL', 'http://localhost:5062'
+    // WA system user for the CFTLib-embedded wa-task-management-api.
+    // Without this it defaults to 'some_user@hmcts.net' which has no role assignments and CCD returns 404.
+    environment 'WA_SYSTEM_USERNAME', System.getenv('WA_SYSTEM_USERNAME') ?: 'wa-system-user@fake.hmcts.net'
+    environment 'WA_SYSTEM_PASSWORD', System.getenv('WA_SYSTEM_PASSWORD') ?: 'password'
+    // Camunda URL for the CFTLib-embedded wa-task-management-api.
+    // Must include /engine-rest suffix — without it Camunda returns 404 on all decision definition calls.
+    environment 'CAMUNDA_URL', 'http://localhost:9090/engine-rest'
+    environment 'SERVICE_AUTH_PROVIDER_API_BASE_URL', 'http://localhost:8489'
+    // IDAM allowed issuers for the CFTLib-embedded wa-task-management-api.
+    environment 'IDAM_SECURITY_ALLOWED_ISSUER_0', 'http://localhost:5062/o'
+    environment 'IDAM_SECURITY_ALLOWED_ISSUER_1', 'http://localhost:5062/o'
+    environment 'IDAM_SECURITY_ALLOWED_ISSUER_2', 'http://localhost:5062/o'
     // xui-manage-org
     environment 'RD_PROFESSIONAL_API_URL', 'http://localhost:8765'
     environment 'RD_PROFESSIONAL_API_SERVICE', 'http://localhost:8765'
@@ -712,7 +745,10 @@ bootWithCCD {
     environment 'CFTLIB_IMPORT_CCD_DEFS_ON_BOOT', System.getenv('CFTLIB_IMPORT_CCD_DEFS_ON_BOOT') ?: 'true'
     // et-ccd-callbacks
     //environment 'SERVICEBUS_FAKE', 'true'*
-    environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
+    // Load WA compose services only when ET_WORK_ALLOCATION=true is set, or when running bootWithCcdAndWa.
+    // This starts camunda, wa-workflow-api, wa-case-event-handler, and wa-task-monitor.
+    environment 'CFTLIB_EXTRA_COMPOSE_FILES', waEnabled ? 'wa-docker-compose.yml' : ''
+    environment 'ET_WORK_ALLOCATION', waEnabled ? 'true' : 'false'
     environment 'SPRING_APPLICATION_JSON', groovy.json.JsonOutput.toJson([
         ccd: [
             decentralised: [
@@ -729,6 +765,12 @@ bootWithCCD {
         ]
     ])
 
+}
+
+tasks.register('bootWithCcdAndWa') {
+    group = 'Application'
+    description = 'Starts bootWithCCD with Work Allocation enabled (equivalent to ET_WORK_ALLOCATION=true ./gradlew bootWithCCD)'
+    dependsOn 'bootWithCCD'
 }
 
 tasks.named('dumpCCDDefinitions') {

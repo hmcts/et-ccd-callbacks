@@ -49,7 +49,9 @@ def secrets = [
     secret('et-lagl-ops-username', 'ET_LEGAL_OPS2_USER_NAME'),
     secret('et-lega-op-password', 'ET_LEGAL_OPS2_PASSWORD'),
     secret('et-judge-user-name-wa','ET_JUDGE_USER_NAME_WORKALLOCATION'),
-    secret('et-judge-user-password-wa','ET_JUDGE_USER_PASSWORD_WORKALLOCATION')
+    secret('et-judge-user-password-wa','ET_JUDGE_USER_PASSWORD_WORKALLOCATION'),
+    secret('et-lagl-ops-username', 'ET_LEGAL_OPS2_USER_NAME'),
+    secret('et-lega-op-password', 'ET_LEGAL_OPS2_PASSWORD')
   ],
   'rpx-${env}': [
     // xuiwebapp IDAM client secret - required for obtaining user tokens with

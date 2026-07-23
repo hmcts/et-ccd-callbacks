@@ -73,7 +73,7 @@ class AmendRepresentativeContactServiceTest {
         // when my hmcts address is selected and role is claimant solicitor should set representative my hmcts contact
         // address and phone number to claimant representative
         caseData.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS);
-        when(nocRepresentativeService.getValidatedRepresentativeRolesByUserToken(VALID_USER_TOKEN, caseData,
+        when(nocRepresentativeService.getValidatedRepresentativeRolesByUserToken(VALID_USER_TOKEN,
                 SUBMISSION_REFERENCE)).thenReturn(List.of(ROLE_CLAIMANT_SOLICITOR));
         OrganisationAddress organisationAddress = OrganisationAddress.builder()
                 .addressLine1(ADDRESS_LINE_1).addressLine2(ADDRESS_LINE_2).addressLine3(ADDRESS_LINE_3)
@@ -111,7 +111,7 @@ class AmendRepresentativeContactServiceTest {
         respondent.setValue(respondentValue);
         respondent.setId(RESPONDENT_ID);
         caseData.setRespondentCollection(List.of(respondent));
-        when(nocRepresentativeService.getValidatedRepresentativeRolesByUserToken(VALID_USER_TOKEN, caseData,
+        when(nocRepresentativeService.getValidatedRepresentativeRolesByUserToken(VALID_USER_TOKEN,
                 SUBMISSION_REFERENCE)).thenReturn(List.of(ROLE_SOLICITOR_A));
         caseData.setRepresentativeContactChangeOption(StringUtils.EMPTY);
         caseData.setEt3ResponsePhone(REPRESENTATIVE_PHONE_NUMBER);
@@ -131,7 +131,7 @@ class AmendRepresentativeContactServiceTest {
         RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder().representativeAddress(address)
                 .representativePhoneNumber(REPRESENTATIVE_PHONE_NUMBER).build();
         caseData.setRepresentativeClaimantType(claimantRepresentative);
-        when(nocRepresentativeService.getValidatedRepresentativeRolesByUserToken(VALID_USER_TOKEN, caseData,
+        when(nocRepresentativeService.getValidatedRepresentativeRolesByUserToken(VALID_USER_TOKEN,
                 SUBMISSION_REFERENCE)).thenReturn(List.of(ROLE_CLAIMANT_SOLICITOR));
         amendRepresentativeContactService
                 .setEt3ResponseContactAddress(VALID_USER_TOKEN, caseData, SUBMISSION_REFERENCE);
@@ -148,7 +148,7 @@ class AmendRepresentativeContactServiceTest {
         RespondentSumTypeItem respondent = new RespondentSumTypeItem();
         respondent.setValue(respondentValue);
         respondent.setId(RESPONDENT_ID);
-        when(nocRepresentativeService.getValidatedRepresentativeRolesByUserToken(VALID_USER_TOKEN, caseData,
+        when(nocRepresentativeService.getValidatedRepresentativeRolesByUserToken(VALID_USER_TOKEN,
                 SUBMISSION_REFERENCE)).thenReturn(List.of(ROLE_SOLICITOR_A));
         amendRepresentativeContactService.setEt3ResponseContactAddress(VALID_USER_TOKEN, caseData,
                 SUBMISSION_REFERENCE);

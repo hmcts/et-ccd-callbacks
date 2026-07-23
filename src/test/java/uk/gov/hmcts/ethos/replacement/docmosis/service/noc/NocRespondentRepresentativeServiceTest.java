@@ -162,7 +162,8 @@ class NocRespondentRepresentativeServiceTest {
     private static final String EXPECTED_ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES =
             "Failed to remove organisation policies for case 1234567890123456. Exception: Something went wrong";
     private static final String EXPECTED_ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES =
-            "Representative Representative Name organisation does not match with selected organisation ORG1";
+            "Representative Name does not have a valid account with the organisation Organisation One. "
+                + "Please check the selected organisation";
 
     private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
             "We have been unable to assign 'Legal One' access to this case via MyHMCTS. They must check with their "
@@ -1628,6 +1629,7 @@ class NocRespondentRepresentativeServiceTest {
         // when organisation response and representative organisation not matches should return error
         representative.getValue().setNameOfRepresentative(REPRESENTATIVE_NAME);
         representative.getValue().setRespondentOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_ONE)
+                .organisationName("Organisation One")
                 .build());
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         AccountIdByEmailResponse accountIdByEmailResponse = new AccountIdByEmailResponse();
@@ -1635,7 +1637,9 @@ class NocRespondentRepresentativeServiceTest {
         when(nocService.findUserByEmail(ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL_1_CAPITALISED, CASE_ID_1))
                 .thenReturn(accountIdByEmailResponse);
         OrganisationsResponse organisationsResponse = OrganisationsResponse.builder()
-                .organisationIdentifier(ORGANISATION_ID_TWO).build();
+                .organisationIdentifier(ORGANISATION_ID_TWO)
+                .name("Organisation Two")
+            .build();
         when(nocService.findOrganisationByUserId(ADMIN_USER_TOKEN, USER_ID, CASE_ID_1))
                 .thenReturn(organisationsResponse);
         assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))

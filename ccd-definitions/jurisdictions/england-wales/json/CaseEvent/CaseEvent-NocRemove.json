@@ -1,0 +1,26 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRemoveRepClaimant",
+    "Name": "Remove representation",
+    "Description": "Remove representation",
+    "PreConditionState(s)": "Submitted;Vetted;Accepted;Rejected;",
+    "PostConditionState": "*",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/nocRemoveRepresentation/claimant/aboutToSubmit",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRemoveRepRespondent",
+    "Name": "Remove representation",
+    "Description": "Remove representation",
+    "PreConditionState(s)": "Submitted;Vetted;Accepted;Rejected;",
+    "PostConditionState": "*",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/nocRemoveRepresentation/respondent/aboutToSubmit",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N"
+  }
+]

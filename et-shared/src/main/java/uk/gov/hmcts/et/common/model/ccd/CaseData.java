@@ -1927,6 +1927,8 @@ public class CaseData extends Et1CaseData {
     private List<GenericTypeItem<CaseNote>> caseNotesCollection;
     @JsonProperty("addCaseNote")
     private CaseNote addCaseNote;
+    @JsonProperty("nocRemoveRepOption")
+    private String nocRemoveRepOption;
     @JsonProperty("editOrDeleteCaseNote")
     private String editOrDeleteCaseNote;
     @JsonProperty("caseNoteList")

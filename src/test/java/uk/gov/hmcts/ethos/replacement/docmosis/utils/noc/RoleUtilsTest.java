@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils.noc;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
@@ -24,6 +25,15 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 final class RoleUtilsTest {
 
     private static final String RESPONDENT_ID_1 = "Respondent Id One";
+    private static final String RESPONDENT_ID_2 = "Respondent Id Two";
+    private static final String RESPONDENT_ID_3 = "Respondent Id Three";
+    private static final String RESPONDENT_ID_4 = "Respondent Id Four";
+    private static final String RESPONDENT_ID_5 = "Respondent Id Five";
+    private static final String RESPONDENT_ID_6 = "Respondent Id Six";
+    private static final String RESPONDENT_ID_7 = "Respondent Id Seven";
+    private static final String RESPONDENT_ID_8 = "Respondent Id Eight";
+    private static final String RESPONDENT_ID_9 = "Respondent Id Nine";
+    private static final String RESPONDENT_ID_10 = "Respondent Id Ten";
     private static final String RESPONDENT_NAME_ONE = "Respondent Name One";
     private static final String RESPONDENT_NAME_TWO = "Respondent Name Two";
     private static final String RESPONDENT_NAME_THREE = "Respondent Name Three";
@@ -75,6 +85,41 @@ final class RoleUtilsTest {
     private static final int INTEGER_NINE = 9;
     private static final int INTEGER_TEN = 10;
     private static final int INTEGER_ELEVEN = 11;
+
+    private static final RespondentSumTypeItem RESPONDENT_1 = new RespondentSumTypeItem();
+    private static final RespondentSumTypeItem RESPONDENT_2 = new RespondentSumTypeItem();
+    private static final RespondentSumTypeItem RESPONDENT_3 = new RespondentSumTypeItem();
+    private static final RespondentSumTypeItem RESPONDENT_4 = new RespondentSumTypeItem();
+    private static final RespondentSumTypeItem RESPONDENT_5 = new RespondentSumTypeItem();
+    private static final RespondentSumTypeItem RESPONDENT_6 = new RespondentSumTypeItem();
+    private static final RespondentSumTypeItem RESPONDENT_7 = new RespondentSumTypeItem();
+    private static final RespondentSumTypeItem RESPONDENT_8 = new RespondentSumTypeItem();
+    private static final RespondentSumTypeItem RESPONDENT_9 = new RespondentSumTypeItem();
+    private static final RespondentSumTypeItem RESPONDENT_10 = new RespondentSumTypeItem();
+
+    @BeforeAll
+    static void setUp() {
+        RESPONDENT_1.setId(RESPONDENT_ID_1);
+        RESPONDENT_1.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_ONE).build());
+        RESPONDENT_2.setId(RESPONDENT_ID_2);
+        RESPONDENT_2.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_TWO).build());
+        RESPONDENT_3.setId(RESPONDENT_ID_3);
+        RESPONDENT_3.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_THREE).build());
+        RESPONDENT_4.setId(RESPONDENT_ID_4);
+        RESPONDENT_4.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_FOUR).build());
+        RESPONDENT_5.setId(RESPONDENT_ID_5);
+        RESPONDENT_5.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_FIVE).build());
+        RESPONDENT_6.setId(RESPONDENT_ID_6);
+        RESPONDENT_6.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_SIX).build());
+        RESPONDENT_7.setId(RESPONDENT_ID_7);
+        RESPONDENT_7.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_SEVEN).build());
+        RESPONDENT_8.setId(RESPONDENT_ID_8);
+        RESPONDENT_8.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_EIGHT).build());
+        RESPONDENT_9.setId(RESPONDENT_ID_9);
+        RESPONDENT_9.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_NINE).build());
+        RESPONDENT_10.setId(RESPONDENT_ID_10);
+        RESPONDENT_10.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_TEN).build());
+    }
 
     @Test
     void theIsRespondentRepresentativeRole() {
@@ -323,6 +368,35 @@ final class RoleUtilsTest {
         assertThat(RoleUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_H)).isEqualTo(RESPONDENT_NAME_EIGHT);
         assertThat(RoleUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_I)).isEqualTo(RESPONDENT_NAME_NINE);
         assertThat(RoleUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_J)).isEqualTo(RESPONDENT_NAME_TEN);
+    }
+
+    @Test
+    void theFindRespondentByRole() {
+        // when role is empty should return null
+        CaseData caseData = new CaseData();
+        assertThat(RoleUtils.findRespondentByRole(caseData, StringUtils.EMPTY)).isNull();
+        // when role is invalid should return null
+        assertThat(RoleUtils.findRespondentByRole(caseData, ROLE_SOLICITOR_K)).isNull();
+        // when case data is empty should return null
+        assertThat(RoleUtils.findRespondentByRole(null, ROLE_SOLICITOR_A)).isNull();
+        // when case data respondent collection is empty should return null
+        assertThat(RoleUtils.findRespondentByRole(caseData, ROLE_SOLICITOR_A)).isNull();
+        // when case data respondent collection does not have respondent at given role index should return null
+        caseData.setRespondentCollection(List.of(RESPONDENT_1));
+        assertThat(RoleUtils.findRespondentByRole(caseData, ROLE_SOLICITOR_B)).isNull();
+        // when role is valid should return respondent
+        caseData.setRespondentCollection(List.of(RESPONDENT_1, RESPONDENT_2, RESPONDENT_3, RESPONDENT_4, RESPONDENT_5,
+                RESPONDENT_6, RESPONDENT_7, RESPONDENT_8, RESPONDENT_9, RESPONDENT_10));
+        assertThat(RoleUtils.findRespondentByRole(caseData, ROLE_SOLICITOR_A)).isEqualTo(RESPONDENT_1);
+        assertThat(RoleUtils.findRespondentByRole(caseData, ROLE_SOLICITOR_B)).isEqualTo(RESPONDENT_2);
+        assertThat(RoleUtils.findRespondentByRole(caseData, ROLE_SOLICITOR_C)).isEqualTo(RESPONDENT_3);
+        assertThat(RoleUtils.findRespondentByRole(caseData, ROLE_SOLICITOR_D)).isEqualTo(RESPONDENT_4);
+        assertThat(RoleUtils.findRespondentByRole(caseData, ROLE_SOLICITOR_E)).isEqualTo(RESPONDENT_5);
+        assertThat(RoleUtils.findRespondentByRole(caseData, ROLE_SOLICITOR_F)).isEqualTo(RESPONDENT_6);
+        assertThat(RoleUtils.findRespondentByRole(caseData, ROLE_SOLICITOR_G)).isEqualTo(RESPONDENT_7);
+        assertThat(RoleUtils.findRespondentByRole(caseData, ROLE_SOLICITOR_H)).isEqualTo(RESPONDENT_8);
+        assertThat(RoleUtils.findRespondentByRole(caseData, ROLE_SOLICITOR_I)).isEqualTo(RESPONDENT_9);
+        assertThat(RoleUtils.findRespondentByRole(caseData, ROLE_SOLICITOR_J)).isEqualTo(RESPONDENT_10);
     }
 
     @Test

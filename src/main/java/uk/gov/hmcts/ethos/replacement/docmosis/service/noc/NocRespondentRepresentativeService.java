@@ -406,24 +406,29 @@ public class NocRespondentRepresentativeService {
     }
 
     /**
-     * Finds the case user assignments that should be revoked for the given representative.
+     * Finds the case user assignments that should be revoked for the supplied representative.
      *
-     * <p>The method looks up the representative's user identifier using their email address, then
-     * filters the provided case user assignments to find assignments belonging to that representative.
-     * If the case no longer contains a matching representative with the same respondent ID and email
-     * address, those existing assignments are returned for revocation.</p>
+     * <p>The method validates that the case ID, case user assignments and representative details
+     * are present. The representative must have either an IDAM ID or a representative email
+     * address that can be used to resolve the IDAM ID. If the required data is missing, or the
+     * representative IDAM ID cannot be resolved, an empty list is returned.</p>
      *
-     * <p>If the case details, representative details, case assignments, or representative email address
-     * are missing, an empty list is returned. An empty list is also returned if the representative user
-     * lookup fails.</p>
+     * <p>The method first finds the representative's existing assignments by IDAM ID. It then
+     * identifies assignments for revocation where the representative has an assignment for a
+     * case role that is also assigned to more than one user. These assignments are removed from
+     * the supplied {@code caseUserAssignments} list before any remaining assignments for the
+     * supplied {@code role} are also added to the revocation list.</p>
      *
-     * <p>If the case representative collection is empty, all existing assignments for the representative
-     * are returned, as there are no remaining representative records on the case.</p>
+     * <p><strong>Note:</strong> this method mutates the supplied {@code caseUserAssignments}
+     * list by removing assignments that have already been identified for revocation.</p>
      *
-     * @param caseUserAssignments the existing case user assignments for the case
+     * @param caseId the ID of the case, also used as the submission reference when resolving
+     *               the representative's IDAM ID
+     * @param caseUserAssignments the current case user assignments for the case
      * @param representative the representative whose assignments should be checked for revocation
-     * @return a list of case user assignments that should be revoked for the representative, or an empty
-     *         list if none are found or the required data is unavailable
+     * @param role the case role whose remaining assignments should also be revoked
+     * @return a list of {@link CaseUserAssignment} entries to revoke, or an empty list if the
+     *         required data is missing or the representative IDAM ID cannot be resolved
      */
     public List<CaseUserAssignment> findCaseAssignmentsToRevokeForRep(String caseId,
                                                                       List<CaseUserAssignment> caseUserAssignments,
@@ -433,21 +438,16 @@ public class NocRespondentRepresentativeService {
                 || CollectionUtils.isEmpty(caseUserAssignments)
                 || ObjectUtils.isEmpty(representative)
                 || ObjectUtils.isEmpty(representative.getValue())
-                || StringUtils.isEmpty(representative.getValue().getRepresentativeEmailAddress())) {
+                || (StringUtils.isBlank(representative.getValue().getRepresentativeEmailAddress())
+                && StringUtils.isBlank(representative.getValue().getIdamId()))) {
             return new ArrayList<>();
         }
-        AccountIdByEmailResponse accountIdByEmailResponse;
-        try {
-            accountIdByEmailResponse = nocService.findUserByEmail(
-                    adminUserService.getAdminUserToken(), representative.getValue().getRepresentativeEmailAddress(),
-                    caseId);
-        } catch (GenericServiceException e) {
-            log.warn(e.getMessage());
+        String idamId = resolveRepresentativeIdamId(representative, caseId);
+        if (StringUtils.isBlank(idamId)) {
             return new ArrayList<>();
         }
         List<CaseUserAssignment> representativeRemainingAssignments = RespondentRepresentativeUtils
-                .findCaseUserAssignmentsByRepresentativeId(caseUserAssignments,
-                        accountIdByEmailResponse.getUserIdentifier());
+                .findCaseUserAssignmentsByRepresentativeIdamId(caseUserAssignments, idamId);
         List<CaseUserAssignment> caseUserAssignmentsToRevoke = new ArrayList<>();
         // finds representative's other case assignments
         for (CaseUserAssignment caseUserAssignment : representativeRemainingAssignments) {
@@ -463,6 +463,46 @@ public class NocRespondentRepresentativeService {
             caseUserAssignmentsToRevoke.addAll(caseUserAssignmentsByRole);
         }
         return caseUserAssignmentsToRevoke;
+    }
+
+    /**
+     * Resolves the IDAM ID for the supplied representative.
+     *
+     * <p>The method first attempts to use the IDAM ID already held on the representative.
+     * If the IDAM ID is blank, it attempts to retrieve the user identifier by looking up
+     * the representative's email address through the NOC service.</p>
+     *
+     * <p>If the lookup fails with a {@link GenericServiceException}, the exception message
+     * is logged as a warning and the unresolved IDAM ID value is returned.</p>
+     *
+     * <p>Assumptions:</p>
+     * <ul>
+     *     <li>{@code representative} is not {@code null}.</li>
+     *     <li>{@code representative.getValue()} is not {@code null}.</li>
+     *     <li>The representative value contains an email address that can be used for lookup
+     *     when the IDAM ID is missing.</li>
+     *     <li>{@code submissionReference} identifies the submission context for the lookup.</li>
+     * </ul>
+     *
+     * @param representative the representative whose IDAM ID should be resolved
+     * @param submissionReference the submission reference used when looking up the user by email
+     * @return the existing or resolved representative IDAM ID, or the original blank value if
+     *         the IDAM ID cannot be resolved
+     */
+    public String resolveRepresentativeIdamId(RepresentedTypeRItem representative, String submissionReference) {
+        String idamId = representative.getValue().getIdamId();
+        if (StringUtils.isBlank(idamId)) {
+            try {
+                AccountIdByEmailResponse accountIdByEmailResponse = nocService.findUserByEmail(
+                        adminUserService.getAdminUserToken(),
+                        representative.getValue().getRepresentativeEmailAddress(),
+                        submissionReference);
+                idamId = accountIdByEmailResponse.getUserIdentifier();
+            } catch (GenericServiceException e) {
+                log.warn(e.getMessage());
+            }
+        }
+        return idamId;
     }
 
     /**
@@ -491,7 +531,8 @@ public class NocRespondentRepresentativeService {
             return;
         }
         if (ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType())
-                || CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())) {
+                || CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())
+                || CollectionUtils.isEmpty(caseDetails.getCaseData().getRespondentCollection())) {
             return;
         }
         String organisationId = ClaimantRepresentativeUtils.getHmctsOrganisationIdOrEmpty(caseDetails.getCaseData()
@@ -605,25 +646,37 @@ public class NocRespondentRepresentativeService {
      */
     public RepresentativesCaseAssignments revokeRespondentRepresentatives(
             CaseDetails caseDetails, List<RepresentedTypeRItem> representativesToRevoke) {
-        CaseUserAssignmentData caseUserAssignmentsData = nocCcdService.retrieveCaseUserAssignments(
-                adminUserService.getAdminUserToken(), caseDetails.getCaseId());
         RepresentativesCaseAssignments representativesCaseAssignments = RepresentativesCaseAssignments.builder()
                 .representativesToRemove(new ArrayList<>()).revokedCaseUserAssignments(new ArrayList<>()).build();
+        if (ObjectUtils.isEmpty(caseDetails)
+                || StringUtils.isBlank(caseDetails.getCaseId())
+                || ObjectUtils.isEmpty(caseDetails.getCaseData())
+                || CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())
+                || CollectionUtils.isEmpty(caseDetails.getCaseData().getRespondentCollection())
+                || CollectionUtils.isEmpty(representativesToRevoke)) {
+            return representativesCaseAssignments;
+        }
+        CaseUserAssignmentData caseUserAssignmentsData = nocCcdService.retrieveCaseUserAssignments(
+                adminUserService.getAdminUserToken(), caseDetails.getCaseId());
         if (ObjectUtils.isEmpty(caseUserAssignmentsData)
                 || CollectionUtils.isEmpty(caseUserAssignmentsData.getCaseUserAssignments())) {
             return  representativesCaseAssignments;
         }
-
-        for (CaseUserAssignment caseUserAssignment : caseUserAssignmentsData.getCaseUserAssignments()) {
-            if (!RoleUtils.isRespondentRepresentativeRole(caseUserAssignment.getCaseRole())) {
-                continue;
+        List<CaseUserAssignment> caseUserAssignments =
+                new ArrayList<>(caseUserAssignmentsData.getCaseUserAssignments());
+        List<CaseUserAssignment> manualAssignments = new ArrayList<>();
+        for (RepresentedTypeRItem representative : representativesToRevoke) {
+            manualAssignments.addAll(RespondentRepresentativeUtils.findManualAssignments(
+                    caseDetails.getCaseData(), caseUserAssignments, representative));
+            if (CollectionUtils.isNotEmpty(manualAssignments)) {
+                representativesCaseAssignments.getRevokedCaseUserAssignments().addAll(manualAssignments);
+                representativesCaseAssignments.getRepresentativesToRemove().add(representative);
+                caseUserAssignments.removeAll(manualAssignments);
             }
-            RepresentedTypeRItem representedTypeRItem = RespondentRepresentativeUtils
-                    .findRepresentativeInListByRoleOrRespondentName(caseDetails.getCaseData(),
-                            caseUserAssignment.getCaseRole(), representativesToRevoke);
-            if (ObjectUtils.isNotEmpty(representedTypeRItem)) {
-                representativesCaseAssignments.getRevokedCaseUserAssignments().add(caseUserAssignment);
-                representativesCaseAssignments.getRepresentativesToRemove().add(representedTypeRItem);
+            List<CaseUserAssignment> autoAssignments = RespondentRepresentativeUtils.findAutoAssignments(
+                    representative, manualAssignments, caseUserAssignments);
+            if (CollectionUtils.isNotEmpty(autoAssignments)) {
+                representativesCaseAssignments.getRevokedCaseUserAssignments().addAll(autoAssignments);
             }
         }
         try {
@@ -631,6 +684,9 @@ public class NocRespondentRepresentativeService {
                     representativesCaseAssignments.getRevokedCaseUserAssignments());
         } catch (GenericRuntimeException e) {
             log.error(ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS, caseDetails.getCaseId(), e.getMessage(), e);
+            if (CollectionUtils.isEmpty(manualAssignments)) {
+                representativesCaseAssignments.setRepresentativesToRemove(Collections.emptyList());
+            }
             representativesCaseAssignments.setRevokedCaseUserAssignments(Collections.emptyList());
         }
         return representativesCaseAssignments;
@@ -976,18 +1032,70 @@ public class NocRespondentRepresentativeService {
         }
         List<RepresentedTypeRItem> representatives = new ArrayList<>();
         for (CaseUserAssignment caseUserAssignment : caseUserAssignmentData.getCaseUserAssignments()) {
-            if (!RoleUtils.isRespondentRepresentativeRole(caseUserAssignment.getCaseRole())
-                    || !userDetails.getUid().equals(caseUserAssignment.getUserId())) {
-                continue;
-            }
-            RepresentedTypeRItem representative =
-                    RespondentRepresentativeUtils.findRepresentativeByRoleOrRespondentName(caseDetails.getCaseData(),
-                            caseUserAssignment.getCaseRole());
-            if (ObjectUtils.isNotEmpty(representative)) {
-                representatives.add(representative);
+            if (userDetails.getUid().equals(caseUserAssignment.getUserId())) {
+                RepresentedTypeRItem representative = RespondentRepresentativeUtils.findRepresentativeByIdamIdOrRole(
+                        caseDetails.getCaseData(), caseUserAssignment.getUserId(), caseUserAssignment.getCaseRole());
+                if (!RespondentRepresentativeUtils.isValidRepresentative(representative)) {
+                    continue;
+                }
+                representative.getValue().setIdamId(userDetails.getUid());
+                if (checkRepresentativeAssignment(caseDetails, representative, caseUserAssignment)) {
+                    representatives.add(representative);
+                }
             }
         }
         return representatives;
+    }
+
+    public boolean checkRepresentativeAssignment(CaseDetails caseDetails,
+                                                  RepresentedTypeRItem representative,
+                                                  CaseUserAssignment caseUserAssignment) {
+        return RespondentRepresentativeUtils.isValidRepresentative(representative)
+                && (matchesRepresentativeIdamId(caseDetails.getCaseId(), representative, caseUserAssignment)
+                || RespondentRepresentativeUtils.isCaseUserAssignmentForRepresentativeByRespondentName(
+                        caseDetails.getCaseData(), representative, caseUserAssignment)
+                || RespondentRepresentativeUtils.isCaseUserAssignmentForRepresentativeByRespondentId(
+                        caseDetails.getCaseData(), representative, caseUserAssignment));
+    }
+
+    /**
+     * Determines whether the supplied case user assignment belongs to the supplied representative.
+     *
+     * <p>The method resolves the representative's IDAM ID, using the existing IDAM ID where
+     * available or the representative's email address as a fallback. If both the representative
+     * email address and IDAM ID are blank, or the IDAM ID cannot be resolved, the method returns
+     * {@code false}.</p>
+     *
+     * <p>The resolved representative IDAM ID is compared with the user ID on the supplied
+     * {@link CaseUserAssignment}.</p>
+     *
+     * <p>Assumptions:</p>
+     * <ul>
+     *     <li>{@code representative} is not {@code null}.</li>
+     *     <li>{@code representative.getValue()} is not {@code null}.</li>
+     *     <li>{@code caseUserAssignment} is not {@code null}.</li>
+     *     <li>{@code submissionReference} identifies the submission context used when resolving
+     *     the representative's IDAM ID by email.</li>
+     * </ul>
+     *
+     * @param submissionReference the submission reference used when resolving the representative's IDAM ID
+     * @param representative the representative to compare against the case user assignment
+     * @param caseUserAssignment the case user assignment to check
+     * @return {@code true} if the resolved representative IDAM ID matches the assignment user ID;
+     *         otherwise {@code false}
+     */
+    public boolean matchesRepresentativeIdamId(String submissionReference,
+                                               RepresentedTypeRItem representative,
+                                               CaseUserAssignment  caseUserAssignment) {
+        if (StringUtils.isBlank(representative.getValue().getRepresentativeEmailAddress())
+                && StringUtils.isBlank(representative.getValue().getIdamId())) {
+            return false;
+        }
+        String idamId = resolveRepresentativeIdamId(representative, submissionReference);
+        if (StringUtils.isBlank(idamId)) {
+            return false;
+        }
+        return idamId.equals(caseUserAssignment.getUserId());
     }
 
     /**

@@ -126,4 +126,17 @@
         <cve>CVE-2026-54514</cve>
         <cve>CVE-2026-54515</cve>
     </suppress>
+    <!-- False positive: CVE-2026-44891, CVE-2026-55831, CVE-2026-55833 are fixed in 4.2.16.Final
+         (affected range is < 4.2.16.Final). Dependency-Check still matches the Netty CPE on the
+         patched release. Remove when NVD/Dependency-Check version matching is corrected. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-*-4.2.16.Final.jar
+   Already on the fixed Netty 4.2.16.Final release for CVE-2026-44891, CVE-2026-55831, CVE-2026-55833.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-.*@4\.2\.16\.Final$</packageUrl>
+        <cve>CVE-2026-44891</cve>
+        <cve>CVE-2026-55831</cve>
+        <cve>CVE-2026-55833</cve>
+    </suppress>
 </suppressions>

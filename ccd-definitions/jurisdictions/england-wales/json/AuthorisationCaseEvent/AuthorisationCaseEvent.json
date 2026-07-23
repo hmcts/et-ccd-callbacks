@@ -2397,5 +2397,29 @@
     "CaseEventID": "DELETE_DRAFT_CASE",
     "UserRole": "[CREATOR]",
     "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "updateRespondentEmail",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "updateRespondentEmail",
+    "UserRole": "caseworker-employment-englandwales",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "updateRespondentEmail",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "UPDATE_RESPONDENT_ACCESS_TRANSFER_STATE",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
   }
 ]

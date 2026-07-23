@@ -1156,5 +1156,36 @@
     "CallBackURLAboutToStartEvent": "${ET_COS_URL}/notificationDocument/aboutToStart",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/notificationDocument/aboutToSubmit",
     "CallBackURLSubmittedEvent": "${ET_COS_URL}/notificationDocument/submitted"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "updateRespondentEmail",
+    "Name": "Update respondent email",
+    "Description": "Update respondent email",
+    "DisplayOrder": 15,
+    "PreConditionState(s)": "Accepted;Rejected;Closed;Submitted;Vetted",
+    "PostConditionState": "*",
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/updateRespondentEmail/aboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/updateRespondentEmail/aboutToSubmit",
+    "CallBackURLSubmittedEvent": "",
+    "EventEnablingCondition": "managingOffice !=\"Unassigned\"",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "Y"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "UPDATE_RESPONDENT_ACCESS_TRANSFER_STATE",
+    "Name": "Update access transfer state",
+    "Description": "System update for respondent access transfer tracker fields",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "EventEnablingCondition": "caseType=\"dummy\"",
+    "CallBackURLAboutToStartEvent": "",
+    "CallBackURLAboutToSubmitEvent": "",
+    "CallBackURLSubmittedEvent": ""
   }
 ]

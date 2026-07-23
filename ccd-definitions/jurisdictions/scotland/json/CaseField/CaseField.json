@@ -6732,5 +6732,47 @@
     "FieldType": "Collection",
     "FieldTypeParameter": "DynamicListCollection",
     "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "respondentEmailUpdateSelection",
+    "Label": "Select a respondent",
+    "FieldType": "DynamicList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "currentRespondentEmail",
+    "Label": "Current email address",
+    "FieldType": "Email",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "newRespondentEmail",
+    "Label": "New email address",
+    "HintText": "The respondent will use this email address to access their case.",
+    "FieldType": "Email",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "respondentAccessTransferPending",
+    "Label": "Respondent access transfer pending",
+    "HintText": "Set when respondent email was updated but case access still needs transferring.",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "respondentAccessPreviousIdamId",
+    "Label": "Previous respondent IdAM id",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   }
 ]

@@ -9162,5 +9162,39 @@
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "updateRespondentEmail",
+    "CaseFieldID": "respondentEmailUpdateSelection",
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageLabel": "Select a respondent",
+    "CallBackURLMidEvent": "${ET_COS_URL}/updateRespondentEmail/select",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "updateRespondentEmail",
+    "CaseFieldID": "currentRespondentEmail",
+    "DisplayContext": "READONLY",
+    "PageID": 2,
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "PageLabel": "Update respondent email",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "updateRespondentEmail",
+    "CaseFieldID": "newRespondentEmail",
+    "DisplayContext": "MANDATORY",
+    "PageID": 2,
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 2,
+    "CallBackURLMidEvent": "${ET_COS_URL}/updateRespondentEmail/validate",
+    "ShowSummaryChangeOption": "Y"
   }
 ]

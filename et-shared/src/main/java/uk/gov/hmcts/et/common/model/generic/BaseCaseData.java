@@ -18,6 +18,18 @@ import java.util.List;
 @Getter
 @Setter
 public class BaseCaseData {
+    // Update respondent email
+    @JsonProperty("respondentEmailUpdateSelection")
+    private DynamicFixedListType respondentEmailUpdateSelection;
+    @JsonProperty("currentRespondentEmail")
+    private String currentRespondentEmail;
+    @JsonProperty("newRespondentEmail")
+    private String newRespondentEmail;
+    @JsonProperty("respondentAccessTransferPending")
+    private String respondentAccessTransferPending;
+    @JsonProperty("respondentAccessPreviousIdamId")
+    private String respondentAccessPreviousIdamId;
+
     //Referral
     @JsonProperty("referralCollection")
     private List<ReferralTypeItem> referralCollection;

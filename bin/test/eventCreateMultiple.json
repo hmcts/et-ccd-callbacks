@@ -1,0 +1,16 @@
+{
+  "data": {
+    "multipleName": "Flex Multiple",
+    "managingOffice": "Glasgow",
+    "leadCase": "%LEAD_ETHOS_REF%",
+    "caseIdCollection": []
+  },
+  "event": {
+    "id": "createMultiple",
+    "summary": "",
+    "description": ""
+  },
+  "event_token": "%EVENT_TOKEN%",
+  "ignore_warning": false,
+  "draft_id": null
+}

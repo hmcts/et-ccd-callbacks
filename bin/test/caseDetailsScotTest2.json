@@ -1,0 +1,127 @@
+{
+  "case_data": {
+    "tribunalCorrespondenceAddress": {
+      "AddressLine1": "Eagle Building,",
+      "AddressLine2": "215 Bothwell Street,",
+      "PostCode": "G2 7TS",
+      "PostTown": "Glasgow,"
+    },
+    "tribunalCorrespondenceTelephone" : "03577123270",
+    "tribunalCorrespondenceFax" : "07127126570",
+    "tribunalCorrespondenceDX" : "1234567",
+    "tribunalCorrespondenceEmail" : "GlasgowOfficeET@hmcts.gov.uk",
+    "ethosCaseReference" : "123456",
+    "claimantRepresentedQuestion" : "no",
+    "claimant_TypeOfClaimant" : "Company",
+    "claimant_Company" : "Orlando LTD",
+    "additionalCaseInfo": {
+      "additional_accepted1": "additional_accepted1",
+      "additional_accepted2": "additional_accepted2",
+      "additional_conciliation_track": "additional_conciliation_track",
+      "additional_emp_claim_made": "additional_emp_claim_made",
+      "additional_ind_expert": "additional_ind_expert",
+      "additional_live_appeal": "additional_live_appeal",
+      "additional_sensitive": "string"
+    },
+    "caseNotes": "Example of Case Note",
+    "caseType": "Single",
+    "claimantType": {
+      "claimant_addressUK": {
+        "AddressLine1": "34",
+        "AddressLine2": "Low Street",
+        "Country": "UK",
+        "County": "Lancashire",
+        "PostCode": "M3 6gw",
+        "PostTown": "Manchester"
+      },
+      "claimant_contact_preference": "Post",
+      "claimant_email_address": "anton@gmail.com",
+      "claimant_mobile_number": "07577136570",
+      "claimant_phone_number": "07577136570"
+    },
+    "claimantIndType": {
+      "claimant_date_of_birth": "1990-02-25",
+      "claimant_first_names": "Anton",
+      "claimant_gender": "Male",
+      "claimant_last_name": "Rodriguez",
+      "claimant_title1": "Mr"
+    },
+    "clerkResponsible": "Juan Diego",
+    "feeGroupReference": "12212121",
+    "hearingCollection": [
+      {
+        "id" : "123345",
+        "value" : {
+          "hearingEstLengthNum": "2",
+          "hearingEstLengthNumType": "days",
+          "Hearing_type": "Single",
+          "hearingNumber": "1",
+          "Hearing_venue": "Glasgow",
+          "hearingDateCollection": [
+            {
+              "id" : "123345",
+              "value" : {
+                "Hearing_status": "Listed",
+                "listedDate": "2019-11-25T12:11:00.000"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "correspondenceScotType": {
+      "topLevel_Scot_Documents": "EM-TRB-SCO-ENG-00043",
+      "part_2_Scot_Documents": "24",
+      "hearingNumber": "1",
+      "dynamicHearingNumber": {
+        "value": {
+          "code": "1",
+          "label": "1 - Glasgow - 25 Nov 2019"
+        },
+        "list_items": [
+          {
+            "code": "1",
+            "label": "1 - Glasgow - 25 Nov 2019"
+          }
+        ]
+      }
+    },
+    "repCollection": [
+      {
+        "id" : "123345",
+        "value" : {
+          "resp_rep_name" : "Antonio Vazquez",
+          "name_of_organisation": "RepresentativeOrganisation",
+          "name_of_representative": "RepresentativeNameRespondent",
+          "representative_address": {
+            "AddressLine1": "56 Block C",
+            "AddressLine2": "Ellesmere Street",
+            "Country": "UK",
+            "County": "Lancashire",
+            "PostCode": "M3 KJR",
+            "PostTown": "Manchester"
+          },
+          "representative_dx": "222222222",
+          "representative_email_address": "example@gmail.com",
+          "representative_mobile_number": "07577136570",
+          "representative_phone_number": "07577136570",
+          "representative_preference": "Post",
+          "representative_reference": "1111111"
+        }
+      }
+    ],
+    "locationType": "Manchester",
+    "multipleReference": "No",
+    "positionType": "First",
+    "dateToPosition": "2019-11-15",
+    "currentPosition": "First",
+    "receiptDate": "2019-03-12",
+    "responseReceived": "none",
+    "userLocation": "Liverpool",
+    "managingOffice" : "Glasgow"
+  },
+  "id": "123456789",
+  "jurisdiction": "English",
+  "case_type_id": "ET_Scotland",
+  "state": "UK"
+}

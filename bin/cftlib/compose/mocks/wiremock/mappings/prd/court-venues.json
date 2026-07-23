@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/refdata/location/court-venues/services",
+    "queryParameters": {
+      "service_code": {
+        "equalTo": "BHA1"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "prd/court-venues.json"
+  }
+}

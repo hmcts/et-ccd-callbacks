@@ -1,0 +1,143 @@
+{
+  "case_data": {
+    "claimant": "John Doe",
+    "respondent": "Claimant Org",
+    "claimantSex": [
+      "Male"
+    ],
+    "SearchCriteria": {},
+    "respondentType": "Organisation",
+    "claimSuccessful": [
+      "compensation",
+      "tribunal",
+      "oldJob",
+      "anotherJob"
+    ],
+    "payTypesOfClaim": [
+      "Holiday pay",
+      "Arrears",
+      "Notice pay",
+      "Redundancy pay",
+      "Other payments"
+    ],
+    "claimantBenefits": "Car",
+    "claimantJobTitle": "Software Developer",
+    "claimantLastName": "Doe",
+    "linkedCasesYesNo": [
+      "No"
+    ],
+    "claimantFirstName": "John",
+    "claimantStartDate": "2021-01-01",
+    "respondentAddress": {
+      "Country": "United Kingdom",
+      "PostCode": "SW11 1PD",
+      "PostTown": "London",
+      "AddressLine1": "1 Rse Way"
+    },
+    "compensationAmount": "1000000000",
+    "claimantDateOfBirth": "1997-12-19",
+    "compensationDetails": "10 million pound",
+    "et1ReppedSectionOne": "Yes",
+    "et1ReppedSectionTwo": "Yes",
+    "respondentAcasYesNo": "No",
+    "whistleblowingYesNo": [
+      "Yes"
+    ],
+    "claimantStillWorking": [
+      "Working"
+    ],
+    "et1ReppedTriageYesNo": "Yes",
+    "claimantAttendHearing": [
+      "Video", "Phone"
+    ],
+    "claimantWeeklyPension": "1000",
+    "didClaimantWorkForOrg": [
+      "Yes"
+    ],
+    "et1ReppedSectionThree": "Yes",
+    "claimantContactAddress": {
+      "Country": "United Kingdom",
+      "PostCode": "SW11 1PD",
+      "PostTown": "London",
+      "AddressLine1": "1 Rse Way"
+    },
+    "et1ReppedTriageAddress": {
+      "County": "West Midlands",
+      "Country": "United Kingdom",
+      "PostCode": "LS16 6NB",
+      "PostTown": "Leeds",
+      "AddressLine1": "A Road"
+    },
+    "claimantSupportQuestion": [
+      "No"
+    ],
+    "otherTypeOfClaimDetails": "Test other claim",
+    "whistleblowingRegulator": "N/A",
+    "claimantEmployeeBenefits": [
+      "Yes"
+    ],
+    "discriminationTypesOfClaim": [
+      "Age",
+      "Gender reassignment",
+      "Disability",
+      "Marriage or civil partnership",
+      "Pregnancy or maternity",
+      "Race",
+      "Religion or belief",
+      "Sex",
+      "Sexual orientation"
+    ],
+    "et1SectionOneDateCompleted": "2024-04-10",
+    "et1SectionThreeTypeOfClaim": [
+      "payRelated",
+      "discrimination",
+      "whistleBlowing",
+      "unfairDismissal",
+      "otherTypesOfClaims"
+    ],
+    "et1SectionTwoDateCompleted": "2024-04-10",
+    "respondentOrganisationName": "Claimant Org",
+    "claimantPensionContribution": [
+      "Yes"
+    ],
+    "et1SectionThreeClaimDetails": "Test",
+    "representativeAttendHearing": [
+      "Phone"
+    ],
+    "didClaimantWorkAtSameAddress": "Yes",
+    "et1SectionThreeDateCompleted": "2024-04-10",
+    "et1ReppedRespondentCollection": [
+      {
+        "id": "61f4d8d5-939b-4417-b02e-481fc1345cef",
+        "value": {
+          "respondentType": "Individual",
+          "respondentLastName": "Respondent",
+          "respondent_ACAS_no": "Unfair Dismissal",
+          "respondent_address": {
+            "Country": "United Kingdom",
+            "PostCode": "SW11 1PD",
+            "PostTown": "London",
+            "AddressLine1": "1 Rse Way"
+          },
+          "respondentFirstName": "Test",
+          "respondent_ACAS_question": "No"
+        }
+      }
+    ],
+    "tribunalRecommendationDetails": "Recommendation",
+    "claimantAverageWeeklyWorkHours": "40",
+    "representativeContactPreference": [
+      "Email"
+    ],
+    "claimantStillWorkingNoticePeriod": [
+      "Months"
+    ],
+    "respondentNoAcasCertificateReason": "No Power",
+    "claimantStillWorkingNoticePeriodMonths": "10",
+    "claimantPreferredTitle": "Dr"
+  },
+  "id": "1712760487710259",
+  "jurisdiction": "EMPLOYMENT",
+  "state": "AWAITING_SUBMISSION_TO_HMCTS",
+  "case_type_id": "ET_EnglandWales"
+}

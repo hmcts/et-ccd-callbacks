@@ -123,7 +123,7 @@ withPipeline(type, product, component) {
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
   }
   syncBranchesWithMaster(branchesToSync)
-  enableSlackNotifications('#et-builds')
+  //enableSlackNotifications('#et-builds')
 
   before('build') {
     sh '''

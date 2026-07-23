@@ -1,0 +1,77 @@
+fixed-list-mappings:
+  rooms:
+    ABERDEEN:
+      RRShetland: Shetland
+    DUNDEE:
+      DundeeTribunal: Tribunal
+    LEEDS:
+      LeedsRooms: Leeds
+      SheffieldCombined: Sheffield Combi
+      Teesside: Teesside ET
+      Wakefield: Wakefield Count
+    GLASGOW:
+      CambeltownSC: Cambeltown HC
+      DumfriesSC: Dumfries HC
+      KirkcudbrightSC: Kirkcudbright
+      LochmaddySC: Lochmaddy HC
+      ObanSC: Oban HC
+      PortreeSC: Portree HC
+      StornowaySC: Stornoway HC
+      StranraerSC: Stranraer HC
+    MANCHESTER:
+      BlackpoolMagistrate: Blackpool Mags
+      Carlisle_CC: Carlisle C C
+      CarlisleMagistrate: Carlisle Mags
+      ManchesterRooms: Manchester
+      ManchesterMagistrate: Manchester Mags
+    MIDLANDS_WEST:
+      "[Stoke(Hanley)]": STOKE (Hanley)
+    WALES:
+      Aberystwyth_CC: Aberystwyth CC
+      Aberystwyth_JC: Aberystwyth JC
+      Aberystwyth_Mag: Aberystwyth Mag
+      Brecon_Court: Brecon Court
+      Caernarfon_CC: Caernarfon CC
+      Caernarfon_CJC: Caernarfon CJC
+      Cardiff: CARDIFF
+      Cardiff_CJC: Cardiff CJC
+      Cardiff_Crown: Cardiff Crown
+      Cardiff_Mag_YC1: Cardiff Mag YC1
+      Cardiff_Mag_YC2: Cardiff Mag YC2
+      Cardiff_Mags: Cardiff Mags
+      CardiffSocial: Cardiff Social
+      CardiffSSCS: Cardiff SSCS
+      CARMARTHEN: Carmarthen
+      Carmarthen_CC: CARMARTHEN CC
+      CARMARTHEN_DC: CARMARTHEN DC
+      Carmarthen_HH: CARMARTHEN HH
+      Chester_County: Chester County
+      Chester_Mags: Chester Mags
+      Denbigh_Mags: Denbigh Mags
+      Dolgellau_Court: Dolgellau Court
+      Flint_Mags: Flint Mags
+      Haverfordwest_M: Haverfordwest M
+      HEREFORD: Hereford
+      Holyhead_Mags: Holyhead Mags
+      Llandrindod_W: Llandrindod W
+      Llandudno_Mags: Llandudno Mags
+      Llanelli_County: Llanelli County
+      Llanelli_Mags: Llanelli Mags
+      Llangefni_Court: Llangefni Court
+      Llangefni_Mags: Llangefni Mags
+      Mold_Court: Mold Court
+      Neath_Mags: Neath Mags
+      Newport_AIT: Newport AIT
+      Port_Talbot: Port Talbot
+      Prestatyn_JC: Prestatyn JC
+      Rhyl_Court: Rhyl Court
+      Swansea_CJ: Swansea CJ
+      Swansea_Mags: Swansea Mags
+      "[Towyn_&_Kinmel]": Towyn & Kinmel
+      WalesRooms: Wales
+      Welshpool_Mags: Welshpool Mags
+      Wrexham_Courts: Wrexham Courts
+      Wrexham_SSCSA: Wrexham SSCSA
+    WATFORD:
+      Reading: Reading ET
+      WatfordRooms: Watford

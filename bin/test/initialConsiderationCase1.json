@@ -1,0 +1,563 @@
+{
+  "caseType": "Single",
+  "claimant": "Tom Franks",
+  "stateAPI": "Accepted",
+  "caseSource": "Manually Created",
+  "respondent": "Test Corp",
+  "receiptDate": "2022-06-06",
+  "claimantType": {
+    "claimant_addressUK": {
+      "Country": "United Kingdom",
+      "PostCode": "EX1 3UD",
+      "PostTown": "Exeter",
+      "AddressLine1": "13 Vaughan Rise"
+    }
+  },
+  "multipleFlag": "No",
+  "positionType": "Manually Created",
+  "preAcceptCase": {
+    "caseAccepted": "Yes",
+    "dateAccepted": "2022-06-12"
+  },
+  "dateToPosition": "2022-06-27",
+  "managingOffice": "Glasgow",
+  "claimantIndType": {
+    "claimant_title1": "Mr",
+    "claimant_last_name": "Franks",
+    "claimant_first_names": "Tom"
+  },
+  "currentPosition": "Manually Created",
+  "claimantRequests": {},
+  "claimantOtherType": {},
+  "conciliationTrack": "Open Track",
+  "feeGroupReference": "123343333333",
+  "hearingCollection": [
+    {
+      "id": "fd2ae85a-3361-4c00-a5e4-c07e9d6a438d",
+      "value": {
+        "Hearing_type": "Hearing",
+        "Hearing_stage": "Stage 1",
+        "hearingFormat": [
+          "In person"
+        ],
+        "hearingNumber": "213",
+        "Hearing_Glasgow": {
+          "value": {
+            "code": "Kirkcudbright",
+            "label": "Kirkcudbright Sheriff Court"
+          },
+          "list_items": [
+            {
+              "code": "Cambeltown HC",
+              "label": "Cambeltown Sheriff Court"
+            },
+            {
+              "code": "Dumfries HC",
+              "label": "Dumfries Sheriff Court"
+            },
+            {
+              "code": "Fort William SC",
+              "label": "Fort William Sheriff Court"
+            },
+            {
+              "code": "Glasgow COET",
+              "label": "Glasgow COET"
+            },
+            {
+              "code": "GTC",
+              "label": "GTC"
+            },
+            {
+              "code": "Kirkcudbright",
+              "label": "Kirkcudbright Sheriff Court"
+            },
+            {
+              "code": "Lochmaddy HC",
+              "label": "Lochmaddy Sheriff Court"
+            },
+            {
+              "code": "Oban HC",
+              "label": "Oban Sheriff court"
+            },
+            {
+              "code": "Portree HC",
+              "label": "Portree Sheriff Court"
+            },
+            {
+              "code": "Stirling SC",
+              "label": "Stirling Sheriff Court"
+            },
+            {
+              "code": "Stornoway HC",
+              "label": "Stornoway Sheriff Court"
+            },
+            {
+              "code": "Stranraer HC",
+              "label": "Stranraer Sheriff Court"
+            }
+          ],
+          "selectedCode": "Kirkcudbright",
+          "selectedLabel": "Kirkcudbright Sheriff Court"
+        },
+        "hearingSitAlone": "Sit Alone",
+        "judicialMediation": "Yes",
+        "hearingEstLengthNum": "3.5",
+        "hearingDateCollection": [
+          {
+            "id": "672393b5-67bc-4805-ab3a-2b3fbe77916e",
+            "value": {
+              "listedDate": "2022-07-15T10:00:00.000",
+              "Hearing_status": "Listed",
+              "Hearing_Glasgow": {
+                "value": {
+                  "code": "Kirkcudbright",
+                  "label": "Kirkcudbright Sheriff Court"
+                },
+                "list_items": [
+                  {
+                    "code": "Cambeltown HC",
+                    "label": "Cambeltown Sheriff Court"
+                  },
+                  {
+                    "code": "Dumfries HC",
+                    "label": "Dumfries Sheriff Court"
+                  },
+                  {
+                    "code": "Fort William SC",
+                    "label": "Fort William Sheriff Court"
+                  },
+                  {
+                    "code": "Glasgow COET",
+                    "label": "Glasgow COET"
+                  },
+                  {
+                    "code": "GTC",
+                    "label": "GTC"
+                  },
+                  {
+                    "code": "Kirkcudbright",
+                    "label": "Kirkcudbright Sheriff Court"
+                  },
+                  {
+                    "code": "Lochmaddy HC",
+                    "label": "Lochmaddy Sheriff Court"
+                  },
+                  {
+                    "code": "Oban HC",
+                    "label": "Oban Sheriff court"
+                  },
+                  {
+                    "code": "Portree HC",
+                    "label": "Portree Sheriff Court"
+                  },
+                  {
+                    "code": "Stirling SC",
+                    "label": "Stirling Sheriff Court"
+                  },
+                  {
+                    "code": "Stornoway HC",
+                    "label": "Stornoway Sheriff Court"
+                  },
+                  {
+                    "code": "Stranraer HC",
+                    "label": "Stranraer Sheriff Court"
+                  }
+                ],
+                "selectedCode": "Kirkcudbright",
+                "selectedLabel": "Kirkcudbright Sheriff Court"
+              },
+              "hearingTimingStart": "2022-07-15T10:00:00.000",
+              "hearingTimingFinish": "2022-07-15T10:00:00.000",
+              "hearingVenueDayScotland": "Glasgow",
+              "Hearing_typeReadingDeliberation": "In Chambers"
+            }
+          },
+          {
+            "id": "9df80d99-4dd2-4892-a355-2d1beba55bbe",
+            "value": {
+              "listedDate": "2022-07-05T00:00:00.000",
+              "Hearing_status": "Listed",
+              "Hearing_Glasgow": {
+                "value": {
+                  "code": "Kirkcudbright",
+                  "label": "Kirkcudbright Sheriff Court"
+                },
+                "list_items": [
+                  {
+                    "code": "Cambeltown HC",
+                    "label": "Cambeltown Sheriff Court"
+                  },
+                  {
+                    "code": "Dumfries HC",
+                    "label": "Dumfries Sheriff Court"
+                  },
+                  {
+                    "code": "Fort William SC",
+                    "label": "Fort William Sheriff Court"
+                  },
+                  {
+                    "code": "Glasgow COET",
+                    "label": "Glasgow COET"
+                  },
+                  {
+                    "code": "GTC",
+                    "label": "GTC"
+                  },
+                  {
+                    "code": "Kirkcudbright",
+                    "label": "Kirkcudbright Sheriff Court"
+                  },
+                  {
+                    "code": "Lochmaddy HC",
+                    "label": "Lochmaddy Sheriff Court"
+                  },
+                  {
+                    "code": "Oban HC",
+                    "label": "Oban Sheriff court"
+                  },
+                  {
+                    "code": "Portree HC",
+                    "label": "Portree Sheriff Court"
+                  },
+                  {
+                    "code": "Stirling SC",
+                    "label": "Stirling Sheriff Court"
+                  },
+                  {
+                    "code": "Stornoway HC",
+                    "label": "Stornoway Sheriff Court"
+                  },
+                  {
+                    "code": "Stranraer HC",
+                    "label": "Stranraer Sheriff Court"
+                  }
+                ],
+                "selectedCode": "Kirkcudbright",
+                "selectedLabel": "Kirkcudbright Sheriff Court"
+              },
+              "hearingTimingStart": "2022-07-05T00:00:00.000",
+              "hearingTimingFinish": "2022-07-05T00:00:00.000",
+              "hearingVenueDayScotland": "Glasgow",
+              "Hearing_typeReadingDeliberation": "Reading Day"
+            }
+          }
+        ],
+        "Hearing_venue_Scotland": "Glasgow",
+        "hearingEstLengthNumType": "Hours"
+      }
+    },
+    {
+      "id": "9b57df05-7d8d-4b07-89fb-27b25f19ad47",
+      "value": {
+        "Hearing_type": "Expenses/Wasted Costs Hearing",
+        "Hearing_stage": "Stage 1",
+        "hearingFormat": [
+          "In person"
+        ],
+        "hearingNumber": "4567",
+        "hearingSitAlone": "Sit Alone",
+        "Hearing_Aberdeen": {
+          "value": {
+            "code": "I J C",
+            "label": "I J C"
+          },
+          "list_items": [
+            {
+              "code": "Aberdeen",
+              "label": "Aberdeen"
+            },
+            {
+              "code": "I J C",
+              "label": "I J C"
+            },
+            {
+              "code": "Inverness",
+              "label": "Inverness"
+            },
+            {
+              "code": "Kirkwall",
+              "label": "Kirkwall"
+            },
+            {
+              "code": "Lerwick",
+              "label": "Lerwick"
+            },
+            {
+              "code": "Portree",
+              "label": "Portree"
+            },
+            {
+              "code": "Shetland",
+              "label": "Shetland"
+            },
+            {
+              "code": "Stornoway",
+              "label": "Stornoway"
+            },
+            {
+              "code": "Wick",
+              "label": "Wick"
+            }
+          ],
+          "selectedCode": "I J C",
+          "selectedLabel": "I J C"
+        },
+        "hearingEstLengthNum": "5",
+        "hearingDateCollection": [
+          {
+            "id": "338cf784-921f-4da8-b98f-c0dc2ba533a3",
+            "value": {
+              "listedDate": "2022-08-11T00:00:00.000",
+              "Hearing_status": "Listed",
+              "Hearing_Aberdeen": {
+                "value": {
+                  "code": "I J C",
+                  "label": "I J C"
+                },
+                "list_items": [
+                  {
+                    "code": "Aberdeen",
+                    "label": "Aberdeen"
+                  },
+                  {
+                    "code": "I J C",
+                    "label": "I J C"
+                  },
+                  {
+                    "code": "Inverness",
+                    "label": "Inverness"
+                  },
+                  {
+                    "code": "Kirkwall",
+                    "label": "Kirkwall"
+                  },
+                  {
+                    "code": "Lerwick",
+                    "label": "Lerwick"
+                  },
+                  {
+                    "code": "Portree",
+                    "label": "Portree"
+                  },
+                  {
+                    "code": "Shetland",
+                    "label": "Shetland"
+                  },
+                  {
+                    "code": "Stornoway",
+                    "label": "Stornoway"
+                  },
+                  {
+                    "code": "Wick",
+                    "label": "Wick"
+                  }
+                ],
+                "selectedCode": "I J C",
+                "selectedLabel": "I J C"
+              },
+              "hearingTimingStart": "2022-08-11T00:00:00.000",
+              "hearingTimingFinish": "2022-08-11T00:00:00.000",
+              "hearingVenueDayScotland": "Aberdeen",
+              "Hearing_typeReadingDeliberation": "Deliberation Day"
+            }
+          }
+        ],
+        "Hearing_venue_Scotland": "Aberdeen",
+        "hearingEstLengthNumType": "Hours"
+      }
+    },
+    {
+      "id": "6079f90e-0ca6-4fa6-a1b4-3a382ae42ba6",
+      "value": {
+        "Hearing_type": "Preliminary Hearing(CM)",
+        "Hearing_stage": "Stage 1",
+        "hearingFormat": [
+          "In person"
+        ],
+        "hearingNumber": "189",
+        "hearingSitAlone": "Full Panel",
+        "Hearing_Aberdeen": {
+          "value": {
+            "code": "Lerwick",
+            "label": "Lerwick"
+          },
+          "list_items": [
+            {
+              "code": "Aberdeen",
+              "label": "Aberdeen"
+            },
+            {
+              "code": "I J C",
+              "label": "I J C"
+            },
+            {
+              "code": "Inverness",
+              "label": "Inverness"
+            },
+            {
+              "code": "Kirkwall",
+              "label": "Kirkwall"
+            },
+            {
+              "code": "Lerwick",
+              "label": "Lerwick"
+            },
+            {
+              "code": "Portree",
+              "label": "Portree"
+            },
+            {
+              "code": "Shetland",
+              "label": "Shetland"
+            },
+            {
+              "code": "Stornoway",
+              "label": "Stornoway"
+            },
+            {
+              "code": "Wick",
+              "label": "Wick"
+            }
+          ],
+          "selectedCode": "Lerwick",
+          "selectedLabel": "Lerwick"
+        },
+        "hearingEstLengthNum": "1.5",
+        "hearingDateCollection": [
+          {
+            "id": "0f400d2d-abc4-4e1d-bf71-a8c9d03ef626",
+            "value": {
+              "listedDate": "2022-07-01T00:00:00.000",
+              "Hearing_status": "Listed",
+              "Hearing_Aberdeen": {
+                "value": {
+                  "code": "Lerwick",
+                  "label": "Lerwick"
+                },
+                "list_items": [
+                  {
+                    "code": "Aberdeen",
+                    "label": "Aberdeen"
+                  },
+                  {
+                    "code": "I J C",
+                    "label": "I J C"
+                  },
+                  {
+                    "code": "Inverness",
+                    "label": "Inverness"
+                  },
+                  {
+                    "code": "Kirkwall",
+                    "label": "Kirkwall"
+                  },
+                  {
+                    "code": "Lerwick",
+                    "label": "Lerwick"
+                  },
+                  {
+                    "code": "Portree",
+                    "label": "Portree"
+                  },
+                  {
+                    "code": "Shetland",
+                    "label": "Shetland"
+                  },
+                  {
+                    "code": "Stornoway",
+                    "label": "Stornoway"
+                  },
+                  {
+                    "code": "Wick",
+                    "label": "Wick"
+                  }
+                ],
+                "selectedCode": "Lerwick",
+                "selectedLabel": "Lerwick"
+              },
+              "hearingTimingStart": "2022-07-01T00:00:00.000",
+              "hearingTimingFinish": "2022-07-01T00:00:00.000",
+              "hearingVenueDayScotland": "Aberdeen"
+            }
+          }
+        ],
+        "Hearing_venue_Scotland": "Aberdeen",
+        "hearingEstLengthNumType": "Hours"
+      }
+    }
+  ],
+  "newEmploymentType": {},
+  "targetHearingDate": "2022-12-03",
+  "ethosCaseReference": "8000001/2022",
+  "flagsImageFileName": "EMP-TRIB-0000000000.jpg",
+  "jurCodesCollection": [
+    {
+      "id": "01dc1a47-6d0e-41e0-814d-351e02336ccc",
+      "value": {
+        "judgmentOutcome": "Not allocated",
+        "juridictionCodesList": "DAG"
+      }
+    },
+    {
+      "id": "5eee9815-00e7-4e44-a343-56efc20eacef",
+      "value": {
+        "judgmentOutcome": "Not allocated",
+        "juridictionCodesList": "DDA"
+      }
+    },
+    {
+      "id": "5eaed2d0-78ad-4dd6-9755-4ae2f70661ee",
+      "value": {
+        "judgmentOutcome": "Not allocated",
+        "juridictionCodesList": "MAT"
+      }
+    }
+  ],
+  "claimantWorkAddress": {
+    "claimant_work_address": {
+      "Country": "United Kingdom",
+      "PostCode": "BR1 4AG",
+      "PostTown": "Bromley",
+      "AddressLine1": "Flat 22",
+      "AddressLine2": "Cameron House",
+      "AddressLine3": "Highland Road"
+    }
+  },
+  "respondentCollection": [
+    {
+      "id": "2038c8a0-0083-4286-82ff-f5932562909d",
+      "value": {
+        "respondent_ACAS": "177",
+        "respondent_name": "Test Corp",
+        "responseContinue": "Yes",
+        "responseReceived": "No",
+        "responseStruckOut": "No",
+        "respondent_address": {
+          "Country": "United Kingdom",
+          "PostCode": "BR1 4AG",
+          "PostTown": "Bromley",
+          "AddressLine1": "Flat 22",
+          "AddressLine2": "Cameron House",
+          "AddressLine3": "Highland Road"
+        },
+        "respondent_ACAS_question": "Yes",
+        "responseRespondentAddress": {}
+      }
+    }
+  ],
+  "claimant_TypeOfClaimant": "Individual",
+  "tribunalCorrespondenceDX": "DX 580003",
+  "tribunalCorrespondenceFax": "01264 785 177",
+  "representativeClaimantType": {},
+  "claimantRepresentedQuestion": "No",
+  "claimantWorkAddressQuestion": "Yes",
+  "tribunalCorrespondenceEmail": "glasgowet@justice.gov.uk",
+  "tribunalCorrespondenceAddress": {
+    "PostCode": "G2 8GT",
+    "PostTown": "Glasgow",
+    "AddressLine1": "Glasgow Tribunals Centre",
+    "AddressLine2": "3 Atlantic Quay, 20 York Street"
+  },
+  "tribunalCorrespondenceTelephone": "0141 204 0730",
+  "etInitialConsiderationRespondent": "| Respondent name given | |\r\n|-------------|-------------|\r\n|In Et1 by claimant | Test Corp|\r\n|In Et3 by Respondent | |"
+}

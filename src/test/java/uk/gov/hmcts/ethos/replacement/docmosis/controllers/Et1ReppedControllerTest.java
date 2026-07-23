@@ -925,6 +925,9 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(caseFlagsService, times(0)).setupCaseFlags(any());
+        verify(caseFlagsService, times(0)).processNewlySetCaseFlags(any());
     }
 
     @Test
@@ -940,6 +943,51 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(caseFlagsService, times(0)).setupCaseFlags(any());
+        verify(caseFlagsService, times(0)).processNewlySetCaseFlags(any());
+    }
+
+    @Test
+    @SneakyThrows
+    void submitClaim_caseFlagToggleOn() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isEt1DocGenEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+        when(caseFlagsService.caseFlagsSetupRequired(any())).thenReturn(false);
+
+        mockMvc.perform(post(SUBMIT_CLAIM)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest2)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(caseFlagsService, times(0)).setupCaseFlags(any());
+        verify(caseFlagsService, times(0)).processNewlySetCaseFlags(any());
+    }
+
+    @Test
+    @SneakyThrows
+    void submitClaim_caseFlagSetupToggleOn() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isEt1DocGenEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+        when(caseFlagsService.caseFlagsSetupRequired(any())).thenReturn(true);
+
+        mockMvc.perform(post(SUBMIT_CLAIM)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest2)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(caseFlagsService, times(1)).setupCaseFlags(any());
+        verify(caseFlagsService, times(1)).processNewlySetCaseFlags(any());
     }
 
     @SneakyThrows
@@ -1140,8 +1188,7 @@ class Et1ReppedControllerTest {
                 StringUtils.EMPTY,
                 "Et1ReppedService",
                 "checkCaseData")).when(et1ReppedService)
-                .setMyHmctsOrganisationAddress(AUTH_TOKEN,
-                        ccdRequestWithClaimantRepresentative.getCaseDetails().getCaseData());
+                .setMyHmctsOrganisationAddress(anyString(), any(CaseData.class));
         mockMvc.perform(post(MID_EVENT_AMEND_CLAIMANT_REPRESENTATIVE_CONTACT)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -1180,8 +1227,7 @@ class Et1ReppedControllerTest {
                 StringUtils.EMPTY,
                 "Et3ResponseService",
                 "setRespondentRepresentsContactDetails")).when(et1ReppedService)
-                .setClaimantRepresentativeValues(AUTH_TOKEN,
-                        ccdRequestWithClaimantRepresentative.getCaseDetails().getCaseData());
+                .setClaimantRepresentativeValues(anyString(), any(CaseData.class));
         mockMvc.perform(post(ABOUT_TO_SUBMIT_AMEND_CLAIMANT_REPRESENTATIVE_CONTACT)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

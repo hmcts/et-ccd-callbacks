@@ -442,7 +442,10 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setPublicCaseName(caseData);
         }
 
-        caseFlagsService.setupCaseFlags(caseData);
+        if (featureToggleService.isCaseFlagsEnabled()) {
+            caseFlagsService.setupCaseFlags(caseData);
+        }
+
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         removeSpacesFromPartyNames(caseData);
         return getCallbackRespEntityNoErrors(caseData);
@@ -495,7 +498,10 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setPublicCaseName(caseData);
         }
 
-        caseFlagsService.setupCaseFlags(caseData);
+        if (featureToggleService.isCaseFlagsEnabled()) {
+            caseFlagsService.setupCaseFlags(caseData);
+        }
+
         caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
         removeSpacesFromPartyNames(caseData);
         return getCallbackRespEntityErrors(errors, caseData);

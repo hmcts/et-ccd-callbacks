@@ -3,6 +3,7 @@ package uk.gov.hmcts.et.common.model.ccd;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -26,7 +27,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsSelectionType;
-import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
+import uk.gov.hmcts.et.common.model.ccd.types.AllPartyFlags;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseNote;
 import uk.gov.hmcts.et.common.model.ccd.types.CasePreAcceptType;
@@ -1557,10 +1558,8 @@ public class CaseData extends Et1CaseData {
     @JsonProperty("appealDocumentCollection")
     private List<DocumentTypeItem> appealDocumentCollection;
 
-    // Case Flags
-    private CaseFlagsType caseFlags;
-    private CaseFlagsType claimantFlags;
-    private CaseFlagsType respondentFlags;
+    @JsonUnwrapped
+    private AllPartyFlags allPartyFlags;
 
     //et-hearings-api
     @JsonProperty("autoListFlag")

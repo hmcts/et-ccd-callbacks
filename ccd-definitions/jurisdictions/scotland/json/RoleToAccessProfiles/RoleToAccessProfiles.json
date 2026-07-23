@@ -11,7 +11,7 @@
     "CaseTypeID": "ET_Scotland",
     "RoleName": "idam:caseworker-employment-etjudge-scotland",
     "ReadOnly": "N",
-    "AccessProfiles": "caseworker-employment-etjudge-scotland"
+    "AccessProfiles": "caseworker-employment-etjudge-scotland,caseworker-employment-caseflags"
   },
   {
     "LiveFrom": "01/01/2017",

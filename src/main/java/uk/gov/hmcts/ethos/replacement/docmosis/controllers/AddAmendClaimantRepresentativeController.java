@@ -21,6 +21,8 @@ import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocClaimantRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
@@ -35,6 +37,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERR
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrorsAndWarnings;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 /**
  * REST controller for the addAmendClaimantRepresentative event.
@@ -47,6 +50,8 @@ public class AddAmendClaimantRepresentativeController {
     private static final String LOG_MESSAGE = "received notification request for case reference : ";
     private final NocClaimantRepresentativeService nocClaimantRepresentativeService;
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
+    private final FeatureToggleService featureToggleService;
+    private final CaseFlagsService caseFlagsService;
 
     @PostMapping(value = "/midEvent", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "checks claimant representative's organisation and email address")
@@ -114,6 +119,11 @@ public class AddAmendClaimantRepresentativeController {
             nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(
                     ccdRequest.getCaseDetails());
         }
+
+        if (featureToggleService.isCaseFlagsEnabled()) {
+            caseFlagsService.setupCaseFlags(caseData);
+        }
+
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
@@ -123,7 +133,7 @@ public class AddAmendClaimantRepresentativeController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public void amendClaimantRepSubmitted(
+    public ResponseEntity<CCDCallbackResponse> amendClaimantRepSubmitted(
             @RequestBody CallbackRequest callbackRequest,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken) {
 
@@ -134,5 +144,6 @@ public class AddAmendClaimantRepresentativeController {
         } catch (IOException e) {
             throw new CcdInputOutputException("Failed to update claimant representatives access", e);
         }
+        return getCallbackRespEntityNoErrors(callbackRequest.getCaseDetails().getCaseData());
     }
 }

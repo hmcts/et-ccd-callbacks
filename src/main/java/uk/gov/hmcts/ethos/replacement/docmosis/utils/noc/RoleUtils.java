@@ -412,9 +412,8 @@ public final class RoleUtils {
      *         returns an empty list if no matching assignments are found
      *         or if the input parameters are invalid
      */
-    public static List<String> getCaseRolesForUser(CaseData caseData,
-                                                   List<CaseUserAssignment> caseUserAssignments,
-                                                   String userId) {
+    public static List<String> getCaseRolesForUser(List<CaseUserAssignment> caseUserAssignments,
+                                                    String userId) {
         List<String> caseRoles = new ArrayList<>();
         if (CollectionUtils.isEmpty(caseUserAssignments) || StringUtils.isBlank(userId)) {
             return caseRoles;
@@ -423,40 +422,7 @@ public final class RoleUtils {
                 .filter(assignment -> userId.equals(assignment.getUserId()))
                 .map(CaseUserAssignment::getCaseRole)
                 .toList());
-        removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, userId);
         return caseRoles;
-    }
-
-    public static void removeRolesWithoutMatchingRespondentRepresentative(CaseData caseData,
-                                                                          List<String> caseRoles,
-                                                                          String userId) {
-        if (CollectionUtils.isEmpty(caseRoles)
-                || CollectionUtils.isEmpty(caseData.getRespondentCollection())
-                || CollectionUtils.isEmpty(caseData.getRepCollection())) {
-            caseRoles.clear();
-            return;
-        }
-        List<String> tmpCaseRoles = new ArrayList<>(caseRoles);
-        for (String role : tmpCaseRoles) {
-            int roleIndex = RoleUtils.findRoleIndexByRoleLabel(role);
-            if (roleIndex == -1 || roleIndex >= caseData.getRespondentCollection().size()) {
-                caseRoles.remove(role);
-                continue;
-            }
-            RespondentSumTypeItem respondent = caseData.getRespondentCollection().get(roleIndex);
-            boolean representativeFound = false;
-            for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
-                if (RespondentRepresentativeUtils.isValidRepresentative(representative)
-                        && Strings.CS.equals(representative.getValue().getIdamId(), userId)
-                        && representative.getValue().getRespondentId().equals(respondent.getId())) {
-                    representativeFound = true;
-                    break;
-                }
-            }
-            if (!representativeFound) {
-                caseRoles.remove(role);
-            }
-        }
     }
 
     /**

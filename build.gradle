@@ -227,6 +227,8 @@ configurations {
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
     apiTestImplementation.extendsFrom testImplementation
     apiTestRuntimeOnly.extendsFrom testRuntimeOnly
+    cftlibTestImplementation.extendsFrom testImplementation
+    cftlibTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 test {
@@ -667,11 +669,18 @@ wrapper {
 
 assemble.dependsOn(dumpCCDDefinitions)
 
-bootWithCCD {
+tasks.withType(uk.gov.hmcts.rse.CftlibExec).configureEach {
     // Simulates idam and s2s locally.
     // See rse-cft-lib/LibRunnerTask
     authMode = uk.gov.hmcts.rse.AuthMode.Local
 
+    environment 'CFTLIB_IMPORT_CCD_DEFS_ON_BOOT',
+        System.getenv('CFTLIB_IMPORT_CCD_DEFS_ON_BOOT') ?: 'true'
+    environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
+    environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
+}
+
+bootWithCCD {
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,ethos,camunda,role_assignment,wa_workflow_api,cft_task_db,wa_case_event_messages_db,ccd_data,emstitch'
     environment 'CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES', 'aac_manage_case_assignment,et_cos,et_sya_api,et_msg_handler'
     // ccd-data-store-api
@@ -705,14 +714,11 @@ bootWithCCD {
     environment 'PRD_HOST', 'http://localhost:8765'
     environment 'XUI_MANAGE_ORGANISATIONS_CASETYPES', 'ET_EnglandWales,ET_Scotland'
 
-    environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
     environment 'ET_COS_URL', System.getenv('ET_COS_URL') ?: 'http://localhost:8081'
     environment 'ET_COS_SYSTEM_USER', System.getenv('ET_COS_SYSTEM_USER') ?: 'admin@hmcts.net'
     environment 'ET_COS_SYSTEM_USER_PASSWORD', System.getenv('ET_COS_SYSTEM_USER_PASSWORD') ?: 'Password'
-    environment 'CFTLIB_IMPORT_CCD_DEFS_ON_BOOT', System.getenv('CFTLIB_IMPORT_CCD_DEFS_ON_BOOT') ?: 'true'
     // et-ccd-callbacks
     //environment 'SERVICEBUS_FAKE', 'true'*
-    environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
     environment 'SPRING_APPLICATION_JSON', groovy.json.JsonOutput.toJson([
         ccd: [
             decentralised: [
@@ -731,18 +737,37 @@ bootWithCCD {
 
 }
 
+cftlibTest {
+    dependsOn 'generateCftlibCcdDefinitions'
+    group = 'verification'
+
+    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos'
+    environment 'RSE_LIB_CLEAN_BOOT', 'true'
+    environment 'CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES', 'et_cos'
+    environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_data,et_cos'
+    environment 'ET_COS_SYSTEM_USER', 'admin@hmcts.net'
+    environment 'ET_COS_SYSTEM_USER_PASSWORD', 'password'
+    environment 'ET_RETAIN_AND_DISPOSE_MODE', 'live'
+    environment 'ET_RETAIN_AND_DISPOSE_CRON', '*/2 * * * * *'
+    environment 'SPRING_APPLICATION_JSON', groovy.json.JsonOutput.toJson([
+        ccd: [
+            decentralised: [
+                'case-type-service-urls': [
+                    ET_EnglandWales: 'http://localhost:8081'
+                ]
+            ]
+        ]
+    ])
+}
+
 tasks.named('dumpCCDDefinitions') {
     dependsOn 'generateCftlibCcdDefinitions'
-    authMode = uk.gov.hmcts.rse.AuthMode.Local
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,ethos,camunda,role_assignment,wa_workflow_api,cft_task_db,wa_case_event_messages_db,ccd_data,emstitch'
-    environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
     environment 'SPRING_MAIN_LAZY_INITIALIZATION', 'true'
-    environment 'CFTLIB_IMPORT_CCD_DEFS_ON_BOOT', System.getenv('CFTLIB_IMPORT_CCD_DEFS_ON_BOOT') ?: 'true'
     environment 'ET_COS_CFTLIB_DB_PASSWORD', System.getenv('ET_COS_CFTLIB_DB_PASSWORD') ?: 'postgres'
     environment 'ET_COS_URL', System.getenv('ET_COS_URL') ?: 'http://localhost:8081'
     environment 'ET_COS_SYSTEM_USER', System.getenv('ET_COS_SYSTEM_USER') ?: 'admin@hmcts.net'
     environment 'ET_COS_SYSTEM_USER_PASSWORD', System.getenv('ET_COS_SYSTEM_USER_PASSWORD') ?: 'Password'
-    environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
 }
 
 tasks.register('highLevelDataSetup', JavaExec) {

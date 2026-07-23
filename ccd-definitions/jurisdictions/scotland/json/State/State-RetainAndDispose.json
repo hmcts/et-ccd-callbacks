@@ -1,0 +1,9 @@
+[
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "PendingDisposal",
+    "Name": "Pending disposal",
+    "Description": "Cases marked for disposal",
+    "DisplayOrder": 8
+  }
+]

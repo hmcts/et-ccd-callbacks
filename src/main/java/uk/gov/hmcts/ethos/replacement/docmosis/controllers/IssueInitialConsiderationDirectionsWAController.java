@@ -104,6 +104,12 @@ public class IssueInitialConsiderationDirectionsWAController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setIcEt1VettingIssuesDetail(null);
+        caseData.setIcEt3ProcessingIssuesDetail(null);
+        caseData.setEtIcPartiesHearingFormat(null);
+        caseData.setEtIcPartiesHearingPanelPreference(null);
+
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .confirmation_header(COMPLETE_IICD_HDR)
                 .build());

@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 final class RoleUtilsTest {
 
     private static final String RESPONDENT_ID_1 = "Respondent Id One";
-    private static final String RESPONDENT_ID_2 = "Respondent Id Two";
     private static final String RESPONDENT_NAME_ONE = "Respondent Name One";
     private static final String RESPONDENT_NAME_TWO = "Respondent Name Two";
     private static final String RESPONDENT_NAME_THREE = "Respondent Name Three";
@@ -561,18 +560,16 @@ final class RoleUtilsTest {
     @Test
     void theGetCaseRolesForUser() {
         // when case user assignments is empty should return an empty list
-        CaseData caseData = CaseDataBuilder.builder().build();
-        assertThat(RoleUtils.getCaseRolesForUser(caseData, null, REPRESENTATIVE_ID_1)).isEmpty();
+        assertThat(RoleUtils.getCaseRolesForUser(null, REPRESENTATIVE_ID_1)).isEmpty();
         // when representative id is empty should return an empty list
         List<CaseUserAssignment> caseUserAssignments = List.of(CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_A)
                 .userId(REPRESENTATIVE_ID_1).build());
-        assertThat(RoleUtils.getCaseRolesForUser(caseData, caseUserAssignments, StringUtils.EMPTY)).isEmpty();
+        assertThat(RoleUtils.getCaseRolesForUser(caseUserAssignments, StringUtils.EMPTY)).isEmpty();
         // when representative id not exists in the case user assignments should return an empty list
-        assertThat(RoleUtils.getCaseRolesForUser(caseData, caseUserAssignments, REPRESENTATIVE_ID_2)).isEmpty();
+        assertThat(RoleUtils.getCaseRolesForUser(caseUserAssignments, REPRESENTATIVE_ID_2)).isEmpty();
         // when representative found should return role list
         RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
         representative.setId(REPRESENTATIVE_ID_1);
-        caseData.setRepCollection(List.of(representative));
         RepresentedTypeR representativeValue = RepresentedTypeR.builder().respondentId(RESPONDENT_ID_1)
                 .idamId(REPRESENTATIVE_ID_1).build();
         representative.setValue(representativeValue);
@@ -580,8 +577,7 @@ final class RoleUtilsTest {
         RespondentSumTypeItem respondent = new RespondentSumTypeItem();
         respondent.setValue(respondentValue);
         respondent.setId(RESPONDENT_ID_1);
-        caseData.setRespondentCollection(List.of(respondent));
-        assertThat(RoleUtils.getCaseRolesForUser(caseData, caseUserAssignments, REPRESENTATIVE_ID_1))
+        assertThat(RoleUtils.getCaseRolesForUser(caseUserAssignments, REPRESENTATIVE_ID_1))
                 .isEqualTo(List.of(ROLE_SOLICITOR_A));
     }
 
@@ -594,62 +590,5 @@ final class RoleUtilsTest {
         // when there are case assignments found for the given user id should return the latest case roles
         assertThat(RoleUtils.findFirstCaseRolesByUserId(caseUserAssignments, REPRESENTATIVE_ID_1))
                 .isEqualTo(List.of(ROLE_SOLICITOR_A));
-    }
-
-    @Test
-    void theRemoveRolesWithoutMatchingRespondentRepresentative() {
-        // when case roles is empty should reset case roles
-        List<String> caseRoles = new ArrayList<>();
-        CaseData caseData = new  CaseData();
-        RoleUtils.removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, REPRESENTATIVE_ID_1);
-        assertThat(caseRoles).isEqualTo(Collections.emptyList());
-        // when respondent collection is empty should reset case roles
-        caseRoles.add(ROLE_SOLICITOR_A);
-        RoleUtils.removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, REPRESENTATIVE_ID_1);
-        assertThat(caseRoles).isEqualTo(Collections.emptyList());
-        // when representative collection is empty should reset case roles
-        RespondentSumType respondentValue = RespondentSumType.builder().respondentName(RESPONDENT_NAME_ONE).build();
-        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
-        respondent.setValue(respondentValue);
-        respondent.setId(RESPONDENT_ID_1);
-        caseData.setRespondentCollection(List.of(respondent));
-        caseRoles.add(ROLE_SOLICITOR_A);
-        RoleUtils.removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, REPRESENTATIVE_ID_1);
-        assertThat(caseRoles).isEqualTo(Collections.emptyList());
-        // when role is not a valid respondent role should not change case roles
-        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
-        representative.setId(REPRESENTATIVE_ID_1);
-        caseData.setRepCollection(List.of(representative));
-        caseRoles.clear();
-        caseRoles.add(ROLE_INVALID);
-        RoleUtils.removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, REPRESENTATIVE_ID_1);
-        assertThat(caseRoles).isEqualTo(Collections.emptyList());
-        // when role index is greater than or equal to respondent collection size  should remove role
-        caseRoles.clear();
-        caseRoles.add(ROLE_SOLICITOR_B);
-        RoleUtils.removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, REPRESENTATIVE_ID_1);
-        assertThat(caseRoles).isEqualTo(Collections.emptyList());
-        // when representative is not a valid representative  should remove role
-        caseRoles.clear();
-        caseRoles.add(ROLE_SOLICITOR_A);
-        RoleUtils.removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, REPRESENTATIVE_ID_1);
-        assertThat(caseRoles).isEqualTo(Collections.emptyList());
-        // when representative idam id not equal to user id should remove role
-        RepresentedTypeR representativeValue = RepresentedTypeR.builder().respondentId(RESPONDENT_ID_2)
-                .idamId(REPRESENTATIVE_ID_1).build();
-        representative.setValue(representativeValue);
-        caseRoles.add(ROLE_SOLICITOR_A);
-        RoleUtils.removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, REPRESENTATIVE_ID_2);
-        assertThat(caseRoles).isEqualTo(Collections.emptyList());
-        // when representative respondent id not equal to respondent id of the selected role indexed respondent should
-        // remove role
-        caseRoles.add(ROLE_SOLICITOR_A);
-        RoleUtils.removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, REPRESENTATIVE_ID_1);
-        assertThat(caseRoles).isEqualTo(Collections.emptyList());
-        // when representative respondent id is equal to the selected role indexed respondent should not remove role
-        caseRoles.add(ROLE_SOLICITOR_A);
-        representativeValue.setRespondentId(RESPONDENT_ID_1);
-        RoleUtils.removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, REPRESENTATIVE_ID_1);
-        assertThat(caseRoles).isEqualTo(List.of(ROLE_SOLICITOR_A));
     }
 }

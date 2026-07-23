@@ -324,6 +324,13 @@ cron:
   reconfigurationCaseIds: ${CRON_RECONFIGURATION_CASE_IDS:}
   reconfigurationLimit: ${CRON_RECONFIGURATION_LIMIT:1000}
 
+retention:
+  disposal:
+    enabled: ${RETENTION_DISPOSAL_ENABLED:true}
+    caseTypeIds: ${RETENTION_DISPOSAL_CASE_TYPE_IDS:ET_Admin,ET_EnglandWales,ET_Scotland}
+    simulationCaseTypeIds: ${RETENTION_DISPOSAL_SIMULATION_CASE_TYPE_IDS:}
+    batchSize: ${RETENTION_DISPOSAL_BATCH_SIZE:100}
+
 pdf:
   english: "ET1_0224.pdf"
   welsh: "CY_ET1_0224.pdf"

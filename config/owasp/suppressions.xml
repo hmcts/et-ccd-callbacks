@@ -137,4 +137,16 @@
         <cve>CVE-2026-54514</cve>
         <cve>CVE-2026-54515</cve>
     </suppress>
+       <!-- Netty 4.2.16.Final is the latest available version; no fix released for these CVEs.
+         Suppress until a patched release is available. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-*-4.2.16.Final.jar
+   Latest available version. No fix released for CVE-2026-44891, CVE-2026-55831, CVE-2026-55833 as of 2026-07-23.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-.*@4\.2\.16\.Final$</packageUrl>
+        <cve>CVE-2026-44891</cve>
+        <cve>CVE-2026-55831</cve>
+        <cve>CVE-2026-55833</cve>
+    </suppress>
 </suppressions>

@@ -1,5 +1,5 @@
 const config = require('../config.js');
-const supportedBrowsers = require('../crossbrowser/supportedBrowsers');
+const supportedBrowsers = require('../crossbrowser/supportedBrowsers.js');
 const testUrl = process.env.TEST_URL || config.TestUrl;
 
 const waitForTimeout = parseInt(process.env.WAIT_FOR_TIMEOUT) || 45000;

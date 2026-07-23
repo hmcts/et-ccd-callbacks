@@ -1,0 +1,8 @@
+{
+  "et1SectionThreeClaimDetails": "No supplemetary Details",
+  "et1SectionThreeTypeOfClaim": ["discrimination"],
+  "discriminationTypesOfClaim": ["Age"],
+  "claimSuccessful": ["compensation"],
+  "compensationDetails": "Compensation £40,000",
+  "linkedCasesYesNo": ["No"]
+}

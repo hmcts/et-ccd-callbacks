@@ -670,8 +670,6 @@ wrapper {
 assemble.dependsOn(dumpCCDDefinitions)
 
 tasks.withType(uk.gov.hmcts.rse.CftlibExec).configureEach {
-    dependsOn 'generateCftlibCcdDefinitions'
-
     // Simulates idam and s2s locally.
     // See rse-cft-lib/LibRunnerTask
     authMode = uk.gov.hmcts.rse.AuthMode.Local
@@ -740,6 +738,7 @@ bootWithCCD {
 }
 
 cftlibTest {
+    dependsOn 'generateCftlibCcdDefinitions'
     group = 'verification'
 
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos'
@@ -762,6 +761,7 @@ cftlibTest {
 }
 
 tasks.named('dumpCCDDefinitions') {
+    dependsOn 'generateCftlibCcdDefinitions'
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,ethos,camunda,role_assignment,wa_workflow_api,cft_task_db,wa_case_event_messages_db,ccd_data,emstitch'
     environment 'SPRING_MAIN_LAZY_INITIALIZATION', 'true'
     environment 'ET_COS_CFTLIB_DB_PASSWORD', System.getenv('ET_COS_CFTLIB_DB_PASSWORD') ?: 'postgres'

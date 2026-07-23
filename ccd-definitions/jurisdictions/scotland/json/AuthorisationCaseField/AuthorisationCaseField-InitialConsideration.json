@@ -1939,7 +1939,8 @@
         "UserRoles": [
           "caseworker-employment-scotland",
           "caseworker-employment-etjudge-scotland",
-          "caseworker-employment-api"
+          "caseworker-employment-api",
+          "caseworker-wa-task-configuration"
         ],
         "CRUD": "CRUD"
       }

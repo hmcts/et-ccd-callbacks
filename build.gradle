@@ -466,7 +466,7 @@ dependencyManagement {
     }
     dependencies {
         dependency 'org.apache.httpcomponents.core5:httpcore5:5.4.3'
-        dependency 'com.microsoft.azure:msal4j:1.25.0'
+        dependency 'com.microsoft.azure:msal4j:1.25.1'
         // CVE-2026-42198, CVE-2026-54291 - override above the Spring Boot BOM
         dependency 'org.postgresql:postgresql:42.7.13'
         dependency 'org.springframework.security:spring-security-crypto:6.5.11'

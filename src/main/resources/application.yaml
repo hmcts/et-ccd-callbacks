@@ -69,6 +69,13 @@ ccd:
   decentralised-runtime:
     cdam-attach:
       enabled: ${CCD_DECENTRALISED_RUNTIME_CDAM_ATTACH_ENABLED:true}
+    retain-and-dispose:
+      mode: ${ET_RETAIN_AND_DISPOSE_MODE:off}
+      cron: "${ET_RETAIN_AND_DISPOSE_CRON:0 0 2 * * *}"
+      zone: ${ET_RETAIN_AND_DISPOSE_ZONE:UTC}
+      system-user:
+        username: ${ET_COS_SYSTEM_USER}
+        password: ${ET_COS_SYSTEM_USER_PASSWORD}
   data-migration:
     enabled: ${ET_CCD_DATA_MIGRATION_ENABLED:false}
     task-name: ${ET_CCD_DATA_MIGRATION_TASK_NAME:et-ccd-data-migration}
@@ -107,16 +114,6 @@ decentralisation:
   local-callback-base-url: ${ET_COS_URL:http://localhost:8081}
   external-callback-base-urls:
     "[CCD_DEF_AAC_URL]": ${AAC_URL:http://localhost:4454}
-
-ccd:
-  decentralised-runtime:
-    retain-and-dispose:
-      mode: ${ET_RETAIN_AND_DISPOSE_MODE:off}
-      cron: "${ET_RETAIN_AND_DISPOSE_CRON:0 0 2 * * *}"
-      zone: ${ET_RETAIN_AND_DISPOSE_ZONE:UTC}
-      system-user:
-        username: ${ET_COS_SYSTEM_USER}
-        password: ${ET_COS_SYSTEM_USER_PASSWORD}
 
 idam:
   s2s-auth:

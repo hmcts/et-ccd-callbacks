@@ -3,6 +3,6 @@
     "CaseTypeID": "ET_EnglandWales",
     "CaseStateID": "PendingDisposal",
     "UserRole": "caseworker-employment-api",
-    "CRUD": "R"
+    "CRUD": "RU"
   }
 ]

@@ -1,0 +1,33 @@
+{
+  "didClaimantWorkForOrg": ["Yes"],
+  "claimantStillWorking": ["Working"],
+  "claimantJobTitle": "Developer",
+  "claimantStartDate": "2022-02-01",
+  "claimantEndDate": null,
+  "claimantStillWorkingNoticePeriod": ["Months"],
+  "claimantStillWorkingNoticePeriodMonths": "1",
+  "claimantAverageWeeklyWorkHours": "40",
+  "claimantPayBeforeTax": "4400000",
+  "claimantPayAfterTax": null,
+  "claimantPayType": ["Weekly"],
+  "claimantPensionContribution": ["Yes"],
+  "claimantWeeklyPension": "2000",
+  "claimantEmployeeBenefits": ["Yes"],
+  "claimantBenefits": "child benefit",
+  "respondentType": "Individual",
+  "respondentFirstName": "Mrs Test",
+  "respondentLastName": "Auto",
+  "respondentAddress": {
+    "AddressLine1": "The Deli",
+    "AddressLine2": "1 Whitehall Place",
+    "AddressLine3": "",
+    "PostTown": "Leeds",
+    "County": "",
+    "PostCode": "LS12 1AA",
+    "Country": "United Kingdom"
+  },
+  "didClaimantWorkAtSameAddress": "Yes",
+  "respondentAcasYesNo": "Yes",
+  "respondentAcasNumber": "R872259/22/64",
+  "addAdditionalRespondent": "No"
+}

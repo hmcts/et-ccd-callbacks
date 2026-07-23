@@ -2,7 +2,14 @@
 
 set -eu
 
-docker stop $(docker ps -a -q)
-docker rm $(docker ps -a -q)
+containers="$(docker ps -a -q)"
+if [ -n "$containers" ]; then
+  docker stop $containers
+  docker rm $containers
+fi
+
 yes | docker volume prune
-docker network rm cftlib_default
+
+if docker network inspect cftlib_default >/dev/null 2>&1; then
+  docker network rm cftlib_default
+fi

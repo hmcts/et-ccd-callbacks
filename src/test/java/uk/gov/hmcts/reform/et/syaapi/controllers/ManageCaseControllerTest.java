@@ -20,6 +20,8 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent;
 import uk.gov.hmcts.reform.et.syaapi.model.CaseTestData;
 import uk.gov.hmcts.reform.et.syaapi.models.CaseRequest;
+import uk.gov.hmcts.reform.et.syaapi.models.CaseTransferInfoResponse;
+import uk.gov.hmcts.reform.et.syaapi.models.CaseTransferType;
 import uk.gov.hmcts.reform.et.syaapi.models.ChangeApplicationStatusRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.ClaimantApplicationRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.HubLinksStatusesRequest;
@@ -27,6 +29,7 @@ import uk.gov.hmcts.reform.et.syaapi.models.RespondToApplicationRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.TribunalResponseViewedRequest;
 import uk.gov.hmcts.reform.et.syaapi.service.ApplicationService;
 import uk.gov.hmcts.reform.et.syaapi.service.CaseService;
+import uk.gov.hmcts.reform.et.syaapi.service.CaseTransferInfoService;
 import uk.gov.hmcts.reform.et.syaapi.service.HubLinkService;
 import uk.gov.hmcts.reform.et.syaapi.service.ManageCaseRoleService;
 import uk.gov.hmcts.reform.et.syaapi.service.utils.ResourceLoader;
@@ -92,6 +95,9 @@ class ManageCaseControllerTest {
     private ApplicationService applicationService;
     @MockitoBean
     private HubLinkService hubLinkService;
+
+    @MockitoBean
+    private CaseTransferInfoService caseTransferInfoService;
 
     ManageCaseControllerTest() {
         // Default constructor
@@ -201,7 +207,7 @@ class ManageCaseControllerTest {
                             .header(HttpHeaders.AUTHORIZATION, TEST_SERVICE_AUTH_TOKEN))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.code").value(400))
-            .andExpect(jsonPath("$.message").value("Bad request - incorrect payload"));
+            .andExpect(jsonPath("$.message").value("Bad request"));
     }
 
     @Test
@@ -492,5 +498,46 @@ class ManageCaseControllerTest {
             .andExpect(jsonPath("$.state").value(expectedDetails.getState()))
             .andExpect(jsonPath("$.created_date").exists())
             .andExpect(jsonPath("$.last_modified").exists());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldGetCaseTransferInfo() {
+        CaseTransferInfoResponse transferInfo = CaseTransferInfoResponse.builder()
+            .transferred(true)
+            .transferType(CaseTransferType.ECM)
+            .caseState("Transferred")
+            .originalCaseId(CASE_ID)
+            .originalEthosCaseReference("60000001/2022")
+            .newEthosCaseReference("18850001/2020")
+            .newCaseId("1234567890123456")
+            .destinationOffice("ECM")
+            .reasonForCT("Office move")
+            .transferComplete(true)
+            .build();
+
+        when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
+        when(caseTransferInfoService.getCaseTransferInfo(
+            TEST_SERVICE_AUTH_TOKEN,
+            CASE_ID,
+            CASE_USER_ROLE_CREATOR
+        )).thenReturn(transferInfo);
+
+        mockMvc.perform(get("/cases/{caseId}/transfer-info", CASE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_SERVICE_AUTH_TOKEN)
+                            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.transferred").value(true))
+            .andExpect(jsonPath("$.transferType").value("ECM"))
+            .andExpect(jsonPath("$.originalCaseId").value(CASE_ID))
+            .andExpect(jsonPath("$.newEthosCaseReference").value("18850001/2020"))
+            .andExpect(jsonPath("$.newCaseId").value("1234567890123456"))
+            .andExpect(jsonPath("$.transferComplete").value(true));
+
+        verify(caseTransferInfoService, times(1)).getCaseTransferInfo(
+            TEST_SERVICE_AUTH_TOKEN,
+            CASE_ID,
+            CASE_USER_ROLE_CREATOR
+        );
     }
 }

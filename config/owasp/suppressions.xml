@@ -70,6 +70,7 @@
         <cve>CVE-2026-39882</cve>
         <cve>CVE-2026-39883</cve>
     </suppress>
+    <!-- CVE-2026-53914 fix requires Kotlin 2.4.20 (not yet GA). Remove when released. -->
     <!-- Suppress Apache HttpComponents CVEs until patched dependency versions are agreed. -->
     <suppress>
         <notes><![CDATA[
@@ -107,28 +108,28 @@
          No fixed version exists. Suppress until a patched release is available. -->
     <suppress>
         <notes><![CDATA[
-   file name: jackson-databind-2.22.0.jar
-   Latest available version. No fix released for CVE-2026-54515 as of 2026-07-01.
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
-        <cve>CVE-2026-54515</cve>
-    </suppress>
-    <!-- CVE-2026-53914 affects kotlin-stdlib 2.2.0 which is the latest available version.
-         No fixed version exists. Suppress until a patched release is available. -->
-    <suppress>
-        <notes><![CDATA[
-   file name: kotlin-stdlib-2.2.0.jar, kotlin-stdlib-jdk7-2.2.0.jar, kotlin-stdlib-jdk8-2.2.0.jar
-   Latest available version. No fix released for CVE-2026-53914 as of 2026-07-01.
+   kotlin-stdlib pinned to 2.4.0 pending Kotlin 2.4.20 release.
+   CVE affects build cache metadata; runtime risk is lower for this service.
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-stdlib.*@.*$</packageUrl>
         <cve>CVE-2026-53914</cve>
     </suppress>
-    <!-- cucumber-core-7.18.0.jar shades jackson-databind:2.17.1 internally; the resolution strategy
+    <!-- CVE-2026-54515: latest jackson-databind 2.22.0 on Maven Central; suppress until patched release. -->
+    <suppress>
+        <notes><![CDATA[
+   jackson-databind 2.22.0 is the latest available version.
+   CVE-2026-54515: case-insensitive deserialization bypasses per-property @JsonIgnoreProperties.
+   Practical risk is low: requires ACCEPT_CASE_INSENSITIVE_PROPERTIES plus per-property @JsonIgnoreProperties.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+        <cve>CVE-2026-54515</cve>
+    </suppress>
+    <!-- cucumber-core shades an older jackson-databind internally; the resolution strategy
          cannot override bundled/shaded jars. cucumber is a test-only dependency and these CVEs do not
          affect production runtime. Suppress until cucumber-core ships a newer embedded jackson. -->
     <suppress>
         <notes><![CDATA[
-   file name: cucumber-core-7.18.0.jar (shaded: com.fasterxml.jackson.core:jackson-databind:2.17.1)
+   file name: cucumber-core-*.jar (shaded: com.fasterxml.jackson.core:jackson-databind:2.17.1)
    Bundled/shaded jackson inside cucumber-core test dependency. Not exploitable in production.
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@2\.17\.1$</packageUrl>
@@ -137,8 +138,9 @@
         <cve>CVE-2026-54514</cve>
         <cve>CVE-2026-54515</cve>
     </suppress>
-       <!-- Netty 4.2.16.Final is the latest available version; no fix released for these CVEs.
-         Suppress until a patched release is available. -->
+    <!-- False positive: CVE-2026-44891, CVE-2026-55831, CVE-2026-55833 are fixed in 4.2.16.Final
+         (affected range is < 4.2.16.Final). Dependency-Check still matches the Netty CPE on the
+         patched release. Remove when NVD/Dependency-Check version matching is corrected. -->
     <suppress>
         <notes><![CDATA[
    file name: netty-*-4.2.16.Final.jar

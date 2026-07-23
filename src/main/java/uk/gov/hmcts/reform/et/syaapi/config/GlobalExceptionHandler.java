@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.et.syaapi.config;
 
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,6 +32,26 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    private static final int MAX_LOGGED_UPSTREAM_BODY_LENGTH = 500;
+
+    private static void logUpstreamFailure(FeignException exception) {
+        String upstreamBody = exception.contentUTF8();
+        if (StringUtils.isNotBlank(upstreamBody) && upstreamBody.length() > MAX_LOGGED_UPSTREAM_BODY_LENGTH) {
+            upstreamBody = upstreamBody.substring(0, MAX_LOGGED_UPSTREAM_BODY_LENGTH) + "...";
+        }
+        if (StringUtils.isNotBlank(upstreamBody)) {
+            log.error(
+                "{} (status {}): {}",
+                exception.getMessage(),
+                exception.status(),
+                upstreamBody,
+                exception
+            );
+        } else {
+            log.error(exception.getMessage(), exception);
+        }
+    }
 
     /**
      * Intercepts any {@link InvalidTokenException} occurances within the api and builds an appropriate response.
@@ -73,11 +94,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(FeignException.class)
     ResponseEntity<ErrorResponse> handleFeignException(FeignException exception) {
-        log.error(exception.getMessage(), exception);
+        logUpstreamFailure(exception);
 
         return ResponseEntity.status(exception.status()).body(
             ErrorResponse.builder()
-                .message(String.format("%s - %s", exception.getMessage(), exception.contentUTF8()))
+                .message(exception.getMessage())
                 .code(exception.status())
                 .build()
         );

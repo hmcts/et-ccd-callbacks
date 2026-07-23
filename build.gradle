@@ -146,11 +146,21 @@ sourceSets {
     }
 }
 
+ext {
+    // CVE-2026-53434, CVE-2026-55276, CVE-2026-53404, CVE-2026-55955, CVE-2026-55956, CVE-2026-50229
+    tomcatEmbedVersion = '10.1.56'
+    // CVE-2026-54515: no fixed jackson-databind release on Maven Central yet; suppress until available
+    jacksonVersion = '2.22.0'
+    jacksonAnnotationsVersion = '2.22'
+    jackson3Version = '3.2.0'
+    kotlinVersion = '2.4.0'
+    cucumberVersion = '7.34.2'
+    messagesNdjsonVersion = '0.5.0'
+}
+
 allprojects {
     // CVE-2026-41840, CVE-2026-41841, CVE-2026-41842, CVE-2026-41843, CVE-2026-41850,
     // CVE-2026-41851 - override the Spring Framework version managed by the Spring Boot BOM.
-    // CVE-2026-54512, CVE-2026-54513, CVE-2026-54514, CVE-2026-54515, CVE-2026-54516,
-    // CVE-2026-54517, CVE-2026-54518 - jackson-databind upgraded to 2.22.0
     ext['spring-framework.version'] = '6.2.19'
 
     configurations.configureEach {
@@ -160,19 +170,20 @@ allprojects {
                 details.useVersion("$jacksonAnnotationsVersion")
             } else if (details.requested.group.startsWith("com.fasterxml.jackson")) {
                 details.useVersion("$jacksonVersion")
-            } else if (details.requested.group == "tools.jackson.core") {
-                // CVE-2026-54512, CVE-2026-54513, CVE-2026-54514, CVE-2026-54515,
-                // CVE-2026-54516, CVE-2026-54517, CVE-2026-54518 - upgrade Jackson 3.x
-                details.useVersion("$jacksonV3Version")
+            } else if (details.requested.group.startsWith("tools.jackson")) {
+                details.useVersion("$jackson3Version")
+            } else if (details.requested.group == "io.cucumber"
+                && details.requested.name == "messages-ndjson") {
+                details.useVersion("$messagesNdjsonVersion")
             }
             if (details.requested.group == "org.apache.tomcat.embed"
                 && ["tomcat-embed-core", "tomcat-embed-websocket"].contains(details.requested.name)) {
                 details.useVersion(tomcatEmbedVersion)
             }
-            // CVE-2020-29582, CVE-2026-53914 - Force Kotlin to 2.2.0+
+            // CVE-2026-53914 - pin Kotlin stdlib; upgrade to 2.4.20 when released
             if (details.requested.group == "org.jetbrains.kotlin"
                 && details.requested.name.startsWith("kotlin-stdlib")) {
-                details.useVersion("2.2.0")
+                details.useVersion("$kotlinVersion")
             }
         }
         resolutionStrategy.force(
@@ -185,10 +196,22 @@ allprojects {
             'com.squareup.okhttp3:okhttp:4.12.0',
             'com.squareup.okhttp3:okhttp-urlconnection:4.12.0',
             'com.squareup.okio:okio:3.17.0',
-            // CVE-2020-29582, CVE-2026-53914 - Fixed in Kotlin 2.2.0+
-            'org.jetbrains.kotlin:kotlin-stdlib:2.2.0',
-            'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.2.0',
-            'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.0',
+            // CVE-2026-53914 - latest stable until 2.4.20 is released
+            "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion",
+            "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion",
+            "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion",
+            // CVE-2026-54512..54517 - Jackson 3.x via elasticsearch-java / cucumber
+            "tools.jackson.core:jackson-databind:$jackson3Version",
+            "tools.jackson.core:jackson-core:$jackson3Version",
+            // CVE-2026-54515 - Jackson 2.x via Spring Boot; suppress until patched release is available
+            "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
+            "com.fasterxml.jackson.core:jackson-core:$jacksonVersion",
+            // befta-fw pins cucumber 7.18.0 on runtime classpath
+            "io.cucumber:cucumber-core:$cucumberVersion",
+            "io.cucumber:cucumber-java:$cucumberVersion",
+            "io.cucumber:cucumber-junit:$cucumberVersion",
+            // CVE-2026-54512..54514 - shaded jackson 2.20.1 in messages-ndjson 0.3.0
+            "io.cucumber:messages-ndjson:$messagesNdjsonVersion",
             'org.bouncycastle:bcprov-jdk15on:1.70',
             'io.netty:netty-buffer:4.2.16.Final',
             'io.netty:netty-codec:4.2.16.Final',
@@ -230,10 +253,18 @@ configurations {
 }
 
 test {
+    dependsOn dumpCCDDefinitions
     exclude '**/*ComponentTest*'
     useJUnitPlatform()
     testLogging {
         events "passed", "skipped", "failed"
+    }
+}
+
+processTestResources {
+    dependsOn dumpCCDDefinitions
+    from("$buildDir/cftlib/definition-snapshots") {
+        into 'definition-snapshots'
     }
 }
 
@@ -430,6 +461,8 @@ dependencyCheck {
     suppressionFile = 'config/owasp/suppressions.xml'
     analyzers.assemblyEnabled = false
     analyzers.nodeAudit.yarnEnabled = false
+    nvd.validForHours = 168
+    autoUpdate = true
 }
 
 repositories {
@@ -456,6 +489,7 @@ ext {
     jacksonVersion = '2.22.1'
     jacksonAnnotationsVersion = '2.22'
     jacksonV3Version = '3.2.0'
+
 }
 
 ext["rest-assured.version"] = '5.1.0'

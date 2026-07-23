@@ -255,6 +255,13 @@ class ManageCaseRoleServiceUtilTest {
     }
 
     @Test
+    void formatCaseUserRoleShouldDefaultToCreatorWhenBlank() {
+        assertThat(ManageCaseRoleServiceUtil.formatCaseUserRole(null)).isEqualTo(CASE_USER_ROLE_CREATOR);
+        assertThat(ManageCaseRoleServiceUtil.formatCaseUserRole("  ")).isEqualTo(CASE_USER_ROLE_CREATOR);
+        assertThat(ManageCaseRoleServiceUtil.formatCaseUserRole("DEFENDANT")).isEqualTo(CASE_USER_ROLE_DEFENDANT);
+    }
+
+    @Test
     void theBuildCaseAccessUrl() {
         String expectedCaseAccessUrl = "http://localhost:8080/ccd/data-store/case-users?case_ids=1234567890123456";
         assertThat(ManageCaseRoleServiceUtil.buildCaseAccessUrl(TEST_CCD_DATA_STORE_BASE_URL, TEST_CASE_ID_STRING))

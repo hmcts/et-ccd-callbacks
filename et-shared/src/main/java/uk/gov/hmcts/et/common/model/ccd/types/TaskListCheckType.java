@@ -10,6 +10,8 @@ public class TaskListCheckType {
 
     @JsonProperty("personalDetailsCheck")
     private String personalDetailsCheck;
+    @JsonProperty("groupClaimsCheck")
+    private String groupClaimsCheck;
     @JsonProperty("employmentAndRespondentCheck")
     private String employmentAndRespondentCheck;
     @JsonProperty("claimDetailsCheck")

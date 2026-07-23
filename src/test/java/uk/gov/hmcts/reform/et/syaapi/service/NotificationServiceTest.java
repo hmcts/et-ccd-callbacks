@@ -62,6 +62,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -75,12 +76,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_ABBREVIATED_MONTHS_MAP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.CASE_ID_NOT_FOUND;
+import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.MULTIPLE_ID_NOT_FOUND;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.NOT_SET;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_PARAMS_APPLICANT_NAME_KEY;
+import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_PARAMS_CASE_NUMBER_KEY;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_PARAMS_CITIZEN_PORTAL_LINK_KEY;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_PARAMS_EXUI_LINK_KEY;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_PARAMS_HEARING_DATE_KEY;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_PARAMS_LINK_DOC_KEY;
+import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_PARAMS_MULTIPLE_CASE_NUMBER_KEY;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_PARAMS_SHORTTEXT_KEY;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.UNASSIGNED_OFFICE;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.YES;
@@ -122,10 +128,6 @@ class NotificationServiceTest {
     ArgumentCaptor<Map<String, Object>> respondentParametersCaptor;
     @Captor
     ArgumentCaptor<Map<String, Object>> claimantParametersCaptor;
-    @Mock
-    RespondentSumType respondentSumTypeMock;
-    @Mock
-    RespondentSumTypeItem respondentSumTypeItemMock;
 
     @BeforeEach
     void before() throws NotificationClientException {
@@ -172,6 +174,16 @@ class NotificationServiceTest {
             .willReturn("claimantTseEmailStoredTemplateId");
         given(notificationsProperties.getClaimantTseEmailSubmitStoredTemplateId())
             .willReturn("claimantTseEmailSubmitStoredTemplateId");
+        given(notificationsProperties.getAdditionalClaimantCaseCreationErrorEmailTemplateId())
+            .willReturn("additional-claimant-error-template");
+        given(notificationsProperties.getMultipleShellCaseCreationErrorEmailTemplateId())
+            .willReturn("multiple-shell-error-template");
+        given(notificationsProperties.getEt1ServiceOwnerNotificationEmail())
+            .willReturn("service.owner@hmcts.net");
+        given(notificationsProperties.getEt1EcmDtsCoreTeamSlackNotificationEmail())
+            .willReturn("core.team@hmcts.net");
+        given(notificationsProperties.getExuiCaseDetailsLink())
+            .willReturn("https://exui/cases/");
 
         caseData = new CaseData();
         caseTestData = new CaseTestData();
@@ -260,6 +272,37 @@ class NotificationServiceTest {
         return notificationService.sendEmail(TestConstants.TEST_TEMPLATE_API_KEY,
                                              TestConstants.TEST_EMAIL, parameters, TestConstants.REFERENCE_STRING
         );
+    }
+
+    @Test
+    void isWelshLanguageShouldReturnFalseWhenClaimantPreferenceIsMissing() {
+        CaseData localCaseData = new CaseData();
+        when(featureToggleService.isWelshEnabled()).thenReturn(true);
+
+        assertFalse(notificationService.isWelshLanguage(localCaseData));
+    }
+
+    @Test
+    void isWelshLanguageShouldReturnFalseWhenWelshFlagDisabled() {
+        ClaimantHearingPreference preference = new ClaimantHearingPreference();
+        preference.setContactLanguage(WELSH_LANGUAGE);
+        CaseData localCaseData = new CaseData();
+        localCaseData.setClaimantHearingPreference(preference);
+        when(featureToggleService.isWelshEnabled()).thenReturn(false);
+
+        assertFalse(notificationService.isWelshLanguage(localCaseData));
+    }
+
+    @Test
+    void isWelshLanguageForRespondentShouldReturnFalseWhenWelshFlagDisabled() {
+        RespondentSumType respondent = RespondentSumType.builder()
+            .et3ResponseLanguagePreference(WELSH_LANGUAGE)
+            .build();
+        RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
+        respondentItem.setValue(respondent);
+        when(featureToggleService.isWelshEnabled()).thenReturn(false);
+
+        assertFalse(notificationService.isWelshLanguage(respondentItem));
     }
 
     @ParameterizedTest
@@ -431,6 +474,52 @@ class NotificationServiceTest {
                 times(1)
             );
         }
+    }
+
+    @Test
+    void shouldSendFailedAdditionalClaimantsEmailWithFallbackValues() throws NotificationClientException {
+        notificationService.sendFailedAdditionalClaimantsEmail(null, null, 12_345L);
+
+        verify(notificationClient).sendEmail(
+            eq("additional-claimant-error-template"),
+            eq("service.owner@hmcts.net"),
+            respondentParametersCaptor.capture(),
+            eq(CASE_ID_NOT_FOUND)
+        );
+        verify(notificationClient).sendEmail(
+            eq("additional-claimant-error-template"),
+            eq("core.team@hmcts.net"),
+            respondentParametersCaptor.capture(),
+            eq(CASE_ID_NOT_FOUND)
+        );
+
+        respondentParametersCaptor.getAllValues().forEach(paramsMap -> {
+            assertEquals(CASE_ID_NOT_FOUND, paramsMap.get(SEND_EMAIL_PARAMS_CASE_NUMBER_KEY));
+            assertEquals(MULTIPLE_ID_NOT_FOUND, paramsMap.get(SEND_EMAIL_PARAMS_MULTIPLE_CASE_NUMBER_KEY));
+            assertEquals("https://exui/cases/12345", paramsMap.get(LINK_TO_EXUI));
+        });
+    }
+
+    @Test
+    void shouldSendFailedMultipleShellCreationEmail() throws NotificationClientException {
+        notificationService.sendFailedMultiplesShellCreationEmail("6000001/2024", 98_765L);
+        verify(notificationClient).sendEmail(
+            eq("multiple-shell-error-template"),
+            eq("service.owner@hmcts.net"),
+            respondentParametersCaptor.capture(),
+            eq("6000001/2024")
+        );
+        verify(notificationClient).sendEmail(
+            eq("multiple-shell-error-template"),
+            eq("core.team@hmcts.net"),
+            respondentParametersCaptor.capture(),
+            eq("6000001/2024")
+        );
+
+        respondentParametersCaptor.getAllValues().forEach(paramsMap -> {
+            assertEquals("6000001/2024", paramsMap.get(SEND_EMAIL_PARAMS_CASE_NUMBER_KEY));
+            assertEquals("https://exui/cases/98765", paramsMap.get(LINK_TO_EXUI));
+        });
     }
 
     private static Stream<Arguments> retrieveSubmitCaseConfirmationEmailPdfFilesArguments() {
@@ -1473,7 +1562,7 @@ class NotificationServiceTest {
                 hearingDate,
                 caseTestData.getExpectedDetails().getId().toString()
             );
-            setLanguagePreference(details.caseData(), WELSH_LANGUAGE);
+            setLanguagePreference(details.caseData());
 
             when(featureToggleService.isWelshEnabled()).thenReturn(true);
             when(notificationsProperties.getRespondentTseTypeCRespAckTemplateId()).thenReturn(
@@ -1502,10 +1591,10 @@ class NotificationServiceTest {
                 .map(entry -> Arguments.of(entry.getKey(), entry.getValue()));
         }
 
-        static void setLanguagePreference(CaseData caseData, String languagePreference) {
+        static void setLanguagePreference(CaseData caseData) {
             caseData.getRespondentCollection().forEach(respondentSumTypeItem -> {
                 RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
-                respondentSumType.setEt3ResponseLanguagePreference(languagePreference);
+                respondentSumType.setEt3ResponseLanguagePreference(TestConstants.WELSH_LANGUAGE);
             });
         }
     }

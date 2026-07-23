@@ -7,12 +7,18 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.dwp.regex.InvalidPostcodeException;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesMsg;
+import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreateMultiplesDataModel;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
 import uk.gov.hmcts.ecm.common.service.pdf.PdfDecodedMultipartFile;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -21,6 +27,10 @@ import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.multiples.AdditionalClaimant;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -41,6 +51,7 @@ import uk.gov.service.notify.SendEmailResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,15 +61,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -109,6 +125,12 @@ class CaseServiceTest {
     private FeatureToggleService featureToggle;
     @Mock
     private ManageCaseRoleService manageCaseRoleService;
+    @Mock
+    private CreateUpdatesBusSender createUpdatesBusSender;
+    @Mock
+    private ExcelReadingService excelReadingService;
+    @Mock
+    private UserIdamService userIdamService;
     @Spy
     private NotificationsProperties notificationsProperties;
     @InjectMocks
@@ -251,6 +273,46 @@ class CaseServiceTest {
     }
 
     @Test
+    void shouldCreateDraftCaseUsingDefaultCaseTypeWhenPostcodeInvalid() throws Exception {
+        when(authTokenGenerator.generate()).thenReturn(TEST_SERVICE_AUTH_TOKEN);
+        when(idamClient.getUserInfo(TEST_SERVICE_AUTH_TOKEN)).thenReturn(new UserInfo(
+            null,
+            USER_ID,
+            TEST_NAME,
+            caseTestData.getCaseData().getClaimantIndType().getClaimantFirstNames(),
+            caseTestData.getCaseData().getClaimantIndType().getClaimantLastName(),
+            null
+        ));
+        when(postcodeToOfficeService.getTribunalOfficeFromPostcode(anyString()))
+            .thenThrow(new InvalidPostcodeException("invalid"));
+        when(ccdApiClient.startForCitizen(
+            eq(TEST_SERVICE_AUTH_TOKEN),
+            eq(TEST_SERVICE_AUTH_TOKEN),
+            eq(USER_ID),
+            eq(JURISDICTION_ID),
+            anyString(),
+            eq(DRAFT_EVENT_TYPE)
+        )).thenReturn(caseTestData.getStartEventResponse());
+        when(ccdApiClient.submitForCitizen(
+            eq(TEST_SERVICE_AUTH_TOKEN),
+            eq(TEST_SERVICE_AUTH_TOKEN),
+            eq(USER_ID),
+            eq(JURISDICTION_ID),
+            anyString(),
+            eq(true),
+            any(CaseDataContent.class)
+        )).thenReturn(caseTestData.getExpectedDetails());
+
+        CaseRequest caseRequest = caseTestData.getCaseRequest();
+        caseRequest.setCaseTypeId(null);
+
+        CaseDetails caseDetails = caseService.createCase(TEST_SERVICE_AUTH_TOKEN, caseRequest);
+
+        assertEquals(caseTestData.getExpectedDetails(), caseDetails);
+        verify(postcodeToOfficeService, times(1)).getTribunalOfficeFromPostcode(nullable(String.class));
+    }
+
+    @Test
     void shouldCreateNewDraftCaseInCcdWithPostCode() {
 
         when(authTokenGenerator.generate()).thenReturn(TEST_SERVICE_AUTH_TOKEN);
@@ -385,7 +447,7 @@ class CaseServiceTest {
              + "judgmentAndReasonsDocuments=null, reconsiderationDocuments=null, miscDocuments=null, "
              + "documentType=null, dateOfCorrespondence=null, docNumber=null, tornadoEmbeddedPdfUrl=null, "
              + "excludeFromDcf=null, documentIndex=null)",
-            ((DocumentTypeItem) docCollection.get(0)).getValue().toString());
+            ((DocumentTypeItem) docCollection.getFirst()).getValue().toString());
     }
 
     @Test
@@ -417,6 +479,97 @@ class CaseServiceTest {
         assertEquals(YES, caseDetails.getData().get(ET1_ONLINE_SUBMISSION));
     }
 
+    @Test
+    void triggerMultipleCreationSendsSingleMessageWithAllClaimants() {
+        UserDetails userDetails = mock(UserDetails.class);
+        when(userDetails.getEmail()).thenReturn("test@test.com");
+        when(userIdamService.getUserDetails(TEST_SERVICE_AUTH_TOKEN)).thenReturn(userDetails);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(CASE_TYPE, MULTIPLE_CASE_TYPE);
+        data.put("ethosCaseReference", "6000001/2024");
+        data.put("addClaimantMethod", "manually");
+        data.put("additionalClaimants", List.of(
+            Map.of("id", "1", "value", Map.of("firstName", "Alice", "lastName", "One")),
+            Map.of("id", "2", "value", Map.of("firstName", "Bob", "lastName", "Two")),
+            Map.of("id", "3", "value", Map.of("firstName", "Carol", "lastName", "Three"))
+        ));
+        CaseDetails caseDetails = CaseDetails.builder()
+            .caseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+            .data(data)
+            .build();
+
+        ReflectionTestUtils.invokeMethod(caseService, "triggerMultipleCreation", TEST_SERVICE_AUTH_TOKEN, caseDetails);
+
+        ArgumentCaptor<CreateUpdatesMsg> captor = ArgumentCaptor.forClass(CreateUpdatesMsg.class);
+        verify(createUpdatesBusSender, times(1)).sendSingleMessage(captor.capture(), anyList());
+        CreateUpdatesMsg sent = captor.getValue();
+        assertEquals("3", sent.getTotalCases());
+        assertEquals(List.of("6000001/2024"), sent.getEthosCaseRefCollection());
+        assertEquals(ENGLANDWALES_CASE_TYPE_ID, sent.getCaseTypeId());
+        CreateMultiplesDataModel sentDataModel = (CreateMultiplesDataModel) sent.getDataModelParent();
+        assertEquals(3, sentDataModel.getAdditionalClaimants().size());
+    }
+
+    @Test
+    void triggerMultipleCreationSpreadsheetReadsClaimantsAndQueuesSingleMessage() {
+        UserDetails userDetails = mock(UserDetails.class);
+        when(userDetails.getEmail()).thenReturn("test@test.com");
+        when(userIdamService.getUserDetails(TEST_SERVICE_AUTH_TOKEN)).thenReturn(userDetails);
+        when(excelReadingService.readClaimantsFromSpreadsheet(anyString(), anyString(), anyList()))
+            .thenReturn(List.of(AdditionalClaimant.builder().firstName("Anne").lastName("Lee").build()));
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(CASE_TYPE, MULTIPLE_CASE_TYPE);
+        data.put("ethosCaseReference", "6000001/2024");
+        data.put("addClaimantMethod", "spreadsheet");
+        data.put("additionalClaimantSpreadsheet", Map.of("document_binary_url", "http://doc/binary"));
+        CaseDetails caseDetails = CaseDetails.builder()
+            .caseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+            .data(data)
+            .build();
+
+        ReflectionTestUtils.invokeMethod(caseService, "triggerMultipleCreation", TEST_SERVICE_AUTH_TOKEN, caseDetails);
+
+        verify(excelReadingService, times(1))
+            .readClaimantsFromSpreadsheet(eq(TEST_SERVICE_AUTH_TOKEN), nullable(String.class), anyList());
+        verify(createUpdatesBusSender, times(1)).sendSingleMessage(any(CreateUpdatesMsg.class), anyList());
+    }
+
+    @Test
+    void triggerMultipleCreationUnknownMethodDoesNotQueue() {
+        Map<String, Object> data = new HashMap<>();
+        data.put(CASE_TYPE, MULTIPLE_CASE_TYPE);
+        data.put("ethosCaseReference", "6000001/2024");
+        data.put("addClaimantMethod", "something-else");
+        CaseDetails caseDetails = CaseDetails.builder()
+            .caseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+            .data(data)
+            .build();
+
+        ReflectionTestUtils.invokeMethod(caseService, "triggerMultipleCreation", TEST_SERVICE_AUTH_TOKEN, caseDetails);
+
+        verify(createUpdatesBusSender, never()).sendSingleMessage(any(CreateUpdatesMsg.class), anyList());
+        verify(userIdamService, never()).getUserDetails(anyString());
+    }
+
+    @Test
+    void triggerMultipleCreationManualWithoutClaimantsDoesNotQueue() {
+        Map<String, Object> data = new HashMap<>();
+        data.put(CASE_TYPE, MULTIPLE_CASE_TYPE);
+        data.put("ethosCaseReference", "6000001/2024");
+        data.put("addClaimantMethod", "manually");
+        data.put("additionalClaimants", List.of());
+        CaseDetails caseDetails = CaseDetails.builder()
+            .caseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+            .data(data)
+            .build();
+
+        ReflectionTestUtils.invokeMethod(caseService, "triggerMultipleCreation", TEST_SERVICE_AUTH_TOKEN, caseDetails);
+
+        verify(createUpdatesBusSender, never()).sendSingleMessage(any(CreateUpdatesMsg.class), anyList());
+    }
+
     private DocumentTypeItem createDocumentTypeItem() {
         UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
         uploadedDocumentType.setDocumentFilename("filename");
@@ -445,7 +598,7 @@ class CaseServiceTest {
                                                     Optional.empty());
 
             CaseData caseData = convertCaseDataMapToCaseDataObject(caseDetails.getData());
-            String actual = caseData.getDocumentCollection().get(0).getValue().getShortDescription();
+            String actual = caseData.getDocumentCollection().getFirst().getValue().getShortDescription();
             String expected = "Withdraw all/part of claim";
             assertThat(actual).isEqualTo(expected);
         }
@@ -459,9 +612,34 @@ class CaseServiceTest {
                                                     Optional.of("Amend response"));
 
             CaseData caseData = convertCaseDataMapToCaseDataObject(caseDetails.getData());
-            String actual = caseData.getDocumentCollection().get(0).getValue().getShortDescription();
+            String actual = caseData.getDocumentCollection().getFirst().getValue().getShortDescription();
             assertThat(actual).isEqualTo(contactApplicationType);
         }
+    }
+
+    @Test
+    @SneakyThrows
+    void submitCaseCcdFailsAndNotSubmittedStateRethrowsException() {
+        when(featureToggle.citizenEt1Generation()).thenReturn(true);
+        when(ccdApiClient.submitEventForCitizen(
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyBoolean(),
+            any())).thenThrow(new RuntimeException("Submission failed"));
+        when(ccdApiClient.getCase(
+            TEST_SERVICE_AUTH_TOKEN,
+            TEST_SERVICE_AUTH_TOKEN,
+            caseTestData.getCaseRequest().getCaseId()
+        )).thenReturn(caseTestData.getExpectedDetails());
+        caseTestData.getExpectedDetails().setState("draft");
+
+        assertThrows(RuntimeException.class,
+            () -> caseService.submitCase(TEST_SERVICE_AUTH_TOKEN, caseTestData.getCaseRequest()));
+        verify(ccdApiClient, times(1)).getCase(any(), any(), any());
     }
 
     @Test
@@ -640,6 +818,26 @@ class CaseServiceTest {
                                    caseTestData.getRespondentTse(),
                                    "TEST"
                                )
+        );
+    }
+
+    @Test
+    void shouldUseVaryOrRevokeLabelInRespondentTsePdfName() throws Exception {
+        when(pdfUploadService.convertRespondentTseIntoMultipartFile(any(), any(), anyString()))
+            .thenReturn(tsePdfMultipartFileMock);
+        caseTestData.getRespondentTse().setContactApplicationClaimantType("Vary/revoke an order");
+
+        caseService.uploadRespondentTseAsPdf(
+            TEST_SERVICE_AUTH_TOKEN,
+            caseTestData.getCaseDetails(),
+            caseTestData.getRespondentTse(),
+            "TEST"
+        );
+
+        verify(pdfUploadService).convertRespondentTseIntoMultipartFile(
+            any(),
+            any(),
+            eq("Application 1 - Vary or revoke an order.pdf")
         );
     }
 

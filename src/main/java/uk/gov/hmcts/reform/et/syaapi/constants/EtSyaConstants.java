@@ -14,6 +14,7 @@ public final class EtSyaConstants {
     public static final String AUTHORIZATION = "Authorization";
     public static final String CASE_FIELD_MANAGING_OFFICE = "managingOffice";
     public static final String CASE_ID_NOT_FOUND = "case id not found";
+    public static final String MULTIPLE_ID_NOT_FOUND = "multiple id not found";
     public static final TribunalOffice DEFAULT_TRIBUNAL_OFFICE = TribunalOffice.LONDON_SOUTH;
     public static final String DRAFT_EVENT_TYPE = "INITIATE_CASE_DRAFT";
     public static final String ENGLAND_CASE_TYPE = "ET_EnglandWales";
@@ -32,6 +33,7 @@ public final class EtSyaConstants {
     public static final String SEND_EMAIL_PARAMS_ACAS_PDF5_LINK_KEY = "link_to_acas_cert_pdf_file_5";
     public static final String SEND_EMAIL_PARAMS_CASE_ID = "caseId";
     public static final String SEND_EMAIL_PARAMS_CASE_NUMBER_KEY = "caseNumber";
+    public static final String SEND_EMAIL_PARAMS_MULTIPLE_CASE_NUMBER_KEY = "multipleCaseNumber";
     public static final String SEND_EMAIL_PARAMS_CITIZEN_PORTAL_LINK_KEY = "citizenPortalLink";
     public static final String SEND_EMAIL_PARAMS_EXUI_LINK_KEY = "exuiCaseDetailsLink";
     public static final String SEND_EMAIL_PARAMS_LINK_TO_CITIZEN_HUB = "linkToCitizenHub";

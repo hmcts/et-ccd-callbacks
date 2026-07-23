@@ -346,6 +346,8 @@ notifications:
   submitCaseEmailTemplateId: ${SUBMIT_CASE_EMAIL_TEMPLATE_ID:a4045b26-3914-4c13-a06e-6fb64a99ee2f}
   cySubmitCaseEmailTemplateId: ${CY_SUBMIT_CASE_EMAIL_TEMPLATE_ID:17ff79da-3bbf-4c82-ab44-48038c792d23}
   submitCaseDocUploadErrorEmailTemplateId: ${SUBMIT_CASE_DOC_UPLOAD_ERROR_EMAIL_TEMPLATE_ID:10a82e6a-5020-4756-9512-eb391b8c46e3}
+  additionalClaimantCaseCreationErrorEmailTemplateId: ${ADDITIONAL_CLAIMANT_CASE_CREATION_ERROR_EMAIL_TEMPLATE_ID:fa0f191f-900d-47c3-aab1-b2f5a4a696d4}
+  multipleShellCaseCreationErrorEmailTemplateId: ${MULTIPLE_SHELL_CASE_CREATION_ERROR_EMAIL_TEMPLATE_ID:1d72bae1-8426-49bf-98a2-15abd3de50d3}
   applicationAcknowledgementTypeA: ${APPLICATION_ACKNOWLEDGEMENT_TYPE_A:1892837f-2a5e-47b9-9d73-29ccffbac8d8}
   cyApplicationAcknowledgementTypeA: ${CY_APPLICATION_ACKNOWLEDGEMENT_TYPE_A:aa5c5e79-bb2b-49b7-a0d3-42a1ca2ab412}
   applicationAcknowledgementTypeB: ${APPLICATION_ACKNOWLEDGEMENT_TYPE_B:59ea1be0-882c-4059-8a9b-229f2ec2cd96}

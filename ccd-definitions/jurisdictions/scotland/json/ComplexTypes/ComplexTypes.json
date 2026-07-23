@@ -685,6 +685,14 @@
   },
   {
     "ID": "TaskListCheck",
+    "ListElementCode": "groupClaimsCheck",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Have you completed this section?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "TaskListCheck",
     "ListElementCode": "employmentAndRespondentCheck",
     "FieldType": "YesOrNo",
     "ElementLabel": "Have you completed this section?",

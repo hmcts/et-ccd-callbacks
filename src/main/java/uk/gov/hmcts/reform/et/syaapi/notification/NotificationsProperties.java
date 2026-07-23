@@ -41,6 +41,14 @@ public class NotificationsProperties {
     @NotBlank
     private String submitCaseDocUploadErrorEmailTemplateId;
 
+    @Value("${notifications.additionalClaimantCaseCreationErrorEmailTemplateId}")
+    @NotBlank
+    private String additionalClaimantCaseCreationErrorEmailTemplateId;
+
+    @Value("${notifications.multipleShellCaseCreationErrorEmailTemplateId}")
+    @NotBlank
+    private String multipleShellCaseCreationErrorEmailTemplateId;
+
     @Value("${notifications.et1EcmDtsCoreTeamSlackNotificationEmail}")
     @NotBlank
     private String et1EcmDtsCoreTeamSlackNotificationEmail;

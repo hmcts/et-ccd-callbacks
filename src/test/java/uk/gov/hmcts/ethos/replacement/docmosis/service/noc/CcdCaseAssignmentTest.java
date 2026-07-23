@@ -306,6 +306,42 @@ class CcdCaseAssignmentTest {
                         ccdCaseAssignment.addCaseUserRole(caseAssignmentUserRolesRequest), "Unauthorised S2S service");
     }
 
+    @Test
+    void removeCaseUserRole() {
+        CaseAssignmentUserRolesResponse expected = CaseAssignmentUserRolesResponse.builder()
+                .statusMessage("Case-User-Role assignment removed successfully")
+                .build();
+        CaseAssignmentUserRolesRequest request = caseUserRoleRequest();
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class),
+                eq(CaseAssignmentUserRolesResponse.class)))
+                .thenReturn(ResponseEntity.ok(expected));
+
+        assertThatNoException().isThrownBy(() -> ccdCaseAssignment.removeCaseUserRole(request));
+    }
+
+    @Test
+    void removeCaseUserRoleException() {
+        CaseAssignmentUserRolesRequest request = caseUserRoleRequest();
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class),
+                eq(CaseAssignmentUserRolesResponse.class)))
+                .thenThrow(new RestClientResponseException("Unauthorised S2S service", 401,
+                        "Unauthorized", null, null, null));
+
+        assertThrows(RestClientResponseException.class,
+                () -> ccdCaseAssignment.removeCaseUserRole(request), "Unauthorised S2S service");
+    }
+
+    private CaseAssignmentUserRolesRequest caseUserRoleRequest() {
+        CaseAssignmentUserRole role = CaseAssignmentUserRole.builder()
+                .caseDataId("1234123412341234")
+                .userId(UUID.randomUUID().toString())
+                .caseRole(CREATOR_ROLE)
+                .build();
+        return CaseAssignmentUserRolesRequest.builder()
+                .caseAssignmentUserRoles(List.of(role))
+                .build();
+    }
+
     private AuditEvent getAuditEvent() {
         return AuditEvent.builder()
                 .userId("123")

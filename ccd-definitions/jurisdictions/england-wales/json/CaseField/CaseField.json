@@ -6568,5 +6568,22 @@
     "FieldType": "Collection",
     "FieldTypeParameter": "DynamicListCollection",
     "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "currentClaimantEmail",
+    "Label": "Current email address",
+    "FieldType": "Email",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "newClaimantEmail",
+    "Label": "New email address",
+    "HintText": "The claimant will use this email address to access their case.",
+    "FieldType": "Email",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   }
 ]

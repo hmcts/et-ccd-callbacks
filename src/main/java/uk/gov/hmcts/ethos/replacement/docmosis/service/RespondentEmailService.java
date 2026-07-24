@@ -8,28 +8,21 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
-import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
-import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentEmailUpdateHelper;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT;
 
 @Slf4j
@@ -39,8 +32,8 @@ public class RespondentEmailService {
 
     static final String NO_UNREPRESENTED_RESPONDENTS_ERROR =
             "There are no unrepresented respondents whose email address can be updated.";
-    static final String RESPONDENT_REQUIRED_ERROR = "Select a respondent.";
-    static final String EMAIL_UNCHANGED_ERROR = "Enter an email address that is different from the current email.";
+    static final String RESPONDENT_REQUIRED_ERROR = RespondentEmailUpdateHelper.RESPONDENT_REQUIRED_ERROR;
+    static final String EMAIL_UNCHANGED_ERROR = RespondentEmailUpdateHelper.EMAIL_UNCHANGED_ERROR;
     static final String IDAM_USER_NOT_FOUND_ERROR = "No IdAM account was found for the new email address.";
     static final String IDAM_USER_AMBIGUOUS_ERROR =
             "More than one IdAM account was found for the new email address.";
@@ -59,39 +52,24 @@ public class RespondentEmailService {
     static final String EMAIL_UPDATE_ERROR =
             "The respondent email could not be saved. Case access was not changed.";
 
+    private static final boolean UNREPRESENTED = false;
+
     private final IdamApi idamApi;
     private final AdminUserService adminUserService;
     private final CcdCaseAssignment ccdCaseAssignment;
 
     public List<String> initialise(CaseData caseData) {
-        caseData.setCurrentRespondentEmail(null);
-        caseData.setNewRespondentEmail(null);
-
-        List<DynamicValueType> respondents = getEligibleRespondents(caseData).stream()
-                .map(respondent -> DynamicValueType.create(
-                        respondent.getId(), respondent.getValue().getRespondentName()))
-                .toList();
-        caseData.setRespondentEmailUpdateSelection(DynamicFixedListType.from(respondents));
-
-        return respondents.isEmpty() ? List.of(NO_UNREPRESENTED_RESPONDENTS_ERROR) : List.of();
+        return RespondentEmailUpdateHelper.initialise(caseData, UNREPRESENTED, NO_UNREPRESENTED_RESPONDENTS_ERROR);
     }
 
     public List<String> populateCurrentEmail(CaseData caseData) {
-        Optional<RespondentSumTypeItem> selectedRespondent = getSelectedEligibleRespondent(caseData);
-        if (selectedRespondent.isEmpty()) {
-            caseData.setCurrentRespondentEmail(null);
-            return List.of(getSelectionError(caseData));
-        }
-
-        RespondentSumType respondent = selectedRespondent.get().getValue();
-        caseData.setCurrentRespondentEmail(StringUtils.firstNonBlank(
-                respondent.getResponseRespondentEmail(), respondent.getRespondentEmail()));
-        caseData.setNewRespondentEmail(null);
-        return List.of();
+        return RespondentEmailUpdateHelper.populateCurrentEmail(
+                caseData, UNREPRESENTED, NO_UNREPRESENTED_RESPONDENTS_ERROR);
     }
 
     public List<String> validateNewEmail(CaseData caseData) {
-        List<String> errors = validateInput(caseData);
+        List<String> errors = RespondentEmailUpdateHelper.validateInput(
+                caseData, UNREPRESENTED, NO_UNREPRESENTED_RESPONDENTS_ERROR);
         if (errors.isEmpty()) {
             findUserByEmail(caseData.getNewRespondentEmail(), errors);
         }
@@ -100,14 +78,17 @@ public class RespondentEmailService {
 
     public List<String> prepareUpdate(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
-        List<String> errors = validateInput(caseData);
+        List<String> errors = RespondentEmailUpdateHelper.validateInput(
+                caseData, UNREPRESENTED, NO_UNREPRESENTED_RESPONDENTS_ERROR);
         if (CollectionUtils.isNotEmpty(errors)) {
             return errors;
         }
 
-        Optional<RespondentSumTypeItem> selectedRespondent = getSelectedEligibleRespondent(caseData);
+        Optional<RespondentSumTypeItem> selectedRespondent =
+                RespondentEmailUpdateHelper.getSelectedEligibleRespondent(caseData, UNREPRESENTED);
         if (selectedRespondent.isEmpty()) {
-            return List.of(getSelectionError(caseData));
+            return List.of(RespondentEmailUpdateHelper.getSelectionError(
+                    caseData, UNREPRESENTED, NO_UNREPRESENTED_RESPONDENTS_ERROR));
         }
 
         Optional<UserDetails> newUser = findUserByEmail(caseData.getNewRespondentEmail(), errors);
@@ -126,7 +107,10 @@ public class RespondentEmailService {
         }
 
         try {
-            applyEmailUpdate(caseData, respondentItem.getValue(), caseData.getNewRespondentEmail());
+            RespondentEmailUpdateHelper.applyEmailUpdate(
+                    caseData, respondentItem.getValue(), caseData.getNewRespondentEmail());
+            caseData.setRespondentAccessTransferPending(null);
+            caseData.setRespondentAccessPreviousIdamId(null);
         } catch (RuntimeException exception) {
             log.error("Defendant access outcome {} but email could not be updated for case {}",
                     accessOutcome, caseDetails.getCaseId(), exception);
@@ -197,37 +181,12 @@ public class RespondentEmailService {
         }
     }
 
-    private void applyEmailUpdate(CaseData caseData, RespondentSumType respondent, String newEmail) {
-        respondent.setRespondentEmail(newEmail);
-        respondent.setResponseRespondentEmail(newEmail);
-        caseData.setCurrentRespondentEmail(null);
-        caseData.setNewRespondentEmail(null);
-        caseData.setRespondentAccessTransferPending(null);
-        caseData.setRespondentAccessPreviousIdamId(null);
-    }
-
     private static String emailUpdateFailureMessage(AccessOutcome accessOutcome) {
         return switch (accessOutcome) {
             case REASSIGNED -> EMAIL_UPDATE_AFTER_REASSIGN_ERROR;
             case GRANTED -> EMAIL_UPDATE_AFTER_GRANT_ERROR;
             case UNCHANGED -> EMAIL_UPDATE_ERROR;
         };
-    }
-
-    private List<String> validateInput(CaseData caseData) {
-        List<String> errors = new ArrayList<>();
-        Optional<RespondentSumTypeItem> selectedRespondent = getSelectedEligibleRespondent(caseData);
-        if (selectedRespondent.isEmpty()) {
-            errors.add(getSelectionError(caseData));
-            return errors;
-        }
-
-        errors.addAll(ReferralHelper.validateEmail(caseData.getNewRespondentEmail()));
-        if (errors.isEmpty() && StringUtils.equalsIgnoreCase(
-                caseData.getCurrentRespondentEmail(), caseData.getNewRespondentEmail())) {
-            errors.add(EMAIL_UNCHANGED_ERROR);
-        }
-        return errors;
     }
 
     private Optional<UserDetails> findUserByEmail(String email, List<String> errors) {
@@ -259,49 +218,6 @@ public class RespondentEmailService {
                 .filter(assignment -> CASE_USER_ROLE_DEFENDANT.equals(assignment.getCaseRole()))
                 .filter(assignment -> userId.equals(assignment.getUserId()))
                 .findFirst();
-    }
-
-    private List<RespondentSumTypeItem> getEligibleRespondents(CaseData caseData) {
-        return emptyIfNull(caseData.getRespondentCollection()).stream()
-                .filter(RespondentUtils::isValidRespondent)
-                .filter(respondent -> !isRepresented(caseData, respondent))
-                .toList();
-    }
-
-    private boolean isRepresented(CaseData caseData, RespondentSumTypeItem respondent) {
-        RespondentSumType respondentValue = respondent.getValue();
-        if (YES.equalsIgnoreCase(respondentValue.getRepresentativeRemoved())) {
-            return false;
-        }
-        if (YES.equalsIgnoreCase(respondentValue.getRepresented())) {
-            return true;
-        }
-        return emptyIfNull(caseData.getRepCollection()).stream()
-                .filter(rep -> rep != null && rep.getValue() != null)
-                .map(RepresentedTypeRItem::getValue)
-                .anyMatch(rep -> respondent.getId().equals(rep.getRespondentId())
-                        || respondentValue.getRespondentName().equals(rep.getRespRepName()));
-    }
-
-    private Optional<RespondentSumTypeItem> getSelectedEligibleRespondent(CaseData caseData) {
-        String selectedId = getSelectedRespondentId(caseData);
-        if (StringUtils.isBlank(selectedId)) {
-            return Optional.empty();
-        }
-        return getEligibleRespondents(caseData).stream()
-                .filter(respondent -> selectedId.equals(respondent.getId()))
-                .findFirst();
-    }
-
-    private String getSelectedRespondentId(CaseData caseData) {
-        DynamicFixedListType selection = caseData.getRespondentEmailUpdateSelection();
-        return selection == null ? null : selection.getSelectedCode();
-    }
-
-    private String getSelectionError(CaseData caseData) {
-        return getEligibleRespondents(caseData).isEmpty()
-                ? NO_UNREPRESENTED_RESPONDENTS_ERROR
-                : RESPONDENT_REQUIRED_ERROR;
     }
 
     private CaseAssignmentUserRolesRequest buildDefendantRequest(String caseId, String userId) {

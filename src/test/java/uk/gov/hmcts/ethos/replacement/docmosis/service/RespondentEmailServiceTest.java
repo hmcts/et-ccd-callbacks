@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -58,6 +59,7 @@ class RespondentEmailServiceTest {
     @Mock
     private CcdCaseAssignment ccdCaseAssignment;
 
+    @InjectMocks
     private RespondentEmailService service;
     private CaseDetails caseDetails;
     private RespondentSumTypeItem firstRespondent;
@@ -65,7 +67,6 @@ class RespondentEmailServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new RespondentEmailService(idamApi, adminUserService, ccdCaseAssignment);
         firstRespondent = respondent(RESPONDENT_ID_ONE, "First respondent", OLD_EMAIL, OLD_USER_ID, NO);
         secondRespondent = respondent(RESPONDENT_ID_TWO, "Second respondent",
                 "second@example.com", "second-user-id", NO);

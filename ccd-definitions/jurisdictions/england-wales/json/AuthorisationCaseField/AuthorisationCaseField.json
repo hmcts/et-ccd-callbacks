@@ -25436,6 +25436,24 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "representedRespondentEmailInfo",
+    "UserRole": "caseworker-employment",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "representedRespondentEmailInfo",
+    "UserRole": "caseworker-employment-englandwales",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "representedRespondentEmailInfo",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
     "CaseFieldID": "respondentAccessTransferPending",
     "UserRole": "caseworker-employment",
     "CRUD": "CRU"

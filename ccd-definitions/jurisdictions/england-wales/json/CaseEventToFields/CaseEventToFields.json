@@ -9196,5 +9196,49 @@
     "PageFieldDisplayOrder": 2,
     "CallBackURLMidEvent": "${ET_COS_URL}/updateRespondentEmail/validate",
     "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "updateRepresentedRespondentEmail",
+    "CaseFieldID": "representedRespondentEmailInfo",
+    "DisplayContext": "READONLY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageLabel": "Select a represented respondent",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "updateRepresentedRespondentEmail",
+    "CaseFieldID": "respondentEmailUpdateSelection",
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "CallBackURLMidEvent": "${ET_COS_URL}/updateRepresentedRespondentEmail/select",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "updateRepresentedRespondentEmail",
+    "CaseFieldID": "currentRespondentEmail",
+    "DisplayContext": "READONLY",
+    "PageID": 2,
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "PageLabel": "Update represented respondent email",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "updateRepresentedRespondentEmail",
+    "CaseFieldID": "newRespondentEmail",
+    "DisplayContext": "MANDATORY",
+    "PageID": 2,
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 2,
+    "CallBackURLMidEvent": "${ET_COS_URL}/updateRepresentedRespondentEmail/validate",
+    "ShowSummaryChangeOption": "Y"
   }
 ]

@@ -45,6 +45,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.RepresentedRespondentEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
@@ -105,6 +106,14 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private static final String UPDATE_RESPONDENT_EMAIL_VALIDATE_URL = "/updateRespondentEmail/validate";
     private static final String UPDATE_RESPONDENT_EMAIL_ABOUT_TO_SUBMIT_URL =
             "/updateRespondentEmail/aboutToSubmit";
+    private static final String UPDATE_REPRESENTED_RESPONDENT_EMAIL_ABOUT_TO_START_URL =
+            "/updateRepresentedRespondentEmail/aboutToStart";
+    private static final String UPDATE_REPRESENTED_RESPONDENT_EMAIL_SELECT_URL =
+            "/updateRepresentedRespondentEmail/select";
+    private static final String UPDATE_REPRESENTED_RESPONDENT_EMAIL_VALIDATE_URL =
+            "/updateRepresentedRespondentEmail/validate";
+    private static final String UPDATE_REPRESENTED_RESPONDENT_EMAIL_ABOUT_TO_SUBMIT_URL =
+            "/updateRepresentedRespondentEmail/aboutToSubmit";
     private static final String AMEND_RESPONDENT_DETAILS_URL = "/amendRespondentDetails";
     private static final String AMEND_RESPONDENT_REPRESENTATIVE_URL = "/amendRespondentRepresentative";
     private static final String UPDATE_HEARING_URL = "/updateHearing";
@@ -213,6 +222,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @MockitoBean
     private RespondentEmailService respondentEmailService;
+
+    @MockitoBean
+    private RepresentedRespondentEmailService representedRespondentEmailService;
 
     private MockMvc mvc;
     private JsonNode requestContent;
@@ -537,6 +549,97 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                         is("Failed to grant case access using the new respondent email. "
                                 + "The respondent email was not changed.")))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void initialiseRepresentedRespondentEmailUpdate() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(representedRespondentEmailService.initialise(any(CaseData.class))).thenReturn(List.of());
+
+        mvc.perform(post(UPDATE_REPRESENTED_RESPONDENT_EMAIL_ABOUT_TO_START_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(representedRespondentEmailService).initialise(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void initialiseRepresentedRespondentEmailUpdateReturnsError() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(representedRespondentEmailService.initialise(any(CaseData.class)))
+                .thenReturn(List.of("There are no represented respondents whose email address can be updated. "
+                        + "For an unrepresented respondent, use Update respondent email instead."));
+
+        mvc.perform(post(UPDATE_REPRESENTED_RESPONDENT_EMAIL_ABOUT_TO_START_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]",
+                        is("There are no represented respondents whose email address can be updated. "
+                                + "For an unrepresented respondent, use Update respondent email instead.")))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void selectRepresentedRespondentForEmailUpdate() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(representedRespondentEmailService.populateCurrentEmail(any(CaseData.class))).thenReturn(List.of());
+
+        mvc.perform(post(UPDATE_REPRESENTED_RESPONDENT_EMAIL_SELECT_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(representedRespondentEmailService).populateCurrentEmail(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void validateRepresentedRespondentEmailUpdateReturnsErrors() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(representedRespondentEmailService.validateNewEmail(any(CaseData.class)))
+                .thenReturn(List.of("Email validation failed"));
+
+        mvc.perform(post(UPDATE_REPRESENTED_RESPONDENT_EMAIL_VALIDATE_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]", is("Email validation failed")))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void updateRepresentedRespondentEmailReturnsPreparedCaseData() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(representedRespondentEmailService.prepareUpdate(any(CaseData.class))).thenReturn(List.of());
+
+        mvc.perform(post(UPDATE_REPRESENTED_RESPONDENT_EMAIL_ABOUT_TO_SUBMIT_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(representedRespondentEmailService).prepareUpdate(any(CaseData.class));
     }
 
     @Test

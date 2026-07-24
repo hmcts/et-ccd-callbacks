@@ -6589,10 +6589,17 @@
     "CaseTypeID": "ET_EnglandWales",
     "ID": "newRespondentEmail",
     "Label": "New email address",
-    "HintText": "The respondent will use this email address to access their case.",
+    "HintText": "Enter a different email address for the respondent.",
     "FieldType": "Email",
     "SecurityClassification": "Public",
     "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "representedRespondentEmailInfo",
+    "Label": "This updates the respondent contact email on the case only. It does not change solicitor access or respondent portal login. To transfer portal access, remove the representative first, then use Update respondent email.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
   },
   {
     "CaseTypeID": "ET_EnglandWales",

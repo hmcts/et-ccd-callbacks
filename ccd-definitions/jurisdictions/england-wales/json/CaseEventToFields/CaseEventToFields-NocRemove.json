@@ -104,8 +104,8 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "nocRemoveRepRespondent",
-    "CaseFieldID": "nocRemoveRepRemoveLabelSelf",
-    "DisplayContext": "READONLY",
+    "CaseFieldID": "respondentsToRemoveRep",
+    "DisplayContext": "MANDATORY",
     "PageID": 3,
     "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 1,
@@ -115,10 +115,21 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "nocRemoveRepRespondent",
+    "CaseFieldID": "nocRemoveRepRemoveLabelSelf",
+    "DisplayContext": "READONLY",
+    "PageID": 4,
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 1,
+    "PageShowCondition": "nocRemoveRepOption=\"yourself\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "nocRemoveRepRespondent",
     "CaseFieldID": "nocRemoveRepRemoveSelfConfirm",
     "DisplayContext": "MANDATORY",
-    "PageID": 3,
-    "PageDisplayOrder": 3,
+    "PageID": 4,
+    "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 2,
     "ShowSummaryChangeOption": "N"
   },
@@ -127,8 +138,8 @@
     "CaseEventID": "nocRemoveRepRespondent",
     "CaseFieldID": "nocRemoveRepRemoveLabelOrg",
     "DisplayContext": "READONLY",
-    "PageID": 4,
-    "PageDisplayOrder": 4,
+    "PageID": 5,
+    "PageDisplayOrder": 5,
     "PageFieldDisplayOrder": 1,
     "PageShowCondition": "nocRemoveRepOption=\"your organisation\"",
     "ShowSummaryChangeOption": "N"
@@ -138,8 +149,8 @@
     "CaseEventID": "nocRemoveRepRespondent",
     "CaseFieldID": "nocRemoveRepRemoveOrgLabelRespondent",
     "DisplayContext": "READONLY",
-    "PageID": 4,
-    "PageDisplayOrder": 4,
+    "PageID": 5,
+    "PageDisplayOrder": 5,
     "PageFieldDisplayOrder": 2,
     "ShowSummaryChangeOption": "N"
   },
@@ -148,8 +159,8 @@
     "CaseEventID": "nocRemoveRepRespondent",
     "CaseFieldID": "nocRemoveRepRemoveOrgConfirm1",
     "DisplayContext": "MANDATORY",
-    "PageID": 4,
-    "PageDisplayOrder": 4,
+    "PageID": 5,
+    "PageDisplayOrder": 5,
     "PageFieldDisplayOrder": 3,
     "ShowSummaryChangeOption": "N"
   },
@@ -158,8 +169,8 @@
     "CaseEventID": "nocRemoveRepRespondent",
     "CaseFieldID": "nocRemoveRepRemoveOrgConfirm2",
     "DisplayContext": "MANDATORY",
-    "PageID": 4,
-    "PageDisplayOrder": 4,
+    "PageID": 5,
+    "PageDisplayOrder": 5,
     "PageFieldDisplayOrder": 4,
     "ShowSummaryChangeOption": "N"
   }

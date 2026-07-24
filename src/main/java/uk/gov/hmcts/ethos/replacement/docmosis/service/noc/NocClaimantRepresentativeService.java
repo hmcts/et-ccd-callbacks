@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
+
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES;
@@ -202,7 +204,7 @@ public class NocClaimantRepresentativeService {
         claimantRep.setNameOfRepresentative(userDetails.getFirstName() + " " + userDetails.getLastName());
         claimantRep.setRepresentativeEmailAddress(userDetails.getEmail());
         claimantRep.setMyHmctsOrganisation(change.getOrganisationToAdd());
-
+        claimantRep.setRepresentativeId(UUID.randomUUID().toString());
         return claimantRep;
     }
 

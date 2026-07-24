@@ -262,15 +262,9 @@ public class RespondentEmailService {
 
     private List<RespondentSumTypeItem> getEligibleRespondents(CaseData caseData) {
         return emptyIfNull(caseData.getRespondentCollection()).stream()
-                .filter(this::isValidRespondent)
+                .filter(RespondentUtils::isValidRespondent)
                 .filter(respondent -> !isRepresented(caseData, respondent))
                 .toList();
-    }
-
-    private boolean isValidRespondent(RespondentSumTypeItem respondent) {
-        return respondent != null && StringUtils.isNotBlank(respondent.getId())
-                && respondent.getValue() != null
-                && StringUtils.isNotBlank(respondent.getValue().getRespondentName());
     }
 
     private boolean isRepresented(CaseData caseData, RespondentSumTypeItem respondent) {

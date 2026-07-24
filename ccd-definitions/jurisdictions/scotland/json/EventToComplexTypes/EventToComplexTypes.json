@@ -2899,9 +2899,9 @@
     "CaseEventID": "amendClaimantDetails",
     "CaseFieldID": "claimantType",
     "ListElementCode": "claimant_email_address",
-    "EventElementLabel": "Email address",
+    "EventElementLabel": "Email address (use Update claimant email / Update represented claimant email to change)",
     "FieldDisplayOrder": 10,
-    "DisplayContext": "OPTIONAL"
+    "DisplayContext": "READONLY"
   },
   {
     "ID": "Claimant",
@@ -4065,7 +4065,7 @@
     "CaseEventID": "addAmendJudgment",
     "CaseFieldID": "judgementCollection",
     "ListElementCode": "judgement_details.total_award",
-    "EventElementLabel": "Total award £",
+    "EventElementLabel": "Total award \u00a3",
     "FieldDisplayOrder": 15,
     "DisplayContext": "OPTIONAL"
   },
@@ -4347,7 +4347,7 @@
     "CaseEventID": "addAmendJurisdiction",
     "CaseFieldID": "jurCodesCollection",
     "ListElementCode": "jurisdictionCodeAPA",
-    "EventElementLabel": "Application by an employee, their representative or trade union for a protective award as a result of an employer’s failure to consult over a redundancy situation",
+    "EventElementLabel": "Application by an employee, their representative or trade union for a protective award as a result of an employer\u2019s failure to consult over a redundancy situation",
     "FieldDisplayOrder": 3,
     "DisplayContext": "MANDATORY"
   },
@@ -4590,7 +4590,7 @@
     "CaseEventID": "addAmendJurisdiction",
     "CaseFieldID": "jurCodesCollection",
     "ListElementCode": "jurisdictionCodeFTO",
-    "EventElementLabel": "Failure to allow time off for trade union activities or duties, for ante-natal care, for adoption, for parental leave, for carer’s leave or for public duties",
+    "EventElementLabel": "Failure to allow time off for trade union activities or duties, for ante-natal care, for adoption, for parental leave, for carer\u2019s leave or for public duties",
     "FieldDisplayOrder": 30,
     "DisplayContext": "MANDATORY"
   },
@@ -4743,7 +4743,7 @@
     "CaseEventID": "addAmendJurisdiction",
     "CaseFieldID": "jurCodesCollection",
     "ListElementCode": "jurisdictionCodeFT1",
-    "EventElementLabel": "Failure to allow or to pay for a time off for care of dependants, union learning representatives’ duties, pension scheme trustee duties, employee representatives’ duties, young person studying/trainin",
+    "EventElementLabel": "Failure to allow or to pay for a time off for care of dependants, union learning representatives\u2019 duties, pension scheme trustee duties, employee representatives\u2019 duties, young person studying/trainin",
     "FieldDisplayOrder": 47,
     "DisplayContext": "MANDATORY"
   },
@@ -5629,7 +5629,7 @@
     "CaseEventID": "recordDeposit",
     "CaseFieldID": "depositType",
     "ListElementCode": "Deposit_amount",
-    "EventElementLabel": "Deposit amount (£)",
+    "EventElementLabel": "Deposit amount (\u00a3)",
     "FieldDisplayOrder": 1,
     "DisplayContext": "MANDATORY"
   },
@@ -6268,7 +6268,6 @@
     "FieldDisplayOrder": 6,
     "DisplayContext": "MANDATORY"
   },
-
   {
     "ID": "InitialConsideration",
     "CaseEventID": "initialConsideration",

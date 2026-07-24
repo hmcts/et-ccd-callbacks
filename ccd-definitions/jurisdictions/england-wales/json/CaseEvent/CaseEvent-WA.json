@@ -518,5 +518,21 @@
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "Y"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "updateRepresentedClaimantEmail",
+    "Name": "Update represented claimant email",
+    "Description": "Update claimant contact email when the claimant is represented (no portal access change)",
+    "DisplayOrder": 15,
+    "PreConditionState(s)": "Accepted;Rejected;Closed;Submitted;Vetted",
+    "PostConditionState": "*",
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/updateRepresentedClaimantEmail/aboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/updateRepresentedClaimantEmail/aboutToSubmit",
+    "CallBackURLSubmittedEvent": "",
+    "EventEnablingCondition": "managingOffice !=\"Unassigned\" AND claimantRepresentedQuestion=\"Yes\"",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "Y"
   }
 ]

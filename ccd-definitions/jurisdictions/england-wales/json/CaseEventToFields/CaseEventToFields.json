@@ -9184,5 +9184,37 @@
     "PageFieldDisplayOrder": 2,
     "CallBackURLMidEvent": "${ET_COS_URL}/updateClaimantEmail/validate",
     "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "updateRepresentedClaimantEmail",
+    "CaseFieldID": "representedClaimantEmailInfo",
+    "DisplayContext": "READONLY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageLabel": "Update represented claimant email",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "updateRepresentedClaimantEmail",
+    "CaseFieldID": "currentClaimantEmail",
+    "DisplayContext": "READONLY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "updateRepresentedClaimantEmail",
+    "CaseFieldID": "newClaimantEmail",
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 3,
+    "CallBackURLMidEvent": "${ET_COS_URL}/updateRepresentedClaimantEmail/validate",
+    "ShowSummaryChangeOption": "Y"
   }
 ]

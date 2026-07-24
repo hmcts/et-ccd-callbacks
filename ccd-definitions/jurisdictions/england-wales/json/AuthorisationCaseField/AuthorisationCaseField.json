@@ -25415,5 +25415,23 @@
     "CaseFieldID": "newClaimantEmail",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "representedClaimantEmailInfo",
+    "UserRole": "caseworker-employment",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "representedClaimantEmailInfo",
+    "UserRole": "caseworker-employment-englandwales",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "representedClaimantEmailInfo",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
   }
 ]

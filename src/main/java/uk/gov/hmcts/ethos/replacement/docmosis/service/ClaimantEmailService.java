@@ -61,7 +61,8 @@ public class ClaimantEmailService {
     static final String EMAIL_UPDATE_AFTER_REASSIGN_ERROR =
             "Case access was updated for the new email, but the claimant email could not be saved. "
                     + "Check case access before retrying.";
-    // Shown when access was newly given to the new email (no previous claimant access), but saving the email then failed.
+    // Shown when access was newly given to the new email (no previous claimant access),
+    // but saving the email then failed.
     // Access may already have been granted — check case access before retrying.
     static final String EMAIL_UPDATE_AFTER_GRANT_ERROR =
             "Case access was granted for the new email, but the claimant email could not be saved. "

@@ -504,7 +504,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "ID": "updateRepresentedClaimantEmail",
-    "Name": "Update represented claimant email",
+    "Name": "Update represented email",
     "Description": "Update claimant contact email when the claimant is represented (no portal access change)",
     "DisplayOrder": 15,
     "PreConditionState(s)": "Accepted;Rejected;Closed;Submitted;Vetted",

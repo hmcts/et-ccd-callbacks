@@ -1132,7 +1132,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "ID": "updateRepresentedRespondentEmail",
-    "Name": "Update represented respondent email",
+    "Name": "Update represented email",
     "Description": "Update respondent contact email when the respondent is represented (no portal access change)",
     "DisplayOrder": 16,
     "PreConditionState(s)": "Accepted;Rejected;Closed;Submitted;Vetted",

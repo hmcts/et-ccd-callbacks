@@ -90,6 +90,18 @@
         <cve>CVE-2026-56148</cve>
         <cve>CVE-2026-56149</cve>
     </suppress>
+    <!-- Netty 4.2.16.Final is the first patched 4.2.x release for these CVEs.
+         Dependency Check incorrectly matches them to all Netty modules through the broad Netty CPE. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-*-4.2.16.Final.jar
+   GitHub security advisories identify 4.2.16.Final as the first patched 4.2.x release.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-.*@4\.2\.16\.Final$</packageUrl>
+        <cve>CVE-2026-44891</cve>
+        <cve>CVE-2026-55831</cve>
+        <cve>CVE-2026-55833</cve>
+    </suppress>
     <!-- All other CVEs below -->
     <!-- CVE-2026-54515 affects jackson-databind 2.22.0 which is the latest available version.
          No fixed version exists. Suppress until a patched release is available. -->
@@ -124,5 +136,17 @@
         <cve>CVE-2026-54513</cve>
         <cve>CVE-2026-54514</cve>
         <cve>CVE-2026-54515</cve>
+    </suppress>
+       <!-- Netty 4.2.16.Final is the latest available version; no fix released for these CVEs.
+         Suppress until a patched release is available. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-*-4.2.16.Final.jar
+   Latest available version. No fix released for CVE-2026-44891, CVE-2026-55831, CVE-2026-55833 as of 2026-07-23.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-.*@4\.2\.16\.Final$</packageUrl>
+        <cve>CVE-2026-44891</cve>
+        <cve>CVE-2026-55831</cve>
+        <cve>CVE-2026-55833</cve>
     </suppress>
 </suppressions>

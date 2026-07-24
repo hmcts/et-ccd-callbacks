@@ -47,6 +47,24 @@ public class NocRemoveRepresentationController {
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 
+    @PostMapping(value = "/respondent/aboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "nocRemoveRep respondent about to start api")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToStartRespondent(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        nocRemoveRepresentationService.loadRespondentsForRepresentationRemoval(caseDetails, userToken);
+        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
+    }
+
     @PostMapping(value = "/respondent/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "nocRemoveRep respondent about to submit page")
     @ApiResponses(value = {
@@ -58,8 +76,8 @@ public class NocRemoveRepresentationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmitRespondent(
-        @RequestBody CCDRequest ccdRequest,
-        @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         nocRemoveRepresentationService.revokeRespondentLegalRep(caseDetails, userToken);
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());

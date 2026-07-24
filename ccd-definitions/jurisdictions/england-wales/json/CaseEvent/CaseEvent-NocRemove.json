@@ -18,6 +18,7 @@
     "Description": "Remove representation",
     "PreConditionState(s)": "Submitted;Vetted;Accepted;Rejected;",
     "PostConditionState": "*",
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/nocRemoveRepresentation/respondent/aboutToStart",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/nocRemoveRepresentation/respondent/aboutToSubmit",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",

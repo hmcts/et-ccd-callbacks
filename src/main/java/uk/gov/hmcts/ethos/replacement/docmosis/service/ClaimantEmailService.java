@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CREATOR;
 
 @Slf4j
@@ -30,26 +31,42 @@ import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CA
 @RequiredArgsConstructor
 public class ClaimantEmailService {
 
+    // Shown when the case has a legal representative; this event is LiP-only.
+    static final String CLAIMANT_REPRESENTED_ERROR =
+            "Update claimant email is only available when the claimant is not represented. "
+                    + "Remove the representative first, then update the claimant email.";
+    // Shown when the user enters a new email that is the same as the email already on the case.
     static final String EMAIL_UNCHANGED_ERROR = "Enter an email address that is different from the current email.";
+    // Shown when no login account exists for the new email (claimant must already have registered).
     static final String IDAM_USER_NOT_FOUND_ERROR =
             "No IdAM account was found for the new email address.";
+    // Shown when more than one login account matches the new email (data issue; cannot safely continue).
     static final String IDAM_USER_AMBIGUOUS_ERROR =
             "More than one IdAM account was found for the new email address.";
+    // Shown when a login account exists for the new email, but it is not a citizen (claimant) account.
     static final String IDAM_USER_NOT_CITIZEN_ERROR =
             "The IdAM account for the new email is not a citizen account.";
     private static final String CITIZEN_ROLE = "citizen";
+    // Shown when the system cannot check who currently has claimant access to the case (temporary system issue).
     static final String ACCESS_LOOKUP_ERROR =
             "The claimant's existing case access could not be checked. Try again later.";
+    // Shown when removing access from the old email fails; the case email is left unchanged.
     static final String ACCESS_REVOKE_ERROR =
             "Failed to revoke access linked to the previous claimant email. The claimant email was not changed.";
+    // Shown when giving case access to the new email fails; the case email is left unchanged.
     static final String ACCESS_GRANT_ERROR =
             "Failed to grant case access using the new claimant email. The claimant email was not changed.";
+    // Shown when access was moved from the old email to the new one, but saving the new email on the case then failed.
+    // Access may already have changed — check case access before retrying.
     static final String EMAIL_UPDATE_AFTER_REASSIGN_ERROR =
             "Case access was updated for the new email, but the claimant email could not be saved. "
                     + "Check case access before retrying.";
+    // Shown when access was newly given to the new email (no previous claimant access), but saving the email then failed.
+    // Access may already have been granted — check case access before retrying.
     static final String EMAIL_UPDATE_AFTER_GRANT_ERROR =
             "Case access was granted for the new email, but the claimant email could not be saved. "
                     + "Check case access before retrying.";
+    // Shown when saving the new email fails, but case access did not need to change (same user already had access).
     static final String EMAIL_UPDATE_ERROR =
             "The claimant email could not be saved. Case access was not changed.";
 
@@ -57,15 +74,23 @@ public class ClaimantEmailService {
     private final AdminUserService adminUserService;
     private final CcdCaseAssignment ccdCaseAssignment;
 
-    public void initialise(CaseData caseData) {
-        caseData.setNewClaimantEmail(null);
-        caseData.setCurrentClaimantEmail(caseData.getClaimantType() == null
-                ? null
-                : caseData.getClaimantType().getClaimantEmailAddress());
+    public List<String> initialise(CaseData caseData) {
+        List<String> errors = validateClaimantIsLip(caseData);
+        if (errors.isEmpty()) {
+            caseData.setNewClaimantEmail(null);
+            caseData.setCurrentClaimantEmail(caseData.getClaimantType() == null
+                    ? null
+                    : caseData.getClaimantType().getClaimantEmailAddress());
+        }
+        return errors;
     }
 
     public List<String> validateNewEmail(CaseData caseData) {
-        List<String> errors = validateEmailInput(caseData);
+        List<String> errors = validateClaimantIsLip(caseData);
+        if (CollectionUtils.isNotEmpty(errors)) {
+            return errors;
+        }
+        errors = validateEmailInput(caseData);
         if (errors.isEmpty()) {
             findCitizenIdamUserByEmail(caseData.getNewClaimantEmail(), errors);
         }
@@ -74,7 +99,11 @@ public class ClaimantEmailService {
 
     public List<String> prepareUpdate(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
-        List<String> errors = validateEmailInput(caseData);
+        List<String> errors = validateClaimantIsLip(caseData);
+        if (CollectionUtils.isNotEmpty(errors)) {
+            return errors;
+        }
+        errors = validateEmailInput(caseData);
         if (CollectionUtils.isNotEmpty(errors)) {
             return errors;
         }
@@ -174,6 +203,14 @@ public class ClaimantEmailService {
             case GRANTED -> EMAIL_UPDATE_AFTER_GRANT_ERROR;
             case UNCHANGED -> EMAIL_UPDATE_ERROR;
         };
+    }
+
+    private List<String> validateClaimantIsLip(CaseData caseData) {
+        List<String> errors = new ArrayList<>();
+        if (YES.equals(caseData.getClaimantRepresentedQuestion())) {
+            errors.add(CLAIMANT_REPRESENTED_ERROR);
+        }
+        return errors;
     }
 
     private List<String> validateEmailInput(CaseData caseData) {

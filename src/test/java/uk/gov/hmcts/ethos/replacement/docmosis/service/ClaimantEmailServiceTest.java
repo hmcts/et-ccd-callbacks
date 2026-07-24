@@ -30,6 +30,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CREATOR;
 
 @ExtendWith(MockitoExtension.class)
@@ -58,6 +60,7 @@ class ClaimantEmailServiceTest {
         claimantType.setClaimantEmailAddress(OLD_EMAIL);
         CaseData caseData = new CaseData();
         caseData.setClaimantType(claimantType);
+        caseData.setClaimantRepresentedQuestion(NO);
         caseData.setCurrentClaimantEmail(OLD_EMAIL);
         caseData.setNewClaimantEmail(NEW_EMAIL);
         caseDetails = new CaseDetails();
@@ -67,7 +70,7 @@ class ClaimantEmailServiceTest {
 
     @Test
     void initialisePrepopulatesCurrentEmailAndClearsNewEmail() {
-        service.initialise(caseDetails.getCaseData());
+        assertThat(service.initialise(caseDetails.getCaseData())).isEmpty();
 
         assertThat(caseDetails.getCaseData().getCurrentClaimantEmail()).isEqualTo(OLD_EMAIL);
         assertThat(caseDetails.getCaseData().getNewClaimantEmail()).isNull();
@@ -77,10 +80,67 @@ class ClaimantEmailServiceTest {
     void initialiseHandlesMissingClaimantDetails() {
         caseDetails.getCaseData().setClaimantType(null);
 
-        service.initialise(caseDetails.getCaseData());
+        assertThat(service.initialise(caseDetails.getCaseData())).isEmpty();
 
         assertThat(caseDetails.getCaseData().getCurrentClaimantEmail()).isNull();
         assertThat(caseDetails.getCaseData().getNewClaimantEmail()).isNull();
+    }
+
+    @Test
+    void initialiseAllowsCaseWhenRepresentationFlagIsUnset() {
+        caseDetails.getCaseData().setClaimantRepresentedQuestion(null);
+        caseDetails.getCaseData().setNewClaimantEmail(NEW_EMAIL);
+
+        assertThat(service.initialise(caseDetails.getCaseData())).isEmpty();
+        assertThat(caseDetails.getCaseData().getCurrentClaimantEmail()).isEqualTo(OLD_EMAIL);
+        assertThat(caseDetails.getCaseData().getNewClaimantEmail()).isNull();
+    }
+
+    @Test
+    void initialiseRejectsRepresentedClaimantWithoutChangingEmails() {
+        caseDetails.getCaseData().setClaimantRepresentedQuestion(YES);
+        caseDetails.getCaseData().setNewClaimantEmail(NEW_EMAIL);
+
+        assertThat(service.initialise(caseDetails.getCaseData()))
+                .containsExactly(ClaimantEmailService.CLAIMANT_REPRESENTED_ERROR);
+        assertThat(caseDetails.getCaseData().getCurrentClaimantEmail()).isEqualTo(OLD_EMAIL);
+        assertThat(caseDetails.getCaseData().getNewClaimantEmail()).isEqualTo(NEW_EMAIL);
+    }
+
+    @Test
+    void validateRejectsRepresentedClaimantWithoutCallingIdam() {
+        caseDetails.getCaseData().setClaimantRepresentedQuestion(YES);
+
+        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+                .containsExactly(ClaimantEmailService.CLAIMANT_REPRESENTED_ERROR);
+        verify(idamApi, never()).searchUsersByQuery(anyString(), anyString(), any(), any());
+    }
+
+    @Test
+    void prepareUpdateRejectsRepresentedClaimantWithoutChangingCaseDataOrAccess() throws IOException {
+        caseDetails.getCaseData().setClaimantRepresentedQuestion(YES);
+
+        assertThat(service.prepareUpdate(caseDetails))
+                .containsExactly(ClaimantEmailService.CLAIMANT_REPRESENTED_ERROR);
+        assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
+        verify(idamApi, never()).searchUsersByQuery(anyString(), anyString(), any(), any());
+        verify(ccdCaseAssignment, never()).getCaseUserRoles(anyString());
+        verify(ccdCaseAssignment, never()).addCaseUserRole(any());
+        verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
+    }
+
+    @Test
+    void prepareUpdateSucceedsForLipAfterRepresentationRemoved() throws IOException {
+        caseDetails.getCaseData().setClaimantRepresentedQuestion(NO);
+        mockNewIdamUser();
+        when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
+                .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(List.of()).build());
+
+        assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+
+        verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
+        assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(NEW_EMAIL);
+        assertThat(caseDetails.getCaseData().getClaimantId()).isEqualTo(NEW_USER_ID);
     }
 
     @Test

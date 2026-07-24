@@ -457,8 +457,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> initialiseClaimantEmailUpdate(
             @RequestBody CCDRequest ccdRequest) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        claimantEmailService.initialise(caseData);
-        return getCallbackRespEntityNoErrors(caseData);
+        return getCallbackRespEntityErrors(claimantEmailService.initialise(caseData), caseData);
     }
 
     @PostMapping(value = "/updateClaimantEmail/validate", consumes = APPLICATION_JSON_VALUE)

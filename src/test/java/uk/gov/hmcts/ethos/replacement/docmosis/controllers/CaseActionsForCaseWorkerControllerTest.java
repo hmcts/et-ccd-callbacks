@@ -452,6 +452,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     @SneakyThrows
     void initialiseClaimantEmailUpdate() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(claimantEmailService.initialise(any(CaseData.class))).thenReturn(List.of());
 
         mvc.perform(post(UPDATE_CLAIMANT_EMAIL_ABOUT_TO_START_URL)
                         .content(requestContent.toString())
@@ -459,10 +460,30 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(claimantEmailService).initialise(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void initialiseClaimantEmailUpdateReturnsRepresentedError() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(claimantEmailService.initialise(any(CaseData.class)))
+                .thenReturn(List.of("Update claimant email is only available when the claimant is not represented. "
+                        + "Remove the representative first, then update the claimant email."));
+
+        mvc.perform(post(UPDATE_CLAIMANT_EMAIL_ABOUT_TO_START_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]",
+                        is("Update claimant email is only available when the claimant is not represented. "
+                                + "Remove the representative first, then update the claimant email.")))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test

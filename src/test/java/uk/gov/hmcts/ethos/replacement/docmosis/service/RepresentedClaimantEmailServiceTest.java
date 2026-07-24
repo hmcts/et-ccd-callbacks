@@ -40,6 +40,15 @@ class RepresentedClaimantEmailServiceTest {
     }
 
     @Test
+    void initialiseHandlesMissingClaimantDetails() {
+        caseData.setClaimantType(null);
+
+        assertThat(service.initialise(caseData)).isEmpty();
+        assertThat(caseData.getCurrentClaimantEmail()).isNull();
+        assertThat(caseData.getNewClaimantEmail()).isNull();
+    }
+
+    @Test
     void initialiseRejectsUnrepresentedClaimant() {
         caseData.setClaimantRepresentedQuestion(NO);
         caseData.setNewClaimantEmail(NEW_EMAIL);
@@ -58,8 +67,21 @@ class RepresentedClaimantEmailServiceTest {
     }
 
     @Test
+    void validateAcceptsDifferentValidEmail() {
+        assertThat(service.validateNewEmail(caseData)).isEmpty();
+    }
+
+    @Test
     void validateRejectsInvalidEmail() {
         caseData.setNewClaimantEmail("not-an-email");
+
+        assertThat(service.validateNewEmail(caseData))
+                .containsExactly("The email address entered is invalid.");
+    }
+
+    @Test
+    void validateRejectsBlankEmail() {
+        caseData.setNewClaimantEmail(" ");
 
         assertThat(service.validateNewEmail(caseData))
                 .containsExactly("The email address entered is invalid.");
@@ -100,6 +122,17 @@ class RepresentedClaimantEmailServiceTest {
         assertThat(caseData.getClaimantType()).isNotNull();
         assertThat(caseData.getClaimantType().getClaimantEmailAddress()).isEqualTo(NEW_EMAIL);
         assertThat(caseData.getClaimantId()).isEqualTo("existing-claimant-id");
+    }
+
+    @Test
+    void prepareUpdateRejectsUnrepresentedWithoutChangingCaseData() {
+        caseData.setClaimantRepresentedQuestion(NO);
+
+        assertThat(service.prepareUpdate(caseData))
+                .containsExactly(RepresentedClaimantEmailService.CLAIMANT_NOT_REPRESENTED_ERROR);
+        assertThat(caseData.getClaimantType().getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
+        assertThat(caseData.getClaimantId()).isEqualTo("existing-claimant-id");
+        assertThat(caseData.getNewClaimantEmail()).isEqualTo(NEW_EMAIL);
     }
 
     @Test

@@ -626,6 +626,24 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
+    void updateRepresentedClaimantEmailReturnsValidationErrors() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(representedClaimantEmailService.prepareUpdate(any(CaseData.class)))
+                .thenReturn(List.of("Enter an email address that is different from the current email."));
+
+        mvc.perform(post(UPDATE_REPRESENTED_CLAIMANT_EMAIL_ABOUT_TO_SUBMIT_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]",
+                        is("Enter an email address that is different from the current email.")))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
     void amendRespondentDetails() {
         when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());

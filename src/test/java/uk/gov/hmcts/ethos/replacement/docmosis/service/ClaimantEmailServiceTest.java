@@ -310,6 +310,25 @@ class ClaimantEmailServiceTest {
     }
 
     @Test
+    void prepareUpdateGrantsCreatorAccessWhenOnlyNonCreatorRolesExist() throws IOException {
+        mockNewIdamUser();
+        CaseUserAssignment solicitor = CaseUserAssignment.builder()
+                .caseId(CASE_ID)
+                .userId("solicitor-user-id")
+                .caseRole("[CLAIMANTSOLICITOR]")
+                .build();
+        when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
+                .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(List.of(solicitor)).build());
+
+        assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+
+        verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
+        verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
+        assertThat(caseDetails.getCaseData().getClaimantId()).isEqualTo(NEW_USER_ID);
+        assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(NEW_EMAIL);
+    }
+
+    @Test
     void prepareUpdateDoesNotChangeAccessWhenCreatorAlreadyMatchesNewUser() throws IOException {
         mockNewIdamUser();
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))

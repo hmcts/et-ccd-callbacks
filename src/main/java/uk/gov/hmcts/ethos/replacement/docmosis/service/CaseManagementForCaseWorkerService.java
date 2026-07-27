@@ -85,6 +85,7 @@ public class CaseManagementForCaseWorkerService {
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final CcdClient ccdClient;
     private final FeatureToggleService featureToggleService;
+    private final CaseFlagsService caseFlagsService;
     private final String hmctsServiceId;
     private final AdminUserService adminUserService;
     private final CaseManagementLocationService caseManagementLocationService;
@@ -106,6 +107,9 @@ public class CaseManagementForCaseWorkerService {
     public static final String CASE_MANAGEMENT_LABEL = "Employment Tribunals";
     public static final String CASE_MANAGEMENT_CODE = "Employment";
     private static final String EMPLOYMENT_JURISDICTION = "EMPLOYMENT";
+    private static final String RESPONDENT_NOT_CONTINUING_FLAG_COMMENT =
+            "The claim against the respondent is not continuing";
+    private static final String RESPONDENT_STRUCK_OUT_FLAG_COMMENT = "The respondent has been struck out";
     public static final String COUNTER_FIELD_INITIAL_VALUE = "1";
     private final String ccdGatewayBaseUrl;
     private final List<String> caseTypeIdsToCheck = List.of("ET_EnglandWales", "ET_Scotland", "Bristol",
@@ -130,6 +134,7 @@ public class CaseManagementForCaseWorkerService {
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
                                               CcdClient ccdClient,
                                               FeatureToggleService featureToggleService,
+                                              CaseFlagsService caseFlagsService,
                                               @Value("${hmcts_service_id}") String hmctsServiceId,
                                               AdminUserService adminUserService,
                                               CaseManagementLocationService caseManagementLocationService,
@@ -140,6 +145,7 @@ public class CaseManagementForCaseWorkerService {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.featureToggleService = featureToggleService;
+        this.caseFlagsService = caseFlagsService;
         this.hmctsServiceId = hmctsServiceId;
         this.adminUserService = adminUserService;
         this.caseManagementLocationService = caseManagementLocationService;
@@ -442,6 +448,11 @@ public class CaseManagementForCaseWorkerService {
                 if (respondentSumType.getResponseStruckOut() != null) {
                     if (respondentSumType.getResponseStruckOut().equals(YES)) {
                         struckRespondent.add(respondentSumTypeItem);
+                        caseFlagsService.inactivateCaseFlags(
+                                caseData,
+                                respondentSumType.getRespondentName(),
+                                RESPONDENT_STRUCK_OUT_FLAG_COMMENT
+                        );
                     } else {
                         activeRespondent.add(respondentSumTypeItem);
                     }
@@ -459,7 +470,7 @@ public class CaseManagementForCaseWorkerService {
 
     public CaseData continuingRespondent(CCDRequest ccdRequest) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        if (isEmpty(caseData.getRepCollection())) {
+        if (isNotEmpty(caseData.getRespondentCollection())) {
             List<RespondentSumTypeItem> continuingRespondent = new ArrayList<>();
             List<RespondentSumTypeItem> notContinuingRespondent = new ArrayList<>();
             for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
@@ -468,6 +479,11 @@ public class CaseManagementForCaseWorkerService {
                     continuingRespondent.add(respondentSumTypeItem);
                 } else if (NO.equals(respondentSumType.getResponseContinue())) {
                     notContinuingRespondent.add(respondentSumTypeItem);
+                    caseFlagsService.inactivateCaseFlags(
+                            caseData,
+                            respondentSumType.getRespondentName(),
+                            RESPONDENT_NOT_CONTINUING_FLAG_COMMENT
+                    );
                 } else {
                     respondentSumType.setResponseContinue(YES);
                     continuingRespondent.add(respondentSumTypeItem);

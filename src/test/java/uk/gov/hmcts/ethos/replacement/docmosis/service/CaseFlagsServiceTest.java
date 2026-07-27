@@ -80,6 +80,9 @@ class CaseFlagsServiceTest {
     public static final String CLAIMANT_REPRESENTATIVE_NAME = "Claimant Representative Name";
     public static final String REPRESENTATIVE_NAME = "Representative Name";
     public static final String RESPONDENT_NAME = "Respondent Name";
+    private static final String RESPONDENT_NOT_CONTINUING_FLAG_COMMENT =
+            "The claim against the respondent is not continuing";
+    private static final String RESPONDENT_STRUCK_OUT_FLAG_COMMENT = "The respondent has been struck out";
     private CaseFlagsService caseFlagsService;
     private CaseData caseData;
 
@@ -274,6 +277,71 @@ class CaseFlagsServiceTest {
         caseFlagsService.rollbackCaseFlags(caseData);
 
         assertNull(caseData.getAllPartyFlags());
+    }
+
+    @Test
+    void inactivateCaseFlags_shouldSetAllMatchingRespondentFlagDetailsInactive() {
+        caseFlagsService.setupCaseFlags(caseData);
+        CaseFlagsType respondentInternalFlags = allPartyFlags(caseData).getRespondent1Flags();
+        respondentInternalFlags.setDetails(ListTypeItem.from(
+                activeFlag("Internal flag 1"),
+                activeFlag("Internal flag 2")
+        ));
+
+        CaseFlagsType respondentExternalFlags = allPartyFlags(caseData).getRespondent1ExternalFlags();
+        CaseFlagsType otherRespondentFlags = allPartyFlags(caseData).getRespondent2Flags();
+        CaseFlagsType claimantFlags = allPartyFlags(caseData).getClaimantFlags();
+        respondentExternalFlags.setDetails(ListTypeItem.from(activeFlag("External flag")));
+        otherRespondentFlags.setDetails(ListTypeItem.from(activeFlag("Other respondent flag")));
+        claimantFlags.setDetails(ListTypeItem.from(activeFlag("Claimant flag")));
+
+        caseFlagsService.inactivateCaseFlags(caseData, respondentName(1), RESPONDENT_NOT_CONTINUING_FLAG_COMMENT);
+
+        assertEquals(INACTIVE, respondentInternalFlags.getDetails().get(0).getValue().getStatus());
+        assertEquals(INACTIVE, respondentInternalFlags.getDetails().get(1).getValue().getStatus());
+        assertEquals(INACTIVE, respondentExternalFlags.getDetails().getFirst().getValue().getStatus());
+        assertEquals(RESPONDENT_NOT_CONTINUING_FLAG_COMMENT,
+                respondentInternalFlags.getDetails().get(0).getValue().getFlagComment());
+        assertEquals(RESPONDENT_NOT_CONTINUING_FLAG_COMMENT,
+                respondentInternalFlags.getDetails().get(1).getValue().getFlagComment());
+        assertEquals(RESPONDENT_NOT_CONTINUING_FLAG_COMMENT,
+                respondentExternalFlags.getDetails().getFirst().getValue().getFlagComment());
+        assertEquals(ACTIVE, otherRespondentFlags.getDetails().getFirst().getValue().getStatus());
+        assertEquals(ACTIVE, claimantFlags.getDetails().getFirst().getValue().getStatus());
+        assertNull(otherRespondentFlags.getDetails().getFirst().getValue().getFlagComment());
+        assertNull(claimantFlags.getDetails().getFirst().getValue().getFlagComment());
+    }
+
+    @Test
+    void inactivateCaseFlags_shouldUseProvidedCommentWhenInactivatingRespondentFlags() {
+        caseFlagsService.setupCaseFlags(caseData);
+        CaseFlagsType respondentInternalFlags = allPartyFlags(caseData).getRespondentFlags();
+        CaseFlagsType respondentExternalFlags = allPartyFlags(caseData).getRespondentExternalFlags();
+        respondentInternalFlags.setDetails(ListTypeItem.from(activeFlag("Internal flag")));
+        respondentExternalFlags.setDetails(ListTypeItem.from(activeFlag("External flag")));
+
+        caseFlagsService.inactivateCaseFlags(caseData, RESPONDENT_NAME, RESPONDENT_STRUCK_OUT_FLAG_COMMENT);
+
+        assertEquals(INACTIVE, respondentInternalFlags.getDetails().getFirst().getValue().getStatus());
+        assertEquals(INACTIVE, respondentExternalFlags.getDetails().getFirst().getValue().getStatus());
+        assertEquals(RESPONDENT_STRUCK_OUT_FLAG_COMMENT,
+                respondentInternalFlags.getDetails().getFirst().getValue().getFlagComment());
+        assertEquals(RESPONDENT_STRUCK_OUT_FLAG_COMMENT,
+                respondentExternalFlags.getDetails().getFirst().getValue().getFlagComment());
+    }
+
+    @Test
+    void inactivateCaseFlags_shouldIgnoreMissingPartyFlagsAndDetails() {
+        caseFlagsService.inactivateCaseFlags(caseData, RESPONDENT_NAME, RESPONDENT_NOT_CONTINUING_FLAG_COMMENT);
+
+        assertNull(caseData.getAllPartyFlags());
+
+        caseFlagsService.setupCaseFlags(caseData);
+        allPartyFlags(caseData).getRespondentFlags().setDetails(null);
+
+        caseFlagsService.inactivateCaseFlags(caseData, RESPONDENT_NAME, RESPONDENT_NOT_CONTINUING_FLAG_COMMENT);
+
+        assertNull(allPartyFlags(caseData).getRespondentFlags().getDetails());
     }
 
     @Test

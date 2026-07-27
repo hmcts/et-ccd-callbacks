@@ -27,6 +27,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.CLAIMANT_RE
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.DISRUPTIVE_CUSTOMER;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.EXTERNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.GRANTED;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.INACTIVE;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.INTERNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.LANGUAGE_INTERPRETER;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.NOT_INDEXED;
@@ -59,7 +60,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Slf4j
 @Service
 public class CaseFlagsService {
-
     private static final List<PartyFlag> PARTY_FLAGS = List.of(
             claimantFlag(AllPartyFlags::getClaimantFlags, AllPartyFlags::setClaimantFlags, INTERNAL),
             claimantFlag(AllPartyFlags::getClaimantExternalFlags, AllPartyFlags::setClaimantExternalFlags, EXTERNAL),
@@ -219,6 +219,39 @@ public class CaseFlagsService {
                 || YES.equals(caseData.getIcListingPreliminaryHearing());
 
         caseData.setPrivateHearingRequiredFlag(shouldBePrivate ? YES : NO);
+    }
+
+    /**
+     * Inactivates all case flag details for a respondent with the supplied reason comment.
+     *
+     * @param caseData Data about the current case
+     * @param respondentName Name of the respondent
+     * @param inactiveFlagComment Comment to add to each inactivated flag
+     */
+    public void inactivateCaseFlags(CaseData caseData, String respondentName, String inactiveFlagComment) {
+        if (caseData == null || StringUtils.isBlank(respondentName)) {
+            return;
+        }
+
+        PARTY_FLAGS.stream()
+                .filter(flag -> PartyType.RESPONDENT.equals(flag.partyType()))
+                .map(flag -> flag.get(caseData))
+                .filter(flags -> flags != null && Objects.equals(respondentName, flags.getPartyName()))
+                .forEach(flags -> inactivateCaseFlags(flags, inactiveFlagComment));
+    }
+
+    private void inactivateCaseFlags(CaseFlagsType flags, String inactiveFlagComment) {
+        if (flags.getDetails() == null) {
+            return;
+        }
+
+        flags.getDetails().stream()
+                .map(GenericTypeItem::getValue)
+                .filter(Objects::nonNull)
+                .forEach(flag -> {
+                    flag.setStatus(INACTIVE);
+                    flag.setFlagComment(inactiveFlagComment);
+                });
     }
 
     private static PartyFlag claimantFlag(

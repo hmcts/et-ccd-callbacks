@@ -1013,8 +1013,8 @@ public class NocRespondentRepresentativeService {
     public CaseData updateRespondentRepresentation(CaseDetails caseDetails) throws IOException {
         CaseData caseData = caseDetails.getCaseData();
         resetRespondentRepresentativeRemovedField(caseData);
-        Map<String, Object> caseDataAsMap = caseConverter.toMap(caseData);
         Map<String, Object> repCollection = updateRepresentationMap(caseData, caseDetails.getCaseId());
+        Map<String, Object> caseDataAsMap = caseConverter.toMap(caseData);
         caseDataAsMap.putAll(repCollection);
         return  caseConverter.convert(caseDataAsMap, CaseData.class);
     }

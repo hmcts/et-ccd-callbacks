@@ -90,18 +90,6 @@
         <cve>CVE-2026-56148</cve>
         <cve>CVE-2026-56149</cve>
     </suppress>
-    <!-- Netty 4.2.16.Final is the first patched 4.2.x release for these CVEs.
-         Dependency Check incorrectly matches them to all Netty modules through the broad Netty CPE. -->
-    <suppress>
-        <notes><![CDATA[
-   file name: netty-*-4.2.16.Final.jar
-   GitHub security advisories identify 4.2.16.Final as the first patched 4.2.x release.
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-.*@4\.2\.16\.Final$</packageUrl>
-        <cve>CVE-2026-44891</cve>
-        <cve>CVE-2026-55831</cve>
-        <cve>CVE-2026-55833</cve>
-    </suppress>
     <!-- All other CVEs below -->
     <!-- CVE-2026-54515 affects jackson-databind 2.22.0 which is the latest available version.
          No fixed version exists. Suppress until a patched release is available. -->
@@ -137,7 +125,7 @@
         <cve>CVE-2026-54514</cve>
         <cve>CVE-2026-54515</cve>
     </suppress>
-       <!-- Netty 4.2.16.Final is the latest available version; no fix released for these CVEs.
+    <!-- Netty 4.2.16.Final is the latest available version; no fix released for these CVEs.
          Suppress until a patched release is available. -->
     <suppress>
         <notes><![CDATA[
@@ -148,5 +136,30 @@
         <cve>CVE-2026-44891</cve>
         <cve>CVE-2026-55831</cve>
         <cve>CVE-2026-55833</cve>
+    </suppress>
+    <!-- spring-cloud-azure 6.4.0 is pinned by com.github.hmcts:ccd-servicebus-support:6.29.0 via the
+         hmcts.ccd.sdk plugin. No 6.x release of spring-cloud-azure exists on Maven Central, so the
+         version cannot be overridden with a resolution strategy. Suppress until ccd-servicebus-support
+         ships a patched spring-cloud-azure dependency. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-cloud-azure-autoconfigure-6.4.0.jar, spring-cloud-azure-core-6.4.0.jar,
+   spring-cloud-azure-service-6.4.0.jar, spring-cloud-azure-starter-6.4.0.jar,
+   spring-cloud-azure-starter-servicebus-jms-6.4.0.jar
+   Transitive dependency from com.github.hmcts:ccd-servicebus-support:6.29.0. No patched 6.x release
+   is available on Maven Central as of 2026-07-27.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.azure\.spring/spring-cloud-azure-.*@6\.4\.0$</packageUrl>
+        <cpe>cpe:/a:microsoft:azure_spring_cloud</cpe>
+    </suppress>
+    <!-- False positive: DependencyCheck matches spring-cloud-azure-service against the unrelated
+         service_project:service CPE based on the artifact name. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-cloud-azure-service-6.4.0.jar
+   False positive — cpe:2.3:a:service_project:service does not apply to spring-cloud-azure-service.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.azure\.spring/spring-cloud-azure-service@.*$</packageUrl>
+        <cpe>cpe:/a:service_project:service</cpe>
     </suppress>
 </suppressions>

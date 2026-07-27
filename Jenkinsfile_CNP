@@ -194,8 +194,7 @@ withPipeline(type, product, component) {
       """
 
       sh """
-        ./bin/pull-latest-e2e-tests.sh
-      cd ccd-definitions && yarn install && yarn setup && yarn scripts:preview ${CHANGE_ID}
+        cd ccd-definitions && yarn install && yarn setup && yarn scripts:preview ${CHANGE_ID}
       """
       sh """
           echo "Importing ET COS reference data"
@@ -275,9 +274,9 @@ withPipeline(type, product, component) {
     env.ET_SUBMIT_DRAFT_CASE_URL = "http://et-sya-api-aat.service.core-compute-aat.internal/cases/submit-case/"
     env.RUNNING_ENV = "aat"
 
-    sh """
-      ./bin/pull-latest-e2e-tests.sh
-    """
+    // sh """
+    //   ./bin/pull-latest-e2e-tests.sh
+    // """
   }
 
   afterAlways('smoketest:aat') {

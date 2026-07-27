@@ -57,6 +57,8 @@ class RespondentEmailServiceTest {
     @Mock
     private AdminUserService adminUserService;
     @Mock
+    private UserIdamService userIdamService;
+    @Mock
     private CcdCaseAssignment ccdCaseAssignment;
 
     @InjectMocks
@@ -77,28 +79,29 @@ class RespondentEmailServiceTest {
     }
 
     @Test
-    void initialiseListsOnlyUnrepresentedRespondents() {
+    void initialiseListsAllRespondentsIncludingRepresented() {
         secondRespondent.getValue().setRepresented(YES);
 
         assertThat(service.initialise(caseDetails.getCaseData())).isEmpty();
         assertThat(caseDetails.getCaseData().getRespondentEmailUpdateSelection().getListItems())
                 .extracting("code", "label")
-                .containsExactly(tuple(RESPONDENT_ID_ONE, "First respondent"));
+                .containsExactly(
+                        tuple(RESPONDENT_ID_ONE, "First respondent"),
+                        tuple(RESPONDENT_ID_TWO, "Second respondent"));
         assertThat(caseDetails.getCaseData().getCurrentRespondentEmail()).isNull();
         assertThat(caseDetails.getCaseData().getNewRespondentEmail()).isNull();
     }
 
     @Test
-    void initialiseReturnsErrorWhenNoUnrepresentedRespondentExists() {
-        firstRespondent.getValue().setRepresented(YES);
-        secondRespondent.getValue().setRepresented(YES);
+    void initialiseReturnsErrorWhenNoRespondentExists() {
+        caseDetails.getCaseData().setRespondentCollection(List.of());
 
         assertThat(service.initialise(caseDetails.getCaseData()))
-                .containsExactly(RespondentEmailService.NO_UNREPRESENTED_RESPONDENTS_ERROR);
+                .containsExactly(RespondentEmailService.NO_RESPONDENTS_ERROR);
     }
 
     @Test
-    void initialiseExcludesRespondentLinkedToRepresentative() {
+    void initialiseIncludesRespondentLinkedToRepresentative() {
         firstRespondent.getValue().setRepresented(null);
         secondRespondent.getValue().setRepresented(null);
         caseDetails.getCaseData().setRepCollection(List.of(representativeFor(RESPONDENT_ID_ONE, "First respondent")));
@@ -106,7 +109,24 @@ class RespondentEmailServiceTest {
         assertThat(service.initialise(caseDetails.getCaseData())).isEmpty();
         assertThat(caseDetails.getCaseData().getRespondentEmailUpdateSelection().getListItems())
                 .extracting("code")
-                .containsExactly(RESPONDENT_ID_TWO);
+                .containsExactly(RESPONDENT_ID_ONE, RESPONDENT_ID_TWO);
+    }
+
+    @Test
+    void prepareUpdateGrantsDefendantAccessForRepresentedRespondent() throws IOException {
+        firstRespondent.getValue().setRepresented(YES);
+        selectRespondent(RESPONDENT_ID_ONE);
+        caseDetails.getCaseData().setCurrentRespondentEmail(OLD_EMAIL);
+        caseDetails.getCaseData().setNewRespondentEmail(NEW_EMAIL);
+        mockNewIdamUser();
+        when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
+                .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(List.of()).build());
+
+        assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+
+        verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
+        assertThat(firstRespondent.getValue().getRespondentEmail()).isEqualTo(NEW_EMAIL);
+        assertThat(firstRespondent.getValue().getIdamId()).isEqualTo(NEW_USER_ID);
     }
 
     @Test

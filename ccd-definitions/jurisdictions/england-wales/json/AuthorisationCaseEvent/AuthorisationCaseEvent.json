@@ -2418,24 +2418,6 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseEventID": "updateRepresentedRespondentEmail",
-    "UserRole": "caseworker-employment",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseEventID": "updateRepresentedRespondentEmail",
-    "UserRole": "caseworker-employment-englandwales",
-    "CRUD": "CRU"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseEventID": "updateRepresentedRespondentEmail",
-    "UserRole": "caseworker-employment-api",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "UPDATE_RESPONDENT_ACCESS_TRANSFER_STATE",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"

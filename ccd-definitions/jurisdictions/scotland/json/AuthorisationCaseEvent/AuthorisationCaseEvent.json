@@ -2398,24 +2398,6 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "updateRepresentedRespondentEmail",
-    "UserRole": "caseworker-employment",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "updateRepresentedRespondentEmail",
-    "UserRole": "caseworker-employment-scotland",
-    "CRUD": "CRU"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "updateRepresentedRespondentEmail",
-    "UserRole": "caseworker-employment-api",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
     "CaseEventID": "UPDATE_RESPONDENT_ACCESS_TRANSFER_STATE",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"

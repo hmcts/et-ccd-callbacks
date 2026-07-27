@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
@@ -23,15 +24,19 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService.BEARER;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT;
 
+/**
+ * Updates respondent contact email and grants or reassigns [DEFENDANT] case access for both
+ * LiP and represented respondents. Solicitor roles are not changed.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class RespondentEmailService {
 
-    static final String NO_UNREPRESENTED_RESPONDENTS_ERROR =
-            "There are no unrepresented respondents whose email address can be updated.";
+    static final String NO_RESPONDENTS_ERROR = RespondentEmailUpdateHelper.NO_RESPONDENTS_ERROR;
     static final String RESPONDENT_REQUIRED_ERROR = RespondentEmailUpdateHelper.RESPONDENT_REQUIRED_ERROR;
     static final String EMAIL_UNCHANGED_ERROR = RespondentEmailUpdateHelper.EMAIL_UNCHANGED_ERROR;
     static final String IDAM_USER_NOT_FOUND_ERROR = "No IdAM account was found for the new email address.";
@@ -52,24 +57,31 @@ public class RespondentEmailService {
     static final String EMAIL_UPDATE_ERROR =
             "The respondent email could not be saved. Case access was not changed.";
 
-    private static final boolean UNREPRESENTED = false;
-
     private final IdamApi idamApi;
     private final AdminUserService adminUserService;
+    private final UserIdamService userIdamService;
     private final CcdCaseAssignment ccdCaseAssignment;
 
+    /**
+     * RSE IdAM simulator does not implement real /api/v1/users search. Enable in cftlib so local
+     * testing can resolve accounts via password login + /o/userinfo instead.
+     */
+    @Value("${idam.user-search.local-password-fallback:false}")
+    private boolean localPasswordFallback;
+
+    @Value("${idam.user-search.local-password:password}")
+    private String localPassword;
+
     public List<String> initialise(CaseData caseData) {
-        return RespondentEmailUpdateHelper.initialise(caseData, UNREPRESENTED, NO_UNREPRESENTED_RESPONDENTS_ERROR);
+        return RespondentEmailUpdateHelper.initialise(caseData);
     }
 
     public List<String> populateCurrentEmail(CaseData caseData) {
-        return RespondentEmailUpdateHelper.populateCurrentEmail(
-                caseData, UNREPRESENTED, NO_UNREPRESENTED_RESPONDENTS_ERROR);
+        return RespondentEmailUpdateHelper.populateCurrentEmail(caseData);
     }
 
     public List<String> validateNewEmail(CaseData caseData) {
-        List<String> errors = RespondentEmailUpdateHelper.validateInput(
-                caseData, UNREPRESENTED, NO_UNREPRESENTED_RESPONDENTS_ERROR);
+        List<String> errors = RespondentEmailUpdateHelper.validateInput(caseData);
         if (errors.isEmpty()) {
             findUserByEmail(caseData.getNewRespondentEmail(), errors);
         }
@@ -78,17 +90,15 @@ public class RespondentEmailService {
 
     public List<String> prepareUpdate(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
-        List<String> errors = RespondentEmailUpdateHelper.validateInput(
-                caseData, UNREPRESENTED, NO_UNREPRESENTED_RESPONDENTS_ERROR);
+        List<String> errors = RespondentEmailUpdateHelper.validateInput(caseData);
         if (CollectionUtils.isNotEmpty(errors)) {
             return errors;
         }
 
         Optional<RespondentSumTypeItem> selectedRespondent =
-                RespondentEmailUpdateHelper.getSelectedEligibleRespondent(caseData, UNREPRESENTED);
+                RespondentEmailUpdateHelper.getSelectedEligibleRespondent(caseData);
         if (selectedRespondent.isEmpty()) {
-            return List.of(RespondentEmailUpdateHelper.getSelectionError(
-                    caseData, UNREPRESENTED, NO_UNREPRESENTED_RESPONDENTS_ERROR));
+            return List.of(RespondentEmailUpdateHelper.getSelectionError(caseData));
         }
 
         Optional<UserDetails> newUser = findUserByEmail(caseData.getNewRespondentEmail(), errors);
@@ -196,6 +206,10 @@ public class RespondentEmailService {
                 .filter(user -> StringUtils.equalsIgnoreCase(email, user.getEmail()))
                 .toList();
         if (exactMatches.isEmpty()) {
+            Optional<UserDetails> localUser = findUserViaLocalPasswordFallback(email);
+            if (localUser.isPresent()) {
+                return localUser;
+            }
             errors.add(IDAM_USER_NOT_FOUND_ERROR);
             return Optional.empty();
         }
@@ -204,6 +218,23 @@ public class RespondentEmailService {
             return Optional.empty();
         }
         return Optional.of(exactMatches.getFirst());
+    }
+
+    private Optional<UserDetails> findUserViaLocalPasswordFallback(String email) {
+        if (!localPasswordFallback || StringUtils.isBlank(email)) {
+            return Optional.empty();
+        }
+        try {
+            String accessToken = userIdamService.getAccessToken(email, localPassword);
+            UserDetails user = userIdamService.getUserDetails(String.join(" ", BEARER, accessToken));
+            if (user != null && StringUtils.equalsIgnoreCase(email, user.getEmail())) {
+                log.info("Resolved IdAM user via local password fallback for {}", email);
+                return Optional.of(user);
+            }
+        } catch (Exception exception) {
+            log.info("Local IdAM password fallback could not resolve {}: {}", email, exception.getMessage());
+        }
+        return Optional.empty();
     }
 
     private Optional<CaseUserAssignment> getDefendantAssignment(String caseId, String userId) throws IOException {

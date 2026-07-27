@@ -6745,7 +6745,7 @@
     "CaseTypeID": "ET_Scotland",
     "ID": "currentRespondentEmail",
     "Label": "Current email address",
-    "FieldType": "Email",
+    "FieldType": "Text",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },
@@ -6753,17 +6753,10 @@
     "CaseTypeID": "ET_Scotland",
     "ID": "newRespondentEmail",
     "Label": "New email address",
-    "HintText": "Enter a different email address for the respondent.",
+    "HintText": "Must be different from the current email and already registered in IdAM. This updates the contact email and grants or reassigns case access.",
     "FieldType": "Email",
     "SecurityClassification": "Public",
     "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
-    "ID": "representedRespondentEmailInfo",
-    "Label": "This updates the respondent contact email on the case only. It does not change solicitor access or respondent portal login. To transfer portal access, remove the representative first, then use Update respondent email.",
-    "FieldType": "Label",
-    "SecurityClassification": "Public"
   },
   {
     "CaseTypeID": "ET_Scotland",

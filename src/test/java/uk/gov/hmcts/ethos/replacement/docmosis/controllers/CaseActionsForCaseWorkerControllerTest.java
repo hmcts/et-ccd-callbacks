@@ -46,7 +46,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.RepresentedClaimantEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
@@ -106,12 +105,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private static final String UPDATE_CLAIMANT_EMAIL_VALIDATE_URL = "/updateClaimantEmail/validate";
     private static final String UPDATE_CLAIMANT_EMAIL_ABOUT_TO_SUBMIT_URL =
             "/updateClaimantEmail/aboutToSubmit";
-    private static final String UPDATE_REPRESENTED_CLAIMANT_EMAIL_ABOUT_TO_START_URL =
-            "/updateRepresentedClaimantEmail/aboutToStart";
-    private static final String UPDATE_REPRESENTED_CLAIMANT_EMAIL_VALIDATE_URL =
-            "/updateRepresentedClaimantEmail/validate";
-    private static final String UPDATE_REPRESENTED_CLAIMANT_EMAIL_ABOUT_TO_SUBMIT_URL =
-            "/updateRepresentedClaimantEmail/aboutToSubmit";
     private static final String AMEND_RESPONDENT_DETAILS_URL = "/amendRespondentDetails";
     private static final String AMEND_RESPONDENT_REPRESENTATIVE_URL = "/amendRespondentRepresentative";
     private static final String UPDATE_HEARING_URL = "/updateHearing";
@@ -220,9 +213,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @MockitoBean
     private ClaimantEmailService claimantEmailService;
-
-    @MockitoBean
-    private RepresentedClaimantEmailService representedClaimantEmailService;
 
     private MockMvc mvc;
     private JsonNode requestContent;
@@ -478,11 +468,10 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
-    void initialiseClaimantEmailUpdateReturnsRepresentedError() {
+    void initialiseClaimantEmailUpdateReturnsErrors() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(claimantEmailService.initialise(any(CaseData.class)))
-                .thenReturn(List.of("Update claimant email is only available when the claimant is not represented. "
-                        + "Remove the representative first, then update the claimant email."));
+                .thenReturn(List.of("Initialisation failed"));
 
         mvc.perform(post(UPDATE_CLAIMANT_EMAIL_ABOUT_TO_START_URL)
                         .content(requestContent.toString())
@@ -490,9 +479,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath("$.errors[0]",
-                        is("Update claimant email is only available when the claimant is not represented. "
-                                + "Remove the representative first, then update the claimant email.")))
+                .andExpect(jsonPath("$.errors[0]", is("Initialisation failed")))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
@@ -548,97 +535,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("$.errors[0]",
                         is("Failed to grant case access using the new claimant email. "
                                 + "The claimant email was not changed.")))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    @SneakyThrows
-    void initialiseRepresentedClaimantEmailUpdate() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(representedClaimantEmailService.initialise(any(CaseData.class))).thenReturn(List.of());
-
-        mvc.perform(post(UPDATE_REPRESENTED_CLAIMANT_EMAIL_ABOUT_TO_START_URL)
-                        .content(requestContent.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-
-        verify(representedClaimantEmailService).initialise(any(CaseData.class));
-    }
-
-    @Test
-    @SneakyThrows
-    void initialiseRepresentedClaimantEmailUpdateReturnsError() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(representedClaimantEmailService.initialise(any(CaseData.class)))
-                .thenReturn(List.of("Update represented claimant email is only available when the claimant "
-                        + "is represented. For an unrepresented claimant, use Update claimant email instead."));
-
-        mvc.perform(post(UPDATE_REPRESENTED_CLAIMANT_EMAIL_ABOUT_TO_START_URL)
-                        .content(requestContent.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath("$.errors[0]",
-                        is("Update represented claimant email is only available when the claimant "
-                                + "is represented. For an unrepresented claimant, use Update claimant email instead.")))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    @SneakyThrows
-    void validateRepresentedClaimantEmailUpdateReturnsErrors() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(representedClaimantEmailService.validateNewEmail(any(CaseData.class)))
-                .thenReturn(List.of("Email validation failed"));
-
-        mvc.perform(post(UPDATE_REPRESENTED_CLAIMANT_EMAIL_VALIDATE_URL)
-                        .content(requestContent.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath("$.errors[0]", is("Email validation failed")))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    @SneakyThrows
-    void updateRepresentedClaimantEmailReturnsPreparedCaseData() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(representedClaimantEmailService.prepareUpdate(any(CaseData.class))).thenReturn(List.of());
-
-        mvc.perform(post(UPDATE_REPRESENTED_CLAIMANT_EMAIL_ABOUT_TO_SUBMIT_URL)
-                        .content(requestContent.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-
-        verify(representedClaimantEmailService).prepareUpdate(any(CaseData.class));
-    }
-
-    @Test
-    @SneakyThrows
-    void updateRepresentedClaimantEmailReturnsValidationErrors() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(representedClaimantEmailService.prepareUpdate(any(CaseData.class)))
-                .thenReturn(List.of("Enter an email address that is different from the current email."));
-
-        mvc.perform(post(UPDATE_REPRESENTED_CLAIMANT_EMAIL_ABOUT_TO_SUBMIT_URL)
-                        .content(requestContent.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath("$.errors[0]",
-                        is("Enter an email address that is different from the current email.")))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 

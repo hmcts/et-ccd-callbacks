@@ -97,36 +97,42 @@ class ClaimantEmailServiceTest {
     }
 
     @Test
-    void initialiseRejectsRepresentedClaimantWithoutChangingEmails() {
+    void initialiseAllowsRepresentedClaimant() {
         caseDetails.getCaseData().setClaimantRepresentedQuestion(YES);
         caseDetails.getCaseData().setNewClaimantEmail(NEW_EMAIL);
 
-        assertThat(service.initialise(caseDetails.getCaseData()))
-                .containsExactly(ClaimantEmailService.CLAIMANT_REPRESENTED_ERROR);
+        assertThat(service.initialise(caseDetails.getCaseData())).isEmpty();
         assertThat(caseDetails.getCaseData().getCurrentClaimantEmail()).isEqualTo(OLD_EMAIL);
-        assertThat(caseDetails.getCaseData().getNewClaimantEmail()).isEqualTo(NEW_EMAIL);
+        assertThat(caseDetails.getCaseData().getNewClaimantEmail()).isNull();
     }
 
     @Test
-    void validateRejectsRepresentedClaimantWithoutCallingIdam() {
+    void prepareUpdateGrantsCreatorAccessForRepresentedClaimant() throws IOException {
         caseDetails.getCaseData().setClaimantRepresentedQuestion(YES);
+        mockNewIdamUser();
+        when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
+                .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(List.of()).build());
 
-        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
-                .containsExactly(ClaimantEmailService.CLAIMANT_REPRESENTED_ERROR);
-        verify(idamApi, never()).searchUsersByQuery(anyString(), anyString(), any(), any());
+        assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+
+        verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
+        assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(NEW_EMAIL);
+        assertThat(caseDetails.getCaseData().getClaimantId()).isEqualTo(NEW_USER_ID);
     }
 
     @Test
-    void prepareUpdateRejectsRepresentedClaimantWithoutChangingCaseDataOrAccess() throws IOException {
+    void prepareUpdateReassignsCreatorAccessForRepresentedClaimant() throws IOException {
         caseDetails.getCaseData().setClaimantRepresentedQuestion(YES);
+        mockNewIdamUser();
+        when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(assignmentsWithCreator());
 
-        assertThat(service.prepareUpdate(caseDetails))
-                .containsExactly(ClaimantEmailService.CLAIMANT_REPRESENTED_ERROR);
-        assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
-        verify(idamApi, never()).searchUsersByQuery(anyString(), anyString(), any(), any());
-        verify(ccdCaseAssignment, never()).getCaseUserRoles(anyString());
-        verify(ccdCaseAssignment, never()).addCaseUserRole(any());
-        verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
+        assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+
+        InOrder inOrder = inOrder(ccdCaseAssignment);
+        inOrder.verify(ccdCaseAssignment).removeCaseUserRole(requestForUser(OLD_USER_ID));
+        inOrder.verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
+        assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(NEW_EMAIL);
+        assertThat(caseDetails.getCaseData().getClaimantId()).isEqualTo(NEW_USER_ID);
     }
 
     @Test

@@ -50,7 +50,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.RepresentedClaimantEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
@@ -117,7 +116,6 @@ public class CaseActionsForCaseWorkerController {
     private final NocRespondentHelper nocRespondentHelper;
     private final UserIdamService userIdamService;
     private final ClaimantEmailService claimantEmailService;
-    private final RepresentedClaimantEmailService representedClaimantEmailService;
 
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "create a case for a caseWorker.")
@@ -477,30 +475,6 @@ public class CaseActionsForCaseWorkerController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         return getCallbackRespEntityErrors(
                 claimantEmailService.prepareUpdate(ccdRequest.getCaseDetails()), caseData);
-    }
-
-    @PostMapping(value = "/updateRepresentedClaimantEmail/aboutToStart", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Initialise represented claimant contact email update.")
-    public ResponseEntity<CCDCallbackResponse> initialiseRepresentedClaimantEmailUpdate(
-            @RequestBody CCDRequest ccdRequest) {
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        return getCallbackRespEntityErrors(representedClaimantEmailService.initialise(caseData), caseData);
-    }
-
-    @PostMapping(value = "/updateRepresentedClaimantEmail/validate", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Validate represented claimant contact email.")
-    public ResponseEntity<CCDCallbackResponse> validateRepresentedClaimantEmailUpdate(
-            @RequestBody CCDRequest ccdRequest) {
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        return getCallbackRespEntityErrors(representedClaimantEmailService.validateNewEmail(caseData), caseData);
-    }
-
-    @PostMapping(value = "/updateRepresentedClaimantEmail/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Update represented claimant contact email without changing case access.")
-    public ResponseEntity<CCDCallbackResponse> updateRepresentedClaimantEmail(
-            @RequestBody CCDRequest ccdRequest) {
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        return getCallbackRespEntityErrors(representedClaimantEmailService.prepareUpdate(caseData), caseData);
     }
 
     @PostMapping(value = "/amendRespondentDetails", consumes = APPLICATION_JSON_VALUE)

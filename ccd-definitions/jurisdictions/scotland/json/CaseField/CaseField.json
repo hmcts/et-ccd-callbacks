@@ -6749,12 +6749,5 @@
     "FieldType": "Email",
     "SecurityClassification": "Public",
     "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
-    "ID": "representedClaimantEmailInfo",
-    "Label": "This updates the claimant contact email on the case only. It does not change solicitor access or citizen portal login. To transfer portal access, remove the representative first, then use Update claimant email.",
-    "FieldType": "Label",
-    "SecurityClassification": "Public"
   }
 ]

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CREATOR;
 
 @Slf4j
@@ -31,10 +30,6 @@ import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CA
 @RequiredArgsConstructor
 public class ClaimantEmailService {
 
-    // Shown when the case has a legal representative; this event is LiP-only.
-    static final String CLAIMANT_REPRESENTED_ERROR =
-            "Update claimant email is only available when the claimant is not represented. "
-                    + "Remove the representative first, then update the claimant email.";
     // Shown when the user enters a new email that is the same as the email already on the case.
     static final String EMAIL_UNCHANGED_ERROR = "Enter an email address that is different from the current email.";
     // Shown when no login account exists for the new email (claimant must already have registered).
@@ -75,23 +70,20 @@ public class ClaimantEmailService {
     private final AdminUserService adminUserService;
     private final CcdCaseAssignment ccdCaseAssignment;
 
+    /**
+     * Updates claimant contact email and grants or reassigns [CREATOR] case access for both
+     * LiP and represented claimants. Solicitor roles are not changed.
+     */
     public List<String> initialise(CaseData caseData) {
-        List<String> errors = validateClaimantIsLip(caseData);
-        if (errors.isEmpty()) {
-            caseData.setNewClaimantEmail(null);
-            caseData.setCurrentClaimantEmail(caseData.getClaimantType() == null
-                    ? null
-                    : caseData.getClaimantType().getClaimantEmailAddress());
-        }
-        return errors;
+        caseData.setNewClaimantEmail(null);
+        caseData.setCurrentClaimantEmail(caseData.getClaimantType() == null
+                ? null
+                : caseData.getClaimantType().getClaimantEmailAddress());
+        return List.of();
     }
 
     public List<String> validateNewEmail(CaseData caseData) {
-        List<String> errors = validateClaimantIsLip(caseData);
-        if (CollectionUtils.isNotEmpty(errors)) {
-            return errors;
-        }
-        errors = validateEmailInput(caseData);
+        List<String> errors = validateEmailInput(caseData);
         if (errors.isEmpty()) {
             findCitizenIdamUserByEmail(caseData.getNewClaimantEmail(), errors);
         }
@@ -100,11 +92,7 @@ public class ClaimantEmailService {
 
     public List<String> prepareUpdate(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
-        List<String> errors = validateClaimantIsLip(caseData);
-        if (CollectionUtils.isNotEmpty(errors)) {
-            return errors;
-        }
-        errors = validateEmailInput(caseData);
+        List<String> errors = validateEmailInput(caseData);
         if (CollectionUtils.isNotEmpty(errors)) {
             return errors;
         }
@@ -204,14 +192,6 @@ public class ClaimantEmailService {
             case GRANTED -> EMAIL_UPDATE_AFTER_GRANT_ERROR;
             case UNCHANGED -> EMAIL_UPDATE_ERROR;
         };
-    }
-
-    private List<String> validateClaimantIsLip(CaseData caseData) {
-        List<String> errors = new ArrayList<>();
-        if (YES.equals(caseData.getClaimantRepresentedQuestion())) {
-            errors.add(CLAIMANT_REPRESENTED_ERROR);
-        }
-        return errors;
     }
 
     private List<String> validateEmailInput(CaseData caseData) {

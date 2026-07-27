@@ -23885,23 +23885,5 @@
     "CaseFieldID": "newClaimantEmail",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "representedClaimantEmailInfo",
-    "UserRole": "caseworker-employment",
-    "CRUD": "CRU"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "representedClaimantEmailInfo",
-    "UserRole": "caseworker-employment-scotland",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "representedClaimantEmailInfo",
-    "UserRole": "caseworker-employment-api",
-    "CRUD": "CRUD"
   }
 ]

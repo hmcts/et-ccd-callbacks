@@ -1054,10 +1054,9 @@ public class NocRespondentRepresentativeService {
             repCollection.get(repIndex).setValue(addedSolicitor);
         } else {
             //assumption is NOC will take care of replacing value in org policy
-            RepresentedTypeRItem representedTypeRItem = RepresentedTypeRItem.builder().build();
-            String representativeId = UUID.randomUUID().toString();
-            representedTypeRItem.setId(representativeId);
-            respondent.getValue().setRepresentativeId(representativeId);
+            RepresentedTypeRItem representedTypeRItem = RepresentedTypeRItem.builder().id(UUID.randomUUID().toString())
+                    .build();
+            respondent.getValue().setRepresentativeId(representedTypeRItem.getId());
             representedTypeRItem.setValue(addedSolicitor);
             repCollection.add(representedTypeRItem);
         }

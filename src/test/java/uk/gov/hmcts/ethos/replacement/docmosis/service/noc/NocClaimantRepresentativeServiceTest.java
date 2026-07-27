@@ -75,8 +75,8 @@ class NocClaimantRepresentativeServiceTest {
                     + "will not be defined for this representative.";
 
     private static final String EXPECTED_ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES =
-            "Representative Representative Name 1 organisation does not match with selected organisation "
-                    + "dummyOrganisationUserId";
+            "Representative Name 1 does not have a valid account with the organisation Dummy Organisation. Please "
+                + "check the selected organisation";
 
     @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
@@ -315,13 +315,16 @@ class NocClaimantRepresentativeServiceTest {
                 .isEmpty();
         // when organisation of representative and organisation response have same id should return empty error list
         claimantRepresentative.getMyHmctsOrganisation().setOrganisationID(DUMMY_ORGANISATION_USER_ID);
+        claimantRepresentative.getMyHmctsOrganisation().setOrganisationName("Dummy Organisation");
         when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_ADMIN_USER_TOKEN);
         AccountIdByEmailResponse accountIdByEmailResponse = new AccountIdByEmailResponse();
         accountIdByEmailResponse.setUserIdentifier(DUMMY_ORGANISATION_USER_ID);
         when(nocService.findUserByEmail(DUMMY_ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL_1, DUMMY_CASE_ID))
                 .thenReturn(accountIdByEmailResponse);
         OrganisationsResponse tmpOrganisationsResponse = OrganisationsResponse.builder()
-                .organisationIdentifier(DUMMY_ORGANISATION_USER_ID).build();
+                .organisationIdentifier(DUMMY_ORGANISATION_USER_ID)
+                .name("Dummy Organisation")
+            .build();
         when(nocService.findOrganisationByUserId(DUMMY_ADMIN_USER_TOKEN, DUMMY_ORGANISATION_USER_ID, DUMMY_CASE_ID))
                 .thenReturn(tmpOrganisationsResponse);
         assertThat(nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisationMatch(tmpCaseDetails))

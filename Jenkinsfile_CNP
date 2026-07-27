@@ -188,6 +188,26 @@ withPipeline(type, product, component) {
       env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
       env.CAMUNDA_BASE_URL = "https://camunda-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
       env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+      sh '''
+        for hostname in \
+          "camunda-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net" \
+          "ccd-definition-store-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net" \
+          "rd-caseworker-ref-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net" \
+          "am-role-assignment-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+        do
+          attempt=0
+          until getent hosts "${hostname}" > /dev/null; do
+            if [ "${attempt}" -ge 6 ]; then
+              echo "DNS did not resolve for ${hostname}"
+              exit 1
+            fi
+
+            attempt=$((attempt + 1))
+            echo "Waiting for DNS for ${hostname} (retry ${attempt}/6)"
+            sleep 5
+          done
+        done
+      '''
       sh """
         ./bin/wa/pull-latest-dmn-files.sh ${dmnBranch}
        ./bin/wa/pull-latest-camunda-wa-files.sh ${bpmnBranch}

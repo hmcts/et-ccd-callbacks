@@ -4065,7 +4065,7 @@
     "CaseEventID": "addAmendJudgment",
     "CaseFieldID": "judgementCollection",
     "ListElementCode": "judgement_details.total_award",
-    "EventElementLabel": "Total award \u00a3",
+    "EventElementLabel": "Total award £",
     "FieldDisplayOrder": 14,
     "DisplayContext": "OPTIONAL"
   },
@@ -4347,7 +4347,7 @@
     "CaseEventID": "addAmendJurisdiction",
     "CaseFieldID": "jurCodesCollection",
     "ListElementCode": "jurisdictionCodeAPA",
-    "EventElementLabel": "Application by an employee, their representative or trade union for a protective award as a result of an employer\u2019s failure to consult over a redundancy situation",
+    "EventElementLabel": "Application by an employee, their representative or trade union for a protective award as a result of an employer's failure to consult over a redundancy situation",
     "FieldDisplayOrder": 3,
     "DisplayContext": "MANDATORY"
   },
@@ -5601,7 +5601,7 @@
     "CaseEventID": "recordDeposit",
     "CaseFieldID": "depositType",
     "ListElementCode": "Deposit_amount",
-    "EventElementLabel": "Deposit amount (\u00a3)",
+    "EventElementLabel": "Deposit amount (£)",
     "FieldDisplayOrder": 1,
     "DisplayContext": "MANDATORY"
   },

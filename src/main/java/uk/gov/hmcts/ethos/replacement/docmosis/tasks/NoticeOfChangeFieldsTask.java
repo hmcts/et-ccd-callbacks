@@ -11,7 +11,6 @@ import org.elasticsearch.index.query.ExistsQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -22,7 +21,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RoleUtils;
@@ -44,10 +42,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.VETTED_STATE;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class NoticeOfChangeFieldsTask {
+public class NoticeOfChangeFieldsTask implements Runnable {
     private final AdminUserService adminUserService;
     private final CcdClient ccdClient;
-    private final FeatureToggleService featureToggleService;
     private final List<String> validStates = List.of(SUBMITTED_STATE, VETTED_STATE, ACCEPTED_STATE, REJECTED_STATE);
 
     @Value("${cron.caseTypeId}")
@@ -56,12 +53,12 @@ public class NoticeOfChangeFieldsTask {
     @Value("${cron.maxCasesPerSearch}")
     private int maxCases;
 
-    @Scheduled(cron = "${cron.noticeOfChange}")
-    public void generateNoticeOfChangeFields() {
-        if (!featureToggleService.isNoticeOfChangeFieldsEnabled()) {
-            return;
-        }
+    @Override
+    public void run() {
+        generateNoticeOfChangeFields();
+    }
 
+    public void generateNoticeOfChangeFields() {
         String query = buildQuery();
         String adminUserToken = adminUserService.getAdminUserToken();
         String[] caseTypeIds = caseTypeIdsString.split(",");
@@ -186,7 +183,7 @@ public class NoticeOfChangeFieldsTask {
                 .query(new BoolQueryBuilder()
                         .must(new TermsQueryBuilder("state.keyword", validStates))
                         .must(new TermsQueryBuilder("jurisdiction.keyword", EMPLOYMENT))
-                        .mustNot(new ExistsQueryBuilder("data.claimantRepresentativeOrganisationPolicy"))
+                        .must(new ExistsQueryBuilder("data.repCollection"))
                 ).toString();
     }
 }

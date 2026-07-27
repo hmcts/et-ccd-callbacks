@@ -22,12 +22,10 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 
@@ -49,8 +47,6 @@ class NoticeOfChangeFieldsTaskTest {
     private AdminUserService adminUserService;
     @MockitoBean
     private CcdClient ccdClient;
-    @MockitoBean
-    private FeatureToggleService featureToggleService;
     @Captor
     private ArgumentCaptor<CaseData> caseDataArgumentCaptor;
 
@@ -67,23 +63,15 @@ class NoticeOfChangeFieldsTaskTest {
 
     @BeforeEach
     void setUp() {
-        noticeOfChangeFieldsTask = new NoticeOfChangeFieldsTask(adminUserService, ccdClient, featureToggleService);
-        when(featureToggleService.isNoticeOfChangeFieldsEnabled()).thenReturn(true);
+        noticeOfChangeFieldsTask = new NoticeOfChangeFieldsTask(adminUserService, ccdClient);
         when(adminUserService.getAdminUserToken()).thenReturn("AuthToken");
         ReflectionTestUtils.setField(noticeOfChangeFieldsTask, "caseTypeIdsString", "ET_EnglandWales,ET_Scotland");
         ReflectionTestUtils.setField(noticeOfChangeFieldsTask, "maxCases", 10);
     }
 
     @Test
-    void testTask_featureOff() throws IOException {
-        when(featureToggleService.isNoticeOfChangeFieldsEnabled()).thenReturn(false);
-        noticeOfChangeFieldsTask.generateNoticeOfChangeFields();
-        verify(ccdClient, times(0)).buildAndGetElasticSearchRequest(any(), any(), any());
-        verify(ccdClient, times(0)).startEventForCase(any(), any(), any(), any(), any());
-    }
-
-    @Test
-    void testNoticeOfChangeFields_featureOn() throws URISyntaxException, IOException {
+    @SneakyThrows
+    void theNoticeOfChangeFields() {
         SubmitEvent submitEvent = new ObjectMapper().readValue(ResourceLoader.getResource("caseDetailsTest1.json"),
                 SubmitEvent.class);
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))

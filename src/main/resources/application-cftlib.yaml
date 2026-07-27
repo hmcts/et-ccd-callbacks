@@ -11,11 +11,15 @@ idam:
     microservice: et_cos
 
 spring:
+  devtools:
+    restart:
+      enabled: false
   jms:
     servicebus:
       enabled: false
   flyway:
     locations: classpath:db/migration,classpath:db/dev
+    out-of-order: true
   datasource:
     password: ${ET_COS_CFTLIB_DB_PASSWORD:postgres}
     username: postgres
@@ -39,3 +43,27 @@ document_management:
 launchdarkly:
   sdk-key: ${ET_LAUNCH_DARKLY_SDK_KEY:sdk-key}
   env: test
+
+# Work Allocation (only active when ET_WORK_ALLOCATION=true)
+et:
+  work-allocation:
+    enabled: ${ET_WORK_ALLOCATION:false}
+
+wa:
+  s2s-auth:
+    microservice: wa_task_monitor
+    totp-secret: ${S2S_SECRET_TASK_MONITOR:AAAAAAAAAAAAAAAA}
+  message-queue-candidate-task:
+    interval: ${WA_MESSAGE_QUEUE_CANDIDATE_TASK_INTERVAL:5000}
+  task-monitor:
+    url: ${TASK_MONITOR_URL:http://localhost:9194}
+    initiation-task:
+      interval: ${WA_TASK_MONITOR_INITIATION_TASK_INTERVAL:5000}
+    reconfiguration-task:
+      interval: ${WA_TASK_MONITOR_RECONFIGURATION_TASK_INTERVAL:60000}
+    termination-task:
+      interval: ${WA_TASK_MONITOR_TERMINATION_TASK_INTERVAL:60000}
+  case-event-handler:
+    url: ${CASE_EVENT_HANDLER_SERVICE_URL:http://localhost:8088}
+    find-problem-messages-task:
+      interval: ${WA_CASE_EVENT_HANDLER_FIND_PROBLEM_MESSAGES_TASK_INTERVAL:60000}

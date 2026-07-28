@@ -103,18 +103,13 @@ public class ClaimantRepresentativeController {
                 LOG_MESSAGE, ccdRequest.getCaseDetails().getCaseId());
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-
         if (StringUtils.isNotBlank(caseData.getClaimantRepresentedQuestion())
                 && NO.equals(caseData.getClaimantRepresentedQuestion())) {
             caseData.setRepresentativeClaimantType(null);
             caseData.setClaimantRepresentativeOrganisationPolicy(
                     OrganisationPolicy.builder().orgPolicyCaseAssignedRole(CLAIMANTSOLICITOR.getCaseRoleLabel()).build()
             );
-
-            caseData.getAllPartyFlags().setClaimantRepresentativeFlags(null);
-            caseData.getAllPartyFlags().setClaimantRepresentativeExternalFlags(null);
         }
-
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 

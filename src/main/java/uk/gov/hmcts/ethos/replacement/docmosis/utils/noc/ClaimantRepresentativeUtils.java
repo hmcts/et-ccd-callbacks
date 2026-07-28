@@ -268,6 +268,7 @@ public final class ClaimantRepresentativeUtils {
             }
             caseData.setRepresentativeClaimantType(null);
             caseData.setClaimantRepresentedQuestion(NO);
+            clearClaimantRepresentativeFlags(caseData);
             caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder().organisation(null)
                     .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
 
@@ -276,6 +277,14 @@ public final class ClaimantRepresentativeUtils {
         caseData.setClaimantRepresentativeRemoved(NO);
         setRepresentativeId(caseData.getRepresentativeClaimantType());
         setClaimantRepresentativeOrganisationPolicy(caseData);
+    }
+
+    private static void clearClaimantRepresentativeFlags(CaseData caseData) {
+        if (caseData.getAllPartyFlags() == null) {
+            return;
+        }
+        caseData.getAllPartyFlags().setClaimantRepresentativeFlags(null);
+        caseData.getAllPartyFlags().setClaimantRepresentativeExternalFlags(null);
     }
 
     private static void setRepresentativeId(RepresentedTypeC claimantRepresentative) {

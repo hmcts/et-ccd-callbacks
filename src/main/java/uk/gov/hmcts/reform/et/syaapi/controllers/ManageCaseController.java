@@ -85,6 +85,7 @@ public class ManageCaseController {
     public ResponseEntity<List<CaseDetails>> getUserCasesByCaseUserRole(
         @RequestHeader(AUTHORIZATION) String authorization,
         @RequestParam(value = CASE_USER_ROLE_API_PARAMETER_NAME, required = false) String caseUserRole) {
+        log.info("caseUserRole {}", caseUserRole);
         var caseDetails = manageCaseRoleService.getUserCasesByCaseUserRole(
             authorization,
             StringUtils.isBlank(caseUserRole)
@@ -110,6 +111,7 @@ public class ManageCaseController {
         log.info("Received initiate-case request");
 
         var caseDetails = caseService.createCase(authorization, caseRequest);
+        log.info("assignClaimantNonLegalRepresentativeRole");
         manageCaseRoleService.assignClaimantNonLegalRepresentativeRole(authorization, caseDetails);
         return ok(caseDetails);
     }

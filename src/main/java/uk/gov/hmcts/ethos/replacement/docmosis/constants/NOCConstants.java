@@ -76,7 +76,7 @@ public final class NOCConstants {
     public static final String ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND =
             "Failed to add organisation policy for case {}. Reason: representative not found";
     public static final String ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES =
-            "Representative %s organisation does not match with selected organisation %s";
+            "%s does not have a valid account with the organisation %s. Please check the selected organisation";
     public static final String ERROR_REPRESENTATIVE_ORGANISATION_AND_EMAIL_NOT_MATCHED =
             "Failed to validate representative organisation and email. %s";
     public static final String ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS =

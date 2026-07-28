@@ -222,15 +222,14 @@ class NocRepresentativeServiceTest {
         UserDetails userDetails = new UserDetails();
         userDetails.setUid(REPRESENTATIVE_ID_2);
         when(userService.getValidatedUserDetails(USER_TOKEN, SUBMISSION_REFERENCE)).thenReturn(userDetails);
-        CaseData caseData = new CaseData();
         // when no role found should throw generic service exception
         GenericServiceException gse = assertThrows(GenericServiceException.class,
-                () -> nocRepresentativeService.getValidatedRepresentativeRolesByUserToken(USER_TOKEN, caseData,
+                () -> nocRepresentativeService.getValidatedRepresentativeRolesByUserToken(USER_TOKEN,
                         SUBMISSION_REFERENCE));
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_CASE_ROLES_NOT_FOUND);
         // when role(s) found should return that role(s) in a list
         userDetails.setUid(REPRESENTATIVE_ID_1);
-        assertThat(nocRepresentativeService.getValidatedRepresentativeRolesByUserToken(USER_TOKEN, caseData,
+        assertThat(nocRepresentativeService.getValidatedRepresentativeRolesByUserToken(USER_TOKEN,
                 SUBMISSION_REFERENCE)).isEqualTo(List.of(RESPONDENT_SOLICITOR_ROLE_A));
 
     }

@@ -82,6 +82,7 @@ public final class RolesConstants {
     public static final String ET_SYSTEM_EMAIL = "et.service@hmcts.net";
     public static final String ROLE_ASSIGNMENT_ADMIN_EMAIL = "role.assignment.admin@gmail.com";
     public static final String ET_CASEADMIN_EMAIL = "et.caseadmin@hmcts.net";
+    public static final String ET_LEGALOPS_EMAIL = "et.legalops@hmcts.net";
     public static final String WA_SYSTEM_USER_EMAIL = "wa-system-user@fake.hmcts.net";
 
     static final String[] ECM_CASEWORKER_ROLES = {

@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/refdata/case-worker/skill"
+  },
+  "response": {
+    "status": 200,
+    "body": "{\"service_skill\": []}",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

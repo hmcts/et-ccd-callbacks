@@ -35,7 +35,7 @@ dependencyManagement {
         dependency 'com.squareup.okhttp3:logging-interceptor:4.12.0'
         dependency 'com.squareup.okhttp3:okhttp:4.12.0'
         dependency 'com.squareup.okhttp3:okhttp-urlconnection:4.12.0'
-        dependency 'com.squareup.okio:okio:3.17.0'
+        dependency 'com.squareup.okio:okio:3.18.0'
         dependency 'org.bouncycastle:bcprov-jdk15on:1.70'
         // CVE-2026-42198, CVE-2026-54291 - override above the Spring Boot BOM
         dependency 'org.postgresql:postgresql:42.7.13'
@@ -199,7 +199,7 @@ configurations.configureEach {
         'com.squareup.okhttp3:logging-interceptor:4.12.0',
         'com.squareup.okhttp3:okhttp:4.12.0',
         'com.squareup.okhttp3:okhttp-urlconnection:4.12.0',
-        'com.squareup.okio:okio:3.17.0',
+        'com.squareup.okio:okio:3.18.0',
         // CVE-2026-53914 - latest stable stdlib; runtime transitive dep only (see OWASP suppression)
         'org.jetbrains.kotlin:kotlin-stdlib:2.3.21',
         'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.3.21',

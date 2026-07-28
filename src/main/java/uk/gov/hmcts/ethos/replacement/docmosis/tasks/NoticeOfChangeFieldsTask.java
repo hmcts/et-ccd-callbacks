@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.ExistsQueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
@@ -57,7 +58,7 @@ public class NoticeOfChangeFieldsTask implements Runnable {
     private static final String UNKNOWN_CASE_ID = "<unknown>";
     private static final String DEFAULT_CASE_ID = "0";
 
-    private static String lastCaseId;
+    private static String lastCaseId = NumberUtils.INTEGER_ZERO.toString();
 
     @Override
     public void run() {

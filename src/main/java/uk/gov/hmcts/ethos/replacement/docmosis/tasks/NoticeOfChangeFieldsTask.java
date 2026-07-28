@@ -54,9 +54,9 @@ public class NoticeOfChangeFieldsTask implements Runnable {
     private int maxCases;
 
     private static final String UNKNOWN_CASE_ID = "<unknown>";
-    private static final String DEFAULT_CASE_ID = "0";
+    private static final String INITIAL_CASE_ID = "0";
 
-    private static String lastCaseId = DEFAULT_CASE_ID;
+    private static String lastCaseId = INITIAL_CASE_ID;
 
     @Override
     public void run() {
@@ -113,7 +113,7 @@ public class NoticeOfChangeFieldsTask implements Runnable {
 
     public static void setLastCaseId(List<SubmitEvent> cases) {
         if (cases == null || cases.isEmpty()) {
-            lastCaseId = DEFAULT_CASE_ID;
+            lastCaseId = INITIAL_CASE_ID;
             return;
         }
 
@@ -129,7 +129,7 @@ public class NoticeOfChangeFieldsTask implements Runnable {
                     submitEvent.getCaseId()
             );
         }
-        lastCaseId = DEFAULT_CASE_ID;
+        lastCaseId = INITIAL_CASE_ID;
     }
 
     public void triggerEventForCase(String adminUserToken, SubmitEvent submitEvent, String caseTypeId)
@@ -227,7 +227,7 @@ public class NoticeOfChangeFieldsTask implements Runnable {
                         .must(new ExistsQueryBuilder("data.repCollection"))
                 ).sort("reference.keyword", SortOrder.ASC);
 
-        if (StringUtils.isNotBlank(lastCaseId) && !lastCaseId.equals(DEFAULT_CASE_ID)) {
+        if (StringUtils.isNotBlank(lastCaseId) && !lastCaseId.equals(INITIAL_CASE_ID)) {
             searchSourceBuilder.searchAfter(new Object[] { lastCaseId });
         }
         return searchSourceBuilder.toString();

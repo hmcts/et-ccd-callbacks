@@ -56,7 +56,7 @@ public class NoticeOfChangeFieldsTask implements Runnable {
     private static final String UNKNOWN_CASE_ID = "<unknown>";
     private static final String INITIAL_CASE_ID = "0";
 
-    private static String lastCaseId = INITIAL_CASE_ID;
+    private String lastCaseId;
 
     @Override
     public void run() {
@@ -64,6 +64,7 @@ public class NoticeOfChangeFieldsTask implements Runnable {
         String[] caseTypeIds = caseTypeIdsString.split(",");
 
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
+            lastCaseId = INITIAL_CASE_ID;
             List<SubmitEvent> cases;
             try {
                 do {
@@ -111,7 +112,7 @@ public class NoticeOfChangeFieldsTask implements Runnable {
         return ObjectUtils.isNotEmpty(se) && se.getCaseId() != 0 ? String.valueOf(se.getCaseId()) : UNKNOWN_CASE_ID;
     }
 
-    public static void setLastCaseId(List<SubmitEvent> cases) {
+    public void setLastCaseId(List<SubmitEvent> cases) {
         if (cases == null || cases.isEmpty()) {
             lastCaseId = INITIAL_CASE_ID;
             return;

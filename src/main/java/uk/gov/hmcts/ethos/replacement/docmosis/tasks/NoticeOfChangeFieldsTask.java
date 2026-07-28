@@ -62,7 +62,6 @@ public class NoticeOfChangeFieldsTask implements Runnable {
 
     @Override
     public void run() {
-        String query = buildQuery();
         String adminUserToken = adminUserService.getAdminUserToken();
         String[] caseTypeIds = caseTypeIdsString.split(",");
 
@@ -70,8 +69,10 @@ public class NoticeOfChangeFieldsTask implements Runnable {
             List<SubmitEvent> cases;
             try {
                 do {
+                    String query = buildQuery();
                     cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
                     setLastCaseId(cases);
+                    log.info("Executing caseId: " + lastCaseId);
                     log.info("{} - Notice of change fields task - Retrieved {} cases", caseTypeId, cases.size());
                     updateCases(cases, caseTypeId, adminUserToken);
                 } while (CollectionUtils.isNotEmpty(cases));

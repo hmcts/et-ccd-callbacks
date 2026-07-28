@@ -545,7 +545,9 @@ public class ManageCaseRoleService {
             return;
         }
         CaseData caseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(caseDetails.getData());
-        log.info("caseData.getClaimantRepresentedQuestion() = {}", caseData.getClaimantRepresentedQuestion());
+        if (caseData != null) {
+            log.info("caseData.getClaimantRepresentedQuestion() = {}", caseData.getClaimantRepresentedQuestion());
+        }
         if (caseData == null || !YES.equals(caseData.getClaimantRepresentedQuestion())) {
             return;
         }

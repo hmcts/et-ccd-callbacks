@@ -77,10 +77,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.WAITING_FOR_THE_TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.WITHDRAWAL_SETTLED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeItemUtil.createSupportingMaterial;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.getGenericTseApplicationTypeItem;
@@ -102,12 +100,10 @@ class TseRespondentReplyServiceTest {
     @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    private static final String TRIBUNAL_EMAIL = "tribunalOffice@test.com";
     private static final String REPLY_TO_TRIB_ACK_TEMPLATE_YES = "replyToTribAckTemplateYes";
     private static final String REPLY_TO_TRIB_ACK_TEMPLATE_NO = "replyToTribAckTemplateNo";
     private static final String REPLY_TO_APP_ACK_TEMPLATE_YES = "replyToAppAckTemplateYes";
     private static final String REPLY_TO_APP_ACK_TEMPLATE_NO = "replyToAppAckTemplateNo";
-    private static final String TEST_XUI_URL = "exuiUrl";
     private static final String TEST_CUI_URL = "citizenUrl";
     private static final String CASE_NUMBER = "9876";
     private static final String WITHDRAW_MY_CLAIM = "Withdraw all/part of claim";
@@ -269,7 +265,6 @@ class TseRespondentReplyServiceTest {
         verify(emailService).sendEmail(any(), eq(userDetails.getEmail()), any());
         verify(emailService, isEmailSentToClaimant)
                 .sendEmail(any(), eq(caseData.getClaimantType().getClaimantEmailAddress()), any());
-        verify(respondentTellSomethingElseService).sendAdminEmail(any());
 
         verify(emailService)
                 .sendEmail(eq(ackEmailTemplate), eq(userDetails.getEmail()), any());
@@ -305,8 +300,6 @@ class TseRespondentReplyServiceTest {
         verify(emailService).sendEmail(any(), eq(userDetails.getEmail()), any());
         verify(emailService, isEmailSentToClaimant)
                 .sendEmail(any(), eq(caseData.getClaimantType().getClaimantEmailAddress()), any());
-        verify(respondentTellSomethingElseService).sendAdminEmail(any());
-
         verify(emailService)
                 .sendEmail(eq(ackEmailTemplate), eq(userDetails.getEmail()), any());
     }
@@ -341,24 +334,16 @@ class TseRespondentReplyServiceTest {
         caseDetails.setCaseId("caseId");
         caseDetails.setCaseData(caseData);
 
-        when(respondentTellSomethingElseService.getTribunalEmail(any())).thenReturn(TRIBUNAL_EMAIL);
-
         ReflectionTestUtils.setField(tseRespondentReplyService,
                 "replyToTribunalAckEmailToLRRule92YesTemplateId", REPLY_TO_TRIB_ACK_TEMPLATE_YES);
         ReflectionTestUtils.setField(tseRespondentReplyService,
                 "replyToTribunalAckEmailToLRRule92NoTemplateId", REPLY_TO_TRIB_ACK_TEMPLATE_NO);
-
-        Map<String, String> tribunalPersonalisation = Map.of(
-                NotificationServiceConstants.CASE_NUMBER, CASE_NUMBER,
-                APPLICATION_TYPE, WITHDRAW_MY_CLAIM,
-                LINK_TO_EXUI, TEST_XUI_URL + "caseId");
 
         Map<String, String> claimantPersonalisation = Map.of(
                 NotificationServiceConstants.CASE_NUMBER, CASE_NUMBER,
                 LINK_TO_CITIZEN_HUB, TEST_CUI_URL + "caseId");
 
         tseRespondentReplyService.sendRespondingToTribunalEmails(caseDetails, "token");
-        verify(emailService).sendEmail(any(), eq(TRIBUNAL_EMAIL), eq(tribunalPersonalisation));
         verify(emailService, isEmailSentToClaimant)
                 .sendEmail(any(),
                         eq(caseData.getClaimantType().getClaimantEmailAddress()),
@@ -489,7 +474,7 @@ class TseRespondentReplyServiceTest {
 
         caseData.setGenericTseApplicationCollection(Collections.singletonList(genericTseApplicationTypeItem));
         tseRespondentReplyService.updateResponseDocsBinaryUrl(caseData);
-        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
+        assertThat(caseData.getGenericTseApplicationCollection().getFirst().getValue()
                 .getRespondCollection().getFirst().getValue()
                 .getSupportingMaterial().getFirst().getValue()
                 .getUploadedDocument().getDocumentBinaryUrl()).endsWith("/binary");

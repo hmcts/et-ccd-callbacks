@@ -17,7 +17,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
@@ -42,7 +41,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.applications.TseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
@@ -57,6 +55,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
@@ -108,9 +107,6 @@ class RespondentTellSomethingElseServiceTest {
     private UserIdamService userIdamService;
 
     @MockitoBean
-    private TribunalOfficesService tribunalOfficesService;
-
-    @MockitoBean
     private TornadoService tornadoService;
 
     @MockitoBean
@@ -143,13 +139,11 @@ class RespondentTellSomethingElseServiceTest {
         + "|\r\n|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n|1|testType"
         + "|Respondent|testDate|testDueDate|0|Open|\r\n\r\n";
 
-    private static final String BRISTOL_OFFICE = "Bristol";
-
     @BeforeEach
     void setUp() {
         emailService = spy(new EmailUtils());
         respondentTellSomethingElseService =
-                new RespondentTellSomethingElseService(emailService, userIdamService, tribunalOfficesService,
+                new RespondentTellSomethingElseService(emailService, userIdamService,
                         tornadoService, documentManagementService, featureToggleService, caseAccessService,
                         emailNotificationService);
         tseService = new TseService(documentManagementService);
@@ -626,62 +620,6 @@ class RespondentTellSomethingElseServiceTest {
                 is(EXPECTED_EMPTY_TABLE_MESSAGE));
     }
 
-    @Test
-    void sendAdminEmail_DoesNothingWhenNoManagingOfficeIsSet() {
-        CaseData caseData = createCaseData("", YES);
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseData(caseData);
-        caseDetails.setCaseId(CASE_ID);
-
-        respondentTellSomethingElseService.sendAdminEmail(caseDetails);
-        verify(emailService, never()).sendEmail(any(), any(), any());
-    }
-
-    @Test
-    void sendAdminEmail_DoesNothingWhenNoManagingOfficeHasNoEmail() {
-        CaseData caseData = createCaseData("", YES);
-        CaseDetails caseDetails = new CaseDetails();
-        caseData.setManagingOffice("Aberdeen");
-        caseDetails.setCaseData(caseData);
-        caseDetails.setCaseId(CASE_ID);
-
-        respondentTellSomethingElseService.sendAdminEmail(caseDetails);
-        verify(emailService, never()).sendEmail(any(), any(), any());
-    }
-
-    @Test
-    void sendAdminEmail_SendsEmail() {
-        CaseData caseData = createCaseData("", YES);
-        CaseDetails caseDetails = new CaseDetails();
-        caseData.setManagingOffice("Bristol");
-        caseDetails.setCaseData(caseData);
-        caseDetails.setCaseId(CASE_ID);
-
-        when(tribunalOfficesService.getTribunalOffice(any())).thenReturn(TribunalOffice.BRISTOL);
-        respondentTellSomethingElseService.sendAdminEmail(caseDetails);
-
-        Map<String, String> caseNumber = Map.of("caseNumber", "test",
-                "emailFlag", "",
-                "claimant", "claimant",
-                "respondents", "Father Ted",
-                "date", "Not set",
-                "url", "exuiUrl669718251103419");
-
-        verify(emailService, times(1)).sendEmail(any(), any(), eq(caseNumber));
-
-    }
-
-    @Test
-    void getTribunalEmail() {
-        CaseData caseData = createCaseData("", YES);
-        caseData.setManagingOffice(BRISTOL_OFFICE);
-
-        when(tribunalOfficesService.getTribunalOffice(BRISTOL_OFFICE)).thenReturn(TribunalOffice.BRISTOL);
-
-        assertThat(respondentTellSomethingElseService.getTribunalEmail(caseData),
-                is(TribunalOffice.BRISTOL.getOfficeEmail()));
-    }
-
     private List<GenericTseApplicationTypeItem> generateGenericTseApplicationList() {
         GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
 
@@ -904,49 +842,7 @@ class RespondentTellSomethingElseServiceTest {
         when(caseAccessService.getCaseUserAssignmentsById("123456")).thenReturn(assignments);
 
         RespondentTellSomethingElseService service = new RespondentTellSomethingElseService(
-                emailService, userIdamService, tribunalOfficesService, tornadoService,
-                documentManagementService, featureToggleService, caseAccessService, emailNotificationService
-        );
-
-        service.sendEmails(caseDetails, "token");
-
-        verify(emailService, atLeastOnce()).sendEmail(any(), any(), any());
-    }
-
-    @Test
-    void sendEmails_shouldLogWarningAndSendAdminEmailWhenNoAssignments_withoutSpy() {
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseId("123456");
-        CaseData caseDataWithRespondent = new CaseData();
-        caseDataWithRespondent.setResTseSelectApplication("Amend response");
-        caseDataWithRespondent.setEthosCaseReference("ET-1234-5678-9012-3456");
-        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
-        RespondentSumType respondentSumType = new RespondentSumType();
-        respondentSumType.setRespondentName("Respondent Ltd");
-        respondentSumTypeItem.setValue(respondentSumType);
-        caseDataWithRespondent.setRespondentCollection(List.of(respondentSumTypeItem));
-        caseDataWithRespondent.setClaimant("John Doe");
-
-        HearingType hearingType = new HearingType();
-        DateListedTypeItem hearingItem = new DateListedTypeItem();
-        DateListedType dateListedType = new DateListedType();
-        dateListedType.setListedDate("2069-05-16T10:00:00.000");
-        hearingItem.setValue(dateListedType);
-        hearingType.setHearingDateCollection(new ArrayList<>(List.of(hearingItem)));
-        HearingTypeItem hearingTypeItem = new HearingTypeItem();
-        hearingTypeItem.setValue(hearingType);
-        caseDataWithRespondent.setHearingCollection(List.of(hearingTypeItem));
-
-        caseDetails.setCaseData(caseDataWithRespondent);
-        caseDetails.setCaseId("123456");
-
-        when(caseAccessService.getCaseUserAssignmentsById("123456")).thenReturn(List.of());
-        TribunalOffice tribunalLeedsOffice = TribunalOffice.valueOfOfficeName("Leeds");
-        when(tribunalOfficesService.getTribunalOffice(any()))
-                .thenReturn(tribunalLeedsOffice);
-
-        RespondentTellSomethingElseService service = new RespondentTellSomethingElseService(
-                emailService, userIdamService, tribunalOfficesService, tornadoService,
+                emailService, userIdamService, tornadoService,
                 documentManagementService, featureToggleService, caseAccessService, emailNotificationService
         );
 

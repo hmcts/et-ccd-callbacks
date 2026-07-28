@@ -90,7 +90,7 @@ class NoticeOfChangeFieldsTaskTest {
         ccdRequest.getCaseDetails().setCaseTypeId(CASE_TYPE_ID);
         ccdRequest.getCaseDetails().setJurisdiction(JURISDICTION);
         when(ccdClient.startEventForCase(any(), any(), any(), any(), any())).thenReturn(ccdRequest);
-        noticeOfChangeFieldsTask.generateNoticeOfChangeFields();
+        noticeOfChangeFieldsTask.run();
         verify(ccdClient, times(1)).submitEventForCase(eq("AuthToken"), caseDataArgumentCaptor.capture(),
                 eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT), any(), eq(CASE_ID));
         CaseData caseDataCaptured = caseDataArgumentCaptor.getValue();
@@ -109,7 +109,7 @@ class NoticeOfChangeFieldsTaskTest {
         when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), anyString(), any()))
                 .thenReturn(List.of(submitEventWithCaseData));
         when(ccdClient.startEventForCase(any(), any(), any(), any(), any())).thenThrow(new IOException());
-        noticeOfChangeFieldsTask.generateNoticeOfChangeFields();
+        noticeOfChangeFieldsTask.run();
         assertThat(caseDataCaptured.getRepCollection().getFirst().getValue().getRole()).isNull();
         assertThat(caseDataCaptured.getRespondentCollection().getFirst().getValue().getRepresentativeId()).isNull();
     }

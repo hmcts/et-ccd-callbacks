@@ -55,10 +55,6 @@ public class NoticeOfChangeFieldsTask implements Runnable {
 
     @Override
     public void run() {
-        generateNoticeOfChangeFields();
-    }
-
-    public void generateNoticeOfChangeFields() {
         String query = buildQuery();
         String adminUserToken = adminUserService.getAdminUserToken();
         String[] caseTypeIds = caseTypeIdsString.split(",");
@@ -127,21 +123,12 @@ public class NoticeOfChangeFieldsTask implements Runnable {
                 }
                 CaseDetails caseDetails = ccdRequest.getCaseDetails();
                 CaseData caseData = caseDetails.getCaseData();
-                for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
-                    if (!isValidRepresentative(representative)) {
-                        continue;
-                    }
-                    if (StringUtils.isBlank(representative.getId())) {
-                        representative.setId(UUID.randomUUID().toString());
-                    }
-                    RespondentSumTypeItem respondent = RespondentRepresentativeUtils
-                         .findRespondentByRepresentative(caseData, representative);
-                    setRespondentValues(caseData, representative, respondent);
+                if (updateRepCollection(caseData)) {
+                    ccdClient.submitEventForCase(adminUserToken, caseData, caseDetails.getCaseTypeId(),
+                            caseDetails.getJurisdiction(), ccdRequest, caseDetails.getCaseId());
+                    log.info("Updated respondent representative repId, role and respondent representative id {}",
+                            submitEvent.getCaseId());
                 }
-                ccdClient.submitEventForCase(adminUserToken, caseData, caseDetails.getCaseTypeId(),
-                        caseDetails.getJurisdiction(), ccdRequest, caseDetails.getCaseId());
-                log.info("Updated respondent representative repId, role and respondent representative id {}",
-                        submitEvent.getCaseId());
             }
         } catch (Exception e) {
             throw new GenericServiceException(e.getMessage(), e, e.getMessage(), findCaseId(submitEvent),
@@ -149,17 +136,38 @@ public class NoticeOfChangeFieldsTask implements Runnable {
         }
     }
 
-    public static void setRespondentValues(CaseData caseData,
-                                    RepresentedTypeRItem representative,
-                                    RespondentSumTypeItem respondent) {
-        if (RespondentUtils.isValidRespondent(respondent)) {
-            respondent.getValue().setRepresentativeId(representative.getId());
-            int respondentIndex = RespondentUtils.getRespondentIndexById(caseData, respondent.getId());
-            if (respondentIndex != NumberUtils.INTEGER_MINUS_ONE) {
-                representative.getValue().setRole(RoleUtils
-                        .solicitorRoleLabelForIndex(respondentIndex));
+    public static boolean updateRepCollection(CaseData caseData) {
+        boolean caseUpdated = false;
+        for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
+            if (!isValidRepresentative(representative)) {
+                continue;
+            }
+            if (StringUtils.isBlank(representative.getId())) {
+                representative.setId(UUID.randomUUID().toString());
+                caseUpdated = true;
+            }
+            RespondentSumTypeItem respondent = RespondentRepresentativeUtils
+                    .findRespondentByRepresentative(caseData, representative);
+            if (setRespondentValues(caseData, representative, respondent)) {
+                caseUpdated = true;
             }
         }
+        return caseUpdated;
+    }
+
+    public static boolean setRespondentValues(CaseData caseData,
+                                    RepresentedTypeRItem representative,
+                                    RespondentSumTypeItem respondent) {
+        if (!RespondentUtils.isValidRespondent(respondent)) {
+            return false;
+        }
+        respondent.getValue().setRepresentativeId(representative.getId());
+        int respondentIndex = RespondentUtils.getRespondentIndexById(caseData, respondent.getId());
+        if (respondentIndex != NumberUtils.INTEGER_MINUS_ONE) {
+            representative.getValue().setRole(RoleUtils
+                    .solicitorRoleLabelForIndex(respondentIndex));
+        }
+        return true;
     }
 
     public static boolean isValidRepresentative(RepresentedTypeRItem representative) {

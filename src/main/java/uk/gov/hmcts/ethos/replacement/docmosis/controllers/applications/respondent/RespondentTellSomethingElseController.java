@@ -89,7 +89,7 @@ public class RespondentTellSomethingElseController {
         }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         if (Helper.isClaimantNonSystemUser(caseData)
-            && !Helper.isRepresentedClaimantWithMyHmctsCase(caseData)) {
+            && !Helper.isClaimantRepresentedByMyHmctsOrganisation(caseData)) {
             caseData.setResTseNotAvailableWarning(YES);
         }
 
@@ -124,7 +124,7 @@ public class RespondentTellSomethingElseController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         if (Helper.isClaimantNonSystemUser(caseData)
-            && !Helper.isRepresentedClaimantWithMyHmctsCase(caseData)) {
+            && !Helper.isClaimantRepresentedByMyHmctsOrganisation(caseData)) {
             errors.add(FUNCTION_NOT_AVAILABLE_ERROR);
         }
 

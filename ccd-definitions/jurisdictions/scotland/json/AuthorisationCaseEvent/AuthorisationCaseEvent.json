@@ -98,6 +98,18 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "UPDATE_RESP_ORG_POLICY",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "UPDATE_RESP_ORG_POLICY",
+    "UserRole": "caseworker-employment",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
     "CaseEventID": "REMOVE_OWN_REP_AS_RESPONDENT",
     "UserRole": "[DEFENDANT]",
     "CRUD": "CRUD"
@@ -321,36 +333,6 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "addAmendClaimantRepresentative",
-    "UserRole": "caseworker-employment",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "addAmendClaimantRepresentative",
-    "UserRole": "caseworker-employment-etjudge",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "addAmendClaimantRepresentative",
-    "UserRole": "caseworker-employment-scotland",
-    "CRUD": "CRU"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "addAmendClaimantRepresentative",
-    "UserRole": "caseworker-employment-etjudge-scotland",
-    "CRUD": "CRU"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "addAmendClaimantRepresentative",
-    "UserRole": "caseworker-employment-api",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
     "CaseEventID": "amendRespondentDetails",
     "UserRole": "caseworker-employment",
     "CRUD": "R"
@@ -376,36 +358,6 @@
   {
     "CaseTypeId": "ET_Scotland",
     "CaseEventID": "amendRespondentDetails",
-    "UserRole": "caseworker-employment-api",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "amendRespondentRepresentative",
-    "UserRole": "caseworker-employment",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "amendRespondentRepresentative",
-    "UserRole": "caseworker-employment-etjudge",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "amendRespondentRepresentative",
-    "UserRole": "caseworker-employment-scotland",
-    "CRUD": "CRU"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "amendRespondentRepresentative",
-    "UserRole": "caseworker-employment-etjudge-scotland",
-    "CRUD": "CRU"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "amendRespondentRepresentative",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
   },
@@ -2373,7 +2325,7 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "amendRespondentRepresentativeContact",
+    "CaseEventID": "amendRepresentativeContact",
     "AccessControl": [
       {
         "UserRoles": [

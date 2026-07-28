@@ -3,14 +3,13 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.ClaimantUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -42,7 +41,7 @@ public final class NotificationHelper {
     public static Map<String, String> buildMapForClaimant(CaseData caseData, String caseId) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
-        personalisation.put(EMAIL_ADDRESS, getEmailAddressForClaimant(caseData));
+        personalisation.put(EMAIL_ADDRESS, ClaimantUtils.getClaimantEmailAddress(caseData));
         personalisation.put(CCD_ID, caseId);
         personalisation.put(NAME, caseData.getClaimant());
 
@@ -100,15 +99,6 @@ public final class NotificationHelper {
         }
 
         return representativeClaimantType.getNameOfRepresentative();
-    }
-
-    public static String getEmailAddressForClaimant(CaseData caseData) {
-        ClaimantType claimantType = caseData.getClaimantType();
-        if (claimantType == null) {
-            throw new NotFoundException("Could not find claimant");
-        }
-        String claimantEmailAddress = claimantType.getClaimantEmailAddress();
-        return isNullOrEmpty(claimantEmailAddress) ? "" : claimantEmailAddress;
     }
 
     private static String getNameOfRespondents(CaseData caseData) {

@@ -20,4 +20,6 @@ public class DraftAndSignJudgement {
     private List<DocumentTypeItem> draftAndSignJudgementDocuments;
     @JsonProperty("furtherDirections")
     private String furtherDirections;
+    @JsonProperty("isUrgent")
+    private String isUrgent;
 }

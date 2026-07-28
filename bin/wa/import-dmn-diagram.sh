@@ -20,7 +20,8 @@ echo "${CAMUNDA_BASE_URL} import-dmn-diagram.sh line 19"
 
 for file in $(find ${dmnFilepath} -name '*.dmn')
 do
-  uploadResponse=$(curl --insecure -v --silent -w "\n%{http_code}" --show-error -X POST \
+  uploadResponse=$(curl --insecure -v --silent -w "\n%{http_code}" --show-error \
+    --retry 12 --retry-all-errors --retry-delay 5 --retry-max-time 120 -X POST \
     ${CAMUNDA_BASE_URL:-http://localhost:9404}/engine-rest/deployment/create \
     -H "Accept: application/json" \
     -H "ServiceAuthorization: Bearer ${serviceToken}" \
@@ -48,7 +49,8 @@ if [ -d ${bpmnFilepath} ]
 then
   for file in $(find ${bpmnFilepath} -name '*.bpmn')
   do
-    uploadResponse=$(curl --insecure -v --silent -w "\n%{http_code}" --show-error -X POST \
+    uploadResponse=$(curl --insecure -v --silent -w "\n%{http_code}" --show-error \
+      --retry 12 --retry-all-errors --retry-delay 5 --retry-max-time 120 -X POST \
       ${CAMUNDA_BASE_URL:-http://localhost:9404}/engine-rest/deployment/create \
       -H "Accept: application/json" \
       -H "ServiceAuthorization: Bearer ${serviceToken}" \
@@ -70,5 +72,4 @@ then
   done
   exit 0;
 fi
-
 

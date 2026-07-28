@@ -66,6 +66,11 @@ withNightlyPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     enableFortifyScan()
 
+    before('build') {
+        sh '''
+          env AZURE_CONFIG_DIR=/opt/jenkins/.azure-nonprod az acr login --name hmctsprod
+        '''
+    }
 
     afterAlways('fortify-scan') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'

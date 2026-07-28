@@ -69,8 +69,6 @@ public abstract class BaseFunctionalTest {
     protected String baseUrl;
     @Value("${ft.idam.url}")
     private String idamApiUrl;
-    @Value("${et-sya-api.url}")
-    protected String syaApiUrl;
     @Value("${ccd.data-store-api-url}")
     private String ccdDataStoreUrl;
     protected RequestSpecification spec;

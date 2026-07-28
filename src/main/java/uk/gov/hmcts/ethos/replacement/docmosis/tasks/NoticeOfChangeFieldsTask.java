@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.ExistsQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
@@ -86,10 +85,9 @@ public class NoticeOfChangeFieldsTask implements Runnable {
 
     private void updateCases(List<SubmitEvent> cases, String caseTypeId, String adminUserToken)
             throws InterruptedException {
-        final int poolSize = Math.min(15, Runtime.getRuntime().availableProcessors() * 2);
         final long awaitTimeoutSeconds = 120;
 
-        try (ExecutorService executor = Executors.newFixedThreadPool(poolSize)) {
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             for (SubmitEvent submitEvent : cases) {
                 executor.execute(() -> {
                     try {

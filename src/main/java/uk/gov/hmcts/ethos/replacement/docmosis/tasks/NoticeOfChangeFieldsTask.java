@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.ExistsQueryBuilder;
-import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
@@ -58,7 +57,7 @@ public class NoticeOfChangeFieldsTask implements Runnable {
     private static final String UNKNOWN_CASE_ID = "<unknown>";
     private static final String DEFAULT_CASE_ID = "0";
 
-    private static String lastCaseId = NumberUtils.INTEGER_ZERO.toString();
+    private static String lastCaseId = DEFAULT_CASE_ID;
 
     @Override
     public void run() {
@@ -222,14 +221,17 @@ public class NoticeOfChangeFieldsTask implements Runnable {
     }
 
     private String buildQuery() {
-        return new SearchSourceBuilder()
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .size(maxCases)
                 .query(new BoolQueryBuilder()
                         .must(new TermsQueryBuilder("state.keyword", validStates))
                         .must(new TermsQueryBuilder("jurisdiction.keyword", EMPLOYMENT))
                         .must(new ExistsQueryBuilder("data.repCollection"))
-                        .must(new RangeQueryBuilder("reference.keyword").gt(lastCaseId))
-                ).sort("reference.keyword", SortOrder.ASC).toString();
+                ).sort("reference.keyword", SortOrder.ASC);
 
+        if (StringUtils.isNotBlank(lastCaseId) && !lastCaseId.equals(DEFAULT_CASE_ID)) {
+            searchSourceBuilder.searchAfter(new Object[] { lastCaseId });
+        }
+        return searchSourceBuilder.toString();
     }
 }

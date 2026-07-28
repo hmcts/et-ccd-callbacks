@@ -4743,7 +4743,7 @@
     "CaseEventID": "addAmendJurisdiction",
     "CaseFieldID": "jurCodesCollection",
     "ListElementCode": "jurisdictionCodeFT1",
-    "EventElementLabel": "Failure to allow or to pay for a time off for care of dependants, union learning representatives’ duties, pension scheme trustee duties, employee representatives' duties, young person studying/trainin",
+    "EventElementLabel": "Failure to allow or to pay for a time off for care of dependants, union learning representatives' duties, pension scheme trustee duties, employee representatives' duties, young person studying/trainin",
     "FieldDisplayOrder": 47,
     "DisplayContext": "MANDATORY"
   },

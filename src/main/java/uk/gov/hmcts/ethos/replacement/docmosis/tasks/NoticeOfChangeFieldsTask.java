@@ -5,11 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.ExistsQueryBuilder;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -53,6 +54,11 @@ public class NoticeOfChangeFieldsTask implements Runnable {
     @Value("${cron.maxCasesPerSearch}")
     private int maxCases;
 
+    private static final String UNKNOWN_CASE_ID = "<unknown>";
+    private static final String DEFAULT_CASE_ID = "0";
+
+    private static String lastCaseId;
+
     @Override
     public void run() {
         String query = buildQuery();
@@ -62,6 +68,7 @@ public class NoticeOfChangeFieldsTask implements Runnable {
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
             try {
                 List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
+                setLastCaseId(cases);
                 log.info("{} - Notice of change fields task - Retrieved {} cases", caseTypeId, cases.size());
                 if (cases.isEmpty()) {
                     log.info("{} - NOC fields task - No cases to process", caseTypeId);
@@ -104,7 +111,28 @@ public class NoticeOfChangeFieldsTask implements Runnable {
     }
 
     public static String findCaseId(SubmitEvent se) {
-        return ObjectUtils.isNotEmpty(se) && se.getCaseId() != 0 ? String.valueOf(se.getCaseId()) : "<unknown>";
+        return ObjectUtils.isNotEmpty(se) && se.getCaseId() != 0 ? String.valueOf(se.getCaseId()) : UNKNOWN_CASE_ID;
+    }
+
+    public static void setLastCaseId(List<SubmitEvent> cases) {
+        if (cases == null || cases.isEmpty()) {
+            lastCaseId = DEFAULT_CASE_ID;
+            return;
+        }
+
+        for (int index = cases.size() - 1; index >= 0; index--) {
+            SubmitEvent submitEvent = cases.get(index);
+            String caseId = findCaseId(submitEvent);
+            if (!UNKNOWN_CASE_ID.equals(caseId)) {
+                lastCaseId = caseId;
+                return;
+            }
+            log.warn(
+                    "{} - NOC fields task - Case ID is unknown",
+                    submitEvent.getCaseId()
+            );
+        }
+        lastCaseId = DEFAULT_CASE_ID;
     }
 
     public void triggerEventForCase(String adminUserToken, SubmitEvent submitEvent, String caseTypeId)
@@ -161,13 +189,21 @@ public class NoticeOfChangeFieldsTask implements Runnable {
         if (!RespondentUtils.isValidRespondent(respondent)) {
             return false;
         }
-        respondent.getValue().setRepresentativeId(representative.getId());
-        int respondentIndex = RespondentUtils.getRespondentIndexById(caseData, respondent.getId());
-        if (respondentIndex != NumberUtils.INTEGER_MINUS_ONE) {
-            representative.getValue().setRole(RoleUtils
-                    .solicitorRoleLabelForIndex(respondentIndex));
+        boolean caseUpdated = false;
+        if (!representative.getId().equals(respondent.getValue().getRepresentativeId())) {
+            respondent.getValue().setRepresentativeId(representative.getId());
+            caseUpdated = true;
         }
-        return true;
+        int respondentIndex = RespondentUtils.getRespondentIndexById(caseData, respondent.getId());
+        String role = StringUtils.EMPTY;
+        if (respondentIndex != -1) {
+            role = RoleUtils.solicitorRoleLabelForIndex(respondentIndex);
+        }
+        if (StringUtils.isNotBlank(role) && !role.equals(representative.getValue().getRole())) {
+            representative.getValue().setRole(RoleUtils.solicitorRoleLabelForIndex(respondentIndex));
+            caseUpdated = true;
+        }
+        return caseUpdated;
     }
 
     public static boolean isValidRepresentative(RepresentedTypeRItem representative) {
@@ -192,6 +228,8 @@ public class NoticeOfChangeFieldsTask implements Runnable {
                         .must(new TermsQueryBuilder("state.keyword", validStates))
                         .must(new TermsQueryBuilder("jurisdiction.keyword", EMPLOYMENT))
                         .must(new ExistsQueryBuilder("data.repCollection"))
-                ).toString();
+                        .must(new RangeQueryBuilder("reference.keyword").gt(lastCaseId))
+                ).sort("reference.keyword", SortOrder.ASC).toString();
+
     }
 }

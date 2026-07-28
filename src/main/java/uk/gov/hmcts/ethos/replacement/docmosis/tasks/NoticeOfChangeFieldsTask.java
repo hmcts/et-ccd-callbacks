@@ -72,7 +72,6 @@ public class NoticeOfChangeFieldsTask implements Runnable {
                     String query = buildQuery();
                     cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
                     setLastCaseId(cases);
-                    log.info("Executing caseId: " + lastCaseId);
                     log.info("{} - Notice of change fields task - Retrieved {} cases", caseTypeId, cases.size());
                     updateCases(cases, caseTypeId, adminUserToken);
                 } while (CollectionUtils.isNotEmpty(cases));

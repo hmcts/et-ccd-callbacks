@@ -5,4 +5,15 @@
 # Usage: ./bin/tasks/NoticeOfChangeFieldsTask_Run.sh
 set -eu
 
+echo "Checking port 4551"
+processId_4551=`lsof -i -n -P | grep LISTEN | grep :4551 | awk '{print $2}'`
+
+if [ ! -z "$processId_4551" ]
+then
+  echo "killing process with Id $processId_4551"
+  kill -9 "$processId_4551"
+else
+  echo "There is no process running on port 4551"
+fi
+
 SERVER_PORT=4551 TASK_NAME=NoticeOfChangeFieldsTask SPRING_PROFILES_ACTIVE=cftlib ./gradlew bootRun

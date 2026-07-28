@@ -665,11 +665,6 @@ wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
 
-tasks.register('azAcrLoginHmctsProd', Exec) {
-    commandLine 'az', 'acr', 'login', '--name', 'hmctsprod'
-}
-
-assemble.dependsOn(azAcrLoginHmctsProd)
 assemble.dependsOn(dumpCCDDefinitions)
 
 // True when ET_WORK_ALLOCATION=true is set explicitly, or when the bootWithCcdAndWa task is invoked.

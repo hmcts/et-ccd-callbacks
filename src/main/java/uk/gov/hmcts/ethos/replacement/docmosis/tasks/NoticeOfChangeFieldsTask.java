@@ -67,15 +67,18 @@ public class NoticeOfChangeFieldsTask implements Runnable {
         String[] caseTypeIds = caseTypeIdsString.split(",");
 
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
+            List<SubmitEvent> cases;
             try {
-                List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
-                setLastCaseId(cases);
-                log.info("{} - Notice of change fields task - Retrieved {} cases", caseTypeId, cases.size());
-                if (cases.isEmpty()) {
-                    log.info("{} - NOC fields task - No cases to process", caseTypeId);
-                    return;
-                }
-                updateCases(cases, caseTypeId, adminUserToken);
+                do {
+                    cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
+                    setLastCaseId(cases);
+                    log.info("{} - Notice of change fields task - Retrieved {} cases", caseTypeId, cases.size());
+                    if (cases.isEmpty()) {
+                        log.info("{} - NOC fields task - No cases to process", caseTypeId);
+                        return;
+                    }
+                    updateCases(cases, caseTypeId, adminUserToken);
+                } while (CollectionUtils.isNotEmpty(cases));
             } catch (IOException e) {
                 log.error(e.getMessage());
 

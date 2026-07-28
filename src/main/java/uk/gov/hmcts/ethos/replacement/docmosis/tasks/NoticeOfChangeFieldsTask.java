@@ -73,10 +73,6 @@ public class NoticeOfChangeFieldsTask implements Runnable {
                     cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
                     setLastCaseId(cases);
                     log.info("{} - Notice of change fields task - Retrieved {} cases", caseTypeId, cases.size());
-                    if (cases.isEmpty()) {
-                        log.info("{} - NOC fields task - No cases to process", caseTypeId);
-                        return;
-                    }
                     updateCases(cases, caseTypeId, adminUserToken);
                 } while (CollectionUtils.isNotEmpty(cases));
             } catch (IOException e) {

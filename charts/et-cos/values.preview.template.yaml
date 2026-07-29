@@ -119,7 +119,7 @@ et-sya:
       REDIS_HOST: et-session-storage-aat.redis.cache.windows.net
       ET_SYA_API_HOST: https://${SERVICE_FQDN}
       PCQ_ENABLED: true
-      HMCTS_ACCESS: 'true'
+      HMCTS_ACCESS: true
 
 et-syr:
   enabled: true
@@ -146,7 +146,7 @@ et-syr:
       REDIS_HOST: et-session-storage-aat.redis.cache.windows.net
       ET_SYA_API_HOST: https://${SERVICE_FQDN}
       PCQ_ENABLED: true
-      HMCTS_ACCESS: 'true'
+      HMCTS_ACCESS: true
 
 ccd:
   enabled: true

@@ -135,6 +135,8 @@ public class ManageCaseController {
         );
 
         var caseDetails = caseService.updateCase(authorization, caseRequest);
+        log.info("case updated successfully - caseTypeId: {} caseId: {}",
+                 caseRequest.getCaseTypeId(), caseRequest.getCaseId());
         return ok(caseDetails);
     }
 

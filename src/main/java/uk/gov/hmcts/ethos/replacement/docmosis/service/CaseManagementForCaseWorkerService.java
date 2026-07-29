@@ -478,6 +478,7 @@ public class CaseManagementForCaseWorkerService {
         caseData.setRespondentCollection(Stream.concat(continuingRespondent.stream(),
                 notContinuingRespondent.stream()).toList());
         respondentDefaults(caseData);
+        return caseData;
     }
 
     private boolean positionChanged(CaseData caseData) {

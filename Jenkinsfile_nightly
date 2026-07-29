@@ -16,21 +16,40 @@ properties([
 def type = "java"
 def product = "et"
 def component = "cos"
+def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 def secrets = [
         "et-cos-${params.ENVIRONMENT}": [
-                secret('et-ccd-caseworker-user-name', 'ET_CCD_CASEWORKER_USER_NAME'),
-                secret('et-ccd-caseworker-password', 'ET_CCD_CASEWORKER_PASSWORD'),
-                secret('et-ccd-api-user-name', 'ET_CCD_API_USER_NAME'),
-                secret('et-ccd-api-password', 'ET_CCD_API_PASSWORD'),
-                secret('et-caseworker-username', 'ET_CASEWORKER_USER_NAME'),
-                secret('et-caseworker-password', 'ET_CASEWORKER_PASSWORD'),
-                secret('et-judge-4-username', 'ET_JUDGE_4_USER_NAME'),
-                secret('et-judge-4-password', 'ET_JUDGE_4_PASSWORD'),
-                secret('idam-client-secret', 'IDAM_CLIENT_SECRET'),
-                secret('et-cos-s2s-secret', 'ET_COS_S2S_SECRET'),
-                secret('cos-system-user', 'ET_COS_SYSTEM_USER'),
-                secret('cos-system-user-password', 'ET_COS_SYSTEM_USER_PASSWORD')
+               secret('et-caseworker-5-username', 'ET_CASEWORKER_USER_NAME'),
+                secret('et-caseworker-5-password', 'ET_CASEWORKER_PASSWORD'),
+                secret('et-legalrep-user-name', 'ET_LEGALREP_USER_NAME'),
+                secret('et-legalrep-password', 'ET_LEGALREP_PASSWORD'),
+                secret('et-wa-legal-ops-user-name', 'ET_LEGAL_OPS_USER_NAME'),
+                secret('et-wa-legal-ops-password', 'ET_LEGAL_OPS_PASSWORD'),
+                secret('et-lagl-ops-username', 'ET_LEGAL_OPS2_USER_NAME'),
+                secret('et-lega-op-password', 'ET_LEGAL_OPS2_PASSWORD'),
+                secret('et-ctsc-admin-user-name', 'ET_CTSC_ADMIN_USER_NAME'),
+                secret('et-ctsc-admin-password', 'ET_CTSC_ADMIN_PASSWORD'),
+                secret('et-hearing-judge-user-name-scotland', 'ET_HEARING_JUDGE_USER_NAME_SCOT'),
+                secret('et-hearing-judge-user-name-eng', 'ET_HEARING_JUDGE_USER_NAME_ENG'),
+                secret('et-hearing-admin-user-name-eng', 'ET_HEARING_ADMIN_USER_NAME_ENG'),
+                secret('et-hearing-admin-user-name-scot', 'ET_HEARING_ADMIN_USER_NAME_SCOT'),
+                secret('et-citizen-user-name', 'ET_CITIZEN_USER_NAME'),
+                secret('et-citizen-password', 'ET_CITIZEN_PASSWORD'),
+                secret('et-ccd-api-user-name','ET_CCD_API_USER_NAME'),
+                secret('et-ccd-api-password','ET_CCD_API_PASSWORD'),
+                secret('et-judge-user-name-eng','ET_JUDGE_USER_NAME_ENG'),
+                secret('et-judge-user-eng-password','ET_JUDGE_USER_ENG_PASSWORD'),
+                secret('et3-resp-user-name','ET3_REPSONDENT_USER_NAME'),
+                secret('et3-resp-password','ET3_REPSONDENT_PASSWORD'),
+                secret('et-resp-user-name','ET_REPSONDENT_USER_NAME'),
+                secret('et-resp-password','ET_REPSONDENT_PASSWORD'),
+                secret('et-manage-org-username','ET_MANAGE_ORG_USERNAME'),
+                secret('et-manage-org-password','ET_MANAGE_ORG_PASSWORD'),
+                secret('et-judge-user-name-wa','ET_JUDGE_USER_NAME_WORKALLOCATION'),
+                secret('et-judge-user-password-wa','ET_JUDGE_USER_PASSWORD_WORKALLOCATION'),
+                secret('et-resp2-user-name', 'ET_RESP2_USER_NAME'),
+                secret('et-resp2-password', 'ET_RESP2_PASSWORD')
         ],
         "s2s-${params.ENVIRONMENT}":  [
                 secret('microservicekey-ccd-gw', 'MICROSERVICE_CCD_GW')
@@ -70,6 +89,27 @@ withNightlyPipeline(type, product, component) {
         sh '''
           env AZURE_CONFIG_DIR=/opt/jenkins/.azure-nonprod az acr login --name hmctsprod
         '''
+    }
+
+    afterAlways('DependencyCheckNightly') {
+         stage('Accessibility tests') {
+            try {
+                yarnBuilder.yarn('install')
+                yarnBuilder.yarn('test:accessibility')
+            } catch (Error) {
+                unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+            } finally {
+                publishHTML([
+                    allowMissing         : true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll              : true,
+                    reportDir            : 'playwright-report',
+                    reportFiles          : 'index.html',
+                    reportName           : 'ET Accessibility Test Report'
+            ])
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
+            }
+        }
     }
 
     afterAlways('fortify-scan') {

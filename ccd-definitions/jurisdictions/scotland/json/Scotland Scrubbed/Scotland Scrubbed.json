@@ -4249,13 +4249,13 @@
   {
     "ID": "fl_pay_cycle",
     "ListElementCode": "Weeks",
-    "ListElement": "Weeks",
+    "ListElement": "Weekly",
     "DisplayOrder": 1
   },
   {
     "ID": "fl_pay_cycle",
     "ListElementCode": "Months",
-    "ListElement": "Months",
+    "ListElement": "Monthly",
     "DisplayOrder": 2
   },
   {

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
@@ -19,7 +18,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRo
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.getOrganisationAddressAsText;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.mapOrganisationAddressToAddress;
 
-@Slf4j
 @Service("amendRepresentativeContactService")
 @RequiredArgsConstructor
 public class AmendRepresentativeContactService {
@@ -62,7 +60,7 @@ public class AmendRepresentativeContactService {
         CaseDataUtils.validateCaseData(caseData, submissionReference);
         UserUtils.validateToken(userToken, submissionReference);
         List<String> roles = nocRepresentativeService
-                .getValidatedRepresentativeRolesByUserToken(userToken, caseData, submissionReference);
+                .getValidatedRepresentativeRolesByUserToken(userToken, submissionReference);
         if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS.equals(
                 caseData.getRepresentativeContactChangeOption())) {
             setRepresentativeMyHmctsContactAddress(userToken, caseData);
@@ -145,8 +143,9 @@ public class AmendRepresentativeContactService {
             throws GenericServiceException {
         CaseDataUtils.validateCaseData(caseData, submissionReference);
         UserUtils.validateToken(userToken, submissionReference);
+
         List<String> roles = nocRepresentativeService
-                .getValidatedRepresentativeRolesByUserToken(userToken, caseData, submissionReference);
+                .getValidatedRepresentativeRolesByUserToken(userToken, submissionReference);
         if (roles.contains(CLAIMANTSOLICITOR.getCaseRoleLabel())) {
             ClaimantRepresentativeUtils.updateET3ResponseContactDetails(caseData);
             return;

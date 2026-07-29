@@ -117,6 +117,15 @@
     "SecurityClassification": "Public"
   },
   {
+    "LiveFrom": "08/07/2026",
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "[CLAIMANTNONLEGALREPRESENTATIVE]",
+    "Name": "CLAIMANTNONLEGALREPRESENTATIVE",
+    "Description": "Representative for claimant with no access to MyHMCTS",
+    "JurisdictionID": "EMPLOYMENT",
+    "SecurityClassification": "Public"
+  },
+  {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "ET_EnglandWales_Multiple",
     "ID": "[CREATOR]",
@@ -131,15 +140,6 @@
     "ID": "[DEFENDANT]",
     "Name": "Defendant",
     "Description": "Respondent of case",
-    "JurisdictionID": "EMPLOYMENT",
-    "SecurityClassification": "Public"
-  },
-  {
-    "LiveFrom": "08/07/2026",
-    "CaseTypeID": "ET_EnglandWales_Multiple",
-    "ID": "[CLAIMANTNONLEGALREPRESENTATIVE]",
-    "Name": "CLAIMANTNONLEGALREPRESENTATIVE",
-    "Description": "Representative for claimant with no access to MyHMCTS",
     "JurisdictionID": "EMPLOYMENT",
     "SecurityClassification": "Public"
   }

@@ -22,7 +22,7 @@ public final class EtSyaConstants {
     public static final String FILE_NOT_EXISTS = "File does not exist!...";
     public static final String JURISDICTION_ID = "EMPLOYMENT";
     public static final String ET1_ATTACHMENT = "ET1 Attachment";
-    public static final String REMOTE_REPO = "https://github.com/hmcts/et-sya-api";
+    public static final String REMOTE_REPO = "https://github.com/hmcts/et-ccd-callbacks";
     public static final String RESOURCE_NOT_FOUND = "Resource not found for case id %s, reason: %s";
     public static final String ET_SYA_FRONTEND = "et-sya-frontend";
 

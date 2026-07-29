@@ -18,20 +18,19 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
-import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3ResponseService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.AmendRepresentativeContactService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE;
@@ -48,6 +47,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.
 public class Et3ResponseController {
     private final Et3ResponseService et3ResponseService;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
+    private final AmendRepresentativeContactService amendRepresentativeContactService;
 
     /**
      * Called at the start of the ET3 Response journey.
@@ -150,7 +150,7 @@ public class Et3ResponseController {
         List<String> errors = new ArrayList<>();
         if (ET3_RESPONSE.equals(ccdRequest.getEventId())) {
             try {
-                et3ResponseService.setRespondentRepresentsContactDetails(
+                amendRepresentativeContactService.updateRepresentativeContactDetails(
                         userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
             }  catch (GenericServiceException gse) {
                 errors.add(gse.getMessage());
@@ -347,73 +347,5 @@ public class Et3ResponseController {
                 .confirmation_body(ET3ResponseConstants.GENERATED_DOCUMENT_URL + caseData.getDocMarkUp()
                                    + "\r\n\r\n" + generateEventHyperlinks(caseData, ccdId))
                 .build());
-    }
-
-    /**
-     * Sets new values to respondent representative model {@link RepresentedTypeR}.
-     *
-     * @param ccdRequest generic request from CCD
-     * @param userToken  authentication token to verify the user
-     * @return Callback response entity with case data attached.
-     */
-    @PostMapping(value = "/midEventAmendRepresentativeContact", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Updates RepresentedTypeR model of the respondent representative with new values")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> midEventAmendRepresentativeContact(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = new ArrayList<>();
-        try {
-            if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS.equals(
-                    caseData.getRepresentativeContactChangeOption())) {
-                et3ResponseService.setRepresentativeMyHmctsContactAddress(userToken,
-                        caseData, ccdRequest.getCaseDetails().getCaseId());
-            }
-        } catch (GenericServiceException gse) {
-            errors.add(gse.getMessage());
-        }
-        return getCallbackRespEntityErrors(errors, caseData);
-    }
-
-    /**
-     * Sets new values to respondent representative model {@link RepresentedTypeR}.
-     *
-     * @param ccdRequest generic request from CCD
-     * @param userToken  authentication token to verify the user
-     * @return Callback response entity with case data attached.
-     */
-    @PostMapping(value = "/aboutToSubmitAmendRepresentativeContact", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Updates RepresentedTypeR model of the respondent representative with new values")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                content = {
-                    @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CCDCallbackResponse.class))
-                }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> aboutToSubmitAmendRepresentativeContact(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = new ArrayList<>();
-        try {
-            et3ResponseService.setRespondentRepresentsContactDetails(
-                    userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
-            caseData.setMyHmctsAddressText(null);
-        } catch (GenericServiceException gse) {
-            errors.add(gse.getMessage());
-        }
-        return getCallbackRespEntityErrors(errors, caseData);
     }
 }

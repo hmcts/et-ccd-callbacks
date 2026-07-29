@@ -1,0 +1,14 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/refdata/case-worker/profile/search.*"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "prd/caseworkerProfileSearch.json",
+    "headers": {
+      "Content-Type": "application/json",
+      "total-records": "3"
+    }
+  }
+}

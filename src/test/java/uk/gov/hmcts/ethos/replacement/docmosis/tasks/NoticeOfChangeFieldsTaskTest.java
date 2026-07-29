@@ -107,7 +107,7 @@ class NoticeOfChangeFieldsTaskTest {
         submitEventWithCaseData.getCaseData().getRepCollection().getFirst().getValue().setRole(null);
         submitEventWithCaseData.getCaseData().getRespondentCollection().getFirst().getValue().setRepresentativeId(null);
         when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), anyString(), any()))
-                .thenReturn(List.of(submitEventWithCaseData));
+                .thenReturn(List.of(submitEventWithCaseData)).thenReturn(Collections.emptyList());
         when(ccdClient.startEventForCase(any(), any(), any(), any(), any())).thenThrow(new IOException());
         noticeOfChangeFieldsTask.run();
         assertThat(caseDataCaptured.getRepCollection().getFirst().getValue().getRole()).isNull();

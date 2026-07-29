@@ -60,6 +60,7 @@ public class NoticeOfChangeFieldsTask implements Runnable {
 
     @Override
     public void run() {
+        log.info("****** Notice of change fields task - Started ******");
         String adminUserToken = adminUserService.getAdminUserToken();
         String[] caseTypeIds = caseTypeIdsString.split(",");
 
@@ -68,6 +69,7 @@ public class NoticeOfChangeFieldsTask implements Runnable {
             List<SubmitEvent> cases;
             try {
                 do {
+                    log.info("{} - Notice of change fields task - Searching for cases", caseTypeId);
                     String query = buildQuery();
                     cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
                     setLastCaseId(cases);

@@ -145,6 +145,18 @@
     "AccessProfiles": "caseworker-ras-validation"
   },
   {
+    "CaseTypeID": "ET_Scotland",
+    "RoleName": "idam:caseworker-employment-englandwales",
+    "ReadOnly": "Y",
+    "AccessProfiles": "caseworker-employment-scotland"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "RoleName": "idam:caseworker-employment-etjudge-englandwales",
+    "ReadOnly": "Y",
+    "AccessProfiles": "caseworker-employment-etjudge-scotland"
+  },
+  {
     "RoleName": "circuit-judge",
     "Authorisation": "",
     "CaseTypeID": "ET_Scotland",

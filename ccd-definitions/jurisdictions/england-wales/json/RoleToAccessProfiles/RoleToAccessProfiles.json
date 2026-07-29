@@ -154,6 +154,18 @@
     "CaseAccessCategories": ""
   },
   {
+    "CaseTypeID": "ET_EnglandWales",
+    "RoleName": "idam:caseworker-employment-scotland",
+    "ReadOnly": "Y",
+    "AccessProfiles": "caseworker-employment-englandwales"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "RoleName": "idam:caseworker-employment-etjudge-scotland",
+    "ReadOnly": "Y",
+    "AccessProfiles": "caseworker-employment-etjudge-englandwales"
+  },
+  {
     "RoleName": "hmcts-judiciary",
     "Authorisation": "",
     "CaseTypeID": "ET_EnglandWales",

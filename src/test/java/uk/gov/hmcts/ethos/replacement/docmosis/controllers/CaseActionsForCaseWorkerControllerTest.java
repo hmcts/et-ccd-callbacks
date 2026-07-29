@@ -81,6 +81,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
@@ -1768,6 +1769,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         DraftAndSignJudgement draftAndSignJudgement = DraftAndSignJudgement.builder()
                 .isJudgement(YES)
+                .isUrgent(NO)
                 .furtherDirections("Dummy directions")
                 .build();
         ccdRequest.getCaseDetails().getCaseData().setDraftAndSignJudgement(draftAndSignJudgement);

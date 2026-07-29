@@ -91,6 +91,12 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "UPDATE_CASE_DRAFT",
+    "UserRole": "[CLAIMANTNONLEGALREPRESENTATIVE]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "UPDATE_CASE_SUBMITTED",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"

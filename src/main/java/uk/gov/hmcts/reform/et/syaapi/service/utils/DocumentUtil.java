@@ -90,6 +90,7 @@ public final class DocumentUtil {
             } else {
                 caseId = ObjectUtils.isNotEmpty(caseDetails.getId()) ? caseDetails.getId().toString() : "";
             }
+            log.info("case Id {} and caseUserRole {}", caseId, caseUserRole);
             filterCaseDocumentsByCaseUserRole(caseDetails, caseId, caseUserRole);
         }
     }

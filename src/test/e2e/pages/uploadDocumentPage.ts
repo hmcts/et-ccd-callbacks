@@ -20,7 +20,7 @@ export default class UploadDocumentPage extends BasePage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.page.locator('#documentCollection_1_uploadedDocument'),
-      'resources/test_file/welshTest.pdf',
+      'src/test/e2e/resources/test_file/welshTest.pdf',
     )
     await this.clickSubmitButton();
   }

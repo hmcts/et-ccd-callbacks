@@ -26,6 +26,7 @@ import java.util.List;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_STATE_ACCEPTED;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USERS_API_URL;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USERS_RETRIEVE_API;
+import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_SOLICITOR;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CREATOR;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT;
@@ -145,7 +146,8 @@ public final class ManageCaseRoleServiceUtil {
             && StringUtils.isNotEmpty(caseAssignmentUserRole.getCaseDataId())
             && (caseDetails.getId().toString().equals(caseAssignmentUserRole.getCaseDataId()))
             && (CASE_USER_ROLE_CREATOR.equals(caseAssignmentUserRole.getCaseRole())
-            ||  CASE_USER_ROLE_DEFENDANT.equals(caseAssignmentUserRole.getCaseRole()))
+            ||  CASE_USER_ROLE_DEFENDANT.equals(caseAssignmentUserRole.getCaseRole())
+            ||  CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE.equals(caseAssignmentUserRole.getCaseRole()))
             ? caseAssignmentUserRole.getCaseRole() : StringUtils.EMPTY;
     }
 

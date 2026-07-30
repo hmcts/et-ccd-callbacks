@@ -131,12 +131,10 @@ class ManageCaseRoleServiceUtilTest {
             && StringUtils.isNotEmpty(caseAssignmentUserRole.getCaseDataId())
             && caseDetails.getId().toString().equals(caseAssignmentUserRole.getCaseDataId())
             && (CASE_USER_ROLE_CREATOR.equals(caseAssignmentUserRole.getCaseRole())
-            ||  ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT.equals(caseAssignmentUserRole.getCaseRole()))) {
-            if (TEST_CASE_USER_ROLE_CREATOR.equals(caseAssignmentUserRole.getCaseRole())) {
-                assertThat(actualCaseUserRole).isEqualTo(TEST_CASE_USER_ROLE_CREATOR);
-            } else {
-                assertThat(actualCaseUserRole).isEqualTo(TEST_CASE_USER_ROLE_DEFENDANT);
-            }
+            ||  ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT.equals(caseAssignmentUserRole.getCaseRole())
+            ||  ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE
+                    .equals(caseAssignmentUserRole.getCaseRole()))) {
+            assertThat(actualCaseUserRole).isEqualTo(caseAssignmentUserRole.getCaseRole());
         } else {
             assertThat(actualCaseUserRole).isEqualTo(StringUtils.EMPTY);
         }
@@ -154,6 +152,11 @@ class ManageCaseRoleServiceUtilTest {
                 .caseRole(TEST_CASE_USER_ROLE_DEFENDANT)
                 .caseDataId(caseDetails.getId().toString())
                 .userId(USER_ID).build();
+        CaseAssignmentUserRole caseAssignmentUserRoleClaimantNonLegalRep =
+            CaseAssignmentUserRole.builder()
+                .caseRole(ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE)
+                .caseDataId(caseDetails.getId().toString())
+                .userId(USER_ID).build();
         CaseDetails caseDetailsWithEmptyCaseId = new CaseTestData().getCaseDetails();
         caseDetailsWithEmptyCaseId.setId(null);
         CaseAssignmentUserRole caseAssignmentUserRoleWithEmptyCaseDataId =
@@ -168,6 +171,7 @@ class ManageCaseRoleServiceUtilTest {
         return Stream.of(Arguments.of(null, caseAssignmentUserRoleCreator),
                          Arguments.of(caseDetailsWithEmptyCaseId, caseAssignmentUserRoleCreator),
                          Arguments.of(caseDetailsWithEmptyCaseId, caseAssignmentUserRoleDefendant),
+                         Arguments.of(caseDetails, caseAssignmentUserRoleClaimantNonLegalRep),
                          Arguments.of(caseDetails, null),
                          Arguments.of(caseDetails, caseAssignmentUserRoleWithEmptyCaseDataId),
                          Arguments.of(caseDetails, caseAssignmentUserRoleWithInvalidCaseDataId),

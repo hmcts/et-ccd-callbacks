@@ -248,6 +248,24 @@
     "TabFieldDisplayOrder": 1
   },
   {
+    "CaseFieldID": "claimantContactDetailsDocument",
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "Channel": "CaseWorker",
+    "TabDisplayOrder": 105,
+    "TabID": "MultiplesRespondentDocumentsTab",
+    "TabLabel": "Docs - Respondent",
+    "TabFieldDisplayOrder": 1
+  },
+  {
+    "CaseFieldID": "claimantContactDetailsDocumentWelsh",
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "Channel": "CaseWorker",
+    "TabDisplayOrder": 106,
+    "TabID": "MultiplesRespondentDocumentsTab",
+    "TabLabel": "Docs - Respondent",
+    "TabFieldDisplayOrder": 1
+  },
+  {
     "CaseFieldID": "legalrepDocumentCollection",
     "CaseTypeID": "ET_EnglandWales_Multiple",
     "Channel": "CaseWorker",

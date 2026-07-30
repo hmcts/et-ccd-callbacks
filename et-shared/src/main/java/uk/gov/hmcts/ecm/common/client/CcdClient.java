@@ -54,6 +54,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
+import javax.naming.NameNotFoundException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -61,7 +62,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import javax.naming.NameNotFoundException;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_VENUES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -987,4 +987,32 @@ public class CcdClient {
         return headers;
     }
 
+    /**
+     * Retrieves single (individual claimant) cases matching a given multiple reference, using Elasticsearch.
+     * Mirrors {@link #retrieveMultipleCasesElasticSearch} but targets the single case type and deserialises
+     * into {@link SubmitEvent} (CaseData) rather than {@link SubmitMultipleEvent} (MultipleData), since the
+     * two case types have entirely different data shapes.
+     *
+     * @param authToken          auth token for the CCD request
+     * @param caseTypeId         the single (base) case type id, e.g. {@code ENGLANDWALES_CASE_TYPE_ID} -
+     *                            NOT the multiple-suffixed type
+     * @param multipleReference  the multiple reference to match against {@code data.multipleReference}
+     * @return the matching single cases; empty if none found
+     * @throws IOException if the request or response handling fails
+     */
+    public List<SubmitEvent> retrieveCasesByMultipleReferenceElasticSearch(String authToken, String caseTypeId,
+                                                                           String multipleReference)
+            throws IOException {
+        List<SubmitEvent> submitEvents = new ArrayList<>();
+        log.info(QUERY_LOG_PREFIX + ESHelper.getBulkSearchQuery(multipleReference));
+        HttpEntity<String> request =
+                new HttpEntity<>(ESHelper.getBulkSearchQuery(multipleReference), buildHeaders(authToken));
+        String url = ccdClientConfig.buildRetrieveCasesUrlElasticSearch(caseTypeId);
+        CaseSearchResult caseSearchResult = restTemplate.exchange(
+                url, HttpMethod.POST, request, CaseSearchResult.class).getBody();
+        if (caseSearchResult != null && caseSearchResult.getCases() != null) {
+            submitEvents.addAll(caseSearchResult.getCases());
+        }
+        return submitEvents;
+    }
 }

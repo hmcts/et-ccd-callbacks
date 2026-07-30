@@ -1347,7 +1347,7 @@ class ManageCaseRoleServiceTest {
     }
 
     @Test
-    void assignCreatorRoleShouldAssignAndPersistClaimantData() throws IOException {
+    void assignCreatorRoleShouldAssignAndPersistClaimantData() {
         ReflectionTestUtils.setField(
             manageCaseRoleService,
             CCD_API_URL_PARAMETER_NAME,

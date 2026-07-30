@@ -24,6 +24,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DynamicListType;
 import uk.gov.hmcts.et.common.model.ccd.types.NotificationsExtract;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.SubCaseLegalRepDetails;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.et.common.model.multiples.items.CaseMultipleTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.items.SubMultipleTypeItem;
@@ -324,6 +325,12 @@ public class MultipleData extends BaseCaseData {
 
     //documentAccess
     private String documentAccess;
+
+    @JsonProperty("claimantContactDetailsDocument")
+    private UploadedDocumentType claimantContactDetailsDocument;
+
+    @JsonProperty("claimantContactDetailsDocumentWelsh")
+    private UploadedDocumentType claimantContactDetailsDocumentWelsh;
 
     @JsonProperty("multipleNote")
     private String multipleNote;

@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.HubLinksStatuses;
+import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.reform.et.syaapi.service.ApplicationService;
 import uk.gov.hmcts.reform.et.syaapi.service.CaseService;
 import uk.gov.hmcts.reform.et.syaapi.service.HubLinkService;
 import uk.gov.hmcts.reform.et.syaapi.service.ManageCaseRoleService;
+import uk.gov.hmcts.reform.et.syaapi.service.multiples.MultiplesCaseService;
 import uk.gov.hmcts.reform.et.syaapi.service.utils.ResourceLoader;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -93,6 +95,9 @@ class ManageCaseControllerTest {
     @MockitoBean
     private HubLinkService hubLinkService;
 
+    @MockitoBean
+    private MultiplesCaseService multiplesCaseService;
+
     ManageCaseControllerTest() {
         // Default constructor
         expectedDetails = ResourceLoader.fromString(
@@ -130,6 +135,53 @@ class ManageCaseControllerTest {
             .andExpect(jsonPath("$.state").value(expectedDetails.getState()))
             .andExpect(jsonPath("$.created_date").exists())
             .andExpect(jsonPath("$.last_modified").exists());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldGetMultipleCaseDetails() {
+        SubmitMultipleEvent multipleCaseDetails = new SubmitMultipleEvent();
+        multipleCaseDetails.setCaseId(Long.parseLong(CASE_ID));
+        multipleCaseDetails.setState("Accepted");
+
+        when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
+        when(multiplesCaseService.getMultipleCaseByCaseReference(SCOTLAND_CASE_TYPE, CASE_ID))
+            .thenReturn(multipleCaseDetails);
+
+        CaseRequest caseRequest = CaseRequest.builder()
+                .caseId(CASE_ID)
+                .caseTypeId(SCOTLAND_CASE_TYPE)
+                .build();
+        mockMvc.perform(get("/cases/multiple-case")
+                            .header(HttpHeaders.AUTHORIZATION, TEST_SERVICE_AUTH_TOKEN)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(ResourceLoader.toJson(caseRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(multipleCaseDetails.getCaseId()))
+            .andExpect(jsonPath("$.state").value("Accepted"));
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldRequestMultipleCaseUsingCaseTypeIdAndCaseId() {
+        SubmitMultipleEvent multipleCaseDetails = new SubmitMultipleEvent();
+        multipleCaseDetails.setCaseId(Long.parseLong(CASE_ID));
+
+        when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
+        when(multiplesCaseService.getMultipleCaseByCaseReference(SCOTLAND_CASE_TYPE, CASE_ID))
+            .thenReturn(multipleCaseDetails);
+
+        CaseRequest caseRequest = CaseRequest.builder()
+                .caseId(CASE_ID)
+                .caseTypeId(SCOTLAND_CASE_TYPE)
+                .build();
+        mockMvc.perform(get("/cases/multiple-case")
+                            .header(HttpHeaders.AUTHORIZATION, TEST_SERVICE_AUTH_TOKEN)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(ResourceLoader.toJson(caseRequest)))
+            .andExpect(status().isOk());
+
+        verify(multiplesCaseService, times(1)).getMultipleCaseByCaseReference(SCOTLAND_CASE_TYPE, CASE_ID);
     }
 
     @Test

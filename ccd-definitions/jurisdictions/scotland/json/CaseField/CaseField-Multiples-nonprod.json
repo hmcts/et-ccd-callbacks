@@ -673,6 +673,20 @@
   },
   {
     "CaseTypeID": "ET_Scotland_Multiple",
+    "ID": "claimantContactDetailsDocument",
+    "Label": "Claimant Contact Details",
+    "FieldType": "Document",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland_Multiple",
+    "ID": "claimantContactDetailsDocumentWelsh",
+    "Label": "Claimant Contact Details",
+    "FieldType": "Document",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland_Multiple",
     "ID": "altCaseIdCollection",
     "Label": "Case Numbers",
     "HintText": "The lead case cannot be removed",

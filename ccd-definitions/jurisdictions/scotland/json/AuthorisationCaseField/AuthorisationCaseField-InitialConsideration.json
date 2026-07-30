@@ -1930,5 +1930,20 @@
     "CaseFieldID": "etIcHearingPanelPreferenceLabel",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "etICIsUrgent",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-scotland",
+          "caseworker-employment-etjudge-scotland",
+          "caseworker-employment-api",
+          "caseworker-wa-task-configuration"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
   }
 ]

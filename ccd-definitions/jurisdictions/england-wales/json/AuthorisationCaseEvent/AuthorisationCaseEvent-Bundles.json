@@ -47,13 +47,13 @@
     "UserRole": "[SOLICITORH]",
     "CRUD": "CRU"
   },
-{
+  {
     "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "bundlesRespondentPrepareDoc",
     "UserRole": "[SOLICITORI]",
     "CRUD": "CRU"
   },
-{
+  {
     "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "bundlesRespondentPrepareDoc",
     "UserRole": "[SOLICITORJ]",
@@ -75,6 +75,12 @@
     "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "SUBMIT_CLAIMANT_BUNDLES",
     "UserRole": "[CREATOR]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "SUBMIT_CLAIMANT_BUNDLES",
+    "UserRole": "[CLAIMANTNONLEGALREPRESENTATIVE]",
     "CRUD": "CRUD"
   },
   {

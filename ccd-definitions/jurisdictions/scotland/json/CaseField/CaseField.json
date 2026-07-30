@@ -6732,5 +6732,12 @@
     "FieldType": "Collection",
     "FieldTypeParameter": "DynamicListCollection",
     "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "showEra",
+    "Label": "Show ERA",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public"
   }
 ]

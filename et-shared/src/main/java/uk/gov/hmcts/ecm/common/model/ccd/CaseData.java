@@ -359,4 +359,7 @@ public class CaseData {
 
     @JsonProperty("TTL")
     private TTL ttl;
+
+    @JsonProperty("showEra")
+    private String showEra;
 }

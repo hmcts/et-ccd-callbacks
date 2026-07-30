@@ -802,8 +802,15 @@
     "CaseTypeID": "ET_Scotland",
     "Channel": "CaseWorker",
     "TabID": "initialConsideration",
-    "CaseFieldID": "etICCanProceed",
+    "CaseFieldID": "etICUnfairDismissalEra",
     "TabFieldDisplayOrder": 4
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "Channel": "CaseWorker",
+    "TabID": "initialConsideration",
+    "CaseFieldID": "etICCanProceed",
+    "TabFieldDisplayOrder": 5
   },
   {
     "CaseTypeID": "ET_Scotland",

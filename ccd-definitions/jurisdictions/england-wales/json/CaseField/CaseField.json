@@ -6568,5 +6568,12 @@
     "FieldType": "Collection",
     "FieldTypeParameter": "DynamicListCollection",
     "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "showEra",
+    "Label": "Show ERA",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public"
   }
 ]

@@ -794,6 +794,8 @@ public class CaseData extends Et1CaseData {
     private String etICJuridictionCodesInvalid;
     @JsonProperty("etICInvalidDetails")
     private String etICInvalidDetails;
+    @JsonProperty("etICUnfairDismissalEra")
+    private String etICUnfairDismissalEra;
     @JsonProperty("etICCanProceed")
     private String etICCanProceed;
     @JsonProperty("etICIsUrgent")

@@ -21,6 +21,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelpe
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmploymentRightsActService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
@@ -52,6 +53,7 @@ public class InitialConsiderationController {
     private final CaseFlagsService caseFlagsService;
     private final FeatureToggleService featureToggleService;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
+    private final EmploymentRightsActService employmentRightsActService;
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String COMPLETE_IC_HDR = "<h1>Initial consideration complete</h1>";
 
@@ -101,6 +103,7 @@ public class InitialConsiderationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         initialConsiderationService.processIcDocumentCollections(caseData);
+        employmentRightsActService.processUnfairDismissalEra(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
 
         caseData.setIcCompletedBy(reportDataService.getUserFullName(userToken));
         caseData.setIcDateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT)));

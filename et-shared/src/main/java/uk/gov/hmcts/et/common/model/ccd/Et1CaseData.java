@@ -84,4 +84,6 @@ public class Et1CaseData extends BaseCaseData {
     private HubLinksStatuses hubLinksStatuses;
     @JsonProperty("TTL")
     private TTL ttl;
+    @JsonProperty("showEra")
+    private String showEra;
 }

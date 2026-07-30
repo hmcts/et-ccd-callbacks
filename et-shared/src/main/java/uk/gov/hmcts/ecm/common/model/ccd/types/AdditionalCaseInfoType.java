@@ -22,4 +22,8 @@ public class AdditionalCaseInfoType {
     private String interventionRequired;
     @JsonProperty("reservedToJudge")
     private String reservedToJudge;
+    @JsonProperty("showEra")
+    private String showEra;
+    @JsonProperty("era")
+    private String era;
 }

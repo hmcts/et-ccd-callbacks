@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.et.syaapi.service.ApplicationService;
 import uk.gov.hmcts.reform.et.syaapi.service.CaseService;
 import uk.gov.hmcts.reform.et.syaapi.service.HubLinkService;
 import uk.gov.hmcts.reform.et.syaapi.service.ManageCaseRoleService;
+import uk.gov.hmcts.reform.et.syaapi.service.utils.ManageCaseRoleServiceUtil;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.util.List;
@@ -80,16 +81,16 @@ public class ManageCaseController {
      * @return a list of cases for the given user wrapped in a {@link CaseDetails} object
      */
     @GetMapping("/user-cases")
-    @Operation(summary = "Return list of case details for a given user")
+    @Operation(summary = "Return list of case details for a given user, optionally filtered by one or more "
+        + "comma-separated case roles (e.g. case_user_role=CREATOR,CLAIMANTNONLEGALREPRESENTATIVE). Each case "
+        + "carries its matched role under 'caseUserRole' in the case data.")
     @ApiResponseGroup
     public ResponseEntity<List<CaseDetails>> getUserCasesByCaseUserRole(
         @RequestHeader(AUTHORIZATION) String authorization,
         @RequestParam(value = CASE_USER_ROLE_API_PARAMETER_NAME, required = false) String caseUserRole) {
-        var caseDetails = manageCaseRoleService.getUserCasesByCaseUserRole(
+        var caseDetails = manageCaseRoleService.getUserCasesByCaseUserRoles(
             authorization,
-            StringUtils.isBlank(caseUserRole)
-                ? CASE_USER_ROLE_CREATOR
-                : STRING_LEFT_SQUARE_BRACKET + caseUserRole.trim() + STRING_RIGHT_SQUARE_BRACKET);
+            ManageCaseRoleServiceUtil.getCaseUserRoles(caseUserRole));
         return ok(caseDetails);
     }
 

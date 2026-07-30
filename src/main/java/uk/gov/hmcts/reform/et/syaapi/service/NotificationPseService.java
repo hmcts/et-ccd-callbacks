@@ -46,33 +46,6 @@ public class NotificationPseService {
         "Acknowledgement email not sent to claimants";
 
     /**
-     * Sends response notification email to tribunal.
-     * @param caseData caseData
-     * @param caseId case id
-     */
-    void sendResponseNotificationEmailToTribunal(CaseData caseData, String caseId) {
-        Map<String, Object> tribunalParameters = new ConcurrentHashMap<>();
-        NotificationsHelper.addCommonParameters(tribunalParameters, caseData, caseId);
-
-        tribunalParameters.put(
-            SEND_EMAIL_PARAMS_HEARING_DATE_KEY,
-            NotificationsHelper.getNearestHearingToReferral(caseData, NOT_SET)
-        );
-
-        tribunalParameters.put(
-            SEND_EMAIL_PARAMS_EXUI_LINK_KEY,
-            notificationsProperties.getExuiCaseDetailsLink() + caseId
-        );
-
-        notificationService.sendTribunalEmail(
-            caseData,
-            caseId,
-            tribunalParameters,
-            notificationsProperties.getPseTribunalResponseTemplateId()
-        );
-    }
-
-    /**
      * Sends response notification email to respondent(s).
      * @param caseData caseData
      * @param caseId case id

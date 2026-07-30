@@ -20,13 +20,11 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.applications.respondent.TseRespondentReplyService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FUNCTION_NOT_AVAILABLE_ERROR;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -42,7 +40,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequiredArgsConstructor
 public class TseRespondentReplyController {
 
-    private final VerifyTokenService verifyTokenService;
     private final TseRespondentReplyService tseRespondentReplyService;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -75,11 +72,6 @@ public class TseRespondentReplyController {
     public ResponseEntity<CCDCallbackResponse> aboutToStart(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
@@ -144,11 +136,6 @@ public class TseRespondentReplyController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         if (tseRespondentReplyService.isRespondingToTribunal(caseData)) {
@@ -184,11 +171,6 @@ public class TseRespondentReplyController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = tseRespondentReplyService.validateInput(caseData);
         return getCallbackRespEntityErrors(errors, caseData);
@@ -215,11 +197,6 @@ public class TseRespondentReplyController {
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
@@ -251,11 +228,6 @@ public class TseRespondentReplyController {
     public ResponseEntity<CCDCallbackResponse> submitted(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 

@@ -229,7 +229,6 @@ public class StoredRespondToTribunalService {
     }
 
     private void sendEmailForRespondToTribunal(CaseData caseData, String caseId, String shortText) {
-        notificationPseService.sendResponseNotificationEmailToTribunal(caseData, caseId);
         notificationService.sendSubmitStoredEmailToClaimant(
             notificationService.formatCoreEmailDetails(caseData, caseId), shortText);
     }

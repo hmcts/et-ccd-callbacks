@@ -37,7 +37,7 @@ public interface OrganisationClient {
     ResponseEntity<RetrieveOrgByIdResponse> getOrganisationById(
             @RequestHeader(AUTHORIZATION) String authorisation,
             @RequestHeader(SERVICE_AUTHORIZATION) String s2sToken,
-            @PathVariable("orgId") String userId
+            @PathVariable("orgId") String orgId
     );
 
     @GetMapping(

@@ -196,7 +196,6 @@ public class SendNotificationService {
     private void sendAddResponseSendNotificationEmails(CaseData caseData,
                                                        String caseId,
                                                        String copyToOtherParty) {
-        notificationPseService.sendResponseNotificationEmailToTribunal(caseData, caseId);
         // passing null for respondent solicitor email as it is not needed in this context
         notificationPseService.sendResponseNotificationEmailToRespondent(
             caseData, caseId, copyToOtherParty, true, null);

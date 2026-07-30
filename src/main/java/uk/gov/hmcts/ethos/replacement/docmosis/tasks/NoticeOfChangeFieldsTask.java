@@ -101,6 +101,7 @@ public class NoticeOfChangeFieldsTask implements Runnable {
                     }
                 });
             }
+            executor.shutdown();
             if (!executor.awaitTermination(awaitTimeoutSeconds, TimeUnit.SECONDS)) {
                 log.warn("{} - Executor did not terminate within {}s, forcing shutdown",
                         caseTypeId, awaitTimeoutSeconds);

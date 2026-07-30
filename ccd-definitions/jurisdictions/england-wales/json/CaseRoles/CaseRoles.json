@@ -120,8 +120,8 @@
     "LiveFrom": "08/07/2026",
     "CaseTypeID": "ET_EnglandWales",
     "ID": "[CLAIMANTNONLEGALREPRESENTATIVE]",
-    "Name": "CLAIMANTNONLEGALREPRESENTATIVE",
-    "Description": "Representative for claimant with no access to MyHMCTS",
+    "Name": "Claimant Non Legal Representative",
+    "Description": "Claimant Non Legal Representative role",
     "JurisdictionID": "EMPLOYMENT",
     "SecurityClassification": "Public"
   },

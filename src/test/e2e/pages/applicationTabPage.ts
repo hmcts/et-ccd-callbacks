@@ -103,7 +103,7 @@ export class ApplicationTabPage extends BasePage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.fileUpload,
-      'resources/test_file/welshTest.pdf',
+      'src/test/e2e/resources/test_file/welshTest.pdf',
     );
   }
 
@@ -251,7 +251,7 @@ export class ApplicationTabPage extends BasePage {
 
   }
 
-  async uploadSupportingMaterial(filePaths: string[] = ['resources/test_file/welshTest.pdf']) {
+  async uploadSupportingMaterial(filePaths: string[] = ['src/test/e2e/resources/test_file/welshTest.pdf']) {
     for (let i=0; i<filePaths.length; i++) {
       await this.addNewButtonClick();
       await this.page.waitForLoadState('load');

@@ -796,6 +796,8 @@ public class CaseData extends Et1CaseData {
     private String etICInvalidDetails;
     @JsonProperty("etICCanProceed")
     private String etICCanProceed;
+    @JsonProperty("etICIsUrgent")
+    private String etICIsUrgent;
     @JsonProperty("etICHearingAlreadyListed")
     private String etICHearingAlreadyListed;
     // ET Initial Consideration - Hearing Not Listed

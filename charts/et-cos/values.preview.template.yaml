@@ -119,6 +119,7 @@ et-sya:
       REDIS_HOST: et-session-storage-aat.redis.cache.windows.net
       ET_SYA_API_HOST: https://${SERVICE_FQDN}
       PCQ_ENABLED: true
+      HMCTS_ACCESS: 'true'
 
 et-syr:
   enabled: true
@@ -145,6 +146,7 @@ et-syr:
       REDIS_HOST: et-session-storage-aat.redis.cache.windows.net
       ET_SYA_API_HOST: https://${SERVICE_FQDN}
       PCQ_ENABLED: true
+      HMCTS_ACCESS: 'true'
 
 # Standalone et-sya-api is retired in preview: the sya-api code is now merged into
 # et-cos (scanned via uk.gov.hmcts.reform.et.syaapi) and served on ${SERVICE_FQDN}.

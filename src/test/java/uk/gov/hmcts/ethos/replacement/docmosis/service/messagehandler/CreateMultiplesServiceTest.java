@@ -8,22 +8,29 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesMsg;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.multiples.AdditionalClaimant;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.ClaimantContactDetailsDocumentService;
 import uk.gov.hmcts.reform.et.syaapi.service.NotificationService;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -49,8 +56,14 @@ class CreateMultiplesServiceTest {
     @Mock
     private NotificationService notificationService;
 
+    @Mock
+    private DocumentManagementService documentManagementService;
+
     @InjectMocks
     private CreateMultiplesService createMultiplesService;
+
+    @InjectMocks
+    private ClaimantContactDetailsDocumentService claimantContactDetailsDocumentService;
 
     @Test
     void retrieveLeadCaseReturnsNullWhenNoCasesFound() throws IOException {
@@ -275,6 +288,123 @@ class CreateMultiplesServiceTest {
         assertTrue(captor.getValue().getMultipleNote().contains("spreadsheet upload"));
         assertTrue(captor.getValue().getMultipleNote().contains("Row 1: no claimant data supplied"));
         verify(notificationService).sendFailedAdditionalClaimantsEmail("6000001/2024", "6000123/2024", 5555L);
+    }
+
+    @Test
+    void generateAndUploadClaimantContactDetails_uploadsPdfAndStoresOnMultiple() throws Exception {
+        // Lead claimant setup
+        ClaimantIndType indType = new ClaimantIndType();
+        indType.setClaimantTitle("Mr");
+        indType.setClaimantFirstNames("Alice");
+        indType.setClaimantLastName("Smith");
+        ClaimantType claimantType = new ClaimantType();
+        claimantType.setClaimantEmailAddress("alice@example.com");
+        Address address = new Address();
+        address.setAddressLine1("1 Main St");
+        address.setPostTown("London");
+        address.setPostCode("SW1A 1AA");
+        claimantType.setClaimantAddressUK(address);
+        CaseData leadData = new CaseData();
+        leadData.setClaimantIndType(indType);
+        leadData.setClaimantType(claimantType);
+        SubmitEvent leadCase = new SubmitEvent();
+        leadCase.setCaseData(leadData);
+
+        // Created multiple with fresh MultipleData
+        MultipleData multipleData = new MultipleData();
+        SubmitMultipleEvent createdMultiple = new SubmitMultipleEvent();
+        createdMultiple.setCaseData(multipleData);
+        createdMultiple.setCaseId(99999L);
+
+        URI mockUri = URI.create("http://dm-store/documents/test-uuid");
+        when(documentManagementService.uploadDocument(
+                anyString(), any(byte[].class), anyString(), anyString(), anyString()))
+                .thenReturn(mockUri);
+        when(documentManagementService.generateDownloadableURL(mockUri))
+                .thenReturn("http://gateway/documents/test-uuid/binary");
+
+        CCDRequest amendRequest = new CCDRequest();
+        when(ccdClient.startBulkAmendEventForCase(anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(amendRequest);
+
+        CreateUpdatesMsg msg = CreateUpdatesMsg.builder()
+                .caseTypeId("ET_EnglandWales")
+                .jurisdiction("EMPLOYMENT")
+                .build();
+
+        claimantContactDetailsDocumentService.generateAndUploadClaimantContactDetails(
+                TOKEN, msg, leadCase, createdMultiple);
+
+        // Verify PDF was uploaded
+        verify(documentManagementService).uploadDocument(
+                eq(TOKEN), any(byte[].class),
+                eq("Claimant Contact Details.pdf"), anyString(), eq("ET_EnglandWales"));
+
+        // Verify the multiple shell was updated with the document
+        verify(ccdClient).submitMultipleEventForCase(eq(TOKEN), eq(multipleData),
+                anyString(), eq("EMPLOYMENT"), eq(amendRequest), eq("99999"));
+        assertNotNull(multipleData.getClaimantContactDetailsDocument());
+        assertEquals("Claimant Contact Details.pdf",
+                multipleData.getClaimantContactDetailsDocument().getDocumentFilename());
+    }
+
+    @Test
+    void generateAndUploadClaimantContactDetails_skipsWhenFiveOrFewerClaimants() throws IOException {
+        SubmitMultipleEvent createdMultiple = new SubmitMultipleEvent();
+        createdMultiple.setCaseData(new MultipleData());
+        createdMultiple.setCaseId(77777L);
+
+        CreateUpdatesMsg msg = CreateUpdatesMsg.builder()
+                .caseTypeId("ET_EnglandWales")
+                .jurisdiction("EMPLOYMENT")
+                .build();
+
+        claimantContactDetailsDocumentService.generateAndUploadClaimantContactDetails(
+                TOKEN, msg, new SubmitEvent(), createdMultiple);
+
+        verify(documentManagementService, never()).uploadDocument(
+                anyString(), any(), anyString(), anyString(), anyString());
+        verify(ccdClient, never()).submitMultipleEventForCase(
+                anyString(), any(MultipleData.class), anyString(), anyString(), any(CCDRequest.class), anyString());
+    }
+
+    @Test
+    void generateAndUploadClaimantContactDetails_skipsWhenMultipleIsNull() throws IOException {
+        CreateUpdatesMsg msg = CreateUpdatesMsg.builder()
+                .caseTypeId("ET_EnglandWales")
+                .jurisdiction("EMPLOYMENT")
+                .build();
+
+        claimantContactDetailsDocumentService.generateAndUploadClaimantContactDetails(
+                TOKEN, msg, new SubmitEvent(), null);
+
+        verify(documentManagementService, never()).uploadDocument(
+                anyString(), any(), anyString(), anyString(), anyString());
+        verify(ccdClient, never()).submitMultipleEventForCase(
+                anyString(), any(MultipleData.class), anyString(), anyString(), any(CCDRequest.class), anyString());
+    }
+
+    @Test
+    void generateAndUploadClaimantContactDetails_logsErrorButDoesNotThrowOnFailure() throws IOException {
+        SubmitMultipleEvent createdMultiple = new SubmitMultipleEvent();
+        createdMultiple.setCaseData(new MultipleData());
+        createdMultiple.setCaseId(12345L);
+
+        when(documentManagementService.uploadDocument(
+                anyString(), any(byte[].class), anyString(), anyString(), anyString()))
+                .thenThrow(new RuntimeException("DM unavailable"));
+
+        CreateUpdatesMsg msg = CreateUpdatesMsg.builder()
+                .caseTypeId("ET_EnglandWales")
+                .jurisdiction("EMPLOYMENT")
+                .build();
+
+        // Must not throw; failure is swallowed and logged
+        claimantContactDetailsDocumentService.generateAndUploadClaimantContactDetails(
+                TOKEN, msg, new SubmitEvent(), createdMultiple);
+
+        verify(ccdClient, never()).submitMultipleEventForCase(
+                anyString(), any(MultipleData.class), anyString(), anyString(), any(CCDRequest.class), anyString());
     }
 
     @Test

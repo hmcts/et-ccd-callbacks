@@ -23,6 +23,9 @@ public class CaseRequest {
     @JsonProperty("post_code")
     private String postCode;
 
+    @JsonProperty("multiple_reference")
+    private String multipleReference;
+
     @JsonProperty("case_data")
     private Map<String, Object> caseData;
 }

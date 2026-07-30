@@ -21,11 +21,15 @@ import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreateMultiplesDataMod
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.TransferToEcmDataModel;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.types.multiples.AdditionalClaimant;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.CreateUpdatesQueueMessage;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.messagequeue.CreateUpdatesQueueRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.messagehandler.CreateMultiplesService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.ClaimantContactDetailsDocumentService;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
@@ -73,6 +77,9 @@ class CreateUpdatesQueueProcessorTest {
     @Mock
     private CreateMultiplesService createMultiplesService;
 
+    @Mock
+    private ClaimantContactDetailsDocumentService claimantContactDetailsDocumentService;
+
     private CreateUpdatesQueueProcessor processor;
 
     @BeforeEach
@@ -84,7 +91,8 @@ class CreateUpdatesQueueProcessorTest {
                 selfProvider,
                 transferToEcmService,
                 adminUserService,
-                createMultiplesService
+                createMultiplesService,
+                claimantContactDetailsDocumentService
         );
         lenient().when(selfProvider.getObject()).thenReturn(processor);
         ReflectionTestUtils.setField(processor, "threadCount", 5);
@@ -318,12 +326,17 @@ class CreateUpdatesQueueProcessorTest {
         msg.setEthosCaseRefCollection(List.of("240001/2024"));
 
         SubmitEvent leadCase = new SubmitEvent();
+        SubmitMultipleEvent createdMultiple = new SubmitMultipleEvent();
+        createdMultiple.setCaseData(new MultipleData());
+        createdMultiple.setCaseId(77777L);
         when(objectMapper.readValue(anyString(), eq(CreateUpdatesMsg.class))).thenReturn(msg);
         when(createUpdatesQueueRepository.lockMessage(anyString(), anyString(), any(), any())).thenReturn(1);
         when(adminUserService.getAdminUserToken()).thenReturn("token");
         when(createMultiplesService.retrieveLeadCase("token", msg)).thenReturn(leadCase);
         when(createMultiplesService.createCase(eq(leadCase), eq("token"), eq(msg), any()))
                 .thenReturn("240002/2024", "240003/2024", null, null, null, null, null, null);
+        when(createMultiplesService.createMultipleShell(anyString(), any(), any(), anyList(), anyMap()))
+                .thenReturn(createdMultiple);
 
         // When
         CreateUpdatesQueueMessage queueMessage = createQueueMessage(msg);
@@ -339,6 +352,8 @@ class CreateUpdatesQueueProcessorTest {
                 eq(leadCase), createdRefsCaptor.capture(), failedCasesCaptor.capture());
         assertEquals(2, createdRefsCaptor.getValue().size());
         assertEquals(2, failedCasesCaptor.getValue().size());
+        verify(claimantContactDetailsDocumentService).generateAndUploadClaimantContactDetails(
+                eq("token"), eq(msg), eq(leadCase), eq(createdMultiple));
         verify(updateCaseQueueSender, never()).sendMessage(any(UpdateCaseMsg.class));
         verify(createUpdatesQueueRepository).markAsCompleted(eq(queueMessage.getMessageId()), any());
     }

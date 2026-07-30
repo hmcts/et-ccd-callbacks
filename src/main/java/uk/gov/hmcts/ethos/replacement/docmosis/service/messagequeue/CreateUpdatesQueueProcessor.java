@@ -17,11 +17,13 @@ import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreateMultiplesDataMod
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.TransferToEcmDataModel;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.types.multiples.AdditionalClaimant;
+import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.CreateUpdatesQueueMessage;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.messagequeue.CreateUpdatesQueueRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.messagehandler.CreateMultiplesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.messagehandler.TransferToEcmService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.ClaimantContactDetailsDocumentService;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -53,6 +55,7 @@ public class CreateUpdatesQueueProcessor {
     private final TransferToEcmService transferToEcmService;
     private final AdminUserService adminUserService;
     private final CreateMultiplesService createMultiplesService;
+    private final ClaimantContactDetailsDocumentService claimantContactDetailsDocumentService;
 
     @Value("${queue.create-updates.batch-size:10}")
     private int batchSize;
@@ -176,13 +179,21 @@ public class CreateUpdatesQueueProcessor {
 
         List<String> createdCaseRefs = new ArrayList<>();
         Map<Integer, AdditionalClaimant> failedCases = new LinkedHashMap<>();
-        for (int i = 0; i < additionalClaimants.size(); i++) {
-            String createdRef = createCaseWithRetry(additionalClaimants, leadCase, accessToken, createUpdatesMsg, i);
-            if (ObjectUtils.isNotEmpty(createdRef)) {
-                createdCaseRefs.add(createdRef);
-            } else {
-                failedCases.put(i, additionalClaimants.get(i));
-            }
+        try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
+            additionalClaimants.forEach(claimant -> executorService.submit(() -> {
+                int index = additionalClaimants.indexOf(claimant);
+                String createdRef =
+                        createCaseWithRetry(additionalClaimants, leadCase, accessToken, createUpdatesMsg, index);
+                if (ObjectUtils.isNotEmpty(createdRef)) {
+                    synchronized (createdCaseRefs) {
+                        createdCaseRefs.add(createdRef);
+                    }
+                } else {
+                    synchronized (failedCases) {
+                        failedCases.put(index, claimant);
+                    }
+                }
+            }));
         }
 
         log.info("Create-multiples message {}: expected {} additional case(s), created {} (totalCases={}), "
@@ -190,8 +201,10 @@ public class CreateUpdatesQueueProcessor {
                 createUpdatesMsg.getMsgId(), additionalClaimants.size(), createdCaseRefs.size(),
                 createUpdatesMsg.getTotalCases(), failedCases.size(), failedCases.keySet());
 
-        createMultiplesService.createMultipleShell(accessToken, createUpdatesMsg,
-                leadCase, createdCaseRefs, failedCases);
+        SubmitMultipleEvent createdMultiple = createMultiplesService.createMultipleShell(
+                accessToken, createUpdatesMsg, leadCase, createdCaseRefs, failedCases);
+        claimantContactDetailsDocumentService.generateAndUploadClaimantContactDetails(
+                accessToken, createUpdatesMsg, leadCase, createdMultiple);
     }
 
     private String createCaseWithRetry(List<AdditionalClaimant> additionalClaimants, SubmitEvent leadCase,

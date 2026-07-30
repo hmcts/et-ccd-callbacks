@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.et.common.model.ccd.types.multiples.AdditionalClaimant;
+import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.et.syaapi.annotation.ApiResponseGroup;
 import uk.gov.hmcts.reform.et.syaapi.models.CaseRequest;
@@ -26,8 +28,10 @@ import uk.gov.hmcts.reform.et.syaapi.service.ApplicationService;
 import uk.gov.hmcts.reform.et.syaapi.service.CaseService;
 import uk.gov.hmcts.reform.et.syaapi.service.HubLinkService;
 import uk.gov.hmcts.reform.et.syaapi.service.ManageCaseRoleService;
+import uk.gov.hmcts.reform.et.syaapi.service.multiples.MultiplesCaseService;
 import uk.gov.service.notify.NotificationClientException;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.springframework.http.ResponseEntity.ok;
@@ -50,6 +54,7 @@ public class ManageCaseController {
     private final ApplicationService applicationService;
     private final HubLinkService hubLinkService;
     private final CaseService caseService;
+    private final MultiplesCaseService multiplesCaseService;
 
     /**
      * Accepts parameter of type {@link CaseRequest} and returns the case specified in 'getCaseId'.
@@ -71,6 +76,47 @@ public class ManageCaseController {
                 ? CASE_USER_ROLE_CREATOR
                 : STRING_LEFT_SQUARE_BRACKET + caseUserRole.trim() + STRING_RIGHT_SQUARE_BRACKET);
         return ok(caseDetails);
+    }
+
+    /**
+     * Retrieves the multiple (group-claim) case details by case type and CCD case ID.
+     * Uses an admin token internally so the respondent user does not need direct CCD access to the multiple.
+     *
+     * @param caseRequest request containing the multiple {@code caseTypeId} and {@code caseId}
+     * @return the multiple case wrapped in a {@link SubmitMultipleEvent}
+     */
+    @PostMapping("/multiple-case")
+    @Operation(summary = "Return multiple case details by CCD case ID")
+    @ApiResponseGroup
+    public ResponseEntity<SubmitMultipleEvent> getMultipleCaseDetails(
+            @RequestBody CaseRequest caseRequest) throws IOException {
+        SubmitMultipleEvent multipleCaseDetails =
+                multiplesCaseService.getMultipleCaseByCaseReference(
+                        caseRequest.getCaseTypeId(),
+                        caseRequest.getCaseId());
+        return ok(multipleCaseDetails);
+    }
+
+    /**
+     * Retrieves additional claimants associated with a multiple (group-claim) case reference.
+     * <p>
+     * Uses an admin token internally so the respondent user does not need direct CCD access to the multiple.
+     * </p>
+     *
+     * @param caseRequest request payload containing the {@code caseTypeId}, {@code caseId},
+     *                    and {@code caseData} (with {@code multipleReference})
+     * @return a {@link ResponseEntity} containing a list of {@link AdditionalClaimant} objects
+     */
+    @PostMapping("/multiple-additional-claimants")
+    @Operation(summary = "Return additional claimants by multiple reference")
+    @ApiResponseGroup
+    public ResponseEntity<List<AdditionalClaimant>> getMultipleAdditionalClaimants(
+            @RequestBody CaseRequest caseRequest) {
+        List<AdditionalClaimant> additionalClaimants =
+                multiplesCaseService.getAdditionalClaimantsByMultipleReference(
+                        caseRequest.getCaseTypeId(),
+                        caseRequest.getMultipleReference());
+        return ok(additionalClaimants);
     }
 
     /**

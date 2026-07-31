@@ -299,6 +299,13 @@ tasks.register('yarnInstall', Exec) {
     commandLine 'yarn', 'install'
 }
 
+tasks.register('validateCcdDefinitionsLockfile', Exec) {
+    group = 'verification'
+    description = 'Fails when the CCD definitions package manifests and yarn.lock are out of sync.'
+    workingDir 'ccd-definitions'
+    commandLine 'yarn', 'install', '--immutable', '--mode=skip-build'
+}
+
 tasks.register('setupCcdDefinitionsWorkspace', Exec) {
     workingDir 'ccd-definitions'
     commandLine 'yarn', 'install'

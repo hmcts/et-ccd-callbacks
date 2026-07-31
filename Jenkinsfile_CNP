@@ -127,6 +127,10 @@ withPipeline(type, product, component) {
   syncBranchesWithMaster(branchesToSync)
   enableSlackNotifications('#et-builds')
 
+  afterSuccess('checkout') {
+    sh './gradlew validateCcdDefinitionsLockfile'
+  }
+
   before('build') {
     sh '''
       env AZURE_CONFIG_DIR=/opt/jenkins/.azure-nonprod az acr login --name hmctsprod

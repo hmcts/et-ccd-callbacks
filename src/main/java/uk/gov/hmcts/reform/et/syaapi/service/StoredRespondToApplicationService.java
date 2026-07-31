@@ -217,8 +217,7 @@ public class StoredRespondToApplicationService {
         appType.getRespondStoredCollection().removeIf(item -> item.getId().equals(request.getStoredRespondId()));
 
         // Send confirmation email
-        boolean isRespondingToRequestOrOrder = true;
-        sendResponseToApplicationEmails(appType, caseData, caseId, isRespondingToRequestOrOrder);
+        sendResponseToApplicationEmails(appType, caseData, caseId);
 
         return caseService.submitUpdate(
             authorization, caseId, caseDetailsConverter.caseDataContent(startEventResponse, caseData), caseTypeId);
@@ -227,12 +226,10 @@ public class StoredRespondToApplicationService {
     private void sendResponseToApplicationEmails(
         GenericTseApplicationType application,
         CaseData caseData,
-        String caseId,
-        boolean isRespondingToRequestOrOrder
+        String caseId
     ) {
         String type = application.getType();
         NotificationService.CoreEmailDetails details = notificationService.formatCoreEmailDetails(caseData, caseId);
-        notificationService.sendResponseEmailToTribunal(details, type, isRespondingToRequestOrOrder);
         notificationService.sendSubmitStoredEmailToClaimant(details, type);
     }
 }

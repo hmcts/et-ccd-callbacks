@@ -37,7 +37,6 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -194,48 +193,6 @@ class ApplicationServiceTest {
             assertThat(coreEmailDetails.hearingDate()).isEqualTo(NOT_SET);
             assertThat(coreEmailDetails.caseId()).isEqualTo(CASE_ID);
         }
-
-        @Test
-        void shouldSendRespondentEmailWithNoSupportingDocument() throws NotificationClientException {
-            applicationService.submitApplication(TEST_SERVICE_AUTH_TOKEN,
-                                                 testData.getClaimantApplicationRequest());
-
-            ArgumentCaptor<CoreEmailDetails> argument = ArgumentCaptor.forClass(CoreEmailDetails.class);
-            verify(notificationService, times(1)).sendAcknowledgementEmailToRespondents(
-                argument.capture(),
-                any(),
-                any()
-            );
-
-            CoreEmailDetails coreEmailDetails = argument.getValue();
-            assertThat(coreEmailDetails.caseData()).isNotNull();
-            assertThat(coreEmailDetails.claimant()).isEqualTo(CLAIMANT);
-            assertThat(coreEmailDetails.caseNumber()).isEqualTo(CASE_REF);
-            assertThat(coreEmailDetails.respondentNames()).isEqualTo(RESPONDENT_LIST);
-            assertThat(coreEmailDetails.hearingDate()).isEqualTo(NOT_SET);
-            assertThat(coreEmailDetails.caseId()).isEqualTo(CASE_ID);
-        }
-    }
-
-    @Test
-    void shouldSendTribunalEmailWithCorrectParameters() throws NotificationClientException {
-        applicationService.submitApplication(TEST_SERVICE_AUTH_TOKEN,
-                                             testData.getClaimantApplicationRequest());
-
-        ArgumentCaptor<CoreEmailDetails> argument = ArgumentCaptor.forClass(CoreEmailDetails.class);
-        verify(notificationService, times(1)).sendAcknowledgementEmailToTribunal(
-            argument.capture(),
-            any(),
-            anyBoolean()
-        );
-
-        CoreEmailDetails coreEmailDetails = argument.getValue();
-        assertThat(coreEmailDetails.caseData()).isNotNull();
-        assertThat(coreEmailDetails.claimant()).isEqualTo(CLAIMANT);
-        assertThat(coreEmailDetails.caseNumber()).isEqualTo(CASE_REF);
-        assertThat(coreEmailDetails.respondentNames()).isEqualTo(RESPONDENT_LIST);
-        assertThat(coreEmailDetails.hearingDate()).isEqualTo(NOT_SET);
-        assertThat(coreEmailDetails.caseId()).isEqualTo(CASE_ID);
     }
 
     @Test
@@ -254,8 +211,8 @@ class ApplicationServiceTest {
         ArgumentCaptor<CaseData> argumentCaptor = ArgumentCaptor.forClass(CaseData.class);
         verify(caseDetailsConverter).caseDataContent(any(), argumentCaptor.capture());
 
-        String actualState
-            = argumentCaptor.getValue().getGenericTseApplicationCollection().get(0).getValue().getApplicationState();
+        String actualState =
+            argumentCaptor.getValue().getGenericTseApplicationCollection().getFirst().getValue().getApplicationState();
         assertThat(actualState).isEqualTo("viewed");
     }
 

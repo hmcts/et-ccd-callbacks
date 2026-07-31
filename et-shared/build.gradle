@@ -127,7 +127,7 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.17'
 
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.1'
-    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.14.0'
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.15.0'
 
     implementation 'org.springframework:spring-web'
     implementation 'org.springframework:spring-context'

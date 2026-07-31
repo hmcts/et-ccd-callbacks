@@ -19,8 +19,6 @@ spring:
 ft:
   base:
     url: ${ET_COS_URL:http://localhost:8081}
-  et-sya-api:
-    url: ${FT_SYA_URL:http://localhost:4550}
   idam:
     url: ${IDAM_API_URL:http://localhost:5062}
 
@@ -36,9 +34,6 @@ idam:
     scope: openid profile roles manage-user
     secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAA}
     id: et-cos
-
-et-sya-api:
-  url: ${FT_SYA_URL:http://localhost:8081}
 
 document_management:
   ccdCaseDocument:
@@ -218,7 +213,6 @@ cron:
   caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}
   maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:10}
   et1DocGen: ${CRON_ACAS_CERT_TASK:0 */2 * * * ?}
-  noticeOfChange: ${CRON_NOTICE_OF_CHANGE:0 10 * * * ?}
   partySpacing: ${CRON_PARTY_SPACING:0 */30 * * * ?}
   acasCertSubmission: ${CRON_ACAS_CERT_SUBMISSION_TASK:0 */5 * * * ?}
   bfActionCronCaseIdsToSkip: ${CRON_BFACTION_CRON_CASE_IDS_TO_SKIP:}

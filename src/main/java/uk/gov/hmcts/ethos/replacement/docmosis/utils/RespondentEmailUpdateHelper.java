@@ -19,11 +19,14 @@ import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
  */
 public final class RespondentEmailUpdateHelper {
 
+    // Shown when the case has no eligible respondents for this event.
     public static final String NO_RESPONDENTS_ERROR =
             "There are no respondents whose email address can be updated.";
+    // Shown when the user continues without selecting a respondent.
     public static final String RESPONDENT_REQUIRED_ERROR = "Select a respondent.";
+    // Shown when the user enters a new email that is the same as the email already on the case.
     public static final String EMAIL_UNCHANGED_ERROR =
-            "Enter an email address that is different from the current email.";
+            "Enter an email address that is different from the current respondent email address.";
 
     private RespondentEmailUpdateHelper() {
         // Utility classes should not have a public or default constructor.
@@ -49,9 +52,7 @@ public final class RespondentEmailUpdateHelper {
             return List.of(getSelectionError(caseData));
         }
 
-        RespondentSumType respondent = selectedRespondent.get().getValue();
-        String existingEmail = StringUtils.firstNonBlank(
-                respondent.getResponseRespondentEmail(), respondent.getRespondentEmail());
+        String existingEmail = getLiveRespondentEmail(selectedRespondent.get().getValue());
         caseData.setCurrentRespondentEmail(StringUtils.defaultIfBlank(existingEmail, "No email address on case"));
         caseData.setNewRespondentEmail(null);
         return List.of();
@@ -66,11 +67,23 @@ public final class RespondentEmailUpdateHelper {
         }
 
         errors.addAll(ReferralHelper.validateEmail(caseData.getNewRespondentEmail()));
-        if (errors.isEmpty() && StringUtils.equalsIgnoreCase(
-                caseData.getCurrentRespondentEmail(), caseData.getNewRespondentEmail())) {
-            errors.add(EMAIL_UNCHANGED_ERROR);
+        if (errors.isEmpty()) {
+            String existingEmail = getLiveRespondentEmail(selectedRespondent.get().getValue());
+            if (StringUtils.equalsIgnoreCase(existingEmail, caseData.getNewRespondentEmail())) {
+                errors.add(EMAIL_UNCHANGED_ERROR);
+            }
         }
         return errors;
+    }
+
+    /**
+     * Live contact email on the selected respondent (ET3 response email preferred, else respondent email).
+     */
+    public static String getLiveRespondentEmail(RespondentSumType respondent) {
+        if (respondent == null) {
+            return null;
+        }
+        return StringUtils.firstNonBlank(respondent.getResponseRespondentEmail(), respondent.getRespondentEmail());
     }
 
     public static void applyEmailUpdate(CaseData caseData, RespondentSumType respondent, String newEmail) {
@@ -78,6 +91,7 @@ public final class RespondentEmailUpdateHelper {
         respondent.setResponseRespondentEmail(newEmail);
         caseData.setCurrentRespondentEmail(null);
         caseData.setNewRespondentEmail(null);
+        caseData.setRespondentEmailUpdateSelection(null);
     }
 
     public static List<RespondentSumTypeItem> getEligibleRespondents(CaseData caseData) {

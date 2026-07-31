@@ -118,9 +118,9 @@
     "CaseEventID": "amendRespondentDetails",
     "CaseFieldID": "respondentCollection",
     "ListElementCode": "respondent_email",
-    "EventElementLabel": "Email address (use Update respondent email to change)",
+    "EventElementLabel": "Email address",
     "FieldDisplayOrder": 14,
-    "DisplayContext": "READONLY"
+    "DisplayContext": "OPTIONAL"
   },
   {
     "ID": "Respondent",

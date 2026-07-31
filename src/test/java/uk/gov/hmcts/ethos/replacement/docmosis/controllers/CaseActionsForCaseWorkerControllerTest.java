@@ -525,8 +525,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     void updateRespondentEmailReturnsAccessErrors() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(respondentEmailService.prepareUpdate(any(CaseDetails.class)))
-                .thenReturn(List.of("Failed to grant case access using the new respondent email. "
-                        + "The respondent email was not changed."));
+                .thenReturn(List.of(RespondentEmailService.ACCESS_GRANT_ERROR));
 
         mvc.perform(post(UPDATE_RESPONDENT_EMAIL_ABOUT_TO_SUBMIT_URL)
                         .content(requestContent.toString())
@@ -534,9 +533,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath("$.errors[0]",
-                        is("Failed to grant case access using the new respondent email. "
-                                + "The respondent email was not changed.")))
+                .andExpect(jsonPath("$.errors[0]", is(RespondentEmailService.ACCESS_GRANT_ERROR)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 

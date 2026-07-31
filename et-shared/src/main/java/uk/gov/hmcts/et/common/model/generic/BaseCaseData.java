@@ -25,10 +25,6 @@ public class BaseCaseData {
     private String currentRespondentEmail;
     @JsonProperty("newRespondentEmail")
     private String newRespondentEmail;
-    @JsonProperty("respondentAccessTransferPending")
-    private String respondentAccessTransferPending;
-    @JsonProperty("respondentAccessPreviousIdamId")
-    private String respondentAccessPreviousIdamId;
 
     //Referral
     @JsonProperty("referralCollection")

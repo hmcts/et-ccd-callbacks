@@ -6589,25 +6589,8 @@
     "CaseTypeID": "ET_EnglandWales",
     "ID": "newRespondentEmail",
     "Label": "New email address",
-    "HintText": "Must be different from the current email and already registered in IdAM. This updates the contact email and grants or reassigns case access.",
+    "HintText": "Must be different from the current email. The respondent must already have a registered user account. This updates the contact email and grants or reassigns case access.",
     "FieldType": "Email",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "respondentAccessTransferPending",
-    "Label": "Respondent access transfer pending",
-    "HintText": "Set when respondent email was updated but case access still needs transferring.",
-    "FieldType": "YesOrNo",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "respondentAccessPreviousIdamId",
-    "Label": "Previous respondent IdAM id",
-    "FieldType": "Text",
     "SecurityClassification": "Public",
     "Searchable": "N"
   }

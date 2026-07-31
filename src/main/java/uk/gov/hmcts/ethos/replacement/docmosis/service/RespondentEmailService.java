@@ -36,26 +36,50 @@ import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CA
 @RequiredArgsConstructor
 public class RespondentEmailService {
 
-    static final String NO_RESPONDENTS_ERROR = RespondentEmailUpdateHelper.NO_RESPONDENTS_ERROR;
-    static final String RESPONDENT_REQUIRED_ERROR = RespondentEmailUpdateHelper.RESPONDENT_REQUIRED_ERROR;
-    static final String EMAIL_UNCHANGED_ERROR = RespondentEmailUpdateHelper.EMAIL_UNCHANGED_ERROR;
-    static final String IDAM_USER_NOT_FOUND_ERROR = "No IdAM account was found for the new email address.";
-    static final String IDAM_USER_AMBIGUOUS_ERROR =
-            "More than one IdAM account was found for the new email address.";
-    static final String ACCESS_LOOKUP_ERROR =
-            "The respondent's existing case access could not be checked. Try again later.";
-    static final String ACCESS_REVOKE_ERROR =
-            "Failed to revoke access linked to the previous respondent email. The respondent email was not changed.";
-    static final String ACCESS_GRANT_ERROR =
-            "Failed to grant case access using the new respondent email. The respondent email was not changed.";
-    static final String EMAIL_UPDATE_AFTER_REASSIGN_ERROR =
-            "Case access was updated for the new email, but the respondent email could not be saved. "
-                    + "Check case access before retrying.";
-    static final String EMAIL_UPDATE_AFTER_GRANT_ERROR =
-            "Case access was granted for the new email, but the respondent email could not be saved. "
-                    + "Check case access before retrying.";
-    static final String EMAIL_UPDATE_ERROR =
-            "The respondent email could not be saved. Case access was not changed.";
+    // Shown when the case has no eligible respondents for this event.
+    public static final String NO_RESPONDENTS_ERROR = RespondentEmailUpdateHelper.NO_RESPONDENTS_ERROR;
+    // Shown when the user continues without selecting a respondent.
+    public static final String RESPONDENT_REQUIRED_ERROR = RespondentEmailUpdateHelper.RESPONDENT_REQUIRED_ERROR;
+    // Shown when the user enters a new email that is the same as the email already on the case.
+    public static final String EMAIL_UNCHANGED_ERROR = RespondentEmailUpdateHelper.EMAIL_UNCHANGED_ERROR;
+    // Shown when no login account exists for the new email (respondent must already have registered).
+    public static final String IDAM_USER_NOT_FOUND_ERROR =
+            "No user account was found for the new email address. The respondent must register an "
+                    + "account before the email address can be updated.";
+    // Shown when more than one login account matches the new email (data issue; cannot safely continue).
+    public static final String IDAM_USER_AMBIGUOUS_ERROR =
+            "More than one user account was found for the new email address. Check the email address "
+                    + "with the respondent before trying again.";
+    // Shown when a login account exists for the new email, but it is not a citizen (respondent portal) account.
+    public static final String IDAM_USER_NOT_CITIZEN_ERROR =
+            "The new email address is linked to an account that is not a citizen account. "
+                    + "Enter a different email address.";
+    private static final String CITIZEN_ROLE = "citizen";
+    // Shown when the system cannot check who currently has respondent access to the case.
+    public static final String ACCESS_LOOKUP_ERROR =
+            "The respondent's current case access could not be checked. Try again later.";
+    // Shown when removing access from the old email fails; the case email is left unchanged.
+    public static final String ACCESS_REVOKE_ERROR =
+            "Case access could not be removed from the previous respondent email address. "
+                    + "The respondent email address was not updated. Enter the email address again.";
+    // Shown when giving case access to the new email fails; the case email is left unchanged.
+    public static final String ACCESS_GRANT_ERROR =
+            "Case access could not be given to the new respondent email address. "
+                    + "The respondent email address was not updated. Enter the email address again.";
+    // Shown when access was moved from the old email to the new one, but saving the new email then failed.
+    // Case access already points at the new user — retrying the same email should complete the email save.
+    public static final String EMAIL_UPDATE_AFTER_REASSIGN_ERROR =
+            "Case access was moved to the new email address, but the respondent email address could not "
+                    + "be updated. Enter the email address again.";
+    // Shown when access was newly given to the new email (no previous respondent access),
+    // but saving the email then failed.
+    // Case access already points at the new user — retrying the same email should complete the email save.
+    public static final String EMAIL_UPDATE_AFTER_GRANT_ERROR =
+            "Case access was given to the new email address, but the respondent email address could not "
+                    + "be updated. Enter the email address again.";
+    // Shown when saving the new email fails, but case access did not need to change (same user already had access).
+    public static final String EMAIL_UPDATE_ERROR =
+            "The respondent email address could not be updated. Enter the email address again.";
 
     private final IdamApi idamApi;
     private final AdminUserService adminUserService;
@@ -119,8 +143,6 @@ public class RespondentEmailService {
         try {
             RespondentEmailUpdateHelper.applyEmailUpdate(
                     caseData, respondentItem.getValue(), caseData.getNewRespondentEmail());
-            caseData.setRespondentAccessTransferPending(null);
-            caseData.setRespondentAccessPreviousIdamId(null);
         } catch (RuntimeException exception) {
             log.error("Defendant access outcome {} but email could not be updated for case {}",
                     accessOutcome, caseDetails.getCaseId(), exception);
@@ -208,7 +230,7 @@ public class RespondentEmailService {
         if (exactMatches.isEmpty()) {
             Optional<UserDetails> localUser = findUserViaLocalPasswordFallback(email);
             if (localUser.isPresent()) {
-                return localUser;
+                return requireCitizenAccount(localUser.get(), errors);
             }
             errors.add(IDAM_USER_NOT_FOUND_ERROR);
             return Optional.empty();
@@ -217,7 +239,15 @@ public class RespondentEmailService {
             errors.add(IDAM_USER_AMBIGUOUS_ERROR);
             return Optional.empty();
         }
-        return Optional.of(exactMatches.getFirst());
+        return requireCitizenAccount(exactMatches.getFirst(), errors);
+    }
+
+    private Optional<UserDetails> requireCitizenAccount(UserDetails user, List<String> errors) {
+        if (CollectionUtils.isEmpty(user.getRoles()) || !user.getRoles().contains(CITIZEN_ROLE)) {
+            errors.add(IDAM_USER_NOT_CITIZEN_ERROR);
+            return Optional.empty();
+        }
+        return Optional.of(user);
     }
 
     private Optional<UserDetails> findUserViaLocalPasswordFallback(String email) {

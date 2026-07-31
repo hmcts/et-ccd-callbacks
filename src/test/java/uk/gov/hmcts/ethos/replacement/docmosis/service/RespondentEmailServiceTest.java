@@ -7,6 +7,7 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -150,12 +151,64 @@ class RespondentEmailServiceTest {
     }
 
     @Test
+    void populateCurrentEmailShowsPlaceholderWhenRespondentHasNoEmail() {
+        firstRespondent.getValue().setRespondentEmail(null);
+        firstRespondent.getValue().setResponseRespondentEmail(null);
+        selectRespondent(RESPONDENT_ID_ONE);
+
+        assertThat(service.populateCurrentEmail(caseDetails.getCaseData())).isEmpty();
+        assertThat(caseDetails.getCaseData().getCurrentRespondentEmail())
+                .isEqualTo("No email address on case");
+    }
+
+    @Test
     void populateCurrentEmailRejectsMissingSelection() {
         caseDetails.getCaseData().setCurrentRespondentEmail(OLD_EMAIL);
 
         assertThat(service.populateCurrentEmail(caseDetails.getCaseData()))
                 .containsExactly(RespondentEmailService.RESPONDENT_REQUIRED_ERROR);
         assertThat(caseDetails.getCaseData().getCurrentRespondentEmail()).isNull();
+    }
+
+    @Test
+    void validateUsesLocalPasswordFallbackWhenSearchFindsNothing() {
+        prepareSelectedEmailFields();
+        ReflectionTestUtils.setField(service, "localPasswordFallback", true);
+        ReflectionTestUtils.setField(service, "localPassword", "password");
+        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
+        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50)).thenReturn(List.of());
+        when(userIdamService.getAccessToken(NEW_EMAIL, "password")).thenReturn("access-token");
+        when(userIdamService.getUserDetails("Bearer access-token"))
+                .thenReturn(user(NEW_EMAIL, NEW_USER_ID, List.of("citizen")));
+
+        assertThat(service.validateNewEmail(caseDetails.getCaseData())).isEmpty();
+    }
+
+    @Test
+    void validateRejectsNonCitizenUserFromLocalPasswordFallback() {
+        prepareSelectedEmailFields();
+        ReflectionTestUtils.setField(service, "localPasswordFallback", true);
+        ReflectionTestUtils.setField(service, "localPassword", "password");
+        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
+        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50)).thenReturn(List.of());
+        when(userIdamService.getAccessToken(NEW_EMAIL, "password")).thenReturn("access-token");
+        when(userIdamService.getUserDetails("Bearer access-token"))
+                .thenReturn(user(NEW_EMAIL, NEW_USER_ID, List.of("caseworker")));
+
+        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+                .containsExactly(RespondentEmailService.IDAM_USER_NOT_CITIZEN_ERROR);
+    }
+
+    @Test
+    void validateDoesNotUseLocalPasswordFallbackWhenDisabled() {
+        prepareSelectedEmailFields();
+        ReflectionTestUtils.setField(service, "localPasswordFallback", false);
+        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
+        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50)).thenReturn(List.of());
+
+        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+                .containsExactly(RespondentEmailService.IDAM_USER_NOT_FOUND_ERROR);
+        verify(userIdamService, never()).getAccessToken(anyString(), anyString());
     }
 
     @Test
@@ -192,6 +245,45 @@ class RespondentEmailServiceTest {
     }
 
     @Test
+    void validateRejectsUnchangedEmailUsingLiveRespondentEmailNotUiField() {
+        selectRespondent(RESPONDENT_ID_ONE);
+        firstRespondent.getValue().setRespondentEmail(OLD_EMAIL);
+        firstRespondent.getValue().setResponseRespondentEmail(null);
+        // Stale/mismatched UI field should be ignored in favour of live case data.
+        caseDetails.getCaseData().setCurrentRespondentEmail("stale-ui@example.com");
+        caseDetails.getCaseData().setNewRespondentEmail(OLD_EMAIL);
+
+        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+                .containsExactly(RespondentEmailService.EMAIL_UNCHANGED_ERROR);
+        verify(idamApi, never()).searchUsersByQuery(anyString(), anyString(), any(), any());
+    }
+
+    @Test
+    void validateRejectsUnchangedEmailUsingLiveResponseRespondentEmail() {
+        selectRespondent(RESPONDENT_ID_ONE);
+        firstRespondent.getValue().setRespondentEmail("other@example.com");
+        firstRespondent.getValue().setResponseRespondentEmail(OLD_EMAIL);
+        caseDetails.getCaseData().setCurrentRespondentEmail("stale-ui@example.com");
+        caseDetails.getCaseData().setNewRespondentEmail(OLD_EMAIL);
+
+        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+                .containsExactly(RespondentEmailService.EMAIL_UNCHANGED_ERROR);
+        verify(idamApi, never()).searchUsersByQuery(anyString(), anyString(), any(), any());
+    }
+
+    @Test
+    void validateAllowsNewEmailWhenUiShowsPlaceholderButLiveEmailIsBlank() {
+        selectRespondent(RESPONDENT_ID_ONE);
+        firstRespondent.getValue().setRespondentEmail(null);
+        firstRespondent.getValue().setResponseRespondentEmail(null);
+        caseDetails.getCaseData().setCurrentRespondentEmail("No email address on case");
+        caseDetails.getCaseData().setNewRespondentEmail(NEW_EMAIL);
+        mockNewIdamUser();
+
+        assertThat(service.validateNewEmail(caseDetails.getCaseData())).isEmpty();
+    }
+
+    @Test
     void validateRejectsAmbiguousIdamAccount() {
         prepareSelectedEmailFields();
         when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
@@ -200,6 +292,43 @@ class RespondentEmailServiceTest {
 
         assertThat(service.validateNewEmail(caseDetails.getCaseData()))
                 .containsExactly(RespondentEmailService.IDAM_USER_AMBIGUOUS_ERROR);
+    }
+
+    @Test
+    void validateRejectsNonCitizenIdamAccount() {
+        prepareSelectedEmailFields();
+        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
+        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
+                .thenReturn(List.of(user(NEW_EMAIL, NEW_USER_ID, List.of("caseworker"))));
+
+        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+                .containsExactly(RespondentEmailService.IDAM_USER_NOT_CITIZEN_ERROR);
+    }
+
+    @Test
+    void validateRejectsIdamAccountWithNullRoles() {
+        prepareSelectedEmailFields();
+        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
+        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
+                .thenReturn(List.of(user(NEW_EMAIL, NEW_USER_ID, null)));
+
+        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+                .containsExactly(RespondentEmailService.IDAM_USER_NOT_CITIZEN_ERROR);
+    }
+
+    @Test
+    void prepareUpdateReturnsCitizenRoleErrorWithoutChangingCaseDataOrAccess() throws IOException {
+        prepareSelectedEmailFields();
+        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
+        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
+                .thenReturn(List.of(user(NEW_EMAIL, NEW_USER_ID, List.of())));
+
+        assertThat(service.prepareUpdate(caseDetails))
+                .containsExactly(RespondentEmailService.IDAM_USER_NOT_CITIZEN_ERROR);
+        assertThat(firstRespondent.getValue().getRespondentEmail()).isEqualTo(OLD_EMAIL);
+        verify(ccdCaseAssignment, never()).getCaseUserRoles(anyString());
+        verify(ccdCaseAssignment, never()).addCaseUserRole(any());
+        verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
     }
 
     @Test
@@ -220,8 +349,7 @@ class RespondentEmailServiceTest {
         assertThat(secondRespondent.getValue().getIdamId()).isEqualTo("second-user-id");
         assertThat(caseDetails.getCaseData().getCurrentRespondentEmail()).isNull();
         assertThat(caseDetails.getCaseData().getNewRespondentEmail()).isNull();
-        assertThat(caseDetails.getCaseData().getRespondentAccessTransferPending()).isNull();
-        assertThat(caseDetails.getCaseData().getRespondentAccessPreviousIdamId()).isNull();
+        assertThat(caseDetails.getCaseData().getRespondentEmailUpdateSelection()).isNull();
     }
 
     @Test
@@ -430,9 +558,14 @@ class RespondentEmailServiceTest {
     }
 
     private UserDetails user(String email, String uid) {
+        return user(email, uid, List.of("citizen"));
+    }
+
+    private UserDetails user(String email, String uid, List<String> roles) {
         UserDetails user = new UserDetails();
         user.setEmail(email);
         user.setUid(uid);
+        user.setRoles(roles);
         return user;
     }
 

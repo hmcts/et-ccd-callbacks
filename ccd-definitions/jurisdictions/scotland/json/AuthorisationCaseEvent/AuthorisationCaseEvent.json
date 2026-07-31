@@ -2395,11 +2395,5 @@
     "CaseEventID": "updateRespondentEmail",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "UPDATE_RESPONDENT_ACCESS_TRANSFER_STATE",
-    "UserRole": "caseworker-employment-api",
-    "CRUD": "CRUD"
   }
 ]

@@ -48,10 +48,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.WAITING_FOR_THE_TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
@@ -322,7 +320,6 @@ public class TseRespondentReplyService {
     public void sendRespondingToApplicationEmails(CaseDetails caseDetails, String userToken) {
         sendEmailToClaimantForRespondingToApp(caseDetails);
         sendAcknowledgementEmailToLR(caseDetails, userToken, false);
-        respondentTseService.sendAdminEmail(caseDetails);
     }
 
     private void sendEmailToClaimantForRespondingToApp(CaseDetails caseDetails) {
@@ -393,25 +390,8 @@ public class TseRespondentReplyService {
      * Send emails when LR submits response to Tribunal request/order.
      */
     public void sendRespondingToTribunalEmails(CaseDetails caseDetails, String userToken) {
-        sendEmailToTribunal(caseDetails);
         sendEmailToClaimantForRespondingToTrib(caseDetails);
         sendAcknowledgementEmailToLR(caseDetails, userToken, true);
-    }
-
-    private void sendEmailToTribunal(CaseDetails caseDetails) {
-        CaseData caseData = caseDetails.getCaseData();
-        String email = respondentTseService.getTribunalEmail(caseData);
-
-        if (isNullOrEmpty(email)) {
-            return;
-        }
-
-        GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
-        Map<String, String> personalisation = Map.of(
-                CASE_NUMBER, caseData.getEthosCaseReference(),
-                APPLICATION_TYPE, selectedApplication.getType(),
-                LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId()));
-        emailService.sendEmail(replyToTribunalEmailToTribunalTemplateId, email, personalisation);
     }
 
     private void sendEmailToClaimantForRespondingToTrib(CaseDetails caseDetails) {

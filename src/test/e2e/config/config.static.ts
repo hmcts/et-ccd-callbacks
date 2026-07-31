@@ -83,8 +83,8 @@ export const staticConfig = {
   EtCosPreviewEtSyaApiUrl:
     process.env.ET_COS_PREVIEW_ET_SYA_API
     || (env.startsWith( 'pr-')
-      ? `https://et-sya-api-et-cos-${env}.preview.platform.hmcts.net/`
-      : `http://et-sya-api-${env}.service.core-compute-${env}.internal/`),
+      ? `https://et-cos-${env}.preview.platform.hmcts.net/`
+      : `http://et-cos-${env}.service.core-compute-${env}.internal/`),
 
   ccdDataStoreApi:
     process.env.ET_COS_PREVIEW_CCD

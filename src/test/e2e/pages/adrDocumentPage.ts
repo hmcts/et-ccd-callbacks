@@ -16,7 +16,7 @@ export default class AdrDocumentPage extends BasePage {
 
     async adrUploadDocument() {
         await this.addNewButtonClick();
-        await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.uploadInput, 'resources/test_file/welshTest.pdf')
+        await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.uploadInput, 'src/test/e2e/resources/test_file/welshTest.pdf')
         await this.shortDescriptionInput.fill('description');
         await this.clickSubmitButton();
     }

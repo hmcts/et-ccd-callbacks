@@ -36,7 +36,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
-import static com.google.common.base.Strings.isNullOrEmpty;
+
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -46,10 +46,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.WAITING_FOR_THE_TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
@@ -267,28 +265,10 @@ public class TseClaimantRepReplyService {
      * Send emails when LR submits response to Tribunal request/order.
      */
     public void sendRespondingToTribunalEmails(CaseDetails caseDetails) {
-        sendEmailToTribunal(caseDetails);
-
         List<CaseUserAssignment> caseUserAssignments =
                 caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
         sendEmailToRespondentForRespondingToTrib(caseDetails, caseUserAssignments);
         sendAcknowledgementEmailToLR(caseDetails, true, caseUserAssignments);
-    }
-
-    private void sendEmailToTribunal(CaseDetails caseDetails) {
-        CaseData caseData = caseDetails.getCaseData();
-        String email = claimantTseService.getTribunalEmail(caseData);
-
-        if (isNullOrEmpty(email)) {
-            return;
-        }
-
-        GenericTseApplicationType selectedApplication = getClaimantRepSelectedApplicationType(caseData);
-        Map<String, String> personalisation = Map.of(
-                CASE_NUMBER, caseData.getEthosCaseReference(),
-                APPLICATION_TYPE, selectedApplication.getType(),
-                LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId()));
-        emailService.sendEmail(replyToTribunalEmailToTribunalTemplateId, email, personalisation);
     }
 
     private void sendEmailToRespondentForRespondingToTrib(CaseDetails caseDetails,
@@ -337,8 +317,6 @@ public class TseClaimantRepReplyService {
         sendEmailToRespondentForRespondingToApp(caseDetails, caseUserAssignments);
         // should send the email to claimant rep
         sendAcknowledgementEmailToLR(caseDetails, false, caseUserAssignments);
-        // send the email to tribunal
-        claimantTseService.sendAdminEmail(caseDetails);
     }
 
     private String getAckEmailTemplateId(CaseDetails caseDetails, boolean isRespondingToTribunal) {

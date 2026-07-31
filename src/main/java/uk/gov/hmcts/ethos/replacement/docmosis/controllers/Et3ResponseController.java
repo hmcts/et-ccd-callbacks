@@ -210,7 +210,6 @@ public class Et3ResponseController {
         et3ResponseService.saveEt3Response(caseData, documentInfo);
         et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
-        et3ResponseService.sendNotifications(ccdRequest.getCaseDetails());
         Et3ResponseHelper.resetEt3FormFields(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         caseManagementForCaseWorkerService.updateWorkAllocationField(new ArrayList<>(), caseData);

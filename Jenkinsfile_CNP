@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@archive-complete-build-results")
+@Library("Infrastructure@master")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 

@@ -255,14 +255,14 @@ withPipeline(type, product, component) {
               reportFiles : "ET-CCD-Callbacks-tests.html",
               reportName : "ET Smoke test report"
       ]
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/test-results/**'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/**'
     }
 
     afterAlways('functionalTest:preview') {
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/test-results/**'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/**'
 
       stage('Functional UI tests chromium') {
         try {
@@ -280,7 +280,7 @@ withPipeline(type, product, component) {
                   reportFiles: 'index.html',
                   reportName: 'CCD Callback - UITestChromiumReport'
           ])
-          steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
+          steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
         }
       }
     }
@@ -302,9 +302,6 @@ withPipeline(type, product, component) {
     env.ET_SUBMIT_DRAFT_CASE_URL = "https://et-cos-staging.aat.platform.hmcts.net/cases/submit-case/"
     env.RUNNING_ENV = "aat"
 
-    // sh """
-    //   ./bin/pull-latest-e2e-tests.sh
-    // """
   }
 
   afterAlways('smoketest:aat') {
@@ -318,14 +315,14 @@ withPipeline(type, product, component) {
             reportFiles : "ET-CCD-Callbacks-tests.html",
             reportName : "ET Smoke test report"
     ]
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/test-results/**'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/**'
   }
 
   afterAlways('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/test-results/**'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/**'
     stage('Functional UI tests chromium') {
       try {
         yarnBuilder.yarn('test:functional-chromium')
@@ -340,7 +337,7 @@ withPipeline(type, product, component) {
               reportFiles: 'index.html',
               reportName: 'CCD Callback - UITestChromiumReport'
           ])
-          steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
+          steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
       }
     }
   }

@@ -238,7 +238,6 @@ test {
 }
 
 tasks.register('smoke', Test) {
-    dependsOn ':codeceptSmoke'
     testClassesDirs = sourceSets.functional.output.classesDirs
     classpath = sourceSets.functional.runtimeClasspath
 
@@ -278,7 +277,7 @@ if (isJenkinsPullRequestBuild) {
     // Jenkins PR previews run these tasks after static checks have already compiled the relevant source sets.
     // Keep --rerun-tasks from compiling the same classes again during post-deploy verification.
     tasks.named('smoke', Test) {
-        setDependsOn([tasks.named('codeceptSmoke')])
+        setDependsOn([])
         testClassesDirs = files(sourceSets.functional.output.classesDirs.files)
         classpath = files(sourceSets.functional.runtimeClasspath.files, etSharedCompiledOutput)
         include '**/HealthCheckTest.class'

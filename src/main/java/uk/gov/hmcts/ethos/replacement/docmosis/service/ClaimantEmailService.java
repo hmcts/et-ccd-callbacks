@@ -31,40 +31,46 @@ import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CA
 public class ClaimantEmailService {
 
     // Shown when the user enters a new email that is the same as the email already on the case.
-    static final String EMAIL_UNCHANGED_ERROR = "Enter an email address that is different from the current email.";
+    public static final String EMAIL_UNCHANGED_ERROR =
+            "Enter an email address that is different from the current claimant email address.";
     // Shown when no login account exists for the new email (claimant must already have registered).
-    static final String IDAM_USER_NOT_FOUND_ERROR =
-            "No IdAM account was found for the new email address.";
+    public static final String IDAM_USER_NOT_FOUND_ERROR =
+            "No user account was found for the new email address. The claimant must register an "
+                    + "account before the email address can be updated.";
     // Shown when more than one login account matches the new email (data issue; cannot safely continue).
-    static final String IDAM_USER_AMBIGUOUS_ERROR =
-            "More than one IdAM account was found for the new email address.";
+    public static final String IDAM_USER_AMBIGUOUS_ERROR =
+            "More than one user account was found for the new email address. Check the email address "
+                    + "with the claimant before trying again.";
     // Shown when a login account exists for the new email, but it is not a citizen (claimant) account.
-    static final String IDAM_USER_NOT_CITIZEN_ERROR =
-            "The IdAM account for the new email is not a citizen account.";
+    public static final String IDAM_USER_NOT_CITIZEN_ERROR =
+            "The new email address is linked to an account that is not a citizen account. "
+                    + "Enter a different email address.";
     private static final String CITIZEN_ROLE = "citizen";
     // Shown when the system cannot check who currently has claimant access to the case (temporary system issue).
-    static final String ACCESS_LOOKUP_ERROR =
-            "The claimant's existing case access could not be checked. Try again later.";
+    public static final String ACCESS_LOOKUP_ERROR =
+            "The claimant's current case access could not be checked. Try again later.";
     // Shown when removing access from the old email fails; the case email is left unchanged.
-    static final String ACCESS_REVOKE_ERROR =
-            "Failed to revoke access linked to the previous claimant email. The claimant email was not changed.";
+    public static final String ACCESS_REVOKE_ERROR =
+            "Case access could not be removed from the previous claimant email address. "
+                    + "The claimant email address was not updated. Enter the email address again.";
     // Shown when giving case access to the new email fails; the case email is left unchanged.
-    static final String ACCESS_GRANT_ERROR =
-            "Failed to grant case access using the new claimant email. The claimant email was not changed.";
+    public static final String ACCESS_GRANT_ERROR =
+            "Case access could not be given to the new claimant email address. "
+                    + "The claimant email address was not updated. Enter the email address again.";
     // Shown when access was moved from the old email to the new one, but saving the new email on the case then failed.
-    // Access may already have changed — check case access before retrying.
-    static final String EMAIL_UPDATE_AFTER_REASSIGN_ERROR =
-            "Case access was updated for the new email, but the claimant email could not be saved. "
-                    + "Check case access before retrying.";
+    // Case access already points at the new user — retrying the same email should complete the email save.
+    public static final String EMAIL_UPDATE_AFTER_REASSIGN_ERROR =
+            "Case access was moved to the new email address, but the claimant email address could not "
+                    + "be updated. Enter the email address again.";
     // Shown when access was newly given to the new email (no previous claimant access),
     // but saving the email then failed.
-    // Access may already have been granted — check case access before retrying.
-    static final String EMAIL_UPDATE_AFTER_GRANT_ERROR =
-            "Case access was granted for the new email, but the claimant email could not be saved. "
-                    + "Check case access before retrying.";
+    // Case access already points at the new user — retrying the same email should complete the email save.
+    public static final String EMAIL_UPDATE_AFTER_GRANT_ERROR =
+            "Case access was given to the new email address, but the claimant email address could not "
+                    + "be updated. Enter the email address again.";
     // Shown when saving the new email fails, but case access did not need to change (same user already had access).
-    static final String EMAIL_UPDATE_ERROR =
-            "The claimant email could not be saved. Case access was not changed.";
+    public static final String EMAIL_UPDATE_ERROR =
+            "The claimant email address could not be updated. Enter the email address again.";
 
     private final IdamApi idamApi;
     private final AdminUserService adminUserService;
@@ -196,9 +202,13 @@ public class ClaimantEmailService {
 
     private List<String> validateEmailInput(CaseData caseData) {
         List<String> errors = new ArrayList<>(ReferralHelper.validateEmail(caseData.getNewClaimantEmail()));
-        if (errors.isEmpty() && StringUtils.equalsIgnoreCase(
-                caseData.getCurrentClaimantEmail(), caseData.getNewClaimantEmail())) {
-            errors.add(EMAIL_UNCHANGED_ERROR);
+        if (errors.isEmpty()) {
+            String existingEmail = caseData.getClaimantType() == null
+                    ? null
+                    : caseData.getClaimantType().getClaimantEmailAddress();
+            if (StringUtils.equalsIgnoreCase(existingEmail, caseData.getNewClaimantEmail())) {
+                errors.add(EMAIL_UNCHANGED_ERROR);
+            }
         }
         return errors;
     }

@@ -53,7 +53,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
@@ -114,7 +113,6 @@ public class CaseActionsForCaseWorkerController {
     private final CaseManagementLocationService caseManagementLocationService;
     private final Et1SubmissionService et1SubmissionService;
     private final NocRespondentHelper nocRespondentHelper;
-    private final UserIdamService userIdamService;
     private final ClaimantEmailService claimantEmailService;
 
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)

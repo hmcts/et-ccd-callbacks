@@ -179,6 +179,26 @@ class ClaimantEmailServiceTest {
     }
 
     @Test
+    void validateRejectsUnchangedEmailUsingClaimantTypeEvenIfCurrentEmailFieldDiffers() {
+        caseDetails.getCaseData().setCurrentClaimantEmail("tampered@example.com");
+        caseDetails.getCaseData().setNewClaimantEmail(OLD_EMAIL);
+
+        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+                .containsExactly(ClaimantEmailService.EMAIL_UNCHANGED_ERROR);
+        verify(idamApi, never()).searchUsersByQuery(anyString(), anyString(), any(), any());
+    }
+
+    @Test
+    void validateRejectsUnchangedEmailWhenCurrentEmailFieldIsMissing() {
+        caseDetails.getCaseData().setCurrentClaimantEmail(null);
+        caseDetails.getCaseData().setNewClaimantEmail(OLD_EMAIL);
+
+        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+                .containsExactly(ClaimantEmailService.EMAIL_UNCHANGED_ERROR);
+        verify(idamApi, never()).searchUsersByQuery(anyString(), anyString(), any(), any());
+    }
+
+    @Test
     void validateAcceptsOneExactIdamAccountIgnoringCase() {
         when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
         when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
@@ -204,6 +224,16 @@ class ClaimantEmailServiceTest {
         when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
         when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
                 .thenReturn(List.of(user(NEW_EMAIL, NEW_USER_ID, List.of("caseworker"))));
+
+        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+                .containsExactly(ClaimantEmailService.IDAM_USER_NOT_CITIZEN_ERROR);
+    }
+
+    @Test
+    void validateRejectsIdamAccountWithNullRoles() {
+        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
+        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
+                .thenReturn(List.of(user(NEW_EMAIL, NEW_USER_ID, null)));
 
         assertThat(service.validateNewEmail(caseDetails.getCaseData()))
                 .containsExactly(ClaimantEmailService.IDAM_USER_NOT_CITIZEN_ERROR);
@@ -394,7 +424,7 @@ class ClaimantEmailServiceTest {
     }
 
     @Test
-    void prepareUpdatePreservesRestoreFailureAsSuppressedWhenGrantFails() throws IOException {
+    void prepareUpdateAttemptsRestoreWhenGrantFailsDuringReassignmentAndBothFail() throws IOException {
         mockNewIdamUser();
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(assignmentsWithCreator());
         doThrow(new IOException("grant failed"))
@@ -404,7 +434,13 @@ class ClaimantEmailServiceTest {
 
         assertThat(service.prepareUpdate(caseDetails))
                 .containsExactly(ClaimantEmailService.ACCESS_GRANT_ERROR);
+
+        InOrder inOrder = inOrder(ccdCaseAssignment);
+        inOrder.verify(ccdCaseAssignment).removeCaseUserRole(requestForUser(OLD_USER_ID));
+        inOrder.verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
+        inOrder.verify(ccdCaseAssignment).addCaseUserRole(requestForUser(OLD_USER_ID));
         assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
+        assertThat(caseDetails.getCaseData().getClaimantId()).isNull();
     }
 
     @Test
@@ -426,15 +462,17 @@ class ClaimantEmailServiceTest {
     void prepareUpdateReportsAccessOutcomeWhenEmailUpdateFailsAfterReassignment() throws IOException {
         mockNewIdamUser();
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(assignmentsWithCreator());
-        CaseData spyCaseData = spy(caseDetails.getCaseData());
-        caseDetails.setCaseData(spyCaseData);
-        doThrow(new RuntimeException("email update failed")).when(spyCaseData).getClaimantType();
+        ClaimantType spyClaimantType = spy(caseDetails.getCaseData().getClaimantType());
+        caseDetails.getCaseData().setClaimantType(spyClaimantType);
+        doThrow(new RuntimeException("email update failed")).when(spyClaimantType)
+                .setClaimantEmailAddress(anyString());
 
         assertThat(service.prepareUpdate(caseDetails))
                 .containsExactly(ClaimantEmailService.EMAIL_UPDATE_AFTER_REASSIGN_ERROR);
         verify(ccdCaseAssignment).removeCaseUserRole(requestForUser(OLD_USER_ID));
         verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
-        assertThat(spyCaseData.getClaimantId()).isEqualTo(NEW_USER_ID);
+        assertThat(caseDetails.getCaseData().getClaimantId()).isEqualTo(NEW_USER_ID);
+        assertThat(spyClaimantType.getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
     }
 
     @Test
@@ -442,14 +480,16 @@ class ClaimantEmailServiceTest {
         mockNewIdamUser();
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
                 .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(List.of()).build());
-        CaseData spyCaseData = spy(caseDetails.getCaseData());
-        caseDetails.setCaseData(spyCaseData);
-        doThrow(new RuntimeException("email update failed")).when(spyCaseData).getClaimantType();
+        ClaimantType spyClaimantType = spy(caseDetails.getCaseData().getClaimantType());
+        caseDetails.getCaseData().setClaimantType(spyClaimantType);
+        doThrow(new RuntimeException("email update failed")).when(spyClaimantType)
+                .setClaimantEmailAddress(anyString());
 
         assertThat(service.prepareUpdate(caseDetails))
                 .containsExactly(ClaimantEmailService.EMAIL_UPDATE_AFTER_GRANT_ERROR);
         verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
-        assertThat(spyCaseData.getClaimantId()).isEqualTo(NEW_USER_ID);
+        assertThat(caseDetails.getCaseData().getClaimantId()).isEqualTo(NEW_USER_ID);
+        assertThat(spyClaimantType.getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
     }
 
     @Test
@@ -457,15 +497,17 @@ class ClaimantEmailServiceTest {
         mockNewIdamUser();
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
                 .thenReturn(assignmentsWithCreator(NEW_USER_ID));
-        CaseData spyCaseData = spy(caseDetails.getCaseData());
-        caseDetails.setCaseData(spyCaseData);
-        doThrow(new RuntimeException("email update failed")).when(spyCaseData).getClaimantType();
+        ClaimantType spyClaimantType = spy(caseDetails.getCaseData().getClaimantType());
+        caseDetails.getCaseData().setClaimantType(spyClaimantType);
+        doThrow(new RuntimeException("email update failed")).when(spyClaimantType)
+                .setClaimantEmailAddress(anyString());
 
         assertThat(service.prepareUpdate(caseDetails))
                 .containsExactly(ClaimantEmailService.EMAIL_UPDATE_ERROR);
         verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
         verify(ccdCaseAssignment, never()).addCaseUserRole(any());
-        assertThat(spyCaseData.getClaimantId()).isEqualTo(NEW_USER_ID);
+        assertThat(caseDetails.getCaseData().getClaimantId()).isEqualTo(NEW_USER_ID);
+        assertThat(spyClaimantType.getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
     }
 
     private void mockNewIdamUser() {

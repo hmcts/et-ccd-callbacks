@@ -49,7 +49,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -207,9 +206,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private NocRespondentHelper nocRespondentHelper;
     @MockitoBean
     private CaseManagementLocationService caseManagementLocationService;
-
-    @MockitoBean
-    private UserIdamService userIdamService;
 
     @MockitoBean
     private ClaimantEmailService claimantEmailService;
@@ -502,6 +498,24 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
+    void validateClaimantEmailUpdateSucceeds() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(claimantEmailService.validateNewEmail(any(CaseData.class))).thenReturn(List.of());
+
+        mvc.perform(post(UPDATE_CLAIMANT_EMAIL_VALIDATE_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(claimantEmailService).validateNewEmail(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
     void updateClaimantEmailReturnsPreparedCaseData() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(claimantEmailService.prepareUpdate(any(CaseDetails.class))).thenReturn(List.of());
@@ -523,8 +537,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     void updateClaimantEmailReturnsAccessErrors() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(claimantEmailService.prepareUpdate(any(CaseDetails.class)))
-                .thenReturn(List.of("Failed to grant case access using the new claimant email. "
-                        + "The claimant email was not changed."));
+                .thenReturn(List.of(ClaimantEmailService.ACCESS_GRANT_ERROR));
 
         mvc.perform(post(UPDATE_CLAIMANT_EMAIL_ABOUT_TO_SUBMIT_URL)
                         .content(requestContent.toString())
@@ -532,9 +545,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath("$.errors[0]",
-                        is("Failed to grant case access using the new claimant email. "
-                                + "The claimant email was not changed.")))
+                .andExpect(jsonPath("$.errors[0]", is(ClaimantEmailService.ACCESS_GRANT_ERROR)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 

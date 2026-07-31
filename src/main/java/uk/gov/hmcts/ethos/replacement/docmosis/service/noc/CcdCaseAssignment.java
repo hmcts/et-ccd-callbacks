@@ -190,6 +190,7 @@ public class CcdCaseAssignment {
     /**
      * Remove a user role from a case.
      * @param caseAssignmentUserRolesRequest the request containing the user role to remove
+     * @throws IOException if there is an error with the request
      */
     public void removeCaseUserRole(CaseAssignmentUserRolesRequest caseAssignmentUserRolesRequest) throws IOException {
         exchangeCaseUserRoles(caseAssignmentUserRolesRequest, HttpMethod.DELETE, "Remove case user role");

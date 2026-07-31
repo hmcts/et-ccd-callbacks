@@ -179,18 +179,19 @@ class ManageCaseRoleServiceUtilTest {
     }
 
     @Test
-    void theGetCaseUserRolesDefaultsToCreatorWhenBlank() {
-        assertThat(ManageCaseRoleServiceUtil.getCaseUserRoles(null)).containsExactly(CASE_USER_ROLE_CREATOR);
-        assertThat(ManageCaseRoleServiceUtil.getCaseUserRoles("   ")).containsExactly(CASE_USER_ROLE_CREATOR);
+    void theGetCaseUserRolesExpandsCreatorToIncludeClaimantNonLegalRepresentative() {
+        assertThat(ManageCaseRoleServiceUtil.getCaseUserRoles(null))
+            .containsExactly(CASE_USER_ROLE_CREATOR,
+                             ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE);
+        assertThat(ManageCaseRoleServiceUtil.getCaseUserRoles("CREATOR"))
+            .containsExactly(CASE_USER_ROLE_CREATOR,
+                             ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE);
     }
 
     @Test
-    void theGetCaseUserRolesParsesCommaSeparatedBracketsAndDeduplicates() {
-        assertThat(ManageCaseRoleServiceUtil.getCaseUserRoles("CREATOR,CLAIMANTNONLEGALREPRESENTATIVE"))
-            .containsExactly(CASE_USER_ROLE_CREATOR,
-                             ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE);
-        assertThat(ManageCaseRoleServiceUtil.getCaseUserRoles("[CREATOR] , CREATOR , DEFENDANT"))
-            .containsExactly(CASE_USER_ROLE_CREATOR, ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT);
+    void theGetCaseUserRolesReturnsSingleBracketedRoleForNonCreator() {
+        assertThat(ManageCaseRoleServiceUtil.getCaseUserRoles("DEFENDANT"))
+            .containsExactly(ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT);
     }
 
     @Test

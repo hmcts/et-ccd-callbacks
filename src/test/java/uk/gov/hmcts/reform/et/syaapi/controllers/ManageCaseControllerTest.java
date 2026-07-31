@@ -139,7 +139,8 @@ class ManageCaseControllerTest {
         when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
         when(idamClient.getUserInfo(TEST_SERVICE_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
         when(manageCaseRoleService.getUserCasesByCaseUserRoles(
-            TEST_SERVICE_AUTH_TOKEN, List.of(CASE_USER_ROLE_CREATOR)
+            TEST_SERVICE_AUTH_TOKEN,
+            List.of(CASE_USER_ROLE_CREATOR, CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE)
         )).thenReturn(requestCaseDataList);
 
         // when
@@ -183,7 +184,7 @@ class ManageCaseControllerTest {
 
     @Test
     @SneakyThrows
-    void shouldGetCaseDetailsForMultipleCaseUserRolesInOneCall() {
+    void shouldExpandCreatorRequestToIncludeClaimantNonLegalRepresentative() {
         when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
         when(idamClient.getUserInfo(TEST_SERVICE_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
         when(manageCaseRoleService.getUserCasesByCaseUserRoles(
@@ -193,7 +194,7 @@ class ManageCaseControllerTest {
 
         // when
         mockMvc.perform(
-                get("/cases/user-cases?case_user_role=CREATOR,CLAIMANTNONLEGALREPRESENTATIVE", SCOTLAND_CASE_TYPE)
+                get("/cases/user-cases?case_user_role=CREATOR", SCOTLAND_CASE_TYPE)
                     .contentType(MediaType.APPLICATION_JSON)
                     .header(HttpHeaders.AUTHORIZATION, TEST_SERVICE_AUTH_TOKEN))
             // then

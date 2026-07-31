@@ -262,33 +262,22 @@ public final class ManageCaseRoleServiceUtil {
     }
 
     /**
-     * Parses the {@code case_user_role} request parameter (a single role or a comma-separated list) into a
-     * list of bracketed case roles, e.g. {@code "CREATOR,CLAIMANTNONLEGALREPRESENTATIVE"} becomes
-     * {@code ["[CREATOR]", "[CLAIMANTNONLEGALREPRESENTATIVE]"]}. Defaults to {@code [CREATOR]} when blank.
+     * Resolves the case roles to fetch for the given {@code case_user_role} request parameter. The role is
+     * bracketed, defaulting to {@code [CREATOR]} when blank. A request for {@code [CREATOR]} is expanded to also
+     * include {@code [CLAIMANTNONLEGALREPRESENTATIVE]}, since a self-representing claimant holds that role in
+     * place of creator, so both should be returned together for the frontend to filter.
      *
-     * @param caseUserRole the raw request parameter value
-     * @return the parsed, de-duplicated list of bracketed case roles
+     * @param caseUserRole the raw request parameter value (a single role, without brackets)
+     * @return the list of bracketed case roles to fetch
      */
     public static List<String> getCaseUserRoles(String caseUserRole) {
+        String bracketedRole = StringUtils.isBlank(caseUserRole)
+            ? CASE_USER_ROLE_CREATOR
+            : STRING_LEFT_SQUARE_BRACKET + caseUserRole.trim() + STRING_RIGHT_SQUARE_BRACKET;
         List<String> caseUserRoles = new ArrayList<>();
-        if (StringUtils.isBlank(caseUserRole)) {
-            caseUserRoles.add(CASE_USER_ROLE_CREATOR);
-            return caseUserRoles;
-        }
-        for (String role : caseUserRole.split(",")) {
-            String trimmedRole = role.trim();
-            if (StringUtils.isBlank(trimmedRole)) {
-                continue;
-            }
-            String bracketedRole = trimmedRole.startsWith(STRING_LEFT_SQUARE_BRACKET)
-                ? trimmedRole
-                : STRING_LEFT_SQUARE_BRACKET + trimmedRole + STRING_RIGHT_SQUARE_BRACKET;
-            if (!caseUserRoles.contains(bracketedRole)) {
-                caseUserRoles.add(bracketedRole);
-            }
-        }
-        if (caseUserRoles.isEmpty()) {
-            caseUserRoles.add(CASE_USER_ROLE_CREATOR);
+        caseUserRoles.add(bracketedRole);
+        if (CASE_USER_ROLE_CREATOR.equals(bracketedRole)) {
+            caseUserRoles.add(CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE);
         }
         return caseUserRoles;
     }

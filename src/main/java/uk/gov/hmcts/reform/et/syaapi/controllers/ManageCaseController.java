@@ -81,9 +81,9 @@ public class ManageCaseController {
      * @return a list of cases for the given user wrapped in a {@link CaseDetails} object
      */
     @GetMapping("/user-cases")
-    @Operation(summary = "Return list of case details for a given user, optionally filtered by one or more "
-        + "comma-separated case roles (e.g. case_user_role=CREATOR,CLAIMANTNONLEGALREPRESENTATIVE). Each case "
-        + "carries its matched role under 'caseUserRole' in the case data.")
+    @Operation(summary = "Return list of case details for a given user, filtered by case role (defaults to "
+        + "CREATOR). A request for CREATOR also returns the user's CLAIMANTNONLEGALREPRESENTATIVE cases. Each "
+        + "case carries its matched role under 'caseUserRole' in the case data.")
     @ApiResponseGroup
     public ResponseEntity<List<CaseDetails>> getUserCasesByCaseUserRole(
         @RequestHeader(AUTHORIZATION) String authorization,

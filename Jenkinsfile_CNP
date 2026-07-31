@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@2.4.0")
+@Library("Infrastructure")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 
@@ -127,11 +127,8 @@ withPipeline(type, product, component) {
   syncBranchesWithMaster(branchesToSync)
   enableSlackNotifications('#et-builds')
 
-  afterSuccess('checkout') {
-    sh './gradlew validateCcdDefinitionsLockfile'
-  }
-
   before('build') {
+    sh './gradlew validateCcdDefinitionsLockfile'
     sh '''
       env AZURE_CONFIG_DIR=/opt/jenkins/.azure-nonprod az acr login --name hmctsprod
     '''

@@ -453,5 +453,14 @@
     "FieldType": "YesOrNo",
     "SecurityClassification": "Public",
     "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "etICUnfairDismissalEra",
+    "Label": "If there is a claim of unfair dismissal, is this a claim that can only be brought following the implementation of ERA?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "frl_yes_no_not_applicable",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   }
 ]

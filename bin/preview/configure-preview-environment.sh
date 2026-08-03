@@ -6,6 +6,9 @@ PR_ID=${1:-${CHANGE_ID:-}}
 DMN_BRANCH=${2:-master}
 BPMN_BRANCH=${3:-master}
 NAMESPACE=${PREVIEW_NAMESPACE:-et}
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+source "${SCRIPT_DIR}/utils/definition-store-db-utils.sh"
 
 if [[ -z "${PR_ID}" ]]; then
   echo "Usage: $0 <pr-id> [dmn-branch] [bpmn-branch]"
@@ -28,6 +31,7 @@ configuration_fingerprint() {
       bin/preview/create-ccd-roles.sh \
       bin/preview/import-ccd-definitions.sh \
       bin/preview/import-ref-data.sh \
+      bin/preview/utils/definition-store-db-utils.sh \
       bin/wa/add-org-roles-to-users.sh
     remote_revision https://github.com/hmcts/et-wa-task-configuration.git "${DMN_BRANCH}"
     remote_revision https://github.com/hmcts/wa-standalone-task-bpmn.git "${BPMN_BRANCH}"
@@ -42,8 +46,13 @@ EXISTING_FINGERPRINT=$(kubectl \
   2>/dev/null || true)
 
 if [[ "${EXISTING_FINGERPRINT}" == "${FINGERPRINT}" ]]; then
-  echo "Preview environment configuration is current (${FINGERPRINT}); skipping import."
-  exit 0
+  wait_for_definition_store_schema "${PR_ID}"
+  if definition_store_case_types_ready; then
+    echo "Preview environment configuration is current (${FINGERPRINT}); skipping import."
+    exit 0
+  fi
+
+  echo "Preview configuration marker is current, but expected ET case types are missing; running configuration again."
 fi
 
 for hostname in \

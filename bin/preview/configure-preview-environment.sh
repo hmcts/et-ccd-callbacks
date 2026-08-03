@@ -98,6 +98,11 @@ echo "Importing CCD definitions"
 echo "Setting up WA users and roles"
 ./bin/wa/add-org-roles-to-users.sh
 
+echo "Cleaning disposable CCD definition dependencies before workspace transfer"
+rm -rf \
+  ccd-definitions/node_modules \
+  ccd-definitions/.yarn/cache
+
 kubectl create configmap "${MARKER_NAME}" \
   --namespace "${NAMESPACE}" \
   --from-literal="fingerprint=${FINGERPRINT}" \

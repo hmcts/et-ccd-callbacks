@@ -19,37 +19,37 @@
   },
   {
     "ID": "fl_selectHearingBundlesCollection",
-    "ListElement": "Claimant's Hearing Bundles",
+    "ListElement": "Claimant’s Hearing Bundles",
     "ListElementCode": "selectClaimantHearingBundles",
     "DisplayOrder": 1
   },
   {
     "ID": "fl_selectHearingBundlesCollection",
-    "ListElement": "Respondent's Hearing Bundles",
+    "ListElement": "Respondent’s Hearing Bundles",
     "ListElementCode": "selectRespondentHearingBundles",
     "DisplayOrder": 2
   },
   {
     "ID": "frl_bundlesWhoseDocuments",
-    "ListElement": "Respondent's documents only",
+    "ListElement": "Respondent’s documents only",
     "ListElementCode": "Respondent's documents only",
     "DisplayOrder": 1
   },
   {
     "ID": "frl_bundlesWhoseDocuments",
-    "ListElement": "Both parties' hearing documents combined",
+    "ListElement": "Both parties’ hearing documents combined",
     "ListElementCode": "Both parties' hearing documents combined",
     "DisplayOrder": 2
   },
   {
     "ID": "frl_bundlesWhoseDocumentsClaimant",
-    "ListElement": "Claimant's documents only",
+    "ListElement": "Claimant’s documents only",
     "ListElementCode": "Claimant's documents only",
     "DisplayOrder": 1
   },
   {
     "ID": "frl_bundlesWhoseDocumentsClaimant",
-    "ListElement": "Both parties' hearing documents combined",
+    "ListElement": "Both parties’ hearing documents combined",
     "ListElementCode": "Both parties' hearing documents combined",
     "DisplayOrder": 2
   },

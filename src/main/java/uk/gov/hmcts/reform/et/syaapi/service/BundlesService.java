@@ -38,8 +38,7 @@ public class BundlesService {
      * @return the associated {@link CaseDetails} for the ID provided in request
      */
     public CaseDetails submitBundles(String authorization, ClaimantBundlesRequest request) {
-        return submitHearingBundle(
-            authorization,
+        return submitHearingBundle(authorization, new BundleSubmission(
             request.getCaseId(),
             request.getCaseTypeId(),
             CaseEvent.SUBMIT_CLAIMANT_BUNDLES,
@@ -47,7 +46,7 @@ public class BundlesService {
             CaseData::getBundlesClaimantCollection,
             CaseData::setBundlesClaimantCollection,
             notificationService::sendBundlesEmails
-        );
+        ));
     }
 
     /**
@@ -58,8 +57,7 @@ public class BundlesService {
      * @return the associated {@link CaseDetails} for the ID provided in request
      */
     public CaseDetails submitRespondentBundles(String authorization, RespondentBundlesRequest request) {
-        return submitHearingBundle(
-            authorization,
+        return submitHearingBundle(authorization, new BundleSubmission(
             request.getCaseId(),
             request.getCaseTypeId(),
             CaseEvent.SUBMIT_RESPONDENT_BUNDLES,
@@ -67,11 +65,42 @@ public class BundlesService {
             CaseData::getBundlesRespondentCollection,
             CaseData::setBundlesRespondentCollection,
             notificationService::sendRespondentBundlesEmails
-        );
+        ));
     }
 
-    private CaseDetails submitHearingBundle(
-        String authorization,
+    private CaseDetails submitHearingBundle(String authorization, BundleSubmission submission) {
+        StartEventResponse startEventResponse = caseService.startUpdate(
+            authorization,
+            submission.caseId(),
+            submission.caseTypeId(),
+            submission.caseEvent()
+        );
+
+        CaseData caseData = EmployeeObjectMapper
+            .convertCaseDataMapToCaseDataObject(startEventResponse.getCaseDetails().getData());
+
+        List<GenericTypeItem<HearingBundleType>> collection = submission.collectionGetter().apply(caseData);
+        if (CollectionUtils.isEmpty(collection)) {
+            collection = new ArrayList<>();
+            submission.collectionSetter().accept(caseData, collection);
+        }
+        collection.add(GenericTypeItem.from(submission.hearingBundle()));
+
+        CaseDataContent content = caseDetailsConverter.caseDataContent(startEventResponse, caseData);
+
+        CaseDetails response = caseService.submitUpdate(
+            authorization,
+            submission.caseId(),
+            content,
+            submission.caseTypeId()
+        );
+
+        submission.emailSender().send(caseData, submission.caseId(), submission.hearingBundle().getHearing());
+
+        return response;
+    }
+
+    private record BundleSubmission(
         String caseId,
         String caseTypeId,
         CaseEvent caseEvent,
@@ -80,35 +109,6 @@ public class BundlesService {
         BiConsumer<CaseData, List<GenericTypeItem<HearingBundleType>>> collectionSetter,
         BundleEmailSender emailSender
     ) {
-        StartEventResponse startEventResponse = caseService.startUpdate(
-            authorization,
-            caseId,
-            caseTypeId,
-            caseEvent
-        );
-
-        CaseData caseData = EmployeeObjectMapper
-            .convertCaseDataMapToCaseDataObject(startEventResponse.getCaseDetails().getData());
-
-        List<GenericTypeItem<HearingBundleType>> collection = collectionGetter.apply(caseData);
-        if (CollectionUtils.isEmpty(collection)) {
-            collection = new ArrayList<>();
-            collectionSetter.accept(caseData, collection);
-        }
-        collection.add(GenericTypeItem.from(hearingBundle));
-
-        CaseDataContent content = caseDetailsConverter.caseDataContent(startEventResponse, caseData);
-
-        CaseDetails response = caseService.submitUpdate(
-            authorization,
-            caseId,
-            content,
-            caseTypeId
-        );
-
-        emailSender.send(caseData, caseId, hearingBundle.getHearing());
-
-        return response;
     }
 
     @FunctionalInterface

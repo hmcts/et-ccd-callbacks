@@ -4,20 +4,17 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.et.syaapi.annotation.ApiResponseGroup;
 import uk.gov.hmcts.reform.et.syaapi.models.ClaimantBundlesRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.RespondentBundlesRequest;
 import uk.gov.hmcts.reform.et.syaapi.service.BundlesService;
-import uk.gov.hmcts.reform.et.syaapi.service.FeatureToggleService;
 
 import static org.springframework.http.ResponseEntity.ok;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.AUTHORIZATION;
@@ -28,7 +25,6 @@ import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.AUTHORIZATI
 @RequestMapping("/bundles")
 public class BundlesController {
     private final BundlesService bundlesService;
-    private final FeatureToggleService featureToggleService;
 
 
     /**
@@ -46,7 +42,6 @@ public class BundlesController {
         @RequestHeader(AUTHORIZATION) String authorization,
         @NotNull @RequestBody ClaimantBundlesRequest request
     ) {
-        ensureBundlesFeatureEnabled();
         log.info("Received submit claimant bundles request - caseTypeId: {} caseId: {}",
                  request.getCaseTypeId(), request.getCaseId()
         );
@@ -68,17 +63,10 @@ public class BundlesController {
         @RequestHeader(AUTHORIZATION) String authorization,
         @NotNull @RequestBody RespondentBundlesRequest request
     ) {
-        ensureBundlesFeatureEnabled();
         log.info("Received submit respondent bundles request - caseTypeId: {} caseId: {}",
                  request.getCaseTypeId(), request.getCaseId()
         );
         CaseDetails finalCaseDetails = bundlesService.submitRespondentBundles(authorization, request);
         return ok(finalCaseDetails);
-    }
-
-    private void ensureBundlesFeatureEnabled() {
-        if (!featureToggleService.isBundlesEnabled()) {
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Bundles feature is not available");
-        }
     }
 }

@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.et.syaapi.models.ClaimantBundlesRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.RespondentBundlesRequest;
 import uk.gov.hmcts.reform.et.syaapi.service.BundlesService;
-import uk.gov.hmcts.reform.et.syaapi.service.FeatureToggleService;
 import uk.gov.hmcts.reform.et.syaapi.service.utils.ResourceLoader;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -45,9 +44,6 @@ class BundlesControllerTest {
     @MockitoBean
     private BundlesService bundlesService;
 
-    @MockitoBean
-    private FeatureToggleService featureToggleService;
-
     BundlesControllerTest() {
         // Default constructor
         expectedDetails = ResourceLoader.fromString(
@@ -67,7 +63,6 @@ class BundlesControllerTest {
             .build();
 
         when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
-        when(featureToggleService.isBundlesEnabled()).thenReturn(true);
 
         when(bundlesService.submitBundles(any(), any())).thenReturn(expectedDetails);
         mockMvc.perform(
@@ -94,7 +89,6 @@ class BundlesControllerTest {
             .build();
 
         when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
-        when(featureToggleService.isBundlesEnabled()).thenReturn(true);
 
         when(bundlesService.submitRespondentBundles(any(), any())).thenReturn(expectedDetails);
         mockMvc.perform(

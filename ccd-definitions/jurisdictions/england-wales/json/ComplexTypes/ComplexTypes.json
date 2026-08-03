@@ -1581,15 +1581,6 @@
     "ListElementCode": "era",
     "FieldType": "YesOrNo",
     "ElementLabel": "ERA",
-    "FieldShowCondition": "showEra=\"Yes\"",
-    "SecurityClassification": "Public"
-  },
-  {
-    "ID": "AdditionalCaseDetails",
-    "ListElementCode": "showEra",
-    "FieldType": "YesOrNo",
-    "ElementLabel": "Show ERA",
-    "FieldShowCondition": "era=\"dummy\"",
     "SecurityClassification": "Public"
   },
   {

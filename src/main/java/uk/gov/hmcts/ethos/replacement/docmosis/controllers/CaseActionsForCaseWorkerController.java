@@ -249,6 +249,7 @@ public class CaseActionsForCaseWorkerController {
         List<String> errors = getValidationDate(ccdRequest.getEventId(), caseDetails);
 
         if (errors.isEmpty()) {
+            employmentRightsActService.setEraFlagByReceiptDate(caseData);
             defaultValuesReaderService.setSubmissionReference(caseDetails);
             DefaultValues defaultValues = getPostDefaultValues(caseDetails);
             defaultValuesReaderService.setCaseData(caseData, defaultValues);
@@ -341,7 +342,7 @@ public class CaseActionsForCaseWorkerController {
 
         et1VettingService.populateHearingVenue(caseData);
         et1VettingService.populateSuggestedHearingVenues(caseData);
-        employmentRightsActService.shouldShowEraFlags(caseData);
+        employmentRightsActService.setEraFlagByReceiptDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -380,6 +381,7 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
             caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
             caseManagementForCaseWorkerService.setNextListedDate(caseData);
+            employmentRightsActService.setEraFlagByReceiptDate(caseData);
             buildFlagsImageFileName(ccdRequest.getCaseDetails());
             UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
             UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);

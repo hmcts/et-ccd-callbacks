@@ -103,6 +103,7 @@ public class InitialConsiderationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         initialConsiderationService.processIcDocumentCollections(caseData);
+        employmentRightsActService.setUnfairDismissalEraByReceiptDate(caseData);
         employmentRightsActService.processUnfairDismissalEra(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
 
         caseData.setIcCompletedBy(reportDataService.getUserFullName(userToken));
@@ -173,6 +174,7 @@ public class InitialConsiderationController {
         initialConsiderationService.setEt1VettingAndEt3ProcessingDetails(caseData, caseTypeId);
 
         initialConsiderationService.setHearingRegionAndVenue(caseData);
+        employmentRightsActService.setUnfairDismissalEraByReceiptDate(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

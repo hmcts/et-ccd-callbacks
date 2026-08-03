@@ -685,7 +685,7 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "ID": "et1SectionThreeDateOfLastEvent",
-    "Label": "What is the date of the most recent event you are complaining about?",
+    "Label": "What is the date of the most recent event complained about?",
     "FieldType": "Date",
     "SecurityClassification": "Public",
     "Searchable": "N"

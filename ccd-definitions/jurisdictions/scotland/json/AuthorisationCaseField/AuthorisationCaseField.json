@@ -23849,31 +23849,5 @@
     "CaseFieldID": "batchUpdateJurisdictionList",
     "UserRole": "caseworker-employment-scotland",
     "CRUD": "CRU"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "showEra",
-    "AccessControl": [
-      {
-        "UserRoles": [
-          "caseworker-employment-scotland",
-          "caseworker-employment-etjudge-scotland"
-        ],
-        "CRUD": "CRU"
-      },
-      {
-        "UserRoles": [
-          "caseworker-employment-api"
-        ],
-        "CRUD": "CRUD"
-      },
-      {
-        "UserRoles": [
-          "caseworker-employment",
-          "caseworker-employment-etjudge"
-        ],
-        "CRUD": "R"
-      }
-    ]
   }
 ]

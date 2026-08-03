@@ -29,40 +29,44 @@ class EmploymentRightsActServiceTest {
     }
 
     @Test
-    void shouldShowEraFlags_OnOrAfterOctoberFirst2026_SetsShowEraToYes() {
-        caseData.setReceiptDate("2026-10-01");
-        employmentRightsActService.shouldShowEraFlags(caseData);
-        assertEquals(YES, caseData.getShowEra());
-        assertEquals(YES, caseData.getAdditionalCaseInfoType().getShowEra());
-    }
-
-    @Test
-    void shouldShowEraFlags_AfterOctoberFirst2026_SetsShowEraToYes() {
-        caseData.setReceiptDate("2026-10-15");
-        employmentRightsActService.shouldShowEraFlags(caseData);
-        assertEquals(YES, caseData.getShowEra());
-        assertEquals(YES, caseData.getAdditionalCaseInfoType().getShowEra());
-    }
-
-    @Test
-    void shouldShowEraFlags_BeforeOctoberFirst2026_SetsShowEraToNo() {
+    void setEraFlagByReceiptDate_BeforeOctoberFirst2026_SetsEraToNo() {
         caseData.setReceiptDate("2026-09-30");
-        employmentRightsActService.shouldShowEraFlags(caseData);
-        assertEquals(NO, caseData.getShowEra());
-        assertEquals(NO, caseData.getAdditionalCaseInfoType().getShowEra());
+        employmentRightsActService.setEraFlagByReceiptDate(caseData);
+        assertEquals(NO, caseData.getAdditionalCaseInfoType().getEra());
+    }
+
+    @Test
+    void setEraFlagByReceiptDate_OnOrAfterOctoberFirst2026_DoesNotSetEraToNo() {
+        caseData.setReceiptDate("2026-10-01");
+        employmentRightsActService.setEraFlagByReceiptDate(caseData);
+        assertNull(caseData.getAdditionalCaseInfoType());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"", "   "})
-    void shouldShowEraFlags_NullOrBlankReceiptDate_DoesNotSetShowEra(String receiptDate) {
+    void setEraFlagByReceiptDate_NullOrBlankReceiptDate_DoesNothing(String receiptDate) {
         caseData.setReceiptDate(receiptDate);
-        employmentRightsActService.shouldShowEraFlags(caseData);
-        assertNull(caseData.getShowEra());
+        employmentRightsActService.setEraFlagByReceiptDate(caseData);
+        assertNull(caseData.getAdditionalCaseInfoType());
     }
 
     @Test
-    void shouldShowEraFlags_NullCaseData_HandlesGracefully() {
-        employmentRightsActService.shouldShowEraFlags(null);
+    void setEraFlagByReceiptDate_NullCaseData_HandlesGracefully() {
+        employmentRightsActService.setEraFlagByReceiptDate(null);
+    }
+
+    @Test
+    void setUnfairDismissalEraByReceiptDate_BeforeOctoberFirst2026_SetsIcUnfairDismissalToNotApplicable() {
+        caseData.setReceiptDate("2026-09-30");
+        employmentRightsActService.setUnfairDismissalEraByReceiptDate(caseData);
+        assertEquals("Not applicable", caseData.getEtICUnfairDismissalEra());
+    }
+
+    @Test
+    void setUnfairDismissalEraByReceiptDate_OnOrAfterOctoberFirst2026_DoesNotSetIcUnfairDismissal() {
+        caseData.setReceiptDate("2026-10-01");
+        employmentRightsActService.setUnfairDismissalEraByReceiptDate(caseData);
+        assertNull(caseData.getEtICUnfairDismissalEra());
     }
 
     @Test
@@ -70,9 +74,7 @@ class EmploymentRightsActServiceTest {
         caseData.setEtICUnfairDismissalEra(YES);
         employmentRightsActService.processUnfairDismissalEra(ENGLANDWALES_CASE_TYPE_ID, caseData);
 
-        assertEquals(YES, caseData.getShowEra());
         assertEquals(YES, caseData.getAdditionalCaseInfoType().getEra());
-        assertEquals(YES, caseData.getAdditionalCaseInfoType().getShowEra());
         assertEquals(1, caseData.getJurCodesCollection().size());
         assertEquals("UDL", caseData.getJurCodesCollection().getFirst().getValue().getJuridictionCodesList());
     }
@@ -96,7 +98,6 @@ class EmploymentRightsActServiceTest {
         caseData.setEtICUnfairDismissalEra(NO);
         employmentRightsActService.processUnfairDismissalEra("ET_EnglandWales", caseData);
 
-        assertNull(caseData.getShowEra());
         assertNull(caseData.getJurCodesCollection());
     }
 
@@ -105,7 +106,6 @@ class EmploymentRightsActServiceTest {
         caseData.setEtICUnfairDismissalEra("Not applicable");
         employmentRightsActService.processUnfairDismissalEra("ET_EnglandWales", caseData);
 
-        assertNull(caseData.getShowEra());
         assertNull(caseData.getJurCodesCollection());
     }
 }

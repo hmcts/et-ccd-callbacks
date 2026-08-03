@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
@@ -29,30 +28,45 @@ public class EmploymentRightsActService {
 
     private static final LocalDate ERA_START_DATE = LocalDate.of(2026, Month.OCTOBER, 1);
     public static final String UDL_JURISDICTION_CODE = "UDL";
+    public static final String NOT_APPLICABLE = "Not applicable";
 
     /**
-     * Sets the showEra flag on CaseData and AdditionalCaseInfoType to Yes if receiptDate is on or
-     * after 1st October 2026, or No otherwise.
+     * Sets the era flag on AdditionalCaseInfoType to No if receiptDate is before 1st October 2026.
      *
      * @param caseData the case data
      */
-    public void shouldShowEraFlags(CaseData caseData) {
-        if (caseData == null || StringUtils.isBlank(caseData.getReceiptDate())) {
+    public void setEraFlagByReceiptDate(CaseData caseData) {
+        if (ObjectUtils.isEmpty(caseData) || ObjectUtils.isEmpty(caseData.getReceiptDate())) {
             return;
         }
 
         try {
-            if (ObjectUtils.isEmpty(caseData.getAdditionalCaseInfoType())) {
-                caseData.setAdditionalCaseInfoType(new AdditionalCaseInfoType());
-            }
-
             LocalDate receiptDate = LocalDate.parse(caseData.getReceiptDate());
-            if (!receiptDate.isBefore(ERA_START_DATE)) {
-                caseData.setShowEra(YES);
-                caseData.getAdditionalCaseInfoType().setShowEra(YES);
-            } else {
-                caseData.setShowEra(NO);
-                caseData.getAdditionalCaseInfoType().setShowEra(NO);
+            if (receiptDate.isBefore(ERA_START_DATE)) {
+                if (ObjectUtils.isEmpty(caseData.getAdditionalCaseInfoType())) {
+                    caseData.setAdditionalCaseInfoType(new AdditionalCaseInfoType());
+                }
+                caseData.getAdditionalCaseInfoType().setEra(NO);
+            }
+        } catch (Exception e) {
+            log.error("Error parsing receiptDate: {}", caseData.getReceiptDate(), e);
+        }
+    }
+
+    /**
+     * Sets etICUnfairDismissalEra to Not applicable if receiptDate is before 1st October 2026.
+     *
+     * @param caseData the case data
+     */
+    public void setUnfairDismissalEraByReceiptDate(CaseData caseData) {
+        if (ObjectUtils.isEmpty(caseData) || ObjectUtils.isEmpty(caseData.getReceiptDate())) {
+            return;
+        }
+
+        try {
+            LocalDate receiptDate = LocalDate.parse(caseData.getReceiptDate());
+            if (receiptDate.isBefore(ERA_START_DATE)) {
+                caseData.setEtICUnfairDismissalEra(NOT_APPLICABLE);
             }
         } catch (Exception e) {
             log.error("Error parsing receiptDate: {}", caseData.getReceiptDate(), e);
@@ -63,7 +77,7 @@ public class EmploymentRightsActService {
      * Processes the Initial Consideration response for unfair dismissal ERA question.
      * When etICUnfairDismissalEra response is "Yes":
      * - Adds jurisdiction code UDL to Jurisdictions if not present.
-     * - Sets ERA radio button (era) to "Yes" on CaseData and AdditionalCaseInfoType.
+     * - Sets ERA radio button (era) to "Yes" on AdditionalCaseInfoType.
      * - Displays ERA flag.
      *
      * @param caseTypeId the case type ID
@@ -79,8 +93,6 @@ public class EmploymentRightsActService {
         }
 
         caseData.getAdditionalCaseInfoType().setEra(YES);
-        caseData.setShowEra(YES);
-        caseData.getAdditionalCaseInfoType().setShowEra(YES);
 
         if (caseData.getJurCodesCollection() == null) {
             caseData.setJurCodesCollection(new ArrayList<>());

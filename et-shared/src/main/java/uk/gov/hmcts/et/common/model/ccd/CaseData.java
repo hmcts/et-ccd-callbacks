@@ -1822,6 +1822,8 @@ public class CaseData extends Et1CaseData {
     private String et1SectionThreeClaimDetails;
     @JsonProperty("et1SectionThreeDocumentUpload")
     private UploadedDocumentType et1SectionThreeDocumentUpload;
+    @JsonProperty("et1SectionThreeDateOfLastEvent")
+    private String et1SectionThreeDateOfLastEvent;
     @JsonProperty("et1SectionThreeTypeOfClaim")
     private List<String> et1SectionThreeTypeOfClaim;
     @JsonProperty("discriminationTypesOfClaim")

@@ -269,25 +269,10 @@ tasks.register('functional', Test) {
 def isJenkinsPullRequestBuild = providers.environmentVariable('CHANGE_ID').isPresent()
 
 if (isJenkinsPullRequestBuild) {
-    def etSharedCompiledOutput = files(
-        project(':et-shared').layout.buildDirectory.dir('classes/java/main'),
-        project(':et-shared').layout.buildDirectory.dir('resources/main')
-    )
-
-    // Jenkins PR previews run these tasks after static checks have already compiled the relevant source sets.
-    // Keep --rerun-tasks from compiling the same classes again during post-deploy verification.
+    // Keep the preview smoke test focused on service health. Jenkins library 2.4.8 deliberately excludes
+    // Gradle build directories from executor transfers, so retain the source-set task dependencies here.
     tasks.named('smoke', Test) {
-        setDependsOn([])
-        testClassesDirs = files(sourceSets.functional.output.classesDirs.files)
-        classpath = files(sourceSets.functional.runtimeClasspath.files, etSharedCompiledOutput)
         include '**/HealthCheckTest.class'
-    }
-
-    tasks.named('functional', Test) {
-        setDependsOn([])
-        testClassesDirs = files(sourceSets.apiTest.output.classesDirs.files)
-        classpath = files(sourceSets.apiTest.runtimeClasspath.files, etSharedCompiledOutput)
-        include '**/*Test.class'
     }
 }
 def puppeteerCacheDir = layout.buildDirectory.dir('puppeteer-cache').get().asFile.absolutePath

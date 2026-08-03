@@ -56,6 +56,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.apache.commons.lang3.ObjectUtils.getIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -1012,8 +1013,8 @@ public class NocRespondentRepresentativeService {
     public CaseData updateRespondentRepresentation(CaseDetails caseDetails) throws IOException {
         CaseData caseData = caseDetails.getCaseData();
         resetRespondentRepresentativeRemovedField(caseData);
-        Map<String, Object> caseDataAsMap = caseConverter.toMap(caseData);
         Map<String, Object> repCollection = updateRepresentationMap(caseData, caseDetails.getCaseId());
+        Map<String, Object> caseDataAsMap = caseConverter.toMap(caseData);
         caseDataAsMap.putAll(repCollection);
         return  caseConverter.convert(caseDataAsMap, CaseData.class);
     }
@@ -1053,7 +1054,9 @@ public class NocRespondentRepresentativeService {
             repCollection.get(repIndex).setValue(addedSolicitor);
         } else {
             //assumption is NOC will take care of replacing value in org policy
-            RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
+            RepresentedTypeRItem representedTypeRItem = RepresentedTypeRItem.builder().id(UUID.randomUUID().toString())
+                    .build();
+            respondent.getValue().setRepresentativeId(representedTypeRItem.getId());
             representedTypeRItem.setValue(addedSolicitor);
             repCollection.add(representedTypeRItem);
         }

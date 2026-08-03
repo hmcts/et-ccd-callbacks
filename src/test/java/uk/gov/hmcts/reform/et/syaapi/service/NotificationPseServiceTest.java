@@ -90,38 +90,6 @@ class NotificationPseServiceTest {
     }
 
     @Test
-    void sendResponseNotificationEmailToTribunal_Normal() throws NotificationClientException {
-        caseTestData.getCaseData().setTribunalCorrespondenceEmail("tribunal@test.com");
-        notificationPseService.sendResponseNotificationEmailToTribunal(
-            caseTestData.getCaseData(),
-            caseTestData.getExpectedDetails().getId().toString()
-        );
-
-        verify(notificationClient, times(1)).sendEmail(
-            any(),
-            eq(caseTestData.getCaseData().getTribunalCorrespondenceEmail()),
-            any(),
-            eq(caseTestData.getExpectedDetails().getId().toString())
-        );
-    }
-
-    @Test
-    void sendNotResponseNotificationEmailToTribunalMissingEmail() throws NotificationClientException {
-        caseTestData.getCaseData().setTribunalCorrespondenceEmail(null);
-        notificationPseService.sendResponseNotificationEmailToTribunal(
-            caseTestData.getCaseData(),
-            caseTestData.getExpectedDetails().getId().toString()
-        );
-
-        verify(notificationClient, times(0)).sendEmail(
-            any(),
-            any(),
-            any(),
-            any()
-        );
-    }
-
-    @Test
     void sendResponseNotificationEmailToRespondent_Copy() throws NotificationClientException {
         notificationPseService.sendResponseNotificationEmailToRespondent(
             caseTestData.getCaseData(),

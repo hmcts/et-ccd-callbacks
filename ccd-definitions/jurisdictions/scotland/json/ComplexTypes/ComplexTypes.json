@@ -1501,6 +1501,13 @@
   },
   {
     "ID": "AdditionalCaseDetails",
+    "ListElementCode": "era",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "ERA",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "AdditionalCaseDetails",
     "ListElementCode": "additional_live_appeal",
     "FieldType": "YesOrNo",
     "ElementLabel": "Live appeal?",

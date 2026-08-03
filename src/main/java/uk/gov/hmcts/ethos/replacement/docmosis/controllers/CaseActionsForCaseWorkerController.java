@@ -42,6 +42,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmploymentRightsActService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
@@ -112,6 +113,7 @@ public class CaseActionsForCaseWorkerController {
     private final CaseManagementLocationService caseManagementLocationService;
     private final Et1SubmissionService et1SubmissionService;
     private final NocRespondentHelper nocRespondentHelper;
+    private final EmploymentRightsActService employmentRightsActService;
 
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "create a case for a caseWorker.")
@@ -247,6 +249,7 @@ public class CaseActionsForCaseWorkerController {
         List<String> errors = getValidationDate(ccdRequest.getEventId(), caseDetails);
 
         if (errors.isEmpty()) {
+            employmentRightsActService.setEraFlagByReceiptDate(caseData);
             defaultValuesReaderService.setSubmissionReference(caseDetails);
             DefaultValues defaultValues = getPostDefaultValues(caseDetails);
             defaultValuesReaderService.setCaseData(caseData, defaultValues);
@@ -339,7 +342,7 @@ public class CaseActionsForCaseWorkerController {
 
         et1VettingService.populateHearingVenue(caseData);
         et1VettingService.populateSuggestedHearingVenues(caseData);
-
+        employmentRightsActService.setEraFlagByReceiptDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -378,6 +381,7 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
             caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
             caseManagementForCaseWorkerService.setNextListedDate(caseData);
+            employmentRightsActService.setEraFlagByReceiptDate(caseData);
             buildFlagsImageFileName(ccdRequest.getCaseDetails());
             UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
             UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);

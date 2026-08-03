@@ -12,12 +12,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3NotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -34,7 +32,6 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -63,8 +60,6 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     private ServingService servingService;
     @MockitoBean
     private Et3NotificationService et3NotificationService;
-    @MockitoBean
-    private CaseUpdateForCaseWorkerService caseUpdateForCaseWorkerService;
     @Autowired
     private MockMvc mvc;
     @Autowired
@@ -250,10 +245,6 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     @Test
     void submitted_tokenOk() throws Throwable {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        SubmitEvent submitEvent = new SubmitEvent();
-        submitEvent.setCaseId(1L);
-        when(caseUpdateForCaseWorkerService.caseUpdateRequest(any(), anyString()))
-                .thenReturn(submitEvent);
         mvc.perform(post(SUBMITTED_URL)
                 .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
                 .header("Authorization", AUTH_TOKEN)

@@ -29,7 +29,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
@@ -161,8 +160,6 @@ class Et1ReppedControllerTest {
     private CaseCloseValidator caseCloseValidator;
     @MockitoBean
     private CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
-    @MockitoBean
-    private CaseUpdateForCaseWorkerService caseUpdateForCaseWorkerService;
     @MockitoBean
     private DefaultValuesReaderService defaultValuesReaderService;
     @MockitoBean

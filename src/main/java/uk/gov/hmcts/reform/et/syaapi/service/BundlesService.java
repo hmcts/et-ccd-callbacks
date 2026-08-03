@@ -14,10 +14,12 @@ import uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent;
 import uk.gov.hmcts.reform.et.syaapi.helper.CaseDetailsConverter;
 import uk.gov.hmcts.reform.et.syaapi.helper.EmployeeObjectMapper;
 import uk.gov.hmcts.reform.et.syaapi.models.ClaimantBundlesRequest;
+import uk.gov.hmcts.reform.et.syaapi.models.RespondentBundlesRequest;
 
 import java.util.ArrayList;
-
-import static java.util.UUID.randomUUID;
+import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 @RequiredArgsConstructor
 @Service
@@ -36,41 +38,81 @@ public class BundlesService {
      * @return the associated {@link CaseDetails} for the ID provided in request
      */
     public CaseDetails submitBundles(String authorization, ClaimantBundlesRequest request) {
-
-        StartEventResponse startEventResponse = caseService.startUpdate(
+        return submitHearingBundle(
             authorization,
             request.getCaseId(),
             request.getCaseTypeId(),
-            CaseEvent.SUBMIT_CLAIMANT_BUNDLES
+            CaseEvent.SUBMIT_CLAIMANT_BUNDLES,
+            request.getClaimantBundles(),
+            CaseData::getBundlesClaimantCollection,
+            CaseData::setBundlesClaimantCollection,
+            notificationService::sendBundlesEmails
+        );
+    }
+
+    /**
+     * Submit Respondent Bundles.
+     *
+     * @param authorization - authorization
+     * @param request       - bundles request from the respondent
+     * @return the associated {@link CaseDetails} for the ID provided in request
+     */
+    public CaseDetails submitRespondentBundles(String authorization, RespondentBundlesRequest request) {
+        return submitHearingBundle(
+            authorization,
+            request.getCaseId(),
+            request.getCaseTypeId(),
+            CaseEvent.SUBMIT_RESPONDENT_BUNDLES,
+            request.getRespondentBundles(),
+            CaseData::getBundlesRespondentCollection,
+            CaseData::setBundlesRespondentCollection,
+            notificationService::sendRespondentBundlesEmails
+        );
+    }
+
+    private CaseDetails submitHearingBundle(
+        String authorization,
+        String caseId,
+        String caseTypeId,
+        CaseEvent caseEvent,
+        HearingBundleType hearingBundle,
+        Function<CaseData, List<GenericTypeItem<HearingBundleType>>> collectionGetter,
+        BiConsumer<CaseData, List<GenericTypeItem<HearingBundleType>>> collectionSetter,
+        BundleEmailSender emailSender
+    ) {
+        StartEventResponse startEventResponse = caseService.startUpdate(
+            authorization,
+            caseId,
+            caseTypeId,
+            caseEvent
         );
 
         CaseData caseData = EmployeeObjectMapper
             .convertCaseDataMapToCaseDataObject(startEventResponse.getCaseDetails().getData());
 
-        if (CollectionUtils.isEmpty(caseData.getBundlesClaimantCollection())) {
-            caseData.setBundlesClaimantCollection(new ArrayList<>());
+        List<GenericTypeItem<HearingBundleType>> collection = collectionGetter.apply(caseData);
+        if (CollectionUtils.isEmpty(collection)) {
+            collection = new ArrayList<>();
+            collectionSetter.accept(caseData, collection);
         }
-        GenericTypeItem<HearingBundleType> hearingBundleTypeItem = new GenericTypeItem<>();
-        hearingBundleTypeItem.setId(String.valueOf(randomUUID()));
-        hearingBundleTypeItem.setValue(request.getClaimantBundles());
-
-        caseData.getBundlesClaimantCollection().add(hearingBundleTypeItem);
+        collection.add(GenericTypeItem.from(hearingBundle));
 
         CaseDataContent content = caseDetailsConverter.caseDataContent(startEventResponse, caseData);
 
         CaseDetails response = caseService.submitUpdate(
             authorization,
-            request.getCaseId(),
+            caseId,
             content,
-            request.getCaseTypeId()
+            caseTypeId
         );
 
-        notificationService.sendBundlesEmails(
-            caseData,
-            request.getCaseId(),
-            request.getClaimantBundles().getHearing()
-        );
+        emailSender.send(caseData, caseId, hearingBundle.getHearing());
 
         return response;
+    }
+
+    @FunctionalInterface
+    private interface BundleEmailSender {
+        void send(CaseData caseData, String caseId, String hearingId);
     }
 }

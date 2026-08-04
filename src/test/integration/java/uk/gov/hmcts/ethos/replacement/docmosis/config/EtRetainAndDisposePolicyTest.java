@@ -3,16 +3,11 @@ package uk.gov.hmcts.ethos.replacement.docmosis.config;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.hmcts.ccd.sdk.config.DecentralisedDataConfiguration;
+import org.springframework.test.context.ContextConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.EtCosPostgresqlContainer;
 
 import java.util.Map;
@@ -21,10 +16,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
-@SpringBootTest(
-    classes = EtRetainAndDisposePolicyTest.TestApplication.class,
-    webEnvironment = SpringBootTest.WebEnvironment.NONE
-)
+@JdbcTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ContextConfiguration(classes = EtRetainAndDisposePolicy.class)
 @ActiveProfiles("test")
 class EtRetainAndDisposePolicyTest {
 
@@ -39,16 +33,6 @@ class EtRetainAndDisposePolicyTest {
 
     @Autowired
     private EtRetainAndDisposePolicy policy;
-
-    @SpringBootConfiguration
-    @Import({DecentralisedDataConfiguration.class, EtRetainAndDisposePolicy.class})
-    @ImportAutoConfiguration({
-        DataSourceAutoConfiguration.class,
-        FlywayAutoConfiguration.class,
-        JdbcTemplateAutoConfiguration.class
-    })
-    static class TestApplication {
-    }
 
     @BeforeEach
     void setUp() {

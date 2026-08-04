@@ -558,6 +558,7 @@ class CaseManagementForCaseWorkerServiceTest {
         assertThat(caseData.getRespondentCollection()).hasSize(1);
         assertThat(caseData.getRespondentCollection().getFirst().getValue().getResponseContinue()).isEqualTo(YES);
     }
+
     @Test
     void continuingRespondentEmpty() {
         CaseData caseData = caseManagementForCaseWorkerService.continuingRespondent(scotlandCcdRequest5);

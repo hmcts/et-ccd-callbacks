@@ -9,7 +9,6 @@ import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.DocumentHelper;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
@@ -24,7 +23,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
 import uk.gov.service.notify.NotificationClient;
@@ -39,9 +37,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.poi.util.StringUtil.isNotBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -57,16 +55,13 @@ import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_R
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICANT_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE_PLUS_7;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_FLAG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_CASE_DETAILS_LINK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_DOCUMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.NOT_SET;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.NOT_SET_CY;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.SHORT_TEXT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
@@ -84,7 +79,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE
 public class RespondentTellSomethingElseService {
     private final EmailService emailService;
     private final UserIdamService userIdamService;
-    private final TribunalOfficesService tribunalOfficesService;
     private final TornadoService tornadoService;
     private final DocumentManagementService documentManagementService;
     private final FeatureToggleService featureToggleService;
@@ -148,8 +142,6 @@ public class RespondentTellSomethingElseService {
             sendAcknowledgeEmail(caseDetails, userToken, caseUserAssignments);
             sendClaimantEmail(caseDetails, caseUserAssignments);
         }
-
-        sendAdminEmail(caseDetails);
     }
 
     /**
@@ -388,45 +380,6 @@ public class RespondentTellSomethingElseService {
 
         return String.format(TABLE_ROW_MARKDOWN, count.getAndIncrement(), value.getType(), value.getApplicant(),
                 value.getDate(), value.getDueDate(), responses, status);
-    }
-
-    /**
-     * Sends an email notifying the admin that an application has been created/replied to.
-     */
-    public void sendAdminEmail(CaseDetails caseDetails) {
-        String email = getTribunalEmail(caseDetails.getCaseData());
-        if (isNullOrEmpty(email)) {
-            return;
-        }
-
-        Map<String, String> personalisation = buildPersonalisationForAdminEmail(caseDetails);
-        emailService.sendEmail(tseNewApplicationAdminTemplateId, email, personalisation);
-    }
-
-    public String getTribunalEmail(CaseData caseData) {
-        String managingOffice = caseData.getManagingOffice();
-        TribunalOffice tribunalOffice = tribunalOfficesService.getTribunalOffice(managingOffice);
-
-        if (tribunalOffice == null) {
-            return null;
-        }
-
-        return tribunalOffice.getOfficeEmail();
-    }
-
-    /**
-     * Builds personalisation data for sending an email to the admin about an application.
-     */
-    public Map<String, String> buildPersonalisationForAdminEmail(CaseDetails caseDetails) {
-        CaseData caseData = caseDetails.getCaseData();
-        Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
-        personalisation.put(EMAIL_FLAG, "");
-        personalisation.put(CLAIMANT, caseData.getClaimant());
-        personalisation.put(RESPONDENTS, getRespondentNames(caseData));
-        personalisation.put(DATE, getNearestHearingToReferral(caseData, NOT_SET));
-        personalisation.put("url", emailService.getExuiCaseLink(caseDetails.getCaseId()));
-        return personalisation;
     }
 
     /**

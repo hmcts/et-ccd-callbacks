@@ -82,7 +82,6 @@ import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_PARAMS_HEARING_DATE_KEY;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_PARAMS_LINK_DOC_KEY;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SEND_EMAIL_PARAMS_SHORTTEXT_KEY;
-import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.UNASSIGNED_OFFICE;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.YES;
 import static uk.gov.hmcts.reform.et.syaapi.helper.NotificationsHelper.MY_HMCTS;
 import static uk.gov.hmcts.reform.et.syaapi.service.NotificationService.TYPE_C_RESPONDENT;
@@ -122,10 +121,6 @@ class NotificationServiceTest {
     ArgumentCaptor<Map<String, Object>> respondentParametersCaptor;
     @Captor
     ArgumentCaptor<Map<String, Object>> claimantParametersCaptor;
-    @Mock
-    RespondentSumType respondentSumTypeMock;
-    @Mock
-    RespondentSumTypeItem respondentSumTypeItemMock;
 
     @BeforeEach
     void before() throws NotificationClientException {
@@ -795,134 +790,6 @@ class NotificationServiceTest {
             verify(notificationClient, times(0)).sendEmail(
                 any(),
                 eq(caseTestData.getCaseData().getClaimantType().getClaimantEmailAddress()),
-                any(),
-                eq(caseTestData.getExpectedDetails().getId().toString())
-            );
-        }
-    }
-
-    @Nested
-    class SendAcknowledgementEmailToTribunal {
-        @BeforeEach
-        void setUp() {
-            details = new CoreEmailDetails(
-                caseTestData.getCaseData(),
-                CLAIMANT,
-                "1",
-                TEST_RESPONDENT,
-                NOT_SET,
-                caseTestData.getExpectedDetails().getId().toString()
-            );
-        }
-
-        @Test
-        void shouldSendEmailToTribunalTypeAOrB() throws NotificationClientException {
-            notificationService.sendAcknowledgementEmailToTribunal(
-                details,
-                caseTestData.getClaimantApplication().getContactApplicationType(),
-                false
-            );
-
-            verify(notificationClient, times(1)).sendEmail(
-                any(),
-                eq(caseTestData.getCaseData().getTribunalCorrespondenceEmail()),
-                any(),
-                eq(caseTestData.getExpectedDetails().getId().toString())
-            );
-
-        }
-
-        @Test
-        void shouldSendEmailToTribunalTypeC() throws NotificationClientException {
-            caseTestData.getClaimantApplication().setContactApplicationType(WITNESS);
-            notificationService.sendAcknowledgementEmailToTribunal(
-                details,
-                caseTestData.getClaimantApplication().getContactApplicationType(),
-                false
-            );
-
-            verify(notificationClient, times(1)).sendEmail(
-                any(),
-                eq(caseTestData.getCaseData().getTribunalCorrespondenceEmail()),
-                any(),
-                eq(caseTestData.getExpectedDetails().getId().toString())
-            );
-        }
-
-        @Test
-        void shouldNotSendEmailToTribunalUnassignedManagingOffice() throws NotificationClientException {
-            caseTestData.getCaseData().setManagingOffice(UNASSIGNED_OFFICE);
-            notificationService.sendAcknowledgementEmailToTribunal(
-                details,
-                caseTestData.getClaimantApplication().getContactApplicationType(),
-                false
-            );
-
-            verify(notificationClient, times(0)).sendEmail(
-                any(),
-                any(),
-                any(),
-                eq(caseTestData.getExpectedDetails().getId().toString())
-            );
-        }
-    }
-
-    @Nested
-    class SetTribunalCorrespondenceEmail {
-        @BeforeEach
-        void setUp() {
-            details = new CoreEmailDetails(
-                caseTestData.getCaseData(),
-                CLAIMANT,
-                "1",
-                TEST_RESPONDENT,
-                NOT_SET,
-                caseTestData.getExpectedDetails().getId().toString()
-            );
-        }
-
-        @Test
-        void shouldSendResponseEmailToTribunal() throws NotificationClientException {
-            caseTestData.getCaseData().setTribunalCorrespondenceEmail("tribunal@test.com");
-            notificationService.sendResponseEmailToTribunal(
-                details,
-                CHANGE_DETAILS_APPLICATION_TYPE,
-                false
-            );
-
-            verify(notificationClient, times(1)).sendEmail(
-                any(),
-                eq(caseTestData.getCaseData().getTribunalCorrespondenceEmail()),
-                any(),
-                eq(caseTestData.getExpectedDetails().getId().toString())
-            );
-        }
-
-        @Test
-        void shouldNotSendResponseEmailToTribunal() throws NotificationClientException {
-            caseTestData.getCaseData().setManagingOffice(UNASSIGNED_OFFICE);
-            notificationService.sendResponseEmailToTribunal(
-                details,
-                CHANGE_DETAILS_APPLICATION_TYPE,
-                false
-            );
-
-            verify(notificationClient, times(0)).sendEmail(
-                any(),
-                eq(caseTestData.getCaseData().getTribunalCorrespondenceEmail()),
-                any(),
-                eq(caseTestData.getExpectedDetails().getId().toString())
-            );
-        }
-
-        @Test
-        void shouldSendResponseToRequestEmailToTribunal() throws NotificationClientException {
-            caseTestData.getCaseData().setTribunalCorrespondenceEmail("tribunal@test.com");
-            notificationService.sendResponseEmailToTribunal(details, CHANGE_DETAILS_APPLICATION_TYPE, true);
-
-            verify(notificationClient, times(1)).sendEmail(
-                eq("tseTribunalResponseToRequestTemplateId"),
-                eq(caseTestData.getCaseData().getTribunalCorrespondenceEmail()),
                 any(),
                 eq(caseTestData.getExpectedDetails().getId().toString())
             );

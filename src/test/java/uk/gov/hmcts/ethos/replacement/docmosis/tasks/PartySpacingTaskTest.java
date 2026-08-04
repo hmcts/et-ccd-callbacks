@@ -73,7 +73,7 @@ class PartySpacingTaskTest {
         CaseData caseData = submitEvent.getCaseData();
         caseData.getClaimantIndType().setClaimantFirstNames("John ");
         caseData.getClaimantIndType().setClaimantLastName(" Doe");
-        caseData.getRespondentCollection().get(0).getValue().setRespondentName(" Jane Doe ");
+        caseData.getRespondentCollection().getFirst().getValue().setRespondentName(" Jane Doe ");
         caseData.getRepresentativeClaimantType().setNameOfRepresentative("  Tim Doe  ");
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseData)
@@ -82,11 +82,11 @@ class PartySpacingTaskTest {
         when(ccdClient.startEventForCase(any(), any(), any(), any(), any())).thenReturn(ccdRequest);
         partySpacingTask.refactorPartySpacing();
         verify(ccdClient, times(1)).submitEventForCase(eq("AuthToken"), caseDataArgumentCaptor.capture(),
-                eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT), any(), eq("123456789"));
+                eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT), any(), eq("1234567890123456"));
         CaseData caseDataCaptured = caseDataArgumentCaptor.getValue();
         assertEquals("John", caseDataCaptured.getClaimantIndType().getClaimantFirstNames());
         assertEquals("Doe", caseDataCaptured.getClaimantIndType().getClaimantLastName());
-        assertEquals("Jane Doe", caseDataCaptured.getRespondentCollection().get(0).getValue().getRespondentName());
+        assertEquals("Jane Doe", caseDataCaptured.getRespondentCollection().getFirst().getValue().getRespondentName());
         assertEquals("Tim Doe", caseDataCaptured.getRepresentativeClaimantType().getNameOfRepresentative());
     }
 }

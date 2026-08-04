@@ -16,8 +16,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
@@ -35,7 +33,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.ClaimantTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
@@ -43,8 +40,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -61,13 +56,13 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -111,10 +106,6 @@ class ClaimantTellSomethingElseServiceTest {
     private DocumentManagementService documentManagementService;
     @MockitoBean
     private TornadoService tornadoService;
-    @MockitoBean
-    private UserIdamService userIdamService;
-    @MockitoBean
-    private TribunalOfficesService tribunalOfficesService;
     @Mock
     private FeatureToggleService featureToggleService;
     @MockitoBean
@@ -183,8 +174,7 @@ class ClaimantTellSomethingElseServiceTest {
         emailService = spy(new EmailUtils());
         claimantTellSomethingElseService =
                 new ClaimantTellSomethingElseService(documentManagementService, tornadoService,
-                        userIdamService, emailService, featureToggleService, tribunalOfficesService, caseAccessService,
-                        emailNotificationService);
+                        emailService, featureToggleService, caseAccessService, emailNotificationService);
 
         ReflectionTestUtils.setField(claimantTellSomethingElseService,
                 "tseClaimantRepAcknowledgeNoTemplateId", TEMPLATE_ID_NO);
@@ -203,9 +193,6 @@ class ClaimantTellSomethingElseServiceTest {
                 "cyTseClaimantToRespondentTypeATemplateId", TEMPLATE_ID_A_CY);
         ReflectionTestUtils.setField(claimantTellSomethingElseService,
                 "cyTseClaimantToRespondentTypeBTemplateId", TEMPLATE_ID_B_CY);
-
-        UserDetails userDetails = HelperTest.getUserDetails();
-        when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
     }
 
     @ParameterizedTest
@@ -843,49 +830,5 @@ class ClaimantTellSomethingElseServiceTest {
         caseData.setClaimantTseSelectApplication(selectedApplication);
         caseData.setClaimantTseRule92(YES);
         return caseData;
-    }
-
-    @Test
-    void sendAdminEmail_DoesNothingWhenNoManagingOfficeIsSet() {
-        CaseData caseData = createCaseData("", YES);
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseData(caseData);
-        caseDetails.setCaseId(CASE_ID);
-
-        claimantTellSomethingElseService.sendAdminEmail(caseDetails);
-        verify(emailService, never()).sendEmail(any(), any(), any());
-    }
-
-    @Test
-    void sendAdminEmail_DoesNothingWhenNoManagingOfficeHasNoEmail() {
-        CaseData caseData = createCaseData("", YES);
-        CaseDetails caseDetails = new CaseDetails();
-        caseData.setManagingOffice("Aberdeen");
-        caseDetails.setCaseData(caseData);
-        caseDetails.setCaseId(CASE_ID);
-
-        claimantTellSomethingElseService.sendAdminEmail(caseDetails);
-        verify(emailService, never()).sendEmail(any(), any(), any());
-    }
-
-    @Test
-    void sendAdminEmail_SendsEmail() {
-        CaseData caseData = createCaseData("", YES);
-        CaseDetails caseDetails = new CaseDetails();
-        caseData.setManagingOffice("Bristol");
-        caseDetails.setCaseData(caseData);
-        caseDetails.setCaseId(CASE_ID);
-
-        when(tribunalOfficesService.getTribunalOffice(any())).thenReturn(TribunalOffice.BRISTOL);
-        claimantTellSomethingElseService.sendAdminEmail(caseDetails);
-
-        Map<String, String> caseNumber = Map.of("caseNumber", "test",
-                "emailFlag", "",
-                "claimant", "claimant",
-                "respondents", "Father Ted",
-                "date", "Not set",
-                "url", "exuiUrl669718251103419");
-
-        verify(emailService, times(1)).sendEmail(any(), any(), eq(caseNumber));
     }
 }

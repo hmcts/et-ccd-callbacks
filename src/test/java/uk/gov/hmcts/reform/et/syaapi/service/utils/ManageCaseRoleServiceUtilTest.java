@@ -179,6 +179,57 @@ class ManageCaseRoleServiceUtilTest {
     }
 
     @Test
+    void theGetCaseUserRolesExpandsCreatorToIncludeClaimantNonLegalRepresentative() {
+        assertThat(ManageCaseRoleServiceUtil.getCaseUserRoles(null))
+            .containsExactly(CASE_USER_ROLE_CREATOR,
+                             ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE);
+        assertThat(ManageCaseRoleServiceUtil.getCaseUserRoles("CREATOR"))
+            .containsExactly(CASE_USER_ROLE_CREATOR,
+                             ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE);
+    }
+
+    @Test
+    void theGetCaseUserRolesReturnsSingleBracketedRoleForNonCreator() {
+        assertThat(ManageCaseRoleServiceUtil.getCaseUserRoles("DEFENDANT"))
+            .containsExactly(ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT);
+    }
+
+    @Test
+    void theGetCaseDetailsByCaseUserRolesReturnsMatchesAndInjectsRole() {
+        CaseDetails caseDetails = new CaseTestData().getCaseDetails();
+        CaseAssignmentUserRole creatorAssignment = CaseAssignmentUserRole.builder()
+            .caseRole(TEST_CASE_USER_ROLE_CREATOR)
+            .caseDataId(caseDetails.getId().toString())
+            .userId(USER_ID).build();
+
+        List<CaseDetails> result = ManageCaseRoleServiceUtil.getCaseDetailsByCaseUserRoles(
+            List.of(caseDetails),
+            List.of(creatorAssignment),
+            List.of(TEST_CASE_USER_ROLE_CREATOR,
+                    ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE));
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getData())
+            .containsEntry(ManageCaseRoleConstants.CASE_USER_ROLE_DATA_KEY, TEST_CASE_USER_ROLE_CREATOR);
+    }
+
+    @Test
+    void theGetCaseDetailsByCaseUserRolesExcludesUnrequestedRoles() {
+        CaseDetails caseDetails = new CaseTestData().getCaseDetails();
+        CaseAssignmentUserRole defendantAssignment = CaseAssignmentUserRole.builder()
+            .caseRole(ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT)
+            .caseDataId(caseDetails.getId().toString())
+            .userId(USER_ID).build();
+
+        List<CaseDetails> result = ManageCaseRoleServiceUtil.getCaseDetailsByCaseUserRoles(
+            List.of(caseDetails),
+            List.of(defendantAssignment),
+            List.of(TEST_CASE_USER_ROLE_CREATOR));
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
     void theIsCaseRoleAssignmentExceptionForSameUser() {
         assertThat(ManageCaseRoleServiceUtil.isCaseRoleAssignmentExceptionForSameUser(
             new Exception("Test Exception"))).isFalse();

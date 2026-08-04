@@ -854,9 +854,11 @@ class ManageCaseRoleServiceTest {
             eq(CaseAssignedUserRolesResponse.class)))
             .thenReturn(expectedCaseAssignedUserRolesResponseCreator);
         List<CaseDetails> caseDetailsForCreator =
-            manageCaseRoleService.getUserCasesByCaseUserRole(TEST_SERVICE_AUTH_TOKEN, CASE_USER_ROLE_CREATOR);
-        assertThat(caseDetailsForCreator)
-            .hasSize(expectedCaseDetails.size()).hasSameElementsAs(expectedCaseDetails);
+            manageCaseRoleService.getUserCasesByCaseUserRoles(TEST_SERVICE_AUTH_TOKEN,
+                                                             List.of(CASE_USER_ROLE_CREATOR));
+        assertThat(caseDetailsForCreator).hasSize(expectedCaseDetails.size());
+        assertThat(caseDetailsForCreator.stream().map(CaseDetails::getId).toList())
+            .containsExactlyInAnyOrderElementsOf(expectedCaseDetails.stream().map(CaseDetails::getId).toList());
 
         when(restTemplate.postForObject(
             eq(CCD_API_URL_PARAMETER_TEST_VALUE
@@ -865,9 +867,11 @@ class ManageCaseRoleServiceTest {
             eq(CaseAssignedUserRolesResponse.class)))
             .thenReturn(expectedCaseAssignedUserRolesResponseDefendant);
         List<CaseDetails> caseDetailsForDefendant =
-            manageCaseRoleService.getUserCasesByCaseUserRole(TEST_SERVICE_AUTH_TOKEN, CASE_USER_ROLE_DEFENDANT);
-        assertThat(caseDetailsForDefendant)
-            .hasSize(expectedCaseDetails.size()).hasSameElementsAs(expectedCaseDetails);
+            manageCaseRoleService.getUserCasesByCaseUserRoles(TEST_SERVICE_AUTH_TOKEN,
+                                                             List.of(CASE_USER_ROLE_DEFENDANT));
+        assertThat(caseDetailsForDefendant).hasSize(expectedCaseDetails.size());
+        assertThat(caseDetailsForDefendant.stream().map(CaseDetails::getId).toList())
+            .containsExactlyInAnyOrderElementsOf(expectedCaseDetails.stream().map(CaseDetails::getId).toList());
     }
 
     @Test

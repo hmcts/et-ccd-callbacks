@@ -89,6 +89,8 @@
         <packageUrl regex="true">^pkg:maven/co\.elastic\.clients/elasticsearch\-(java|rest5\-client)@9\.4\.2$</packageUrl>
         <cve>CVE-2026-56148</cve>
         <cve>CVE-2026-56149</cve>
+        <cve>CVE-2026-63144</cve>
+        <cve>CVE-2026-63263</cve>
     </suppress>
     <!-- CVE-2026-53914 affects Kotlin compiler build-cache metadata (fixed in 2.4.20, not yet on Maven Central).
          kotlin-stdlib here is a runtime transitive dependency from okhttp; this project does not use the Kotlin Gradle plugin. -->

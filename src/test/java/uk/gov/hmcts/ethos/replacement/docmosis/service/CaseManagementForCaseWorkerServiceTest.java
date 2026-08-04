@@ -104,9 +104,6 @@ class CaseManagementForCaseWorkerServiceTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     public static final String UNASSIGNED_OFFICE = "Unassigned";
     private static final String HMCTS_SERVICE_ID = "BHA1";
-    private static final String RESPONDENT_NOT_CONTINUING_FLAG_COMMENT =
-            "The claim against the respondent is not continuing";
-    private static final String RESPONDENT_STRUCK_OUT_FLAG_COMMENT = "The respondent has been struck out";
 
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
@@ -137,8 +134,6 @@ class CaseManagementForCaseWorkerServiceTest {
     @MockitoBean
     private FeatureToggleService featureToggleService;
     @MockitoBean
-    private CaseFlagsService caseFlagsService;
-    @MockitoBean
     private AdminUserService adminUserService;
     @MockitoBean
     private CaseManagementLocationService caseManagementLocationService;
@@ -163,7 +158,7 @@ class CaseManagementForCaseWorkerServiceTest {
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
-                caseRetrievalForCaseWorkerService, ccdClient, featureToggleService, caseFlagsService, HMCTS_SERVICE_ID,
+                caseRetrievalForCaseWorkerService, ccdClient, featureToggleService, HMCTS_SERVICE_ID,
                 adminUserService, caseManagementLocationService, multipleReferenceService, ccdGatewayBaseUrl,
                 multipleCasesSendingService, answersConverter);
     }
@@ -497,7 +492,6 @@ class CaseManagementForCaseWorkerServiceTest {
         assertThat(caseData.getRespondentCollection().get(1).getValue().getResponseStruckOut()).isEqualTo(NO);
         assertThat(caseData.getRespondentCollection().get(2).getValue().getRespondentName()).isEqualTo("Juan Garcia");
         assertThat(caseData.getRespondentCollection().get(2).getValue().getResponseStruckOut()).isEqualTo(YES);
-        verify(caseFlagsService).inactivateCaseFlags(caseData, "Juan Garcia", RESPONDENT_STRUCK_OUT_FLAG_COMMENT);
     }
 
     @Test
@@ -556,11 +550,6 @@ class CaseManagementForCaseWorkerServiceTest {
         assertThat(caseData.getRespondentCollection().get(2).getValue().getRespondentName())
                 .isEqualTo("Roberto Dondini");
         assertThat(caseData.getRespondentCollection().get(2).getValue().getResponseContinue()).isEqualTo(NO);
-        verify(caseFlagsService).inactivateCaseFlags(
-                caseData,
-                "Roberto Dondini",
-                RESPONDENT_NOT_CONTINUING_FLAG_COMMENT
-        );
     }
 
     @Test
@@ -569,35 +558,6 @@ class CaseManagementForCaseWorkerServiceTest {
         assertThat(caseData.getRespondentCollection()).hasSize(1);
         assertThat(caseData.getRespondentCollection().getFirst().getValue().getResponseContinue()).isEqualTo(YES);
     }
-
-    @Test
-    void continuingRespondentDefaultsResponseContinueWhenRepCollectionExists() {
-        CaseData caseData = scotlandCcdRequest3.getCaseDetails().getCaseData();
-        caseData.setRepCollection(createRepCollection());
-        caseData.getRespondentCollection().getFirst().getValue().setResponseContinue(null);
-
-        caseManagementForCaseWorkerService.continuingRespondent(scotlandCcdRequest3);
-
-        assertThat(caseData.getRespondentCollection().getFirst().getValue().getResponseContinue()).isEqualTo(YES);
-        verify(caseFlagsService, never()).inactivateCaseFlags(any(), anyString(), anyString());
-    }
-
-    @Test
-    void continuingRespondentInactivatesCaseFlagsWhenRepCollectionExistsAndResponseDoesNotContinue() {
-        CaseData caseData = scotlandCcdRequest3.getCaseDetails().getCaseData();
-        caseData.setRepCollection(createRepCollection());
-        caseData.getRespondentCollection().getFirst().getValue().setResponseContinue(NO);
-
-        caseManagementForCaseWorkerService.continuingRespondent(scotlandCcdRequest3);
-
-        assertThat(caseData.getRespondentCollection().getFirst().getValue().getResponseContinue()).isEqualTo(NO);
-        verify(caseFlagsService).inactivateCaseFlags(
-                caseData,
-                "Antonio Vazquez",
-                RESPONDENT_NOT_CONTINUING_FLAG_COMMENT
-        );
-    }
-
     @Test
     void continuingRespondentEmpty() {
         CaseData caseData = caseManagementForCaseWorkerService.continuingRespondent(scotlandCcdRequest5);

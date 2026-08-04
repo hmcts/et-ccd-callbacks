@@ -100,6 +100,8 @@
         <packageUrl regex="true">^pkg:maven/co\.elastic\.clients/elasticsearch\-(java|rest5\-client)@9\.4\.2$</packageUrl>
         <cve>CVE-2026-56148</cve>
         <cve>CVE-2026-56149</cve>
+        <cve>CVE-2026-63144</cve>
+        <cve>CVE-2026-63263</cve>
     </suppress>
     <!-- All other CVEs below -->
     <!-- CVE-2026-54515 affects jackson-databind 2.22.0 which is the latest available version.

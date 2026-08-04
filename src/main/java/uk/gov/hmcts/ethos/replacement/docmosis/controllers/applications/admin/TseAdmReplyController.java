@@ -17,12 +17,10 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.applications.admin.TseAdmReplyService;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_WHAT_HAPPENS_NEXT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
@@ -34,8 +32,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequiredArgsConstructor
 public class TseAdmReplyController {
 
-    private static final String INVALID_TOKEN = "Invalid Token {}";
-    private final VerifyTokenService verifyTokenService;
     private final TseAdmReplyService tseAdmReplyService;
 
     /**
@@ -61,11 +57,6 @@ public class TseAdmReplyController {
     public ResponseEntity<CCDCallbackResponse> midDetailsTable(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setTseAdmReplyTableMarkUp(tseAdmReplyService.initialTseAdmReplyTableMarkUp(caseData, userToken));
@@ -96,11 +87,6 @@ public class TseAdmReplyController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         return getCallbackRespEntityErrors(errors, caseData);
@@ -119,10 +105,6 @@ public class TseAdmReplyController {
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
@@ -159,11 +141,6 @@ public class TseAdmReplyController {
     public ResponseEntity<CCDCallbackResponse> submitted(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         String body = String.format(APPLICATION_WHAT_HAPPENS_NEXT,
             ccdRequest.getCaseDetails().getCaseId());

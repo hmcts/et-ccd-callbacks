@@ -1178,6 +1178,41 @@ class NotificationServiceTest {
         );
     }
 
+    @Test
+    void shouldSendRespondentBundlesEmailToClaimantAndTribunal() throws NotificationClientException {
+        given(notificationsProperties.getBundlesRespondentSubmittedForClaimantTemplateId()
+        ).willReturn("bundlesRespondentSubmittedForClaimantTemplateId");
+        given(notificationsProperties.getBundlesRespondentSubmittedForTribunalTemplateId()
+        ).willReturn("bundlesRespondentSubmittedForTribunalTemplateId");
+        given(notificationsProperties.getCitizenPortalLink()).willReturn("http://citizen/");
+        given(notificationsProperties.getExuiCaseDetailsLink()).willReturn("http://exui/");
+
+        caseData = caseTestData.getCaseData();
+        caseData.setEt1OnlineSubmission(YES);
+        String futureDate = LocalDateTime.now().plusDays(5).toString();
+        caseData.getHearingCollection().getFirst().getValue()
+            .getHearingDateCollection().getFirst().getValue().setListedDate(futureDate);
+
+        notificationService.sendRespondentBundlesEmails(
+            caseData,
+            caseTestData.getExpectedDetails().getId().toString(),
+            "123345"
+        );
+
+        verify(notificationClient, times(1)).sendEmail(
+            eq("bundlesRespondentSubmittedForClaimantTemplateId"),
+            eq(caseData.getClaimantType().getClaimantEmailAddress()),
+            any(),
+            eq(caseTestData.getExpectedDetails().getId().toString())
+        );
+        verify(notificationClient, times(1)).sendEmail(
+            eq("bundlesRespondentSubmittedForTribunalTemplateId"),
+            eq(caseData.getTribunalCorrespondenceEmail()),
+            any(),
+            eq(caseTestData.getExpectedDetails().getId().toString())
+        );
+    }
+
     @BeforeEach
     void setUp() {
         claimantHearingPreference = new ClaimantHearingPreference();

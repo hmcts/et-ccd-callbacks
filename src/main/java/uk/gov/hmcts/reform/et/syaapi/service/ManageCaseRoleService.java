@@ -70,6 +70,7 @@ import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.YES;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_SOLICITOR;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CREATOR;
+import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_DATA_KEY;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.MODIFICATION_TYPE_ASSIGNMENT;
 import static uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent.REMOVE_OWN_REP_AS_CLAIMANT;
@@ -743,17 +744,17 @@ public class ManageCaseRoleService {
     // @Retryable({FeignException.class, RuntimeException.class}) --> No need to give exception classes as Retryable
     // covers all runtime exceptions.
     @Retryable
-    public List<CaseDetails> getUserCasesByCaseUserRole(String authorization, String caseUserRole) {
-        return getCasesByCaseDetailsListAuthorizationAndCaseUserRole(getCaseDetailsByCaseUserRole(authorization,
-                                                                                                  caseUserRole),
-                                                                     authorization,
-                                                                     caseUserRole);
+    public List<CaseDetails> getUserCasesByCaseUserRoles(String authorization, List<String> caseUserRoles) {
+        return getCasesByCaseDetailsListAuthorizationAndCaseUserRoles(getCaseDetailsByCaseUserRole(authorization,
+                                                                                                   caseUserRoles),
+                                                                      authorization,
+                                                                      caseUserRoles);
     }
 
-    private List<CaseDetails> getCaseDetailsByCaseUserRole(String authorization, String caseUserRole) {
+    private List<CaseDetails> getCaseDetailsByCaseUserRole(String authorization, List<String> caseUserRoles) {
         // If defendant uses ET3 cases search because case service's all case search doesn't list all cases
         // immediately after assigning a new case
-        log.info("CASE USER ROLE VALUE ON getCaseDetailsByCaseUserRole: {}", caseUserRole);
+        log.info("CASE USER ROLE VALUES ON getCaseDetailsByCaseUserRole: {}", caseUserRoles);
         return caseService.getAllUserCases(authorization);
     }
 
@@ -772,6 +773,33 @@ public class ManageCaseRoleService {
             throw new ManageCaseRoleException(e);
         }
         return caseDetailsListByRole;
+    }
+
+    /**
+     * Filters the given cases to those where the user holds any of {@code caseUserRoles}, stamping each returned
+     * case with its matched role (under {@code caseUserRole} in case data) and filtering its documents by that
+     * role. Lets a single {@code /user-cases} call return cases for multiple roles for the frontend to filter.
+     */
+    private List<CaseDetails> getCasesByCaseDetailsListAuthorizationAndCaseUserRoles(
+        List<CaseDetails> caseDetailsList, String authorization, List<String> caseUserRoles) {
+        List<CaseDetails> caseDetailsListByRoles;
+        try {
+            CaseAssignedUserRolesResponse caseAssignedUserRolesResponse =
+                getCaseUserRolesByCaseAndUserIdsCcd(authorization, caseDetailsList);
+            caseDetailsListByRoles = ManageCaseRoleServiceUtil
+                .getCaseDetailsByCaseUserRoles(caseDetailsList,
+                                               caseAssignedUserRolesResponse.getCaseAssignedUserRoles(),
+                                               caseUserRoles);
+            for (CaseDetails caseDetails : caseDetailsListByRoles) {
+                String caseUserRole = ObjectUtils.isNotEmpty(caseDetails.getData())
+                    ? (String) caseDetails.getData().get(CASE_USER_ROLE_DATA_KEY)
+                    : null;
+                DocumentUtil.filterCasesDocumentsByCaseUserRole(List.of(caseDetails), caseUserRole);
+            }
+        } catch (IOException e) {
+            throw new ManageCaseRoleException(e);
+        }
+        return caseDetailsListByRoles;
     }
 
     /**

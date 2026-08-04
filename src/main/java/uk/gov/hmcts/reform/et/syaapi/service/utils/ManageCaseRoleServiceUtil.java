@@ -26,8 +26,10 @@ import java.util.List;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_STATE_ACCEPTED;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USERS_API_URL;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USERS_RETRIEVE_API;
+import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_SOLICITOR;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CREATOR;
+import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_DATA_KEY;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.EXCEPTION_CASE_DETAILS_NOT_FOUND;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.EXCEPTION_CASE_DETAILS_NOT_HAVE_CASE_DATA;
@@ -43,9 +45,11 @@ import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.MO
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.MODIFY_CASE_USER_ROLE_ITEM_INVALID;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.STRING_AMPERSAND;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.STRING_EQUAL;
+import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.STRING_LEFT_SQUARE_BRACKET;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.STRING_PARAM_NAME_CASE_IDS;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.STRING_PARAM_NAME_USER_IDS;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.STRING_QUESTION_MARK;
+import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.STRING_RIGHT_SQUARE_BRACKET;
 
 @Slf4j
 public final class ManageCaseRoleServiceUtil {
@@ -145,7 +149,8 @@ public final class ManageCaseRoleServiceUtil {
             && StringUtils.isNotEmpty(caseAssignmentUserRole.getCaseDataId())
             && (caseDetails.getId().toString().equals(caseAssignmentUserRole.getCaseDataId()))
             && (CASE_USER_ROLE_CREATOR.equals(caseAssignmentUserRole.getCaseRole())
-            ||  CASE_USER_ROLE_DEFENDANT.equals(caseAssignmentUserRole.getCaseRole()))
+            ||  CASE_USER_ROLE_DEFENDANT.equals(caseAssignmentUserRole.getCaseRole())
+            ||  CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE.equals(caseAssignmentUserRole.getCaseRole()))
             ? caseAssignmentUserRole.getCaseRole() : StringUtils.EMPTY;
     }
 
@@ -216,6 +221,65 @@ public final class ManageCaseRoleServiceUtil {
             }
         }
         return caseDetailsListByRole;
+    }
+
+    /**
+     * Returns the cases where the user holds any of the given case roles. Each returned case has its matched
+     * role added to its case data under {@link ManageCaseRoleConstants#CASE_USER_ROLE_DATA_KEY} so a single
+     * response can carry cases for multiple roles and the frontend can filter on the role per case.
+     *
+     * @param caseDetailsList          the user's cases to filter
+     * @param caseAssignmentUserRoles  the user's case-role assignments (from CCD/AAC)
+     * @param caseUserRoles            the roles to match (e.g. {@code [CREATOR]},
+     *                                 {@code [CLAIMANTNONLEGALREPRESENTATIVE]})
+     * @return the matching cases, each with its role stored in case data
+     */
+    public static List<CaseDetails> getCaseDetailsByCaseUserRoles(
+        List<CaseDetails> caseDetailsList, List<CaseAssignmentUserRole> caseAssignmentUserRoles,
+        List<String> caseUserRoles) {
+        List<CaseDetails> caseDetailsListByRoles = new ArrayList<>();
+        if (CollectionUtils.isEmpty(caseDetailsList)
+            || CollectionUtils.isEmpty(caseAssignmentUserRoles)
+            || CollectionUtils.isEmpty(caseUserRoles)) {
+            return caseDetailsListByRoles;
+        }
+        for (CaseAssignmentUserRole caseAssignmentUserRole : caseAssignmentUserRoles) {
+            for (CaseDetails caseDetails : caseDetailsList) {
+                String tmpCaseUserRole = ManageCaseRoleServiceUtil.findCaseUserRole(
+                    caseDetails, caseAssignmentUserRole);
+                if (StringUtils.isNotBlank(tmpCaseUserRole)
+                    && caseUserRoles.contains(tmpCaseUserRole)
+                    && !caseDetailsListByRoles.contains(caseDetails)) {
+                    if (ObjectUtils.isNotEmpty(caseDetails.getData())) {
+                        caseDetails.getData().put(CASE_USER_ROLE_DATA_KEY, tmpCaseUserRole);
+                    }
+                    caseDetailsListByRoles.add(caseDetails);
+                    break;
+                }
+            }
+        }
+        return caseDetailsListByRoles;
+    }
+
+    /**
+     * Resolves the case roles to fetch for the given {@code case_user_role} request parameter. The role is
+     * bracketed, defaulting to {@code [CREATOR]} when blank. A request for {@code [CREATOR]} is expanded to also
+     * include {@code [CLAIMANTNONLEGALREPRESENTATIVE]}, since a self-representing claimant holds that role in
+     * place of creator, so both should be returned together for the frontend to filter.
+     *
+     * @param caseUserRole the raw request parameter value (a single role, without brackets)
+     * @return the list of bracketed case roles to fetch
+     */
+    public static List<String> getCaseUserRoles(String caseUserRole) {
+        String bracketedRole = StringUtils.isBlank(caseUserRole)
+            ? CASE_USER_ROLE_CREATOR
+            : STRING_LEFT_SQUARE_BRACKET + caseUserRole.trim() + STRING_RIGHT_SQUARE_BRACKET;
+        List<String> caseUserRoles = new ArrayList<>();
+        caseUserRoles.add(bracketedRole);
+        if (CASE_USER_ROLE_CREATOR.equals(bracketedRole)) {
+            caseUserRoles.add(CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE);
+        }
+        return caseUserRoles;
     }
 
     public static boolean isCaseRoleAssignmentExceptionForSameUser(Exception exception) {

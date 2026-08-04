@@ -49,6 +49,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SCOTLAND_CASE_TYPE;
+import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CREATOR;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_FIRST_NAME;
@@ -137,8 +138,9 @@ class ManageCaseControllerTest {
     void shouldGetCaseDetailsByUser() {
         when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
         when(idamClient.getUserInfo(TEST_SERVICE_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
-        when(manageCaseRoleService.getUserCasesByCaseUserRole(
-            TEST_SERVICE_AUTH_TOKEN, CASE_USER_ROLE_CREATOR
+        when(manageCaseRoleService.getUserCasesByCaseUserRoles(
+            TEST_SERVICE_AUTH_TOKEN,
+            List.of(CASE_USER_ROLE_CREATOR, CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE)
         )).thenReturn(requestCaseDataList);
 
         // when
@@ -161,8 +163,8 @@ class ManageCaseControllerTest {
     void shouldGetCaseDetailsByDefendantUser() {
         when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
         when(idamClient.getUserInfo(TEST_SERVICE_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
-        when(manageCaseRoleService.getUserCasesByCaseUserRole(
-            TEST_SERVICE_AUTH_TOKEN, CASE_USER_ROLE_DEFENDANT
+        when(manageCaseRoleService.getUserCasesByCaseUserRoles(
+            TEST_SERVICE_AUTH_TOKEN, List.of(CASE_USER_ROLE_DEFENDANT)
         )).thenReturn(requestCaseDataList);
 
         // when
@@ -177,6 +179,27 @@ class ManageCaseControllerTest {
             .andExpect(jsonPath("[0].state").value(requestCaseDataList.get(0).getState()))
             .andExpect(jsonPath("[0].created_date").exists())
             .andExpect(jsonPath("[0].last_modified").exists())
+            .andExpect(jsonPath("[1].case_type_id").value(requestCaseDataList.get(1).getCaseTypeId()));
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldExpandCreatorRequestToIncludeClaimantNonLegalRepresentative() {
+        when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
+        when(idamClient.getUserInfo(TEST_SERVICE_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
+        when(manageCaseRoleService.getUserCasesByCaseUserRoles(
+            TEST_SERVICE_AUTH_TOKEN,
+            List.of(CASE_USER_ROLE_CREATOR, CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE)
+        )).thenReturn(requestCaseDataList);
+
+        // when
+        mockMvc.perform(
+                get("/cases/user-cases?case_user_role=CREATOR", SCOTLAND_CASE_TYPE)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header(HttpHeaders.AUTHORIZATION, TEST_SERVICE_AUTH_TOKEN))
+            // then
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("[0].case_type_id").value(requestCaseDataList.get(0).getCaseTypeId()))
             .andExpect(jsonPath("[1].case_type_id").value(requestCaseDataList.get(1).getCaseTypeId()));
     }
 

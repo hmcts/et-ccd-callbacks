@@ -40,7 +40,8 @@
       {
         "UserRoles": [
           "[CREATOR]",
-          "caseworker-employment-api"
+          "caseworker-employment-api",
+          "[CLAIMANTNONLEGALREPRESENTATIVE]"
         ],
         "CRUD": "CRUD"
       }

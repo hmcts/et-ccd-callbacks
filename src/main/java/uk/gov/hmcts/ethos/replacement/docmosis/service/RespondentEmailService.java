@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
@@ -24,7 +23,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService.BEARER;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT;
 
 /**
@@ -83,18 +81,7 @@ public class RespondentEmailService {
 
     private final IdamApi idamApi;
     private final AdminUserService adminUserService;
-    private final UserIdamService userIdamService;
     private final CcdCaseAssignment ccdCaseAssignment;
-
-    /**
-     * RSE IdAM simulator does not implement real /api/v1/users search. Enable in cftlib so local
-     * testing can resolve accounts via password login + /o/userinfo instead.
-     */
-    @Value("${idam.user-search.local-password-fallback:false}")
-    private boolean localPasswordFallback;
-
-    @Value("${idam.user-search.local-password:password}")
-    private String localPassword;
 
     public List<String> initialise(CaseData caseData) {
         return RespondentEmailUpdateHelper.initialise(caseData);
@@ -228,10 +215,6 @@ public class RespondentEmailService {
                 .filter(user -> StringUtils.equalsIgnoreCase(email, user.getEmail()))
                 .toList();
         if (exactMatches.isEmpty()) {
-            Optional<UserDetails> localUser = findUserViaLocalPasswordFallback(email);
-            if (localUser.isPresent()) {
-                return requireCitizenAccount(localUser.get(), errors);
-            }
             errors.add(IDAM_USER_NOT_FOUND_ERROR);
             return Optional.empty();
         }
@@ -248,23 +231,6 @@ public class RespondentEmailService {
             return Optional.empty();
         }
         return Optional.of(user);
-    }
-
-    private Optional<UserDetails> findUserViaLocalPasswordFallback(String email) {
-        if (!localPasswordFallback || StringUtils.isBlank(email)) {
-            return Optional.empty();
-        }
-        try {
-            String accessToken = userIdamService.getAccessToken(email, localPassword);
-            UserDetails user = userIdamService.getUserDetails(String.join(" ", BEARER, accessToken));
-            if (user != null && StringUtils.equalsIgnoreCase(email, user.getEmail())) {
-                log.info("Resolved IdAM user via local password fallback for {}", email);
-                return Optional.of(user);
-            }
-        } catch (Exception exception) {
-            log.info("Local IdAM password fallback could not resolve {}: {}", email, exception.getMessage());
-        }
-        return Optional.empty();
     }
 
     private Optional<CaseUserAssignment> getDefendantAssignment(String caseId, String userId) throws IOException {

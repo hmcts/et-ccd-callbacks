@@ -7,7 +7,6 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -57,8 +56,6 @@ class RespondentEmailServiceTest {
     private IdamApi idamApi;
     @Mock
     private AdminUserService adminUserService;
-    @Mock
-    private UserIdamService userIdamService;
     @Mock
     private CcdCaseAssignment ccdCaseAssignment;
 
@@ -168,47 +165,6 @@ class RespondentEmailServiceTest {
         assertThat(service.populateCurrentEmail(caseDetails.getCaseData()))
                 .containsExactly(RespondentEmailService.RESPONDENT_REQUIRED_ERROR);
         assertThat(caseDetails.getCaseData().getCurrentRespondentEmail()).isNull();
-    }
-
-    @Test
-    void validateUsesLocalPasswordFallbackWhenSearchFindsNothing() {
-        prepareSelectedEmailFields();
-        ReflectionTestUtils.setField(service, "localPasswordFallback", true);
-        ReflectionTestUtils.setField(service, "localPassword", "password");
-        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
-        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50)).thenReturn(List.of());
-        when(userIdamService.getAccessToken(NEW_EMAIL, "password")).thenReturn("access-token");
-        when(userIdamService.getUserDetails("Bearer access-token"))
-                .thenReturn(user(NEW_EMAIL, NEW_USER_ID, List.of("citizen")));
-
-        assertThat(service.validateNewEmail(caseDetails.getCaseData())).isEmpty();
-    }
-
-    @Test
-    void validateRejectsNonCitizenUserFromLocalPasswordFallback() {
-        prepareSelectedEmailFields();
-        ReflectionTestUtils.setField(service, "localPasswordFallback", true);
-        ReflectionTestUtils.setField(service, "localPassword", "password");
-        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
-        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50)).thenReturn(List.of());
-        when(userIdamService.getAccessToken(NEW_EMAIL, "password")).thenReturn("access-token");
-        when(userIdamService.getUserDetails("Bearer access-token"))
-                .thenReturn(user(NEW_EMAIL, NEW_USER_ID, List.of("caseworker")));
-
-        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
-                .containsExactly(RespondentEmailService.IDAM_USER_NOT_CITIZEN_ERROR);
-    }
-
-    @Test
-    void validateDoesNotUseLocalPasswordFallbackWhenDisabled() {
-        prepareSelectedEmailFields();
-        ReflectionTestUtils.setField(service, "localPasswordFallback", false);
-        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
-        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50)).thenReturn(List.of());
-
-        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
-                .containsExactly(RespondentEmailService.IDAM_USER_NOT_FOUND_ERROR);
-        verify(userIdamService, never()).getAccessToken(anyString(), anyString());
     }
 
     @Test

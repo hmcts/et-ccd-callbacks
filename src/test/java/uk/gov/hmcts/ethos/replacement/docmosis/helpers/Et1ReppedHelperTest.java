@@ -184,6 +184,18 @@ class Et1ReppedHelperTest {
 
     }
 
+    @Test
+    void setEt1SubmitDataSavesClaimantHearingPanelPreference() {
+        caseData.setClaimantHearingPanelPreference("Panel");
+        caseData.setClaimantHearingPanelPreferenceReason("Workplace expertise is required");
+
+        Et1ReppedHelper.setEt1SubmitData(caseData);
+
+        assertEquals("Panel", caseData.getClaimantHearingPreference().getClaimantHearingPanelPreference());
+        assertEquals("Workplace expertise is required",
+                caseData.getClaimantHearingPreference().getClaimantHearingPanelPreferenceWhy());
+    }
+
     private void generateRespondentTypeInfo(String type) {
         if (INDIVIDUAL.equals(type)) {
             caseData.setRespondentFirstName("First");

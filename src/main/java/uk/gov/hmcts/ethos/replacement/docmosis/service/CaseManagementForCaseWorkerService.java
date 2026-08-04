@@ -470,29 +470,30 @@ public class CaseManagementForCaseWorkerService {
 
     public CaseData continuingRespondent(CCDRequest ccdRequest) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        if (isNotEmpty(caseData.getRespondentCollection())) {
-            List<RespondentSumTypeItem> continuingRespondent = new ArrayList<>();
-            List<RespondentSumTypeItem> notContinuingRespondent = new ArrayList<>();
-            for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
-                RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
-                if (YES.equals(respondentSumType.getResponseContinue())) {
-                    continuingRespondent.add(respondentSumTypeItem);
-                } else if (NO.equals(respondentSumType.getResponseContinue())) {
-                    notContinuingRespondent.add(respondentSumTypeItem);
-                    caseFlagsService.inactivateCaseFlags(
-                            caseData,
-                            respondentSumType.getRespondentName(),
-                            RESPONDENT_NOT_CONTINUING_FLAG_COMMENT
-                    );
-                } else {
-                    respondentSumType.setResponseContinue(YES);
-                    continuingRespondent.add(respondentSumTypeItem);
-                }
-            }
-            caseData.setRespondentCollection(Stream.concat(continuingRespondent.stream(),
-                    notContinuingRespondent.stream()).toList());
-            respondentDefaults(caseData);
+        if (isEmpty(caseData.getRespondentCollection())) {
+            return caseData;
         }
+        List<RespondentSumTypeItem> continuingRespondent = new ArrayList<>();
+        List<RespondentSumTypeItem> notContinuingRespondent = new ArrayList<>();
+        caseData.getRespondentCollection().forEach(respondentSumTypeItem -> {
+            RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
+            if (YES.equals(respondentSumType.getResponseContinue())) {
+                continuingRespondent.add(respondentSumTypeItem);
+            } else if (NO.equals(respondentSumType.getResponseContinue())) {
+                notContinuingRespondent.add(respondentSumTypeItem);
+                caseFlagsService.inactivateCaseFlags(
+                        caseData,
+                        respondentSumType.getRespondentName(),
+                        RESPONDENT_NOT_CONTINUING_FLAG_COMMENT
+                );
+            } else {
+                respondentSumType.setResponseContinue(YES);
+                continuingRespondent.add(respondentSumTypeItem);
+            }
+        });
+        caseData.setRespondentCollection(Stream.concat(continuingRespondent.stream(),
+                notContinuingRespondent.stream()).toList());
+        respondentDefaults(caseData);
         return caseData;
     }
 

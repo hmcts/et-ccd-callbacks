@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -16,25 +15,18 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_TO_A_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_ATTACHMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_CATEGORY_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.SHORT_DESCRIPTION;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.findRepresentativeFromCaseData;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.ET3_RESPONSE_PDF_FILE_NAME;
@@ -50,11 +42,7 @@ public class Et3ResponseService {
 
     private final DocumentManagementService documentManagementService;
     private final PdfBoxService pdfBoxService;
-    private final EmailService emailService;
     private final MyHmctsService myHmctsService;
-
-    @Value("${template.et3Response.tribunal}")
-    private String et3EmailTribunalTemplateId;
 
     @Value("${pdf.et3form}")
     private String et3FormTemplate;
@@ -168,38 +156,4 @@ public class Et3ResponseService {
                 String.format("%s : %s", SHORT_DESCRIPTION, docSubGroup));
     }
 
-    /**
-     * Sends notification emails to Tribunal.
-     * @param caseDetails Contains details about the case.
-     */
-    public void sendNotifications(CaseDetails caseDetails) {
-        emailService.sendEmail(
-            et3EmailTribunalTemplateId,
-            caseDetails.getCaseData().getTribunalCorrespondenceEmail(),
-            buildPersonalisation(caseDetails)
-        );
-    }
-
-    // todo group all personalisation methods and NotificationServiceConstants to EmailService or to a
-    // PersonalisationService. Might even be able to join into one single method that prepares all the data for all
-    // emails (unless some of it is expensive / bespoke / overrides in which case send a map parameter of overrides)
-    private Map<String, String> buildPersonalisation(CaseDetails caseDetails) {
-        CaseData caseData = caseDetails.getCaseData();
-        Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put("case_number", caseData.getEthosCaseReference());
-        personalisation.put(CLAIMANT, caseData.getClaimant());
-        personalisation.put("list_of_respondents", getRespondentNames(caseData));
-        personalisation.put(DATE, ReferralHelper.getNearestHearingToReferral(caseData, "Not set"));
-        personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId()));
-        // TODO: Current templates in environments expect a ccdId - this should be removed later
-        personalisation.put("ccdId", caseDetails.getCaseId());
-        return personalisation;
-    }
-
-    // todo probably should be replaced with Helper.getRespondentNames
-    private static String getRespondentNames(CaseData caseData) {
-        return caseData.getRespondentCollection().stream()
-            .map(o -> o.getValue().getRespondentName())
-            .collect(Collectors.joining(", "));
-    }
 }

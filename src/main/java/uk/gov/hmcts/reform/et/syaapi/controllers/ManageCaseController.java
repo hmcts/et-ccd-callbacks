@@ -60,17 +60,17 @@ public class ManageCaseController {
      * @return the requested case wrapped in a {@link CaseDetails} object
      */
     @PostMapping("/user-case")
-    @Operation(summary = "Return individual case details")
+    @Operation(summary = "Return individual case details, filtered by case role (defaults to CREATOR). A request "
+        + "for CREATOR also matches the user's CLAIMANTNONLEGALREPRESENTATIVE case. The matched role is carried "
+        + "under 'caseUserRole' in the case data.")
     @ApiResponseGroup
     public ResponseEntity<CaseDetails> getUserCaseDetails(
         @RequestHeader(AUTHORIZATION) String authorization,
         @RequestParam(value = CASE_USER_ROLE_API_PARAMETER_NAME, required = false) String caseUserRole,
         @RequestBody CaseRequest caseRequest) {
-        CaseDetails caseDetails = manageCaseRoleService.getUserCaseByCaseUserRole(
+        CaseDetails caseDetails = manageCaseRoleService.getUserCaseByCaseUserRoles(
             authorization, caseRequest.getCaseId(),
-            StringUtils.isBlank(caseUserRole)
-                ? CASE_USER_ROLE_CREATOR
-                : STRING_LEFT_SQUARE_BRACKET + caseUserRole.trim() + STRING_RIGHT_SQUARE_BRACKET);
+            ManageCaseRoleServiceUtil.getCaseUserRoles(caseUserRole));
         return ok(caseDetails);
     }
 

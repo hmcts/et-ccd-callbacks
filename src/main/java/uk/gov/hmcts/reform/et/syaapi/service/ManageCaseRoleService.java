@@ -735,6 +735,33 @@ public class ManageCaseRoleService {
     }
 
     /**
+     * With the given caseId, gets the case details if the user holds any of the given case roles, filtering the
+     * case documents by the matched role and stamping that role into the case data (under {@code caseUserRole}).
+     * Mirrors {@link #getUserCasesByCaseUserRoles} for the single-case endpoint, so a request for {@code [CREATOR]}
+     * also matches a self-representing claimant's {@code [CLAIMANTNONLEGALREPRESENTATIVE]} case.
+     *
+     * @param authorization is used to get the {@link UserInfo} for the request
+     * @param caseId        the id of the case to retrieve
+     * @param caseUserRoles the roles to match
+     * @return the associated {@link CaseDetails} if the user holds one of the roles on it, otherwise {@code null}
+     */
+    @Retryable
+    public CaseDetails getUserCaseByCaseUserRoles(String authorization,
+                                                  String caseId,
+                                                  List<String> caseUserRoles) {
+        CaseDetails caseDetails = ccdApi.getCase(authorization, authTokenGenerator.generate(), caseId);
+        if (ObjectUtils.isEmpty(caseDetails)) {
+            throw new ManageCaseRoleException(
+                new Exception("Unable to find user case by case id: " + caseId));
+        }
+        List<CaseDetails> caseDetailsListByCaseUserRoles =
+            getCasesByCaseDetailsListAuthorizationAndCaseUserRoles(List.of(caseDetails), authorization, caseUserRoles);
+        return CollectionUtils.isNotEmpty(caseDetailsListByCaseUserRoles)
+            ? caseDetailsListByCaseUserRoles.getFirst()
+            : null;
+    }
+
+    /**
      * Given a user derived from the authorisation token in the request,
      * gets all cases {@link CaseDetails} for that user and filters case documents.
      *

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 # Usage: ./add-wa-admin-user.sh <region_id> <location_id> <location> <service_code> <user_type> <task_supervisor> <case_allocator> <staff_admin> <suspended> <up_idam_status> <region>
 # All arguments are optional and have defaults.
 
@@ -37,8 +39,10 @@ SERVICE_TOKEN=$(get_service_token "xui_webapp")
 echo "Creating user ${FIRST_NAME} ${LAST_NAME} with email ${EMAIL_ID}"
 echo "Using HTTP/1.1 with ${CURL_RETRY_COUNT} retries, ${CURL_CONNECT_TIMEOUT_SECONDS}s connect timeout, ${CURL_MAX_TIME_SECONDS}s max time"
 response_body_file=$(mktemp)
+trap 'rm -f "${response_body_file}"' EXIT
 if http_code=$(curl --silent --show-error --location \
   --http1.1 \
+  --fail-with-body \
   --retry "${CURL_RETRY_COUNT}" \
   --retry-delay "${CURL_RETRY_DELAY_SECONDS}" \
   --retry-all-errors \
@@ -83,22 +87,28 @@ if http_code=$(curl --silent --show-error --location \
       "region": "'"${REGION}"'"
     }'
 ); then
-  :
+  curl_exit_code=0
 else
   curl_exit_code="$?"
-  echo "POST failed due to curl error ${curl_exit_code}"
-  if [[ -s "${response_body_file}" ]]; then
-    echo "Response: $(cat "${response_body_file}")"
-  fi
-  rm -f "${response_body_file}"
-  exit "${curl_exit_code}"
 fi
 
 body=$(cat "${response_body_file}")
-rm -f "${response_body_file}"
 echo "Response received from server. : ${body}"
 echo "${http_code}"
-if [[ "${http_code}" =~ ^[0-9]+$ ]] && [ "$http_code" -ge 400 ]; then
-  echo "POST failed with status $http_code: $body"
+
+if [[ "${http_code}" == "409" ]]; then
+  echo "WA admin user already exists."
+  exit 0
 fi
+
+if (( curl_exit_code != 0 )); then
+  echo "POST failed due to curl error ${curl_exit_code} (HTTP ${http_code}): ${body}"
+  exit "${curl_exit_code}"
+fi
+
+if [[ ! "${http_code}" =~ ^2[0-9][0-9]$ ]]; then
+  echo "POST failed with unexpected status ${http_code}: ${body}"
+  exit 1
+fi
+
 exit 0

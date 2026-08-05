@@ -242,6 +242,41 @@ test {
     }
 }
 
+// Infrastructure 2.4.9 invokes these tasks with --rerun-tasks. Its deployment
+// stages receive the outputs produced by the earlier check, so avoid rebuilding
+// Java when those outputs are present. Cold and local runs still build
+// any missing outputs normally.
+def requestedTaskNames = gradle.startParameter.taskNames.collect { it.tokenize(':').last() }
+def rerunOnlyDeploymentTests = !requestedTaskNames.isEmpty()
+    && requestedTaskNames.every { it in ['smoke', 'functional'] }
+def deploymentCompilationMarker = layout.buildDirectory
+    .file('jenkins/deployment-test-compilation.ready')
+    .get().asFile
+def reuseTransferredCompilation = gradle.startParameter.rerunTasks
+    && rerunOnlyDeploymentTests
+    && System.getenv('JENKINS_URL')
+    && deploymentCompilationMarker.exists()
+
+tasks.named('check') {
+    doLast {
+        deploymentCompilationMarker.parentFile.mkdirs()
+        deploymentCompilationMarker.text = 'compiled by successful check\n'
+    }
+}
+
+allprojects {
+    afterEvaluate {
+        tasks.withType(JavaCompile).configureEach {
+            // --rerun-tasks bypasses up-to-date and only-if checks, so disable
+            // compilation only when Jenkins has transferred its prior output.
+            if (reuseTransferredCompilation && destinationDirectory.get().asFile.exists()) {
+                logger.lifecycle("Reusing compiled output for ${path}")
+                enabled = false
+            }
+        }
+    }
+}
+
 tasks.register('smoke', Test) {
     testClassesDirs = sourceSets.smoke.output.classesDirs
     classpath = sourceSets.smoke.runtimeClasspath
@@ -269,6 +304,7 @@ tasks.register('functional', Test) {
 
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
     maxHeapSize = '1G'
+    outputs.upToDateWhen { false }
 }
 
 def puppeteerCacheDir = layout.buildDirectory.dir('puppeteer-cache').get().asFile.absolutePath

@@ -25,14 +25,12 @@ remote_revision() {
 
 configuration_fingerprint() {
   {
-    git rev-parse HEAD:ccd-definitions
-    git hash-object \
-      bin/preview/configure-preview-environment.sh \
-      bin/preview/create-ccd-roles.sh \
-      bin/preview/import-ccd-definitions.sh \
-      bin/preview/import-ref-data.sh \
-      bin/preview/utils/definition-store-db-utils.sh \
-      bin/wa/add-org-roles-to-users.sh
+    # Hash the complete local configuration trees so changes to any directly or
+    # transitively invoked setup utility invalidate the marker.
+    git rev-parse \
+      HEAD:ccd-definitions \
+      HEAD:bin/preview \
+      HEAD:bin/wa
     remote_revision https://github.com/hmcts/et-wa-task-configuration.git "${DMN_BRANCH}"
     remote_revision https://github.com/hmcts/wa-standalone-task-bpmn.git "${BPMN_BRANCH}"
   } | sha256sum | awk '{ print $1 }'

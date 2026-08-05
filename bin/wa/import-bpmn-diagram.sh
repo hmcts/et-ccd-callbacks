@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu
+set -euo pipefail
 workspace=${1}
 
 serviceToken=$($(realpath $workspace)/bin/preview/idam-lease-service-token.sh et_cos \
@@ -9,24 +9,33 @@ filepath="$(realpath $workspace)/camunda"
 
 for file in $(find ${filepath} -name '*.bpmn')
 do
-  uploadResponse=$(curl --insecure -v --silent -w "\n%{http_code}" --show-error -X POST \
+  curl_exit_code=0
+  if uploadResponse=$(curl --insecure -v --silent -w "\n%{http_code}" --show-error --fail-with-body \
+    --retry 12 --retry-all-errors --retry-delay 5 --retry-max-time 120 -X POST \
     ${CAMUNDA_BASE_URL:-http://localhost:9404}/engine-rest/deployment/create \
     -H "Accept: application/json" \
     -H "ServiceAuthorization: Bearer ${serviceToken}" \
     -F "deployment-name=$(date +"%Y%m%d-%H%M%S")-$(basename ${file})" \
     -F "tenant-id=employment" \
-    -F "file=@${filepath}/$(basename ${file})")
+    -F "file=@${filepath}/$(basename ${file})"); then
+    curl_exit_code=0
+  else
+    curl_exit_code=$?
+  fi
 
 upload_http_code=$(echo "$uploadResponse" | tail -n1)
 upload_response_content=$(echo "$uploadResponse" | sed '$d')
 
-if [[ "${upload_http_code}" == '200' ]]; then
+if [[ "${curl_exit_code}" -eq 0 && "${upload_http_code}" == '200' ]]; then
   echo "$(basename ${file}) diagram uploaded successfully (${upload_response_content})"
   continue;
 fi
 
 echo "$(basename ${file}) upload failed with http code ${upload_http_code} and response (${upload_response_content})"
-continue;
+if [[ "${curl_exit_code}" -eq 0 ]]; then
+  curl_exit_code=1
+fi
+exit "${curl_exit_code}"
 
 done
 exit 0;

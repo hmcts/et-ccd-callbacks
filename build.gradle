@@ -101,6 +101,12 @@ sourceSets {
         compileClasspath += main.output + test.output
         runtimeClasspath += main.output + test.output
     }
+    smoke {
+        java {
+            srcDir 'src/test/functional/java'
+            include '**/HealthCheckTest.java'
+        }
+    }
     apiTest {
         java {
             srcDir 'src/test/apiTest/java'
@@ -237,8 +243,8 @@ test {
 }
 
 tasks.register('smoke', Test) {
-    testClassesDirs = sourceSets.functional.output.classesDirs
-    classpath = sourceSets.functional.runtimeClasspath
+    testClassesDirs = sourceSets.smoke.output.classesDirs
+    classpath = sourceSets.smoke.runtimeClasspath
 
     useJUnitPlatform {
         includeTags 'smokeTest'
@@ -265,15 +271,6 @@ tasks.register('functional', Test) {
     maxHeapSize = '1G'
 }
 
-def isJenkinsPullRequestBuild = providers.environmentVariable('CHANGE_ID').isPresent()
-
-if (isJenkinsPullRequestBuild) {
-    // Keep the preview smoke test focused on service health. Jenkins library 2.4.8 deliberately excludes
-    // Gradle build directories from executor transfers, so retain the source-set task dependencies here.
-    tasks.named('smoke', Test) {
-        include '**/HealthCheckTest.class'
-    }
-}
 def puppeteerCacheDir = layout.buildDirectory.dir('puppeteer-cache').get().asFile.absolutePath
 
 tasks.register('yarnInstall', Exec) {
@@ -304,17 +301,6 @@ tasks.register('yarnAudit', Exec) {
     dependsOn ':yarnInstall'
     workingDir '.'
     commandLine 'yarn', 'npm', 'audit', '--groups', 'dependencies', '--json', '|', 'grep', 'auditAdvisory', '>', 'yarn-audit-known-issues'
-}
-
-tasks.register('codeceptSmoke', Exec) {
-    dependsOn ':yarnInstall'
-    def junitDir = file("$buildDir/test-results/codeceptSmoke")
-    doFirst {
-        junitDir.mkdirs()
-    }
-    environment 'PLAYWRIGHT_JUNIT_OUTPUT_DIR', junitDir.absolutePath
-    environment 'PLAYWRIGHT_JUNIT_OUTPUT_NAME', 'playwright-junit.xml'
-    commandLine 'yarn', 'test:smoke', '--', '--reporter=html,list,junit'
 }
 
 tasks.register('codeceptFunctional', Exec) {
@@ -537,6 +523,11 @@ dependencyManagement {
 }
 
 dependencies {
+    smokeImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.1.0'
+    smokeImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.12.2'
+    smokeRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.12.2'
+    smokeRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.12.2'
+
 
     implementation project(':et-shared')
     implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'

@@ -4607,7 +4607,7 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "et3Response",
-    "CaseFieldID": "et3ResponseHearingPanelPreferenceReason",
+    "CaseFieldID": "et3HearingPanelPreferenceReason",
     "DisplayContext": "MANDATORY",
     "PageID": 8,
     "PageDisplayOrder": 8,

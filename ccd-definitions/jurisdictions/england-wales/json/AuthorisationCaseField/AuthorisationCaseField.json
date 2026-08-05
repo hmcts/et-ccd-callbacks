@@ -7165,13 +7165,13 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "et3ResponseHearingPanelPreferenceReason",
+    "CaseFieldID": "et3HearingPanelPreferenceReason",
     "UserRole": "caseworker-employment-legalrep-solicitor",
     "CRUD": "CRU"
   },
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "et3ResponseHearingPanelPreferenceReason",
+    "CaseFieldID": "et3HearingPanelPreferenceReason",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
   },

@@ -3091,7 +3091,7 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "ID": "et3ResponseHearingPanelPreferenceReason",
+    "ID": "et3HearingPanelPreferenceReason",
     "Label": "Give reason",
     "FieldType": "TextArea",
     "Max": 500,

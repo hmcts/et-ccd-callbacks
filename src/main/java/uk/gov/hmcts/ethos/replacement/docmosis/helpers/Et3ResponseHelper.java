@@ -305,7 +305,7 @@ public final class Et3ResponseHelper {
         respondent.setEt3ResponseHearingRepresentative(caseData.getEt3ResponseHearingRepresentative());
         respondent.setEt3ResponseHearingRespondent(caseData.getEt3ResponseHearingRespondent());
         respondent.setRespondentHearingPanelPreference(caseData.getEt3ResponseHearingPanelPreference());
-        respondent.setRespondentHearingPanelPreferenceReason(caseData.getEt3ResponseHearingPanelPreferenceReason());
+        respondent.setRespondentHearingPanelPreferenceReason(caseData.getEt3HearingPanelPreferenceReason());
         respondent.setEt3ResponseRespondentSupportNeeded(caseData.getEt3ResponseRespondentSupportNeeded());
         respondent.setEt3ResponseRespondentSupportDetails(caseData.getEt3ResponseRespondentSupportDetails());
         respondent.setEt3ResponseRespondentSupportDocument(caseData.getEt3ResponseRespondentSupportDocument());
@@ -387,7 +387,7 @@ public final class Et3ResponseHelper {
         caseData.setEt3ResponseHearingRepresentative(value.getEt3ResponseHearingRepresentative());
         caseData.setEt3ResponseHearingRespondent(value.getEt3ResponseHearingRespondent());
         caseData.setEt3ResponseHearingPanelPreference(value.getRespondentHearingPanelPreference());
-        caseData.setEt3ResponseHearingPanelPreferenceReason(value.getRespondentHearingPanelPreferenceReason());
+        caseData.setEt3HearingPanelPreferenceReason(value.getRespondentHearingPanelPreferenceReason());
         caseData.setEt3ResponseEmploymentCount(value.getEt3ResponseEmploymentCount());
         caseData.setEt3ResponseMultipleSites(value.getEt3ResponseMultipleSites());
         caseData.setEt3ResponseSiteEmploymentCount(value.getEt3ResponseSiteEmploymentCount());
@@ -457,7 +457,7 @@ public final class Et3ResponseHelper {
         caseData.setEt3ResponseHearingRepresentative(null);
         caseData.setEt3ResponseHearingRespondent(null);
         caseData.setEt3ResponseHearingPanelPreference(null);
-        caseData.setEt3ResponseHearingPanelPreferenceReason(null);
+        caseData.setEt3HearingPanelPreferenceReason(null);
         caseData.setEt3ResponseEmploymentCount(null);
         caseData.setEt3ResponseMultipleSites(null);
         caseData.setEt3ResponseSiteEmploymentCount(null);

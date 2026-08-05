@@ -924,8 +924,8 @@ public class CaseData extends Et1CaseData {
     private List<String> et3ResponseHearingRespondent;
     @JsonProperty("et3ResponseHearingPanelPreference")
     private String et3ResponseHearingPanelPreference;
-    @JsonProperty("et3ResponseHearingPanelPreferenceReason")
-    private String et3ResponseHearingPanelPreferenceReason;
+    @JsonProperty("et3HearingPanelPreferenceReason")
+    private String et3HearingPanelPreferenceReason;
     // ET3 Response - Respondent's workforce page (10)
     @JsonProperty("et3ResponseEmploymentCount")
     private String et3ResponseEmploymentCount;

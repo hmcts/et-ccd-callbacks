@@ -22,6 +22,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Service
 @Slf4j
@@ -133,7 +134,7 @@ public class AcasService {
         }
         caseData.getRespondentCollection().stream()
             .map(RespondentSumTypeItem::getValue)
-            .filter(r -> ObjectUtils.isNotEmpty(r) && !isNullOrEmpty(r.getRespondentAcas()))
+            .filter(r -> ObjectUtils.isNotEmpty(r) && isNotBlank(r.getRespondentAcas()))
             .forEach(respondent -> {
                 String acasNum = respondent.getRespondentAcas();
                 Optional<AcasCertificate> certOpt = emptyIfNull(acasCertificateList).stream()

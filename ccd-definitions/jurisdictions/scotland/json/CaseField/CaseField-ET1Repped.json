@@ -949,7 +949,7 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "ID": "claimantHearingPanelPreferenceReason",
+    "ID": "claimantHearingPanelPreferenceWhy",
     "Label": "Give reason",
     "FieldType": "TextArea",
     "SecurityClassification": "Public",

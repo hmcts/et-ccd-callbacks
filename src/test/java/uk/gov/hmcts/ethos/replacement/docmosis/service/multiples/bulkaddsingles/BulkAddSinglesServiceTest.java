@@ -2,8 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.bulkaddsingles
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleAmendService;
@@ -20,7 +18,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
 class BulkAddSinglesServiceTest {
     private BulkAddSinglesService bulkAddSinglesService;
     private SingleCasesImporter singleCasesImporter;

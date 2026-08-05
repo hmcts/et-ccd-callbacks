@@ -239,7 +239,7 @@ test {
     exclude '**/*ComponentTest*'
     useJUnitPlatform()
     testLogging {
-        events "passed", "skipped", "failed"
+        events "skipped", "failed"
     }
 }
 
@@ -293,7 +293,7 @@ tasks.register('smoke', Test) {
         includeTags 'smokeTest'
     }
     testLogging {
-        events "passed", "skipped", "failed"
+        events "skipped", "failed"
     }
     outputs.upToDateWhen { false }
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
@@ -307,7 +307,7 @@ tasks.register('functional', Test) {
 
     useJUnitPlatform ()
     testLogging {
-        events "passed", "skipped", "failed"
+        events "skipped", "failed"
     }
 
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
@@ -386,7 +386,7 @@ tasks.register('integration', Test) {
     failFast = true
     useJUnitPlatform()
     testLogging {
-        events "passed", "skipped", "failed"
+        events "skipped", "failed"
     }
     reports {
         html.required = true
@@ -463,10 +463,14 @@ jacocoTestReport {
 }
 
 jacocoTestCoverageVerification {
+    dependsOn test, integration
+    executionData(test, integration)
     violationRules {
         rule {
             limit {
-                minimum = 0.0
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.92
             }
         }
     }
@@ -501,6 +505,7 @@ repositories {
 
 project.tasks['sonarqube'].dependsOn jacocoTestReport
 project.tasks['check'].dependsOn integration
+project.tasks['check'].dependsOn jacocoTestCoverageVerification
 checkstyleMain.shouldRunAfter(compileJava)
 test.shouldRunAfter(checkstyleTest)
 integration.shouldRunAfter(checkstyleIntegrationTest)

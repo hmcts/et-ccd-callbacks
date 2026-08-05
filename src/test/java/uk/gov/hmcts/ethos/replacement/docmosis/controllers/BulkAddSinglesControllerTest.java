@@ -2,10 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
@@ -19,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
 class BulkAddSinglesControllerTest {
     private BulkAddSinglesController bulkAddSinglesController;
     private VerifyTokenService verifyTokenService;

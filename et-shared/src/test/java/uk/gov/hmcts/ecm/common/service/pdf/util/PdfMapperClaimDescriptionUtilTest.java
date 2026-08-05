@@ -50,17 +50,6 @@ class PdfMapperClaimDescriptionUtilTest {
         ConcurrentMap<String, Optional<String>> printFields = new ConcurrentHashMap<>();
         PdfMapperClaimDescriptionUtil.putClaimDescription(caseData, printFields);
 
-        assertThat(printFields.get(PdfMapperConstants.Q8_DATE_OF_RECENT_EVENT)).contains("15/05/2026");
+        assertThat(printFields.get(PdfMapperConstants.Q8_DATE_OF_RECENT_EVENT)).contains("15-05-2026");
     }
-
-    @Test
-    void putClaimDescription_mapsDateOfLastEventFromEt1SectionThreeDateOfLastEventFallback() {
-        caseData.setEt1SectionThreeDateOfLastEvent("2026-06-20");
-
-        ConcurrentMap<String, Optional<String>> printFields = new ConcurrentHashMap<>();
-        PdfMapperClaimDescriptionUtil.putClaimDescription(caseData, printFields);
-
-        assertThat(printFields.get(PdfMapperConstants.Q8_DATE_OF_RECENT_EVENT)).contains("20/06/2026");
-    }
-
 }

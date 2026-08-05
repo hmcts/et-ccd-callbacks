@@ -117,6 +117,7 @@ public class AcasService {
             if (isEmpty(acasCertificateList)) {
                 return new ArrayList<>();
             }
+            populateAcasDatesOnRespondents(caseData, acasCertificateList);
             return acasCertificateList.stream()
                     .map(ac -> createAcasCertificate(caseData, authToken, caseTypeId, ac))
                     .toList();
@@ -124,6 +125,29 @@ public class AcasService {
             log.error("Error retrieving ACAS Certificate with exception : {}", errorException.getMessage());
             throw errorException;
         }
+    }
+
+    private void populateAcasDatesOnRespondents(CaseData caseData, List<AcasCertificate> acasCertificateList) {
+        if (isEmpty(caseData.getRespondentCollection())) {
+            return;
+        }
+        caseData.getRespondentCollection().stream()
+            .map(RespondentSumTypeItem::getValue)
+            .filter(r -> ObjectUtils.isNotEmpty(r) && !isNullOrEmpty(r.getRespondentAcas()))
+            .forEach(respondent -> {
+                String acasNum = respondent.getRespondentAcas();
+                Optional<AcasCertificate> certOpt = emptyIfNull(acasCertificateList).stream()
+                    .filter(c -> acasNum.equals(c.getCertificateNumber()))
+                    .findFirst();
+                String receiptDate = certOpt.map(AcasCertificate::getDateOfReceipt)
+                    .filter(d -> !isNullOrEmpty(d))
+                    .orElse(null);
+                String issueDate = certOpt.map(AcasCertificate::getDateOfIssue)
+                    .filter(d -> !isNullOrEmpty(d))
+                    .orElse(null);
+                respondent.setAcasCertificateReceiptDate(receiptDate);
+                respondent.setAcasCertificateIssueDate(issueDate);
+            });
     }
 
     private DocumentInfo createAcasCertificate(CaseData caseData, String authToken, String caseTypeId,

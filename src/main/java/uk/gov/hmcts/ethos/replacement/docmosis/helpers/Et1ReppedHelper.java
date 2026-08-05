@@ -499,7 +499,7 @@ public final class Et1ReppedHelper {
         claimantHearingPreference.setClaimantHearingPanelPreference(
                 caseData.getClaimantHearingPanelPreference());
         claimantHearingPreference.setClaimantHearingPanelPreferenceWhy(
-                caseData.getClaimantHearingPanelPreferenceReason());
+                caseData.getClaimantHearingPanelPreferenceWhy());
         return claimantHearingPreference;
     }
 
@@ -551,7 +551,7 @@ public final class Et1ReppedHelper {
         caseData.setClaimantSupportQuestion(null);
         caseData.setClaimantSupportQuestionReason(null);
         caseData.setClaimantHearingPanelPreference(null);
-        caseData.setClaimantHearingPanelPreferenceReason(null);
+        caseData.setClaimantHearingPanelPreferenceWhy(null);
         caseData.setRepresentativeContactPreference(null);
         caseData.setContactPreferencePostReason(null);
         caseData.setRepresentativeAddress(null);

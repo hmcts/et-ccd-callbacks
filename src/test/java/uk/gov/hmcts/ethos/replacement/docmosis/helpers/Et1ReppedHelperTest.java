@@ -187,7 +187,7 @@ class Et1ReppedHelperTest {
     @Test
     void setEt1SubmitDataSavesClaimantHearingPanelPreference() {
         caseData.setClaimantHearingPanelPreference("Panel");
-        caseData.setClaimantHearingPanelPreferenceReason("Workplace expertise is required");
+        caseData.setClaimantHearingPanelPreferenceWhy("Workplace expertise is required");
 
         Et1ReppedHelper.setEt1SubmitData(caseData);
 

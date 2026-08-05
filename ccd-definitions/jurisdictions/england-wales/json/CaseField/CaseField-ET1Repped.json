@@ -975,7 +975,7 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "claimantHearingPanelPreferenceReason",
+    "ID": "claimantHearingPanelPreferenceWhy",
     "Label": "Give reason",
     "FieldType": "TextArea",
     "SecurityClassification": "Public",

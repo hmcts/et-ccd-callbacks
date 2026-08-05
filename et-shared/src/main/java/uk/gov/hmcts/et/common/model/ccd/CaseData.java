@@ -1748,8 +1748,8 @@ public class CaseData extends Et1CaseData {
     private String claimantSupportQuestionReason;
     @JsonProperty("claimantHearingPanelPreference")
     private String claimantHearingPanelPreference;
-    @JsonProperty("claimantHearingPanelPreferenceReason")
-    private String claimantHearingPanelPreferenceReason;
+    @JsonProperty("claimantHearingPanelPreferenceWhy")
+    private String claimantHearingPanelPreferenceWhy;
     @JsonProperty("representativeContactPreference")
     private List<String> representativeContactPreference;
     @JsonProperty("contactPreferencePostReason")

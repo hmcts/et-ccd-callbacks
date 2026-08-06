@@ -25,8 +25,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -90,6 +92,42 @@ class WaTaskCreationCronForExpiredBfActionsTest {
         verify(ccdClient, times(0))
                 .submitEventForCase(any(), any(), any(), any(), any(), any());
     }
+    @Test
+    void skipsCasesWithBfDateBeforeAugust2026() throws IOException {
+        when(featureToggleService.isWaTaskForExpiredBfActionsEnabled()).thenReturn(true);
+        SubmitEvent submitEvent = expiredBfActionSubmitEvent(LocalDate.of(2026, 7, 31));
+        when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
+                .thenReturn(List.of(submitEvent)).thenReturn(Collections.emptyList());
+
+        waTaskCreationCronForExpiredBfActions.run();
+
+        verify(ccdClient, times(0)).startEventForCase(any(), any(), any(), any(), any());
+        verify(ccdClient, times(0)).submitEventForCase(
+                any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void processesCasesWithBfDateFromFirstAugust2026AndUsesCutoffInSearch() throws IOException {
+        when(featureToggleService.isWaTaskForExpiredBfActionsEnabled()).thenReturn(true);
+        SubmitEvent submitEvent = expiredBfActionSubmitEvent(LocalDate.of(2026, 8, 1));
+        when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
+                .thenReturn(List.of(submitEvent)).thenReturn(Collections.emptyList());
+
+        CCDRequest build = CCDRequestBuilder.builder().withCaseData(submitEvent.getCaseData()).build();
+        build.getCaseDetails().setJurisdiction("EMPLOYMENT");
+        when(ccdClient.startEventForCase(any(), any(), any(), any(), any())).thenReturn(build);
+
+        waTaskCreationCronForExpiredBfActions.run();
+
+        verify(ccdClient, times(2)).buildAndGetElasticSearchRequest(
+                any(), eq(ENGLANDWALES_CASE_TYPE_ID), argThat(query -> {
+                    assertThat(query).contains("\"from\": \"2026-08-01\"");
+                    return true;
+                }));
+        verify(ccdClient, times(1)).startEventForCase(any(), any(), any(), any(), any());
+        verify(ccdClient, times(1)).submitEventForCase(
+                any(), any(), any(), any(), any(), any());
+    }
 
     @Test
     void processesCasesSuccessfully() throws IOException, URISyntaxException {
@@ -99,7 +137,7 @@ class WaTaskCreationCronForExpiredBfActionsTest {
         SubmitEvent submitEvent = new ObjectMapper().readValue(resource, SubmitEvent.class);
         submitEvent.setCaseId(Long.parseLong("1741710954147332"));
         submitEvent.getCaseData().getBfActions().get(1).getValue().setBfDate(
-                LocalDate.now().minusDays(30).toString());
+                LocalDate.now().minusDays(1).toString());
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
                 .thenReturn(List.of(submitEvent)).thenReturn(Collections.emptyList());
 
@@ -231,5 +269,21 @@ class WaTaskCreationCronForExpiredBfActionsTest {
         verify(ccdClient, times(1)).startEventForCase(any(), any(), any(), any(), any());
         verify(ccdClient, times(0))
                 .submitEventForCase(any(), any(), any(), any(), any(), any());
+    }
+
+    private SubmitEvent expiredBfActionSubmitEvent(LocalDate bfDate) {
+        BFActionType bfActionType = new BFActionType();
+        bfActionType.setBfDate(bfDate.toString());
+        BFActionTypeItem bfActionTypeItem = new BFActionTypeItem();
+        bfActionTypeItem.setId("TestId");
+        bfActionTypeItem.setValue(bfActionType);
+
+        CaseData caseData = new CaseData();
+        caseData.setBfActions(List.of(bfActionTypeItem));
+
+        SubmitEvent submitEvent = new SubmitEvent();
+        submitEvent.setCaseId(123L);
+        submitEvent.setCaseData(caseData);
+        return submitEvent;
     }
 }

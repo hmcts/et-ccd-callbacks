@@ -684,6 +684,14 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
+    "ID": "et1SectionThreeDateOfLastEvent",
+    "Label": "What is the date of the most recent event complained about?",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
     "ID": "et1SectionThreeTypeOfClaim",
     "Label": "What type of claim is this?",
     "HintText": "Select all that apply",

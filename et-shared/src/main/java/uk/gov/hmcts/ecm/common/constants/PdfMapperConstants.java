@@ -35,6 +35,10 @@ public final class PdfMapperConstants {
     public static final String I_CAN_TAKE_PART_IN_PHONE_HEARINGS = "1.11 phone";
     public static final String I_CAN_TAKE_PART_IN_NO_HEARINGS = "1.11 no";
     public static final String I_CAN_TAKE_PART_IN_NO_HEARINGS_EXPLAIN = "1.11 explain";
+    public static final String HEARINGS_1_12_JUDGE = "1.12 a judge";
+    public static final String HEARINGS_1_12_PANEL = "1.12 a panel";
+    public static final String HEARINGS_1_12_NO_PREFERENCE = "1.12 no preference";
+    public static final String HEARINGS_1_12_REASONS = "1.12 reasons";
     public static final String Q2_4_DIFFERENT_WORK_ADDRESS =  "2.4 Full, different working address - Number or name";
     public static final String Q3_MORE_CLAIMS_YES = "3.1 Are you aware that your claim is one of a number of "
         + "claims against the same employer arising from the same, or similar, circumstances? Yes";
@@ -103,6 +107,7 @@ public final class PdfMapperConstants {
     public static final String Q8_TYPE_OF_DISCRIMINATION_SEX = "8.1 sex (including equal pay)";
     public static final String Q8_CLAIM_DESCRIPTION
         = "8.2 Please set out the background and details of your claim in the space below";
+    public static final String Q8_DATE_OF_RECENT_EVENT = "8.3 Date of recent event";
     public static final String Q9_CLAIM_SUCCESSFUL_REQUEST_OLD_JOB_BACK_AND_COMPENSATION =
         "9.1 If claiming unfair dismissal, to get your old job back and compensation (reinstatement)";
     public static final String Q9_CLAIM_SUCCESSFUL_REQUEST_ANOTHER_JOB =

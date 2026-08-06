@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.dwp.regex.InvalidPostcodeException;
@@ -61,7 +62,8 @@ public class Et1ReppedService {
     private final Et1SubmissionService et1SubmissionService;
     private final MyHmctsService myHmctsService;
 
-    private static final String ET1_EN_PDF = "ET1_0224.pdf";
+    @Value("${pdf.english}")
+    private String et1EnPdf;
     private final List<TribunalOffice> liveTribunalOffices = List.of(TribunalOffice.LEEDS,
             TribunalOffice.MIDLANDS_EAST, TribunalOffice.BRISTOL, TribunalOffice.LONDON_CENTRAL,
             TribunalOffice.LONDON_SOUTH, TribunalOffice.LONDON_EAST, TribunalOffice.MANCHESTER,
@@ -137,7 +139,7 @@ public class Et1ReppedService {
             CaseData caseData = caseDetails.getCaseData();
             caseData.setManagingOffice(null);
             caseData.setReceiptDate(null);
-            DocumentInfo documentInfo = et1SubmissionService.createEt1(caseDetails, userToken, ET1_EN_PDF);
+            DocumentInfo documentInfo = et1SubmissionService.createEt1(caseDetails, userToken, et1EnPdf);
             documentInfo.setMarkUp(documentInfo.getMarkUp().replace("Document",
                     "Draft ET1 - " + caseDetails.getCaseId() + " (opens in a new tab)"));
             caseData.setDocMarkUp(documentInfo.getMarkUp());

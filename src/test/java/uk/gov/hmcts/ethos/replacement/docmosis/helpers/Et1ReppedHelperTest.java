@@ -229,6 +229,15 @@ class Et1ReppedHelperTest {
     }
 
     @Test
+    void validateGroundsFutureDateError() {
+        caseData.setEt1SectionThreeClaimDetails("Grounds");
+        caseData.setEt1SectionThreeDateOfLastEvent(java.time.LocalDate.now().plusDays(1).toString());
+        List<String> errors = Et1ReppedHelper.validateGrounds(caseData);
+        assertEquals(1, errors.size());
+        assertEquals("The date of the most recent event cannot be in the future", errors.getFirst());
+    }
+
+    @Test
     void theLoadClaimantRepresentativeValues() {
         // Scenario 1: CaseData is empty
         GenericServiceException gse = assertThrows(GenericServiceException.class,

@@ -358,7 +358,9 @@ class ManageCaseControllerTest {
         ));
         when(hubLinkService.updateHubLinkStatuses(hubLinksStatusesRequest,
                                                   TEST_SERVICE_AUTH_TOKEN,
-                                                  CASE_USER_ROLE_CREATOR)).thenReturn(expectedDetails);
+                                                  List.of(CASE_USER_ROLE_CREATOR,
+                                                          CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE)))
+            .thenReturn(expectedDetails);
 
         mockMvc.perform(
             put("/cases/update-hub-links-statuses", CASE_ID)
@@ -369,7 +371,7 @@ class ManageCaseControllerTest {
         verify(hubLinkService, times(1)).updateHubLinkStatuses(
             hubLinksStatusesRequest,
             TEST_SERVICE_AUTH_TOKEN,
-            CASE_USER_ROLE_CREATOR
+            List.of(CASE_USER_ROLE_CREATOR, CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE)
         );
     }
 

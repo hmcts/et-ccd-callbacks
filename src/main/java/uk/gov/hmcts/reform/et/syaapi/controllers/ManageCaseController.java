@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,9 +33,6 @@ import java.util.List;
 import static org.springframework.http.ResponseEntity.ok;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.AUTHORIZATION;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_API_PARAMETER_NAME;
-import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CREATOR;
-import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.STRING_LEFT_SQUARE_BRACKET;
-import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.STRING_RIGHT_SQUARE_BRACKET;
 
 /**
  * Rest Controller will use {@link CaseService} for interacting and accessing cases.
@@ -178,9 +174,7 @@ public class ManageCaseController {
         return ok(hubLinkService.updateHubLinkStatuses(
             request,
             authorization,
-            StringUtils.isBlank(caseUserRole)
-                ? CASE_USER_ROLE_CREATOR
-                : STRING_LEFT_SQUARE_BRACKET + caseUserRole.trim() + STRING_RIGHT_SQUARE_BRACKET));
+            ManageCaseRoleServiceUtil.getCaseUserRoles(caseUserRole)));
     }
 
     /**

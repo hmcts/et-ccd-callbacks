@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.ccd.event.page.InitialConsiderationPage2;
 import uk.gov.hmcts.et.common.ccd.event.page.InitialConsiderationPage3;
 import uk.gov.hmcts.et.common.ccd.event.page.InitialConsiderationPage4;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.IcDocumentUpload;
 import uk.gov.hmcts.et.common.model.ccd.State;
 import uk.gov.hmcts.et.common.model.ccd.UserRole;
 
@@ -45,5 +46,8 @@ public class InitialConsideration implements CCDConfig<CaseData, State, UserRole
         InitialConsiderationPage2.apply(fields);
         InitialConsiderationPage3.apply(fields);
         InitialConsiderationPage4.apply(fields);
+        fields.complex(CaseData::getIcAllDocumentCollection, IcDocumentUpload.class)
+                    .mandatory(IcDocumentUpload::getUploadedDocument)
+                    .optional(IcDocumentUpload::getShortDescription).done();
     }
 }

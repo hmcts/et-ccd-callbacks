@@ -1,0 +1,5 @@
+[ {
+  "ID" : "amendRepresentativeContact",
+  "CallBackURLAboutToStartEvent" : "${ET_COS_URL}/amendRepresentativeContact/aboutToStart",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/amendRepresentativeContact/aboutToSubmit"
+} ]

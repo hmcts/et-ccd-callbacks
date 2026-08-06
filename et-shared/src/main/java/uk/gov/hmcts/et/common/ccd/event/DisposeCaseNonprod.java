@@ -38,7 +38,6 @@ public class DisposeCaseNonprod implements CCDConfig<CaseData, State, UserRole> 
             .showSummary()
             .publishToCamunda()
             .significant()
-            .ttlIncrement(365)
             .explicitGrants()
             .grant(Set.of(Permission.R), UserRole.CASEWORKER_EMPLOYMENT, UserRole.CASEWORKER_EMPLOYMENT_ETJUDGE)
             .grant(Permission.CRU, UserRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES, UserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES)

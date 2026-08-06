@@ -2,6 +2,7 @@ package uk.gov.hmcts.et.common.ccd.event.page;
 
 import uk.gov.hmcts.ccd.sdk.api.Event;
 import uk.gov.hmcts.ccd.sdk.api.FieldCollection;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.State;
 import uk.gov.hmcts.et.common.model.ccd.UserRole;
@@ -25,7 +26,14 @@ public final class Et1ReppedCreateCasePage1 {
         fields.page("1");
         fields.pageLabel("Claimant's work location");
         fields.readonly(CaseData::getEt1ReppedTriageLabel);
-        fields.complex(CaseData::getEt1ReppedTriageAddress).done();
+        fields.complex(CaseData::getEt1ReppedTriageAddress)
+                    .optional(Address::getAddressLine1)
+                    .optional(Address::getAddressLine2)
+                    .optional(Address::getAddressLine3)
+                    .optional(Address::getPostTown)
+                    .optional(Address::getCounty)
+                    .optional(Address::getCountry)
+                    .optional(Address::getPostCode).done();
         fields.readonly(CaseData::getEt1ReppedTriageYesNo)
                     .fieldShowCondition("et1ReppedTriageAddress=\"dummy\"");
     }

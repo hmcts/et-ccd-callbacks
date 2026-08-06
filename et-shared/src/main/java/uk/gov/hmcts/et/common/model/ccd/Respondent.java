@@ -889,4 +889,20 @@ public class Respondent {
             retainHiddenValue = true
     )
     private String representativeRemoved;
+
+    @CCD(
+            label = " ",
+            showCondition = "responseReceived=\"dummy\"",
+            searchable = false,
+            retainHiddenValue = true
+    )
+    private String represented;
+
+    @CCD(
+            label = " ",
+            showCondition = "responseReceived=\"dummy\"",
+            searchable = false,
+            retainHiddenValue = true
+    )
+    private String representativeId;
 }

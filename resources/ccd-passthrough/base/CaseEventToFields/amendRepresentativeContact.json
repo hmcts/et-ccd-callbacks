@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "representativeContactChangeOption",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/amendRepresentativeContact/midEvent"
+} ]

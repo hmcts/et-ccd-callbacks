@@ -34,7 +34,6 @@ public class DeleteDraftCase implements CCDConfig<CaseData, State, UserRole> {
             .displayOrder(1000)
             .showSummary(false)
             .significant()
-            .ttlIncrement(0)
             .explicitGrants()
             .grant(Permission.CRUD, UserRole.CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR)
             .fields();

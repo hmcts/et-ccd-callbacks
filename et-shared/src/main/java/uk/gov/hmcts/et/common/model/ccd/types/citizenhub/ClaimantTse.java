@@ -9,7 +9,9 @@ import java.util.AbstractMap;
 import java.util.Map;
 import uk.gov.hmcts.ccd.sdk.api.CCD;
 import uk.gov.hmcts.ccd.sdk.type.FieldType;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(name = "claimantTse", generate = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class ClaimantTse {

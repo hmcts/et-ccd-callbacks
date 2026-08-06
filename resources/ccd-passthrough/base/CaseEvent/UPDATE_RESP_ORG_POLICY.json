@@ -1,0 +1,4 @@
+[ {
+  "ID" : "UPDATE_RESP_ORG_POLICY",
+  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/respondentRepresentative/updateRespOrgPolicyAboutToSubmit"
+} ]

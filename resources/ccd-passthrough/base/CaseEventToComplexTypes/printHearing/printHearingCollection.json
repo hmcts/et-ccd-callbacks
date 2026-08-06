@@ -1,0 +1,9 @@
+[ {
+  "ID" : "Scheduling",
+  "CaseEventID" : "printHearing",
+  "CaseFieldID" : "printHearingCollection",
+  "ListElementCode" : "listingCollection.additionalJudge",
+  "EventElementLabel" : "Employment Judge",
+  "FieldDisplayOrder" : 10,
+  "DisplayContext" : "READONLY"
+} ]

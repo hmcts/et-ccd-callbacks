@@ -3,6 +3,7 @@ package uk.gov.hmcts.et.common.ccd.event.page;
 import uk.gov.hmcts.ccd.sdk.api.Event;
 import uk.gov.hmcts.ccd.sdk.api.FieldCollection;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.JurisdictionCode;
 import uk.gov.hmcts.et.common.model.ccd.State;
 import uk.gov.hmcts.et.common.model.ccd.UserRole;
 
@@ -31,6 +32,9 @@ public final class Et1VettingPage5 {
         fields.mandatory(CaseData::getCodesCorrectGiveDetails)
                     .fieldShowCondition("areTheseCodesCorrect=\"No\"");
         fields.optional(CaseData::getVettingJurisdictionCodeCollection);
+        fields.complex(CaseData::getVettingJurisdictionCodeCollection, JurisdictionCode.class)
+                    .optional(JurisdictionCode::getEt1VettingJurCodeList)
+                    .eventLabel("Jurisdiction code").done();
         fields.optional(CaseData::getEt1JurisdictionCodeGeneralNotes);
         fields.readonly(CaseData::getTrackType)
                     .fieldShowCondition("areTheseCodesCorrect=\"dummy\"");

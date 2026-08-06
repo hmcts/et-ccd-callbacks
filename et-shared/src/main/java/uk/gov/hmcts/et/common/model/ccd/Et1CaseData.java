@@ -38,12 +38,12 @@ import uk.gov.hmcts.et.common.ccd.access.CaseworkerEmploymentCaseworkerEmploymen
 import uk.gov.hmcts.et.common.ccd.access.CitizenCruAccess;
 import uk.gov.hmcts.et.common.ccd.access.CaseworkerEmploymentApiCrudCitizenCudAccess;
 import uk.gov.hmcts.et.common.ccd.access.CaseworkerWaTaskConfigurationRAccess;
-import uk.gov.hmcts.et.common.ccd.access.CaseworkerEmploymentApiCrudCaseworkerWaTaskConfigurationRAccess;
+import uk.gov.hmcts.et.common.ccd.access.CaseworkerEmploymentApiCitizenCrudAccess;
 import uk.gov.hmcts.et.common.ccd.access.CaseworkerEmploymentCrudAccess;
-import uk.gov.hmcts.et.common.ccd.access.CitizenCrudAccess;
 import uk.gov.hmcts.et.common.ccd.access.CaseworkerEmploymentApiCrudAccess;
 import uk.gov.hmcts.et.common.ccd.access.DefaultAccess;
 import uk.gov.hmcts.et.common.ccd.access.CaseworkerEmploymentEtjudgeRAccess;
+import uk.gov.hmcts.et.common.ccd.access.CitizenCrudAccess;
 import uk.gov.hmcts.et.common.ccd.access.CaseworkerEmploymentLegalrepSolicitorRCitizenCruAccess;
 import uk.gov.hmcts.et.common.ccd.access.CaseworkerEmploymentApiCrudCitizenCuAccess;
 import uk.gov.hmcts.et.common.ccd.access.CaseworkerEmploymentRAccess;
@@ -152,7 +152,7 @@ public class Et1CaseData extends BaseCaseData {
             min = 1,
             typeOverride = FieldType.Collection,
             typeParameterOverride = "Respondent",
-            access = {CaseworkerEmploymentEnglandwalesCruPlus2RolesHenbjpAccess.class, CaseworkerEmploymentApiCrudCaseworkerWaTaskConfigurationRAccess.class, CaseworkerEmploymentLegalrepSolicitorCudAccess.class, CaseworkerEmploymentCrudAccess.class, CitizenCrudAccess.class}
+            access = {CaseworkerEmploymentEnglandwalesCruPlus2RolesHenbjpAccess.class, CaseworkerEmploymentApiCitizenCrudAccess.class, CaseworkerEmploymentLegalrepSolicitorCudAccess.class, CaseworkerEmploymentCrudAccess.class, CaseworkerWaTaskConfigurationRAccess.class}
     )
     @JsonProperty("respondentCollection")
     private List<RespondentSumTypeItem> respondentCollection;
@@ -179,7 +179,7 @@ public class Et1CaseData extends BaseCaseData {
             access = {CaseworkerEmploymentRPlus5RolesBbxtjpAccess.class, CaseworkerEmploymentLegalrepSolicitorCrudCitizenCruAccess.class}
     )
     @JsonProperty("additionalCaseInfo")
-    private AdditionalCaseInfoType additionalCaseInfoType;
+    private AdditionalCaseDetails additionalCaseInfoType;
     @CCD(
             label = "Tribunal Office",
             typeOverride = FieldType.FixedList,
@@ -214,7 +214,7 @@ public class Et1CaseData extends BaseCaseData {
             access = {CaseworkerEmploymentRPlus5RolesBbxtjpAccess.class, CaseworkerEmploymentLegalrepSolicitorDCitizenCruAccess.class}
     )
     @JsonProperty("claimantTaskListChecks")
-    private TaskListCheckType claimantTaskListChecks;
+    private TaskListCheck claimantTaskListChecks;
     @CCD(
             label = "Date of Receipt",
             typeOverride = FieldType.Date,

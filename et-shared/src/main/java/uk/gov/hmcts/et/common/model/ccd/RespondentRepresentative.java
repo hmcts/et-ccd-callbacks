@@ -137,10 +137,29 @@ public class RespondentRepresentative {
     private List<ListValue<OrganisationUsersIdamUser>> organisationUsers;
 
     @CCD(
+            label = "Respondent representative role",
+            searchable = false
+    )
+    private String role;
+
+    @CCD(
+            label = "Respondent representative idam id",
+            showCondition = "role=\"dummy\"",
+            searchable = false
+    )
+    private String idamId;
+
+    @CCD(
             label = "Contact preference",
             searchable = false,
             typeOverride = FieldType.FixedList,
             typeParameterOverride = "fl_RepresentativeContact"
     )
     private String representative_preference;
+
+    @CCD(
+            label = " ",
+            showCondition = "myHmctsYesNo=\"dummy\""
+    )
+    private String nonMyHmctsOrganisationId;
 }

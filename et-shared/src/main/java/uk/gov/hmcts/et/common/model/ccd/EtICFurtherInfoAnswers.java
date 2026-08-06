@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import uk.gov.hmcts.ccd.sdk.api.CCD;
 import uk.gov.hmcts.ccd.sdk.type.FieldType;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(name = "etICFurtherInfoAnswers", generate = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class EtICFurtherInfoAnswers {
@@ -17,7 +19,12 @@ public class EtICFurtherInfoAnswers {
     )
     @JsonProperty("etICFurtherInformationGiveDetails")
     private String etICFurtherInformationGiveDetails;
-    @CCD(label = "How much time to comply? (days)", hint = "Give details", searchable = false)
+    @CCD(
+            label = "How much time to comply? (days)",
+            hint = "Give details",
+            searchable = false,
+            typeOverride = FieldType.Number
+    )
     @JsonProperty("etICFurtherInformationTimeToComply")
     private String etICFurtherInformationTimeToComply;
 }

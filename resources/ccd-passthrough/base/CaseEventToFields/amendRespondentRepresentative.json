@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "repCollection",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/respondentRepresentative/amendRespondentRepresentativeMidEvent"
+} ]

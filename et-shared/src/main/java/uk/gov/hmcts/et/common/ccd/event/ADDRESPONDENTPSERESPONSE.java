@@ -5,6 +5,8 @@ import uk.gov.hmcts.ccd.sdk.api.CCDConfig;
 import uk.gov.hmcts.ccd.sdk.api.ConfigBuilder;
 import uk.gov.hmcts.ccd.sdk.api.Permission;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.PseRespondCollection;
+import uk.gov.hmcts.et.common.model.ccd.SendNotificationCollection;
 import uk.gov.hmcts.et.common.model.ccd.State;
 import uk.gov.hmcts.et.common.model.ccd.UserRole;
 
@@ -39,6 +41,21 @@ public class ADDRESPONDENTPSERESPONSE implements CCDConfig<CaseData, State, User
             .grant(Permission.CRUD, UserRole.CASEWORKER_WA_TASK_CONFIGURATION)
             .fields();
         fields.page("1");
+        fields.complex(CaseData::getSendNotificationCollection).done();
+        fields.complex(CaseData::getSendNotificationCollection, SendNotificationCollection.class)
+                    .optional(SendNotificationCollection::getSendNotificationResponsesCount)
+                    .eventLabel(" ")
+                    .optional(SendNotificationCollection::getRespondCollection)
+                    .eventLabel(" ")
+                    .complex(SendNotificationCollection::getRespondCollection, PseRespondCollection.class)
+                    .optional(PseRespondCollection::getFrom)
+                    .eventLabel(" ").done()
+                    .complex(SendNotificationCollection::getRespondCollection, PseRespondCollection.class)
+                    .optional(PseRespondCollection::getDateTime)
+                    .eventLabel(" ").done()
+                    .complex(SendNotificationCollection::getRespondCollection, PseRespondCollection.class)
+                    .optional(PseRespondCollection::getIsECC)
+                    .eventLabel(" ").done().done();
         fields.optionalNoSummary(CaseData::getNextListedDate);
     }
 }

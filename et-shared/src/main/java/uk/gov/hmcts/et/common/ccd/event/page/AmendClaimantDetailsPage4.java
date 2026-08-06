@@ -2,9 +2,9 @@ package uk.gov.hmcts.et.common.ccd.event.page;
 
 import uk.gov.hmcts.ccd.sdk.api.Event;
 import uk.gov.hmcts.ccd.sdk.api.FieldCollection;
-import uk.gov.hmcts.et.common.model.ccd.Address;
+import uk.gov.hmcts.ccd.sdk.type.AddressUK;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.types.CompanyPremisesType;
+import uk.gov.hmcts.et.common.model.ccd.CompanyPremises;
 import uk.gov.hmcts.et.common.model.ccd.State;
 import uk.gov.hmcts.et.common.model.ccd.UserRole;
 
@@ -27,28 +27,28 @@ public final class AmendClaimantDetailsPage4 {
         fields.page("4");
         fields.showCondition("claimant_TypeOfClaimant=\"Company\"");
         fields.complex(CaseData::getCompanyPremises)
-                    .optional(CompanyPremisesType::getPremises)
+                    .optional(CompanyPremises::getPremises)
                     .eventLabel("Premises")
-                    .complex(CompanyPremisesType::getAddress)
-                    .mandatory(Address::getAddressLine1)
+                    .complex(CompanyPremises::getAddress)
+                    .mandatory(AddressUK::getAddressLine1)
                     .eventLabel("Building and Street").done()
-                    .complex(CompanyPremisesType::getAddress)
-                    .optional(Address::getAddressLine2)
+                    .complex(CompanyPremises::getAddress)
+                    .optional(AddressUK::getAddressLine2)
                     .eventLabel(" ").done()
-                    .complex(CompanyPremisesType::getAddress)
-                    .optional(Address::getAddressLine3)
+                    .complex(CompanyPremises::getAddress)
+                    .optional(AddressUK::getAddressLine3)
                     .eventLabel(" ").done()
-                    .complex(CompanyPremisesType::getAddress)
-                    .optional(Address::getPostTown)
+                    .complex(CompanyPremises::getAddress)
+                    .optional(AddressUK::getPostTown)
                     .eventLabel("Town or City").done()
-                    .complex(CompanyPremisesType::getAddress)
-                    .optional(Address::getCounty)
+                    .complex(CompanyPremises::getAddress)
+                    .optional(AddressUK::getCounty)
                     .eventLabel("County").done()
-                    .complex(CompanyPremisesType::getAddress)
-                    .optional(Address::getCountry)
+                    .complex(CompanyPremises::getAddress)
+                    .optional(AddressUK::getCountry)
                     .eventLabel("Country").done()
-                    .complex(CompanyPremisesType::getAddress)
-                    .mandatory(Address::getPostCode)
+                    .complex(CompanyPremises::getAddress)
+                    .mandatory(AddressUK::getPostCode)
                     .eventLabel("Postcode").done().done();
     }
 }

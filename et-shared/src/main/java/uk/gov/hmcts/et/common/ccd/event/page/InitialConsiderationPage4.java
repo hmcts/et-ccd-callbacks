@@ -3,6 +3,8 @@ package uk.gov.hmcts.et.common.ccd.event.page;
 import uk.gov.hmcts.ccd.sdk.api.Event;
 import uk.gov.hmcts.ccd.sdk.api.FieldCollection;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule27;
+import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule28;
 import uk.gov.hmcts.et.common.model.ccd.IcDocumentUpload;
 import uk.gov.hmcts.et.common.model.ccd.State;
 import uk.gov.hmcts.et.common.model.ccd.UserRole;
@@ -40,8 +42,19 @@ public final class InitialConsiderationPage4 {
                     .publish(false);
         fields.mandatory(CaseData::getEtInitialConsiderationRule27)
                     .fieldShowCondition("etICFurtherInformation CONTAINS \"Issue Rule 27 Notice and order\"");
+        fields.complexScope(CaseData::getEtInitialConsiderationRule27)
+                    .optional(EtInitialConsiderationRule27::getEtICRule27ClaimToBe)
+                    .optional(EtInitialConsiderationRule27::getEtICRule27WhichPart)
+                    .optional(EtInitialConsiderationRule27::getEtICRule27Direction)
+                    .optional(EtInitialConsiderationRule27::getEtICRule27DirectionReason)
+                    .optional(EtInitialConsiderationRule27::getEtICRule27NumberOfDays).done();
         fields.mandatory(CaseData::getEtInitialConsiderationRule28)
                     .fieldShowCondition("etICFurtherInformation CONTAINS \"Issue Rule 28 Notice and order\"");
+        fields.complexScope(CaseData::getEtInitialConsiderationRule28)
+                    .optional(EtInitialConsiderationRule28::getEtICRule28ClaimToBe)
+                    .optional(EtInitialConsiderationRule28::getEtICRule28WhichPart)
+                    .optional(EtInitialConsiderationRule28::getEtICRule28DirectionReason)
+                    .optional(EtInitialConsiderationRule28::getEtICRule28NumberOfDays).done();
         fields.readonlyNoSummary(CaseData::getEtICFurtherInformationHearingAnyOtherDirectionsLabel)
                     .publish(false);
         fields.optional(CaseData::getEtICFurtherInformationHearingAnyOtherDirections)

@@ -37,7 +37,6 @@ public class Et1ReppedCreateCase implements CCDConfig<CaseData, State, UserRole>
             .showSummary(false)
             .endButtonLabel("Create draft claim")
             .significant()
-            .ttlIncrement(365)
             .explicitGrants()
             .grant(Permission.CRUD, UserRole.CASEWORKER_EMPLOYMENT_API, UserRole.CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR)
             .fields();

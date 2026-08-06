@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import uk.gov.hmcts.ccd.sdk.api.CCD;
 import uk.gov.hmcts.ccd.sdk.type.FieldType;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(name = "etInitialConsiderationRule28", generate = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class EtInitialConsiderationRule28 {
@@ -28,7 +30,11 @@ public class EtInitialConsiderationRule28 {
     )
     @JsonProperty("etICRule28DirectionReason")
     private String etICRule28DirectionReason;
-    @CCD(label = "Number of days for respondent to provide written representations", searchable = false)
+    @CCD(
+            label = "Number of days for respondent to provide written representations",
+            searchable = false,
+            typeOverride = FieldType.Number
+    )
     @JsonProperty("etICRule28NumberOfDays")
     private String etICRule28NumberOfDays;
 }

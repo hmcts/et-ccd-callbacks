@@ -156,6 +156,7 @@ public class CaseData extends Et1CaseData {
     @CCD(
             label = "Correspondence Address",
             searchable = false,
+            typeOverride = FieldType.AddressUK,
             access = {CaseworkerEmploymentRPlus5RolesBbxtjpAccess.class, CaseworkerEmploymentLegalrepSolicitorDCitizenCruAccess.class}
     )
     @JsonProperty("tribunalCorrespondenceAddress")
@@ -343,7 +344,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentEnglandwalesCruPlus2RolesHenbjpAccess.class, CaseworkerEmploymentApiCrudCitizenCudAccess.class, CaseworkerEmploymentLegalrepSolicitorCudAccess.class, CaseworkerEmploymentCrudAccess.class}
     )
     @JsonProperty("hearingCollection")
-    private List<HearingTypeItem> hearingCollection;
+    private List<Hearing> hearingCollection;
     @CCD(
             label = " ",
             searchable = false,
@@ -368,7 +369,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentEnglandwalesCruPlus2RolesHenbjpAccess.class, CaseworkerEmploymentApiCrudCitizenCuAccess.class}
     )
     @JsonProperty("depositType")
-    private List<DepositTypeItem> depositCollection;
+    private List<Deposit> depositCollection;
     @CCD(
             label = " ",
             typeOverride = FieldType.Collection,
@@ -384,7 +385,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentEnglandwalesCruPlus2RolesHenbjpAccess.class, CaseworkerEmploymentApiCrudCaseworkerWaTaskConfigurationRAccess.class}
     )
     @JsonProperty("bfActions")
-    private List<BFActionTypeItem> bfActions;
+    private List<BFActions> bfActions;
     @CCD(
             label = "Clerk Responsible",
             typeOverride = FieldType.DynamicList,
@@ -405,7 +406,7 @@ public class CaseData extends Et1CaseData {
             access = {DefaultAccess.class, CaseworkerEmploymentEtjudgeRAccess.class, CitizenCrudAccess.class}
     )
     @JsonProperty("addDocumentCollection")
-    private List<DocumentTypeItem> addDocumentCollection;
+    private List<DocumentUpload> addDocumentCollection;
     @CCD(ignore = true)
     @JsonProperty("correspondenceScotType")
     private CorrespondenceScotType correspondenceScotType;
@@ -415,14 +416,14 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentRPlus5RolesBbxtjpAccess.class, CaseworkerEmploymentLegalrepSolicitorDCitizenCruAccess.class}
     )
     @JsonProperty("correspondenceType")
-    private CorrespondenceType correspondenceType;
+    private Letters correspondenceType;
     @CCD(
             label = "Address labels selection",
             searchable = false,
             access = {CaseworkerEmploymentRPlus5RolesBbxtjpAccess.class, CaseworkerEmploymentLegalrepSolicitorDCitizenCruAccess.class}
     )
     @JsonProperty("addressLabelsSelectionType")
-    private AddressLabelsSelectionType addressLabelsSelectionType;
+    private AddressLabelsSelection addressLabelsSelectionType;
     @CCD(
             label = "Address labels",
             searchable = false,
@@ -431,13 +432,13 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentRPlus5RolesBbxtjpAccess.class, CaseworkerEmploymentLegalrepSolicitorDCitizenCruAccess.class}
     )
     @JsonProperty("addressLabelCollection")
-    private List<AddressLabelTypeItem> addressLabelCollection;
+    private List<AddressLabel> addressLabelCollection;
     @CCD(
             label = "Address labels attributes",
             access = {CaseworkerEmploymentRPlus5RolesBbxtjpAccess.class, CaseworkerEmploymentLegalrepSolicitorDCitizenCruAccess.class}
     )
     @JsonProperty("addressLabelsAttributesType")
-    private AddressLabelsAttributesType addressLabelsAttributesType;
+    private AddressLabelsAttributes addressLabelsAttributesType;
     @CCD(ignore = true)
     @JsonProperty("allocatedOffice")
     private String allocatedOffice;
@@ -462,7 +463,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentApiCudPlus2RolesJgoofxAccess.class, CaseworkerEmploymentLegalrepSolicitorCuAccess.class, CitizenCuAccess.class}
     )
     @JsonProperty("eccCases")
-    private List<EccCounterClaimTypeItem> eccCases;
+    private List<CounterClaim> eccCases;
     @CCD(
             label = "Respondents with an ECC",
             searchable = false,
@@ -476,7 +477,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentEnglandwalesCruPlus2RolesHenbjpAccess.class, CaseworkerEmploymentApiCrudCitizenCuAccess.class}
     )
     @JsonProperty("restrictedReporting")
-    private RestrictedReportingType restrictedReporting;
+    private RestrictedCase restrictedReporting;
     @CCD(
             label = "Hearing List",
             searchable = false,
@@ -686,7 +687,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentEnglandwalesCruPlus2RolesHenbjpAccess.class, CaseworkerEmploymentRCaseworkerEmploymentApiCrudCitizenCruAccess.class}
     )
     @JsonProperty("companyPremises")
-    private CompanyPremisesType companyPremises;
+    private CompanyPremises companyPremises;
 
     @CCD(
             label = "Select the office you want to transfer the case to",
@@ -948,31 +949,31 @@ public class CaseData extends Et1CaseData {
     )
     @JsonProperty("hearingDetailsAttendeeClaimant")
     private String hearingDetailsAttendeeClaimant;
-    @CCD(label = "Number of Non Attendees (Respondent) ", searchable = false)
+    @CCD(label = "Number of Non Attendees (Respondent) ", searchable = false, typeOverride = FieldType.Number)
     @JsonProperty("hearingDetailsAttendeeNonAttendees")
     private String hearingDetailsAttendeeNonAttendees;
-    @CCD(label = "Respondent Attended - No Representative", searchable = false)
+    @CCD(label = "Respondent Attended - No Representative", searchable = false, typeOverride = FieldType.Number)
     @JsonProperty("hearingDetailsAttendeeRespNoRep")
     private String hearingDetailsAttendeeRespNoRep;
-    @CCD(label = "Respondent and Representative Attended", searchable = false)
+    @CCD(label = "Respondent and Representative Attended", searchable = false, typeOverride = FieldType.Number)
     @JsonProperty("hearingDetailsAttendeeRespAndRep")
     private String hearingDetailsAttendeeRespAndRep;
-    @CCD(label = "Respondent representative only attended", searchable = false)
+    @CCD(label = "Respondent representative only attended", searchable = false, typeOverride = FieldType.Number)
     @JsonProperty("hearingDetailsAttendeeRepOnly")
     private String hearingDetailsAttendeeRepOnly;
-    @CCD(label = "Start Time", searchable = false)
+    @CCD(label = "Start Time", searchable = false, typeOverride = FieldType.DateTime)
     @JsonProperty("hearingDetailsTimingStart")
     private String hearingDetailsTimingStart;
-    @CCD(label = "Break", searchable = false)
+    @CCD(label = "Break", searchable = false, typeOverride = FieldType.DateTime)
     @JsonProperty("hearingDetailsTimingBreak")
     private String hearingDetailsTimingBreak;
-    @CCD(label = "Resume", searchable = false)
+    @CCD(label = "Resume", searchable = false, typeOverride = FieldType.DateTime)
     @JsonProperty("hearingDetailsTimingResume")
     private String hearingDetailsTimingResume;
-    @CCD(label = "Finish", searchable = false)
+    @CCD(label = "Finish", searchable = false, typeOverride = FieldType.DateTime)
     @JsonProperty("hearingDetailsTimingFinish")
     private String hearingDetailsTimingFinish;
-    @CCD(label = "Duration", searchable = false)
+    @CCD(label = "Duration", searchable = false, typeOverride = FieldType.Number)
     @JsonProperty("hearingDetailsTimingDuration")
     private String hearingDetailsTimingDuration;
     @CCD(label = "Hearing Notes", searchable = false, typeOverride = FieldType.TextArea)
@@ -1355,7 +1356,7 @@ public class CaseData extends Et1CaseData {
             access = {DefaultAccess.class, CaseworkerEmploymentEtjudgeRAccess.class}
     )
     @JsonProperty("vettingJurisdictionCodeCollection")
-    private List<VettingJurCodesTypeItem> vettingJurisdictionCodeCollection;
+    private List<JurisdictionCode> vettingJurisdictionCodeCollection;
 
     // ET1 Vetting - Track allocation
     @CCD(
@@ -1830,7 +1831,7 @@ public class CaseData extends Et1CaseData {
             access = {DefaultAccess.class, CaseworkerEmploymentRPlus2RolesYovydhAccess.class, CitizenCrudAccess.class}
     )
     @JsonProperty("servingDocumentCollection")
-    private List<DocumentTypeItem> servingDocumentCollection;
+    private List<ServingDocumentUpload> servingDocumentCollection;
     @CCD(
             label = "Serving document other type name placeholder",
             searchable = false,
@@ -1921,7 +1922,7 @@ public class CaseData extends Et1CaseData {
             access = {DefaultAccess.class, CaseworkerEmploymentRPlus2RolesYovydhAccess.class, EtAcasApiRAccess.class}
     )
     @JsonProperty("et3CompanyHouseDocument")
-    private UploadedDocumentType et3CompanyHouseDocument;
+    private DocumentUpload et3CompanyHouseDocument;
     @CCD(
             label = "General Notes",
             searchable = false,
@@ -1948,7 +1949,7 @@ public class CaseData extends Et1CaseData {
             access = {DefaultAccess.class, CaseworkerEmploymentRPlus2RolesYovydhAccess.class, EtAcasApiRAccess.class}
     )
     @JsonProperty("et3IndividualInsolvencyDocument")
-    private UploadedDocumentType et3IndividualInsolvencyDocument;
+    private DocumentUpload et3IndividualInsolvencyDocument;
     @CCD(
             label = "General Notes",
             searchable = false,
@@ -2531,16 +2532,16 @@ public class CaseData extends Et1CaseData {
 
     @CCD(label = "Seek comments on the video hearing", searchable = false, access = {DefaultAccess.class})
     @JsonProperty("etICHearingNotListedSeekComments")
-    private EtICSeekComments etICHearingNotListedSeekComments;
+    private EtICHearingNotListedSeekComments etICHearingNotListedSeekComments;
     @CCD(label = "List for preliminary hearing", searchable = false, access = {DefaultAccess.class})
     @JsonProperty("etICHearingNotListedListForPrelimHearing")
-    private EtICListForPreliminaryHearing etICHearingNotListedListForPrelimHearing;
+    private EtICHearingNotListedListForPrelimHearing etICHearingNotListedListForPrelimHearing;
     @CCD(label = "List for final hearing", searchable = false, access = {DefaultAccess.class})
     @JsonProperty("etICHearingNotListedListForFinalHearing")
-    private EtICListForFinalHearing etICHearingNotListedListForFinalHearing;
+    private EtICHearingNotListedListForFinalHearing etICHearingNotListedListForFinalHearing;
     @CCD(label = "UDL hearing", searchable = false, access = {DefaultAccess.class})
     @JsonProperty("etICHearingNotListedUDLHearing")
-    private EtIcudlHearing etICHearingNotListedUDLHearing;
+    private EtICHearingNotListedUDLHearing etICHearingNotListedUDLHearing;
     @CCD(label = " ", searchable = false, typeOverride = FieldType.TextArea, access = {DefaultAccess.class})
     @JsonProperty("etICHearingNotListedAnyOtherDirections")
     private String etICHearingNotListedAnyOtherDirections;
@@ -2558,14 +2559,14 @@ public class CaseData extends Et1CaseData {
     private List<String> etICHearingNotListedListUpdated;
     @CCD(label = "List for preliminary hearing", searchable = false, access = {DefaultAccess.class})
     @JsonProperty("etICHearingNotListedListForPrelimHearingUpdated")
-    private EtICListForPreliminaryHearingUpdated etICHearingNotListedListForPrelimHearingUpdated;
+    private EtICHearingNotListedListForPrelimHearingUpdated etICHearingNotListedListForPrelimHearingUpdated;
     @CCD(
             label = "List for final hearing",
             searchable = false,
             access = {DefaultAccess.class, CaseworkerEmploymentEtjudgeCudAccess.class}
     )
     @JsonProperty("etICHearingNotListedListForFinalHearingUpdated")
-    private EtICListForFinalHearingUpdated etICHearingNotListedListForFinalHearingUpdated;
+    private EtICHearingNotListedListForFinalHearingUpdated etICHearingNotListedListForFinalHearingUpdated;
     @CCD(ignore = true)
     @JsonProperty("etICHearingNotListedDoNotListHearingDirections")
     private String etICHearingNotListedDoNotListHearingDirections;
@@ -2651,7 +2652,7 @@ public class CaseData extends Et1CaseData {
             access = {DefaultAccess.class, CaseworkerEmploymentEtjudgeEtAcasApiRAccess.class}
     )
     @JsonProperty("icDocumentCollection1")
-    private List<DocumentTypeItem> icDocumentCollection1;
+    private List<IcDocumentUpload> icDocumentCollection1;
     @CCD(
             label = "Upload document",
             searchable = false,
@@ -2660,7 +2661,7 @@ public class CaseData extends Et1CaseData {
             access = {DefaultAccess.class, CaseworkerEmploymentEtjudgeEtAcasApiRAccess.class}
     )
     @JsonProperty("icDocumentCollection2")
-    private List<DocumentTypeItem> icDocumentCollection2;
+    private List<IcDocumentUpload> icDocumentCollection2;
     @CCD(
             label = "Upload document",
             searchable = false,
@@ -2669,7 +2670,7 @@ public class CaseData extends Et1CaseData {
             access = {DefaultAccess.class, CaseworkerEmploymentEtjudgeEtAcasApiRAccess.class}
     )
     @JsonProperty("icDocumentCollection3")
-    private List<DocumentTypeItem> icDocumentCollection3;
+    private List<IcDocumentUpload> icDocumentCollection3;
     @CCD(
             label = "Upload document",
             searchable = false,
@@ -2678,7 +2679,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentApiCudPlus2RolesPvynvpAccess.class}
     )
     @JsonProperty("icAllDocumentCollection")
-    private List<DocumentTypeItem> icAllDocumentCollection;
+    private List<IcDocumentUpload> icAllDocumentCollection;
 
     // ET3 Response
     @CCD(
@@ -2762,6 +2763,7 @@ public class CaseData extends Et1CaseData {
     @CCD(
             label = "Enter a UK postcode",
             searchable = false,
+            typeOverride = FieldType.AddressUK,
             access = {CaseworkerEmploymentRPlus5RolesBbxtjpAccess.class, CaseworkerEmploymentLegalrepSolicitorCruAccess.class}
     )
     @JsonProperty("et3RespondentAddress")
@@ -2813,6 +2815,7 @@ public class CaseData extends Et1CaseData {
     @CCD(
             label = "Contact address if different from registered address",
             searchable = false,
+            typeOverride = FieldType.AddressUK,
             access = {SOLICITORACrudPlus9RolesLhlklnAccess.class, CLAIMANTSOLICITORDAccess.class, CaseworkerEmploymentApiCrudAccess.class}
     )
     @JsonProperty("et3ResponseAddress")
@@ -2851,6 +2854,7 @@ public class CaseData extends Et1CaseData {
             label = "How many people does the respondent employ in Great Britain?",
             hint = "It can help the tribunal to have an indication of the employer's size.\r\n\r\nEnter a rough amount in digits or leave blank if you're not sure",
             searchable = false,
+            typeOverride = FieldType.Number,
             access = {CaseworkerEmploymentRPlus5RolesBbxtjpAccess.class, CaseworkerEmploymentLegalrepSolicitorCruAccess.class}
     )
     @JsonProperty("et3ResponseEmploymentCount")
@@ -2867,6 +2871,7 @@ public class CaseData extends Et1CaseData {
             label = "How many people are employed at the place where the claimant worked?",
             hint = "Enter a rough amount in digits or leave blank if you're not sure",
             searchable = false,
+            typeOverride = FieldType.Number,
             access = {CaseworkerEmploymentRPlus5RolesBbxtjpAccess.class, CaseworkerEmploymentLegalrepSolicitorCruAccess.class}
     )
     @JsonProperty("et3ResponseSiteEmploymentCount")
@@ -2971,6 +2976,7 @@ public class CaseData extends Et1CaseData {
             label = "What are the claimant's correct total weekly work hours?",
             hint = "Enter their hours work per week",
             searchable = false,
+            typeOverride = FieldType.Number,
             access = {CaseworkerEmploymentRPlus5RolesBbxtjpAccess.class, CaseworkerEmploymentLegalrepSolicitorCruAccess.class}
     )
     @JsonProperty("et3ResponseClaimantCorrectHours")
@@ -3151,7 +3157,7 @@ public class CaseData extends Et1CaseData {
             access = {DefaultAccess.class, CaseworkerEmploymentEtjudgeEtAcasApiRAccess.class, CaseworkerEmploymentLegalrepSolicitorCruAccess.class, CaseworkerEmploymentRAccess.class, CitizenCruAccess.class}
     )
     @JsonProperty("et3NotificationDocCollection")
-    private List<DocumentTypeItem> et3NotificationDocCollection;
+    private List<Et3NotificationDocUpload> et3NotificationDocCollection;
     @CCD(
             label = "Serving document other type name placeholder",
             searchable = false,
@@ -3860,7 +3866,7 @@ public class CaseData extends Et1CaseData {
             access = {CLAIMANTSOLICITORCudPlus15RolesEslhbeAccess.class}
     )
     @JsonProperty("genericTseApplicationCollection")
-    private List<GenericTseApplicationTypeItem> genericTseApplicationCollection;
+    private List<GenericTseDetails> genericTseApplicationCollection;
     @CCD(
             label = " ",
             searchable = false,
@@ -3869,7 +3875,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentApiCrudEtAcasApiRAccess.class, CREATORCrudAccess.class}
     )
     @JsonProperty("tseApplicationStoredCollection")
-    private List<GenericTseApplicationTypeItem> tseApplicationStoredCollection;
+    private List<GenericTseDetails> tseApplicationStoredCollection;
     @CCD(
             label = " ",
             searchable = false,
@@ -3878,7 +3884,7 @@ public class CaseData extends Et1CaseData {
             access = {DEFENDANTCrudAccess.class, CaseworkerEmploymentApiCrudAccess.class}
     )
     @JsonProperty("tseRespondentStoredCollection")
-    private List<GenericTseApplicationTypeItem> tseRespondentStoredCollection;
+    private List<GenericTseDetails> tseRespondentStoredCollection;
 
     // Claimant tell something else
     @CCD(
@@ -4221,7 +4227,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentEnglandwalesCruPlus2RolesHenbjpAccess.class, CaseworkerEmploymentApiCruEtAcasApiRAccess.class}
     )
     @JsonProperty("tseAdminResponseRequiredYesDoc")
-    private List<GenericTypeItem<DocumentType>> tseAdminResponseRequiredYesDoc;
+    private List<GenericTypeItem<DocumentUpload>> tseAdminResponseRequiredYesDoc;
     @CCD(
             label = "Supporting material",
             hint = "Upload a document to the system",
@@ -4231,7 +4237,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentEnglandwalesCruPlus2RolesHenbjpAccess.class, CaseworkerEmploymentApiCruEtAcasApiRAccess.class}
     )
     @JsonProperty("tseAdminResponseRequiredNoDoc")
-    private List<GenericTypeItem<DocumentType>> tseAdminResponseRequiredNoDoc;
+    private List<GenericTypeItem<DocumentUpload>> tseAdminResponseRequiredNoDoc;
     @CCD(
             label = "Decision was made by",
             searchable = false,
@@ -4301,7 +4307,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentApiCrudPlus2RolesKlompmAccess.class}
     )
     @JsonProperty("tseResponseSupportingMaterial")
-    private List<GenericTypeItem<DocumentType>> tseResponseSupportingMaterial;
+    private List<GenericTypeItem<DocumentUpload>> tseResponseSupportingMaterial;
     @CCD(
             label = "Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?",
             searchable = false,
@@ -4385,7 +4391,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentLegalrepSolicitorCruAccess.class}
     )
     @JsonProperty("claimantRepResSupportingMaterial")
-    private List<GenericTypeItem<DocumentType>> claimantRepResSupportingMaterial;
+    private List<GenericTypeItem<DocumentUpload>> claimantRepResSupportingMaterial;
     @CCD(
             label = "Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?",
             searchable = false,
@@ -4459,7 +4465,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentEnglandwalesCruPlus2RolesHenbjpAccess.class, CaseworkerEmploymentApiCrudEtAcasApiRAccess.class, CaseworkerEmploymentLegalrepSolicitorDAccess.class}
     )
     @JsonProperty("tseAdmReplyAddDocument")
-    private List<GenericTypeItem<DocumentType>> tseAdmReplyAddDocument;
+    private List<GenericTypeItem<DocumentUpload>> tseAdmReplyAddDocument;
     @CCD(
             label = "Is this a case management order or request?",
             searchable = false,
@@ -4626,7 +4632,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentRPlus5RolesBbxtjpAccess.class, CaseworkerEmploymentLegalrepSolicitorCruAccess.class}
     )
     @JsonProperty("pseRespondentOrdReqUploadDocument")
-    private List<GenericTypeItem<DocumentType>> pseRespondentOrdReqUploadDocument;
+    private List<GenericTypeItem<DocumentUpload>> pseRespondentOrdReqUploadDocument;
     @CCD(
             label = "Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?",
             searchable = false,
@@ -4664,7 +4670,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentApiCitizenCrudAccess.class, CaseworkerEmploymentEnglandwalesCuPlus1RolesDqbnwvAccess.class}
     )
     @JsonProperty("sendNotificationCollection")
-    private List<SendNotificationTypeItem> sendNotificationCollection;
+    private List<SendNotificationCollection> sendNotificationCollection;
     @CCD(
             label = "Enter notification title",
             hint = "Start with a verb if you need the parties to do something. For example: submit hearing agenda, view notice of hearing. Please note the text entered here will be displayed in the notification e-mail sent to the parties.",
@@ -4848,7 +4854,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentApiCrudAccess.class, CaseworkerEmploymentLegalrepSolicitorCruAccess.class}
     )
     @JsonProperty("et3RepresentingRespondent")
-    private List<DynamicListTypeItem> et3RepresentingRespondent;
+    private List<DynamicListCollection> et3RepresentingRespondent;
 
     @CCD(
             label = "Enter response title",
@@ -4875,7 +4881,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentRPlus5RolesBbxtjpAccess.class, CitizenCruAccess.class}
     )
     @JsonProperty("respondNotificationUploadDocument")
-    private List<DocumentTypeItem> respondNotificationUploadDocument;
+    private List<DocumentUpload> respondNotificationUploadDocument;
     @CCD(
             label = "Is this a case management order or request?",
             searchable = false,
@@ -5022,7 +5028,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentApiCrudPlus2RolesKlompmAccess.class}
     )
     @JsonProperty("bundlesRespondentUploadFile")
-    private UploadedDocumentType bundlesRespondentUploadFile;
+    private DocumentUpload bundlesRespondentUploadFile;
     @CCD(
             label = "Respondent Hearing Documents",
             searchable = false,
@@ -5031,7 +5037,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentApiCudPlus2RolesJgoofxAccess.class, SOLICITORACuPlus9RolesXrnczvAccess.class, CitizenCuAccess.class}
     )
     @JsonProperty("bundlesRespondentCollection")
-    private List<GenericTypeItem<HearingBundleType>> bundlesRespondentCollection;
+    private List<GenericTypeItem<HearingBundle>> bundlesRespondentCollection;
 
     // Claimant Bundles
     @CCD(
@@ -5042,7 +5048,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentApiCudPlus2RolesJgoofxAccess.class, SOLICITORACuPlus9RolesXrnczvAccess.class, CitizenCuAccess.class}
     )
     @JsonProperty("bundlesClaimantCollection")
-    private List<GenericTypeItem<HearingBundleType>> bundlesClaimantCollection;
+    private List<GenericTypeItem<HearingBundle>> bundlesClaimantCollection;
 
     // Remove Hearing Bundle
     @CCD(
@@ -5053,7 +5059,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentEnglandwalesCuPlus1RolesDqbnwvAccess.class, CaseworkerEmploymentApiCuAccess.class}
     )
     @JsonProperty("removedHearingBundlesCollection")
-    private List<GenericTypeItem<RemovedHearingBundleItem>> removedHearingBundlesCollection;
+    private List<GenericTypeItem<RemovedHearingBundle>> removedHearingBundlesCollection;
 
     @CCD(
             label = "Please select the hearing bundle to be removed",
@@ -5091,7 +5097,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentEnglandwalesCruPlus2RolesHenbjpAccess.class, CaseworkerEmploymentApiCrudAccess.class}
     )
     @JsonProperty("adrDocumentCollection")
-    private List<DocumentTypeItem> adrDocumentCollection;
+    private List<AdrDocumentUploadDetails> adrDocumentCollection;
     @CCD(
             label = "Documents",
             searchable = false,
@@ -5100,7 +5106,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentEnglandwalesCruPlus2RolesHenbjpAccess.class, CaseworkerEmploymentApiCrudAccess.class}
     )
     @JsonProperty("piiDocumentCollection")
-    private List<DocumentTypeItem> piiDocumentCollection;
+    private List<PiiDocumentUploadDetails> piiDocumentCollection;
     @CCD(
             label = "Documents",
             searchable = false,
@@ -5109,7 +5115,7 @@ public class CaseData extends Et1CaseData {
             access = {CaseworkerEmploymentEnglandwalesCruPlus2RolesHenbjpAccess.class, CaseworkerEmploymentApiCrudAccess.class}
     )
     @JsonProperty("appealDocumentCollection")
-    private List<DocumentTypeItem> appealDocumentCollection;
+    private List<AppealDocumentUploadDetails> appealDocumentCollection;
 
     // Case Flags
     @CCD(
@@ -5369,7 +5375,12 @@ public class CaseData extends Et1CaseData {
                 .toList();
     }
 
-    @CCD(label = " ", searchable = false, access = {CaseworkerEmploymentApiCaseworkerEmploymentLegalrepSolicitorCrudAccess.class})
+    @CCD(
+            label = " ",
+            searchable = false,
+            typeOverride = FieldType.AddressUK,
+            access = {CaseworkerEmploymentApiCaseworkerEmploymentLegalrepSolicitorCrudAccess.class}
+    )
     @JsonProperty("et1ReppedTriageAddress")
     private Address et1ReppedTriageAddress;
     @CCD(
@@ -5452,7 +5463,12 @@ public class CaseData extends Et1CaseData {
     )
     @JsonProperty("claimantPreferredTitle")
     private String claimantPreferredTitle;
-    @CCD(label = " ", searchable = false, access = {CLAIMANTSOLICITORCaseworkerEmploymentApiCrudAccess.class})
+    @CCD(
+            label = " ",
+            searchable = false,
+            typeOverride = FieldType.AddressUK,
+            access = {CLAIMANTSOLICITORCaseworkerEmploymentApiCrudAccess.class}
+    )
     @JsonProperty("claimantContactAddress")
     private Address claimantContactAddress;
     @CCD(
@@ -5528,6 +5544,7 @@ public class CaseData extends Et1CaseData {
     @CCD(
             label = "Contact address if different from registered address",
             searchable = false,
+            typeOverride = FieldType.AddressUK,
             access = {CLAIMANTSOLICITORCrudPlus11RolesKpylwqAccess.class}
     )
     @JsonProperty("representativeAddress")
@@ -5586,6 +5603,7 @@ public class CaseData extends Et1CaseData {
     @CCD(
             label = "How many months is the notice period?",
             searchable = false,
+            typeOverride = FieldType.Number,
             access = {CLAIMANTSOLICITORCaseworkerEmploymentApiCrudAccess.class}
     )
     @JsonProperty("claimantStillWorkingNoticePeriodMonths")
@@ -5593,6 +5611,7 @@ public class CaseData extends Et1CaseData {
     @CCD(
             label = "How many weeks is the notice period?",
             searchable = false,
+            typeOverride = FieldType.Number,
             access = {CLAIMANTSOLICITORCaseworkerEmploymentApiCrudAccess.class}
     )
     @JsonProperty("claimantStillWorkingNoticePeriodWeeks")
@@ -5609,6 +5628,7 @@ public class CaseData extends Et1CaseData {
     @CCD(
             label = "How many months of the notice period is the claimant being paid for?",
             searchable = false,
+            typeOverride = FieldType.Number,
             access = {CLAIMANTSOLICITORCaseworkerEmploymentApiCrudAccess.class}
     )
     @JsonProperty("claimantWorkingNoticePeriodMonths")
@@ -5616,6 +5636,7 @@ public class CaseData extends Et1CaseData {
     @CCD(
             label = "How many weeks of the notice period is the claimant being paid for?",
             searchable = false,
+            typeOverride = FieldType.Number,
             access = {CLAIMANTSOLICITORCaseworkerEmploymentApiCrudAccess.class}
     )
     @JsonProperty("claimantWorkingNoticePeriodWeeks")
@@ -5650,6 +5671,7 @@ public class CaseData extends Et1CaseData {
     @CCD(
             label = "How many months was the notice period?",
             searchable = false,
+            typeOverride = FieldType.Number,
             access = {CLAIMANTSOLICITORCaseworkerEmploymentApiCrudAccess.class}
     )
     @JsonProperty("claimantNoLongerWorkingMonths")
@@ -5657,6 +5679,7 @@ public class CaseData extends Et1CaseData {
     @CCD(
             label = "How many weeks was the notice period?",
             searchable = false,
+            typeOverride = FieldType.Number,
             access = {CLAIMANTSOLICITORCaseworkerEmploymentApiCrudAccess.class}
     )
     @JsonProperty("claimantNoLongerWorkingWeeks")
@@ -5669,6 +5692,7 @@ public class CaseData extends Et1CaseData {
             searchable = false,
             min = 0,
             max = 168,
+            typeOverride = FieldType.Number,
             access = {CLAIMANTSOLICITORCaseworkerEmploymentApiCrudAccess.class}
     )
     @JsonProperty("claimantAverageWeeklyWorkHours")
@@ -5798,7 +5822,12 @@ public class CaseData extends Et1CaseData {
     )
     @JsonProperty("respondentLastName")
     private String respondentLastName;
-    @CCD(label = " ", searchable = false, access = {CLAIMANTSOLICITORCaseworkerEmploymentApiCrudAccess.class})
+    @CCD(
+            label = " ",
+            searchable = false,
+            typeOverride = FieldType.AddressUK,
+            access = {CLAIMANTSOLICITORCaseworkerEmploymentApiCrudAccess.class}
+    )
     @JsonProperty("respondentAddress")
     private Address respondentAddress;
     @CCD(label = " ", searchable = false, access = {CLAIMANTSOLICITORCaseworkerEmploymentApiCrudAccess.class})
@@ -5862,7 +5891,7 @@ public class CaseData extends Et1CaseData {
             access = {CLAIMANTSOLICITORCaseworkerEmploymentApiCrudAccess.class}
     )
     @JsonProperty("et1ReppedRespondentCollection")
-    private List<GenericTypeItem<CreateRespondentType>> et1ReppedRespondentCollection;
+    private List<GenericTypeItem<CreateRespondent>> et1ReppedRespondentCollection;
 
     @CCD(
             label = "Enter details of the claim",
@@ -6097,7 +6126,7 @@ public class CaseData extends Et1CaseData {
             access = {CLAIMANTSOLICITORCaseworkerEmploymentApiCrudAccess.class}
     )
     @JsonProperty("claimantNotificationDocuments")
-    private List<GenericTypeItem<DocumentType>> claimantNotificationDocuments;
+    private List<GenericTypeItem<DocumentUpload>> claimantNotificationDocuments;
     @CCD(
             label = "Is the respondent a system user?",
             searchable = false,
@@ -6172,12 +6201,18 @@ public class CaseData extends Et1CaseData {
             label = "Respondent representative(s) to remove",
             typeOverride = FieldType.Collection,
             typeParameterOverride = "RespondentRepresentative",
-            access = {CaseworkerEmploymentApiCitizenCrudAccess.class}
+            access = {CaseworkerEmploymentApiCitizenCrudAccess.class, CaseworkerEmploymentCrudAccess.class}
     )
     @JsonProperty("repCollectionToRemove")
-    private List<RepresentedTypeRItem> repCollectionToRemove;
+    private List<RespondentRepresentative> repCollectionToRemove;
+    @CCD(
+            label = "Respondent representative(s) to add",
+            typeOverride = FieldType.Collection,
+            typeParameterOverride = "RespondentRepresentative",
+            access = {CaseworkerEmploymentApiCitizenCrudAccess.class, CaseworkerEmploymentCrudAccess.class}
+    )
     @JsonProperty("repCollectionToAdd")
-    private List<RepresentedTypeRItem> repCollectionToAdd;
+    private List<RespondentRepresentative> repCollectionToAdd;
 
     @CCD(
             label = " ",
@@ -6220,7 +6255,7 @@ public class CaseData extends Et1CaseData {
             access = {DefaultAccess.class}
     )
     @JsonProperty("uploadHearingDocumentType")
-    private List<GenericTypeItem<UploadHearingDocumentType>> uploadHearingDocumentType;
+    private List<GenericTypeItem<HearingDocumentUpload>> uploadHearingDocumentType;
     @CCD(
             label = "Which party has submitted these documents?",
             searchable = false,
@@ -6859,7 +6894,12 @@ public class CaseData extends Et1CaseData {
           access = {DefaultAccess.class, CaseworkerEmploymentEtjudgeEtAcasApiRAccess.class, CaseworkerEmploymentLegalrepSolicitorRAccess.class, CaseworkerEmploymentRAccess.class}
   )
   private String horizontalLine4;
-  @CCD(label = "History", searchable = false, access = {CaseworkerEmploymentApiCudPlus2RolesJgoofxAccess.class})
+  @CCD(
+          label = "History",
+          searchable = false,
+          typeOverride = FieldType.CaseHistoryViewer,
+          access = {CaseworkerEmploymentApiCudPlus2RolesJgoofxAccess.class}
+  )
   private String caseHistory;
   @CCD(
           label = "state",

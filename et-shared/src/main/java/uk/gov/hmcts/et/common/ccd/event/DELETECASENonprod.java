@@ -37,7 +37,6 @@ public class DELETECASENonprod implements CCDConfig<CaseData, State, UserRole> {
             .displayOrder(1000)
             .showSummary(false)
             .significant()
-            .ttlIncrement(0)
             .explicitGrants()
             .grant(Permission.CRU, UserRole.CASEWORKER_EMPLOYMENT_API);
     }

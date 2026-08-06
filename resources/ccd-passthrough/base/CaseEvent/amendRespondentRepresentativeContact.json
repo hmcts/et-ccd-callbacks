@@ -1,4 +1,0 @@
-[ {
-  "ID" : "amendRespondentRepresentativeContact",
-  "CallBackURLAboutToSubmitEvent" : "${ET_COS_URL}/et3Response/aboutToSubmitAmendRepresentativeContact"
-} ]

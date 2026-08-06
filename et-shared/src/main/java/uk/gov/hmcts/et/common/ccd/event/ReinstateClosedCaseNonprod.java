@@ -48,10 +48,13 @@ public class ReinstateClosedCaseNonprod implements CCDConfig<CaseData, State, Us
         fields.complex(CaseData::getPreAcceptCase)
                     .readonly(CasePreAcceptType::getDateAccepted)
                     .eventLabel("Date Accepted")
+                    .retainHiddenValue()
                     .readonly(CasePreAcceptType::getDateRejected)
                     .eventLabel("Date Rejected")
+                    .retainHiddenValue()
                     .readonly(CasePreAcceptType::getRejectReason)
-                    .eventLabel("Reason for the rejection").done()
+                    .eventLabel("Reason for the rejection")
+                    .retainHiddenValue().done()
                     .fieldShowCondition("positionType !=\"Case closed\"");
     }
 }

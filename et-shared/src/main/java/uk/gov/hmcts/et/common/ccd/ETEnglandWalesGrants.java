@@ -55,6 +55,7 @@ public class ETEnglandWalesGrants implements CCDConfig<CaseData, State, UserRole
         builder.grant(State.Vetted, Set.of(Permission.R), UserRole.CASEWORKER_EMPLOYMENT_ETJUDGE);
         builder.grant(State.Vetted, Set.of(Permission.R), UserRole.GS_PROFILE);
         builder.grant(State.Delete, Permission.CRUD, UserRole.CASEWORKER_EMPLOYMENT_API);
+        builder.grant(State.PendingDisposal, Set.of(Permission.R), UserRole.CASEWORKER_EMPLOYMENT_API);
         builder.grant(State.Accepted, Permission.CRU, UserRole.CASEWORKER_WA_TASK_CONFIGURATION);
         builder.grant(State.Accepted, Permission.CRU, UserRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES);
         builder.grant(State.Accepted, Permission.CRU, UserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES);

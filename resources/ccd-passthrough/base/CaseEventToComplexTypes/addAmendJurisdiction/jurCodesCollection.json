@@ -2,14 +2,6 @@
   "ID" : "Jurisdiction",
   "CaseEventID" : "addAmendJurisdiction",
   "CaseFieldID" : "jurCodesCollection",
-  "ListElementCode" : "juridictionCodesList",
-  "EventElementLabel" : "Jurisdiction Code",
-  "FieldDisplayOrder" : 1,
-  "DisplayContext" : "MANDATORY"
-}, {
-  "ID" : "Jurisdiction",
-  "CaseEventID" : "addAmendJurisdiction",
-  "CaseFieldID" : "jurCodesCollection",
   "ListElementCode" : "jurisdictionCodeADT",
   "EventElementLabel" : "Discriminatory terms or rules",
   "FieldDisplayOrder" : 2,
@@ -605,29 +597,5 @@
   "ListElementCode" : "jurisdictionCodeZNON",
   "EventElementLabel" : "Dummy code for purposes of record closure only used when undertaken as part of a reasonable and proportionate data cleansing checking exercise where the actual jurisdiction and outcome are unknown",
   "FieldDisplayOrder" : 76,
-  "DisplayContext" : "MANDATORY"
-}, {
-  "ID" : "Jurisdiction",
-  "CaseEventID" : "addAmendJurisdiction",
-  "CaseFieldID" : "jurCodesCollection",
-  "ListElementCode" : "judgmentOutcome",
-  "EventElementLabel" : "Outcome",
-  "FieldDisplayOrder" : 77,
-  "DisplayContext" : "OPTIONAL"
-}, {
-  "ID" : "Jurisdiction",
-  "CaseEventID" : "addAmendJurisdiction",
-  "CaseFieldID" : "jurCodesCollection",
-  "ListElementCode" : "dateNotified",
-  "EventElementLabel" : "Date notified",
-  "FieldDisplayOrder" : 78,
-  "DisplayContext" : "MANDATORY"
-}, {
-  "ID" : "Jurisdiction",
-  "CaseEventID" : "addAmendJurisdiction",
-  "CaseFieldID" : "jurCodesCollection",
-  "ListElementCode" : "disposalDate",
-  "EventElementLabel" : "Disposal date",
-  "FieldDisplayOrder" : 79,
   "DisplayContext" : "MANDATORY"
 } ]

@@ -1,9 +1,0 @@
-[ {
-  "ID" : "JurisdictionCode",
-  "CaseEventID" : "et1Vetting",
-  "CaseFieldID" : "vettingJurisdictionCodeCollection",
-  "ListElementCode" : "et1VettingJurCodeList",
-  "EventElementLabel" : "Jurisdiction code",
-  "FieldDisplayOrder" : 1,
-  "DisplayContext" : "OPTIONAL"
-} ]

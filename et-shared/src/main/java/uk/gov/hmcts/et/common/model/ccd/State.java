@@ -14,6 +14,12 @@ public enum State {
     Delete,
 
     @CCD(
+            label = "Pending disposal",
+            description = "Cases marked for disposal"
+    )
+    PendingDisposal,
+
+    @CCD(
             label = "Submitted",
             hint = "# Case Number:${ethosCaseReference}</br><h1>${claimant} v ${respondent}<br>${flagsImageAltText}</h1>"
     )

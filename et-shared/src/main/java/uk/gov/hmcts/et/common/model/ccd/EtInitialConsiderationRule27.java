@@ -7,7 +7,9 @@ import lombok.Data;
 import java.util.List;
 import uk.gov.hmcts.ccd.sdk.api.CCD;
 import uk.gov.hmcts.ccd.sdk.type.FieldType;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(name = "etInitialConsiderationRule27", generate = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class EtInitialConsiderationRule27 {
@@ -41,7 +43,11 @@ public class EtInitialConsiderationRule27 {
     @CCD(ignore = true)
     @JsonProperty("etICRule27NoJurisdictionReason")
     private String etICRule27NoJurisdictionReason;
-    @CCD(label = "Number of days for claimant to provide written representations", searchable = false)
+    @CCD(
+            label = "Number of days for claimant to provide written representations",
+            searchable = false,
+            typeOverride = FieldType.Number
+    )
     @JsonProperty("etICRule27NumberOfDays")
     private String etICRule27NumberOfDays;
 }

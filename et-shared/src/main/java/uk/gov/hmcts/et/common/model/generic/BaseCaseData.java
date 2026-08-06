@@ -29,6 +29,7 @@ import uk.gov.hmcts.et.common.ccd.access.CitizenCruAccess;
 import uk.gov.hmcts.et.common.ccd.access.CaseworkerEmploymentApiCrudCaseworkerWaTaskConfigurationRAccess;
 import uk.gov.hmcts.et.common.ccd.access.GSProfileRAccess;
 import uk.gov.hmcts.et.common.ccd.access.CaseworkerRasValidationRAccess;
+import uk.gov.hmcts.et.common.model.ccd.DigitalCaseFile;
 
 /**
  * Data common to single and multiple cases.
@@ -147,7 +148,7 @@ public class BaseCaseData {
             access = {CaseworkerEmploymentEnglandwalesCruPlus2RolesHenbjpAccess.class, CaseworkerEmploymentApiCrudAccess.class}
     )
     @JsonProperty("digitalCaseFile")
-    private DigitalCaseFileType digitalCaseFile;
+    private DigitalCaseFile digitalCaseFile;
 
     @CCD(
             label = "Digital Case File configuration",

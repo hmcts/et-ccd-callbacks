@@ -7,7 +7,9 @@ import lombok.Data;
 import java.util.List;
 import uk.gov.hmcts.ccd.sdk.api.CCD;
 import uk.gov.hmcts.ccd.sdk.type.FieldType;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(name = "etICHearingListedAnswers", generate = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class EtICHearingListedAnswers {

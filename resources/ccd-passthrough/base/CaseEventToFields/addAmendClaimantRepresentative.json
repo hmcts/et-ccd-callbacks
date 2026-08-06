@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "representativeClaimantType",
+  "CallBackURLMidEvent" : "${ET_COS_URL}/addAmendClaimantRepresentative/midEvent"
+} ]

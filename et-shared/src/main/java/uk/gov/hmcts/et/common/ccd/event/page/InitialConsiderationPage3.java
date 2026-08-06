@@ -3,6 +3,7 @@ package uk.gov.hmcts.et.common.ccd.event.page;
 import uk.gov.hmcts.ccd.sdk.api.Event;
 import uk.gov.hmcts.ccd.sdk.api.FieldCollection;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.EtICHearingListedAnswers;
 import uk.gov.hmcts.et.common.model.ccd.IcDocumentUpload;
 import uk.gov.hmcts.et.common.model.ccd.State;
 import uk.gov.hmcts.et.common.model.ccd.UserRole;
@@ -37,7 +38,26 @@ public final class InitialConsiderationPage3 {
                     .publish(false);
         fields.readonlyNoSummary(CaseData::getEtICHearingListedJurisdictionCodesLabel)
                     .publish(false);
-        fields.complex(CaseData::getEtICHearingListedAnswers).done();
+        fields.complex(CaseData::getEtICHearingListedAnswers)
+                    .mandatory(EtICHearingListedAnswers::getEtICHearingListed)
+                    .mandatory(EtICHearingListedAnswers::getEtICExtendDurationGiveDetails)
+                    .mandatory(EtICHearingListedAnswers::getEtICOtherGiveDetails)
+                    .mandatory(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembers)
+                    .mandatory(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembersReason)
+                    .mandatory(EtICHearingListedAnswers::getEtICIsFinalHearingWithJudgeOrMembersJsaReason)
+                    .mandatory(EtICHearingListedAnswers::getEtICIsFinalHearingWithJudgeOrMembersReason)
+                    .mandatory(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembersReasonOther)
+                    .mandatory(EtICHearingListedAnswers::getEtICJsaFinalHearingReasonOther)
+                    .mandatory(EtICHearingListedAnswers::getEtICMembersFinalHearingReasonOther)
+                    .readonly(EtICHearingListedAnswers::getEtInitialConsiderationListedHearingType)
+                    .mandatory(EtICHearingListedAnswers::getEtICIsHearingWithJsa)
+                    .mandatory(EtICHearingListedAnswers::getEtICIsHearingWithJsaReasonOther)
+                    .mandatory(EtICHearingListedAnswers::getEtICJsaCmPreliminaryHearingReasonOther)
+                    .mandatory(EtICHearingListedAnswers::getEtICIsHearingWithMembers)
+                    .optional(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembersFurtherDetails)
+                    .readonly(EtICHearingListedAnswers::getOtherDirectionsLabel)
+                    .optional(EtICHearingListedAnswers::getEtICHearingAnyOtherDirections)
+                    .eventLabel(" ").done();
         fields.readonlyNoSummary(CaseData::getEtICUploadDocDividerHrLabel3)
                     .publish(false);
         fields.complex(CaseData::getIcDocumentCollection2).done();

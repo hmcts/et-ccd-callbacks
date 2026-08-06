@@ -2,6 +2,7 @@ package uk.gov.hmcts.et.common.ccd.event.page;
 
 import uk.gov.hmcts.ccd.sdk.api.Event;
 import uk.gov.hmcts.ccd.sdk.api.FieldCollection;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.State;
 import uk.gov.hmcts.et.common.model.ccd.UserRole;
@@ -25,5 +26,18 @@ public final class Et1SectionOnePage4 {
         fields.page("4");
         fields.pageLabel("Claimant contact address");
         fields.mandatory(CaseData::getClaimantContactAddress);
+        fields.complexScope(CaseData::getClaimantContactAddress)
+                    .optional(Address::getAddressLine1)
+                    .eventLabel("Building and Street")
+                    .optional(Address::getAddressLine2)
+                    .optional(Address::getAddressLine3)
+                    .optional(Address::getPostTown)
+                    .eventLabel("Town or City")
+                    .optional(Address::getCounty)
+                    .eventLabel("County")
+                    .optional(Address::getCountry)
+                    .eventLabel("Country")
+                    .optional(Address::getPostCode)
+                    .eventLabel("Postcode").done();
     }
 }

@@ -1,6 +1,7 @@
 #!groovy
 
-@Library("Infrastructure@2.4.9")
+//@Library("Infrastructure@2.4.9")
+@Library("Infrastructure@performance-stages-updatev5")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 
@@ -310,7 +311,7 @@ withPipeline(type, product, component) {
     ]
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
   }
-  
+
   afterAlways('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'

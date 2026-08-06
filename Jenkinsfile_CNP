@@ -133,12 +133,12 @@ withPipeline(type, product, component) {
 
   // Enable Performance Test Stages
   enablePerformanceTestStages(timeout: 10, perfTestEnvironments: ['preview','aat','perftest'])
-  enableGatlingLoadTests([
-    repo: 'https://github.com/hmcts/performance-testing.git',
-    branch: 'add-et-tests',
-    simulation: 'et.simulations.EtCosApiBuildSimulation', 
-    timeout: 10
-  ])
+  // enableGatlingLoadTests([
+  //   repo: 'https://github.com/hmcts/performance-testing.git',
+  //   branch: 'add-et-tests',
+  //   simulation: 'et.simulations.EtCosApiBuildSimulation', 
+  //   timeout: 10
+  // ])
 
   afterAlways('test') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/**/*'
@@ -253,26 +253,26 @@ withPipeline(type, product, component) {
     afterAlways('functionalTest:preview') {
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
-
-      stage('Functional UI tests chromium') {
-        try {
-          env.ET_COS_PREVIEW_ET_SYA_API = "https://et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
-          env.ET_COS_PREVIEW_CCD = "https://ccd-data-store-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
-          yarnBuilder.yarn('test:functional-chromium')
-        } catch (Error) {
-          unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-        } finally {
-          publishHTML([
-                  allowMissing: true,
-                  alwaysLinkToLastBuild: true,
-                  keepAll: true,
-                  reportDir: 'playwright-report',
-                  reportFiles: 'index.html',
-                  reportName: 'CCD Callback - UITestChromiumReport'
-          ])
-          steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
-        }
-      }
+//****  Disable UI Functional test temp 
+      // stage('Functional UI tests chromium') {
+      //   try {
+      //     env.ET_COS_PREVIEW_ET_SYA_API = "https://et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
+      //     env.ET_COS_PREVIEW_CCD = "https://ccd-data-store-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
+      //     yarnBuilder.yarn('test:functional-chromium')
+      //   } catch (Error) {
+      //     unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+      //   } finally {
+      //     publishHTML([
+      //             allowMissing: true,
+      //             alwaysLinkToLastBuild: true,
+      //             keepAll: true,
+      //             reportDir: 'playwright-report',
+      //             reportFiles: 'index.html',
+      //             reportName: 'CCD Callback - UITestChromiumReport'
+      //     ])
+      //     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
+      //   }
+      // }
     }
 
 
@@ -310,7 +310,7 @@ withPipeline(type, product, component) {
     ]
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
   }
-
+  
   afterAlways('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'

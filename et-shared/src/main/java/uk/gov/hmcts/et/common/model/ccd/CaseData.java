@@ -922,6 +922,10 @@ public class CaseData extends Et1CaseData {
     private List<String> et3ResponseHearingRepresentative;
     @JsonProperty("et3ResponseHearingRespondent")
     private List<String> et3ResponseHearingRespondent;
+    @JsonProperty("et3ResponseHearingPanelPreference")
+    private String et3ResponseHearingPanelPreference;
+    @JsonProperty("et3HearingPanelPreferenceReason")
+    private String et3HearingPanelPreferenceReason;
     // ET3 Response - Respondent's workforce page (10)
     @JsonProperty("et3ResponseEmploymentCount")
     private String et3ResponseEmploymentCount;
@@ -1742,6 +1746,10 @@ public class CaseData extends Et1CaseData {
     private List<String> claimantSupportQuestion;
     @JsonProperty("claimantSupportQuestionReason")
     private String claimantSupportQuestionReason;
+    @JsonProperty("claimantHearingPanelPreference")
+    private String claimantHearingPanelPreference;
+    @JsonProperty("claimantHearingPanelPreferenceWhy")
+    private String claimantHearingPanelPreferenceWhy;
     @JsonProperty("representativeContactPreference")
     private List<String> representativeContactPreference;
     @JsonProperty("contactPreferencePostReason")

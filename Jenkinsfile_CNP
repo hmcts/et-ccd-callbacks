@@ -214,7 +214,6 @@ withPipeline(type, product, component) {
     afterAlways('functionalTest:preview') {
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/**'
 
       stage('Functional UI tests chromium') {
         try {
@@ -233,6 +232,7 @@ withPipeline(type, product, component) {
                   reportName: 'CCD Callback - UITestChromiumReport'
           ])
           steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
+          steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/**'
         }
       }
     }
@@ -274,7 +274,6 @@ withPipeline(type, product, component) {
   afterAlways('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/**'
     stage('Functional UI tests chromium') {
       try {
         yarnBuilder.yarn('test:functional-chromium')
@@ -290,6 +289,7 @@ withPipeline(type, product, component) {
               reportName: 'CCD Callback - UITestChromiumReport'
           ])
           steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
+          steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/**'
       }
     }
   }

@@ -123,6 +123,8 @@ class Et1SubmissionServiceTest {
                 "7b1f33eb-31c5-4a00-b1a4-c1bca84bc441");
         ReflectionTestUtils.setField(et1SubmissionService, "claimantSubmissionTemplateIdWelsh",
                 "7b1f33eb-31c5-4a00-b1a4-c1bca84bc441");
+        ReflectionTestUtils.setField(et1SubmissionService, "et1EnPdf", "ET1_1026.pdf");
+        ReflectionTestUtils.setField(et1SubmissionService, "et1CyPdf", "CY_ET1_1026.pdf");
     }
 
     @Test

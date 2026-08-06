@@ -36,6 +36,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmploymentRightsActService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
@@ -188,6 +189,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @MockitoBean
     private UserIdamService userIdamService;
+
+    @MockitoBean
+    private EmploymentRightsActService employmentRightsActService;
 
     private MockMvc mvc;
     private JsonNode requestContent;

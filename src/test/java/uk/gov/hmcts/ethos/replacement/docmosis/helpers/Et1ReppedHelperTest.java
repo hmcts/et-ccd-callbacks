@@ -184,6 +184,18 @@ class Et1ReppedHelperTest {
 
     }
 
+    @Test
+    void setEt1SubmitDataSavesClaimantHearingPanelPreference() {
+        caseData.setClaimantHearingPanelPreference("Panel");
+        caseData.setClaimantHearingPanelPreferenceWhy("Workplace expertise is required");
+
+        Et1ReppedHelper.setEt1SubmitData(caseData);
+
+        assertEquals("Panel", caseData.getClaimantHearingPreference().getClaimantHearingPanelPreference());
+        assertEquals("Workplace expertise is required",
+                caseData.getClaimantHearingPreference().getClaimantHearingPanelPreferenceWhy());
+    }
+
     private void generateRespondentTypeInfo(String type) {
         if (INDIVIDUAL.equals(type)) {
             caseData.setRespondentFirstName("First");
@@ -226,6 +238,15 @@ class Et1ReppedHelperTest {
         List<String> errors = Et1ReppedHelper.validateGrounds(caseData);
         assertEquals(1, errors.size());
         assertEquals(ET1ReppedConstants.CLAIM_DETAILS_MISSING, errors.getFirst());
+    }
+
+    @Test
+    void validateGroundsFutureDateError() {
+        caseData.setEt1SectionThreeClaimDetails("Grounds");
+        caseData.setEt1SectionThreeDateOfLastEvent(java.time.LocalDate.now().plusDays(1).toString());
+        List<String> errors = Et1ReppedHelper.validateGrounds(caseData);
+        assertEquals(1, errors.size());
+        assertEquals("The date of the most recent event cannot be in the future", errors.getFirst());
     }
 
     @Test

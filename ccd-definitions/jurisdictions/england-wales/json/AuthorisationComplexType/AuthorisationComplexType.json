@@ -1269,6 +1269,20 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "respondentCollection",
+    "ListElementCode": "acasCertificateReceiptDate",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "respondentCollection",
+    "ListElementCode": "acasCertificateIssueDate",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "respondentCollection",
     "ListElementCode": "respondent_ACAS_no",
     "UserRole": "caseworker-employment-legalrep-solicitor",
     "CRUD": "R"

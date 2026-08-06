@@ -12,7 +12,7 @@ test.describe('Case creation in Citizen UI', () => {
   test(
     'Create a claim for still working for organisation, submit and process within manage cases',
     {
-      tag: ['@cx', '@ccd-callback-tests'],
+      tag: ['@cx', '@smoke', '@ccd-callback-tests'],
     },
     async ({
       page,

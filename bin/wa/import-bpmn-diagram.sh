@@ -16,6 +16,7 @@ do
     -H "Accept: application/json" \
     -H "ServiceAuthorization: Bearer ${serviceToken}" \
     -F "deployment-name=$(date +"%Y%m%d-%H%M%S")-$(basename ${file})" \
+    -F "deploy-changed-only=true" \
     -F "tenant-id=employment" \
     -F "file=@${filepath}/$(basename ${file})"); then
     curl_exit_code=0

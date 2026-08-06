@@ -235,6 +235,7 @@ configurations {
 }
 
 test {
+    dependsOn dumpCCDDefinitions
     exclude '**/*ComponentTest*'
     useJUnitPlatform()
     testLogging {
@@ -274,6 +275,13 @@ allprojects {
                 enabled = false
             }
         }
+    }
+}
+
+processTestResources {
+    dependsOn dumpCCDDefinitions
+    from("$buildDir/cftlib/definition-snapshots") {
+        into 'definition-snapshots'
     }
 }
 
@@ -645,7 +653,7 @@ dependencies {
     // CVE-2025-7962
     implementation group: 'org.eclipse.angus', name: 'angus-mail', version: '2.0.5'
 
-    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.17.0'
+    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.18.0'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 

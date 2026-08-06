@@ -45,7 +45,7 @@ if http_code=$(curl --silent --show-error --location \
   --fail-with-body \
   --retry "${CURL_RETRY_COUNT}" \
   --retry-delay "${CURL_RETRY_DELAY_SECONDS}" \
-  --retry-all-errors \
+  --retry-connrefused \
   --connect-timeout "${CURL_CONNECT_TIMEOUT_SECONDS}" \
   --max-time "${CURL_MAX_TIME_SECONDS}" \
   --output "${response_body_file}" \
@@ -93,6 +93,13 @@ echo "Response received from server. : ${body}"
 echo "${http_code}"
 
 if [[ "${http_code}" == "409" ]]; then
+  echo "WA legal operations user already exists."
+  exit 0
+fi
+
+if [[ "${http_code}" == "400" ]] && jq --exit-status \
+  '.errorDescription == "The profile is already created for the given email Id"' \
+  "${response_body_file}" > /dev/null; then
   echo "WA legal operations user already exists."
   exit 0
 fi

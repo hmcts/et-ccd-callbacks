@@ -48,4 +48,6 @@ public class ClaimantOtherType {
     private String pastEmployer;
     @JsonProperty("stillWorking")
     private String stillWorking;
+    @JsonProperty("dateOfLastEvent")
+    private String dateOfLastEvent;
 }

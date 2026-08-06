@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import feign.FeignException;
+import feign.Request;
+import feign.RequestTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,8 +20,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -217,6 +223,30 @@ class ClaimantEmailServiceTest {
 
         assertThat(service.validateNewEmail(caseDetails.getCaseData()))
                 .containsExactly(ClaimantEmailService.IDAM_USER_AMBIGUOUS_ERROR);
+    }
+
+    @Test
+    void validateReturnsLookupErrorWhenIdamSearchIsForbidden() {
+        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
+        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
+                .thenThrow(forbiddenIdamSearchException());
+
+        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+                .containsExactly(ClaimantEmailService.IDAM_USER_LOOKUP_ERROR);
+    }
+
+    @Test
+    void prepareUpdateReturnsLookupErrorWithoutChangingCaseDataOrAccess() throws IOException {
+        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
+        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
+                .thenThrow(forbiddenIdamSearchException());
+
+        assertThat(service.prepareUpdate(caseDetails))
+                .containsExactly(ClaimantEmailService.IDAM_USER_LOOKUP_ERROR);
+        assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
+        verify(ccdCaseAssignment, never()).getCaseUserRoles(anyString());
+        verify(ccdCaseAssignment, never()).addCaseUserRole(any());
+        verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
     }
 
     @Test
@@ -514,6 +544,20 @@ class ClaimantEmailServiceTest {
         when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
         when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
                 .thenReturn(List.of(user(NEW_EMAIL, NEW_USER_ID)));
+    }
+
+    private FeignException forbiddenIdamSearchException() {
+        Request request = Request.create(
+                Request.HttpMethod.GET,
+                "https://idam-api.aat.platform.hmcts.net/api/v1/users",
+                Map.of(),
+                null,
+                new RequestTemplate());
+        return new FeignException.Forbidden(
+                "[403 Forbidden] during [GET] to [/api/v1/users]",
+                request,
+                "{\"status\":403,\"error\":\"Forbidden\"}".getBytes(StandardCharsets.UTF_8),
+                Collections.emptyMap());
     }
 
     private UserDetails user(String email, String uid) {

@@ -31,7 +31,7 @@ idam:
     totp_secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAC}
     microservice: et_cos
   client:
-    scope: openid profile roles manage-user
+    scope: ${IDAM_CLIENT_SCOPE:openid profile roles manage-user search-user}
     secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAA}
     id: et-cos
 

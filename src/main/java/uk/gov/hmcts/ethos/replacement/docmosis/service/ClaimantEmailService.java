@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -45,6 +46,9 @@ public class ClaimantEmailService {
     public static final String IDAM_USER_NOT_CITIZEN_ERROR =
             "The new email address is linked to an account that is not a citizen account. "
                     + "Enter a different email address.";
+    // Shown when IdAM user search fails (for example 403 when the system token lacks search-user scope).
+    public static final String IDAM_USER_LOOKUP_ERROR =
+            "The new email address could not be checked against user accounts. Try again later.";
     private static final String CITIZEN_ROLE = "citizen";
     // Shown when the system cannot check who currently has claimant access to the case (temporary system issue).
     public static final String ACCESS_LOOKUP_ERROR =
@@ -214,11 +218,18 @@ public class ClaimantEmailService {
     }
 
     private Optional<UserDetails> findCitizenIdamUserByEmail(String email, List<String> errors) {
-        List<UserDetails> exactMatches = idamApi.searchUsersByQuery(
-                        adminUserService.getAdminUserToken(), email, 0, 50)
-                .stream()
-                .filter(user -> StringUtils.equalsIgnoreCase(email, user.getEmail()))
-                .toList();
+        List<UserDetails> exactMatches;
+        try {
+            exactMatches = idamApi.searchUsersByQuery(
+                            adminUserService.getAdminUserToken(), email, 0, 50)
+                    .stream()
+                    .filter(user -> StringUtils.equalsIgnoreCase(email, user.getEmail()))
+                    .toList();
+        } catch (FeignException exception) {
+            log.error("Unable to search IdAM users while validating claimant email update", exception);
+            errors.add(IDAM_USER_LOOKUP_ERROR);
+            return Optional.empty();
+        }
         if (exactMatches.isEmpty()) {
             errors.add(IDAM_USER_NOT_FOUND_ERROR);
             return Optional.empty();

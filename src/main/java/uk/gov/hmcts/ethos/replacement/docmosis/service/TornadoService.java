@@ -235,19 +235,22 @@ public class TornadoService {
     public DocumentInfo createDocumentInfoFromBytes(String authToken, byte[] bytes, String documentName,
                                                      String caseTypeId) {
 
-        URI documentSelfPath = uploadDocument(documentName, authToken, bytes, caseTypeId);
+        DocumentManagementService.UploadedDocumentMetadata uploadedDocument =
+                uploadDocument(documentName, authToken, bytes, caseTypeId);
+        URI documentSelfPath = uploadedDocument.uri();
         String downloadUrl = documentManagementService.generateDownloadableURL(documentSelfPath);
         String markup = documentManagementService.generateMarkupDocument(downloadUrl);
-        return generateDocumentInfo(documentName, documentSelfPath, markup);
+        return generateDocumentInfo(documentName, documentSelfPath, markup, uploadedDocument.hashToken());
     }
 
-    private URI uploadDocument(String documentName, String authToken, byte[] bytes, String caseTypeId) {
+    private DocumentManagementService.UploadedDocumentMetadata uploadDocument(String documentName, String authToken,
+                                                                             byte[] bytes, String caseTypeId) {
         if (documentName.endsWith(".pdf")) {
             String pdfFileName = isCustomDocName(documentName) ? documentName : OUTPUT_FILE_NAME_PDF;
-            return documentManagementService.uploadDocument(authToken, bytes, pdfFileName,
+            return documentManagementService.uploadDocumentWithMetadata(authToken, bytes, pdfFileName,
                     APPLICATION_PDF_VALUE, caseTypeId);
         } else {
-            return documentManagementService.uploadDocument(authToken, bytes, OUTPUT_FILE_NAME,
+            return documentManagementService.uploadDocumentWithMetadata(authToken, bytes, OUTPUT_FILE_NAME,
                     APPLICATION_DOCX_VALUE, caseTypeId);
         }
     }
@@ -264,13 +267,15 @@ public class TornadoService {
         return os.toByteArray();
     }
 
-    private DocumentInfo generateDocumentInfo(String documentName, URI documentSelfPath, String markupURL) {
+    private DocumentInfo generateDocumentInfo(String documentName, URI documentSelfPath, String markupURL,
+                                              String hashToken) {
         DocumentInfo documentInfo =
                 DocumentInfo.builder()
                         .type(DOCUMENT_NAME)
                         .description(documentName)
                         .markUp(markupURL)
                         .url(ccdGatewayBaseUrl + documentSelfPath.getRawPath() + "/binary")
+                        .hashToken(hashToken)
                         .build();
         log.info("DocumentInfo created: " + documentInfo.toString());
         return documentInfo;

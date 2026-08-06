@@ -7,13 +7,11 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ecm.common.model.ccd.types.CasePreAcceptType;
 import uk.gov.hmcts.ecm.compat.common.model.servicebus.datamodel.DataModelParent;
 import uk.gov.hmcts.ecm.compat.common.model.servicebus.datamodel.PreAcceptDataModel;
 
-import static uk.gov.hmcts.ecm.compat.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.compat.common.model.helper.Constants.SINGLE_OPEN_CASE_STATES;
 import static uk.gov.hmcts.ecm.compat.common.model.helper.Constants.YES;
 
@@ -41,12 +39,10 @@ public class PreAcceptDataTask extends DataTaskParent {
 
     private void preAcceptLogic(CaseData caseData) {
         log.info("Moving to accepted state");
-        if (caseData.getPreAcceptCase() == null || NO.equals(caseData.getPreAcceptCase().getCaseAccepted())) {
-            var casePreAcceptType = new CasePreAcceptType();
-            casePreAcceptType.setCaseAccepted(YES);
-            casePreAcceptType.setDateAccepted(((PreAcceptDataModel)dataModelParent).getDateAccepted());
-            caseData.setPreAcceptCase(casePreAcceptType);
-        }
+        CasePreAcceptType casePreAcceptType = new CasePreAcceptType();
+        casePreAcceptType.setCaseAccepted(YES);
+        casePreAcceptType.setDateAccepted(((PreAcceptDataModel)dataModelParent).getDateAccepted());
+        caseData.setPreAcceptCase(casePreAcceptType);
 
     }
 

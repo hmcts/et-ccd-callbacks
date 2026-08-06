@@ -2,10 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.dwp.regex.InvalidPostcodeException;
@@ -14,7 +12,6 @@ import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserWithOrganisationRoles
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.service.JurisdictionCodesMapperService;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
-import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
@@ -26,7 +23,9 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -42,7 +41,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_DATA_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper.setEt1Statuses;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getFirstListItem;
 
@@ -181,27 +180,12 @@ public class Et1ReppedService {
                     .build());
             claimantRepresentative.setNameOfOrganisation(organisationDetails.getName());
             claimantRepresentative.setRepresentativeAddress(ObjectUtils.isEmpty(caseData.getRepresentativeAddress())
-                    ? getOrganisationAddress(organisationDetails) : caseData.getRepresentativeAddress());
+                    ? OrganisationUtils.getOrganisationAddress(organisationDetails)
+                    : caseData.getRepresentativeAddress());
             setClaimantRepOrgPolicy(caseData, organisationDetails);
         }
         caseData.setClaimantRepresentedQuestion(YES);
         caseData.setRepresentativeClaimantType(claimantRepresentative);
-    }
-
-    @NotNull
-    static Address getOrganisationAddress(OrganisationsResponse organisationDetails) {
-        Address organisationAddress = new Address();
-        if (CollectionUtils.isEmpty(organisationDetails.getContactInformation())) {
-            return organisationAddress;
-        }
-        organisationAddress.setAddressLine1(organisationDetails.getContactInformation().getFirst().getAddressLine1());
-        organisationAddress.setAddressLine2(organisationDetails.getContactInformation().getFirst().getAddressLine2());
-        organisationAddress.setAddressLine3(organisationDetails.getContactInformation().getFirst().getAddressLine3());
-        organisationAddress.setPostCode(organisationDetails.getContactInformation().getFirst().getPostCode());
-        organisationAddress.setPostTown(organisationDetails.getContactInformation().getFirst().getTownCity());
-        organisationAddress.setCounty(organisationDetails.getContactInformation().getFirst().getCounty());
-        organisationAddress.setCountry(organisationDetails.getContactInformation().getFirst().getCountry());
-        return organisationAddress;
     }
 
     /**
@@ -278,7 +262,7 @@ public class Et1ReppedService {
      * @param caseData the {@link CaseData} object containing the representative and associated contact details.
      */
     public void setClaimantRepresentativeValues(String userToken, CaseData caseData) throws GenericServiceException {
-        if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS
+        if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS
                 .equals(caseData.getRepresentativeContactChangeOption())) {
             setMyHmctsOrganisationAddress(userToken, caseData);
         } else {
@@ -312,7 +296,7 @@ public class Et1ReppedService {
     public void setMyHmctsOrganisationAddress(String userToken, CaseData caseData)
             throws GenericServiceException {
         checkCaseData(caseData);
-        OrganisationAddress organisationAddress = myHmctsService.getOrganisationAddress(userToken);
+        OrganisationAddress organisationAddress = myHmctsService.getUserOrganisationAddress(userToken);
         caseData.getRepresentativeClaimantType().setRepresentativeAddress(
                 AddressUtils.mapOrganisationAddressToAddress(organisationAddress));
         caseData.setMyHmctsAddressText(AddressUtils.getOrganisationAddressAsText(organisationAddress));

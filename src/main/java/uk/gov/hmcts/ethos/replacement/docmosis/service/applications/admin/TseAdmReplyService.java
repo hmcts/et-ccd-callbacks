@@ -60,7 +60,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TSE_ADMIN_CORRESPONDENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantRepresentedByMyHmctsOrganisation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.isPartyToNotifyMismatch;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.TseHelper.getAdminSelectedApplicationType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_ADMIN_REPLY;
@@ -253,7 +253,7 @@ public class TseAdmReplyService {
         for (final TSEAdminEmailRecipientsData emailRecipient : emailsToSend) {
             personalisationHashMap = buildPersonalisation(caseNumber, caseId,
                     emailRecipient.getCustomisedText(), uploadedDocContent);
-            if (isRepresentedClaimantWithMyHmctsCase(caseData)) {
+            if (isClaimantRepresentedByMyHmctsOrganisation(caseData)) {
                 personalisationHashMap.put(LINK_TO_CITIZEN_HUB, emailService.getExuiCaseLink(caseId));
             }
             emailService.sendEmail(emailRecipient.getRecipientTemplate(), emailRecipient.getRecipientEmail(),

@@ -1,0 +1,119 @@
+{
+  "hearingCollection": [
+    {
+      "value": {
+        "hearingNumber": "1",
+        "Hearing_type": "Costs Hearing",
+        "hearingPublicPrivate": null,
+        "judicialMediation": "No",
+        "Hearing_venue": {
+          "value": {
+            "label": "Amersham",
+            "code": "Amersham"
+          },
+          "list_items": [
+            {
+              "label": "Amersham",
+              "code": "Amersham"
+            },
+            {
+              "label": "Aylesbury Crown",
+              "code": "Aylesbury Crown"
+            },
+            {
+              "label": "Bedford",
+              "code": "Bedford"
+            },
+            {
+              "label": "Bedford Mags",
+              "code": "Bedford Mags"
+            },
+            {
+              "label": "Bury St Edmunds",
+              "code": "Bury St Edmunds"
+            },
+            {
+              "label": "Cambridge",
+              "code": "Cambridge"
+            },
+            {
+              "label": "Huntingdon",
+              "code": "Huntingdon"
+            },
+            {
+              "label": "London Central",
+              "code": "London Central"
+            },
+            {
+              "label": "Milton Keynes",
+              "code": "Milton Keynes"
+            },
+            {
+              "label": "Norwich",
+              "code": "Norwich"
+            },
+            {
+              "label": "Peterborough",
+              "code": "Peterborough"
+            },
+            {
+              "label": "Reading ET",
+              "code": "Reading ET"
+            },
+            {
+              "label": "Transfer Team 3",
+              "code": "Transfer Team 3"
+            },
+            {
+              "label": "Watford",
+              "code": "Watford"
+            }
+          ]
+        },
+        "hearingEstLengthNum": "1",
+        "hearingEstLengthNumType": "Hours",
+        "hearingSitAlone": "Sit Alone",
+        "Hearing_stage": "Stage 1",
+        "Hearing_notes": "The hearing should be help as soon as possible....",
+        "hearingShowDetails": null,
+        "hearingDates": null,
+        "judge": null,
+        "additionalJudge": null,
+        "hearingERMember": null,
+        "hearingEEMember": null,
+        "hearingFormat": [
+          "Hybrid"
+        ],
+        "hearingDateCollection": [
+          {
+            "value": {
+              "listedDate": "2026-05-18T00:00:00.000",
+              "Hearing_status": null,
+              "Postponed_by": null,
+              "postponedDate": null,
+              "hearingVenueDay": null,
+              "hearingRoom": null,
+              "hearingClerk": null,
+              "hearingCaseDisposed": null,
+              "Hearing_part_heard": null,
+              "Hearing_reserved_judgement": null,
+              "attendee_claimant": null,
+              "attendee_non_attendees": null,
+              "attendee_resp_no_rep": null,
+              "attendee_resp_&_rep": null,
+              "attendee_rep_only": null,
+              "hearingTimingStart": null,
+              "hearingTimingBreak": null,
+              "hearingTimingResume": null,
+              "hearingTimingFinish": null,
+              "hearingTimingDuration": null,
+              "HearingNotes2": null
+            },
+            "id": null
+          }
+        ]
+      },
+      "id": "15ec4971-e859-4dc6-b0e2-b709122e188f"
+    }
+  ]
+}

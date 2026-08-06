@@ -25,8 +25,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import static org.assertj.core.api.Assertions.assertThat;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -92,6 +92,7 @@ class WaTaskCreationCronForExpiredBfActionsTest {
         verify(ccdClient, times(0))
                 .submitEventForCase(any(), any(), any(), any(), any(), any());
     }
+
     @Test
     void skipsCasesWithBfDateBeforeAugust2026() throws IOException {
         when(featureToggleService.isWaTaskForExpiredBfActionsEnabled()).thenReturn(true);

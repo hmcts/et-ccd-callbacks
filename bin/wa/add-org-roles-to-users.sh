@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 # Setup Users
 echo ""
 echo "Setting up WA Users and role assignments..."

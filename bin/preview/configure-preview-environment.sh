@@ -17,6 +17,17 @@ fi
 
 MARKER_NAME="et-cos-pr-${PR_ID}-configuration"
 
+cleanup_disposable_dependencies() {
+  if [[ -d ccd-definitions/node_modules || -d ccd-definitions/.yarn/cache ]]; then
+    echo "Cleaning disposable CCD definition dependencies before workspace transfer"
+    rm -rf \
+      ccd-definitions/node_modules \
+      ccd-definitions/.yarn/cache
+  fi
+}
+
+trap cleanup_disposable_dependencies EXIT
+
 remote_revision() {
   local repository=$1
   local branch=$2
@@ -33,6 +44,38 @@ configuration_fingerprint() {
       HEAD:bin/wa
     remote_revision https://github.com/hmcts/et-wa-task-configuration.git "${DMN_BRANCH}"
     remote_revision https://github.com/hmcts/wa-standalone-task-bpmn.git "${BPMN_BRANCH}"
+
+    # Include non-secret inputs that select the users and backing services being
+    # configured. Credentials are intentionally excluded: rotating a password
+    # does not change the desired preview configuration and must not be exposed
+    # through the marker fingerprint.
+    printf '%s\n' \
+      "preview_namespace=${NAMESPACE}" \
+      "pr_id=${PR_ID}" \
+      "et_caseofficer_username=${ET_CASEOFFICER_USERNAME:-}" \
+      "et_caseworker_username=${ET_CASEWORKER_USER_NAME:-}" \
+      "camunda_base_url=${CAMUNDA_BASE_URL:-https://camunda-et-cos-pr-${PR_ID}.preview.platform.hmcts.net}" \
+      "ccd_definition_store_api_base_url=${CCD_DEFINITION_STORE_API_BASE_URL:-https://ccd-definition-store-et-cos-pr-${PR_ID}.preview.platform.hmcts.net}" \
+      "ref_data_url=${REF_DATA_URL:-https://rd-caseworker-ref-api-et-cos-pr-${PR_ID}.preview.platform.hmcts.net}" \
+      "role_assignment_url=${ROLE_ASSIGNMENT_URL:-https://am-role-assignment-et-cos-pr-${PR_ID}.preview.platform.hmcts.net}" \
+      "idam_api_url=${IDAM_API_URL:-}" \
+      "service_auth_provider_url=${SERVICE_AUTH_PROVIDER_URL:-}" \
+      "service_auth_provider_api_base_url=${SERVICE_AUTH_PROVIDER_API_BASE_URL:-}" \
+      "source_et_cos_db_host=${ET_COS_AAT_DB_HOST:-${SOURCE_ET_COS_DB_HOST:-et-cos-postgres-v15-aat.postgres.database.azure.com}}" \
+      "source_et_cos_db_port=${ET_COS_AAT_DB_PORT:-${SOURCE_ET_COS_DB_PORT:-5432}}" \
+      "source_et_cos_db_name=${ET_COS_AAT_DB_NAME:-${SOURCE_ET_COS_DB_NAME:-et_cos}}" \
+      "source_et_cos_db_user=${ET_COS_AAT_DB_USER_NAME:-${SOURCE_ET_COS_DB_USER_NAME:-pgadmin}}" \
+      "source_et_cos_db_conn_options=${ET_COS_AAT_DB_CONN_OPTIONS:-${SOURCE_ET_COS_DB_CONN_OPTIONS:-sslmode=require}}" \
+      "target_et_cos_db_host=${ET_COS_PREVIEW_DB_HOST:-et-preview.postgres.database.azure.com}" \
+      "target_et_cos_db_port=${ET_COS_PREVIEW_DB_PORT:-5432}" \
+      "target_et_cos_db_name=${ET_COS_PREVIEW_DB_NAME:-pr-${PR_ID}-et_cos}" \
+      "target_et_cos_db_user=${ET_COS_PREVIEW_DB_USER_NAME:-hmcts}" \
+      "target_et_cos_db_conn_options=${ET_COS_PREVIEW_DB_CONN_OPTIONS:-sslmode=require}" \
+      "definition_store_db_host=${CCD_DEFINITION_STORE_PREVIEW_DB_HOST:-et-preview.postgres.database.azure.com}" \
+      "definition_store_db_port=${CCD_DEFINITION_STORE_PREVIEW_DB_PORT:-5432}" \
+      "definition_store_db_name=${CCD_DEFINITION_STORE_PREVIEW_DB_NAME:-pr-${PR_ID}-definition-store}" \
+      "definition_store_db_user=${CCD_DEFINITION_STORE_PREVIEW_DB_USER_NAME:-hmcts}" \
+      "definition_store_db_conn_options=${CCD_DEFINITION_STORE_PREVIEW_DB_CONN_OPTIONS:-sslmode=require}"
   } | sha256sum | awk '{ print $1 }'
 }
 
@@ -95,11 +138,6 @@ echo "Importing CCD definitions"
 
 echo "Setting up WA users and roles"
 ./bin/wa/add-org-roles-to-users.sh
-
-echo "Cleaning disposable CCD definition dependencies before workspace transfer"
-rm -rf \
-  ccd-definitions/node_modules \
-  ccd-definitions/.yarn/cache
 
 kubectl create configmap "${MARKER_NAME}" \
   --namespace "${NAMESPACE}" \

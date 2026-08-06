@@ -74,8 +74,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CCD_API_POST_METHOD_NAME;
+import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_SOLICITOR;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CREATOR;
+import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_DATA_KEY;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT;
 import static uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent.REMOVE_OWN_REP_AS_CLAIMANT;
 import static uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent.REMOVE_OWN_REP_AS_RESPONDENT;
@@ -786,6 +788,42 @@ class ManageCaseRoleServiceTest {
                                                                                   caseRequest.getCaseId(),
                                                                                   CASE_USER_ROLE_CREATOR);
         assertEquals(caseTestData.getExpectedDetails(), caseDetails);
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldGetUserCaseWhenHoldingAnyOfTheRequestedRoles() {
+        ReflectionTestUtils.setField(manageCaseRoleService,
+                                     CCD_API_URL_PARAMETER_NAME,
+                                     CCD_API_URL_PARAMETER_TEST_VALUE);
+        when(authTokenGenerator.generate()).thenReturn(TEST_SERVICE_AUTH_TOKEN);
+        when(idamClient.getUserInfo(ArgumentMatchers.anyString())).thenReturn(userInfo);
+        when(ccdApi.getCase(
+            TEST_SERVICE_AUTH_TOKEN,
+            TEST_SERVICE_AUTH_TOKEN,
+            caseTestData.getCaseRequest().getCaseId()
+        )).thenReturn(caseTestData.getExpectedDetails());
+        CaseRequest caseRequest = CaseRequest.builder()
+            .caseId(caseTestData.getCaseRequest().getCaseId()).build();
+        CaseAssignmentUserRole caseAssignedUserRole = CaseAssignmentUserRole.builder()
+            .caseDataId(caseRequest.getCaseId())
+            .caseRole(CASE_USER_ROLE_CREATOR)
+            .userId(USER_ID).build();
+        CaseAssignedUserRolesResponse caseAssignedUserRolesResponse = CaseAssignedUserRolesResponse.builder()
+            .caseAssignedUserRoles(List.of(caseAssignedUserRole))
+            .build();
+        when(restTemplate.postForObject(
+            eq(CCD_API_URL_PARAMETER_TEST_VALUE
+                   + CASE_USER_ROLE_CCD_API_POST_METHOD_NAME),
+            any(HttpEntity.class),
+            eq(CaseAssignedUserRolesResponse.class)))
+            .thenReturn(caseAssignedUserRolesResponse);
+        CaseDetails caseDetails = manageCaseRoleService.getUserCaseByCaseUserRoles(
+            TEST_SERVICE_AUTH_TOKEN,
+            caseRequest.getCaseId(),
+            List.of(CASE_USER_ROLE_CREATOR, CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE));
+        assertThat(caseDetails).isNotNull();
+        assertThat(caseDetails.getData()).containsEntry(CASE_USER_ROLE_DATA_KEY, CASE_USER_ROLE_CREATOR);
     }
 
     @Test

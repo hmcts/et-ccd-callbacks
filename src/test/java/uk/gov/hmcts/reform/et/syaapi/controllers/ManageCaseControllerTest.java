@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -115,9 +116,10 @@ class ManageCaseControllerTest {
 
         // given
         when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
-        when(manageCaseRoleService.getUserCaseByCaseUserRole(TEST_SERVICE_AUTH_TOKEN,
-                                                             caseRequest.getCaseId(),
-                                                             CASE_USER_ROLE_CREATOR))
+        when(manageCaseRoleService.getUserCaseByCaseUserRoles(
+                 TEST_SERVICE_AUTH_TOKEN,
+                 caseRequest.getCaseId(),
+                 List.of(CASE_USER_ROLE_CREATOR, CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE)))
             .thenReturn(expectedDetails);
         // when
         mockMvc.perform(post("/cases/user-case", CASE_ID)
@@ -212,7 +214,7 @@ class ManageCaseControllerTest {
         Request request = Request.create(
             Request.HttpMethod.GET, "/test", Collections.emptyMap(), null, new RequestTemplate());
         when(verifyTokenService.verifyTokenSignature(anyString())).thenReturn(true);
-        when(manageCaseRoleService.getUserCaseByCaseUserRole(anyString(), anyString(), anyString())).thenThrow(
+        when(manageCaseRoleService.getUserCaseByCaseUserRoles(anyString(), anyString(), anyList())).thenThrow(
             new FeignException.BadRequest(
                 "Bad request",
                 request,
@@ -356,7 +358,9 @@ class ManageCaseControllerTest {
         ));
         when(hubLinkService.updateHubLinkStatuses(hubLinksStatusesRequest,
                                                   TEST_SERVICE_AUTH_TOKEN,
-                                                  CASE_USER_ROLE_CREATOR)).thenReturn(expectedDetails);
+                                                  List.of(CASE_USER_ROLE_CREATOR,
+                                                          CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE)))
+            .thenReturn(expectedDetails);
 
         mockMvc.perform(
             put("/cases/update-hub-links-statuses", CASE_ID)
@@ -367,7 +371,7 @@ class ManageCaseControllerTest {
         verify(hubLinkService, times(1)).updateHubLinkStatuses(
             hubLinksStatusesRequest,
             TEST_SERVICE_AUTH_TOKEN,
-            CASE_USER_ROLE_CREATOR
+            List.of(CASE_USER_ROLE_CREATOR, CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE)
         );
     }
 

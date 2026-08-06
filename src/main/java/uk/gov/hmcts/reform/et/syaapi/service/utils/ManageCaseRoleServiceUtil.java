@@ -43,14 +43,28 @@ import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.MO
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.MODIFY_CASE_USER_ROLE_ITEM_INVALID;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.STRING_AMPERSAND;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.STRING_EQUAL;
+import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.STRING_LEFT_SQUARE_BRACKET;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.STRING_PARAM_NAME_CASE_IDS;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.STRING_PARAM_NAME_USER_IDS;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.STRING_QUESTION_MARK;
+import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.STRING_RIGHT_SQUARE_BRACKET;
 
 @Slf4j
 public final class ManageCaseRoleServiceUtil {
     private ManageCaseRoleServiceUtil() {
         // restrict instantiation
+    }
+
+    /**
+     * Normalises the optional case user role query parameter to the bracketed CCD role format.
+     *
+     * @param caseUserRole raw role from the API query parameter; blank defaults to creator
+     * @return bracketed case user role understood by CCD case-access APIs
+     */
+    public static String formatCaseUserRole(String caseUserRole) {
+        return StringUtils.isBlank(caseUserRole)
+            ? CASE_USER_ROLE_CREATOR
+            : STRING_LEFT_SQUARE_BRACKET + caseUserRole.trim() + STRING_RIGHT_SQUARE_BRACKET;
     }
 
     /**

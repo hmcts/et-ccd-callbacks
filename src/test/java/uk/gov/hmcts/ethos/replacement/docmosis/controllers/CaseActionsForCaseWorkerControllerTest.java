@@ -46,6 +46,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
@@ -104,6 +105,12 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private static final String UPDATE_CLAIMANT_EMAIL_VALIDATE_URL = "/updateClaimantEmail/validate";
     private static final String UPDATE_CLAIMANT_EMAIL_ABOUT_TO_SUBMIT_URL =
             "/updateClaimantEmail/aboutToSubmit";
+    private static final String UPDATE_RESPONDENT_EMAIL_ABOUT_TO_START_URL =
+            "/updateRespondentEmail/aboutToStart";
+    private static final String UPDATE_RESPONDENT_EMAIL_SELECT_URL = "/updateRespondentEmail/select";
+    private static final String UPDATE_RESPONDENT_EMAIL_VALIDATE_URL = "/updateRespondentEmail/validate";
+    private static final String UPDATE_RESPONDENT_EMAIL_ABOUT_TO_SUBMIT_URL =
+            "/updateRespondentEmail/aboutToSubmit";
     private static final String AMEND_RESPONDENT_DETAILS_URL = "/amendRespondentDetails";
     private static final String AMEND_RESPONDENT_REPRESENTATIVE_URL = "/amendRespondentRepresentative";
     private static final String UPDATE_HEARING_URL = "/updateHearing";
@@ -209,6 +216,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @MockitoBean
     private ClaimantEmailService claimantEmailService;
+
+    @MockitoBean
+    private RespondentEmailService respondentEmailService;
 
     private MockMvc mvc;
     private JsonNode requestContent;
@@ -546,6 +556,94 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath("$.errors[0]", is(ClaimantEmailService.ACCESS_GRANT_ERROR)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void initialiseRespondentEmailUpdate() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(respondentEmailService.initialise(any(CaseData.class))).thenReturn(List.of());
+
+        mvc.perform(post(UPDATE_RESPONDENT_EMAIL_ABOUT_TO_START_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(respondentEmailService).initialise(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void selectRespondentForEmailUpdate() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(respondentEmailService.populateCurrentEmail(any(CaseData.class))).thenReturn(List.of());
+
+        mvc.perform(post(UPDATE_RESPONDENT_EMAIL_SELECT_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(respondentEmailService).populateCurrentEmail(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void validateRespondentEmailUpdateReturnsErrors() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(respondentEmailService.validateNewEmail(any(CaseData.class)))
+                .thenReturn(List.of("Email validation failed"));
+
+        mvc.perform(post(UPDATE_RESPONDENT_EMAIL_VALIDATE_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]", is("Email validation failed")))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void updateRespondentEmailReturnsPreparedCaseData() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(respondentEmailService.prepareUpdate(any(CaseDetails.class))).thenReturn(List.of());
+
+        mvc.perform(post(UPDATE_RESPONDENT_EMAIL_ABOUT_TO_SUBMIT_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(respondentEmailService).prepareUpdate(any(CaseDetails.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void updateRespondentEmailReturnsAccessErrors() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(respondentEmailService.prepareUpdate(any(CaseDetails.class)))
+                .thenReturn(List.of(RespondentEmailService.ACCESS_GRANT_ERROR));
+
+        mvc.perform(post(UPDATE_RESPONDENT_EMAIL_ABOUT_TO_SUBMIT_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]", is(RespondentEmailService.ACCESS_GRANT_ERROR)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 

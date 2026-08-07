@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import feign.FeignException;
+import feign.Request;
+import feign.RequestTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -22,7 +24,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -59,7 +64,6 @@ class RespondentEmailServiceTest {
     @Mock
     private CcdCaseAssignment ccdCaseAssignment;
 
-    @InjectMocks
     private RespondentEmailService service;
     private CaseDetails caseDetails;
     private RespondentSumTypeItem firstRespondent;
@@ -67,6 +71,9 @@ class RespondentEmailServiceTest {
 
     @BeforeEach
     void setUp() {
+        PartyEmailUpdateSupport partyEmailUpdateSupport =
+                new PartyEmailUpdateSupport(idamApi, adminUserService, ccdCaseAssignment);
+        service = new RespondentEmailService(partyEmailUpdateSupport);
         firstRespondent = respondent(RESPONDENT_ID_ONE, "First respondent", OLD_EMAIL, OLD_USER_ID, NO);
         secondRespondent = respondent(RESPONDENT_ID_TWO, "Second respondent",
                 "second@example.com", "second-user-id", NO);
@@ -259,6 +266,17 @@ class RespondentEmailServiceTest {
 
         assertThat(service.validateNewEmail(caseDetails.getCaseData()))
                 .containsExactly(RespondentEmailService.IDAM_USER_NOT_CITIZEN_ERROR);
+    }
+
+    @Test
+    void validateReturnsLookupErrorWhenIdamSearchIsForbidden() {
+        prepareSelectedEmailFields();
+        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
+        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
+                .thenThrow(forbiddenIdamSearchException());
+
+        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+                .containsExactly(RespondentEmailService.IDAM_USER_LOOKUP_ERROR);
     }
 
     @Test
@@ -511,6 +529,20 @@ class RespondentEmailServiceTest {
         when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
         when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
                 .thenReturn(List.of(user(NEW_EMAIL, NEW_USER_ID)));
+    }
+
+    private FeignException forbiddenIdamSearchException() {
+        Request request = Request.create(
+                Request.HttpMethod.GET,
+                "https://idam-api.aat.platform.hmcts.net/api/v1/users",
+                Map.of(),
+                null,
+                new RequestTemplate());
+        return new FeignException.Forbidden(
+                "[403 Forbidden] during [GET] to [/api/v1/users]",
+                request,
+                "{\"status\":403,\"error\":\"Forbidden\"}".getBytes(StandardCharsets.UTF_8),
+                Collections.emptyMap());
     }
 
     private UserDetails user(String email, String uid) {

@@ -2944,7 +2944,7 @@
     "CaseEventID": "amendClaimantDetails",
     "CaseFieldID": "claimantType",
     "ListElementCode": "claimant_email_address",
-    "EventElementLabel": "Email address",
+    "EventElementLabel": "Email address (use Update claimant email to change)",
     "FieldDisplayOrder": 10,
     "DisplayContext": "OPTIONAL"
   },
@@ -4347,7 +4347,7 @@
     "CaseEventID": "addAmendJurisdiction",
     "CaseFieldID": "jurCodesCollection",
     "ListElementCode": "jurisdictionCodeAPA",
-    "EventElementLabel": "Application by an employee, their representative or trade union for a protective award as a result of an employer’s failure to consult over a redundancy situation",
+    "EventElementLabel": "Application by an employee, their representative or trade union for a protective award as a result of an employer's failure to consult over a redundancy situation",
     "FieldDisplayOrder": 3,
     "DisplayContext": "MANDATORY"
   },

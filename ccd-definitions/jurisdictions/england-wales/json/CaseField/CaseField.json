@@ -883,7 +883,7 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "ID": "hearingDetailsAttendeeNonAttendees",
-    "Label": "Number of Non Attendees (Respondent) ",
+    "Label": "Number of Non Attendees (Respondent)",
     "FieldType": "Number",
     "SecurityClassification": "Public",
     "Searchable": "N"
@@ -1443,7 +1443,7 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "ID": "icEmployersContractClaimIssues",
-    "Label": "Are there any issues or instructions regarding an Employer’s Contract Claim?",
+    "Label": "Are there any issues or instructions regarding an Employer's Contract Claim?",
     "FieldType": "TextArea",
     "SecurityClassification": "Public",
     "Searchable": "N"
@@ -6568,6 +6568,23 @@
     "FieldType": "Collection",
     "FieldTypeParameter": "DynamicListCollection",
     "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "currentClaimantEmail",
+    "Label": "Current email address",
+    "FieldType": "Email",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "newClaimantEmail",
+    "Label": "New email address",
+    "HintText": "Enter a different email address for the claimant.",
+    "FieldType": "Email",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   },
   {
     "CaseTypeID": "ET_EnglandWales",

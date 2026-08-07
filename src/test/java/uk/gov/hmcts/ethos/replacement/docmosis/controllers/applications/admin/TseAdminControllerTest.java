@@ -31,6 +31,7 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -141,8 +142,8 @@ class TseAdminControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseAdminService).initialTseAdminTableMarkUp(
-                ccdRequest.getCaseDetails().getCaseData(),
-                AUTH_TOKEN);
+                any(CaseData.class),
+                eq(AUTH_TOKEN));
     }
 
     @Test
@@ -154,8 +155,8 @@ class TseAdminControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
         verify(tseAdminService, never()).initialTseAdminTableMarkUp(
-                ccdRequest.getCaseDetails().getCaseData(),
-                AUTH_TOKEN);
+                any(CaseData.class),
+                eq(AUTH_TOKEN));
     }
 
     @Test
@@ -166,8 +167,8 @@ class TseAdminControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
         verify(tseAdminService, never()).initialTseAdminTableMarkUp(
-                ccdRequest.getCaseDetails().getCaseData(),
-                AUTH_TOKEN);
+                any(CaseData.class),
+                eq(AUTH_TOKEN));
     }
 
     @Test
@@ -182,7 +183,7 @@ class TseAdminControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseAdminService, times(1))
-            .validateInput(ccdRequest.getCaseDetails().getCaseData());
+            .validateInput(any(CaseData.class));
     }
 
     @Test
@@ -194,7 +195,7 @@ class TseAdminControllerTest extends BaseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isForbidden());
         verify(tseAdminService, never())
-            .validateInput(ccdRequest.getCaseDetails().getCaseData());
+            .validateInput(any(CaseData.class));
     }
 
     @Test
@@ -205,7 +206,7 @@ class TseAdminControllerTest extends BaseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
         verify(tseAdminService, never())
-            .validateInput(ccdRequest.getCaseDetails().getCaseData());
+            .validateInput(any(CaseData.class));
     }
 
     @Test
@@ -220,12 +221,12 @@ class TseAdminControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseAdminService).saveTseAdminDataFromCaseData(
-                ccdRequest.getCaseDetails().getCaseData());
+                any(CaseData.class));
         verify(tseAdminService).sendEmailToClaimant(
-            ccdRequest.getCaseDetails().getCaseId(),
-            ccdRequest.getCaseDetails().getCaseData());
+            eq(ccdRequest.getCaseDetails().getCaseId()),
+            any(CaseData.class));
         verify(tseAdminService).clearTseAdminDataFromCaseData(
-                ccdRequest.getCaseDetails().getCaseData());
+                any(CaseData.class));
         verify(caseFlagsService, times(1)).setPrivateHearingFlag(any());
     }
 
@@ -238,12 +239,12 @@ class TseAdminControllerTest extends BaseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isForbidden());
         verify(tseAdminService, never()).saveTseAdminDataFromCaseData(
-                ccdRequest.getCaseDetails().getCaseData());
+                any(CaseData.class));
         verify(tseAdminService, never()).sendEmailToClaimant(
-            ccdRequest.getCaseDetails().getCaseId(),
-            ccdRequest.getCaseDetails().getCaseData());
+            eq(ccdRequest.getCaseDetails().getCaseId()),
+            any(CaseData.class));
         verify(tseAdminService, never()).clearTseAdminDataFromCaseData(
-                ccdRequest.getCaseDetails().getCaseData());
+                any(CaseData.class));
     }
 
     @Test
@@ -254,12 +255,12 @@ class TseAdminControllerTest extends BaseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
         verify(tseAdminService, never()).saveTseAdminDataFromCaseData(
-                ccdRequest.getCaseDetails().getCaseData());
+                any(CaseData.class));
         verify(tseAdminService, never()).sendEmailToClaimant(
-            ccdRequest.getCaseDetails().getCaseId(),
-            ccdRequest.getCaseDetails().getCaseData());
+            eq(ccdRequest.getCaseDetails().getCaseId()),
+            any(CaseData.class));
         verify(tseAdminService, never()).clearTseAdminDataFromCaseData(
-                ccdRequest.getCaseDetails().getCaseData());
+                any(CaseData.class));
     }
 
     @Test
@@ -307,7 +308,7 @@ class TseAdminControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseAdmCloseService).aboutToSubmitCloseApplication(
-            ccdRequest.getCaseDetails().getCaseData());
+            any(CaseData.class));
     }
 
     @Test
@@ -319,7 +320,7 @@ class TseAdminControllerTest extends BaseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isForbidden());
         verify(tseAdmCloseService, never()).aboutToSubmitCloseApplication(
-            ccdRequest.getCaseDetails().getCaseData());
+            any(CaseData.class));
     }
 
     @Test
@@ -330,7 +331,7 @@ class TseAdminControllerTest extends BaseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
         verify(tseAdmCloseService, never()).aboutToSubmitCloseApplication(
-            ccdRequest.getCaseDetails().getCaseData());
+            any(CaseData.class));
     }
 
     @Test

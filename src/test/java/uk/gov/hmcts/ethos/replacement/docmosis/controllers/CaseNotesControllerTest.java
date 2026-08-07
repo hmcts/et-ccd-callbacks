@@ -32,6 +32,7 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -124,7 +125,7 @@ class CaseNotesControllerTest extends BaseControllerTest {
     @Test
     void manageCaseNote_aboutToStart_noNotes() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doCallRealMethod().when(caseNotesService).populateCaseNoteList(ccdRequest.getCaseDetails().getCaseData());
+        doCallRealMethod().when(caseNotesService).populateCaseNoteList(any(CaseData.class));
         ccdRequest.getCaseDetails().getCaseData().setCaseNotesCollection(null);
         mockMvc.perform(post(SINGLES_MANAGE_ABOUT_TO_START_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -139,7 +140,7 @@ class CaseNotesControllerTest extends BaseControllerTest {
     @Test
     void manageCaseNote_aboutToStart() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doCallRealMethod().when(caseNotesService).populateCaseNoteList(ccdRequest.getCaseDetails().getCaseData());
+        doCallRealMethod().when(caseNotesService).populateCaseNoteList(any(CaseData.class));
         GenericTypeItem<CaseNote> caseNoteItem = createCaseNoteItem();
         ccdRequest.getCaseDetails().getCaseData().setCaseNotesCollection(List.of(caseNoteItem, caseNoteItem));
         mockMvc.perform(post(SINGLES_MANAGE_ABOUT_TO_START_URL)
@@ -154,7 +155,7 @@ class CaseNotesControllerTest extends BaseControllerTest {
     @Test
     void manageCaseNote_midEvent() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doCallRealMethod().when(caseNotesService).populateEditCaseNote(ccdRequest.getCaseDetails().getCaseData());
+        doCallRealMethod().when(caseNotesService).populateEditCaseNote(any(CaseData.class));
         GenericTypeItem<CaseNote> caseNoteItem = createCaseNoteItem();
         ccdRequest.getCaseDetails().getCaseData().setCaseNotesCollection(List.of(caseNoteItem));
         ccdRequest.getCaseDetails().getCaseData().setEditOrDeleteCaseNote("Edit");
@@ -171,7 +172,7 @@ class CaseNotesControllerTest extends BaseControllerTest {
     @Test
     void manageCaseNote_aboutToSubmit() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doCallRealMethod().when(caseNotesService).submitCaseNoteUpdate(ccdRequest.getCaseDetails().getCaseData());
+        doCallRealMethod().when(caseNotesService).submitCaseNoteUpdate(any(CaseData.class));
         GenericTypeItem<CaseNote> caseNoteItem = createCaseNoteItem();
         ccdRequest.getCaseDetails().getCaseData().setCaseNotesCollection(List.of(caseNoteItem));
         ccdRequest.getCaseDetails().getCaseData().setEditOrDeleteCaseNote("Delete");

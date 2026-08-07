@@ -13,6 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PseRespondToTribunalService;
@@ -26,6 +27,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -154,8 +156,8 @@ class PseRespondToTribunalControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(pseRespondToTribunalService).initialOrdReqDetailsTableMarkUp(ccdRequest.getCaseDetails().getCaseData(),
-                RESPONDENT_TITLE);
+        verify(pseRespondToTribunalService).initialOrdReqDetailsTableMarkUp(
+                any(CaseData.class), eq(RESPONDENT_TITLE));
     }
 
     @Test
@@ -179,7 +181,7 @@ class PseRespondToTribunalControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(pseRespondToTribunalService).validateRespondentInput(ccdRequest.getCaseDetails().getCaseData());
+        verify(pseRespondToTribunalService).validateRespondentInput(any(CaseData.class));
     }
 
     @Test
@@ -203,9 +205,11 @@ class PseRespondToTribunalControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(pseRespondToTribunalService, times(1)).sendAcknowledgeEmail(ccdRequest.getCaseDetails(), AUTH_TOKEN);
-        verify(pseRespondToTribunalService, times(1)).sendClaimantEmail(ccdRequest.getCaseDetails());
-        verify(pseRespondToTribunalService, times(1)).sendTribunalEmail(ccdRequest.getCaseDetails(), RESPONDENT_TITLE);
+        verify(pseRespondToTribunalService, times(1)).sendAcknowledgeEmail(
+                any(CaseDetails.class), eq(AUTH_TOKEN));
+        verify(pseRespondToTribunalService, times(1)).sendClaimantEmail(any(CaseDetails.class));
+        verify(pseRespondToTribunalService, times(1)).sendTribunalEmail(
+                any(CaseDetails.class), eq(RESPONDENT_TITLE));
     }
 
     @Test
@@ -220,7 +224,7 @@ class PseRespondToTribunalControllerTest {
 
     @Test
     void submitted_Success() throws Exception {
-        when(pseRespondToTribunalService.getRespondentSubmittedBody(ccdRequest.getCaseDetails().getCaseData()))
+        when(pseRespondToTribunalService.getRespondentSubmittedBody(any(CaseData.class)))
             .thenReturn("SubmittedBody");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_URL)

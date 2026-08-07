@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -22,6 +23,9 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.CLAIMANT;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.INTERNAL;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT1;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 
 @Slf4j
@@ -56,10 +60,23 @@ public class CaseFlagsDataMigrationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseFlagsService.setupCaseFlags(caseData);
-        log.info("Migrating existing case: {} for claimant: {},  respondent: {},",
-                ccdRequest.getCaseDetails().getCaseTypeId(),
-                caseData.getClaimantFlags().getPartyName(),
-                caseData.getRespondentFlags().getPartyName());
+        CaseFlagsType claimantFlags = caseData.getAllPartyFlags().getClaimantFlags();
+        CaseFlagsType respondentFlags = caseData.getAllPartyFlags().getRespondentFlags();
+
+        /* Add visibility and group ID fields for the claimant and the first respondent records
+           that were already migrated in Case Flag v1.0. */
+        if (claimantFlags.getGroupId() == null) {
+            claimantFlags.setGroupId(CLAIMANT);
+            claimantFlags.setVisibility(INTERNAL);
+        }
+
+        if (respondentFlags.getGroupId() == null) {
+            respondentFlags.setRoleOnCase(RESPONDENT1);
+            respondentFlags.setGroupId(RESPONDENT1);
+            respondentFlags.setVisibility(INTERNAL);
+        }
+
+        log.info("Migrating existing case: {}", ccdRequest.getCaseDetails().getCaseId());
 
         return getCallbackRespEntityErrors(List.of(), caseData);
     }

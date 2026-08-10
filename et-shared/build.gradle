@@ -107,7 +107,7 @@ dependencies {
     api group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.4'
     api group: 'org.apache.poi', name: 'poi-ooxml', version: '5.4.1'
     api group: 'org.elasticsearch', name: 'elasticsearch', version: '9.2.4'
-    api group: 'com.github.hmcts', name: 'ccd-config-generator', version: 'json-definition-converter-114.1-bb854854'
+    api group: 'com.github.hmcts', name: 'ccd-config-generator', version: 'json-definition-converter-116.1-e0bc96dc'
 
     implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '4.9.2'
     implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'

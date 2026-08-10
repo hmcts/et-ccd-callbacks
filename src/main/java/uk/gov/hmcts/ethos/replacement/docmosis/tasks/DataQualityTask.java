@@ -10,11 +10,16 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 
 import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -27,6 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
@@ -86,13 +92,22 @@ public class DataQualityTask implements Runnable {
     private final uk.gov.hmcts.ecm.compat.common.client.CcdClient ecmCcdClient;
     private final CoreCaseDataApi coreCaseDataApi;
     private final AuthTokenGenerator authTokenGenerator;
+    private final DocumentManagementService documentManagementService;
+    private final EmailService emailService;
 
     @Value("${cron.reconfigurationCaseIds}")
     private String casesToUpdate;
+    @Value("${cron.reconfigurationDryRun:false}")
+    private boolean dryRun;
+    @Value("${notifications.et1ServiceOwnerNotificationEmail}")
+    private String serviceOwnerEmail;
+    @Value("${notifications.dataQualityReportTemplateId:DATA_QUALITY_REPORT_TEMPLATE_ID}")
+    private String dataQualityReportTemplateId;
 
     private record UpdateTracker(AtomicInteger count,
             ConcurrentLinkedQueue<String> updated,
-            ConcurrentLinkedQueue<String> failed) {
+            ConcurrentLinkedQueue<String> failed,
+            ConcurrentLinkedQueue<Correction> corrections) {
         void recordSuccess(String caseId) {
             count.incrementAndGet();
             updated.add(caseId);
@@ -101,6 +116,11 @@ public class DataQualityTask implements Runnable {
         void recordFailure(String caseId) {
             failed.add(caseId);
         }
+    }
+
+    private record Correction(String caseId, String ethosCaseReference, String caseTypeId,
+                              String judgmentId, String previousDate, String updatedDate,
+                              String judgmentSentDate, String sourceHearingDate) {
     }
 
     @Override
@@ -124,7 +144,7 @@ public class DataQualityTask implements Runnable {
         log.info("Number of cases to update - {}", caseIds.size());
 
         UpdateTracker tracker = new UpdateTracker(new AtomicInteger(0),
-                new ConcurrentLinkedQueue<>(), new ConcurrentLinkedQueue<>());
+                new ConcurrentLinkedQueue<>(), new ConcurrentLinkedQueue<>(), new ConcurrentLinkedQueue<>());
 
         String adminUserToken = adminUserService.getAdminUserToken();
 
@@ -135,6 +155,7 @@ public class DataQualityTask implements Runnable {
         log.info("Completed transfer of {} cases", tracker.count().get());
         log.info("Updated cases: {}", String.join(", ", tracker.updated()));
         log.info("Failed cases: {}", String.join(", ", tracker.failed()));
+        sendReport(adminUserToken, tracker);
     }
 
     /**
@@ -157,9 +178,9 @@ public class DataQualityTask implements Runnable {
             String caseTypeId = caseDetails.getCaseTypeId();
             log.info("Case {} resolved to type {}", caseId, caseTypeId);
             if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId) || SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
-                triggerEventForCase(adminUserToken, caseId, caseTypeId);
+                triggerEventForCase(adminUserToken, caseId, caseTypeId, tracker.corrections());
             } else if (ECM_CASE_TYPES.contains(caseTypeId)) {
-                triggerEcmEventForCase(adminUserToken, caseId, caseTypeId);
+                triggerEcmEventForCase(adminUserToken, caseId, caseTypeId, tracker.corrections());
             } else {
                 log.warn("Skipping case {} — unknown case type {}", caseId, caseTypeId);
             }
@@ -179,16 +200,20 @@ public class DataQualityTask implements Runnable {
      * @param caseId         the CCD case ID
      * @param caseTypeId     the ET Reform case type (e.g. {@code ET_EnglandWales})
      */
-    private void triggerEventForCase(String adminUserToken, String caseId, String caseTypeId) throws IOException {
+    private void triggerEventForCase(String adminUserToken, String caseId, String caseTypeId,
+                                     ConcurrentLinkedQueue<Correction> corrections) throws IOException {
         CCDRequest ccdRequest = ccdClient.startEventForCase(adminUserToken, caseTypeId, EMPLOYMENT,
                 caseId, FIX_CASE_API_EVENT_ID);
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
         caseData.setStateAPI(null);
-        boolean updated = updateHearingInJudgment(caseData, caseId);
+        boolean updated = updateHearingInJudgment(caseData, caseId, caseTypeId,
+                caseData.getEthosCaseReference(), corrections);
         if (updated) {
-            ccdClient.submitEventForCase(adminUserToken, caseData, caseTypeId,
-                    caseDetails.getJurisdiction(), ccdRequest, caseId);
+            if (!dryRun) {
+                ccdClient.submitEventForCase(adminUserToken, caseData, caseTypeId,
+                        caseDetails.getJurisdiction(), ccdRequest, caseId);
+            }
             log.info("{} - Successfully updated case {}", caseTypeId, caseId);
         } else {
             log.info("{} - No data quality fixes needed for case {}", caseTypeId, caseId);
@@ -204,17 +229,21 @@ public class DataQualityTask implements Runnable {
      * @param caseId         the CCD case ID
      * @param caseTypeId     the ECM case type (e.g. {@code Manchester})
      */
-    private void triggerEcmEventForCase(String adminUserToken, String caseId, String caseTypeId) throws IOException {
+    private void triggerEcmEventForCase(String adminUserToken, String caseId, String caseTypeId,
+                                        ConcurrentLinkedQueue<Correction> corrections) throws IOException {
         uk.gov.hmcts.ecm.common.model.ccd.CCDRequest ccdRequest = ecmCcdClient.startEventForCase(adminUserToken,
                 caseTypeId, EMPLOYMENT,
                 caseId, FIX_CASE_API_EVENT_ID);
         uk.gov.hmcts.ecm.common.model.ccd.CaseDetails caseDetails = ccdRequest.getCaseDetails();
         uk.gov.hmcts.ecm.common.model.ccd.CaseData caseData = caseDetails.getCaseData();
         caseData.setStateAPI(null);
-        boolean updated = updateHearingInJudgment(caseData, caseId);
+        boolean updated = updateHearingInJudgment(caseData, caseId, caseTypeId,
+                caseData.getEthosCaseReference(), corrections);
         if (updated) {
-            ecmCcdClient.submitEventForCase(adminUserToken, caseData, caseTypeId,
-                    caseDetails.getJurisdiction(), ccdRequest, caseId);
+            if (!dryRun) {
+                ecmCcdClient.submitEventForCase(adminUserToken, caseData, caseTypeId,
+                        caseDetails.getJurisdiction(), ccdRequest, caseId);
+            }
             log.info("{} - Successfully updated case {}", caseTypeId, caseId);
         } else {
             log.info("{} - No data quality fixes needed for case {}", caseTypeId, caseId);
@@ -241,7 +270,9 @@ public class DataQualityTask implements Runnable {
      * @return true if any modifications were made to the judgment dates, false
      *         otherwise
      */
-    private boolean updateHearingInJudgment(CaseData caseData, String caseId) {
+    private boolean updateHearingInJudgment(CaseData caseData, String caseId, String caseTypeId,
+                                            String ethosCaseReference,
+                                            ConcurrentLinkedQueue<Correction> corrections) {
         return updateHearingInJudgmentCommon(
                 caseId,
                 caseData.getHearingCollection(),
@@ -261,7 +292,10 @@ public class DataQualityTask implements Runnable {
                         j.getValue().setDynamicJudgementHearing(null);
                     }
                 },
-            uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem::getId
+            uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem::getId,
+                correction -> corrections.add(new Correction(caseId, ethosCaseReference, caseTypeId,
+                        correction.judgmentId(), correction.previousDate(), correction.updatedDate(),
+                        correction.judgmentSentDate(), correction.sourceHearingDate()))
         );
     }
 
@@ -281,7 +315,9 @@ public class DataQualityTask implements Runnable {
      * @return true if any modifications were made to the judgment dates, false
      *         otherwise
      */
-    private boolean updateHearingInJudgment(uk.gov.hmcts.ecm.common.model.ccd.CaseData caseData, String caseId) {
+    private boolean updateHearingInJudgment(uk.gov.hmcts.ecm.common.model.ccd.CaseData caseData, String caseId,
+                                            String caseTypeId, String ethosCaseReference,
+                                            ConcurrentLinkedQueue<Correction> corrections) {
         return updateHearingInJudgmentCommon(
                 caseId,
                 caseData.getHearingCollection(),
@@ -301,7 +337,10 @@ public class DataQualityTask implements Runnable {
                         j.getValue().setDynamicJudgementHearing(null);
                     }
                 },
-            JudgementTypeItem::getId
+            JudgementTypeItem::getId,
+                correction -> corrections.add(new Correction(caseId, ethosCaseReference, caseTypeId,
+                        correction.judgmentId(), correction.previousDate(), correction.updatedDate(),
+                        correction.judgmentSentDate(), correction.sourceHearingDate()))
         );
     }
 
@@ -320,7 +359,8 @@ public class DataQualityTask implements Runnable {
             Function<J, String> getDateJudgmentSent,
             BiConsumer<J, String> setJudgmentHearingDate,
             Consumer<J> clearDynamicJudgementHearing,
-            Function<J, String> getJudgmentId) {
+            Function<J, String> getJudgmentId,
+            Consumer<Correction> recordCorrection) {
 
         if (isEmpty(hearingCollection) || isEmpty(judgementCollection)) {
             return false;
@@ -360,6 +400,9 @@ public class DataQualityTask implements Runnable {
                                         getJudgmentId.apply(judgmentItem), caseId);
                                 setJudgmentHearingDate.accept(judgmentItem, correctedDate);
                                 clearDynamicJudgementHearing.accept(judgmentItem);
+                                recordCorrection.accept(new Correction(caseId, null, null,
+                                        getJudgmentId.apply(judgmentItem), judgmentHearingDate, correctedDate,
+                                        dateJudgmentSent, correctedDate));
                                 updated.set(true);
                             });
                 });
@@ -407,5 +450,35 @@ public class DataQualityTask implements Runnable {
             log.warn("Failed to process judgment hearing date for case {}: {}", caseId, e.getMessage());
             return Optional.empty();
         }
+    }
+
+    private void sendReport(String adminUserToken, UpdateTracker tracker) {
+        if (tracker.corrections().isEmpty() && tracker.failed().isEmpty()) {
+            return;
+        }
+        String csv = "case_id,ethos_case_reference,case_type,judgment_id,previous_date,updated_date,"
+                + "judgment_sent_date,source_hearing_date\n"
+                + tracker.corrections().stream()
+            .map(c -> String.join(",", c.caseId(),
+                nullToEmpty(c.ethosCaseReference()),
+                c.caseTypeId(),
+                c.judgmentId(),
+                c.previousDate(),
+                c.updatedDate(),
+                c.judgmentSentDate(),
+                c.sourceHearingDate()))
+                .collect(Collectors.joining("\n"));
+        String filename = "data-quality-report-" + LocalDateTime.now() + ".csv";
+        URI document = documentManagementService.uploadDocument(adminUserToken,
+                csv.getBytes(StandardCharsets.UTF_8), filename, "text/csv", ENGLANDWALES_CASE_TYPE_ID);
+        emailService.sendEmail(dataQualityReportTemplateId, serviceOwnerEmail, java.util.Map.of(
+                "runMode", dryRun ? "DRY_RUN" : "LIVE",
+                "correctionsCount", tracker.corrections().size(),
+                "failuresCount", tracker.failed().size(),
+                "reportLink", documentManagementService.generateDownloadableURL(document)));
+    }
+
+    private String nullToEmpty(String value) {
+        return value == null ? "" : value;
     }
 }

@@ -34,6 +34,7 @@ tasks.register('printVersionInit') {
 }
 
 ccd {
+    rootPackage = 'uk.gov.hmcts.et.common.ccd'
     configDir = file('build/definitions')
     decentralised = true
     runtimeIndexing = true
@@ -767,3 +768,10 @@ pmdMain.maxFailures = 0
 pmdTest.maxFailures = 0
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")
+
+// The generator's Spring context has no web tier: run it with no embedded server. The generated
+// entry point takes no autoconfiguration, so nothing supplies a ServletWebServerFactory and Boot
+// would otherwise fail on deducing a servlet application from the service's classpath.
+tasks.named('generateCCDConfig') {
+    systemProperty 'spring.main.web-application-type', 'none'
+}

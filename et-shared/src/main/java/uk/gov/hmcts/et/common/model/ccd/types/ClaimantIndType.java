@@ -12,29 +12,58 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(name = "ClaimantIndividual", generate = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class ClaimantIndType {
 
+    @CCD(
+            label = "Title",
+            searchable = false,
+            typeOverride = FieldType.FixedList,
+            typeParameterOverride = "fl_PreferredTitle"
+    )
     @JsonProperty("claimant_preferred_title")
     private String claimantPreferredTitle;
+    @CCD(
+            label = "Deprecated",
+            searchable = false,
+            typeOverride = FieldType.FixedList,
+            typeParameterOverride = "fl_Title"
+    )
     @JsonProperty("claimant_title1")
     private String claimantTitle;
+    @CCD(label = "Other title", showCondition = "claimant_preferred_title=\"Other\"", searchable = false)
     @JsonProperty("claimant_title_other")
     private String claimantTitleOther;
+    @CCD(label = "First Name")
     @JsonProperty("claimant_first_names")
     private String claimantFirstNames;
+    @CCD(label = "Last Name")
     @JsonProperty("claimant_last_name")
     private String claimantLastName;
+    @CCD(label = "Date of birth", searchable = false, typeOverride = FieldType.Date)
     @JsonProperty("claimant_date_of_birth")
     private String claimantDateOfBirth;
+    @CCD(label = "Gender", searchable = false, typeOverride = FieldType.FixedList, typeParameterOverride = "fl_Gender")
     @JsonProperty("claimant_gender")
     private String claimantGender;
+    @CCD(label = "Sex", searchable = false, typeOverride = FieldType.FixedList, typeParameterOverride = "fl_Sex")
     @JsonProperty("claimant_sex")
     private String claimantSex;
+    @CCD(
+            label = "Is the claimant's identity and sex registered at birth the same?",
+            searchable = false,
+            typeOverride = FieldType.FixedList,
+            typeParameterOverride = "fl_YesOrNoOrPreferNot"
+    )
     @JsonProperty("claimant_gender_identity_same")
     private String claimantGenderIdentitySame;
+    @CCD(label = "Gender Identity description", searchable = false)
     @JsonProperty("claimant_gender_identity")
     private String claimantGenderIdentity;
 

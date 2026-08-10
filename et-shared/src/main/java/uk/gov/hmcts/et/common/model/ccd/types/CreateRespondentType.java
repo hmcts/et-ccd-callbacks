@@ -7,7 +7,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.et.common.model.ccd.Address;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(name = "CreateRespondent", generate = true)
 @Data
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -15,20 +19,67 @@ import uk.gov.hmcts.et.common.model.ccd.Address;
 @AllArgsConstructor
 public class CreateRespondentType {
 
+    @CCD(
+            label = "Respondent name",
+            searchable = false,
+            typeOverride = FieldType.FixedRadioList,
+            typeParameterOverride = "frl_respondentType"
+    )
     @JsonProperty("respondentType")
     private String respondentType;
+    @CCD(
+            label = "Enter the first name of the individual",
+            showCondition = "respondentType=\"Individual\"",
+            searchable = false
+    )
     @JsonProperty("respondentFirstName")
     private String respondentFirstName;
+    @CCD(
+            label = "Enter the last name of the individual",
+            showCondition = "respondentType=\"Individual\"",
+            searchable = false
+    )
     @JsonProperty("respondentLastName")
     private String respondentLastName;
+    @CCD(
+            label = "Enter the name of the organisation",
+            showCondition = "respondentType=\"Organisation\"",
+            searchable = false
+    )
     @JsonProperty("respondentOrganisation")
     private String respondentOrganisation;
+    @CCD(
+            label = "Respondent address",
+            searchable = false,
+            typeOverride = FieldType.AddressUK,
+            typeParameterOverride = "Please enter address details"
+    )
     @JsonProperty("respondent_address")
     private Address respondentAddress;
+    @CCD(
+            label = "Do you have an Acas certificate number for this respondent",
+            searchable = false,
+            typeOverride = FieldType.FixedRadioList,
+            typeParameterOverride = "msl_YesNo"
+    )
     @JsonProperty("respondent_ACAS_question")
     private String respondentAcasQuestion;
+    @CCD(
+            label = "Enter the Acas certificate number",
+            showCondition = "respondent_ACAS_question=\"Yes\"",
+            regex = "[a-zA-Z]{1,2}\\d{6}\\/\\d{2}\\/\\d{2}",
+            searchable = false
+    )
     @JsonProperty("respondent_ACAS")
     private String respondentAcas;
+    @CCD(
+            label = "Why is there no Acas certificate number?",
+            hint = "Incorrectly claiming an exemption may lead to the claim being rejected. If in doubt, please contact Acas",
+            showCondition = "respondent_ACAS_question=\"No\"",
+            searchable = false,
+            typeOverride = FieldType.FixedRadioList,
+            typeParameterOverride = "frl_noAcasReason"
+    )
     @JsonProperty("respondent_ACAS_no")
     private String respondentAcasNo;
 }

@@ -4,13 +4,19 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import uk.gov.hmcts.et.common.model.ccd.Address;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(name = "CompanyPremises", generate = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class CompanyPremisesType {
 
+    @CCD(label = "Premises")
     @JsonProperty("premises")
     private String premises;
+    @CCD(label = "Address", searchable = false, typeOverride = FieldType.AddressUK)
     @JsonProperty("address")
     private Address address;
 

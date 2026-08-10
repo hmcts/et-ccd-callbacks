@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import uk.gov.hmcts.et.common.model.ccd.types.DepositType;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(name = "Deposit", generate = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class DepositTypeItem {

@@ -179,7 +179,7 @@ public class Et1CaseData extends BaseCaseData {
             access = {CaseworkerEmploymentRPlus5RolesBbxtjpAccess.class, CaseworkerEmploymentLegalrepSolicitorCrudCitizenCruAccess.class}
     )
     @JsonProperty("additionalCaseInfo")
-    private AdditionalCaseDetails additionalCaseInfoType;
+    private AdditionalCaseInfoType additionalCaseInfoType;
     @CCD(
             label = "Tribunal Office",
             typeOverride = FieldType.FixedList,
@@ -214,7 +214,7 @@ public class Et1CaseData extends BaseCaseData {
             access = {CaseworkerEmploymentRPlus5RolesBbxtjpAccess.class, CaseworkerEmploymentLegalrepSolicitorDCitizenCruAccess.class}
     )
     @JsonProperty("claimantTaskListChecks")
-    private TaskListCheck claimantTaskListChecks;
+    private TaskListCheckType claimantTaskListChecks;
     @CCD(
             label = "Date of Receipt",
             typeOverride = FieldType.Date,

@@ -38,6 +38,20 @@ definition_store_role_table_ready() {
   [[ "${result}" == "t" ]]
 }
 
+definition_store_case_types_ready() {
+  local result
+  result="$(PGPASSWORD="${CCD_DEFINITION_STORE_PREVIEW_DB_PASSWORD}" psql \
+    --quiet \
+    --tuples-only \
+    --no-align \
+    --set=ON_ERROR_STOP=1 \
+    --dbname="${CCD_DEFINITION_STORE_PREVIEW_DB_URI}" \
+    --command="select count(distinct reference) from case_type where reference in ('ET_EnglandWales', 'ET_Scotland')" \
+    2>/dev/null)" || return 1
+
+  [[ "${result}" == "2" ]]
+}
+
 wait_for_definition_store_schema() {
   local pr_id="${1:-${CHANGE_ID:-}}"
 

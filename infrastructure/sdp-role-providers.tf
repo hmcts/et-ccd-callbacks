@@ -16,5 +16,5 @@ provider "postgresql" {
 
   # The Flexible Server is private; the runner executing terraform apply must
   # have network access via VNet/bastion or private DNS resolution.
-  connect_timeout = 15
+  connect_timeout = 30
 }

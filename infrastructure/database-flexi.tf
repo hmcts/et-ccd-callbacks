@@ -1,7 +1,7 @@
 # ET COS FlexiDB
 
 module "postgres" {
-  source = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=master"
+  source = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=DTSPO-30107-additional-postgres-admins"
   env    = var.env
   providers = {
     azurerm.postgres_network = azurerm.private_endpoint
@@ -18,7 +18,7 @@ module "postgres" {
     }
   ]
   pgsql_version                  = "15"
-  pgsql_storage_mb               = var.env == "prod" ? 262144 : 65536
+  pgsql_storage_mb               = var.env == "prod" ? 524288 : 65536
   admin_user_object_id           = var.jenkins_AAD_objectId
   force_user_permissions_trigger = "2"
   enable_db_report_privileges    = true

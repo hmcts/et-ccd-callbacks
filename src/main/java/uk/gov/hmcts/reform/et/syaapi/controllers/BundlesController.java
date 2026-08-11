@@ -26,7 +26,6 @@ import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.AUTHORIZATI
 public class BundlesController {
     private final BundlesService bundlesService;
 
-
     /**
      * Submits claimant hearing document pdf and related information.
      *

@@ -20,6 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 
@@ -72,6 +73,8 @@ class DataQualityTaskTest {
 
     @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
+    @MockitoBean
+    private EmailService emailService;
 
     @Captor
     private ArgumentCaptor<CaseData> etCaseDataCaptor;
@@ -79,8 +82,10 @@ class DataQualityTaskTest {
     @BeforeEach
     void setUp() {
         dataQualityTask = new DataQualityTask(adminUserService, ccdClient, ecmCcdClient, coreCaseDataApi,
-            authTokenGenerator);
+            authTokenGenerator, emailService);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
+        ReflectionTestUtils.setField(dataQualityTask, "serviceOwnerEmail", "service.owner@example.com");
+        ReflectionTestUtils.setField(dataQualityTask, "dataQualityReportTemplateId", "report-template-id");
         setEtCase();
     }
 
@@ -339,10 +344,8 @@ class DataQualityTaskTest {
 
         uk.gov.hmcts.ecm.common.model.ccd.CaseData ecmCaseData =
             new uk.gov.hmcts.ecm.common.model.ccd.CaseData();
-        ecmCaseData.setHearingCollection(
-            List.of(buildEcmHearingItem(LISTED_DATE_LATEST_BEFORE_SENT, HEARING_STATUS_HEARD)));
-        ecmCaseData.setJudgementCollection(
-            List.of(buildEcmJudgmentItem()));
+        ecmCaseData.setHearingCollection(List.of(buildEcmHearingItem()));
+        ecmCaseData.setJudgementCollection(List.of(buildEcmJudgmentItem()));
 
         when(ecmCcdClient.startEventForCase(ADMIN_TOKEN, ECM_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API_EVENT_ID))
             .thenReturn(buildEcmCcdRequest(ecmCaseData));
@@ -366,7 +369,7 @@ class DataQualityTaskTest {
         uk.gov.hmcts.ecm.common.model.ccd.CaseData ecmCaseData =
             new uk.gov.hmcts.ecm.common.model.ccd.CaseData();
         ecmCaseData.setHearingCollection(
-            List.of(buildEcmHearingItem(LISTED_DATE_LATEST_BEFORE_SENT, HEARING_STATUS_HEARD)));
+            List.of(buildEcmHearingItem()));
         
         uk.gov.hmcts.ecm.common.model.ccd.types.JudgementType judgment =
             new uk.gov.hmcts.ecm.common.model.ccd.types.JudgementType();
@@ -383,6 +386,35 @@ class DataQualityTaskTest {
         dataQualityTask.run();
 
         verify(ecmCcdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void dryRun_doesNotSubmitButUploadsAndEmailsReport() throws Exception {
+        CaseData caseData = new CaseData();
+        caseData.setHearingCollection(List.of(
+            buildEtHearingItem(LISTED_DATE_LATEST_BEFORE_SENT, HEARING_STATUS_HEARD)));
+        caseData.setJudgementCollection(List.of(buildEtJudgmentItem(HEARING_DATE_INVALID)));
+        mockEtStartEvent(caseData);
+        ReflectionTestUtils.setField(dataQualityTask, "dryRun", true);
+
+        dataQualityTask.run();
+
+        verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
+        verify(emailService).sendEmail(eq("report-template-id"), eq("service.owner@example.com"), any());
+    }
+
+    @Test
+    void liveRun_submitsCorrectionAndEmailsReport() throws Exception {
+        CaseData caseData = new CaseData();
+        caseData.setHearingCollection(List.of(
+            buildEtHearingItem(LISTED_DATE_LATEST_BEFORE_SENT, HEARING_STATUS_HEARD)));
+        caseData.setJudgementCollection(List.of(buildEtJudgmentItem(HEARING_DATE_INVALID)));
+        mockEtStartEvent(caseData);
+
+        dataQualityTask.run();
+
+        verify(ccdClient).submitEventForCase(any(), any(), any(), any(), any(), any());
+        verify(emailService).sendEmail(eq("report-template-id"), eq("service.owner@example.com"), any());
     }
 
     private void setEtCase() {
@@ -464,12 +496,11 @@ class DataQualityTaskTest {
         return ccdRequest;
     }
 
-    private uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem buildEcmHearingItem(
-            String listedDate, String hearingStatus) {
+    private uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem buildEcmHearingItem() {
         uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType dateListedType =
             new uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType();
-        dateListedType.setListedDate(listedDate);
-        dateListedType.setHearingStatus(hearingStatus);
+        dateListedType.setListedDate(DataQualityTaskTest.LISTED_DATE_LATEST_BEFORE_SENT);
+        dateListedType.setHearingStatus(HEARING_STATUS_HEARD);
         uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem dateItem =
             new uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem();
         dateItem.setValue(dateListedType);

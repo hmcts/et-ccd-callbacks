@@ -35,6 +35,40 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "bundlesClaimantPrepareDoc",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]",
+          "caseworker-employment-api"
+        ],
+        "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "[SOLICITORA]",
+          "[SOLICITORB]",
+          "[SOLICITORC]",
+          "[SOLICITORD]",
+          "[SOLICITORE]",
+          "[SOLICITORF]",
+          "[SOLICITORG]",
+          "[SOLICITORH]",
+          "[SOLICITORI]",
+          "[SOLICITORJ]"
+        ],
+        "CRUD": "D"
+      },
+      {
+        "UserRoles": [
+          "et-acas-api"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
     "CaseEventID": "SUBMIT_CLAIMANT_BUNDLES",
     "AccessControl": [
       {

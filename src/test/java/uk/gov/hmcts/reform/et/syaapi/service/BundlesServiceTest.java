@@ -184,4 +184,30 @@ class BundlesServiceTest {
         CaseData data = (CaseData) contentCaptor.getValue().getData();
         Assertions.assertEquals(collection.get(0).getValue(), data.getBundlesRespondentCollection().get(0).getValue());
     }
+
+    @Test
+    void shouldInitialiseEmptyRespondentBundleCollectionWhenMissing() {
+        RespondentBundlesRequest request = testData.getRespondentBundlesRequest();
+
+        when(caseService.startUpdate(
+            MOCK_TOKEN,
+            request.getCaseId(),
+            request.getCaseTypeId(),
+            SUBMIT_RESPONDENT_BUNDLES
+        )).thenReturn(testData.getUpdateCaseEventResponse());
+
+        ArgumentCaptor<CaseDataContent> contentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
+        bundlesService.submitRespondentBundles(MOCK_TOKEN, request);
+
+        verify(caseService, times(1)).submitUpdate(
+            eq(MOCK_TOKEN), any(), contentCaptor.capture(), any());
+
+        CaseData data = (CaseData) contentCaptor.getValue().getData();
+        Assertions.assertNotNull(data.getBundlesRespondentCollection());
+        Assertions.assertEquals(1, data.getBundlesRespondentCollection().size());
+        Assertions.assertEquals(
+            request.getRespondentBundles(),
+            data.getBundlesRespondentCollection().get(0).getValue()
+        );
+    }
 }

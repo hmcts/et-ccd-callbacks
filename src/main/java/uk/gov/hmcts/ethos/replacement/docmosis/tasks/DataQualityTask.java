@@ -10,16 +10,14 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
+import uk.gov.service.notify.NotificationClientException;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -43,6 +41,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTE
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.compat.common.model.helper.Constants.ECM_CASE_TYPES;
+import static uk.gov.service.notify.NotificationClient.prepareUpload;
 
 /**
  * Scheduled task that fixes data quality issues across a configurable set of
@@ -92,7 +91,6 @@ public class DataQualityTask implements Runnable {
     private final uk.gov.hmcts.ecm.compat.common.client.CcdClient ecmCcdClient;
     private final CoreCaseDataApi coreCaseDataApi;
     private final AuthTokenGenerator authTokenGenerator;
-    private final DocumentManagementService documentManagementService;
     private final EmailService emailService;
 
     @Value("${cron.reconfigurationCaseIds}")
@@ -101,7 +99,7 @@ public class DataQualityTask implements Runnable {
     private boolean dryRun;
     @Value("${notifications.et1ServiceOwnerNotificationEmail}")
     private String serviceOwnerEmail;
-    @Value("${notifications.dataQualityReportTemplateId:DATA_QUALITY_REPORT_TEMPLATE_ID}")
+    @Value("${notifications.dataQualityReportTemplateId}")
     private String dataQualityReportTemplateId;
 
     private record UpdateTracker(AtomicInteger count,
@@ -155,7 +153,7 @@ public class DataQualityTask implements Runnable {
         log.info("Completed transfer of {} cases", tracker.count().get());
         log.info("Updated cases: {}", String.join(", ", tracker.updated()));
         log.info("Failed cases: {}", String.join(", ", tracker.failed()));
-        sendReport(adminUserToken, tracker);
+        sendReport(tracker);
     }
 
     /**
@@ -452,7 +450,7 @@ public class DataQualityTask implements Runnable {
         }
     }
 
-    private void sendReport(String adminUserToken, UpdateTracker tracker) {
+    private void sendReport(UpdateTracker tracker) {
         if (tracker.corrections().isEmpty() && tracker.failed().isEmpty()) {
             return;
         }
@@ -468,14 +466,15 @@ public class DataQualityTask implements Runnable {
                 c.judgmentSentDate(),
                 c.sourceHearingDate()))
                 .collect(Collectors.joining("\n"));
-        String filename = "data-quality-report-" + LocalDateTime.now() + ".csv";
-        URI document = documentManagementService.uploadDocument(adminUserToken,
-                csv.getBytes(StandardCharsets.UTF_8), filename, "text/csv", ENGLANDWALES_CASE_TYPE_ID);
-        emailService.sendEmail(dataQualityReportTemplateId, serviceOwnerEmail, java.util.Map.of(
-                "runMode", dryRun ? "DRY_RUN" : "LIVE",
-                "correctionsCount", tracker.corrections().size(),
-                "failuresCount", tracker.failed().size(),
-                "reportLink", documentManagementService.generateDownloadableURL(document)));
+        try {
+            emailService.sendEmail(dataQualityReportTemplateId, serviceOwnerEmail, java.util.Map.of(
+                    "runMode", dryRun ? "DRY_RUN" : "LIVE",
+                    "correctionsCount", tracker.corrections().size(),
+                    "failuresCount", tracker.failed().size(),
+                    "dataQualityReportCsv", prepareUpload(csv.getBytes(StandardCharsets.UTF_8))));
+        } catch (NotificationClientException e) {
+            log.error("Unable to prepare data quality CSV report attachment", e);
+        }
     }
 
     private String nullToEmpty(String value) {

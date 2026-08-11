@@ -22,7 +22,7 @@ resource "postgresql_role" "sdp_reader" {
   inherit                   = false
   replication               = false
   bypass_row_level_security = false
-  connection_limit          = 10
+  connection_limit          = 20
 }
 
 resource "postgresql_grant" "sdp_reader_database_connect" {

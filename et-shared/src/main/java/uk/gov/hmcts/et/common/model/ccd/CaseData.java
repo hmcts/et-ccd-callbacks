@@ -794,6 +794,8 @@ public class CaseData extends Et1CaseData {
     private String etICJuridictionCodesInvalid;
     @JsonProperty("etICInvalidDetails")
     private String etICInvalidDetails;
+    @JsonProperty("etICUnfairDismissalEra")
+    private String etICUnfairDismissalEra;
     @JsonProperty("etICCanProceed")
     private String etICCanProceed;
     @JsonProperty("etICIsUrgent")
@@ -920,6 +922,10 @@ public class CaseData extends Et1CaseData {
     private List<String> et3ResponseHearingRepresentative;
     @JsonProperty("et3ResponseHearingRespondent")
     private List<String> et3ResponseHearingRespondent;
+    @JsonProperty("et3ResponseHearingPanelPreference")
+    private String et3ResponseHearingPanelPreference;
+    @JsonProperty("et3ResponseHearingPanelPreferenceReason")
+    private String et3ResponseHearingPanelPreferenceReason;
     // ET3 Response - Respondent's workforce page (10)
     @JsonProperty("et3ResponseEmploymentCount")
     private String et3ResponseEmploymentCount;
@@ -1535,7 +1541,29 @@ public class CaseData extends Et1CaseData {
     @JsonProperty("bundlesRespondentCollection")
     private List<GenericTypeItem<HearingBundleType>> bundlesRespondentCollection;
 
-    // Claimant Bundles
+    // Bundles Claimant
+    @JsonProperty("bundlesClaimantPrepareDocNotesShow")
+    private String bundlesClaimantPrepareDocNotesShow;
+
+    @JsonProperty("bundlesClaimantAgreedDocWith")
+    private String bundlesClaimantAgreedDocWith;
+    @JsonProperty("bundlesClaimantAgreedDocWithBut")
+    private String bundlesClaimantAgreedDocWithBut;
+    @JsonProperty("bundlesClaimantAgreedDocWithNo")
+    private String bundlesClaimantAgreedDocWithNo;
+
+    @JsonProperty("bundlesClaimantSelectHearing")
+    private DynamicFixedListType bundlesClaimantSelectHearing;
+
+    @JsonProperty("bundlesClaimantWhatDocuments")
+    private String bundlesClaimantWhatDocuments;
+
+    @JsonProperty("bundlesClaimantWhoseDocuments")
+    private String bundlesClaimantWhoseDocuments;
+
+    @JsonProperty("bundlesClaimantUploadFile")
+    private UploadedDocumentType bundlesClaimantUploadFile;
+
     @JsonProperty("bundlesClaimantCollection")
     private List<GenericTypeItem<HearingBundleType>> bundlesClaimantCollection;
 
@@ -1718,6 +1746,10 @@ public class CaseData extends Et1CaseData {
     private List<String> claimantSupportQuestion;
     @JsonProperty("claimantSupportQuestionReason")
     private String claimantSupportQuestionReason;
+    @JsonProperty("claimantHearingPanelPreference")
+    private String claimantHearingPanelPreference;
+    @JsonProperty("claimantHearingPanelPreferenceReason")
+    private String claimantHearingPanelPreferenceReason;
     @JsonProperty("representativeContactPreference")
     private List<String> representativeContactPreference;
     @JsonProperty("contactPreferencePostReason")
@@ -1820,6 +1852,8 @@ public class CaseData extends Et1CaseData {
     private String et1SectionThreeClaimDetails;
     @JsonProperty("et1SectionThreeDocumentUpload")
     private UploadedDocumentType et1SectionThreeDocumentUpload;
+    @JsonProperty("et1SectionThreeDateOfLastEvent")
+    private String et1SectionThreeDateOfLastEvent;
     @JsonProperty("et1SectionThreeTypeOfClaim")
     private List<String> et1SectionThreeTypeOfClaim;
     @JsonProperty("discriminationTypesOfClaim")

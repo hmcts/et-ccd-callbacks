@@ -2,8 +2,11 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
@@ -13,19 +16,24 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
+@ExtendWith(MockitoExtension.class)
 class EmploymentRightsActServiceTest {
 
     private EmploymentRightsActService employmentRightsActService;
     private CaseData caseData;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setUp() {
-        employmentRightsActService = new EmploymentRightsActService();
+        employmentRightsActService = new EmploymentRightsActService(featureToggleService);
         caseData = new CaseData();
+        when(featureToggleService.isEraOctober2026Enabled()).thenReturn(true);
     }
 
     @Test
@@ -106,6 +114,37 @@ class EmploymentRightsActServiceTest {
         caseData.setEtICUnfairDismissalEra("Not applicable");
         employmentRightsActService.processUnfairDismissalEra("ET_EnglandWales", caseData);
 
+        assertNull(caseData.getJurCodesCollection());
+    }
+
+    @Test
+    void setEraFlagByReceiptDate_EraFeatureDisabled_DoesNotSetEraToNo() {
+        when(featureToggleService.isEraOctober2026Enabled()).thenReturn(false);
+        caseData.setReceiptDate("2026-09-30");
+
+        employmentRightsActService.setEraFlagByReceiptDate(caseData);
+
+        assertNull(caseData.getAdditionalCaseInfoType());
+    }
+
+    @Test
+    void setUnfairDismissalEraByReceiptDate_EraFeatureDisabled_DoesNotSetIcUnfairDismissal() {
+        when(featureToggleService.isEraOctober2026Enabled()).thenReturn(false);
+        caseData.setReceiptDate("2026-09-30");
+
+        employmentRightsActService.setUnfairDismissalEraByReceiptDate(caseData);
+
+        assertNull(caseData.getEtICUnfairDismissalEra());
+    }
+
+    @Test
+    void processUnfairDismissalEra_EraFeatureDisabled_DoesNotSetEraOrUdl() {
+        when(featureToggleService.isEraOctober2026Enabled()).thenReturn(false);
+        caseData.setEtICUnfairDismissalEra(YES);
+
+        employmentRightsActService.processUnfairDismissalEra(ENGLANDWALES_CASE_TYPE_ID, caseData);
+
+        assertNull(caseData.getAdditionalCaseInfoType());
         assertNull(caseData.getJurCodesCollection());
     }
 }

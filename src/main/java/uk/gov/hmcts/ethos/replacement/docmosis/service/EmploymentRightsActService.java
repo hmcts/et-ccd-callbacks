@@ -30,12 +30,18 @@ public class EmploymentRightsActService {
     public static final String UDL_JURISDICTION_CODE = "UDL";
     public static final String NOT_APPLICABLE = "Not applicable";
 
+    private final FeatureToggleService featureToggleService;
+
     /**
      * Sets the era flag on AdditionalCaseInfoType to No if receiptDate is before 1st October 2026.
      *
      * @param caseData the case data
      */
     public void setEraFlagByReceiptDate(CaseData caseData) {
+        if (!featureToggleService.isEraOctober2026Enabled()) {
+            return;
+        }
+
         if (ObjectUtils.isEmpty(caseData) || ObjectUtils.isEmpty(caseData.getReceiptDate())) {
             return;
         }
@@ -59,6 +65,9 @@ public class EmploymentRightsActService {
      * @param caseData the case data
      */
     public void setUnfairDismissalEraByReceiptDate(CaseData caseData) {
+        if (!featureToggleService.isEraOctober2026Enabled()) {
+            return;
+        }
         if (ObjectUtils.isEmpty(caseData) || ObjectUtils.isEmpty(caseData.getReceiptDate())) {
             return;
         }
@@ -84,6 +93,10 @@ public class EmploymentRightsActService {
      * @param caseData the case data
      */
     public void processUnfairDismissalEra(String caseTypeId, CaseData caseData) {
+        if (!featureToggleService.isEraOctober2026Enabled()) {
+            return;
+        }
+
         if (caseData == null || !YES.equalsIgnoreCase(caseData.getEtICUnfairDismissalEra())) {
             return;
         }

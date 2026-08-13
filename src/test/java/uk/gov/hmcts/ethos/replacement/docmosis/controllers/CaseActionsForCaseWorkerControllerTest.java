@@ -21,6 +21,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -93,6 +94,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private static final String AMEND_CASE_DETAILS_URL = "/amendCaseDetails";
     private static final String AMEND_CLAIMANT_DETAILS_URL = "/amendClaimantDetails";
     private static final String AMEND_RESPONDENT_DETAILS_URL = "/amendRespondentDetails";
+    private static final String AMEND_RESPONDENT_DETAILS_SUBMITTED_URL = "/amendRespondentDetailsSubmitted";
     private static final String AMEND_RESPONDENT_REPRESENTATIVE_URL = "/amendRespondentRepresentative";
     private static final String UPDATE_HEARING_URL = "/updateHearing";
     private static final String RESTRICTED_CASES_URL = "/restrictedCases";
@@ -240,6 +242,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .tribunalCorrespondenceDX("123456")
                 .tribunalCorrespondenceEmail("manchester@gmail.com")
                 .build();
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
     }
 
     @ParameterizedTest
@@ -406,6 +410,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(caseFlagsService, times(0)).setupCaseFlags(any(CaseData.class));
+        verify(nocRespondentHelper, times(1)).amendRespondentNameRepresentativeNames(any(CaseData.class));
+        verify(nocRespondentRepresentativeService, times(1))
+                .prepopulateOrgPolicyAndNoc(any(CaseData.class));
     }
 
     @Test
@@ -448,6 +455,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(nocRespondentHelper, times(0)).amendRespondentNameRepresentativeNames(any(CaseData.class));
+        verify(nocRespondentRepresentativeService, never()).prepopulateOrgPolicyAndNoc(any(CaseData.class));
     }
 
     @Test
@@ -469,6 +477,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(nocRespondentHelper, times(0)).amendRespondentNameRepresentativeNames(any(CaseData.class));
+        verify(nocRespondentRepresentativeService, never()).prepopulateOrgPolicyAndNoc(any(CaseData.class));
     }
 
     @Test
@@ -511,6 +520,28 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void amendRespondentDetailsSubmittedRealignsRepresentativeAccess() {
+        CaseDetails previousCaseDetails = new CaseDetails();
+        previousCaseDetails.setCaseId(ccdRequest.getCaseDetails().getCaseId());
+        previousCaseDetails.setCaseData(new CaseData());
+        CallbackRequest callbackRequest = CallbackRequest.builder()
+                .caseDetailsBefore(previousCaseDetails)
+                .caseDetails(ccdRequest.getCaseDetails())
+                .build();
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mvc.perform(post(AMEND_RESPONDENT_DETAILS_SUBMITTED_URL)
+                        .content(jsonMapper.toJson(callbackRequest))
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(nocRespondentRepresentativeService)
+                .realignRespondentRepresentativeAccess(any(CallbackRequest.class));
     }
 
     @Test

@@ -17,6 +17,7 @@ import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
@@ -383,6 +384,7 @@ public class CaseActionsForCaseWorkerController {
         if (errors.isEmpty() && isNotEmpty(caseData.getRepCollection())) {
             //Needed to keep the respondent names in the rep collection sync
             nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData);
+            caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
         }
 
         if (errors.isEmpty() && isNotEmpty(caseData.getRespondentCollection())) {
@@ -405,6 +407,21 @@ public class CaseActionsForCaseWorkerController {
         caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
         removeSpacesFromPartyNames(caseData);
         return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    @PostMapping(value = "/amendRespondentDetailsSubmitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Realigns representative access after respondents have been reordered.")
+    public void amendRespondentDetailsSubmitted(
+            @RequestBody CallbackRequest callbackRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
+        try {
+            nocRespondentRepresentativeService.realignRespondentRepresentativeAccess(callbackRequest);
+        } catch (RuntimeException exception) {
+            String caseId = callbackRequest == null || callbackRequest.getCaseDetails() == null
+                    ? StringUtils.EMPTY
+                    : callbackRequest.getCaseDetails().getCaseId();
+            log.error("Unable to realign respondent representative access for case {}", caseId, exception);
+        }
     }
 
     @PostMapping(value = "/updateHearing", consumes = APPLICATION_JSON_VALUE)

@@ -85,6 +85,7 @@ public class CaseManagementForCaseWorkerService {
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final CcdClient ccdClient;
     private final FeatureToggleService featureToggleService;
+    private final CaseFlagsService caseFlagsService;
     private final String hmctsServiceId;
     private final AdminUserService adminUserService;
     private final CaseManagementLocationService caseManagementLocationService;
@@ -130,6 +131,7 @@ public class CaseManagementForCaseWorkerService {
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
                                               CcdClient ccdClient,
                                               FeatureToggleService featureToggleService,
+                                              CaseFlagsService caseFlagsService,
                                               @Value("${hmcts_service_id}") String hmctsServiceId,
                                               AdminUserService adminUserService,
                                               CaseManagementLocationService caseManagementLocationService,
@@ -140,6 +142,7 @@ public class CaseManagementForCaseWorkerService {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.featureToggleService = featureToggleService;
+        this.caseFlagsService = caseFlagsService;
         this.hmctsServiceId = hmctsServiceId;
         this.adminUserService = adminUserService;
         this.caseManagementLocationService = caseManagementLocationService;
@@ -442,6 +445,14 @@ public class CaseManagementForCaseWorkerService {
                 if (respondentSumType.getResponseStruckOut() != null) {
                     if (respondentSumType.getResponseStruckOut().equals(YES)) {
                         struckRespondent.add(respondentSumTypeItem);
+                        caseFlagsService.inactivateRespondentCaseFlags(
+                                caseData,
+                                respondentSumType.getRespondentName()
+                        );
+                        caseFlagsService.inactivateRespondentRepresentativeCaseFlags(
+                                caseData,
+                                respondentSumTypeItem
+                        );
                     } else {
                         activeRespondent.add(respondentSumTypeItem);
                     }
@@ -470,6 +481,14 @@ public class CaseManagementForCaseWorkerService {
                 continuingRespondent.add(respondentSumTypeItem);
             } else if (NO.equals(respondentSumType.getResponseContinue())) {
                 notContinuingRespondent.add(respondentSumTypeItem);
+                caseFlagsService.inactivateRespondentCaseFlags(
+                        caseData,
+                        respondentSumType.getRespondentName()
+                );
+                caseFlagsService.inactivateRespondentRepresentativeCaseFlags(
+                        caseData,
+                        respondentSumTypeItem
+                );
             } else {
                 respondentSumType.setResponseContinue(YES);
                 continuingRespondent.add(respondentSumTypeItem);

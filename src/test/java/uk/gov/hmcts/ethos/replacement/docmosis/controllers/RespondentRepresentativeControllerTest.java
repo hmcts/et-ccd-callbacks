@@ -25,6 +25,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -38,6 +40,10 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -84,6 +90,10 @@ class RespondentRepresentativeControllerTest {
     private NocRespondentHelper nocRespondentHelper;
     @MockitoBean
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
+    @MockitoBean
+    private FeatureToggleService featureToggleService;
+    @MockitoBean
+    private CaseFlagsService caseFlagsService;
 
     @Autowired
     private JsonMapper jsonMapper;
@@ -91,6 +101,8 @@ class RespondentRepresentativeControllerTest {
     @BeforeEach
     void setUp() {
         when(verifyTokenService.verifyTokenSignature(DUMMY_TOKEN)).thenReturn(true);
+        when(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(
+                any(CaseDetails.class))).thenReturn(List.of());
     }
 
     @Test
@@ -159,6 +171,28 @@ class RespondentRepresentativeControllerTest {
     }
 
     @Test
+    void testRemoveOwnRepresentativeSetsUpCaseFlagsWhenRequired() throws Exception {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        RepresentedTypeRItem representedTypeRItem = RepresentedTypeRItem.builder().id(ID_REPRESENTATIVE_1).build();
+        caseData.setRepCollection(List.of(representedTypeRItem));
+        caseData.setRepCollectionToRemove(List.of(representedTypeRItem));
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
+        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+        when(caseFlagsService.caseFlagsSetupRequired(any(CaseData.class))).thenReturn(true);
+
+        mockMvc.perform(post(URL_REMOVE_OWN_REPRESENTATIVE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(caseFlagsService, times(1)).setupCaseFlags(any(CaseData.class));
+    }
+
+    @Test
     @SneakyThrows
     void amendRespondentRepresentativeAboutToStart() {
         CaseData caseData = new CaseData();
@@ -210,6 +244,106 @@ class RespondentRepresentativeControllerTest {
 
     @Test
     @SneakyThrows
+    void amendRespondentRepresentativeAboutToSubmitSetsUpCaseFlagsWhenNameChanges() {
+        CaseData previousCaseData = new CaseData();
+        previousCaseData.setRepCollection(List.of(RepresentedTypeRItem.builder().id(ID_REPRESENTATIVE_1).value(
+                RepresentedTypeR.builder()
+                        .nameOfRepresentative("Previous Representative Name")
+                        .respondentId(ID_RESPONDENT_1)
+                        .respRepName(RESPONDENT_NAME_1)
+                        .build()).build()));
+        CaseData caseData = new CaseData();
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_1).build());
+        respondent.setId(ID_RESPONDENT_1);
+        caseData.setRespondentCollection(List.of(respondent));
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setLabel(RESPONDENT_NAME_1);
+        dynamicFixedListType.setValue(dynamicValueType);
+        caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().id(ID_REPRESENTATIVE_1).value(
+                RepresentedTypeR.builder().dynamicRespRepName(dynamicFixedListType)
+                        .nameOfRepresentative(REPRESENTATIVE_NAME).build()).build()));
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId(DUMMY_SUBMISSION_REFERENCE);
+        caseDetails.setCaseData(caseData);
+        CaseDetails caseDetailsBefore = new CaseDetails();
+        caseDetailsBefore.setCaseId(DUMMY_SUBMISSION_REFERENCE);
+        caseDetailsBefore.setCaseData(previousCaseData);
+        CallbackRequest callbackRequest = CallbackRequest.builder()
+                .caseDetails(caseDetails)
+                .caseDetailsBefore(caseDetailsBefore)
+                .build();
+        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+
+        mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_SUBMIT)
+                        .content(jsonMapper.toJson(callbackRequest))
+                        .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, empty()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(caseFlagsService, times(1)).clearRespondentRepresentativeFlags(
+                any(CaseData.class), eq(List.of(0)));
+        verify(caseFlagsService, times(1)).setupCaseFlags(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void amendRespondentRepresentativeAboutToSubmitClearsAndSetsUpCaseFlagsWhenOnlyEmailChanges() {
+        CaseData previousCaseData = new CaseData();
+        previousCaseData.setRepCollection(List.of(RepresentedTypeRItem.builder().id(ID_REPRESENTATIVE_1).value(
+                RepresentedTypeR.builder()
+                        .nameOfRepresentative(REPRESENTATIVE_NAME)
+                        .respondentId(ID_RESPONDENT_1)
+                        .respRepName(RESPONDENT_NAME_1)
+                        .representativeEmailAddress("old@example.com")
+                        .build()).build()));
+        CaseData caseData = new CaseData();
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_1).build());
+        respondent.setId(ID_RESPONDENT_1);
+        caseData.setRespondentCollection(List.of(respondent));
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setLabel(RESPONDENT_NAME_1);
+        dynamicFixedListType.setValue(dynamicValueType);
+        caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().id(ID_REPRESENTATIVE_1).value(
+                RepresentedTypeR.builder()
+                        .dynamicRespRepName(dynamicFixedListType)
+                        .nameOfRepresentative(REPRESENTATIVE_NAME)
+                        .representativeEmailAddress("new@example.com")
+                        .build()).build()));
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId(DUMMY_SUBMISSION_REFERENCE);
+        caseDetails.setCaseData(caseData);
+        CaseDetails caseDetailsBefore = new CaseDetails();
+        caseDetailsBefore.setCaseId(DUMMY_SUBMISSION_REFERENCE);
+        caseDetailsBefore.setCaseData(previousCaseData);
+        CallbackRequest callbackRequest = CallbackRequest.builder()
+                .caseDetails(caseDetails)
+                .caseDetailsBefore(caseDetailsBefore)
+                .build();
+        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+
+        mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_SUBMIT)
+                        .content(jsonMapper.toJson(callbackRequest))
+                        .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, empty()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(caseFlagsService, times(1)).clearRespondentRepresentativeFlags(
+                any(CaseData.class), eq(List.of(0)));
+        verify(caseFlagsService, times(1)).setupCaseFlags(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
     void amendRespondentRepresentativeAboutToSubmitWithError() {
         CaseData caseData = new CaseData();
         RespondentSumTypeItem respondent = new RespondentSumTypeItem();
@@ -235,6 +369,8 @@ class RespondentRepresentativeControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(caseFlagsService, never()).setupCaseFlags(any(CaseData.class));
     }
 
     @Test

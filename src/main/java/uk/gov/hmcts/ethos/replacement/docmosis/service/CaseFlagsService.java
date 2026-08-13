@@ -9,13 +9,21 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AllPartyFlags;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -166,7 +174,8 @@ public class CaseFlagsService {
         return getCaseFlags(caseData) == null
                 || PARTY_FLAGS.stream()
                         .filter(flag -> isRequired(caseData, flag))
-                        .anyMatch(flag -> isMissingRole(caseData, flag));
+                        .anyMatch(flag -> partyFlagSetupRequired(caseData, flag))
+                || hasStaleRespondentRepresentativeFlags(caseData);
     }
 
     /**
@@ -179,9 +188,14 @@ public class CaseFlagsService {
             setCaseFlags(caseData, CaseFlagsType.builder().build());
         }
 
+        List<ExistingRepresentativeFlag> existingRepresentativeFlags = currentRespondentRepresentativeFlags(caseData);
+        alignIndexedFlagsWithCurrentOrder(caseData);
         PARTY_FLAGS.stream()
                 .filter(flag -> hasParty(caseData, flag))
                 .forEach(flag -> setupPartyFlag(caseData, flag));
+
+        alignRespondentRepresentativeFlagDetails(caseData, existingRepresentativeFlags);
+        clearStaleRespondentRepresentativeFlags(caseData);
     }
 
     /**
@@ -222,13 +236,12 @@ public class CaseFlagsService {
     }
 
     /**
-     * Inactivates all case flag details for a respondent with the supplied reason comment.
+     * Inactivates all case flag details for a respondent.
      *
      * @param caseData Data about the current case
      * @param respondentName Name of the respondent
-     * @param inactiveFlagComment Comment to add to each inactivated flag
      */
-    public void inactivateCaseFlags(CaseData caseData, String respondentName, String inactiveFlagComment) {
+    public void inactivateRespondentCaseFlags(CaseData caseData, String respondentName) {
         if (caseData == null || StringUtils.isBlank(respondentName)) {
             return;
         }
@@ -237,10 +250,10 @@ public class CaseFlagsService {
                 .filter(flag -> PartyType.RESPONDENT.equals(flag.partyType()))
                 .map(flag -> flag.get(caseData))
                 .filter(flags -> flags != null && Objects.equals(respondentName, flags.getPartyName()))
-                .forEach(flags -> inactivateCaseFlags(flags, inactiveFlagComment));
+                .forEach(this::inactivateCaseFlags);
     }
 
-    private void inactivateCaseFlags(CaseFlagsType flags, String inactiveFlagComment) {
+    private void inactivateCaseFlags(CaseFlagsType flags) {
         if (flags.getDetails() == null) {
             return;
         }
@@ -248,10 +261,56 @@ public class CaseFlagsService {
         flags.getDetails().stream()
                 .map(GenericTypeItem::getValue)
                 .filter(Objects::nonNull)
-                .forEach(flag -> {
-                    flag.setStatus(INACTIVE);
-                    flag.setFlagComment(inactiveFlagComment);
-                });
+                .forEach(flag -> flag.setStatus(INACTIVE));
+    }
+
+    /**
+     * Inactivates respondent representative flags when the representative no longer has active respondents.
+     *
+     * @param caseData Data about the current case
+     * @param inactiveRespondent Respondent that has become struck out or no longer continuing
+     */
+    public void inactivateRespondentRepresentativeCaseFlags(
+            CaseData caseData, RespondentSumTypeItem inactiveRespondent) {
+        if (caseData == null || inactiveRespondent == null || caseData.getRepCollection() == null) {
+            return;
+        }
+
+        List<RepresentativeIdentity> inactiveRepresentativeIdentities = caseData.getRepCollection().stream()
+                .map(RepresentedTypeRItem::getValue)
+                .filter(Objects::nonNull)
+                .filter(representative -> representsRespondent(representative, inactiveRespondent))
+                .map(CaseFlagsService::representativeIdentity)
+                .filter(Objects::nonNull)
+                .distinct()
+                .filter(identity -> !representsAnyActiveRespondent(caseData, identity))
+                .toList();
+
+        if (inactiveRepresentativeIdentities.isEmpty()) {
+            return;
+        }
+
+        PARTY_FLAGS.stream()
+                .filter(flag -> PartyType.RESPONDENT_REPRESENTATIVE.equals(flag.partyType()))
+                .filter(flag -> hasUniqueRepresentativeAtIndex(caseData, flag.index()))
+                .filter(flag -> inactiveRepresentativeIdentities.contains(representativeIdentity(
+                        caseData.getRepCollection().get(flag.index()).getValue())))
+                .map(flag -> flag.get(caseData))
+                .filter(Objects::nonNull)
+                .forEach(this::inactivateCaseFlags);
+    }
+
+    public void clearRespondentRepresentativeFlags(CaseData caseData, List<Integer> representativeIndexes) {
+        if (caseData == null || representativeIndexes == null || representativeIndexes.isEmpty()) {
+            return;
+        }
+
+        PARTY_FLAGS.stream()
+                .filter(flag -> PartyType.RESPONDENT_REPRESENTATIVE.equals(flag.partyType()))
+                .filter(flag -> representativeIndexes.contains(flag.index()))
+                .map(flag -> flag.get(caseData))
+                .filter(Objects::nonNull)
+                .forEach(flags -> flags.setDetails(null));
     }
 
     private static PartyFlag claimantFlag(
@@ -310,7 +369,7 @@ public class CaseFlagsService {
         return switch (flag.partyType()) {
             case CLAIMANT, CLAIMANT_REPRESENTATIVE -> true;
             case RESPONDENT -> respondentCount(caseData) > flag.index();
-            case RESPONDENT_REPRESENTATIVE -> representativeCount(caseData) > flag.index();
+            case RESPONDENT_REPRESENTATIVE -> hasUniqueRepresentativeAtIndex(caseData, flag.index());
         };
     }
 
@@ -319,24 +378,117 @@ public class CaseFlagsService {
             case CLAIMANT -> true;
             case RESPONDENT -> respondentCount(caseData) > flag.index();
             case CLAIMANT_REPRESENTATIVE -> caseData.getRepresentativeClaimantType() != null;
-            case RESPONDENT_REPRESENTATIVE -> representativeCount(caseData) > flag.index();
+            case RESPONDENT_REPRESENTATIVE -> hasUniqueRepresentativeAtIndex(caseData, flag.index());
         };
     }
 
-    private static boolean isMissingRole(CaseData caseData, PartyFlag flag) {
+    private static boolean partyFlagSetupRequired(CaseData caseData, PartyFlag flag) {
         CaseFlagsType flags = flag.get(caseData);
-        return flags == null || StringUtils.isEmpty(flags.getRoleOnCase());
+        return flags == null
+                || StringUtils.isEmpty(flags.getRoleOnCase())
+                || partyNameChanged(caseData, flag, flags);
+    }
+
+    private static boolean partyNameChanged(CaseData caseData, PartyFlag flag, CaseFlagsType flags) {
+        return hasParty(caseData, flag) && !Objects.equals(getPartyName(caseData, flag), flags.getPartyName());
+    }
+
+    private static void alignIndexedFlagsWithCurrentOrder(CaseData caseData) {
+        // Discontinuance can move indexed parties, so keep flag details with the named party
+        // before refreshing slot-specific roles.
+        alignIndexedPartyFlags(caseData, PartyType.RESPONDENT, INTERNAL, respondentCount(caseData));
+        alignIndexedPartyFlags(caseData, PartyType.RESPONDENT, EXTERNAL, respondentCount(caseData));
+        alignIndexedPartyFlags(
+                caseData, PartyType.RESPONDENT_REPRESENTATIVE, INTERNAL, representativeCount(caseData));
+        alignIndexedPartyFlags(
+                caseData, PartyType.RESPONDENT_REPRESENTATIVE, EXTERNAL, representativeCount(caseData));
+    }
+
+    private static void alignIndexedPartyFlags(
+            CaseData caseData, PartyType partyType, String visibility, int partyCount) {
+        List<PartyFlag> indexedFlags = PARTY_FLAGS.stream()
+                .filter(flag -> partyType.equals(flag.partyType()))
+                .filter(flag -> visibility.equals(flag.visibility()))
+                .toList();
+        List<String> currentPartyNames = currentPartyNames(caseData, indexedFlags, partyCount);
+        Map<String, CaseFlagsType> existingFlagsByPartyName = hasDuplicatePartyNames(currentPartyNames)
+                ? Map.of()
+                : existingFlagsByPartyName(caseData, indexedFlags);
+        List<CaseFlagsType> alignedFlags = new ArrayList<>();
+
+        for (PartyFlag flag : indexedFlags) {
+            if (flag.index() >= partyCount) {
+                alignedFlags.add(null);
+                continue;
+            }
+
+            String partyName = getPartyName(caseData, flag);
+            CaseFlagsType matchedFlag = existingFlagsByPartyName.get(partyName);
+            CaseFlagsType currentFlag = flag.get(caseData);
+            alignedFlags.add(matchedFlag != null
+                    ? matchedFlag
+                    : keepCurrentFlagIfItDoesNotBelongToAnotherParty(currentFlag, currentPartyNames, partyName));
+        }
+
+        for (int i = 0; i < indexedFlags.size(); i++) {
+            indexedFlags.get(i).set(caseData, alignedFlags.get(i));
+        }
+    }
+
+    private static Map<String, CaseFlagsType> existingFlagsByPartyName(
+            CaseData caseData, List<PartyFlag> indexedFlags) {
+        Map<String, CaseFlagsType> flagsByPartyName = new HashMap<>();
+        indexedFlags.stream()
+                .map(flag -> flag.get(caseData))
+                .filter(Objects::nonNull)
+                .filter(flags -> StringUtils.isNotBlank(flags.getPartyName()))
+                .forEach(flags -> flagsByPartyName.putIfAbsent(flags.getPartyName(), flags));
+        return flagsByPartyName;
+    }
+
+    private static List<String> currentPartyNames(CaseData caseData, List<PartyFlag> indexedFlags, int partyCount) {
+        return indexedFlags.stream()
+                .filter(flag -> flag.index() < partyCount)
+                .map(flag -> getPartyName(caseData, flag))
+                .toList();
+    }
+
+    private static boolean hasDuplicatePartyNames(List<String> partyNames) {
+        return partyNames.stream()
+                .filter(StringUtils::isNotBlank)
+                .distinct()
+                .count() < partyNames.stream()
+                .filter(StringUtils::isNotBlank)
+                .count();
+    }
+
+    private static CaseFlagsType keepCurrentFlagIfItDoesNotBelongToAnotherParty(
+            CaseFlagsType currentFlag, List<String> currentPartyNames, String partyName) {
+        if (currentFlag == null
+                || Objects.equals(currentFlag.getPartyName(), partyName)
+                || !currentPartyNames.contains(currentFlag.getPartyName())) {
+            return currentFlag;
+        }
+        return null;
     }
 
     private static void setupPartyFlag(CaseData caseData, PartyFlag flag) {
         String partyName = getPartyName(caseData, flag);
         CaseFlagsType existingFlag = flag.get(caseData);
 
-        if (existingFlag == null || StringUtils.isEmpty(existingFlag.getRoleOnCase())) {
+        if (existingFlag == null
+                || StringUtils.isEmpty(existingFlag.getRoleOnCase())
+                || shouldResetRespondentRepresentativeFlags(flag, existingFlag, partyName)) {
             flag.set(caseData, createShellFlag(partyName, flag.roleOnCase(), flag.visibility()));
-        } else if (!Objects.equals(partyName, existingFlag.getPartyName())) {
-            existingFlag.setPartyName(partyName);
+        } else {
+            updateShellFlag(existingFlag, partyName, flag.roleOnCase(), flag.visibility());
         }
+    }
+
+    private static boolean shouldResetRespondentRepresentativeFlags(
+            PartyFlag flag, CaseFlagsType existingFlag, String partyName) {
+        return PartyType.RESPONDENT_REPRESENTATIVE.equals(flag.partyType())
+                && !Objects.equals(partyName, existingFlag.getPartyName());
     }
 
     private static CaseFlagsType createShellFlag(String partyName, String roleOnCase, String visibility) {
@@ -346,6 +498,14 @@ public class CaseFlagsService {
                 .groupId(roleOnCase)
                 .visibility(visibility)
                 .build();
+    }
+
+    private static void updateShellFlag(CaseFlagsType existingFlag, String partyName, String roleOnCase,
+                                        String visibility) {
+        existingFlag.setPartyName(partyName);
+        existingFlag.setRoleOnCase(roleOnCase);
+        existingFlag.setGroupId(roleOnCase);
+        existingFlag.setVisibility(visibility);
     }
 
     private static String getPartyName(CaseData caseData, PartyFlag flag) {
@@ -367,8 +527,186 @@ public class CaseFlagsService {
         return caseData.getRespondentCollection() == null ? 0 : caseData.getRespondentCollection().size();
     }
 
+    private static boolean hasUniqueRepresentativeAtIndex(CaseData caseData, int index) {
+        return representativeCount(caseData) > index && !isDuplicateRepresentativeAtIndex(caseData, index);
+    }
+
     private static int representativeCount(CaseData caseData) {
         return caseData.getRepCollection() == null ? 0 : caseData.getRepCollection().size();
+    }
+
+    private static boolean representsAnyActiveRespondent(CaseData caseData, RepresentativeIdentity identity) {
+        if (caseData.getRespondentCollection() == null) {
+            return false;
+        }
+
+        return caseData.getRepCollection().stream()
+                .map(RepresentedTypeRItem::getValue)
+                .filter(Objects::nonNull)
+                .filter(representative -> Objects.equals(identity, representativeIdentity(representative)))
+                .anyMatch(representative -> caseData.getRespondentCollection().stream()
+                        .filter(CaseFlagsService::isActiveRespondent)
+                        .anyMatch(respondent -> representsRespondent(representative, respondent)));
+    }
+
+    private static boolean representsRespondent(RepresentedTypeR representative, RespondentSumTypeItem respondent) {
+        if (representative == null || respondent == null || respondent.getValue() == null) {
+            return false;
+        }
+
+        if (StringUtils.isNotBlank(representative.getRespondentId())) {
+            return Objects.equals(representative.getRespondentId(), respondent.getId());
+        }
+
+        return StringUtils.isNotBlank(representative.getRespRepName())
+                && Objects.equals(representative.getRespRepName(), respondentName(respondent));
+    }
+
+    private static boolean isActiveRespondent(RespondentSumTypeItem respondent) {
+        if (respondent == null || respondent.getValue() == null) {
+            return false;
+        }
+
+        RespondentSumType respondentValue = respondent.getValue();
+        return !YES.equals(respondentValue.getResponseStruckOut())
+                && !NO.equals(respondentValue.getResponseContinue());
+    }
+
+    private static String respondentName(RespondentSumTypeItem respondent) {
+        return respondent.getValue().getRespondentName();
+    }
+
+    private static boolean isDuplicateRepresentativeAtIndex(CaseData caseData, int index) {
+        RepresentativeIdentity identity = representativeIdentity(caseData.getRepCollection().get(index).getValue());
+        if (identity == null) {
+            return false;
+        }
+
+        for (int i = 0; i < index; i++) {
+            if (Objects.equals(identity, representativeIdentity(caseData.getRepCollection().get(i).getValue()))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Nullable
+    private static RepresentativeIdentity representativeIdentity(RepresentedTypeR representative) {
+        if (representative == null
+                || StringUtils.isAllBlank(
+                representative.getNameOfRepresentative(), representative.getRepresentativeEmailAddress())) {
+            return null;
+        }
+
+        return new RepresentativeIdentity(
+                normaliseRepresentativeIdentity(representative.getNameOfRepresentative()),
+                normaliseRepresentativeIdentity(representative.getRepresentativeEmailAddress())
+        );
+    }
+
+    private static String normaliseRepresentativeIdentity(String value) {
+        return StringUtils.trimToEmpty(value).toLowerCase(Locale.ROOT);
+    }
+
+    private static List<ExistingRepresentativeFlag> currentRespondentRepresentativeFlags(CaseData caseData) {
+        return PARTY_FLAGS.stream()
+                .filter(flag -> PartyType.RESPONDENT_REPRESENTATIVE.equals(flag.partyType()))
+                .map(flag -> existingRepresentativeFlag(caseData, flag))
+                .toList();
+    }
+
+    private static ExistingRepresentativeFlag existingRepresentativeFlag(CaseData caseData, PartyFlag flag) {
+        CaseFlagsType flags = flag.get(caseData);
+        return new ExistingRepresentativeFlag(
+                flag.index(),
+                flag.visibility(),
+                flags == null ? null : flags.getPartyName(),
+                flags == null ? null : flags.getDetails()
+        );
+    }
+
+    private static void alignRespondentRepresentativeFlagDetails(
+            CaseData caseData, List<ExistingRepresentativeFlag> existingRepresentativeFlags) {
+        PARTY_FLAGS.stream()
+                .filter(flag -> PartyType.RESPONDENT_REPRESENTATIVE.equals(flag.partyType()))
+                .filter(flag -> hasUniqueRepresentativeAtIndex(caseData, flag.index()))
+                .forEach(flag -> alignRepresentativeFlagDetails(caseData, flag, existingRepresentativeFlags));
+    }
+
+    private static void alignRepresentativeFlagDetails(
+            CaseData caseData,
+            PartyFlag targetFlag,
+            List<ExistingRepresentativeFlag> existingRepresentativeFlags) {
+        CaseFlagsType target = targetFlag.get(caseData);
+        if (target == null) {
+            return;
+        }
+
+        target.setDetails(concatFlagDetails(
+                target.getDetails(),
+                staleRepresentativeFlagDetails(caseData, targetFlag, target, existingRepresentativeFlags)));
+    }
+
+    private static ListTypeItem<FlagDetailType> concatFlagDetails(
+            ListTypeItem<FlagDetailType> existing, ListTypeItem<FlagDetailType> additional) {
+        if (additional == null) {
+            return existing;
+        }
+        return ListTypeItem.concat(existing, additional);
+    }
+
+    private static ListTypeItem<FlagDetailType> staleRepresentativeFlagDetails(
+            CaseData caseData,
+            PartyFlag targetFlag,
+            CaseFlagsType target,
+            List<ExistingRepresentativeFlag> existingRepresentativeFlags) {
+        String targetPartyName = target.getPartyName();
+        if (StringUtils.isBlank(targetPartyName)) {
+            return null;
+        }
+
+        ListTypeItem<FlagDetailType> details = null;
+        for (ExistingRepresentativeFlag existingFlag : existingRepresentativeFlags) {
+            if (existingFlag.index() == targetFlag.index()
+                    || existingRepresentativeFlagStillMatchesCurrentUniqueParty(caseData, existingFlag)
+                    || Objects.equals(existingFlag.details(), target.getDetails())
+                    || !Objects.equals(existingFlag.visibility(), targetFlag.visibility())
+                    || !Objects.equals(existingFlag.partyName(), targetPartyName)) {
+                continue;
+            }
+
+            details = concatFlagDetails(details, existingFlag.details());
+        }
+        return details;
+    }
+
+    private static boolean existingRepresentativeFlagStillMatchesCurrentUniqueParty(
+            CaseData caseData, ExistingRepresentativeFlag existingFlag) {
+        String currentPartyName = currentRepresentativePartyName(caseData, existingFlag.index());
+        return hasUniqueRepresentativeAtIndex(caseData, existingFlag.index())
+                && Objects.equals(existingFlag.partyName(), currentPartyName);
+    }
+
+    private static String currentRepresentativePartyName(CaseData caseData, int index) {
+        if (representativeCount(caseData) <= index || caseData.getRepCollection().get(index).getValue() == null) {
+            return null;
+        }
+        return caseData.getRepCollection().get(index).getValue().getNameOfRepresentative();
+    }
+
+    private static void clearStaleRespondentRepresentativeFlags(CaseData caseData) {
+        PARTY_FLAGS.stream()
+                .filter(flag -> PartyType.RESPONDENT_REPRESENTATIVE.equals(flag.partyType()))
+                .filter(flag -> !hasUniqueRepresentativeAtIndex(caseData, flag.index()))
+                .forEach(flag -> flag.clear(caseData));
+    }
+
+    private static boolean hasStaleRespondentRepresentativeFlags(CaseData caseData) {
+        return PARTY_FLAGS.stream()
+                .filter(flag -> PartyType.RESPONDENT_REPRESENTATIVE.equals(flag.partyType()))
+                .filter(flag -> !hasUniqueRepresentativeAtIndex(caseData, flag.index()))
+                .anyMatch(flag -> flag.get(caseData) != null);
     }
 
     private boolean isFlaggedForRestrictedReporting(CaseData caseData) {
@@ -460,5 +798,19 @@ public class CaseFlagsService {
                 setter.accept(allPartyFlags, null);
             }
         }
+    }
+
+    /**
+     * This lets the service move flag details when representative slots reorder, and then clear stale/duplicate
+     * representative flag slots.
+     */
+    private record ExistingRepresentativeFlag(
+            int index,
+            String visibility,
+            String partyName,
+            ListTypeItem<FlagDetailType> details) {
+    }
+
+    private record RepresentativeIdentity(String name, String email) {
     }
 }

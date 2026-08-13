@@ -39,6 +39,7 @@ public class CaseActionsForCaseWorkerControllerFunctionalTest extends BaseFuncti
         CaseData caseData = CaseDataBuilder.builder()
                 .withEthosCaseReference("6000001/2023")
                 .withClaimant("claimant")
+                .withClaimantIndType("Claimant", "LastName")
                 .withRespondent(RESPONDENT_NAME, NO, null, false)
                 .build();
 

@@ -256,6 +256,58 @@ class NocClaimantRepresentativeServiceTest {
     }
 
     @Test
+    void shouldReturnChangeRequestWithOrganisationToRemoveWhenNameChanges() {
+        Organisation org = Organisation.builder().organisationID("SAME").build();
+        CaseData after = new CaseData();
+        CaseData before = new CaseData();
+        after.setRepresentativeClaimantType(RepresentedTypeC.builder()
+                .nameOfRepresentative("New Representative")
+                .representativeEmailAddress("claimant.rep@example.com")
+                .myHmctsOrganisation(org)
+                .build());
+        before.setRepresentativeClaimantType(RepresentedTypeC.builder()
+                .nameOfRepresentative("Old Representative")
+                .representativeEmailAddress("claimant.rep@example.com")
+                .myHmctsOrganisation(org)
+                .build());
+
+        ChangeOrganisationRequest expected = ChangeOrganisationRequest.builder().build();
+        when(NocUtils.buildApprovedChangeOrganisationRequest(org, org,
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(expected);
+
+        ChangeOrganisationRequest result =
+                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before);
+
+        assertThat(result).isSameAs(expected);
+    }
+
+    @Test
+    void shouldReturnChangeRequestWithOrganisationToRemoveWhenEmailChanges() {
+        Organisation org = Organisation.builder().organisationID("SAME").build();
+        CaseData after = new CaseData();
+        CaseData before = new CaseData();
+        after.setRepresentativeClaimantType(RepresentedTypeC.builder()
+                .nameOfRepresentative("Claimant Representative")
+                .representativeEmailAddress("new.claimant.rep@example.com")
+                .myHmctsOrganisation(org)
+                .build());
+        before.setRepresentativeClaimantType(RepresentedTypeC.builder()
+                .nameOfRepresentative("Claimant Representative")
+                .representativeEmailAddress("old.claimant.rep@example.com")
+                .myHmctsOrganisation(org)
+                .build());
+
+        ChangeOrganisationRequest expected = ChangeOrganisationRequest.builder().build();
+        when(NocUtils.buildApprovedChangeOrganisationRequest(org, org,
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(expected);
+
+        ChangeOrganisationRequest result =
+                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before);
+
+        assertThat(result).isSameAs(expected);
+    }
+
+    @Test
     void shouldHandleNullRepresentativeClaimantType() {
         CaseData after = new CaseData();
         CaseData before = new CaseData();

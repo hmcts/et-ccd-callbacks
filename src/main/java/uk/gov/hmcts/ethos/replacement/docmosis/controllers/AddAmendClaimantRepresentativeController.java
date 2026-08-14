@@ -90,7 +90,7 @@ public class AddAmendClaimantRepresentativeController {
     /**
      * AboutToSubmit for addAmendClaimantRepresentative. Sets the claimant rep's id.
      *
-     * @param ccdRequest holds the request and case data
+     * @param callbackRequest holds the request and case data
      * @return Callback response entity with case data attached.
      */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
@@ -105,22 +105,26 @@ public class AddAmendClaimantRepresentativeController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
-            @RequestBody CCDRequest ccdRequest) {
-        CaseDataUtils.validateCCDRequest(ccdRequest);
+            @RequestBody CallbackRequest callbackRequest) {
+        CaseDataUtils.validateCaseDetails(callbackRequest.getCaseDetails());
         List<String> errors = new ArrayList<>();
         String error = nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisationMatch(
-                ccdRequest.getCaseDetails());
+                callbackRequest.getCaseDetails());
         if (StringUtils.isNotBlank(error)) {
             errors.add(error);
         }
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
         if (errors.isEmpty()) {
             ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData);
             nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(
-                    ccdRequest.getCaseDetails());
+                    callbackRequest.getCaseDetails());
         }
 
         if (featureToggleService.isCaseFlagsEnabled()) {
+            caseFlagsService.clearClaimantRepresentativeFlagsIfRepresentativeChanged(caseData,
+                    callbackRequest.getCaseDetailsBefore() == null
+                            ? null
+                            : callbackRequest.getCaseDetailsBefore().getCaseData());
             caseFlagsService.setupCaseFlags(caseData);
         }
 

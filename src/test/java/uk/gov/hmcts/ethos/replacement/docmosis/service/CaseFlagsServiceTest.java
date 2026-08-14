@@ -231,6 +231,39 @@ class CaseFlagsServiceTest {
     }
 
     @Test
+    void setupCaseFlags_shouldUseSolicitorRoleForRepresentativeFlagSlotWhenRespondentHasNoRepresentative() {
+        caseData.setRespondentCollection(respondentCollection(4));
+        List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
+        caseData.setRepCollection(List.of(
+                representativeItemForRespondent(
+                        "1", "Representative 1", "rep1@example.com", respondents.get(0), "[SOLICITORA]"),
+                representativeItemForRespondent(
+                        "2", "Representative 2", "rep2@example.com", respondents.get(1), "[SOLICITORB]"),
+                representativeItemForRespondent(
+                        "4", "Representative 3", "rep3@example.com", respondents.get(3), "[SOLICITORD]")
+        ));
+
+        caseFlagsService.setupCaseFlags(caseData);
+
+        AllPartyFlags allPartyFlags = allPartyFlags(caseData);
+        assertAll(
+                () -> assertEquals("Representative 1", allPartyFlags.getRepresentativeFlags().getPartyName()),
+                () -> assertEquals("Representative 2", allPartyFlags.getRepresentative1Flags().getPartyName()),
+                () -> assertNull(allPartyFlags.getRepresentative2Flags()),
+                () -> assertNull(allPartyFlags.getRepresentative2ExternalFlags()),
+                () -> assertEquals("Representative 3", allPartyFlags.getRepresentative3Flags().getPartyName()),
+                () -> assertEquals(REPRESENTATIVE4, allPartyFlags.getRepresentative3Flags().getRoleOnCase()),
+                () -> assertEquals(INTERNAL, allPartyFlags.getRepresentative3Flags().getVisibility()),
+                () -> assertEquals(
+                        "Representative 3", allPartyFlags.getRepresentative3ExternalFlags().getPartyName()),
+                () -> assertEquals(
+                        REPRESENTATIVE4, allPartyFlags.getRepresentative3ExternalFlags().getRoleOnCase()),
+                () -> assertEquals(EXTERNAL, allPartyFlags.getRepresentative3ExternalFlags().getVisibility()),
+                () -> assertFalse(caseFlagsService.caseFlagsSetupRequired(caseData))
+        );
+    }
+
+    @Test
     void setupCaseFlags_shouldReuseRespondentRepresentativeFlagsForTheSameRepresentativeWithoutCompactingSlots() {
         String sharedRepresentativeName = "Shared Representative";
         String otherRepresentativeName = "Other Representative";
@@ -659,6 +692,36 @@ class CaseFlagsServiceTest {
     }
 
     @Test
+    void clearRespondentRepresentativeFlags_shouldClearTheRepresentativesRoleAlignedFlagSlot() {
+        caseData.setRespondentCollection(respondentCollection(4));
+        List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
+        caseData.setRepCollection(List.of(
+                representativeItemForRespondent(
+                        "1", "Representative 1", "rep1@example.com", respondents.get(0), "[SOLICITORA]"),
+                representativeItemForRespondent(
+                        "2", "Representative 2", "rep2@example.com", respondents.get(1), "[SOLICITORB]"),
+                representativeItemForRespondent(
+                        "4", "Representative 3", "rep3@example.com", respondents.get(3), "[SOLICITORD]")
+        ));
+        caseFlagsService.setupCaseFlags(caseData);
+        AllPartyFlags allPartyFlags = allPartyFlags(caseData);
+        CaseFlagsType representativeInternalFlags = allPartyFlags.getRepresentative3Flags();
+        CaseFlagsType representativeExternalFlags = allPartyFlags.getRepresentative3ExternalFlags();
+        representativeInternalFlags.setDetails(ListTypeItem.from(activeFlag("Representative internal flag")));
+        representativeExternalFlags.setDetails(ListTypeItem.from(activeFlag("Representative external flag")));
+
+        caseFlagsService.clearRespondentRepresentativeFlags(caseData, List.of(2));
+
+        assertAll(
+                () -> assertNull(representativeInternalFlags.getDetails()),
+                () -> assertNull(representativeExternalFlags.getDetails()),
+                () -> assertNotNull(allPartyFlags.getRepresentativeFlags()),
+                () -> assertNotNull(allPartyFlags.getRepresentative1Flags()),
+                () -> assertNull(allPartyFlags.getRepresentative2Flags())
+        );
+    }
+
+    @Test
     void setupCaseFlags_shouldMoveRespondentFlagsWithRespondentWhenCollectionIsReordered() {
         caseData.setRespondentCollection(respondentCollection(3));
         caseFlagsService.setupCaseFlags(caseData);
@@ -822,6 +885,71 @@ class CaseFlagsServiceTest {
         assertEquals(CLAIMANT_REPRESENTATIVE, claimantRepresentativeExternalFlags.getRoleOnCase());
         assertEquals(CLAIMANT_REPRESENTATIVE, claimantRepresentativeExternalFlags.getGroupId());
         assertEquals(EXTERNAL, claimantRepresentativeExternalFlags.getVisibility());
+    }
+
+    @Test
+    void clearClaimantRepresentativeFlagsIfRepresentativeChanged_shouldRemoveDetailsWhenNameChanges() {
+        CaseData caseDataBefore = CaseDataBuilder.builder().build();
+        caseDataBefore.setRepresentativeClaimantType(RepresentedTypeC.builder()
+                .nameOfRepresentative(CLAIMANT_REPRESENTATIVE_NAME)
+                .representativeEmailAddress("claimant.rep@example.com")
+                .build());
+        caseData.getRepresentativeClaimantType().setRepresentativeEmailAddress("claimant.rep@example.com");
+        caseFlagsService.setupCaseFlags(caseData);
+        allPartyFlags(caseData).getClaimantRepresentativeFlags()
+                .setDetails(ListTypeItem.from(activeFlag("Previous internal rep flag")));
+        allPartyFlags(caseData).getClaimantRepresentativeExternalFlags()
+                .setDetails(ListTypeItem.from(activeFlag("Previous external rep flag")));
+        caseData.getRepresentativeClaimantType().setNameOfRepresentative("Updated Claimant Representative Name");
+
+        caseFlagsService.clearClaimantRepresentativeFlagsIfRepresentativeChanged(caseData, caseDataBefore);
+        caseFlagsService.setupCaseFlags(caseData);
+
+        assertNull(allPartyFlags(caseData).getClaimantRepresentativeFlags().getDetails());
+        assertNull(allPartyFlags(caseData).getClaimantRepresentativeExternalFlags().getDetails());
+        assertEquals("Updated Claimant Representative Name",
+                allPartyFlags(caseData).getClaimantRepresentativeExternalFlags().getPartyName());
+    }
+
+    @Test
+    void clearClaimantRepresentativeFlagsIfRepresentativeChanged_shouldRemoveDetailsWhenEmailChanges() {
+        CaseData caseDataBefore = CaseDataBuilder.builder().build();
+        caseDataBefore.setRepresentativeClaimantType(RepresentedTypeC.builder()
+                .nameOfRepresentative(CLAIMANT_REPRESENTATIVE_NAME)
+                .representativeEmailAddress("old.claimant.rep@example.com")
+                .build());
+        caseData.getRepresentativeClaimantType().setRepresentativeEmailAddress("new.claimant.rep@example.com");
+        caseFlagsService.setupCaseFlags(caseData);
+        allPartyFlags(caseData).getClaimantRepresentativeFlags()
+                .setDetails(ListTypeItem.from(activeFlag("Previous internal rep flag")));
+        allPartyFlags(caseData).getClaimantRepresentativeExternalFlags()
+                .setDetails(ListTypeItem.from(activeFlag("Previous external rep flag")));
+
+        caseFlagsService.clearClaimantRepresentativeFlagsIfRepresentativeChanged(caseData, caseDataBefore);
+        caseFlagsService.setupCaseFlags(caseData);
+
+        assertNull(allPartyFlags(caseData).getClaimantRepresentativeFlags().getDetails());
+        assertNull(allPartyFlags(caseData).getClaimantRepresentativeExternalFlags().getDetails());
+        assertEquals(CLAIMANT_REPRESENTATIVE_NAME,
+                allPartyFlags(caseData).getClaimantRepresentativeExternalFlags().getPartyName());
+    }
+
+    @Test
+    void clearClaimantRepresentativeFlagsIfRepresentativeChanged_shouldKeepDetailsWhenOnlyOrganisationChanges() {
+        CaseData caseDataBefore = CaseDataBuilder.builder().build();
+        caseDataBefore.setRepresentativeClaimantType(RepresentedTypeC.builder()
+                .nameOfRepresentative(CLAIMANT_REPRESENTATIVE_NAME)
+                .representativeEmailAddress("claimant.rep@example.com")
+                .build());
+        caseData.getRepresentativeClaimantType().setRepresentativeEmailAddress("claimant.rep@example.com");
+        caseFlagsService.setupCaseFlags(caseData);
+        allPartyFlags(caseData).getClaimantRepresentativeExternalFlags()
+                .setDetails(ListTypeItem.from(activeFlag("Existing external rep flag")));
+
+        caseFlagsService.clearClaimantRepresentativeFlagsIfRepresentativeChanged(caseData, caseDataBefore);
+        caseFlagsService.setupCaseFlags(caseData);
+
+        assertNotNull(allPartyFlags(caseData).getClaimantRepresentativeExternalFlags().getDetails());
     }
 
     @ParameterizedTest(name = "{0}")
@@ -1261,11 +1389,17 @@ class CaseFlagsServiceTest {
 
     private static RepresentedTypeRItem representativeItemForRespondent(
             String id, String name, String email, RespondentSumTypeItem respondent) {
+        return representativeItemForRespondent(id, name, email, respondent, null);
+    }
+
+    private static RepresentedTypeRItem representativeItemForRespondent(
+            String id, String name, String email, RespondentSumTypeItem respondent, String role) {
         RepresentedTypeR representative = RepresentedTypeR.builder()
                 .nameOfRepresentative(name)
                 .representativeEmailAddress(email)
                 .respondentId(respondent.getId())
                 .respRepName(respondent.getValue().getRespondentName())
+                .role(role)
                 .build();
         return representativeItem(id, representative);
     }

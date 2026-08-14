@@ -79,14 +79,14 @@ public class AddAmendClaimantRepresentativeControllerFunctionalTest extends Base
                 .body(callbackRequest)
                 .post(ABOUT_TO_SUBMIT_URL)
                 .then()
-                .statusCode(HttpStatus.SC_OK)
-                .body("data.allPartyFlags.claimantRepresentativeFlags.partyName", equalTo(NEW_REPRESENTATIVE_NAME))
-                .body("data.allPartyFlags.claimantRepresentativeFlags.details", nullValue())
-                .body("data.allPartyFlags.claimantRepresentativeExternalFlags.partyName",
-                        equalTo(NEW_REPRESENTATIVE_NAME))
-                .body("data.allPartyFlags.claimantRepresentativeExternalFlags.details", nullValue())
                 .log()
-                .all(true);
+                .ifValidationFails()
+                .statusCode(HttpStatus.SC_OK)
+                .body("data.claimantRepresentativeFlags.partyName", equalTo(NEW_REPRESENTATIVE_NAME))
+                .body("data.claimantRepresentativeFlags.details", nullValue())
+                .body("data.claimantRepresentativeExternalFlags.partyName",
+                        equalTo(NEW_REPRESENTATIVE_NAME))
+                .body("data.claimantRepresentativeExternalFlags.details", nullValue());
     }
 
     @Test

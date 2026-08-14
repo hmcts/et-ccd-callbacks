@@ -61,7 +61,7 @@ export default class Et3LoginPage extends LoginPage {
     firstName: string,
     lastName: string,
   ) {
-    await this.page.goto(config.etSyrUiUrl + '/case-list');
+    await this.page.goto(config.etSyrUiUrl + 'case-list');
     await expect(this.page.locator('#main-content')).toContainText('ET3 Responses');
     await this.respondToNewClaim.click();
     await this.enterCaseNumberDetail(caseNumber);
@@ -104,7 +104,7 @@ export default class Et3LoginPage extends LoginPage {
   }
 
   async navigateToCase(caseNumber: string, caseId: string) {
-    await this.page.goto(config.etSyrUiUrl + '/case-list');
+    await this.page.goto(config.etSyrUiUrl + 'case-list');
     await this.page.waitForLoadState('load');
     await expect(this.page.locator('#main-content')).toContainText('ET3 Responses');
     await expect(this.respondToNewClaim).toBeVisible();

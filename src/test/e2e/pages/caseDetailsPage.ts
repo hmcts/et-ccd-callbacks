@@ -16,26 +16,26 @@ export default class CaseDetailsPage extends BasePage {
   }
 
   async addVPCaseFlag() {
-        await this.page.locator('text=Managing Office').waitFor({ state: 'visible' });
-        await this.page.locator('#allocatedOffice').selectOption('1: Glasgow');
-        await this.clickContinue();
-        await this.page.locator('text=Single or Multiple').waitFor({ state: 'visible' });
-        await this.clickContinue();
-        await this.page.locator('text=Speak to VP (Optional)').waitFor({ state: 'visible' });
-        await this.page.locator('#additionalCaseInfo_interventionRequired_Yes').scrollIntoViewIfNeeded();
-        await this.page.locator('#additionalCaseInfo_interventionRequired_Yes').click();
-        await this.clickContinue();
-        await this.page.locator('text=Check your answers').waitFor({ state: 'visible' });
-        await this.clickSubmitButton();
+    await this.page.locator('text=Managing Office').waitFor({ state: 'visible' });
+    await this.page.locator('#allocatedOffice').selectOption('1: Glasgow');
+    await this.clickContinue();
+    await this.page.locator('text=Single or Multiple').waitFor({ state: 'visible' });
+    await this.clickContinue();
+    await this.page.locator('text=Speak to VP (Optional)').waitFor({ state: 'visible' });
+    await this.page.locator('#additionalCaseInfo_interventionRequired_Yes').scrollIntoViewIfNeeded();
+    await this.page.locator('#additionalCaseInfo_interventionRequired_Yes').click();
+    await this.clickContinue();
+    await this.page.locator('text=Check your answers').waitFor({ state: 'visible' });
+    await this.clickSubmitButton();
 
-        await expect(this.page.getByRole('tab', { name: 'Case Details' }).locator('div')).toContainText('Case Details');
-        await expect(this.page.getByText('SPEAK TO VP', { exact: true })).toBeVisible();
-    }
+    await expect(this.page.getByRole('tab', { name: 'Case Details' }).locator('div')).toContainText('Case Details');
+    await expect(this.page.getByText('SPEAK TO VP', { exact: true })).toBeVisible();
+  }
 
   async checkHasBeenCreated(event: CaseEvent) {
-      await expect(this.page.locator('//div[@class="alert-message"]')).toBeVisible();
-      const successMessage = this.page.getByText(`has been updated with event: ${event.listItem}`);
-      await expect(successMessage).toBeVisible();
+    await expect(this.page.locator('//div[@class="alert-message"]')).toBeVisible();
+    const successMessage = this.page.getByText(`has been updated with event: ${event.listItem}`);
+    await expect(successMessage).toBeVisible();
   }
 
   async assertTabData(tabs: Tab[]) {
@@ -115,7 +115,7 @@ export default class CaseDetailsPage extends BasePage {
             `xpath=following-sibling::*[self::td or self::th][${i + 1}] | ancestor::*[self::td or self::th or self::tr][1]/following-sibling::*[self::td or self::th][${i + 1}]`
           );
           if (!content.exact) {
-           //await expect(tabValue).toContainText(expectedValues[i]);
+            await expect(tabValue).toContainText(expectedValues[i]);
           } else {
             await expect(tabValue).toHaveText(expectedValues[i]);
           }
@@ -151,7 +151,11 @@ export default class CaseDetailsPage extends BasePage {
    * 5. Throws an error if the requested visible position does not exist.
    */
   private async getVisibleTabContent(content: string, position: number = 0, exact: boolean = true): Promise<Locator> {
-    const locator = this.page.getByText(content, { exact });
+    // active tab area
+    const activeTabContent = this.page.locator('mat-tab-body.mat-tab-body-active .mat-tab-body-content');
+    await expect(activeTabContent).toBeVisible();
+
+    const locator = activeTabContent.getByText(content, { exact });
     // Wait for at least one matching element to be attached
     await locator.first().waitFor({ state: 'attached', timeout: 10000 }).catch(() => {});
     const count = await locator.count();
@@ -268,7 +272,7 @@ export default class CaseDetailsPage extends BasePage {
     try {
       await this.page.waitForLoadState('load');
       tabHeader = this.page.locator(xpath);
-      await tabHeader.click({ trial: true, timeout:4000 }); // trial: true checks if clickable
+      await tabHeader.click({ trial: true, timeout:2000 }); // trial: true checks if clickable
       await tabHeader.click();
       console.log('Clicked on tab: ' + tabName);
       return;

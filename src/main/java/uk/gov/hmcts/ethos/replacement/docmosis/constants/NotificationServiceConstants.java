@@ -31,6 +31,16 @@ public final class NotificationServiceConstants {
     public static final String APPLICANT_NAME = "applicantName";
     public static final String LINK_TO_CIT_UI = "linkToCitUI";
     public static final String PARTY_NAME = "party_name";
+    public static final String LEGAL_REP_NAME = "legalRepName";
+    public static final String LEGAL_REP_ORG = "legalRepOrg";
+
+    public static final String EMAIL_TYPE_TO_ORG_ADMIN_NO_REP_LEFT = "orgAdminNoRepLeft";
+    public static final String EMAIL_TYPE_TO_ORG_ADMIN_REMOVED = "orgAdminRemoved";
+
+    public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_REMOVED_REPRESENTATIVE =
+            "Failed to send email to removed legal representative, case id: {}, error: {}";
+    public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_UNREPRESENTED_PARTY =
+            "Failed to send email to unrepresented party, case id: {}, error: {}";
 
     private NotificationServiceConstants() {
         // restrict instantiation

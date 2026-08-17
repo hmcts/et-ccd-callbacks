@@ -188,7 +188,7 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "respondentsToRemoveRep",
+    "CaseFieldID": "respondents",
     "AccessControl": [
       {
         "UserRoles": [

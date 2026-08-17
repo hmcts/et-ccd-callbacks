@@ -1936,6 +1936,10 @@ public class CaseData extends Et1CaseData {
     // Remove representation variables
     @JsonProperty("nocRemoveRepOption")
     private String nocRemoveRepOption;
-    @JsonProperty("respondentsToRemoveRep")
-    private DynamicMultiSelectListType respondentsToRemoveRep;
+    /**
+     * List of respondents displayed in the dynamic multi-select,
+     * allowing the user to select which respondent(s) to process.
+     */
+    @JsonProperty("respondents")
+    private DynamicMultiSelectListType respondents;
 }

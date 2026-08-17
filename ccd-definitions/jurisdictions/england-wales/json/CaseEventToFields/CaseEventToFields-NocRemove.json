@@ -104,7 +104,7 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "nocRemoveRepRespondent",
-    "CaseFieldID": "respondentsToRemoveRep",
+    "CaseFieldID": "respondents",
     "DisplayContext": "MANDATORY",
     "PageID": 3,
     "PageDisplayOrder": 3,

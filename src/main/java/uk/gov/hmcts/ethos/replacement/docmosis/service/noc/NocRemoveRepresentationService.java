@@ -225,7 +225,7 @@ public class NocRemoveRepresentationService {
         }
         DynamicMultiSelectListType dynamicMultiSelectListType = new DynamicMultiSelectListType();
         dynamicMultiSelectListType.setListItems(respondents);
-        caseDetails.getCaseData().setRespondentsToRemoveRep(dynamicMultiSelectListType);
+        caseDetails.getCaseData().setRespondents(dynamicMultiSelectListType);
     }
 
 }

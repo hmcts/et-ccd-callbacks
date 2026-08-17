@@ -43,7 +43,7 @@ export default class Et1CaseServingPage extends BasePage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.servingDocUpload,
-      `resources/test_file/welshTest.pdf`
+      `src/test/e2e/resources/test_file/welshTest.pdf`
     );
     await this.page.waitForTimeout(3000);
     await this.servingDocShortDesc.fill('ET1 serving');
@@ -56,7 +56,7 @@ export default class Et1CaseServingPage extends BasePage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.servingDocUpload,
-      `resources/test_file/welshTest.pdf`
+      `src/test/e2e/resources/test_file/welshTest.pdf`
     );
     await this.page.waitForTimeout(3000);
     await this.servingDocShortDesc.fill('ET1 serving');

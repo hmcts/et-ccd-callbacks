@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 branchName=$1
 
 #Checkout specific branch pf  camunda bpmn definition
@@ -7,7 +9,7 @@ git clone https://github.com/hmcts/et-wa-task-configuration.git
 cd et-wa-task-configuration
 
 echo "Switch to ${branchName} branch on et-wa-task-configuration"
-git checkout ${branchName}
+git checkout "${branchName}"
 cd ..
 
 #Copy camunda folder which contains dmn files

@@ -74,5 +74,13 @@
     "FieldTypeParameter": "msl_NocRemove_Notice",
     "SecurityClassification": "Public",
     "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "respondents",
+    "Label": "Select the client you wish to end representation of",
+    "HintText": "Select a respondent or respondents",
+    "FieldType": "DynamicMultiSelectList",
+    "SecurityClassification": "Public"
   }
 ]

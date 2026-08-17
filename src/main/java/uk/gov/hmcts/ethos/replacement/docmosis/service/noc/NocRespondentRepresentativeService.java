@@ -56,6 +56,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.apache.commons.lang3.ObjectUtils.getIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -1120,8 +1121,8 @@ public class NocRespondentRepresentativeService {
     public CaseData updateRespondentRepresentation(CaseDetails caseDetails) throws IOException {
         CaseData caseData = caseDetails.getCaseData();
         resetRespondentRepresentativeRemovedField(caseData);
-        Map<String, Object> caseDataAsMap = caseConverter.toMap(caseData);
         Map<String, Object> repCollection = updateRepresentationMap(caseData, caseDetails.getCaseId());
+        Map<String, Object> caseDataAsMap = caseConverter.toMap(caseData);
         caseDataAsMap.putAll(repCollection);
         return  caseConverter.convert(caseDataAsMap, CaseData.class);
     }
@@ -1158,10 +1159,13 @@ public class NocRespondentRepresentativeService {
         List<RepresentedTypeRItem> repCollection = getIfNull(caseData.getRepCollection(), new ArrayList<>());
         int repIndex = nocRespondentHelper.getIndexOfRep(respondent, repCollection);
         if (repIndex >= 0) {
+            respondent.getValue().setRepresentativeId(repCollection.get(repIndex).getId());
             repCollection.get(repIndex).setValue(addedSolicitor);
         } else {
-            //assumption is NOC will take care of replacing value in org policy
             RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
+            String representativeId = UUID.randomUUID().toString();
+            representedTypeRItem.setId(representativeId);
+            respondent.getValue().setRepresentativeId(representativeId);
             representedTypeRItem.setValue(addedSolicitor);
             repCollection.add(representedTypeRItem);
         }

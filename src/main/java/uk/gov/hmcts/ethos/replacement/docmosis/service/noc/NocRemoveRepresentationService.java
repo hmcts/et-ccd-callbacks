@@ -8,6 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicMultiSelectListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
@@ -22,9 +24,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EMAIL_TYPE_TO_ORG_ADMIN_NO_REP_LEFT;
@@ -197,4 +201,31 @@ public class NocRemoveRepresentationService {
         }
         return currentRepList;
     }
+
+    public void loadRespondentsForRepresentationRemoval(CaseDetails caseDetails, String userToken) {
+        List<RepresentedTypeRItem> currentRepList =
+                nocRespondentRepresentativeService.findRepresentativesByToken(userToken, caseDetails);
+        if (CollectionUtils.isEmpty(currentRepList)) {
+            throw new NotFoundException(String.format(EXCEPTION_REPRESENTATIVE_NOT_FOUND, caseDetails.getCaseId()));
+        }
+        List<DynamicValueType> respondents = new ArrayList<>();
+        for (RepresentedTypeRItem representative : currentRepList) {
+            if (!RespondentRepresentativeUtils.isValidRepresentative(representative)) {
+                continue;
+            }
+            RespondentSumTypeItem respondent = RespondentRepresentativeUtils.findRespondentByRepresentative(
+                    caseDetails.getCaseData(), representative);
+            if (RespondentUtils.isValidRespondent(respondent)) {
+                assert respondent != null;
+                DynamicValueType dynamicValueType = new DynamicValueType();
+                dynamicValueType.setCode(respondent.getId());
+                dynamicValueType.setLabel(respondent.getValue().getRespondentName());
+                respondents.add(dynamicValueType);
+            }
+        }
+        DynamicMultiSelectListType dynamicMultiSelectListType = new DynamicMultiSelectListType();
+        dynamicMultiSelectListType.setListItems(respondents);
+        caseDetails.getCaseData().setRespondents(dynamicMultiSelectListType);
+    }
+
 }

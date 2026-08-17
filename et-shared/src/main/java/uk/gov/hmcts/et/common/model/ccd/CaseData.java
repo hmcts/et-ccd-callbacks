@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Tolerate;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicMultiSelectListType;
 import uk.gov.hmcts.et.common.model.ccd.items.AddressLabelTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DepositTypeItem;
@@ -1927,10 +1928,18 @@ public class CaseData extends Et1CaseData {
     private List<GenericTypeItem<CaseNote>> caseNotesCollection;
     @JsonProperty("addCaseNote")
     private CaseNote addCaseNote;
-    @JsonProperty("nocRemoveRepOption")
-    private String nocRemoveRepOption;
     @JsonProperty("editOrDeleteCaseNote")
     private String editOrDeleteCaseNote;
     @JsonProperty("caseNoteList")
     private DynamicFixedListType caseNoteList;
+
+    // Remove representation variables
+    @JsonProperty("nocRemoveRepOption")
+    private String nocRemoveRepOption;
+    /**
+     * List of respondents displayed in the dynamic multi-select,
+     * allowing the user to select which respondent(s) to process.
+     */
+    @JsonProperty("respondents")
+    private DynamicMultiSelectListType respondents;
 }

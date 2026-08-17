@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@2.4.9")
+@Library("Infrastructure@feature/optional-smoke-test-secrets")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 
@@ -102,6 +102,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 withPipeline(type, product, component) {
   env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
   loadVaultSecrets(secrets)
+  disableSmokeTestSecrets()
 //  enableHighLevelDataSetup()
   enableAksStagingDeployment()
   onMaster {

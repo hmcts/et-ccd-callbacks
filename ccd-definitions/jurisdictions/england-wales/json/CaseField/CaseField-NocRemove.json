@@ -19,7 +19,7 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "ID": "nocRemoveRepRemoveLabelSelf",
-    "Label": "When you submit this page, you will be removed from this case and it will no longer appear on your case list.<br><br>A notification will be sent to all parties on this case.<br><br>This is a new online process - you don't need to file any further documents in relation to this notice of change with the court.",
+    "Label": "When you submit this page, you will be removed from this case and it will no longer appear on your case list.<br><br>A notification will be sent to all parties on this case.<br><br>This is a new online process - you don't need to file any further documents in relation to this notice of change with the tribunal.",
     "FieldType": "Label",
     "SecurityClassification": "Public",
     "Searchable": "N"

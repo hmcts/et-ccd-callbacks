@@ -127,7 +127,7 @@ withNightlyPipeline(type, product, component) {
             steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
             }
          }
-         stage('Full functional test') {
+         stage('Full functional test- UI') {
             try {
                 yarnBuilder.yarn('test:full-functional-chromium')
             } catch (Error) {

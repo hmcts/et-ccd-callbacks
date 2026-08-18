@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -15,7 +13,6 @@ import java.util.List;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
 class RoomSelectionServiceTest {
     @Test
     void testCreateRoomSelectionNoSelectedRoom() {

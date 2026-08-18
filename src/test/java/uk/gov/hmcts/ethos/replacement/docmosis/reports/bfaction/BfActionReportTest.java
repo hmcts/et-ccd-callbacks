@@ -2,9 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.commons.util.StringUtils;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -30,7 +28,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
-@ExtendWith(SpringExtension.class)
 class BfActionReportTest {
     private List<SubmitEvent> submitEvents;
     private ListingDetails listingDetails;

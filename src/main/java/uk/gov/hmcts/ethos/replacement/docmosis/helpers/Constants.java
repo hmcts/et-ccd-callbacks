@@ -73,6 +73,17 @@ public final class Constants {
             + "<tr><td width=\"200\">Contact address</td><td>%s</td></tr>"
             + "<tr><td width=\"200\">Acas certificate</td><td>%s</td></tr>"
             + "</table>";
+    public static final String RESPONDENT_ACAS_DETAILS_WITH_ERA = "<h3>Respondent %o</h3>"
+            + "<table>"
+            + "<tr><td width=\"200\">Name</td><td>%s</td></tr>"
+            + "<tr><td width=\"200\">Contact address</td><td>%s</td></tr>"
+            + "<tr><td width=\"200\">Acas certificate</td><td>%s</td></tr>"
+            + "<tr><td width=\"200\">Date of Last Event</td><td>%s</td></tr>"
+            + "<tr><td width=\"200\">Date Received by Acas</td><td>%s</td></tr>"
+            + "<tr><td width=\"200\">Date Acas Certificate Issued</td><td>%s</td></tr>"
+            + "<tr><td width=\"200\">ET1 Received</td><td>%s</td></tr>"
+            + "<tr><td width=\"200\">Effective Elapsed Time</td><td>%s</td></tr>"
+            + "</table>";
     public static final String TRIBUNAL_OFFICE_LOCATION = "<hr><h3>Tribunal location</h3>"
             + "<table>"
             + "<tr><td width=\"200\">Tribunal</td><td>%s</td></tr>"
@@ -107,6 +118,9 @@ public final class Constants {
     public static final String EXCEPTION_CASE_DATA_NOT_FOUND = "Case data not found";
     public static final String EXCEPTION_UPDATE_RESPONDENT_REPRESENTATIVE_REQUEST_EMPTY =
             "Update respondent representative request is empty";
+    public static final String ERA_ASSESSMENT_HEADER =
+        "### ERA Assessment\n\n"
+        + "The following respondent(s) have an effective elapsed time greater than 3 months and less than or equal to 6 months:\n\n";
 
     private Constants() {
         // Utility classes should not have a public or default constructor.

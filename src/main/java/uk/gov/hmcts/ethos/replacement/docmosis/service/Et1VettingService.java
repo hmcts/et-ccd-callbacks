@@ -25,12 +25,17 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.JurisdictionCodeHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.jpaservice.JpaVenueService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
@@ -55,6 +60,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CLAIMANT
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CLAIMANT_DETAILS_PERSON;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.COMPANY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ERA_ASSESSMENT_HEADER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ERROR_EXISTING_JUR_CODE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ERROR_SELECTED_JUR_CODE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_ATTACHMENT_DOC_TYPE;
@@ -63,6 +69,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.FIVE_ACA
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.JUR_CODE_HTML;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ONE_RESPONDENT_COUNT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.RESPONDENT_ACAS_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.RESPONDENT_ACAS_DETAILS_WITH_ERA;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.RESPONDENT_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TRACK_ALLOCATION_HTML;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TRIBUNAL_ENGLAND;
@@ -70,6 +77,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TRIBUNAL
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TRIBUNAL_OFFICE_LOCATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TRIBUNAL_SCOTLAND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.addressIsEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.EmploymentRightsActService.NOT_APPLICABLE;
 
 @Slf4j
 @Service
@@ -77,8 +85,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.addressIsEm
 public class Et1VettingService {
 
     public static final String ADDRESS_NOT_ENTERED = "Address not entered";
+
     private final TornadoService tornadoService;
     private final JpaVenueService jpaVenueService;
+    private final EmploymentRightsActService employmentRightsActService;
 
     /**
      * Update et1VettingBeforeYouStart.
@@ -91,6 +101,7 @@ public class Et1VettingService {
         caseDetails.getCaseData().setEt1VettingRespondentDetailsMarkUp(
             initialRespondentDetailsMarkUp(caseDetails.getCaseData()));
         populateRespondentAcasDetailsMarkUp(caseDetails.getCaseData());
+        populateEraAssessmentMarkUp(caseDetails.getCaseData());
         initialEt1ReasonableAdjustments(caseDetails);
     }
 
@@ -141,6 +152,7 @@ public class Et1VettingService {
         caseData.setEt1AddressDetails(null);
         caseData.setTribunalCorrespondenceAddress(null);
         caseData.setRegionalOffice(null);
+        caseData.setEt1VettingEraAssessmentMarkUp(null);
     }
 
     /**
@@ -263,39 +275,262 @@ public class Et1VettingService {
         }
     }
 
-    @SuppressWarnings({"checkstyle:FallThrough"}) // This is intentional as it acts like a loop
     private void populateRespondentAcasDetailsMarkUp(CaseData caseData) {
         List<RespondentSumTypeItem> respondentList = caseData.getRespondentCollection();
-        switch (respondentList.size()) {
-            case 6:
-                caseData.setEt1VettingRespondentAcasDetails6(
-                        generateRespondentAndAcasDetails(respondentList.get(5).getValue(), 6));
-            case 5:
-                caseData.setEt1VettingRespondentAcasDetails5(
-                        generateRespondentAndAcasDetails(respondentList.get(4).getValue(), 5));
-            case 4:
-                caseData.setEt1VettingRespondentAcasDetails4(
-                        generateRespondentAndAcasDetails(respondentList.get(3).getValue(), 4));
-            case 3:
-                caseData.setEt1VettingRespondentAcasDetails3(
-                        generateRespondentAndAcasDetails(respondentList.get(2).getValue(), 3));
-            case 2:
-                caseData.setEt1VettingRespondentAcasDetails2(
-                        generateRespondentAndAcasDetails(respondentList.get(1).getValue(), 2));
+        if (CollectionUtils.isEmpty(respondentList)) {
+            return;
+        }
+        int count = Math.min(respondentList.size(), 6);
+        IntStream.range(0, count).forEach(i -> {
+            RespondentSumType respondent = respondentList.get(i).getValue();
+            int respondentNumber = i + 1;
+            String markUp = generateRespondentAndAcasDetails(caseData, respondent, respondentNumber);
+            setRespondentAcasDetailsMarkUp(caseData, respondentNumber, markUp);
+        });
+    }
+
+    private void setRespondentAcasDetailsMarkUp(CaseData caseData, int respondentNumber, String markUp) {
+        switch (respondentNumber) {
             case 1:
-                caseData.setEt1VettingRespondentAcasDetails1(
-                        generateRespondentAndAcasDetails(respondentList.get(0).getValue(), 1));
+                caseData.setEt1VettingRespondentAcasDetails1(markUp);
+                break;
+            case 2:
+                caseData.setEt1VettingRespondentAcasDetails2(markUp);
+                break;
+            case 3:
+                caseData.setEt1VettingRespondentAcasDetails3(markUp);
+                break;
+            case 4:
+                caseData.setEt1VettingRespondentAcasDetails4(markUp);
+                break;
+            case 5:
+                caseData.setEt1VettingRespondentAcasDetails5(markUp);
+                break;
+            case 6:
+                caseData.setEt1VettingRespondentAcasDetails6(markUp);
                 break;
             default:
+                break;
         }
     }
 
-    private String generateRespondentAndAcasDetails(RespondentSumType respondent, int respondentNumber) {
+    private String generateRespondentAndAcasDetails(CaseData caseData, RespondentSumType respondent,
+                                                    int respondentNumber) {
+        if (caseData == null || respondent == null) {
+            return "";
+        }
+
         String acasStatus = respondent.getRespondentAcas() == null
             ? "No certificate provided."
             : String.format("%s", respondent.getRespondentAcas());
-        return String.format(RESPONDENT_ACAS_DETAILS, respondentNumber, respondent.getRespondentName(),
-            toAddressWithTab(respondent.getRespondentAddress()), acasStatus);
+
+        if (!employmentRightsActService.isEraOctober2026(caseData)) {
+            return String.format(RESPONDENT_ACAS_DETAILS, respondentNumber, respondent.getRespondentName(),
+                toAddressWithTab(respondent.getRespondentAddress()), acasStatus);
+        }
+
+        String dateOfLastEvent = getDateOfLastEvent(caseData);
+        String acasReceiptDate = respondent.getAcasCertificateReceiptDate();
+        String acasIssueDate = respondent.getAcasCertificateIssueDate();
+        String receiptDate = caseData.getReceiptDate();
+
+        String effectiveElapsedTime = calculateEffectiveElapsedTime(receiptDate, dateOfLastEvent,
+                acasReceiptDate, acasIssueDate);
+
+        return String.format(RESPONDENT_ACAS_DETAILS_WITH_ERA, respondentNumber, respondent.getRespondentName(),
+            toAddressWithTab(respondent.getRespondentAddress()), acasStatus,
+            formatDisplayDate(dateOfLastEvent),
+            formatDisplayDate(acasReceiptDate),
+            formatDisplayDate(acasIssueDate),
+            formatDisplayDate(receiptDate),
+            effectiveElapsedTime != null ? effectiveElapsedTime : "Not calculated");
+    }
+
+    private String getDateOfLastEvent(CaseData caseData) {
+        if (caseData == null) {
+            return null;
+        }
+        if (caseData.getClaimantOtherType() != null
+                && !isNullOrEmpty(caseData.getClaimantOtherType().getDateOfLastEvent())) {
+            return caseData.getClaimantOtherType().getDateOfLastEvent();
+        }
+        return null;
+    }
+
+    /**
+     * Populates the ERA Limitation Assessment Markdown panel and sets the default response state for et1VettingEra.
+     *
+     * <p>If the claim is submitted before 1st October 2026 or the ERA feature flag is disabled,
+     * {@code et1VettingEra} is set to "Not applicable" and the ERA assessment markdown is set to {@code null}.
+     *
+     * <p>If the ERA feature is active, each respondent's Effective Elapsed Time is evaluated.
+     * If at least one respondent has an Effective Elapsed Time greater than 3 months and less than or equal to
+     * 6 months, the markdown panel is populated listing the triggering respondent(s) and their effective elapsed time.
+     * In this case, {@code et1VettingEra} is reset to {@code null} if unselected or previously "Not applicable",
+     * requiring mandatory selection by the caseworker.
+     *
+     * <p>If no respondents fall within the 3 to 6 month window, {@code et1VettingEra} defaults to "Not applicable"
+     * and the markdown panel is set to {@code null}.
+     *
+     * @param caseData the case data containing claim and respondent details
+     */
+    private void populateEraAssessmentMarkUp(CaseData caseData) {
+        if (!employmentRightsActService.isEraOctober2026(caseData)) {
+            caseData.setEt1VettingEra(NOT_APPLICABLE);
+            caseData.setEt1VettingEraAssessmentMarkUp(null);
+            return;
+        }
+
+        List<RespondentSumTypeItem> respondentList = caseData.getRespondentCollection();
+        if (CollectionUtils.isEmpty(respondentList)) {
+            caseData.setEt1VettingEra(NOT_APPLICABLE);
+            caseData.setEt1VettingEraAssessmentMarkUp(null);
+            return;
+        }
+
+        String dateOfLastEvent = getDateOfLastEvent(caseData);
+        String receiptDate = caseData.getReceiptDate();
+        if (isNullOrEmpty(dateOfLastEvent) || isNullOrEmpty(receiptDate)) {
+            caseData.setEt1VettingEra(NOT_APPLICABLE);
+            caseData.setEt1VettingEraAssessmentMarkUp(null);
+            return;
+        }
+
+        int count = Math.min(respondentList.size(), 6);
+        StringBuilder triggeringRespondents = new StringBuilder();
+
+        for (int i = 0; i < count; i++) {
+            RespondentSumType respondent = respondentList.get(i).getValue();
+            int respondentNumber = i + 1;
+            String acasReceiptDate = respondent.getAcasCertificateReceiptDate();
+            String acasIssueDate = respondent.getAcasCertificateIssueDate();
+
+            Period period = calculateEffectiveElapsedPeriod(receiptDate, dateOfLastEvent,
+                acasReceiptDate, acasIssueDate);
+            if (period != null && isBetweenThreeAndSixMonths(period)) {
+                String elapsedTimeStr = formatPeriod(period.getYears() * 12 + period.getMonths(), period.getDays());
+                triggeringRespondents.append(String.format("• Respondent %d - %s%n%n", respondentNumber,
+                    elapsedTimeStr));
+            }
+        }
+
+        if (!triggeringRespondents.isEmpty()) {
+            String markUp = ERA_ASSESSMENT_HEADER + triggeringRespondents;
+            caseData.setEt1VettingEraAssessmentMarkUp(markUp);
+            if (isNullOrEmpty(caseData.getEt1VettingEra()) || NOT_APPLICABLE.equals(caseData.getEt1VettingEra())) {
+                caseData.setEt1VettingEra(null);
+            }
+        } else {
+            caseData.setEt1VettingEraAssessmentMarkUp(null);
+            caseData.setEt1VettingEra(NOT_APPLICABLE);
+        }
+    }
+
+    private static boolean isBetweenThreeAndSixMonths(Period period) {
+        int totalMonths = period.getYears() * 12 + period.getMonths();
+        int totalDays = period.getDays();
+        boolean isGreaterThanThreeMonths = totalMonths > 3 || (totalMonths == 3 && totalDays > 0);
+        boolean isLessThanOrEqualToSixMonths = totalMonths < 6 || (totalMonths == 6 && totalDays == 0);
+        return isGreaterThanThreeMonths && isLessThanOrEqualToSixMonths;
+    }
+
+    /**
+     * Calculates the Effective Elapsed Period between the Date of Last Event and the ET1 Receipt Date,
+     * adjusted for any Acas Early Conciliation period.
+     */
+    public static Period calculateEffectiveElapsedPeriod(String receiptDateStr, String dateOfLastEventStr,
+                                                         String acasReceiptDateStr, String acasIssueDateStr) {
+        if (isNullOrEmpty(receiptDateStr) || isNullOrEmpty(dateOfLastEventStr)) {
+            return null;
+        }
+        try {
+            LocalDate receiptDate = LocalDate.parse(receiptDateStr);
+            LocalDate dateOfLastEvent = LocalDate.parse(dateOfLastEventStr);
+
+            long acasDays = 0;
+            if (!isNullOrEmpty(acasReceiptDateStr) && !isNullOrEmpty(acasIssueDateStr)) {
+                LocalDate acasReceiptDate = LocalDate.parse(acasReceiptDateStr);
+                LocalDate acasIssueDate = LocalDate.parse(acasIssueDateStr);
+                if (acasReceiptDate.equals(acasIssueDate)) {
+                    acasDays = 1;
+                } else if (acasIssueDate.isAfter(acasReceiptDate)) {
+                    acasDays = ChronoUnit.DAYS.between(acasReceiptDate, acasIssueDate);
+                }
+            }
+
+            LocalDate adjustedReceiptDate = receiptDate.minusDays(acasDays);
+            if (adjustedReceiptDate.isBefore(dateOfLastEvent)) {
+                return Period.ZERO;
+            }
+
+            return Period.between(dateOfLastEvent, adjustedReceiptDate);
+        } catch (Exception e) {
+            log.error("Error calculating effective elapsed period", e);
+            return null;
+        }
+    }
+
+    /**
+     * Calculates the Effective Elapsed Time between the Date of Last Event and the ET1 Receipt Date,
+     * adjusted for any Acas Early Conciliation period.
+     *
+     * <p>The formula applied is:
+     * <pre>
+     * Effective Elapsed Time = (ET1 Receipt Date - Date of Last Event)
+     *                          - (Date Acas Certificate Issued - Date Received by Acas)
+     * </pre>
+     *
+     * <p>Calendar dates are used for period calculations rather than fixed day-to-month conversions.
+     * If Acas certificate dates are present, the number of days between Acas receipt and certificate issue
+     * is subtracted from the ET1 receipt date prior to computing the period from the Date of Last Event.
+     * If the Acas receipt date and issue date are the same, the Acas conciliation period is treated as 1 day.
+     *
+     * @param receiptDateStr the ET1 receipt date (YYYY-MM-DD format)
+     * @param dateOfLastEventStr the date of the last event (YYYY-MM-DD format)
+     * @param acasReceiptDateStr the date conciliation request was received by Acas (YYYY-MM-DD format, optional)
+     * @param acasIssueDateStr the date Acas certificate was issued (YYYY-MM-DD format, optional)
+     * @return a formatted string representing the effective elapsed time (e.g. "4 months", "2 months 20 days",
+     *         "15 days", "0 days"), or {@code null} if required dates are missing or invalid
+     */
+    public static String calculateEffectiveElapsedTime(String receiptDateStr, String dateOfLastEventStr,
+                                                       String acasReceiptDateStr, String acasIssueDateStr) {
+        Period period = calculateEffectiveElapsedPeriod(receiptDateStr, dateOfLastEventStr,
+                acasReceiptDateStr, acasIssueDateStr);
+        if (period == null) {
+            return null;
+        }
+        int months = (period.getYears() * 12) + period.getMonths();
+        int days = period.getDays();
+        return formatPeriod(months, days);
+    }
+
+    private static String formatPeriod(int months, int days) {
+        if (months == 0 && days == 0) {
+            return "0 days";
+        }
+        StringBuilder sb = new StringBuilder();
+        if (months > 0) {
+            sb.append(months).append(months == 1 ? " month" : " months");
+        }
+        if (days > 0) {
+            if (months > 0) {
+                sb.append(" ");
+            }
+            sb.append(days).append(days == 1 ? " day" : " days");
+        }
+        return sb.toString();
+    }
+
+    private String formatDisplayDate(String dateStr) {
+        if (isNullOrEmpty(dateStr)) {
+            return "Not provided";
+        }
+        try {
+            LocalDate date = LocalDate.parse(dateStr);
+            return date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        } catch (Exception e) {
+            return dateStr;
+        }
     }
 
     /**
@@ -485,6 +720,13 @@ public class Et1VettingService {
                     caseTypeId, "ET1 Vetting.pdf");
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
+        }
+    }
+
+    public void setEt1VettingFields(CaseData caseData) {
+        if (!employmentRightsActService.isEraOctober2026(caseData)) {
+            caseData.setEt1VettingEra(NOT_APPLICABLE);
+            caseData.setEt1VettingEraAssessmentMarkUp(null);
         }
     }
 }

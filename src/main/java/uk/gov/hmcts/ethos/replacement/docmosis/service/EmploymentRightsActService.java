@@ -13,6 +13,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -26,11 +27,39 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Slf4j
 public class EmploymentRightsActService {
 
-    private static final LocalDate ERA_START_DATE = LocalDate.of(2026, Month.OCTOBER, 1);
+    private static final LocalDate ERA_START_DATE = LocalDate.of(2026, Month.MAY, 1);
     public static final String UDL_JURISDICTION_CODE = "UDL";
     public static final String NOT_APPLICABLE = "Not applicable";
 
     private final FeatureToggleService featureToggleService;
+
+    /**
+     * Checks if the case is submitted on or after 1st October 2026 and ERA October 2026 feature is enabled.
+     *
+     * @param caseData the case data
+     * @return true if case is submitted on or after 1st October 2026 and ERA October 2026 feature is enabled
+     */
+    public boolean isEraOctober2026(CaseData caseData) {
+        if (!featureToggleService.isEraOctober2026Enabled()) {
+            return false;
+        }
+        return getParsedReceiptDate(caseData)
+                .map(date -> !date.isBefore(ERA_START_DATE))
+                .orElse(false);
+    }
+
+    private Optional<LocalDate> getParsedReceiptDate(CaseData caseData) {
+        if (ObjectUtils.isEmpty(caseData) || ObjectUtils.isEmpty(caseData.getReceiptDate())
+                || caseData.getReceiptDate().isBlank()) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(LocalDate.parse(caseData.getReceiptDate().trim()));
+        } catch (Exception e) {
+            log.error("Error parsing receiptDate: {}", caseData.getReceiptDate(), e);
+            return Optional.empty();
+        }
+    }
 
     /**
      * Sets the era flag on AdditionalCaseInfoType to No if receiptDate is before 1st October 2026.
@@ -42,21 +71,14 @@ public class EmploymentRightsActService {
             return;
         }
 
-        if (ObjectUtils.isEmpty(caseData) || ObjectUtils.isEmpty(caseData.getReceiptDate())) {
-            return;
-        }
-
-        try {
-            LocalDate receiptDate = LocalDate.parse(caseData.getReceiptDate());
+        getParsedReceiptDate(caseData).ifPresent(receiptDate -> {
             if (receiptDate.isBefore(ERA_START_DATE)) {
                 if (ObjectUtils.isEmpty(caseData.getAdditionalCaseInfoType())) {
                     caseData.setAdditionalCaseInfoType(new AdditionalCaseInfoType());
                 }
                 caseData.getAdditionalCaseInfoType().setEra(NO);
             }
-        } catch (Exception e) {
-            log.error("Error parsing receiptDate: {}", caseData.getReceiptDate(), e);
-        }
+        });
     }
 
     /**
@@ -68,18 +90,12 @@ public class EmploymentRightsActService {
         if (!featureToggleService.isEraOctober2026Enabled()) {
             return;
         }
-        if (ObjectUtils.isEmpty(caseData) || ObjectUtils.isEmpty(caseData.getReceiptDate())) {
-            return;
-        }
 
-        try {
-            LocalDate receiptDate = LocalDate.parse(caseData.getReceiptDate());
+        getParsedReceiptDate(caseData).ifPresent(receiptDate -> {
             if (receiptDate.isBefore(ERA_START_DATE)) {
                 caseData.setEtICUnfairDismissalEra(NOT_APPLICABLE);
             }
-        } catch (Exception e) {
-            log.error("Error parsing receiptDate: {}", caseData.getReceiptDate(), e);
-        }
+        });
     }
 
     /**

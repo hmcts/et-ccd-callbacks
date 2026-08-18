@@ -14,8 +14,11 @@ import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -60,7 +63,7 @@ class EmploymentRightsActServiceTest {
 
     @Test
     void setEraFlagByReceiptDate_NullCaseData_HandlesGracefully() {
-        employmentRightsActService.setEraFlagByReceiptDate(null);
+        assertDoesNotThrow(() -> employmentRightsActService.setEraFlagByReceiptDate(null));
     }
 
     @Test
@@ -146,5 +149,30 @@ class EmploymentRightsActServiceTest {
 
         assertNull(caseData.getAdditionalCaseInfoType());
         assertNull(caseData.getJurCodesCollection());
+    }
+
+    @Test
+    void isEraOctober2026_OnOrAfterOctoberFirst2026_ReturnsTrue() {
+        caseData.setReceiptDate("2026-10-01");
+        assertTrue(employmentRightsActService.isEraOctober2026(caseData));
+    }
+
+    @Test
+    void isEraOctober2026_BeforeOctoberFirst2026_ReturnsFalse() {
+        caseData.setReceiptDate("2026-09-30");
+        assertFalse(employmentRightsActService.isEraOctober2026(caseData));
+    }
+
+    @Test
+    void isEraOctober2026_FeatureDisabled_ReturnsFalse() {
+        when(featureToggleService.isEraOctober2026Enabled()).thenReturn(false);
+        caseData.setReceiptDate("2026-10-01");
+        assertFalse(employmentRightsActService.isEraOctober2026(caseData));
+    }
+
+    @Test
+    void isEraOctober2026_NullOrInvalidReceiptDate_ReturnsFalse() {
+        caseData.setReceiptDate(null);
+        assertFalse(employmentRightsActService.isEraOctober2026(caseData));
     }
 }

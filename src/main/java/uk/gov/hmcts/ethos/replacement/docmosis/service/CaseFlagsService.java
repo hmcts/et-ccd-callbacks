@@ -66,6 +66,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.VEXATIOUS_L
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RESTRICT_PUBLICITY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsReferenceDataService.normaliseCaseFlagReferenceKey;
 
 @Slf4j
 @Service
@@ -198,6 +199,37 @@ public class CaseFlagsService {
 
         alignRespondentRepresentativeFlagDetails(caseData, existingRepresentativeFlags);
         clearStaleRespondentRepresentativeFlags(caseData);
+    }
+
+    /**
+     * Migrates existing claimant and respondent case flags from the v1.0 fields into
+     * the v2.1 internal and external sections.
+     *
+     * @param caseData Data about the current case
+     */
+    public void migrateExistingClaimantAndRespondentCaseFlags(CaseData caseData) {
+        migrateExistingClaimantAndRespondentCaseFlags(caseData, Map.of());
+    }
+
+    /**
+     * Migrates existing claimant and respondent case flags from the v1.0 fields into
+     * the v2.1 internal and external sections.
+     *
+     * @param caseData Data about the current case
+     * @param referenceDataVisibilityByFlagCodeOrName flag visibility from reference data, keyed by flag code or name
+     */
+    public void migrateExistingClaimantAndRespondentCaseFlags(
+            CaseData caseData,
+            Map<String, String> referenceDataVisibilityByFlagCodeOrName) {
+        if (caseData == null) {
+            return;
+        }
+
+        Map<String, String> referenceDataVisibility = normaliseCaseFlagVisibility(
+                referenceDataVisibilityByFlagCodeOrName);
+        List<ExistingPartyFlagDetails> existingFlagDetails = currentClaimantAndRespondentFlagDetails(caseData);
+        setupCaseFlags(caseData);
+        existingFlagDetails.forEach(details -> migrateExistingFlagDetails(caseData, details, referenceDataVisibility));
     }
 
     /**
@@ -536,6 +568,171 @@ public class CaseFlagsService {
         existingFlag.setRoleOnCase(roleOnCase);
         existingFlag.setGroupId(roleOnCase);
         existingFlag.setVisibility(visibility);
+    }
+
+    private static List<ExistingPartyFlagDetails> currentClaimantAndRespondentFlagDetails(CaseData caseData) {
+        return PARTY_FLAGS.stream()
+                .filter(flag -> PartyType.CLAIMANT.equals(flag.partyType())
+                        || PartyType.RESPONDENT.equals(flag.partyType()))
+                .filter(flag -> INTERNAL.equals(flag.visibility()))
+                .filter(flag -> isRequired(caseData, flag))
+                .map(flag -> existingPartyFlagDetails(caseData, flag))
+                .filter(details -> !details.details().isEmpty())
+                .toList();
+    }
+
+    private static ExistingPartyFlagDetails existingPartyFlagDetails(CaseData caseData, PartyFlag internalFlag) {
+        PartyFlag externalFlag = matchingExternalPartyFlag(internalFlag);
+        CaseFlagsType internalFlags = internalFlag.get(caseData);
+        CaseFlagsType externalFlags = externalFlag.get(caseData);
+        return new ExistingPartyFlagDetails(
+                internalFlag.partyType(),
+                internalFlag.index(),
+                existingPartyName(caseData, internalFlag, internalFlags, externalFlags),
+                existingDetails(internalFlags, externalFlags)
+        );
+    }
+
+    private static String existingPartyName(
+            CaseData caseData, PartyFlag internalFlag, CaseFlagsType internalFlags, CaseFlagsType externalFlags) {
+        return StringUtils.firstNonBlank(
+                internalFlags == null ? null : internalFlags.getPartyName(),
+                externalFlags == null ? null : externalFlags.getPartyName(),
+                getPartyName(caseData, internalFlag)
+        );
+    }
+
+    private static PartyFlag matchingExternalPartyFlag(PartyFlag internalFlag) {
+        return PARTY_FLAGS.stream()
+                .filter(flag -> EXTERNAL.equals(flag.visibility()))
+                .filter(flag -> internalFlag.partyType().equals(flag.partyType()))
+                .filter(flag -> internalFlag.index() == flag.index())
+                .findFirst()
+                .orElseThrow();
+    }
+
+    @SafeVarargs
+    private static List<GenericTypeItem<FlagDetailType>> existingDetails(CaseFlagsType...flags) {
+        List<GenericTypeItem<FlagDetailType>> details = new ArrayList<>();
+        for (CaseFlagsType flagsType : flags) {
+            if (flagsType == null || flagsType.getDetails() == null) {
+                continue;
+            }
+
+            flagsType.getDetails().stream()
+                    .filter(item -> item != null && item.getValue() != null)
+                    .filter(item -> details.stream().noneMatch(existing -> sameFlagDetailItem(existing, item)))
+                    .forEach(details::add);
+        }
+        return details;
+    }
+
+    private static boolean sameFlagDetailItem(
+            GenericTypeItem<FlagDetailType> existing, GenericTypeItem<FlagDetailType> candidate) {
+        if (StringUtils.isNotBlank(existing.getId()) && StringUtils.isNotBlank(candidate.getId())) {
+            return Objects.equals(existing.getId(), candidate.getId());
+        }
+        return existing == candidate || existing.getValue() == candidate.getValue();
+    }
+
+    private static Map<String, String> normaliseCaseFlagVisibility(Map<String, String> visibilityByKey) {
+        if (visibilityByKey == null || visibilityByKey.isEmpty()) {
+            return Map.of();
+        }
+
+        Map<String, String> normalisedVisibilityByKey = new HashMap<>();
+        visibilityByKey.forEach((key, visibility) -> {
+            if (StringUtils.isNotBlank(key) && (INTERNAL.equals(visibility) || EXTERNAL.equals(visibility))) {
+                normalisedVisibilityByKey.put(normaliseCaseFlagReferenceKey(key), visibility);
+            }
+        });
+        return normalisedVisibilityByKey;
+    }
+
+    private static void migrateExistingFlagDetails(
+            CaseData caseData,
+            ExistingPartyFlagDetails existingFlagDetails,
+            Map<String, String> referenceDataVisibility) {
+        PartyFlag internalFlag = matchingCurrentInternalPartyFlag(caseData, existingFlagDetails);
+        if (internalFlag == null) {
+            return;
+        }
+
+        PartyFlag externalFlag = matchingExternalPartyFlag(internalFlag);
+        CaseFlagsType internalFlags = internalFlag.get(caseData);
+        CaseFlagsType externalFlags = externalFlag.get(caseData);
+        if (internalFlags == null || externalFlags == null) {
+            return;
+        }
+
+        internalFlags.setDetails(detailsForVisibility(
+                existingFlagDetails.details(), INTERNAL, referenceDataVisibility));
+        externalFlags.setDetails(detailsForVisibility(
+                existingFlagDetails.details(), EXTERNAL, referenceDataVisibility));
+    }
+
+    @Nullable
+    private static PartyFlag matchingCurrentInternalPartyFlag(
+            CaseData caseData, ExistingPartyFlagDetails existingFlagDetails) {
+        List<PartyFlag> requiredInternalFlags = PARTY_FLAGS.stream()
+                .filter(flag -> existingFlagDetails.partyType().equals(flag.partyType()))
+                .filter(flag -> INTERNAL.equals(flag.visibility()))
+                .filter(flag -> isRequired(caseData, flag))
+                .toList();
+
+        if (StringUtils.isNotBlank(existingFlagDetails.partyName())
+                && !hasDuplicateCurrentPartyNames(caseData, requiredInternalFlags)) {
+            return requiredInternalFlags.stream()
+                    .filter(flag -> Objects.equals(existingFlagDetails.partyName(), getPartyName(caseData, flag)))
+                    .findFirst()
+                    .orElseGet(() -> matchingInternalPartyFlagAtIndex(requiredInternalFlags,
+                            existingFlagDetails.index()));
+        }
+
+        return matchingInternalPartyFlagAtIndex(requiredInternalFlags, existingFlagDetails.index());
+    }
+
+    private static boolean hasDuplicateCurrentPartyNames(CaseData caseData, List<PartyFlag> flags) {
+        return hasDuplicatePartyNames(flags.stream()
+                .map(flag -> getPartyName(caseData, flag))
+                .toList());
+    }
+
+    @Nullable
+    private static PartyFlag matchingInternalPartyFlagAtIndex(List<PartyFlag> flags, int index) {
+        return flags.stream()
+                .filter(flag -> flag.index() == index)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private static ListTypeItem<FlagDetailType> detailsForVisibility(
+            List<GenericTypeItem<FlagDetailType>> details,
+            String visibility,
+            Map<String, String> referenceDataVisibility) {
+        ListTypeItem<FlagDetailType> matchingDetails = new ListTypeItem<>();
+        details.stream()
+                .filter(detail -> isExternalFlag(detail.getValue(), referenceDataVisibility) == EXTERNAL
+                        .equals(visibility))
+                .forEach(matchingDetails::add);
+
+        return matchingDetails.isEmpty() ? null : matchingDetails;
+    }
+
+    private static boolean isExternalFlag(
+            FlagDetailType flagDetail, Map<String, String> referenceDataVisibility) {
+        String referenceDataVisibilityValue = StringUtils.firstNonBlank(
+                referenceDataVisibility.get(normaliseCaseFlagReferenceKey(flagDetail.getFlagCode())),
+                referenceDataVisibility.get(normaliseCaseFlagReferenceKey(flagDetail.getName()))
+        );
+        if (StringUtils.isNotBlank(referenceDataVisibilityValue)) {
+            return EXTERNAL.equals(referenceDataVisibilityValue);
+        }
+
+        String availableExternally = StringUtils.trimToEmpty(flagDetail.getAvailableExternally());
+        return YES.equalsIgnoreCase(availableExternally)
+                || Boolean.TRUE.toString().equalsIgnoreCase(availableExternally)
+                || EXTERNAL.equalsIgnoreCase(availableExternally);
     }
 
     private static String getPartyName(CaseData caseData, PartyFlag flag) {
@@ -891,6 +1088,13 @@ public class CaseFlagsService {
             String visibility,
             String partyName,
             ListTypeItem<FlagDetailType> details) {
+    }
+
+    private record ExistingPartyFlagDetails(
+            PartyType partyType,
+            int index,
+            String partyName,
+            List<GenericTypeItem<FlagDetailType>> details) {
     }
 
     private record RepresentativeIdentity(String name, String email) {

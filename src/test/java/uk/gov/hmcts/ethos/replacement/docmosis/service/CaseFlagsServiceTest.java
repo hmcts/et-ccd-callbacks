@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,8 +23,11 @@ import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -37,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.ACTIVE;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.CLAIMANT;
@@ -73,6 +78,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RESTRICT_PU
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 class CaseFlagsServiceTest {
+    private static final Path EXISTING_CASE_SAMPLE =
+            Path.of("src", "test", "resources", "requests", "caseFlagMigrationRequest.json");
     public static final String CLAIMANT_NAME = "Claimant Name";
     public static final String CLAIMANT_REPRESENTATIVE_NAME = "Claimant Representative Name";
     public static final String REPRESENTATIVE_NAME = "Representative Name";
@@ -195,6 +202,129 @@ class CaseFlagsServiceTest {
         assertNotNull(allPartyFlags(caseData).getCaseFlags());
         assertNotNull(allPartyFlags(caseData).getClaimantFlags());
         assertNotNull(allPartyFlags(caseData).getClaimantExternalFlags());
+    }
+
+    @Test
+    void migrateExistingClaimantAndRespondentCaseFlags_shouldMoveFlagsToInternalAndExternalSections() {
+        caseData.setRespondentCollection(respondentCollection(2));
+        FlagDetailType claimantInternal = flagDetail("Claimant internal", ACTIVE, NO);
+        FlagDetailType claimantExternal = flagDetail("Claimant external", INACTIVE, YES);
+        FlagDetailType respondent1Internal = flagDetail("Respondent 1 internal", INACTIVE, NO);
+        FlagDetailType respondent1External = flagDetail("Respondent 1 external", ACTIVE, YES);
+        FlagDetailType respondent2Internal = flagDetail("Respondent 2 internal", ACTIVE, "false");
+        FlagDetailType respondent2External = flagDetail("Respondent 2 external", INACTIVE, "true");
+
+        AllPartyFlags allPartyFlags = getOrCreateAllPartyFlags(caseData);
+        allPartyFlags.setClaimantFlags(legacyCaseFlags(claimantInternal, claimantExternal));
+        allPartyFlags.setRespondentFlags(legacyCaseFlags(respondent1External, respondent1Internal));
+        allPartyFlags.setRespondent1Flags(legacyCaseFlags(respondent2Internal, respondent2External));
+
+        caseFlagsService.migrateExistingClaimantAndRespondentCaseFlags(caseData);
+
+        AllPartyFlags migratedFlags = allPartyFlags(caseData);
+        assertMigratedFlag(migratedFlags.getClaimantFlags(), CLAIMANT_NAME, CLAIMANT, INTERNAL, claimantInternal);
+        assertMigratedFlag(migratedFlags.getClaimantExternalFlags(), CLAIMANT_NAME, CLAIMANT, EXTERNAL,
+                claimantExternal);
+        assertMigratedFlag(migratedFlags.getRespondentFlags(), RESPONDENT_NAME, RESPONDENT1, INTERNAL,
+                respondent1Internal);
+        assertMigratedFlag(migratedFlags.getRespondentExternalFlags(), RESPONDENT_NAME, RESPONDENT1, EXTERNAL,
+                respondent1External);
+        assertMigratedFlag(migratedFlags.getRespondent1Flags(), respondentName(1), RESPONDENT2, INTERNAL,
+                respondent2Internal);
+        assertMigratedFlag(migratedFlags.getRespondent1ExternalFlags(), respondentName(1), RESPONDENT2, EXTERNAL,
+                respondent2External);
+    }
+
+    @Test
+    void migrateExistingClaimantAndRespondentCaseFlags_shouldUseLegacyVisibilityWhenMissingFromReferenceData() {
+        FlagDetailType claimantFlagMissingFromReferenceData = flagDetail("Missing claimant flag", ACTIVE, YES);
+        FlagDetailType respondentFlagMissingFromReferenceData = flagDetail("Missing respondent flag", ACTIVE, NO);
+        AllPartyFlags allPartyFlags = getOrCreateAllPartyFlags(caseData);
+        allPartyFlags.setClaimantFlags(legacyCaseFlags(claimantFlagMissingFromReferenceData));
+        allPartyFlags.setRespondentFlags(legacyCaseFlags(respondentFlagMissingFromReferenceData));
+
+        caseFlagsService.migrateExistingClaimantAndRespondentCaseFlags(
+                caseData,
+                Map.of("Current reference data flag", EXTERNAL)
+        );
+
+        assertNull(allPartyFlags(caseData).getClaimantFlags().getDetails());
+        assertMigratedFlag(allPartyFlags(caseData).getClaimantExternalFlags(), CLAIMANT_NAME, CLAIMANT, EXTERNAL,
+                claimantFlagMissingFromReferenceData);
+        assertMigratedFlag(allPartyFlags(caseData).getRespondentFlags(), RESPONDENT_NAME, RESPONDENT1, INTERNAL,
+                respondentFlagMissingFromReferenceData);
+        assertNull(allPartyFlags(caseData).getRespondentExternalFlags().getDetails());
+    }
+
+    @Test
+    void migrateExistingClaimantAndRespondentCaseFlags_shouldMigrateExistingCaseSample() throws IOException {
+        CaseData existingCase = new ObjectMapper().readValue(EXISTING_CASE_SAMPLE.toFile(), CaseData.class);
+        final ListTypeItem<FlagDetailType> existingClaimantDetails =
+                existingCase.getAllPartyFlags().getClaimantFlags().getDetails();
+        final ListTypeItem<FlagDetailType> existingRespondentDetails =
+                existingCase.getAllPartyFlags().getRespondentFlags().getDetails();
+
+        caseFlagsService.migrateExistingClaimantAndRespondentCaseFlags(
+                existingCase,
+                Map.of(
+                        "PF0002", INTERNAL,
+                        "RA0010", EXTERNAL
+                )
+        );
+
+        AllPartyFlags migratedFlags = existingCase.getAllPartyFlags();
+        assertEquals(List.of("PF0015", "PF0002"), flagCodes(migratedFlags.getClaimantFlags()));
+        assertNull(migratedFlags.getClaimantExternalFlags().getDetails());
+        assertEquals(List.of("PF0015"), flagCodes(migratedFlags.getRespondentFlags()));
+        assertEquals(List.of("RA0010"), flagCodes(migratedFlags.getRespondentExternalFlags()));
+        assertSame(existingClaimantDetails.get(0), migratedFlags.getClaimantFlags().getDetails().get(0));
+        assertSame(existingClaimantDetails.get(1), migratedFlags.getClaimantFlags().getDetails().get(1));
+        assertSame(existingRespondentDetails.get(0),
+                migratedFlags.getRespondentFlags().getDetails().getFirst());
+        assertSame(existingRespondentDetails.get(1),
+                migratedFlags.getRespondentExternalFlags().getDetails().getFirst());
+    }
+
+    @Test
+    void migrateExistingClaimantAndRespondentCaseFlags_shouldUseReferenceDataVisibilityFirst() {
+        FlagDetailType internalByReferenceData = flagDetail("Internal by reference data", "PF0002", ACTIVE, YES);
+        FlagDetailType externalByReferenceData = flagDetail("External by reference data", "RA0010", INACTIVE, NO);
+        getOrCreateAllPartyFlags(caseData).setClaimantFlags(
+                legacyCaseFlags(internalByReferenceData, externalByReferenceData));
+
+        caseFlagsService.migrateExistingClaimantAndRespondentCaseFlags(
+                caseData,
+                Map.of(
+                        "PF0002", INTERNAL,
+                        "RA0010", EXTERNAL
+                )
+        );
+
+        assertMigratedFlag(allPartyFlags(caseData).getClaimantFlags(), CLAIMANT_NAME, CLAIMANT, INTERNAL,
+                internalByReferenceData);
+        assertMigratedFlag(allPartyFlags(caseData).getClaimantExternalFlags(), CLAIMANT_NAME, CLAIMANT, EXTERNAL,
+                externalByReferenceData);
+    }
+
+    @Test
+    void migrateExistingClaimantAndRespondentCaseFlags_shouldKeepFlagsWithNamedRespondentAfterReorder() {
+        caseData.setRespondentCollection(respondentCollection(2));
+        FlagDetailType respondent1External = flagDetail("Respondent 1 external", ACTIVE, YES);
+        FlagDetailType respondent2Internal = flagDetail("Respondent 2 internal", INACTIVE, NO);
+
+        AllPartyFlags allPartyFlags = getOrCreateAllPartyFlags(caseData);
+        allPartyFlags.setRespondentFlags(legacyCaseFlags(respondentName(1), respondent2Internal));
+        allPartyFlags.setRespondent1Flags(legacyCaseFlags(RESPONDENT_NAME, respondent1External));
+
+        caseFlagsService.migrateExistingClaimantAndRespondentCaseFlags(caseData);
+
+        AllPartyFlags migratedFlags = allPartyFlags(caseData);
+        assertNull(migratedFlags.getRespondentFlags().getDetails());
+        assertMigratedFlag(migratedFlags.getRespondentExternalFlags(), RESPONDENT_NAME, RESPONDENT1, EXTERNAL,
+                respondent1External);
+        assertMigratedFlag(migratedFlags.getRespondent1Flags(), respondentName(1), RESPONDENT2, INTERNAL,
+                respondent2Internal);
+        assertNull(migratedFlags.getRespondent1ExternalFlags().getDetails());
     }
 
     @Test
@@ -1453,6 +1583,36 @@ class CaseFlagsServiceTest {
                 .build();
     }
 
+    private static CaseFlagsType legacyCaseFlags(FlagDetailType...details) {
+        return CaseFlagsType.builder()
+                .details(ListTypeItem.from(details))
+                .build();
+    }
+
+    private static CaseFlagsType legacyCaseFlags(String partyName, FlagDetailType...details) {
+        return CaseFlagsType.builder()
+                .partyName(partyName)
+                .details(ListTypeItem.from(details))
+                .build();
+    }
+
+    private static FlagDetailType flagDetail(String name, String status, String availableExternally) {
+        return FlagDetailType.builder()
+                .name(name)
+                .status(status)
+                .availableExternally(availableExternally)
+                .build();
+    }
+
+    private static FlagDetailType flagDetail(String name, String flagCode, String status, String availableExternally) {
+        return FlagDetailType.builder()
+                .name(name)
+                .flagCode(flagCode)
+                .status(status)
+                .availableExternally(availableExternally)
+                .build();
+    }
+
     private static FlagDetailType activeFlag(String name) {
         return FlagDetailType.builder()
                 .name(name)
@@ -1469,7 +1629,7 @@ class CaseFlagsServiceTest {
     }
 
     private static void inactivateCaseFlags(CaseFlagsType flags) {
-        flags.getDetails().stream()
+        flags.getDetails()
                 .forEach(flag -> flag.getValue().setStatus(INACTIVE));
     }
 
@@ -1480,6 +1640,25 @@ class CaseFlagsServiceTest {
         assertEquals(roleOnCase, flags.getGroupId());
         assertEquals(status, firstFlagStatus(flags));
         assertEquals(flagName, flags.getDetails().getFirst().getValue().getName());
+    }
+
+    private static void assertMigratedFlag(
+            CaseFlagsType flags, String partyName, String roleOnCase, String visibility, FlagDetailType detail) {
+        assertNotNull(flags);
+        assertAll(roleOnCase + " " + visibility,
+                () -> assertEquals(partyName, flags.getPartyName()),
+                () -> assertEquals(roleOnCase, flags.getRoleOnCase()),
+                () -> assertEquals(roleOnCase, flags.getGroupId()),
+                () -> assertEquals(visibility, flags.getVisibility()),
+                () -> assertEquals(1, flags.getDetails().size()),
+                () -> assertSame(detail, flags.getDetails().getFirst().getValue())
+        );
+    }
+
+    private static List<String> flagCodes(CaseFlagsType flags) {
+        return flags.getDetails().stream()
+                .map(item -> item.getValue().getFlagCode())
+                .toList();
     }
 
     private static GenericTseApplicationTypeItem tseApplication(

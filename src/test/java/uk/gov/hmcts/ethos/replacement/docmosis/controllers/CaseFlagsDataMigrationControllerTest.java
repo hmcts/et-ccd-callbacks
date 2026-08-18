@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +18,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsReferenceDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -26,12 +26,14 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -53,6 +55,9 @@ class CaseFlagsDataMigrationControllerTest {
     @MockitoBean
     private CaseFlagsService caseFlagsService;
 
+    @MockitoBean
+    private CaseFlagsReferenceDataService caseFlagsReferenceDataService;
+
     @Autowired
     private WebApplicationContext applicationContext;
     private JsonNode requestContent;
@@ -71,6 +76,9 @@ class CaseFlagsDataMigrationControllerTest {
     @SneakyThrows
     void shouldMigrateCaseFlags() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        Map<String, String> partyFlagVisibilities = Map.of("ra0010", "External");
+        when(caseFlagsReferenceDataService.getPartyFlagVisibilities(AUTH_TOKEN)).thenReturn(partyFlagVisibilities);
+
         mvc.perform(post(CASE_FLAGS_DATA_MIGRATION)
                         .content(requestContent.toString())
                         .header(AUTHORIZATION, AUTH_TOKEN)
@@ -81,50 +89,14 @@ class CaseFlagsDataMigrationControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         ArgumentCaptor<CaseData> caseDataCaptor = ArgumentCaptor.forClass(CaseData.class);
-        verify(caseFlagsService).setupCaseFlags(caseDataCaptor.capture());
+        verify(caseFlagsReferenceDataService).getPartyFlagVisibilities(AUTH_TOKEN);
+        verify(caseFlagsService).migrateExistingClaimantAndRespondentCaseFlags(
+                caseDataCaptor.capture(),
+                eq(partyFlagVisibilities)
+        );
         assertNotNull(caseDataCaptor.getValue().getAllPartyFlags());
         assertNotNull(caseDataCaptor.getValue().getAllPartyFlags().getClaimantFlags());
         assertNotNull(caseDataCaptor.getValue().getAllPartyFlags().getRespondentFlags());
-    }
-
-    @Test
-    @SneakyThrows
-    void shouldAddCaseFlagGroupIdAndVisibilityForPreviouslyMigratedFlags() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-
-        mvc.perform(post(CASE_FLAGS_DATA_MIGRATION)
-                        .content(requestContent.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.claimantFlags.groupId").value("Claimant"))
-                .andExpect(jsonPath("$.data.claimantFlags.visibility").value("Internal"))
-                .andExpect(jsonPath("$.data.respondentFlags.groupId").value("Respondent 1"))
-                .andExpect(jsonPath("$.data.respondentFlags.visibility").value("Internal"));
-    }
-
-    @Test
-    @SneakyThrows
-    void shouldNotOverwriteExistingCaseFlagGroupIdAndVisibility() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-
-        ObjectNode caseData = (ObjectNode) requestContent.at("/case_details/case_data");
-        ObjectNode claimantFlags = (ObjectNode) caseData.get("claimantFlags");
-        claimantFlags.put("groupId", "existing-claimant-group");
-        claimantFlags.put("visibility", "Internal");
-        ObjectNode respondentFlags = (ObjectNode) caseData.get("respondentFlags");
-        respondentFlags.put("groupId", "existing-respondent-group");
-        respondentFlags.put("visibility", "Internal");
-
-        mvc.perform(post(CASE_FLAGS_DATA_MIGRATION)
-                        .content(requestContent.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.claimantFlags.groupId").value("existing-claimant-group"))
-                .andExpect(jsonPath("$.data.claimantFlags.visibility").value("Internal"))
-                .andExpect(jsonPath("$.data.respondentFlags.groupId").value("existing-respondent-group"))
-                .andExpect(jsonPath("$.data.respondentFlags.visibility").value("Internal"));
     }
 
     @Test

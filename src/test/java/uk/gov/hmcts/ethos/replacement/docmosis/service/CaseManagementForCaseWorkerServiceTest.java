@@ -101,6 +101,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForC
 @ExtendWith(SpringExtension.class)
 class CaseManagementForCaseWorkerServiceTest {
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     public static final String UNASSIGNED_OFFICE = "Unassigned";
     private static final String HMCTS_SERVICE_ID = "BHA1";
@@ -669,8 +671,7 @@ class CaseManagementForCaseWorkerServiceTest {
     private CaseDetails generateCaseDetails(String jsonFileName) throws URISyntaxException, IOException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
             .getContextClassLoader().getResource(jsonFileName)).toURI())));
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(json, CaseDetails.class);
+        return OBJECT_MAPPER.readValue(json, CaseDetails.class);
     }
 
     @Test

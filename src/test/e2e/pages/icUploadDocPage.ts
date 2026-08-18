@@ -10,6 +10,7 @@ export default class ICUploadDocPage extends BasePage {
     private readonly jurisdictionCodeInvalidYes: Locator;
     private readonly invalidDetails: Locator;
     private readonly canProceedYes: Locator;
+    private readonly isThisUrgentYes: Locator;
     private readonly documentHeading: Locator;
     private readonly fileUploadEle: Locator;
     private readonly claimantRespondentHearingPanel: Locator;
@@ -20,6 +21,7 @@ export default class ICUploadDocPage extends BasePage {
         this.jurisdictionCodeInvalidYes = page.locator('#etICJuridictionCodesInvalid_Yes');
         this.invalidDetails = page.locator('#etICInvalidDetails');
         this.canProceedYes = page.locator('#etICCanProceed_Yes');
+        this.isThisUrgentYes = page.locator('#etICIsUrgent_Yes');
         this.documentHeading = page.locator('#icDocumentCollection1 h2');
         this.fileUploadEle = page.locator('#icDocumentCollection1_0_uploadedDocument');
         this.claimantRespondentHearingPanel = page.locator('#etIcPartiesHearingPanelPreferenceLabel td');
@@ -34,6 +36,7 @@ export default class ICUploadDocPage extends BasePage {
         await this.jurisdictionCodeInvalidYes.click();
         await this.invalidDetails.fill(icPageData.invalidDetailsText);
         await this.canProceedYes.click();
+        await this.isThisUrgentYes.click();
         await this.clickContinue(expUrl, 2);
 
         let txtHeading = await this.documentHeading.textContent();
@@ -42,7 +45,7 @@ export default class ICUploadDocPage extends BasePage {
 
         // Click and upload a document
         await this.addNewBtn.click();
-        await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.fileUploadEle,'resources/test_file/test-doc.pdf' )
+        await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.fileUploadEle,'src/test/e2e/resources/test_file/test-doc.pdf' )
         await this.delay(2000);
         await this.clickContinue(expUrl+ '/submit');
 

@@ -229,6 +229,21 @@ configurations.configureEach {
     )
 }
 
+jacocoTestCoverageVerification {
+    dependsOn test
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.75
+            }
+        }
+    }
+}
+
+check.dependsOn jacocoTestCoverageVerification
+
 test {
     useJUnitPlatform()
 }

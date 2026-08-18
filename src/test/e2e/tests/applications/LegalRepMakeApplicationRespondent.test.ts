@@ -56,7 +56,7 @@ test.describe('LR Make an application and view Recorded Decision for respondent'
 
   //RET-5787
   // Test is failing at submission of application or responding to application in citizen UI, DEFECT RET-6573 needs fixing
-  test.fail('Legal representatives make and application - England', async ({
+  test('Legal representatives make and application - England', async ({
     applicationTabPage, caseDetailsPage
   }) => {
 
@@ -74,7 +74,7 @@ test.describe('LR Make an application and view Recorded Decision for respondent'
     await loginPageCW.processLogin(users.etCaseWorker);
     caseNumber = await manageCaseDashboardPageCW.navigateToCaseDetails(caseId, CaseTypeLocation.EnglandAndWales);
     await caseDetailsPageCW.navigateToTab('Applications')
-    await applicationTabPageCW.caseWorkerRespondToAnApplication('Amend response');
+    await applicationTabPageCW.caseWorkerRespondToAnApplication('Amend response', 'Case management order', 'No');
 
     //claimant see response of respond
     await citizenHubLoginPage.processCitizenHubLogin(users.etClaimant);

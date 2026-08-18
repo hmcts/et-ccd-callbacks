@@ -632,7 +632,7 @@ public class CaseFlagsService {
         if (StringUtils.isNotBlank(existing.getId()) && StringUtils.isNotBlank(candidate.getId())) {
             return Objects.equals(existing.getId(), candidate.getId());
         }
-        return existing == candidate || existing.getValue() == candidate.getValue();
+        return existing.equals(candidate) || existing.getValue().equals(candidate.getValue());
     }
 
     private static Map<String, String> normaliseCaseFlagVisibility(Map<String, String> visibilityByKey) {

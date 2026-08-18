@@ -4,6 +4,12 @@
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 
+if (env.CHANGE_ID) {
+  properties([
+    disableConcurrentBuilds(abortPrevious: true)
+  ])
+}
+
 def type = "java"
 def product = "et"
 def component = "cos"

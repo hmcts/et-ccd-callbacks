@@ -11,7 +11,7 @@ properties([
         ])
 ])
 
-@Library("Infrastructure")
+@Library("Infrastructure@2.4.9")
 
 def type = "java"
 def product = "et"
@@ -110,6 +110,40 @@ withNightlyPipeline(type, product, component) {
             steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
             }
         }
+        stage('Smoke test') {
+            try {
+                yarnBuilder.yarn('test:smoke')
+            } catch (Error) {
+                unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+            } finally {
+                publishHTML([
+                    allowMissing         : true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll              : true,
+                    reportDir            : 'playwright-report',
+                    reportFiles          : 'index.html',
+                    reportName           : 'ET Smoke Test Report'
+            ])
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
+            }
+         }
+         stage('Full functional test- UI') {
+            try {
+                yarnBuilder.yarn('test:full-functional-chromium')
+            } catch (Error) {
+                unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+            } finally {
+                publishHTML([
+                    allowMissing         : true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll              : true,
+                    reportDir            : 'playwright-report',
+                    reportFiles          : 'index.html',
+                    reportName           : 'ET Full Functional Test Report'
+            ])
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
+            }
+         }
     }
 
     afterAlways('fortify-scan') {

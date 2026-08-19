@@ -1,8 +1,14 @@
 #!groovy
 
-@Library("Infrastructure")
+@Library("Infrastructure@2.4.9")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
+
+if (env.CHANGE_ID) {
+  properties([
+    disableConcurrentBuilds(abortPrevious: true)
+  ])
+}
 
 def type = "java"
 def product = "et"
@@ -126,19 +132,20 @@ withPipeline(type, product, component) {
   enableSlackNotifications('#et-builds')
 
   before('build') {
+    sh './gradlew validateCcdDefinitionsLockfile'
     sh '''
       env AZURE_CONFIG_DIR=/opt/jenkins/.azure-nonprod az acr login --name hmctsprod
     '''
   }
 
-  // Enable Performance Test Stages
-  enablePerformanceTestStages(timeout: 10, perfTestEnvironments: ['preview','aat','perftest'])
-  enableGatlingLoadTests([
-    repo: 'https://github.com/hmcts/performance-testing.git',
-    branch: 'add-et-tests',
-    simulation: 'et.simulations.EtCosApiBuildSimulation', 
-    timeout: 10
-  ])
+  // Performance stages are temporarily disabled while their runtime and variability are investigated.
+  // enablePerformanceTestStages(timeout: 10, perfTestEnvironments: ['preview','aat','perftest'])
+  // enableGatlingLoadTests([
+  //   repo: 'https://github.com/hmcts/performance-testing.git',
+  //   branch: 'add-et-tests',
+  //   simulation: 'et.simulations.EtCosApiBuildSimulation',
+  //   timeout: 10
+  // ])
 
   afterAlways('test') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/**/*'
@@ -164,6 +171,8 @@ withPipeline(type, product, component) {
     env.IMPORT_PREVIEW=true
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
     env.SERVICE_AUTH_PROVIDER_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+    env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+    env.CAMUNDA_BASE_URL = "https://camunda-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.ET_COS_URL = "https://et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CCD_DATA_STORE_API_URL = "https://ccd-data-store-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.TEST_URL_CITIZEN_UI = "https://et-sya-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
@@ -176,66 +185,27 @@ withPipeline(type, product, component) {
     env.REF_DATA_URL = "https://rd-caseworker-ref-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.ROLE_ASSIGNMENT_URL = "https://am-role-assignment-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.RUNNING_ENV = "aat"
+    env.IMPORT_ES_RETRY_COUNT = "20"
+    env.IMPORT_ES_RETRY_DELAY_SECONDS = "15"
+    env.IMPORT_ES_MAX_RETRY_DELAY_SECONDS = "60"
+    env.IMPORT_ES_INITIAL_WAIT_SECONDS = "60"
     env.ET_COS_AAT_DB_NAME = "et_cos"
     env.ET_COS_PREVIEW_DB_HOST = "et-preview.postgres.database.azure.com"
     env.ET_COS_PREVIEW_DB_PORT = "5432"
     env.ET_COS_PREVIEW_DB_NAME = "pr-${CHANGE_ID}-et_cos"
     env.ET_COS_PREVIEW_DB_USER_NAME = "hmcts"
     env.ET_COS_PREVIEW_DB_CONN_OPTIONS = "sslmode=require"
+    env.CCD_DEFINITION_STORE_PREVIEW_DB_NAME = "pr-${CHANGE_ID}-definition-store"
 
-    before('smoketest:preview') {
-      env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
-      env.CAMUNDA_BASE_URL = "https://camunda-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-      env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-      sh '''
-        for hostname in \
-          "camunda-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net" \
-          "ccd-definition-store-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net" \
-          "rd-caseworker-ref-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net" \
-          "am-role-assignment-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-        do
-          attempt=0
-          until getent hosts "${hostname}" > /dev/null; do
-            if [ "${attempt}" -ge 6 ]; then
-              echo "DNS did not resolve for ${hostname}"
-              exit 1
-            fi
-
-            attempt=$((attempt + 1))
-            echo "Waiting for DNS for ${hostname} (retry ${attempt}/6)"
-            sleep 5
-          done
-        done
-      '''
-      sh """
-        ./bin/wa/pull-latest-dmn-files.sh ${dmnBranch}
-       ./bin/wa/pull-latest-camunda-wa-files.sh ${bpmnBranch}
-      """
-
-      sh """
-        cd ccd-definitions && yarn install && yarn setup && yarn scripts:preview ${CHANGE_ID}
-      """
-      sh """
-          echo "Importing ET COS reference data"
-          ./bin/preview/import-ref-data.sh ${CHANGE_ID}
+    afterSuccess('akschartsinstall') {
+      stage('Configure preview environment') {
+        sh """
+          ./bin/preview/configure-preview-environment.sh ${CHANGE_ID} ${dmnBranch} ${bpmnBranch}
         """
-
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/admin/xlsx/et-admin-ccd-config-preview.xlsx'
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/england-wales/xlsx/et-englandwales-ccd-config-preview.xlsx'
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/scotland/xlsx/et-scotland-ccd-config-preview.xlsx'
-
-      sh """
-          echo "Creating CCD roles"
-          ./bin/preview/create-ccd-roles.sh
-        """
-      sh """
-          echo "Importing CCD definitions"
-          ./bin/preview/import-ccd-definitions.sh
-        """
-      sh """
-          echo "Setting up WA users and roles"
-          ./bin/wa/add-org-roles-to-users.sh
-        """
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/admin/xlsx/et-admin-ccd-config-preview.xlsx'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/england-wales/xlsx/et-englandwales-ccd-config-preview.xlsx'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/scotland/xlsx/et-scotland-ccd-config-preview.xlsx'
+      }
     }
 
     afterAlways('smoketest:preview') {
@@ -247,7 +217,8 @@ withPipeline(type, product, component) {
               reportFiles : "ET-CCD-Callbacks-tests.html",
               reportName : "ET Smoke test report"
       ]
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/**'
     }
 
     afterAlways('functionalTest:preview') {
@@ -270,7 +241,8 @@ withPipeline(type, product, component) {
                   reportFiles: 'index.html',
                   reportName: 'CCD Callback - UITestChromiumReport'
           ])
-          steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
+          steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
+          steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/**'
         }
       }
     }
@@ -292,9 +264,6 @@ withPipeline(type, product, component) {
     env.ET_SUBMIT_DRAFT_CASE_URL = "https://et-cos-staging.aat.platform.hmcts.net/cases/submit-case/"
     env.RUNNING_ENV = "aat"
 
-    // sh """
-    //   ./bin/pull-latest-e2e-tests.sh
-    // """
   }
 
   afterAlways('smoketest:aat') {
@@ -308,7 +277,8 @@ withPipeline(type, product, component) {
             reportFiles : "ET-CCD-Callbacks-tests.html",
             reportName : "ET Smoke test report"
     ]
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/**'
   }
 
   afterAlways('functionalTest:aat') {
@@ -328,7 +298,8 @@ withPipeline(type, product, component) {
               reportFiles: 'index.html',
               reportName: 'CCD Callback - UITestChromiumReport'
           ])
-          steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
+          steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
+          steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/**'
       }
     }
   }

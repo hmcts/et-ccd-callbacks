@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.functional;
 
 import io.restassured.RestAssured;
-import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +19,7 @@ class HealthCheckTest {
         RestAssured.given()
                 .get("/health")
                 .then()
-                .statusCode(HttpStatus.SC_OK)
+                .statusCode(200)
                 .log().all(true)
                 .assertThat().body("status", equalTo("UP"));
     }

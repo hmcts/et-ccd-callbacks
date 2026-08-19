@@ -16,26 +16,26 @@ export default class CaseDetailsPage extends BasePage {
   }
 
   async addVPCaseFlag() {
-        await this.page.locator('text=Managing Office').waitFor({ state: 'visible' });
-        await this.page.locator('#allocatedOffice').selectOption('1: Glasgow');
-        await this.clickContinue();
-        await this.page.locator('text=Single or Multiple').waitFor({ state: 'visible' });
-        await this.clickContinue();
-        await this.page.locator('text=Speak to VP (Optional)').waitFor({ state: 'visible' });
-        await this.page.locator('#additionalCaseInfo_interventionRequired_Yes').scrollIntoViewIfNeeded();
-        await this.page.locator('#additionalCaseInfo_interventionRequired_Yes').click();
-        await this.clickContinue();
-        await this.page.locator('text=Check your answers').waitFor({ state: 'visible' });
-        await this.clickSubmitButton();
+    await this.page.locator('text=Managing Office').waitFor({ state: 'visible' });
+    await this.page.locator('#allocatedOffice').selectOption('1: Glasgow');
+    await this.clickContinue();
+    await this.page.locator('text=Single or Multiple').waitFor({ state: 'visible' });
+    await this.clickContinue();
+    await this.page.locator('text=Speak to VP (Optional)').waitFor({ state: 'visible' });
+    await this.page.locator('#additionalCaseInfo_interventionRequired_Yes').scrollIntoViewIfNeeded();
+    await this.page.locator('#additionalCaseInfo_interventionRequired_Yes').click();
+    await this.clickContinue();
+    await this.page.locator('text=Check your answers').waitFor({ state: 'visible' });
+    await this.clickSubmitButton();
 
-        await expect(this.page.getByRole('tab', { name: 'Case Details' }).locator('div')).toContainText('Case Details');
-        await expect(this.page.getByText('SPEAK TO VP', { exact: true })).toBeVisible();
-    }
+    await expect(this.page.getByRole('tab', { name: 'Case Details' }).locator('div')).toContainText('Case Details');
+    await expect(this.page.getByText('SPEAK TO VP', { exact: true })).toBeVisible();
+  }
 
   async checkHasBeenCreated(event: CaseEvent) {
-      await expect(this.page.locator('//div[@class="alert-message"]')).toBeVisible();
-      const successMessage = this.page.getByText(`has been updated with event: ${event.listItem}`);
-      await expect(successMessage).toBeVisible();
+    await expect(this.page.locator('//div[@class="alert-message"]')).toBeVisible();
+    const successMessage = this.page.getByText(`has been updated with event: ${event.listItem}`);
+    await expect(successMessage).toBeVisible();
   }
 
   async assertTabData(tabs: Tab[]) {
@@ -115,7 +115,7 @@ export default class CaseDetailsPage extends BasePage {
             `xpath=following-sibling::*[self::td or self::th][${i + 1}] | ancestor::*[self::td or self::th or self::tr][1]/following-sibling::*[self::td or self::th][${i + 1}]`
           );
           if (!content.exact) {
-           //await expect(tabValue).toContainText(expectedValues[i]);
+            await expect(tabValue).toContainText(expectedValues[i]);
           } else {
             await expect(tabValue).toHaveText(expectedValues[i]);
           }
@@ -151,7 +151,11 @@ export default class CaseDetailsPage extends BasePage {
    * 5. Throws an error if the requested visible position does not exist.
    */
   private async getVisibleTabContent(content: string, position: number = 0, exact: boolean = true): Promise<Locator> {
-    const locator = this.page.getByText(content, { exact });
+    // active tab area
+    const activeTabContent = this.page.locator('mat-tab-body.mat-tab-body-active .mat-tab-body-content');
+    await expect(activeTabContent).toBeVisible();
+
+    const locator = activeTabContent.getByText(content, { exact });
     // Wait for at least one matching element to be attached
     await locator.first().waitFor({ state: 'attached', timeout: 10000 }).catch(() => {});
     const count = await locator.count();
@@ -243,43 +247,103 @@ export default class CaseDetailsPage extends BasePage {
   }
 
   async navigateToTab(tabName: string): Promise<void> {
-    await this.page.waitForLoadState('load', {timeout: 5000});
-    const xpath = `//div[@role='tab']/div[normalize-space()='${tabName}']`;
-    let tabHeader = this.page.locator(xpath);
+    await this.page.waitForLoadState('load', { timeout: 5000 });
 
-    const tryPaginateAncClickTab = async(direction: string) => {
-      let paginateDirectionButton = this.page.locator(`button.mat-tab-header-pagination-${direction}[aria-hidden="true"]:not([disabled])`);
-      while (await paginateDirectionButton.count() > 0) {
-        await paginateDirectionButton.click();
-        try {
-          await this.page.waitForLoadState('load');
-          tabHeader = this.page.locator(xpath);
-          await tabHeader.click({ trial: true, timeout:2000 });
-          await tabHeader.click();
-          console.log(`Clicked on tab after paginating ${direction}: ` + tabName);
-          return true;
-        } catch {
-        }
-        paginateDirectionButton = this.page.locator(`button.mat-tab-header-pagination-${direction}[aria-hidden="true"]:not([disabled])`);
+    const tabs = this.page.locator("//div[@role='tab']");
+    await tabs.first().waitFor({ state: 'attached', timeout: 5000 });
+
+    const totalTabs = await tabs.count();
+    const tabNames: string[] = [];
+
+    for (let i = 0; i < totalTabs; i++) {
+      const name = (await tabs.nth(i).locator(':scope > div').innerText()).replace(/\s+/g, ' ').trim();
+      tabNames.push(name);
+    }
+
+    const targetIndex = tabNames.indexOf(tabName);
+    if (targetIndex === -1) {
+      throw new Error(`Tab \"${tabName}\" not found in tab list: [${tabNames.join(', ')}]`);
+    }
+
+    const tryClickTargetTab = async(): Promise<boolean> => {
+      try {
+        const targetTab = tabs.nth(targetIndex);
+        await targetTab.click({ trial: true, timeout: 2000 });
+        await targetTab.click();
+        console.log('Clicked on tab: ' + tabName);
+        return true;
+      } catch {
+        return false;
       }
-      return false;
     };
 
-    try {
-      await this.page.waitForLoadState('load');
-      tabHeader = this.page.locator(xpath);
-      await tabHeader.click({ trial: true, timeout:4000 }); // trial: true checks if clickable
-      await tabHeader.click();
-      console.log('Clicked on tab: ' + tabName);
+    const getVisibleRange = async(): Promise<{ first: number; last: number }> => {
+      let first = -1;
+      let last = -1;
+
+      for (let i = 0; i < totalTabs; i++) {
+        if (await tabs.nth(i).isVisible()) {
+          if (first === -1) {
+            first = i;
+          }
+          last = i;
+        }
+      }
+
+      return { first, last };
+    };
+
+    const paginateAndClick = async(direction: 'before' | 'after'): Promise<boolean> => {
+      const paginationButton = this.page.locator(`button.mat-tab-header-pagination-${direction}:not([disabled])`);
+
+      for (let step = 0; step < totalTabs; step++) {
+        if (await tryClickTargetTab()) {
+          return true;
+        }
+
+        if (await paginationButton.count() === 0) {
+          break;
+        }
+
+        await paginationButton.first().click();
+        await this.page.waitForTimeout(100);
+      }
+
+      return tryClickTargetTab();
+    };
+
+    if (await tryClickTargetTab()) {
       return;
-    } catch {
-      // Try paginating before
-      if (await tryPaginateAncClickTab('before'))  return;
-      // Try paginating After
-      if (await tryPaginateAncClickTab('after'))  return;
-      // if nothing worked then throw error
-      throw new Error('Not able to navigate to Tab ' + tabName);
     }
+
+    const { first, last } = await getVisibleRange();
+
+    if (first !== -1 && last !== -1) {
+      if (targetIndex < first) {
+        if (await paginateAndClick('before')) {
+          return;
+        }
+        if (await paginateAndClick('after')) {
+          return;
+        }
+      } else if (targetIndex > last) {
+        if (await paginateAndClick('after')) {
+          return;
+        }
+        if (await paginateAndClick('before')) {
+          return;
+        }
+      }
+    } else {
+      if (await paginateAndClick('before')) {
+        return;
+      }
+      if (await paginateAndClick('after')) {
+        return;
+      }
+    }
+
+    throw new Error(`Not able to navigate to Tab ${tabName}`);
   }
 
   async selectNextEvent(event: CaseEvent, navigate: boolean = true) {

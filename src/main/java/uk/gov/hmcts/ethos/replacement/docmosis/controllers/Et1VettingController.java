@@ -33,6 +33,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper.buildFlagsImageFileName;
 
 @Slf4j
 @RestController
@@ -158,7 +159,7 @@ public class Et1VettingController {
         log.info("ET1 CASE VETTING ABOUT TO SUBMIT ---> {}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        et1VettingService.setEt1VettingFields(caseData);
+        et1VettingService.setEraFields(caseData);
         caseData.setEt1VettingCompletedBy(reportDataService.getUserFullName(userToken));
         caseData.setEt1DateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT)));
         DocumentInfo documentInfo = et1VettingService.generateEt1VettingDocument(caseData, userToken,
@@ -168,6 +169,7 @@ public class Et1VettingController {
         caseData.setSuggestedHearingVenues(caseData.getEt1HearingVenues());
         setDocumentNumbers(caseData);
         et1VettingService.clearEt1FieldsFromCaseData(ccdRequest.getCaseDetails().getCaseData());
+        buildFlagsImageFileName(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

@@ -2648,21 +2648,11 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseEventID": "et1Vetting",
-    "CaseFieldID": "et1VettingAcasCertGeneralNote",
-    "DisplayContext": "OPTIONAL",
-    "PageID": 3,
-    "PageDisplayOrder": 3,
-    "PageFieldDisplayOrder": 27,
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
-    "CaseEventID": "et1Vetting",
     "CaseFieldID": "et1VettingEraAssessmentMarkUp",
     "DisplayContext": "READONLY",
     "PageID": 3,
     "PageDisplayOrder": 3,
-    "PageFieldDisplayOrder": 28,
+    "PageFieldDisplayOrder": 27,
     "FieldShowCondition": "et1VettingEraAssessmentMarkUpLabel =\"dummy\""
   },
   {
@@ -2672,13 +2662,23 @@
     "DisplayContext": "READONLY",
     "PageID": 3,
     "PageDisplayOrder": 3,
-    "PageFieldDisplayOrder": 29
+    "PageFieldDisplayOrder": 28
   },
   {
     "CaseTypeID": "ET_Scotland",
     "CaseEventID": "et1Vetting",
     "CaseFieldID": "et1VettingEra",
     "DisplayContext": "MANDATORY",
+    "PageID": 3,
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 29,
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "et1Vetting",
+    "CaseFieldID": "et1VettingAcasCertGeneralNote",
+    "DisplayContext": "OPTIONAL",
     "PageID": 3,
     "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 30,

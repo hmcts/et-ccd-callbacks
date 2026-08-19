@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.AdditionalCaseInfoType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -523,7 +524,7 @@ public class Et1VettingService {
 
     private String formatDisplayDate(String dateStr) {
         if (isNullOrEmpty(dateStr)) {
-            return "Not provided";
+            return "-";
         }
         try {
             LocalDate date = LocalDate.parse(dateStr);
@@ -723,10 +724,20 @@ public class Et1VettingService {
         }
     }
 
-    public void setEt1VettingFields(CaseData caseData) {
+    public void setEraFields(CaseData caseData) {
         if (!employmentRightsActService.isEraOctober2026(caseData)) {
             caseData.setEt1VettingEra(NOT_APPLICABLE);
-            caseData.setEt1VettingEraAssessmentMarkUp(null);
         }
+        caseData.setEt1VettingEraAssessmentMarkUp(null);
+        if (ObjectUtils.isEmpty(caseData.getAdditionalCaseInfoType())) {
+            caseData.setAdditionalCaseInfoType(new AdditionalCaseInfoType());
+        }
+
+        if (YES.equals(caseData.getEt1VettingEra())) {
+            caseData.getAdditionalCaseInfoType().setEra(YES);
+        } else if (NO.equals(caseData.getEt1VettingEra()) || NOT_APPLICABLE.equals(caseData.getEt1VettingEra())) {
+            caseData.getAdditionalCaseInfoType().setEra(NO);
+        }
+
     }
 }

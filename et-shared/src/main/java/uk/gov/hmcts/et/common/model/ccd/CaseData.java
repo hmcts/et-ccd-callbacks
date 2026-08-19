@@ -795,8 +795,12 @@ public class CaseData extends Et1CaseData {
     private String etICJuridictionCodesInvalid;
     @JsonProperty("etICInvalidDetails")
     private String etICInvalidDetails;
+    @JsonProperty("etICUnfairDismissalEra")
+    private String etICUnfairDismissalEra;
     @JsonProperty("etICCanProceed")
     private String etICCanProceed;
+    @JsonProperty("etICIsUrgent")
+    private String etICIsUrgent;
     @JsonProperty("etICHearingAlreadyListed")
     private String etICHearingAlreadyListed;
     // ET Initial Consideration - Hearing Not Listed
@@ -919,6 +923,10 @@ public class CaseData extends Et1CaseData {
     private List<String> et3ResponseHearingRepresentative;
     @JsonProperty("et3ResponseHearingRespondent")
     private List<String> et3ResponseHearingRespondent;
+    @JsonProperty("et3ResponseHearingPanelPreference")
+    private String et3ResponseHearingPanelPreference;
+    @JsonProperty("et3ResponseHearingPanelPreferenceReason")
+    private String et3ResponseHearingPanelPreferenceReason;
     // ET3 Response - Respondent's workforce page (10)
     @JsonProperty("et3ResponseEmploymentCount")
     private String et3ResponseEmploymentCount;
@@ -1534,7 +1542,29 @@ public class CaseData extends Et1CaseData {
     @JsonProperty("bundlesRespondentCollection")
     private List<GenericTypeItem<HearingBundleType>> bundlesRespondentCollection;
 
-    // Claimant Bundles
+    // Bundles Claimant
+    @JsonProperty("bundlesClaimantPrepareDocNotesShow")
+    private String bundlesClaimantPrepareDocNotesShow;
+
+    @JsonProperty("bundlesClaimantAgreedDocWith")
+    private String bundlesClaimantAgreedDocWith;
+    @JsonProperty("bundlesClaimantAgreedDocWithBut")
+    private String bundlesClaimantAgreedDocWithBut;
+    @JsonProperty("bundlesClaimantAgreedDocWithNo")
+    private String bundlesClaimantAgreedDocWithNo;
+
+    @JsonProperty("bundlesClaimantSelectHearing")
+    private DynamicFixedListType bundlesClaimantSelectHearing;
+
+    @JsonProperty("bundlesClaimantWhatDocuments")
+    private String bundlesClaimantWhatDocuments;
+
+    @JsonProperty("bundlesClaimantWhoseDocuments")
+    private String bundlesClaimantWhoseDocuments;
+
+    @JsonProperty("bundlesClaimantUploadFile")
+    private UploadedDocumentType bundlesClaimantUploadFile;
+
     @JsonProperty("bundlesClaimantCollection")
     private List<GenericTypeItem<HearingBundleType>> bundlesClaimantCollection;
 
@@ -1715,6 +1745,10 @@ public class CaseData extends Et1CaseData {
     private List<String> claimantSupportQuestion;
     @JsonProperty("claimantSupportQuestionReason")
     private String claimantSupportQuestionReason;
+    @JsonProperty("claimantHearingPanelPreference")
+    private String claimantHearingPanelPreference;
+    @JsonProperty("claimantHearingPanelPreferenceReason")
+    private String claimantHearingPanelPreferenceReason;
     @JsonProperty("representativeContactPreference")
     private List<String> representativeContactPreference;
     @JsonProperty("contactPreferencePostReason")
@@ -1817,6 +1851,8 @@ public class CaseData extends Et1CaseData {
     private String et1SectionThreeClaimDetails;
     @JsonProperty("et1SectionThreeDocumentUpload")
     private UploadedDocumentType et1SectionThreeDocumentUpload;
+    @JsonProperty("et1SectionThreeDateOfLastEvent")
+    private String et1SectionThreeDateOfLastEvent;
     @JsonProperty("et1SectionThreeTypeOfClaim")
     private List<String> et1SectionThreeTypeOfClaim;
     @JsonProperty("discriminationTypesOfClaim")
@@ -1895,10 +1931,14 @@ public class CaseData extends Et1CaseData {
     // MyHMCTS address or a manually entered address.
     @JsonProperty("representativeContactChangeOption")
     private String representativeContactChangeOption;
-    // Unable to remove respondent representative from repCollection as a respondent (remove legal representation).
-    // To resolve this problem added new field to identify which respondent representatives needs to be removed.
+    // Unable to remove respondent representative from repCollection as a respondent (remove legal representation),
+    // Unable to update organisation policies and change role definitions for removed/added representatives
+    // To resolve these problems added new field to identify which respondent representatives needs to be
+    // removed or added.
     @JsonProperty("repCollectionToRemove")
     private List<RepresentedTypeRItem> repCollectionToRemove;
+    @JsonProperty("repCollectionToAdd")
+    private List<RepresentedTypeRItem> repCollectionToAdd;
 
     @JsonProperty("acasCertificateRequired")
     private String acasCertificateRequired;

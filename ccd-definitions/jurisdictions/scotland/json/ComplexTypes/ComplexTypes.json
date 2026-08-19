@@ -1448,6 +1448,23 @@
     "SecurityClassification": "Public"
   },
   {
+    "ID": "RespondentRepresentative",
+    "ListElementCode": "role",
+    "FieldType": "Text",
+    "ElementLabel": "Respondent representative role",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RespondentRepresentative",
+    "ListElementCode": "idamId",
+    "FieldType": "Text",
+    "ElementLabel": "Respondent representative idam id",
+    "FieldShowCondition": "role=\"dummy\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
     "ID": "acceptOrRejectCase",
     "ListElementCode": "caseAccepted",
     "FieldType": "YesOrNo",
@@ -4975,6 +4992,14 @@
     "SecurityClassification": "Public"
   },
   {
+    "ID": "RespondentRepresentative",
+    "ListElementCode": "nonMyHmctsOrganisationId",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "FieldShowCondition": "myHmctsYesNo=\"dummy\"",
+    "SecurityClassification": "Public"
+  },
+  {
     "ID": "ListingItemType",
     "ListElementCode": "estHearingLength",
     "FieldType": "Text",
@@ -8058,6 +8083,14 @@
     "ListElementCode": "furtherDirections",
     "FieldType": "TextArea",
     "ElementLabel": "Any further directions",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DraftAndSignJudgement",
+    "ListElementCode": "isUrgent",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Is this urgent?",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },

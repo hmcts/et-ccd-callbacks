@@ -7,7 +7,7 @@ import java.io.Serial;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtil.logException;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils.logException;
 
 /**
  * Is thrown when an exception occurs whiles converting case data in pdf in {@link PdfBoxService}.
@@ -17,6 +17,25 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtil.logExcep
 public class GenericServiceException extends Exception {
     @Serial
     private static final long serialVersionUID = 304268196018404976L;
+
+    /**
+     * Constructs a new {@code GenericServiceException} with the specified detail message.
+     *
+     * @param message the detail message, which is saved for later retrieval by the
+     *                {@link Throwable#getMessage()} method
+     */
+    public GenericServiceException(String message) {
+        super(message);
+    }
+
+    /**
+     * Constructs a new {@code GenericServiceException} with the specified cause.
+     *
+     * @param exception the underlying exception that caused this exception; may be {@code null}
+     */
+    public GenericServiceException(Exception exception) {
+        super(exception);
+    }
 
     /**
      * Creates a {@link GenericServiceException} with an error message and the cause of the error and

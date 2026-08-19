@@ -10,8 +10,6 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,7 +22,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ExcelReportHelper.
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ExcelReportHelper.getReportTitleCellStyle;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ExcelReportHelper.initializeReportHeaders;
 
-@ExtendWith(SpringExtension.class)
 class ExcelReportHelperTest {
 
     @Test

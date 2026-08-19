@@ -288,7 +288,6 @@ public class ApplicationService {
 
         notificationService.sendAcknowledgementEmailToClaimant(details, claimantTse);
         notificationService.sendAcknowledgementEmailToRespondents(details, documentJson, claimantTse);
-        notificationService.sendAcknowledgementEmailToTribunal(details, claimantTse.getContactApplicationType(), false);
     }
 
     private void sendRespondentAppAcknowledgementEmails(
@@ -305,8 +304,6 @@ public class ApplicationService {
 
         notificationService.sendRespondentAppAcknowledgementEmailToRespondent(details, respondentTse, documentJson);
         notificationService.sendRespondentAppAcknowledgementEmailToClaimant(details, documentJson, respondentTse);
-        notificationService.sendAcknowledgementEmailToTribunal(
-            details, respondentTse.getContactApplicationType(), true);
     }
 
     private CoreEmailDetails prepareCoreEmailDetails(CaseData caseData, String caseId) {
@@ -334,8 +331,6 @@ public class ApplicationService {
     ) {
         CoreEmailDetails details = prepareCoreEmailDetails(caseData, caseId);
         String type = application.getType();
-
-        notificationService.sendResponseEmailToTribunal(details, type, isRespondingToRequestOrOrder);
 
         if (respondingUserType.equals(RESPONDENT_TITLE)) {
             sendRespondentResponseToApplicationEmails(caseData, details, caseId, type, copyToOtherParty,

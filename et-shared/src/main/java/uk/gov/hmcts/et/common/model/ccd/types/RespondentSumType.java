@@ -67,6 +67,10 @@ public class RespondentSumType {
     private String respondentAcas;
     @JsonProperty("respondent_ACAS_no")
     private String respondentAcasNo;
+    @JsonProperty("acasCertificateReceiptDate")
+    private String acasCertificateReceiptDate;
+    @JsonProperty("acasCertificateIssueDate")
+    private String acasCertificateIssueDate;
     @JsonProperty("respondent_address")
     private Address respondentAddress;
     @JsonProperty("respondent_phone1")
@@ -252,4 +256,8 @@ public class RespondentSumType {
     private String employersContractClaimSection;
     @JsonProperty("representativeRemoved")
     private String representativeRemoved;
+    @JsonProperty("represented")
+    private String represented;
+    @JsonProperty("representativeId")
+    private String representativeId;
 }

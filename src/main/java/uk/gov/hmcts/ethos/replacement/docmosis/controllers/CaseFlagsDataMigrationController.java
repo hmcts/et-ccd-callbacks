@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsReferenceDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -23,9 +23,6 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.CLAIMANT;
-import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.INTERNAL;
-import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT1;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 
 @Slf4j
@@ -37,9 +34,10 @@ public class CaseFlagsDataMigrationController {
 
     private final VerifyTokenService verifyTokenService;
     private final CaseFlagsService caseFlagsService;
+    private final CaseFlagsReferenceDataService caseFlagsReferenceDataService;
 
     @PostMapping(value = "/case-flags-migration/about-to-submit", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "update existing cases with default values for case flags.")
+    @Operation(summary = "migrate existing party case flags into internal and external sections.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
                 content = {@Content(mediaType = "application/json",
@@ -59,22 +57,10 @@ public class CaseFlagsDataMigrationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseFlagsService.setupCaseFlags(caseData);
-        CaseFlagsType claimantFlags = caseData.getAllPartyFlags().getClaimantFlags();
-        CaseFlagsType respondentFlags = caseData.getAllPartyFlags().getRespondentFlags();
-
-        /* Add visibility and group ID fields for the claimant and the first respondent records
-           that were already migrated in Case Flag v1.0. */
-        if (claimantFlags.getGroupId() == null) {
-            claimantFlags.setGroupId(CLAIMANT);
-            claimantFlags.setVisibility(INTERNAL);
-        }
-
-        if (respondentFlags.getGroupId() == null) {
-            respondentFlags.setRoleOnCase(RESPONDENT1);
-            respondentFlags.setGroupId(RESPONDENT1);
-            respondentFlags.setVisibility(INTERNAL);
-        }
+        caseFlagsService.migrateExistingClaimantAndRespondentCaseFlags(
+                caseData,
+                caseFlagsReferenceDataService.getPartyFlagVisibilities(userToken)
+        );
 
         log.info("Migrating existing case: {}", ccdRequest.getCaseDetails().getCaseId());
 

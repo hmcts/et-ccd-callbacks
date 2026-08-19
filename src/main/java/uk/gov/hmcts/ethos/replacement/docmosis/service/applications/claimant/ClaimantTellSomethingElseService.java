@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.DocumentHelper;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
@@ -24,8 +23,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions.EmailServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
 import uk.gov.service.notify.NotificationClient;
@@ -39,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -48,16 +46,13 @@ import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_A
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_MONTHS_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE_PLUS_7;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_FLAG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_CASE_DETAILS_LINK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_DOCUMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.NOT_SET;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.NOT_SET_CY;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.SHORT_TEXT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
@@ -85,10 +80,8 @@ public class ClaimantTellSomethingElseService {
 
     private final DocumentManagementService documentManagementService;
     private final TornadoService tornadoService;
-    private final UserIdamService userIdamService;
     private final EmailService emailService;
     private final FeatureToggleService featureToggleService;
-    private final TribunalOfficesService tribunalOfficesService;
     private final CaseAccessService caseAccessService;
     private final EmailNotificationService emailNotificationService;
 
@@ -245,7 +238,6 @@ public class ClaimantTellSomethingElseService {
             sendRespondentsEmail(caseDetails, caseUserAssignments);
         }
         sendAcknowledgementEmail(caseDetails, caseUserAssignments);
-        sendAdminEmail(caseDetails);
     }
 
     public void sendRespondentsEmail(CaseDetails caseDetails, List<CaseUserAssignment> caseUserAssignments) {
@@ -366,40 +358,6 @@ public class ClaimantTellSomethingElseService {
         return hearingDate;
     }
 
-    public void sendAdminEmail(CaseDetails caseDetails) {
-        String email = getTribunalEmail(caseDetails.getCaseData());
-        if (isNullOrEmpty(email)) {
-            return;
-        }
-
-        Map<String, String> personalisation = prepareContentAdminEmail(caseDetails);
-        emailService.sendEmail(tseClaimantRepNewApplicationTemplateId, email, personalisation);
-    }
-
-    public String getTribunalEmail(CaseData caseData) {
-        String managingOffice = caseData.getManagingOffice();
-        TribunalOffice tribunalOffice = tribunalOfficesService.getTribunalOffice(managingOffice);
-
-        if (tribunalOffice == null) {
-            return null;
-        }
-
-        return tribunalOffice.getOfficeEmail();
-    }
-
-    private Map<String, String> prepareContentAdminEmail(CaseDetails caseDetails) {
-        CaseData caseData = caseDetails.getCaseData();
-
-        Map<String, String> content = new ConcurrentHashMap<>();
-        content.put(CASE_NUMBER, caseData.getEthosCaseReference());
-        content.put(EMAIL_FLAG, "");
-        content.put(CLAIMANT, caseData.getClaimant());
-        content.put(DATE, getNearestHearingToReferral(caseData, NOT_SET));
-        content.put("url", emailService.getExuiCaseLink(caseDetails.getCaseId()));
-        content.put(RESPONDENTS, getRespondentNames(caseData));
-        return content;
-    }
-  
     public String generateClaimantApplicationTableMarkdown(CaseData caseData) {
         return ClaimantTellSomethingElseHelper.generateClaimantRepApplicationMarkdown(caseData);
     }

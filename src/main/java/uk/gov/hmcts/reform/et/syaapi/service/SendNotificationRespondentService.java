@@ -349,7 +349,6 @@ public class SendNotificationRespondentService {
                                                 String caseId,
                                                 String copyToOtherParty,
                                                 String respondentIdamId) {
-        notificationPseService.sendResponseNotificationEmailToTribunal(caseData, caseId);
         notificationPseService.sendResponseNotificationEmailToRespondent(caseData, caseId, copyToOtherParty,
                                                                       false, respondentIdamId);
         notificationPseService.sendResponseNotificationEmailToClaimant(caseData, caseId, copyToOtherParty, false);

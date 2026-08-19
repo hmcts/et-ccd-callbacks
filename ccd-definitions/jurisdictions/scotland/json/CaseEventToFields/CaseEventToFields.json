@@ -1587,45 +1587,11 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "CaseEventID": "addAmendClaimantRepresentative",
-    "CaseFieldID": "claimantRepresentedQuestion",
-    "DisplayContext": "OPTIONAL",
-    "PageID": 1,
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 1,
-    "ShowSummaryChangeOption": "Y",
-    "PageColumnNumber": 1
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
-    "CaseEventID": "addAmendClaimantRepresentative",
-    "CaseFieldID": "representativeClaimantType",
-    "DisplayContext": "COMPLEX",
-    "PageID": 1,
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 2,
-    "FieldShowCondition": "claimantRepresentedQuestion=\"Yes\"",
-    "ShowSummaryChangeOption": "Y",
-    "PageColumnNumber": 1
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
     "CaseEventID": "amendRespondentDetails",
     "CaseFieldID": "respondentCollection",
     "DisplayContext": "COMPLEX",
     "PageID": 1,
     "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 1,
-    "ShowSummaryChangeOption": "Y",
-    "PageColumnNumber": 1
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
-    "CaseEventID": "amendRespondentRepresentative",
-    "CaseFieldID": "repCollection",
-    "DisplayContext": "COMPLEX",
-    "PageID": 1,
-    "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
     "ShowSummaryChangeOption": "Y",
     "PageColumnNumber": 1
@@ -5102,18 +5068,18 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "CaseEventID": "amendRespondentRepresentativeContact",
+    "CaseEventID": "amendRepresentativeContact",
     "CaseFieldID": "representativeContactChangeOption",
     "DisplayContext": "OPTIONAL",
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
-    "CallBackURLMidEvent": "${ET_COS_URL}/et3Response/midEventAmendRepresentativeContact",
+    "CallBackURLMidEvent": "${ET_COS_URL}/amendRepresentativeContact/midEvent",
     "ShowSummaryChangeOption": "N"
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "CaseEventID": "amendRespondentRepresentativeContact",
+    "CaseEventID": "amendRepresentativeContact",
     "CaseFieldID": "et3ResponsePhone",
     "DisplayContext": "OPTIONAL",
     "PageID": 2,
@@ -5125,7 +5091,7 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "CaseEventID": "amendRespondentRepresentativeContact",
+    "CaseEventID": "amendRepresentativeContact",
     "CaseFieldID": "et3ResponseAddress",
     "DisplayContext": "OPTIONAL",
     "PageID": 2,
@@ -5136,7 +5102,7 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "CaseEventID": "amendRespondentRepresentativeContact",
+    "CaseEventID": "amendRepresentativeContact",
     "CaseFieldID": "myHmctsAddressText",
     "DisplayContext": "READONLY",
     "PageID": 3,

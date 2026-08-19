@@ -9,7 +9,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -61,7 +63,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.TseHe
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.TseHelper.getRespondentSelectedApplicationType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.getGenericTseApplicationTypeItem;
 
-@ExtendWith(SpringExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+@ExtendWith(MockitoExtension.class)
 class TseHelperTest {
     private static final DynamicValueType SELECT_APPLICATION = DynamicValueType.create("1", "");
 
@@ -268,7 +271,7 @@ class TseHelperTest {
             + "\"uploadedDocument\":{\"document_binary_url\":\"http://dm-store:8080/documents/1234/binary"
             + "\",\"document_filename\":\"image.png\","
             + "\"document_url\":\"http://dm-store:8080/documents/1234\",\"category_id\":null,\"upload_timestamp\""
-            + ":null},\"ownerDocument\":null,"
+            + ":null,\"document_hash\":null},\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null,\"topLevelDocuments\":null,\"startingClaimDocuments\":"
             + "null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null,\"caseManagementDocuments\""
             + ":null,\"eccDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
@@ -313,7 +316,7 @@ class TseHelperTest {
                 + "\"uploadedDocument\":{\"document_binary_url\":\"http://dm-store:8080/documents/1234/binary"
                 + "\",\"document_filename\":\"image.png\","
                 + "\"document_url\":\"http://dm-store:8080/documents/1234\",\"category_id\":null,\"upload_timestamp\""
-                + ":null},\"ownerDocument\":null,"
+                + ":null,\"document_hash\":null},\"ownerDocument\":null,"
                 + "\"creationDate\":null,"
                 + "\"shortDescription\":null,\"topLevelDocuments\":null,\"startingClaimDocuments\":"
                 + "null,\"responseClaimDocuments\":null,"

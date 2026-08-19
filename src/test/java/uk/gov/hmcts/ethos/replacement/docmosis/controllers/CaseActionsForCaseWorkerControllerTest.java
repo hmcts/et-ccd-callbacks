@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -20,6 +21,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -28,12 +30,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
@@ -45,11 +44,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
@@ -57,7 +56,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -81,6 +79,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
@@ -90,15 +89,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @ContextConfiguration(classes = DocmosisApplication.class)
 class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
-    private static final String CREATION_CASE_URL = "/createCase";
-    private static final String RETRIEVE_CASE_URL = "/retrieveCase";
-    private static final String RETRIEVE_CASES_URL = "/retrieveCases";
-    private static final String UPDATE_CASE_URL = "/updateCase";
     private static final String PRE_DEFAULT_VALUES_URL = "/preDefaultValues";
     private static final String POST_DEFAULT_VALUES_URL = "/postDefaultValues";
     private static final String AMEND_CASE_DETAILS_URL = "/amendCaseDetails";
     private static final String AMEND_CLAIMANT_DETAILS_URL = "/amendClaimantDetails";
     private static final String AMEND_RESPONDENT_DETAILS_URL = "/amendRespondentDetails";
+    private static final String AMEND_RESPONDENT_DETAILS_SUBMITTED_URL = "/amendRespondentDetailsSubmitted";
     private static final String AMEND_RESPONDENT_REPRESENTATIVE_URL = "/amendRespondentRepresentative";
     private static final String UPDATE_HEARING_URL = "/updateHearing";
     private static final String RESTRICTED_CASES_URL = "/restrictedCases";
@@ -133,15 +129,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @MockitoBean
     private CaseCloseValidator caseCloseValidator;
-
-    @MockitoBean
-    private CaseCreationForCaseWorkerService caseCreationForCaseWorkerService;
-
-    @MockitoBean
-    private CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
-
-    @MockitoBean
-    private CaseUpdateForCaseWorkerService caseUpdateForCaseWorkerService;
 
     @MockitoBean
     private DefaultValuesReaderService defaultValuesReaderService;
@@ -255,72 +242,20 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .tribunalCorrespondenceDX("123456")
                 .tribunalCorrespondenceEmail("manchester@gmail.com")
                 .build();
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"/createCase", "/retrieveCase", "/retrieveCases", "/updateCase"})
     @SneakyThrows
-    void createCase() {
-        when(caseCreationForCaseWorkerService.caseCreationRequest(any(CCDRequest.class),
-                eq(AUTH_TOKEN))).thenReturn(submitEvent);
+    void legacyCaseWorkerEndpointsAreNotMapped(String endpoint) {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mvc.perform(post(CREATION_CASE_URL)
+        mvc.perform(post(endpoint)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    @SneakyThrows
-    void retrieveCase() {
-        when(caseRetrievalForCaseWorkerService.caseRetrievalRequest(eq(AUTH_TOKEN),
-                anyString(), anyString(), anyString()))
-                .thenReturn(submitEvent);
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mvc.perform(post(RETRIEVE_CASE_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    @SneakyThrows
-    void retrieveCases() {
-        List<SubmitEvent> submitEventList = Collections.singletonList(submitEvent);
-        when(caseRetrievalForCaseWorkerService.casesRetrievalRequest(any(CCDRequest.class),
-                eq(AUTH_TOKEN))).thenReturn(submitEventList);
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mvc.perform(post(RETRIEVE_CASES_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    @SneakyThrows
-    void updateCase() {
-        when(caseUpdateForCaseWorkerService.caseUpdateRequest(any(CCDRequest.class),
-                eq(AUTH_TOKEN))).thenReturn(submitEvent);
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mvc.perform(post(UPDATE_CASE_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -475,6 +410,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(caseFlagsService, times(0)).setupCaseFlags(any(CaseData.class));
+        verify(nocRespondentHelper, times(1)).amendRespondentNameRepresentativeNames(any(CaseData.class));
+        verify(nocRespondentRepresentativeService, times(1))
+                .prepopulateOrgPolicyAndNoc(any(CaseData.class));
     }
 
     @Test
@@ -517,6 +455,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(nocRespondentHelper, times(0)).amendRespondentNameRepresentativeNames(any(CaseData.class));
+        verify(nocRespondentRepresentativeService, never()).prepopulateOrgPolicyAndNoc(any(CaseData.class));
     }
 
     @Test
@@ -538,6 +477,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(nocRespondentHelper, times(0)).amendRespondentNameRepresentativeNames(any(CaseData.class));
+        verify(nocRespondentRepresentativeService, never()).prepopulateOrgPolicyAndNoc(any(CaseData.class));
     }
 
     @Test
@@ -584,46 +524,24 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
-    void amendRespondentRepresentative() {
+    void amendRespondentDetailsSubmittedRealignsRepresentativeAccess() {
+        CaseDetails previousCaseDetails = new CaseDetails();
+        previousCaseDetails.setCaseId(ccdRequest.getCaseDetails().getCaseId());
+        previousCaseDetails.setCaseData(new CaseData());
+        CallbackRequest callbackRequest = CallbackRequest.builder()
+                .caseDetailsBefore(previousCaseDetails)
+                .caseDetails(ccdRequest.getCaseDetails())
+                .build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
-                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
-        when(nocRespondentRepresentativeService.prepopulateOrgAddress(any(CaseData.class), anyString()))
-                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
 
-        mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-
-        verify(nocRespondentRepresentativeService, times(1)).updateNonMyHmctsOrgIds(anyList());
-        verify(caseFlagsService, times(0)).setupCaseFlags(any(CaseData.class));
-    }
-
-    @Test
-    @SneakyThrows
-    void amendRespondentRepresentativeSetsUpCaseFlagsWhenEnabled() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
-        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
-                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
-        when(nocRespondentRepresentativeService.prepopulateOrgAddress(any(CaseData.class), anyString()))
-                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
-
-        mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)
-                        .content(requestContent.toString())
+        mvc.perform(post(AMEND_RESPONDENT_DETAILS_SUBMITTED_URL)
+                        .content(jsonMapper.toJson(callbackRequest))
                         .header(AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+                .andExpect(status().isOk());
 
-        verify(caseFlagsService, times(1)).setupCaseFlags(any(CaseData.class));
+        verify(nocRespondentRepresentativeService)
+                .realignRespondentRepresentativeAccess(any(CallbackRequest.class));
     }
 
     @Test
@@ -891,20 +809,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
-    void dynamicRespondentRepresentativeNamesErrors()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mvc.perform(post(DYNAMIC_RESPONDENT_REPRESENTATIVE_NAMES_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    @SneakyThrows
     void dynamicDepositOrderErrors()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_DEPOSIT_ORDER_URL)
@@ -981,46 +885,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
-    void createCaseError400()  {
-        mvc.perform(post(CREATION_CASE_URL)
-                .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @SneakyThrows
-    void retrieveCaseError400()  {
-        mvc.perform(post(RETRIEVE_CASE_URL)
-                .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @SneakyThrows
-    void retrieveCasesError400()  {
-        mvc.perform(post(RETRIEVE_CASES_URL)
-                .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @SneakyThrows
-    void updateCaseError400()  {
-        mvc.perform(post(UPDATE_CASE_URL)
-                .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @SneakyThrows
     void preDefaultValuesError400()  {
         mvc.perform(post(PRE_DEFAULT_VALUES_URL)
                 .content("error")
@@ -1063,16 +927,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     @SneakyThrows
     void amendRespondentDetailsError400()  {
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
-                .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @SneakyThrows
-    void amendRespondentRepresentativeError400()  {
-        mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -1221,16 +1075,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
-    void dynamicRespondentRepresentativeNamesUrlError400()  {
-        mvc.perform(post(DYNAMIC_RESPONDENT_REPRESENTATIVE_NAMES_URL)
-                .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @SneakyThrows
     void dynamicDepositOrderError400()  {
         mvc.perform(post(DYNAMIC_DEPOSIT_ORDER_URL)
                 .content("error")
@@ -1289,59 +1133,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
         verify(caseCloseValidator, never()).validateReinstateClosedCaseMidEvent(any(CaseData.class));
-    }
-
-    @Test
-    @SneakyThrows
-    void createCaseError500()  {
-        when(caseCreationForCaseWorkerService.caseCreationRequest(any(CCDRequest.class),
-                eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mvc.perform(post(CREATION_CASE_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError());
-    }
-
-    @Test
-    @SneakyThrows
-    void retrieveCaseError500()  {
-        when(caseRetrievalForCaseWorkerService.caseRetrievalRequest(eq(AUTH_TOKEN), anyString(),
-                anyString(), anyString()))
-                .thenThrow(new InternalException(ERROR_MESSAGE));
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mvc.perform(post(RETRIEVE_CASE_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError());
-    }
-
-    @Test
-    @SneakyThrows
-    void retrieveCasesError500()  {
-        when(caseRetrievalForCaseWorkerService.casesRetrievalRequest(any(CCDRequest.class),
-                eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mvc.perform(post(RETRIEVE_CASES_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError());
-    }
-
-    @Test
-    @SneakyThrows
-    void updateCaseError500()  {
-        when(caseUpdateForCaseWorkerService.caseUpdateRequest(any(CCDRequest.class),
-                eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mvc.perform(post(UPDATE_CASE_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError());
     }
 
     @Test
@@ -1423,50 +1214,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
-    }
-
-    @Test
-    @SneakyThrows
-    void createCaseErrorForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(CREATION_CASE_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void retrieveCaseForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(RETRIEVE_CASE_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void retrieveCasesForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(RETRIEVE_CASES_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void updateCaseForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(UPDATE_CASE_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -1889,6 +1636,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         DraftAndSignJudgement draftAndSignJudgement = DraftAndSignJudgement.builder()
                 .isJudgement(YES)
+                .isUrgent(NO)
                 .furtherDirections("Dummy directions")
                 .build();
         ccdRequest.getCaseDetails().getCaseData().setDraftAndSignJudgement(draftAndSignJudgement);

@@ -22,7 +22,8 @@
     "ElementLabel": "Responses",
     "FieldTypeParameter": "pseRespondCollection",
     "FieldShowCondition": "date=\"dummy\"",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "DisplayOrder": 37
   },
   {
     "ID": "sendNotificationCollection",
@@ -31,7 +32,8 @@
     "ElementLabel": "Responses",
     "FieldTypeParameter": "pseRespondCollection",
     "FieldShowCondition": "date=\"dummy\"",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "DisplayOrder": 38
   },
   {
     "ID": "respondentTse",

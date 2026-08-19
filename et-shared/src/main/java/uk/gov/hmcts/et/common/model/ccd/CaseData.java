@@ -1471,6 +1471,12 @@ public class CaseData extends Et1CaseData {
     private String sendNotificationEccQuestion;
     @JsonProperty("sendNotificationWhoMadeJudgement")
     private String sendNotificationWhoMadeJudgement;
+    @JsonProperty("sendNotificationGroupClaims")
+    private String sendNotificationGroupClaims;
+    @JsonProperty("sendNotificationGroupClaimsMadeBy")
+    private String sendNotificationGroupClaimsMadeBy;
+    @JsonProperty("sendNotificationFullName3")
+    private String sendNotificationFullName3;
     @JsonProperty("notificationSentFrom")
     private String notificationSentFrom;
 

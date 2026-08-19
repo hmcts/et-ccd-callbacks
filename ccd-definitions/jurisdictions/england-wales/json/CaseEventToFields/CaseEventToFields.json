@@ -6909,7 +6909,7 @@
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 8,
-    "FieldShowCondition": "sendNotificationSubject CONTAINS \"Case management orders / requests\" OR sendNotificationSubject CONTAINS \"Employer Contract Claim\"",
+    "FieldShowCondition": "sendNotificationSubject CONTAINS \"Case management orders / requests\" OR sendNotificationSubject CONTAINS \"Employer Contract Claim\" OR sendNotificationSubject CONTAINS \"Group claims\"",
     "RetainHiddenValue": "No",
     "ShowSummaryChangeOption": "Y",
     "Publish": "N"
@@ -6946,7 +6946,7 @@
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 9,
-    "FieldShowCondition": "sendNotificationSubject CONTAINS \"Case management orders / requests\" OR sendNotificationSubject CONTAINS \"Employer Contract Claim\" AND sendNotificationResponseTribunal=\"Yes - view document for details\"",
+    "FieldShowCondition": "sendNotificationResponseTribunal=\"Yes - view document for details\" AND sendNotificationSubject CONTAINS \"Case management orders / requests\" OR sendNotificationResponseTribunal=\"Yes - view document for details\" AND sendNotificationSubject CONTAINS \"Employer Contract Claim\" OR sendNotificationResponseTribunal=\"Yes - view document for details\" AND sendNotificationSubject CONTAINS \"Group claims\"",
     "RetainHiddenValue": "No",
     "ShowSummaryChangeOption": "Y",
     "Publish": "N"

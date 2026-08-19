@@ -65,7 +65,10 @@ public class SendNotificationService {
         List<SendNotificationTypeItem> notifications = caseData.getSendNotificationCollection();
         for (SendNotificationTypeItem item : notifications) {
             if (item.getId().equals(request.getSendNotificationId())) {
-                if (item.getValue().getNotificationState().equals(NOT_VIEWED_YET)) {
+                boolean isGroupClaims = CollectionUtils.isNotEmpty(item.getValue().getSendNotificationSubject())
+                    && item.getValue().getSendNotificationSubject().contains("Group claims");
+
+                if (NOT_VIEWED_YET.equals(item.getValue().getNotificationState()) || isGroupClaims) {
                     item.getValue().setNotificationState(VIEWED);
                 }
                 setTribunalResponsesAsViewed(item.getValue().getRespondNotificationTypeCollection());

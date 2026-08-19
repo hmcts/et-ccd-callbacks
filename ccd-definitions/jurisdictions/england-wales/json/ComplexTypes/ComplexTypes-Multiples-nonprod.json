@@ -1,11 +1,36 @@
 [
   {
     "ID": "sendNotificationCollection",
+    "ListElementCode": "sendNotificationGroupClaims",
+    "FieldType": "Text",
+    "ElementLabel": "Which notification is required",
+    "SecurityClassification": "Public",
+    "DisplayOrder": 30
+  },
+  {
+    "ID": "sendNotificationCollection",
+    "ListElementCode": "sendNotificationGroupClaimsMadeBy",
+    "FieldType": "Text",
+    "ElementLabel": "Who made the order",
+    "SecurityClassification": "Public",
+    "DisplayOrder": 31
+  },
+  {
+    "ID": "sendNotificationCollection",
+    "ListElementCode": "sendNotificationFullName3",
+    "FieldType": "Text",
+    "ElementLabel": "Full name",
+    "SecurityClassification": "Public",
+    "DisplayOrder": 32
+  },
+  {
+    "ID": "sendNotificationCollection",
     "ListElementCode": "sendNotificationNotifyLeadCase",
     "FieldType": "Text",
     "ElementLabel": "To",
     "FieldShowCondition": "sendNotificationNotify=\"Lead case\"",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "DisplayOrder": 33
   },
   {
     "ID": "sendNotificationCollection",
@@ -13,7 +38,8 @@
     "FieldType": "Text",
     "ElementLabel": "To",
     "FieldShowCondition": "sendNotificationNotify=\"Lead and sub cases\"",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "DisplayOrder": 34
   },
   {
     "ID": "sendNotificationCollection",
@@ -21,7 +47,8 @@
     "FieldType": "Text",
     "ElementLabel": "To",
     "FieldShowCondition": "sendNotificationNotify=\"Selected cases\"",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "DisplayOrder": 35
   },
   {
     "ID": "sendNotificationCollection",
@@ -29,7 +56,8 @@
     "FieldType": "Text",
     "ElementLabel": "Multiple ref",
     "FieldShowCondition": "sendNotificationNotify=\"dummy\"",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "DisplayOrder": 36
   },
   {
     "ID": "notificationsExtract",

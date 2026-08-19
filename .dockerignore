@@ -1,3 +1,24 @@
+# ACR only needs the Dockerfile and the artefacts copied into the image.
+# Excluding the rest avoids uploading source, caches, dependencies and reports.
+**
+
+!Dockerfile
+
+!lib/
+!lib/applicationinsights.json
+
+!build/
+!build/libs/
+!build/libs/et-cos.jar
+!build/cftlib/
+!build/cftlib/definition-snapshots/
+!build/cftlib/definition-snapshots/**
+
+!ccd-definitions/
+!ccd-definitions/jurisdictions/
+!ccd-definitions/jurisdictions/**
+
+# These jurisdiction sources are not required by the running application.
 ccd-definitions/jurisdictions/*/data
 ccd-definitions/jurisdictions/*/xlsx
 ccd-definitions/jurisdictions/*/package.json

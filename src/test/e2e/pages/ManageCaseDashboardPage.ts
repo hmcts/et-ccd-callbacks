@@ -61,6 +61,9 @@ export class ManageCaseDashboardPage extends BasePage {
   }
 
   async visit() {
-    await this.page.goto(`${this.url}`);
+    const targetUrl = `${this.url}`;
+    await this.page.goto(targetUrl, { waitUntil: 'domcontentloaded' });
+    await this.page.waitForURL(targetUrl, { timeout: 10_000 });
+    await this.page.waitForLoadState('load');
   }
 }

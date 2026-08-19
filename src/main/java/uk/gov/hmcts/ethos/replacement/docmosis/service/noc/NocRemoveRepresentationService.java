@@ -15,7 +15,7 @@ import java.util.List;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_OLD_CASE_DETAILS_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_TYPE_TO_ORG_ADMIN_REMOVED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_TYPE_TO_ORG_ADMIN_NO_REP_LEFT;
 
 @Slf4j
 @Service
@@ -63,7 +63,7 @@ public class NocRemoveRepresentationService {
         final String partyName = caseDetailsBeforeRepUpdate.getCaseData().getClaimant();
         // send email to organisation admin if his/her email exists
         nocRemoveRepresentationEmailService.sendEmailToOrgAdmin(caseDetailsBeforeRepUpdate, orgEmailAddress, repName,
-                EMAIL_TYPE_TO_ORG_ADMIN_REMOVED);
+                EMAIL_TYPE_TO_ORG_ADMIN_NO_REP_LEFT);
         // send email to removed legal rep if his/her email exists
         nocRemoveRepresentationEmailService.sendEmailToRemovedLegalRep(caseDetailsBeforeRepUpdate, repEmailAddress);
         // send email to unrepresented party, i.e. claimant if his/her email exists

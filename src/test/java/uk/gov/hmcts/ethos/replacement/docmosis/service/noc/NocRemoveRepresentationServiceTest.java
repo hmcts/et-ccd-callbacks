@@ -27,7 +27,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_TYPE_TO_ORG_ADMIN_REMOVED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_TYPE_TO_ORG_ADMIN_NO_REP_LEFT;
 
 @ExtendWith(SpringExtension.class)
 class NocRemoveRepresentationServiceTest {
@@ -84,7 +84,7 @@ class NocRemoveRepresentationServiceTest {
                 any(CaseDetails.class),
                 eq(ORG_CLAIMANT_EMAIL),
                 eq(REP_CLAIMANT_NAME),
-                eq(EMAIL_TYPE_TO_ORG_ADMIN_REMOVED)
+                eq(EMAIL_TYPE_TO_ORG_ADMIN_NO_REP_LEFT)
         );
         // send email to removed legal rep
         verify(nocRemoveRepresentationEmailService, times(LoggerTestUtils.INTEGER_ONE))

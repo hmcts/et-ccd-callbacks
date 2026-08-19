@@ -58,6 +58,18 @@ public final class ManageCaseRoleServiceUtil {
     }
 
     /**
+     * Normalises the optional case user role query parameter to the bracketed CCD role format.
+     *
+     * @param caseUserRole raw role from the API query parameter; blank defaults to creator
+     * @return bracketed case user role understood by CCD case-access APIs
+     */
+    public static String formatCaseUserRole(String caseUserRole) {
+        return StringUtils.isBlank(caseUserRole)
+            ? CASE_USER_ROLE_CREATOR
+            : STRING_LEFT_SQUARE_BRACKET + caseUserRole.trim() + STRING_RIGHT_SQUARE_BRACKET;
+    }
+
+    /**
      * This method is implemented because SpringUtils of creation of URI components(UriComponentsBuilder)
      * has vulnerability (<a href="https://nvd.nist.gov/vuln/detail/CVE-2024-22243">CVE-2024-22243</a>).
      * On the date of implementation(1st of September 2024) that vulnerability was not resolved.

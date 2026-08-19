@@ -28,7 +28,7 @@ export default class UploadHearingBundlePage extends BasePage {
     await this.futureHearing.check();
     await this.hearingCombo.selectOption({ value: '1: 1' });
     await this.addNewButtonClick();
-    await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.uploadDocInput, `resources/test_file/welshTest.pdf`);
+    await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.uploadDocInput, `src/test/e2e/resources/test_file/welshTest.pdf`);
     await this.whatHearingDocument.getByRole('radio', { name: 'Hearing Bundle' }).check();
     await this.claimantRadio.check();
     await this.dateSubmittedDay.fill(dateUtilComponent.getCurrentDateParts().dd);

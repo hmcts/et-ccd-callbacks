@@ -101,6 +101,12 @@ sourceSets {
         compileClasspath += main.output + test.output
         runtimeClasspath += main.output + test.output
     }
+    smoke {
+        java {
+            srcDir 'src/test/functional/java'
+            include '**/HealthCheckTest.java'
+        }
+    }
     apiTest {
         java {
             srcDir 'src/test/apiTest/java'
@@ -229,23 +235,65 @@ configurations {
 }
 
 test {
+    dependsOn dumpCCDDefinitions
     exclude '**/*ComponentTest*'
     useJUnitPlatform()
     testLogging {
-        events "passed", "skipped", "failed"
+        events "skipped", "failed"
+    }
+}
+
+// Infrastructure 2.4.9 invokes these tasks with --rerun-tasks. Its deployment
+// stages receive the outputs produced by the earlier check, so avoid rebuilding
+// Java when those outputs are present. Cold and local runs still build
+// any missing outputs normally.
+def requestedTaskNames = gradle.startParameter.taskNames.collect { it.tokenize(':').last() }
+def rerunOnlyDeploymentTests = !requestedTaskNames.isEmpty()
+    && requestedTaskNames.every { it in ['smoke', 'functional'] }
+def deploymentCompilationMarker = layout.buildDirectory
+    .file('jenkins/deployment-test-compilation.ready')
+    .get().asFile
+def reuseTransferredCompilation = gradle.startParameter.rerunTasks
+    && rerunOnlyDeploymentTests
+    && System.getenv('JENKINS_URL')
+    && deploymentCompilationMarker.exists()
+
+tasks.named('check') {
+    doLast {
+        deploymentCompilationMarker.parentFile.mkdirs()
+        deploymentCompilationMarker.text = 'compiled by successful check\n'
+    }
+}
+
+allprojects {
+    afterEvaluate {
+        tasks.withType(JavaCompile).configureEach {
+            // --rerun-tasks bypasses up-to-date and only-if checks, so disable
+            // compilation only when Jenkins has transferred its prior output.
+            if (reuseTransferredCompilation && destinationDirectory.get().asFile.exists()) {
+                logger.lifecycle("Reusing compiled output for ${path}")
+                enabled = false
+            }
+        }
+    }
+}
+
+processTestResources {
+    dependsOn dumpCCDDefinitions
+    from("$buildDir/cftlib/definition-snapshots") {
+        into 'definition-snapshots'
     }
 }
 
 tasks.register('smoke', Test) {
-    dependsOn ':codeceptSmoke'
-    testClassesDirs = sourceSets.functional.output.classesDirs
-    classpath = sourceSets.functional.runtimeClasspath
+    testClassesDirs = sourceSets.smoke.output.classesDirs
+    classpath = sourceSets.smoke.runtimeClasspath
 
     useJUnitPlatform {
         includeTags 'smokeTest'
     }
     testLogging {
-        events "passed", "skipped", "failed"
+        events "skipped", "failed"
     }
     outputs.upToDateWhen { false }
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
@@ -259,11 +307,12 @@ tasks.register('functional', Test) {
 
     useJUnitPlatform ()
     testLogging {
-        events "passed", "skipped", "failed"
+        events "skipped", "failed"
     }
 
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
     maxHeapSize = '1G'
+    outputs.upToDateWhen { false }
 }
 
 def puppeteerCacheDir = layout.buildDirectory.dir('puppeteer-cache').get().asFile.absolutePath
@@ -272,6 +321,13 @@ tasks.register('yarnInstall', Exec) {
     workingDir '.'
     environment 'PUPPETEER_CACHE_DIR', puppeteerCacheDir
     commandLine 'yarn', 'install'
+}
+
+tasks.register('validateCcdDefinitionsLockfile', Exec) {
+    group = 'verification'
+    description = 'Fails when the CCD definitions package manifests and yarn.lock are out of sync.'
+    workingDir 'ccd-definitions'
+    commandLine 'yarn', 'install', '--immutable', '--mode=skip-build'
 }
 
 tasks.register('setupCcdDefinitionsWorkspace', Exec) {
@@ -289,11 +345,6 @@ tasks.register('yarnAudit', Exec) {
     dependsOn ':yarnInstall'
     workingDir '.'
     commandLine 'yarn', 'npm', 'audit', '--groups', 'dependencies', '--json', '|', 'grep', 'auditAdvisory', '>', 'yarn-audit-known-issues'
-}
-
-tasks.register('codeceptSmoke', Exec) {
-    dependsOn ':yarnInstall'
-    commandLine 'yarn', 'test:smoke'
 }
 
 tasks.register('codeceptFunctional', Exec) {
@@ -335,7 +386,7 @@ tasks.register('integration', Test) {
     failFast = true
     useJUnitPlatform()
     testLogging {
-        events "passed", "skipped", "failed"
+        events "skipped", "failed"
     }
     reports {
         html.required = true
@@ -412,10 +463,14 @@ jacocoTestReport {
 }
 
 jacocoTestCoverageVerification {
+    dependsOn test, integration
+    executionData(test, integration)
     violationRules {
         rule {
             limit {
-                minimum = 0.0
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.80
             }
         }
     }
@@ -450,6 +505,7 @@ repositories {
 
 project.tasks['sonarqube'].dependsOn jacocoTestReport
 project.tasks['check'].dependsOn integration
+project.tasks['check'].dependsOn jacocoTestCoverageVerification
 checkstyleMain.shouldRunAfter(compileJava)
 test.shouldRunAfter(checkstyleTest)
 integration.shouldRunAfter(checkstyleIntegrationTest)
@@ -516,6 +572,11 @@ dependencyManagement {
 }
 
 dependencies {
+    smokeImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.1.0'
+    smokeImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.12.2'
+    smokeRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.12.2'
+    smokeRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.12.2'
+
 
     implementation project(':et-shared')
     implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
@@ -531,7 +592,7 @@ dependencies {
     // Log4J core added to remove startup error message
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4JVersion
     // CVE-2025-54988
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '3.2.3'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '3.3.2'
 
     implementation group: 'commons-io', name: 'commons-io', version: '2.22.0'
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.6.0'
@@ -573,7 +634,7 @@ dependencies {
     implementation group: 'org.webjars.npm', name: 'minimatch', version: '9.0.9'
     implementation group: 'org.webjars', name: 'webjars-locator-core', version: '0.59'
     implementation group: 'org.asynchttpclient', name: 'async-http-client-netty-utils', version: '2.12.4'
-    implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '7.2.1'
+    implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '7.2.2'
     implementation group: 'com.squareup.okio', name: 'okio', version: '3.18.0'
     // Updated from 1.5.6 to fix CVE-2024-12798, CVE-2024-12801, CVE-2025-11226, CVE-2026-1225
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.38'
@@ -597,7 +658,7 @@ dependencies {
     // CVE-2025-7962
     implementation group: 'org.eclipse.angus', name: 'angus-mail', version: '2.0.5'
 
-    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.17.0'
+    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.18.0'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 

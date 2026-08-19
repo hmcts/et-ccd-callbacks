@@ -83,4 +83,8 @@ public class RespondentSumType {
     private String responseCounterClaim;
     @JsonProperty("responseReference")
     private String responseReference;
+    @JsonProperty("acasCertificateReceiptDate")
+    private String acasCertificateReceiptDate;
+    @JsonProperty("acasCertificateIssueDate")
+    private String acasCertificateIssueDate;
 }

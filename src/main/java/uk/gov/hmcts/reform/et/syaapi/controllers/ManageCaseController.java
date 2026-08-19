@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.et.syaapi.annotation.ApiResponseGroup;
 import uk.gov.hmcts.reform.et.syaapi.models.CaseRequest;
+import uk.gov.hmcts.reform.et.syaapi.models.CaseTransferInfoResponse;
 import uk.gov.hmcts.reform.et.syaapi.models.ChangeApplicationStatusRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.ClaimantApplicationRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.HubLinksStatusesRequest;
@@ -23,6 +25,7 @@ import uk.gov.hmcts.reform.et.syaapi.models.RespondToApplicationRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.TribunalResponseViewedRequest;
 import uk.gov.hmcts.reform.et.syaapi.service.ApplicationService;
 import uk.gov.hmcts.reform.et.syaapi.service.CaseService;
+import uk.gov.hmcts.reform.et.syaapi.service.CaseTransferInfoService;
 import uk.gov.hmcts.reform.et.syaapi.service.HubLinkService;
 import uk.gov.hmcts.reform.et.syaapi.service.ManageCaseRoleService;
 import uk.gov.hmcts.reform.et.syaapi.service.utils.ManageCaseRoleServiceUtil;
@@ -33,6 +36,7 @@ import java.util.List;
 import static org.springframework.http.ResponseEntity.ok;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.AUTHORIZATION;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_API_PARAMETER_NAME;
+import static uk.gov.hmcts.reform.et.syaapi.service.utils.ManageCaseRoleServiceUtil.formatCaseUserRole;
 
 /**
  * Rest Controller will use {@link CaseService} for interacting and accessing cases.
@@ -47,6 +51,7 @@ public class ManageCaseController {
     private final ApplicationService applicationService;
     private final HubLinkService hubLinkService;
     private final CaseService caseService;
+    private final CaseTransferInfoService caseTransferInfoService;
 
     /**
      * Accepts parameter of type {@link CaseRequest} and returns the case specified in 'getCaseId'.
@@ -68,6 +73,30 @@ public class ManageCaseController {
             authorization, caseRequest.getCaseId(),
             ManageCaseRoleServiceUtil.getCaseUserRoles(caseUserRole));
         return ok(caseDetails);
+    }
+
+    /**
+     * Returns transfer metadata for a case that is no longer accessible in the citizen hub.
+     *
+     * @param authorization jwt of the user
+     * @param caseId        the CCD case id
+     * @param caseUserRole  optional case user role filter
+     * @return transfer metadata for the requested case
+     */
+    @GetMapping("/{caseId}/transfer-info")
+    @Operation(summary = "Return case transfer information for a transferred case")
+    @ApiResponseGroup
+    public ResponseEntity<CaseTransferInfoResponse> getCaseTransferInfo(
+        @RequestHeader(AUTHORIZATION) String authorization,
+        @PathVariable String caseId,
+        @RequestParam(value = CASE_USER_ROLE_API_PARAMETER_NAME, required = false) String caseUserRole) {
+        log.info("Received get case transfer info request - caseId: {} caseUserRole: {}",
+                caseId, caseUserRole);
+        CaseTransferInfoResponse transferInfo = caseTransferInfoService.getCaseTransferInfo(
+            authorization,
+            caseId,
+            formatCaseUserRole(caseUserRole));
+        return ok(transferInfo);
     }
 
     /**

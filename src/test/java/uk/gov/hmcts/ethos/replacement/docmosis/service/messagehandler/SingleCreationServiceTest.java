@@ -6,7 +6,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.servicebus.UpdateCaseMsg;
@@ -33,7 +35,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.messagehandler.SingleCreationService.CREATE_CASE_EVENT_SUMMARY_TEMPLATE;
 
-@ExtendWith(SpringExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+@ExtendWith(MockitoExtension.class)
 class SingleCreationServiceTest {
     @InjectMocks
     private SingleCreationService singleCreationService;

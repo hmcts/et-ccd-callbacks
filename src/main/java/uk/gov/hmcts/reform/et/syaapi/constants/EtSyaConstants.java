@@ -88,7 +88,7 @@ public final class EtSyaConstants {
     public static final List<String> ACAS_PHASE2_VISIBLE_DOCS = List.of(RESPONSE_REJECTED, RESPONSE_ACCEPTED);
     public static final List<String> EW_ACAS_SERVING_DOCUMENTS = List.of("2.6", "2.7", "2.8", "7.7", "7.8", "7.8a");
     public static final List<String> SCOT_ACAS_SERVING_DOCUMENTS = List.of("Letter 7", "Letter 72 short track notice "
-        + "of claim and notice of hearing", "Letter 75", "Letter 76 Notice of Claim", "Notice of Claim",
+        + "of claim and notice of hearing", "Letter 76 Notice of Claim", "Notice of Claim",
         "Notice of Preliminary Hearing");
     public static final List<String> ACAS_SERVING_DOCUMENTS =
         Stream.of(EW_ACAS_SERVING_DOCUMENTS, SCOT_ACAS_SERVING_DOCUMENTS).flatMap(List::stream).toList();

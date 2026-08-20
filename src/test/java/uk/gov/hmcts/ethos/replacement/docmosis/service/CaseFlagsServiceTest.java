@@ -219,7 +219,17 @@ class CaseFlagsServiceTest {
         allPartyFlags.setRespondentFlags(legacyCaseFlags(respondent1External, respondent1Internal));
         allPartyFlags.setRespondent1Flags(legacyCaseFlags(respondent2Internal, respondent2External));
 
-        caseFlagsService.migrateExistingClaimantAndRespondentCaseFlags(caseData);
+        caseFlagsService.migrateExistingClaimantAndRespondentCaseFlags(
+                caseData,
+                Map.of(
+                        claimantInternal.getName(), INTERNAL,
+                        claimantExternal.getName(), EXTERNAL,
+                        respondent1Internal.getName(), INTERNAL,
+                        respondent1External.getName(), EXTERNAL,
+                        respondent2Internal.getName(), INTERNAL,
+                        respondent2External.getName(), EXTERNAL
+                )
+        );
 
         AllPartyFlags migratedFlags = allPartyFlags(caseData);
         assertMigratedFlag(migratedFlags.getClaimantFlags(), CLAIMANT_NAME, CLAIMANT, INTERNAL, claimantInternal);
@@ -236,9 +246,9 @@ class CaseFlagsServiceTest {
     }
 
     @Test
-    void migrateExistingClaimantAndRespondentCaseFlags_shouldUseLegacyVisibilityWhenMissingFromReferenceData() {
+    void migrateExistingClaimantAndRespondentCaseFlags_shouldKeepFlagsMissingFromReferenceDataInternal() {
         FlagDetailType claimantFlagMissingFromReferenceData = flagDetail("Missing claimant flag", ACTIVE, YES);
-        FlagDetailType respondentFlagMissingFromReferenceData = flagDetail("Missing respondent flag", ACTIVE, NO);
+        FlagDetailType respondentFlagMissingFromReferenceData = flagDetail("Missing respondent flag", ACTIVE, YES);
         AllPartyFlags allPartyFlags = getOrCreateAllPartyFlags(caseData);
         allPartyFlags.setClaimantFlags(legacyCaseFlags(claimantFlagMissingFromReferenceData));
         allPartyFlags.setRespondentFlags(legacyCaseFlags(respondentFlagMissingFromReferenceData));
@@ -248,9 +258,9 @@ class CaseFlagsServiceTest {
                 Map.of("Current reference data flag", EXTERNAL)
         );
 
-        assertNull(allPartyFlags(caseData).getClaimantFlags().getDetails());
-        assertMigratedFlag(allPartyFlags(caseData).getClaimantExternalFlags(), CLAIMANT_NAME, CLAIMANT, EXTERNAL,
+        assertMigratedFlag(allPartyFlags(caseData).getClaimantFlags(), CLAIMANT_NAME, CLAIMANT, INTERNAL,
                 claimantFlagMissingFromReferenceData);
+        assertNull(allPartyFlags(caseData).getClaimantExternalFlags().getDetails());
         assertMigratedFlag(allPartyFlags(caseData).getRespondentFlags(), RESPONDENT_NAME, RESPONDENT1, INTERNAL,
                 respondentFlagMissingFromReferenceData);
         assertNull(allPartyFlags(caseData).getRespondentExternalFlags().getDetails());
@@ -316,7 +326,13 @@ class CaseFlagsServiceTest {
         allPartyFlags.setRespondentFlags(legacyCaseFlags(respondentName(1), respondent2Internal));
         allPartyFlags.setRespondent1Flags(legacyCaseFlags(RESPONDENT_NAME, respondent1External));
 
-        caseFlagsService.migrateExistingClaimantAndRespondentCaseFlags(caseData);
+        caseFlagsService.migrateExistingClaimantAndRespondentCaseFlags(
+                caseData,
+                Map.of(
+                        respondent1External.getName(), EXTERNAL,
+                        respondent2Internal.getName(), INTERNAL
+                )
+        );
 
         AllPartyFlags migratedFlags = allPartyFlags(caseData);
         assertNull(migratedFlags.getRespondentFlags().getDetails());

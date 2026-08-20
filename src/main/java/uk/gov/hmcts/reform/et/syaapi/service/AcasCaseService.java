@@ -37,6 +37,8 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.postgresql.shaded.com.ongres.scram.common.util.Preconditions.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
+import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ACAS_PHASE2_VISIBLE_DOCS;
+import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ACAS_SERVING_DOCUMENTS;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ACAS_VISIBLE_DOCS;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ENGLAND_CASE_TYPE;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ET1_ATTACHMENT;
@@ -63,6 +65,7 @@ public class AcasCaseService {
     private final CaseDocumentService caseDocumentService;
     @Qualifier("applicationTaskExecutor")
     private final TaskExecutor taskExecutor;
+    private final FeatureToggleService featureToggleService;
 
     /**
      * Given a datetime, this method will return a list of caseIds which have been modified since the datetime
@@ -194,14 +197,26 @@ public class AcasCaseService {
         return documentTypeItemList;
     }
 
-    private static List<DocumentTypeItem> getDocumentCollectionDocs(CaseData caseData) {
+    private List<DocumentTypeItem> getDocumentCollectionDocs(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
             return new ArrayList<>();
         }
 
-        return caseData.getDocumentCollection().stream()
-            .filter(d -> !isNullOrEmpty(getDocumentType(d)) && ACAS_VISIBLE_DOCS.contains(getDocumentType(d)))
+        List<DocumentTypeItem> acasDocuments = new ArrayList<>();
+        List<String> acasVisibleDocs = new ArrayList<>(ACAS_VISIBLE_DOCS);
+        if (featureToggleService.isAcasDocumentsPhase2Enabled()) {
+            acasVisibleDocs.addAll(ACAS_PHASE2_VISIBLE_DOCS);
+            List<DocumentTypeItem> servingDocuments = caseData.getServingDocumentCollection().stream()
+                .filter(d -> !isNullOrEmpty(getDocumentType(d)) && ACAS_SERVING_DOCUMENTS.contains(getDocumentType(d)))
+                .toList();
+            acasDocuments.addAll(servingDocuments);
+        }
+
+        List<DocumentTypeItem> list = caseData.getDocumentCollection().stream()
+            .filter(d -> !isNullOrEmpty(getDocumentType(d)) && acasVisibleDocs.contains(getDocumentType(d)))
             .toList();
+        acasDocuments.addAll(list);
+        return acasDocuments;
     }
 
     private void retrieveRespondentDocuments(String authorisation, List<CaseDocumentAcasResponse> documents,

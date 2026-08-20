@@ -30,6 +30,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -44,6 +46,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_ACCEPTED;
+import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ACAS_SERVING_DOCUMENTS;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_NAME;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.USER_ID;
 
@@ -63,6 +67,8 @@ class AcasCaseServiceTest {
     private CaseDocumentService caseDocumentService;
     @Mock
     private TaskExecutor taskExecutor;
+    @Mock
+    private FeatureToggleService featureToggleService;
     @InjectMocks
     private AcasCaseService acasCaseService;
     private final CaseTestData testData;
@@ -289,6 +295,55 @@ class AcasCaseServiceTest {
         List<CaseDocumentAcasResponse> documents = acasCaseService.retrieveAcasDocuments(caseId);
         assertNotNull(documents);
         assertThat(documents).hasSize(4);
+    }
+
+    @Test
+    void retrieveAcasDocumentsShouldIncludePhase2DocumentsWhenFeatureIsEnabled() {
+        String caseId = EXAMPLE_CASE_ID;
+        CaseDetails caseDetails = testData.getRequestCaseDataListEnglandAcas().getFirst();
+        Map<String, Object> caseData = caseDetails.getData();
+        List<Map<String, Object>> documentCollection = (List<Map<String, Object>>) caseData.get("documentCollection");
+        documentCollection.add(document(RESPONSE_ACCEPTED, UUID.randomUUID().toString()));
+        caseData.put("servingDocumentCollection", List.of(document(ACAS_SERVING_DOCUMENTS.getFirst(),
+                                                                    UUID.randomUUID().toString())));
+
+        when(featureToggleService.isAcasDocumentsPhase2Enabled()).thenReturn(true);
+        when(ccdApiClient.searchCases(
+            TestConstants.TEST_SERVICE_AUTH_TOKEN,
+            TestConstants.TEST_SERVICE_AUTH_TOKEN,
+            EtSyaConstants.ENGLAND_CASE_TYPE, generateCaseDataEsQuery(Collections.singletonList(caseId))
+        )).thenReturn(SearchResult.builder().total(1).cases(List.of(caseDetails)).build());
+        when(ccdApiClient.searchCases(
+            TestConstants.TEST_SERVICE_AUTH_TOKEN,
+            TestConstants.TEST_SERVICE_AUTH_TOKEN,
+            EtSyaConstants.SCOTLAND_CASE_TYPE, generateCaseDataEsQuery(Collections.singletonList(caseId))
+        )).thenReturn(SearchResult.builder().total(0).cases(null).build());
+        doCallRealMethod().when(caseDocumentService).createDocumentTypeItem(
+            isA(String.class), isA(UploadedDocumentType.class));
+        doCallRealMethod().when(caseDocumentService).getDocumentUuid(isA(String.class));
+        when(caseDocumentService.getDocumentDetails(any(), any()))
+            .thenReturn(TestDataProvider.getDocumentDetailsFromCdam());
+
+        List<CaseDocumentAcasResponse> documents = acasCaseService.retrieveAcasDocuments(caseId);
+
+        assertThat(documents).hasSize(6);
+        assertThat(documents)
+            .extracting(CaseDocumentAcasResponse::getDocumentType)
+            .contains(RESPONSE_ACCEPTED, ACAS_SERVING_DOCUMENTS.getFirst());
+    }
+
+    private Map<String, Object> document(String type, String documentId) {
+        return Map.of(
+            "id", documentId,
+            "value", Map.of(
+                "typeOfDocument", type,
+                "uploadedDocument", Map.of(
+                    "document_url", "http://document.binary.url/" + documentId,
+                    "document_filename", "document.pdf",
+                    "document_binary_url", "http://document.binary.url/" + documentId + "/binary"
+                )
+            )
+        );
     }
 
     @Test

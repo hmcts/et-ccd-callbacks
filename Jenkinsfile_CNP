@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@feature/optional-smoke-test-secrets")
+@Library("Infrastructure@2.5.2")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 

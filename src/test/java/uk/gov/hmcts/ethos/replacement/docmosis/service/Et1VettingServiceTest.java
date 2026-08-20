@@ -712,16 +712,22 @@ class Et1VettingServiceTest {
         }
         caseData.getClaimantOtherType().setDateOfLastEvent("2026-03-01");
         caseData.setRespondentCollection(new ArrayList<>(caseData.getRespondentCollection().subList(0, 1)));
-        RespondentSumType respondent = caseData.getRespondentCollection().get(0).getValue();
+        RespondentSumType respondent = caseData.getRespondentCollection().getFirst().getValue();
         respondent.setAcasCertificateReceiptDate("2026-04-01");
         respondent.setAcasCertificateIssueDate("2026-04-11");
         caseData.setEt1VettingEra("Not applicable");
 
         et1VettingService.initialiseEt1Vetting(caseDetails);
 
-        String expectedMarkUp = "### ERA Assessment\n\n"
-                + "The following respondent(s) have an effective elapsed time greater than 3 months and less than or equal to 6 months:\n\n"
-                + "• Respondent 1 - 4 months\n";
+        String expectedMarkUp = """
+            ### ERA Assessment
+            
+            The following respondent(s) have an effective elapsed time greater than 3 months and less than or equal to\
+             6 months:
+            
+            • Respondent 1 - 4 months
+            
+            """;
         assertThat(caseData.getEt1VettingEraAssessmentMarkUp()).isEqualTo(expectedMarkUp);
         assertNull(caseData.getEt1VettingEra());
     }

@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -515,7 +516,7 @@ public class Et1VettingService {
         }
         if (days > 0) {
             if (months > 0) {
-                sb.append(" ");
+                sb.append(SPACE);
             }
             sb.append(days).append(days == 1 ? " day" : " days");
         }

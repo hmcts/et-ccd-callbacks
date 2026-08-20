@@ -27,7 +27,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Slf4j
 public class EmploymentRightsActService {
 
-    private static final LocalDate ERA_START_DATE = LocalDate.of(2026, Month.MAY, 1);
+    // TODO try and make this configurable to make this easier to test. Current validation prevents us submitting a
+    //  claim after October 2026 so we can't test the logic in a real case. We could make this configurable and then
+    //  have a test profile that sets it to a date in the past so we can test the logic.
+    private static final LocalDate ERA_START_DATE = LocalDate.of(2026, Month.OCTOBER, 1);
     public static final String UDL_JURISDICTION_CODE = "UDL";
     public static final String NOT_APPLICABLE = "Not applicable";
 

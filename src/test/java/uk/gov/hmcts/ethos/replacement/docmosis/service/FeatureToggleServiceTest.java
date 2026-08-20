@@ -147,6 +147,7 @@ class FeatureToggleServiceTest {
         givenToggle("waTaskExpiredBfActions", toggleStat);
         assertThat(featureToggleService.isWaTaskForExpiredBfActionsEnabled()).isEqualTo(toggleStat);
     }
+
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void returnsCorrectValue_whenEraOctober2026IsEnabled(Boolean toggleStat) {

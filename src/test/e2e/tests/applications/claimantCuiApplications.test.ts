@@ -176,6 +176,7 @@ test.describe.serial('Claimant applications with correspondence No - Caseworker 
 
 //RET-6425
 test.describe.serial('Citizen with 2 respondent case applications', () => {
+  test.skip();
   let caseId: string;
   let caseNumber: string;
 

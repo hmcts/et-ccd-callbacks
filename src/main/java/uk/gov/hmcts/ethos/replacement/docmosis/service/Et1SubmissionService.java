@@ -82,6 +82,10 @@ public class Et1SubmissionService {
     private String et1EnPdf;
     @Value("${pdf.welsh}")
     private String et1CyPdf;
+    @Value("${pdf.era.english}")
+    private String et1EnPdfEra;
+    @Value("${pdf.era.welsh}")
+    private String et1CyPdfEra;
 
     /**
      * Creates the ET1 PDF and calls off to ACAS to retrieve the certificates.
@@ -91,10 +95,13 @@ public class Et1SubmissionService {
      */
     public void createAndUploadEt1Docs(CaseDetails caseDetails, String userToken) {
         try {
-            DocumentTypeItem englishEt1 = createEt1DocumentType(caseDetails, userToken, et1EnPdf);
+            String englishPdfSource = featureToggleService.isEraOctober2026Enabled() ? et1EnPdfEra : et1EnPdf;
+            String welshPdfSource = featureToggleService.isEraOctober2026Enabled() ? et1CyPdfEra : et1CyPdf;
+
+            DocumentTypeItem englishEt1 = createEt1DocumentType(caseDetails, userToken, englishPdfSource);
             DocumentTypeItem welshEt1 = null;
             if (WELSH_LANGUAGE.equals(findLanguagePreference(caseDetails.getCaseData()))) {
-                welshEt1 = createEt1DocumentType(caseDetails, userToken, et1CyPdf);
+                welshEt1 = createEt1DocumentType(caseDetails, userToken, welshPdfSource);
             }
 
             List<DocumentTypeItem> acasCertificates = new ArrayList<>();

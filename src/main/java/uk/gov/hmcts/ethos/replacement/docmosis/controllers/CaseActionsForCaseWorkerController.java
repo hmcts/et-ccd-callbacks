@@ -361,18 +361,21 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/updateClaimantEmail/validate", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Validate the claimant's new email address.")
     public ResponseEntity<CCDCallbackResponse> validateClaimantEmailUpdate(
-            @RequestBody CCDRequest ccdRequest) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        return getCallbackRespEntityErrors(claimantEmailService.validateNewEmail(caseData), caseData);
+        return getCallbackRespEntityErrors(
+                claimantEmailService.validateNewEmail(caseData, userToken), caseData);
     }
 
     @PostMapping(value = "/updateClaimantEmail/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Update claimant email and case access.")
     public ResponseEntity<CCDCallbackResponse> updateClaimantEmail(
-            @RequestBody CCDRequest ccdRequest) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         return getCallbackRespEntityErrors(
-                claimantEmailService.prepareUpdate(ccdRequest.getCaseDetails()), caseData);
+                claimantEmailService.prepareUpdate(ccdRequest.getCaseDetails(), userToken), caseData);
     }
 
     @PostMapping(value = "/amendRespondentDetails", consumes = APPLICATION_JSON_VALUE)

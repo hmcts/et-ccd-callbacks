@@ -413,7 +413,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     @SneakyThrows
     void validateClaimantEmailUpdateReturnsErrors() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(claimantEmailService.validateNewEmail(any(CaseData.class)))
+        when(claimantEmailService.validateNewEmail(any(CaseData.class), anyString()))
                 .thenReturn(List.of("Email validation failed"));
 
         mvc.perform(post(UPDATE_CLAIMANT_EMAIL_VALIDATE_URL)
@@ -430,7 +430,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     @SneakyThrows
     void validateClaimantEmailUpdateSucceeds() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(claimantEmailService.validateNewEmail(any(CaseData.class))).thenReturn(List.of());
+        when(claimantEmailService.validateNewEmail(any(CaseData.class), anyString())).thenReturn(List.of());
 
         mvc.perform(post(UPDATE_CLAIMANT_EMAIL_VALIDATE_URL)
                         .content(requestContent.toString())
@@ -441,14 +441,14 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(claimantEmailService).validateNewEmail(any(CaseData.class));
+        verify(claimantEmailService).validateNewEmail(any(CaseData.class), eq(AUTH_TOKEN));
     }
 
     @Test
     @SneakyThrows
     void updateClaimantEmailReturnsPreparedCaseData() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(claimantEmailService.prepareUpdate(any(CaseDetails.class))).thenReturn(List.of());
+        when(claimantEmailService.prepareUpdate(any(CaseDetails.class), anyString())).thenReturn(List.of());
 
         mvc.perform(post(UPDATE_CLAIMANT_EMAIL_ABOUT_TO_SUBMIT_URL)
                         .content(requestContent.toString())
@@ -459,14 +459,14 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(claimantEmailService).prepareUpdate(any(CaseDetails.class));
+        verify(claimantEmailService).prepareUpdate(any(CaseDetails.class), eq(AUTH_TOKEN));
     }
 
     @Test
     @SneakyThrows
     void updateClaimantEmailReturnsAccessErrors() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(claimantEmailService.prepareUpdate(any(CaseDetails.class)))
+        when(claimantEmailService.prepareUpdate(any(CaseDetails.class), anyString()))
                 .thenReturn(List.of(ClaimantEmailService.ACCESS_GRANT_ERROR));
 
         mvc.perform(post(UPDATE_CLAIMANT_EMAIL_ABOUT_TO_SUBMIT_URL)

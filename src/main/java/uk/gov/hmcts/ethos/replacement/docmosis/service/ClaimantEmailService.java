@@ -46,7 +46,7 @@ public class ClaimantEmailService {
     public static final String IDAM_USER_NOT_CITIZEN_ERROR =
             "The new email address is linked to an account that is not a citizen account. "
                     + "Enter a different email address.";
-    // Shown when IdAM user search fails (for example 403 when the system token lacks search-user scope).
+    // Shown when IdAM user search fails (for example 403 when the ExUI token lacks search-user scope).
     public static final String IDAM_USER_LOOKUP_ERROR =
             "The new email address could not be checked against user accounts. Try again later.";
     private static final String CITIZEN_ROLE = "citizen";
@@ -77,7 +77,6 @@ public class ClaimantEmailService {
             "The claimant email address could not be updated. Enter the email address again.";
 
     private final IdamApi idamApi;
-    private final AdminUserService adminUserService;
     private final CcdCaseAssignment ccdCaseAssignment;
 
     /**
@@ -86,28 +85,30 @@ public class ClaimantEmailService {
      */
     public List<String> initialise(CaseData caseData) {
         caseData.setNewClaimantEmail(null);
-        caseData.setCurrentClaimantEmail(caseData.getClaimantType() == null
+        String existingEmail = caseData.getClaimantType() == null
                 ? null
-                : caseData.getClaimantType().getClaimantEmailAddress());
+                : caseData.getClaimantType().getClaimantEmailAddress();
+        caseData.setCurrentClaimantEmail(StringUtils.defaultIfBlank(existingEmail, "No email address on case"));
         return List.of();
     }
 
-    public List<String> validateNewEmail(CaseData caseData) {
+    public List<String> validateNewEmail(CaseData caseData, String userToken) {
         List<String> errors = validateEmailInput(caseData);
         if (errors.isEmpty()) {
-            findCitizenIdamUserByEmail(caseData.getNewClaimantEmail(), errors);
+            findCitizenIdamUserByEmail(caseData.getNewClaimantEmail(), userToken, errors);
         }
         return errors;
     }
 
-    public List<String> prepareUpdate(CaseDetails caseDetails) {
+    public List<String> prepareUpdate(CaseDetails caseDetails, String userToken) {
         CaseData caseData = caseDetails.getCaseData();
         List<String> errors = validateEmailInput(caseData);
         if (CollectionUtils.isNotEmpty(errors)) {
             return errors;
         }
 
-        Optional<UserDetails> newUser = findCitizenIdamUserByEmail(caseData.getNewClaimantEmail(), errors);
+        Optional<UserDetails> newUser = findCitizenIdamUserByEmail(
+                caseData.getNewClaimantEmail(), userToken, errors);
         if (newUser.isEmpty()) {
             return errors;
         }
@@ -217,11 +218,10 @@ public class ClaimantEmailService {
         return errors;
     }
 
-    private Optional<UserDetails> findCitizenIdamUserByEmail(String email, List<String> errors) {
+    private Optional<UserDetails> findCitizenIdamUserByEmail(String email, String userToken, List<String> errors) {
         List<UserDetails> exactMatches;
         try {
-            exactMatches = idamApi.searchUsersByQuery(
-                            adminUserService.getAdminUserToken(), email, 0, 50)
+            exactMatches = idamApi.searchUsersByQuery(userToken, "email:" + email, 0, 50)
                     .stream()
                     .filter(user -> StringUtils.equalsIgnoreCase(email, user.getEmail()))
                     .toList();

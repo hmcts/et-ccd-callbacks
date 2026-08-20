@@ -48,11 +48,11 @@ class ClaimantEmailServiceTest {
     private static final String NEW_EMAIL = "new@example.com";
     private static final String OLD_USER_ID = "old-user-id";
     private static final String NEW_USER_ID = "new-user-id";
+    private static final String USER_TOKEN = "Bearer exui-token";
+    private static final String EMAIL_QUERY = "email:" + NEW_EMAIL;
 
     @Mock
     private IdamApi idamApi;
-    @Mock
-    private AdminUserService adminUserService;
     @Mock
     private CcdCaseAssignment ccdCaseAssignment;
 
@@ -61,7 +61,7 @@ class ClaimantEmailServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new ClaimantEmailService(idamApi, adminUserService, ccdCaseAssignment);
+        service = new ClaimantEmailService(idamApi, ccdCaseAssignment);
         ClaimantType claimantType = new ClaimantType();
         claimantType.setClaimantEmailAddress(OLD_EMAIL);
         CaseData caseData = new CaseData();
@@ -88,7 +88,7 @@ class ClaimantEmailServiceTest {
 
         assertThat(service.initialise(caseDetails.getCaseData())).isEmpty();
 
-        assertThat(caseDetails.getCaseData().getCurrentClaimantEmail()).isNull();
+        assertThat(caseDetails.getCaseData().getCurrentClaimantEmail()).isEqualTo("No email address on case");
         assertThat(caseDetails.getCaseData().getNewClaimantEmail()).isNull();
     }
 
@@ -119,7 +119,7 @@ class ClaimantEmailServiceTest {
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
                 .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(List.of()).build());
 
-        assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN)).isEmpty();
 
         verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
         assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(NEW_EMAIL);
@@ -132,7 +132,7 @@ class ClaimantEmailServiceTest {
         mockNewIdamUser();
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(assignmentsWithCreator());
 
-        assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN)).isEmpty();
 
         InOrder inOrder = inOrder(ccdCaseAssignment);
         inOrder.verify(ccdCaseAssignment).removeCaseUserRole(requestForUser(OLD_USER_ID));
@@ -148,7 +148,7 @@ class ClaimantEmailServiceTest {
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
                 .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(List.of()).build());
 
-        assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN)).isEmpty();
 
         verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
         assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(NEW_EMAIL);
@@ -159,7 +159,7 @@ class ClaimantEmailServiceTest {
     void validateRejectsInvalidEmailWithoutCallingIdam() {
         caseDetails.getCaseData().setNewClaimantEmail("not-an-email");
 
-        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+        assertThat(service.validateNewEmail(caseDetails.getCaseData(), USER_TOKEN))
                 .containsExactly("The email address entered is invalid.");
         verify(idamApi, never()).searchUsersByQuery(anyString(), anyString(), any(), any());
     }
@@ -167,11 +167,10 @@ class ClaimantEmailServiceTest {
     @Test
     void validateRejectsEmailWithoutAnExactIdamAccount() {
         UserDetails differentUser = user("different@example.com", "different-user-id");
-        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
-        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
+        when(idamApi.searchUsersByQuery(USER_TOKEN, EMAIL_QUERY, 0, 50))
                 .thenReturn(List.of(differentUser));
 
-        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+        assertThat(service.validateNewEmail(caseDetails.getCaseData(), USER_TOKEN))
                 .containsExactly(ClaimantEmailService.IDAM_USER_NOT_FOUND_ERROR);
     }
 
@@ -179,7 +178,7 @@ class ClaimantEmailServiceTest {
     void validateRejectsUnchangedEmailIgnoringCase() {
         caseDetails.getCaseData().setNewClaimantEmail(OLD_EMAIL.toUpperCase(Locale.ROOT));
 
-        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+        assertThat(service.validateNewEmail(caseDetails.getCaseData(), USER_TOKEN))
                 .containsExactly(ClaimantEmailService.EMAIL_UNCHANGED_ERROR);
         verify(idamApi, never()).searchUsersByQuery(anyString(), anyString(), any(), any());
     }
@@ -189,7 +188,7 @@ class ClaimantEmailServiceTest {
         caseDetails.getCaseData().setCurrentClaimantEmail("tampered@example.com");
         caseDetails.getCaseData().setNewClaimantEmail(OLD_EMAIL);
 
-        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+        assertThat(service.validateNewEmail(caseDetails.getCaseData(), USER_TOKEN))
                 .containsExactly(ClaimantEmailService.EMAIL_UNCHANGED_ERROR);
         verify(idamApi, never()).searchUsersByQuery(anyString(), anyString(), any(), any());
     }
@@ -199,49 +198,45 @@ class ClaimantEmailServiceTest {
         caseDetails.getCaseData().setCurrentClaimantEmail(null);
         caseDetails.getCaseData().setNewClaimantEmail(OLD_EMAIL);
 
-        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+        assertThat(service.validateNewEmail(caseDetails.getCaseData(), USER_TOKEN))
                 .containsExactly(ClaimantEmailService.EMAIL_UNCHANGED_ERROR);
         verify(idamApi, never()).searchUsersByQuery(anyString(), anyString(), any(), any());
     }
 
     @Test
     void validateAcceptsOneExactIdamAccountIgnoringCase() {
-        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
-        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
+        when(idamApi.searchUsersByQuery(USER_TOKEN, EMAIL_QUERY, 0, 50))
                 .thenReturn(List.of(user(NEW_EMAIL.toUpperCase(Locale.ROOT), NEW_USER_ID)));
 
-        assertThat(service.validateNewEmail(caseDetails.getCaseData())).isEmpty();
+        assertThat(service.validateNewEmail(caseDetails.getCaseData(), USER_TOKEN)).isEmpty();
     }
 
     @Test
     void validateRejectsMultipleExactIdamAccounts() {
-        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
-        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
+        when(idamApi.searchUsersByQuery(USER_TOKEN, EMAIL_QUERY, 0, 50))
                 .thenReturn(List.of(
                         user(NEW_EMAIL, NEW_USER_ID),
                         user(NEW_EMAIL.toUpperCase(Locale.ROOT), "another-user-id")));
 
-        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+        assertThat(service.validateNewEmail(caseDetails.getCaseData(), USER_TOKEN))
                 .containsExactly(ClaimantEmailService.IDAM_USER_AMBIGUOUS_ERROR);
     }
 
     @Test
     void validateReturnsLookupErrorWhenIdamSearchIsForbidden() {
-        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
-        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
+        when(idamApi.searchUsersByQuery(USER_TOKEN, EMAIL_QUERY, 0, 50))
                 .thenThrow(forbiddenIdamSearchException());
 
-        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+        assertThat(service.validateNewEmail(caseDetails.getCaseData(), USER_TOKEN))
                 .containsExactly(ClaimantEmailService.IDAM_USER_LOOKUP_ERROR);
     }
 
     @Test
     void prepareUpdateReturnsLookupErrorWithoutChangingCaseDataOrAccess() throws IOException {
-        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
-        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
+        when(idamApi.searchUsersByQuery(USER_TOKEN, EMAIL_QUERY, 0, 50))
                 .thenThrow(forbiddenIdamSearchException());
 
-        assertThat(service.prepareUpdate(caseDetails))
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN))
                 .containsExactly(ClaimantEmailService.IDAM_USER_LOOKUP_ERROR);
         assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
         verify(ccdCaseAssignment, never()).getCaseUserRoles(anyString());
@@ -251,31 +246,28 @@ class ClaimantEmailServiceTest {
 
     @Test
     void validateRejectsIdamAccountWithoutCitizenRole() {
-        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
-        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
+        when(idamApi.searchUsersByQuery(USER_TOKEN, EMAIL_QUERY, 0, 50))
                 .thenReturn(List.of(user(NEW_EMAIL, NEW_USER_ID, List.of("caseworker"))));
 
-        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+        assertThat(service.validateNewEmail(caseDetails.getCaseData(), USER_TOKEN))
                 .containsExactly(ClaimantEmailService.IDAM_USER_NOT_CITIZEN_ERROR);
     }
 
     @Test
     void validateRejectsIdamAccountWithNullRoles() {
-        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
-        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
+        when(idamApi.searchUsersByQuery(USER_TOKEN, EMAIL_QUERY, 0, 50))
                 .thenReturn(List.of(user(NEW_EMAIL, NEW_USER_ID, null)));
 
-        assertThat(service.validateNewEmail(caseDetails.getCaseData()))
+        assertThat(service.validateNewEmail(caseDetails.getCaseData(), USER_TOKEN))
                 .containsExactly(ClaimantEmailService.IDAM_USER_NOT_CITIZEN_ERROR);
     }
 
     @Test
     void prepareUpdateReturnsCitizenRoleErrorWithoutChangingCaseDataOrAccess() throws IOException {
-        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
-        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
+        when(idamApi.searchUsersByQuery(USER_TOKEN, EMAIL_QUERY, 0, 50))
                 .thenReturn(List.of(user(NEW_EMAIL, NEW_USER_ID, List.of())));
 
-        assertThat(service.prepareUpdate(caseDetails))
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN))
                 .containsExactly(ClaimantEmailService.IDAM_USER_NOT_CITIZEN_ERROR);
         assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
         verify(ccdCaseAssignment, never()).getCaseUserRoles(anyString());
@@ -287,7 +279,7 @@ class ClaimantEmailServiceTest {
     void prepareUpdateReturnsInputErrorsWithoutCallingIdamOrAccess() throws IOException {
         caseDetails.getCaseData().setNewClaimantEmail(OLD_EMAIL);
 
-        assertThat(service.prepareUpdate(caseDetails))
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN))
                 .containsExactly(ClaimantEmailService.EMAIL_UNCHANGED_ERROR);
         verify(idamApi, never()).searchUsersByQuery(anyString(), anyString(), any(), any());
         verify(ccdCaseAssignment, never()).getCaseUserRoles(anyString());
@@ -296,10 +288,9 @@ class ClaimantEmailServiceTest {
 
     @Test
     void prepareUpdateReturnsIdamLookupErrorsWithoutChangingCaseDataOrAccess() throws IOException {
-        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
-        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50)).thenReturn(List.of());
+        when(idamApi.searchUsersByQuery(USER_TOKEN, EMAIL_QUERY, 0, 50)).thenReturn(List.of());
 
-        assertThat(service.prepareUpdate(caseDetails))
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN))
                 .containsExactly(ClaimantEmailService.IDAM_USER_NOT_FOUND_ERROR);
         assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
         verify(ccdCaseAssignment, never()).getCaseUserRoles(anyString());
@@ -312,7 +303,7 @@ class ClaimantEmailServiceTest {
         mockNewIdamUser();
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(assignmentsWithCreator());
 
-        assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN)).isEmpty();
 
         InOrder inOrder = inOrder(ccdCaseAssignment);
         inOrder.verify(ccdCaseAssignment).removeCaseUserRole(requestForUser(OLD_USER_ID));
@@ -329,7 +320,7 @@ class ClaimantEmailServiceTest {
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
                 .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(List.of()).build());
 
-        assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN)).isEmpty();
 
         verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
         verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
@@ -342,7 +333,7 @@ class ClaimantEmailServiceTest {
         mockNewIdamUser();
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(null);
 
-        assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN)).isEmpty();
 
         verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
         verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
@@ -356,7 +347,7 @@ class ClaimantEmailServiceTest {
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
                 .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(null).build());
 
-        assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN)).isEmpty();
 
         verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
         assertThat(caseDetails.getCaseData().getClaimantId()).isEqualTo(NEW_USER_ID);
@@ -369,7 +360,7 @@ class ClaimantEmailServiceTest {
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
                 .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(List.of()).build());
 
-        assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN)).isEmpty();
         assertThat(caseDetails.getCaseData().getClaimantType()).isNotNull();
         assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(NEW_EMAIL);
         assertThat(caseDetails.getCaseData().getClaimantId()).isEqualTo(NEW_USER_ID);
@@ -386,7 +377,7 @@ class ClaimantEmailServiceTest {
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
                 .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(List.of(solicitor)).build());
 
-        assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN)).isEmpty();
 
         verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
         verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
@@ -400,7 +391,7 @@ class ClaimantEmailServiceTest {
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID))
                 .thenReturn(assignmentsWithCreator(NEW_USER_ID));
 
-        assertThat(service.prepareUpdate(caseDetails)).isEmpty();
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN)).isEmpty();
 
         verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
         verify(ccdCaseAssignment, never()).addCaseUserRole(any());
@@ -413,7 +404,7 @@ class ClaimantEmailServiceTest {
         mockNewIdamUser();
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenThrow(new IOException("lookup failed"));
 
-        assertThat(service.prepareUpdate(caseDetails))
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN))
                 .containsExactly(ClaimantEmailService.ACCESS_LOOKUP_ERROR);
         assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
         assertThat(caseDetails.getCaseData().getClaimantId()).isNull();
@@ -428,7 +419,7 @@ class ClaimantEmailServiceTest {
         doThrow(new IOException("revoke failed"))
                 .when(ccdCaseAssignment).removeCaseUserRole(requestForUser(OLD_USER_ID));
 
-        assertThat(service.prepareUpdate(caseDetails))
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN))
                 .containsExactly(ClaimantEmailService.ACCESS_REVOKE_ERROR);
         assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
         assertThat(caseDetails.getCaseData().getClaimantId()).isNull();
@@ -442,7 +433,7 @@ class ClaimantEmailServiceTest {
         doThrow(new IOException("grant failed"))
                 .when(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
 
-        assertThat(service.prepareUpdate(caseDetails))
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN))
                 .containsExactly(ClaimantEmailService.ACCESS_GRANT_ERROR);
 
         InOrder inOrder = inOrder(ccdCaseAssignment);
@@ -462,7 +453,7 @@ class ClaimantEmailServiceTest {
         doThrow(new IOException("restore failed"))
                 .when(ccdCaseAssignment).addCaseUserRole(requestForUser(OLD_USER_ID));
 
-        assertThat(service.prepareUpdate(caseDetails))
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN))
                 .containsExactly(ClaimantEmailService.ACCESS_GRANT_ERROR);
 
         InOrder inOrder = inOrder(ccdCaseAssignment);
@@ -481,7 +472,7 @@ class ClaimantEmailServiceTest {
         doThrow(new IOException("grant failed"))
                 .when(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
 
-        assertThat(service.prepareUpdate(caseDetails))
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN))
                 .containsExactly(ClaimantEmailService.ACCESS_GRANT_ERROR);
         assertThat(caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress()).isEqualTo(OLD_EMAIL);
         assertThat(caseDetails.getCaseData().getClaimantId()).isNull();
@@ -497,7 +488,7 @@ class ClaimantEmailServiceTest {
         doThrow(new RuntimeException("email update failed")).when(spyClaimantType)
                 .setClaimantEmailAddress(anyString());
 
-        assertThat(service.prepareUpdate(caseDetails))
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN))
                 .containsExactly(ClaimantEmailService.EMAIL_UPDATE_AFTER_REASSIGN_ERROR);
         verify(ccdCaseAssignment).removeCaseUserRole(requestForUser(OLD_USER_ID));
         verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
@@ -515,7 +506,7 @@ class ClaimantEmailServiceTest {
         doThrow(new RuntimeException("email update failed")).when(spyClaimantType)
                 .setClaimantEmailAddress(anyString());
 
-        assertThat(service.prepareUpdate(caseDetails))
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN))
                 .containsExactly(ClaimantEmailService.EMAIL_UPDATE_AFTER_GRANT_ERROR);
         verify(ccdCaseAssignment).addCaseUserRole(requestForUser(NEW_USER_ID));
         assertThat(caseDetails.getCaseData().getClaimantId()).isEqualTo(NEW_USER_ID);
@@ -532,7 +523,7 @@ class ClaimantEmailServiceTest {
         doThrow(new RuntimeException("email update failed")).when(spyClaimantType)
                 .setClaimantEmailAddress(anyString());
 
-        assertThat(service.prepareUpdate(caseDetails))
+        assertThat(service.prepareUpdate(caseDetails, USER_TOKEN))
                 .containsExactly(ClaimantEmailService.EMAIL_UPDATE_ERROR);
         verify(ccdCaseAssignment, never()).removeCaseUserRole(any());
         verify(ccdCaseAssignment, never()).addCaseUserRole(any());
@@ -541,8 +532,7 @@ class ClaimantEmailServiceTest {
     }
 
     private void mockNewIdamUser() {
-        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
-        when(idamApi.searchUsersByQuery("admin-token", NEW_EMAIL, 0, 50))
+        when(idamApi.searchUsersByQuery(USER_TOKEN, EMAIL_QUERY, 0, 50))
                 .thenReturn(List.of(user(NEW_EMAIL, NEW_USER_ID)));
     }
 

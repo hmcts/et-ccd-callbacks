@@ -78,8 +78,10 @@ public class Et1SubmissionService {
     private String claimantSubmissionTemplateId;
     @Value("${template.et1.cySubmitCaseEmailTemplateId}")
     private String claimantSubmissionTemplateIdWelsh;
-    private static final String ET1_EN_PDF = "ET1_0224.pdf";
-    private static final String ET1_CY_PDF = "CY_ET1_2222.pdf";
+    @Value("${pdf.english}")
+    private String et1EnPdf;
+    @Value("${pdf.welsh}")
+    private String et1CyPdf;
 
     /**
      * Creates the ET1 PDF and calls off to ACAS to retrieve the certificates.
@@ -89,10 +91,10 @@ public class Et1SubmissionService {
      */
     public void createAndUploadEt1Docs(CaseDetails caseDetails, String userToken) {
         try {
-            DocumentTypeItem englishEt1 = createEt1DocumentType(caseDetails, userToken, ET1_EN_PDF);
+            DocumentTypeItem englishEt1 = createEt1DocumentType(caseDetails, userToken, et1EnPdf);
             DocumentTypeItem welshEt1 = null;
             if (WELSH_LANGUAGE.equals(findLanguagePreference(caseDetails.getCaseData()))) {
-                welshEt1 = createEt1DocumentType(caseDetails, userToken, ET1_CY_PDF);
+                welshEt1 = createEt1DocumentType(caseDetails, userToken, et1CyPdf);
             }
 
             List<DocumentTypeItem> acasCertificates = new ArrayList<>();
@@ -176,7 +178,7 @@ public class Et1SubmissionService {
     }
 
     private String getEt1DocumentName(CaseData caseData, String pdfSource) {
-        return ET1_CY_PDF.equals(pdfSource) ? "ET1 CY - " + caseData.getClaimant() + ".pdf"
+        return et1CyPdf.equals(pdfSource) ? "ET1 CY - " + caseData.getClaimant() + ".pdf"
                 : "ET1 - " + sanitizePartyName(caseData.getClaimant()) + ".pdf";
     }
 

@@ -31,6 +31,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmploymentRightsActService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
@@ -91,6 +92,9 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
 
     @MockitoBean
     private FeatureToggleService featureToggleService;
+
+    @MockitoBean
+    private EmploymentRightsActService employmentRightsActService;
 
     private MockMvc mvc;
 
@@ -197,6 +201,7 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(caseFlagsService, times(1)).setPrivateHearingFlag(any());
+        verify(employmentRightsActService, times(1)).processUnfairDismissalEra(any(), any());
     }
 
     @Test

@@ -39,6 +39,7 @@ public class Constants {
     public static final String ENGLANDWALES_LISTING_CASE_TYPE_ID = "ET_EnglandWales_Listings";
     public static final String SCOTLAND_LISTING_CASE_TYPE_ID = "ET_Scotland_Listings";
     public static final String ADMIN_CASE_TYPE_ID = "ET_Admin";
+    public static final String PRE_HEARING_DEPOSIT_CASE_TYPE_ID = "Pre_Hearing_Deposit";
 
     public static final String PENDING_STATE = "Pending";
     public static final String SUBMITTED_STATE = "Submitted";

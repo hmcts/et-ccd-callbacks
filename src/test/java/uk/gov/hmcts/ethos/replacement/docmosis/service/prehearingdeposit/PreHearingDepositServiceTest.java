@@ -5,6 +5,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.service.UserService;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.GenericTypeCaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.Document;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.ImportFile;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.prehearingdeposit.PreHearingDepositData;
@@ -22,6 +24,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
@@ -47,6 +50,8 @@ class PreHearingDepositServiceTest {
     private static final String URL = "testUrl";
     private static final String BINARY_URL = "Test Binary URL";
     private static final String TEST_CASE_REFERENCE_NUMBER = "12345678901";
+    private static final String EXPECTED_CASE_TYPE_ID = "Pre_Hearing_Deposit";
+    private static final String EXPECTED_JURISDICTION = "EMPLOYMENT";
     @Mock
     UserService userService;
     @Mock
@@ -88,8 +93,15 @@ class PreHearingDepositServiceTest {
         ImportFile importFile = new ImportFile();
         importFile.setFile(document);
         preHearingDepositService.importPreHearingDepositData(importFile, USER_TOKEN);
-        verify(ccdClient, times(4)).startGenericTypeCaseCreation(anyString(), any());
+        ArgumentCaptor<GenericTypeCaseDetails<PreHearingDepositData>> caseDetailsCaptor =
+                ArgumentCaptor.captor();
+        verify(ccdClient, times(4)).startGenericTypeCaseCreation(anyString(), caseDetailsCaptor.capture());
         verify(ccdClient, times(4)).submitGenericTypeCaseCreation(
                 anyString(), any(), any(), anyString(), anyString());
+
+        caseDetailsCaptor.getAllValues().forEach(caseDetails -> {
+            assertEquals(EXPECTED_CASE_TYPE_ID, caseDetails.getCaseTypeId());
+            assertEquals(EXPECTED_JURISDICTION, caseDetails.getJurisdiction());
+        });
     }
 }

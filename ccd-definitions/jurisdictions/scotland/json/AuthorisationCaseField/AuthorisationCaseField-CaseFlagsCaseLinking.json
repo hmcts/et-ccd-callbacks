@@ -982,5 +982,11 @@
     "CaseFieldID": "representative9ExternalFlags",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "claimantExternalFlags",
+    "UserRole": "citizen",
+    "CRUD": "R"
   }
 ]

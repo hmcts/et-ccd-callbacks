@@ -5987,7 +5987,7 @@
     "ListElementCode": "etICIsPreliminaryHearingWithMembersReasonV2",
     "FieldType": "TextArea",
     "ElementLabel": "Give reasons for requiring members",
-    "FieldShowCondition": "etICIsPreliminaryHearingWithMembersV2=\"Yes\"",
+    "FieldShowCondition": "etICIsPreliminaryHearingWithMembersV2=\"dummy\"",
     "RetainHiddenValue": "No",
     "SecurityClassification": "Public",
     "Searchable": "N"

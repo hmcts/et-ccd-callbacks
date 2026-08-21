@@ -244,25 +244,39 @@ class NocRespondentHelperTest {
     }
 
     @Test
-    void amendRespondentNameRepresentativeNames() {
+    void amendRespondentNameRepresentativeNamesReordersRepresentativesAndRolesWithRespondents() {
         RespondentSumTypeItem amendedRespondent = caseData.getRespondentCollection().get(2);
         amendedRespondent.getValue().setRespondentName(AMENDED_RESP_NAME);
         nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData);
 
         RepresentedTypeR rep = caseData.getRepCollection().getFirst().getValue();
-        assertThat(rep.getDynamicRespRepName().getSelectedCode()).isEqualTo("R: " + AMENDED_RESP_NAME);
-        assertThat(rep.getDynamicRespRepName().getSelectedLabel()).isEqualTo(AMENDED_RESP_NAME);
-        assertThat(rep.getRespRepName()).isEqualTo(AMENDED_RESP_NAME);
+        assertThat(caseData.getRepCollection().getFirst().getId()).isEqualTo(RESPONDENT_REP_ID_THREE);
+        assertThat(rep.getRole()).isEqualTo(SOLICITORA);
+        assertThat(rep.getDynamicRespRepName().getSelectedCode()).isEqualTo("R: " + RESPONDENT_NAME_ONE);
+        assertThat(rep.getDynamicRespRepName().getSelectedLabel()).isEqualTo(RESPONDENT_NAME_ONE);
+        assertThat(rep.getRespRepName()).isEqualTo(RESPONDENT_NAME_ONE);
 
         rep = caseData.getRepCollection().get(1).getValue();
+        assertThat(caseData.getRepCollection().get(1).getId()).isEqualTo(RESPONDENT_REP_ID_TWO);
+        assertThat(rep.getRole()).isEqualTo(SOLICITORB);
         assertThat(rep.getDynamicRespRepName().getSelectedCode()).isEqualTo("R: " + RESPONDENT_NAME_TWO);
         assertThat(rep.getDynamicRespRepName().getSelectedLabel()).isEqualTo(RESPONDENT_NAME_TWO);
         assertThat(rep.getRespRepName()).isEqualTo(RESPONDENT_NAME_TWO);
 
         rep = caseData.getRepCollection().get(2).getValue();
-        assertThat(rep.getDynamicRespRepName().getSelectedCode()).isEqualTo("R: " + RESPONDENT_NAME_ONE);
-        assertThat(rep.getDynamicRespRepName().getSelectedLabel()).isEqualTo(RESPONDENT_NAME_ONE);
-        assertThat(rep.getRespRepName()).isEqualTo(RESPONDENT_NAME_ONE);
+        assertThat(caseData.getRepCollection().get(2).getId()).isEqualTo(RESPONDENT_REP_ID);
+        assertThat(rep.getRole()).isEqualTo(SOLICITORC);
+        assertThat(rep.getDynamicRespRepName().getSelectedCode()).isEqualTo("R: " + AMENDED_RESP_NAME);
+        assertThat(rep.getDynamicRespRepName().getSelectedLabel()).isEqualTo(AMENDED_RESP_NAME);
+        assertThat(rep.getRespRepName()).isEqualTo(AMENDED_RESP_NAME);
+    }
+
+    @Test
+    void amendRespondentNameRepresentativeNamesIgnoresRepresentativesWithoutRespondentId() {
+        caseData.getRespondentCollection().getFirst().setId(null);
+        caseData.getRepCollection().getFirst().getValue().setRespondentId(null);
+
+        assertDoesNotThrow(() -> nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData));
     }
 
     @Test

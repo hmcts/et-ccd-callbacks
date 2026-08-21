@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsReferenceDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -33,9 +34,10 @@ public class CaseFlagsDataMigrationController {
 
     private final VerifyTokenService verifyTokenService;
     private final CaseFlagsService caseFlagsService;
+    private final CaseFlagsReferenceDataService caseFlagsReferenceDataService;
 
     @PostMapping(value = "/case-flags-migration/about-to-submit", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "update existing cases with default values for case flags.")
+    @Operation(summary = "migrate existing party case flags into internal and external sections.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
                 content = {@Content(mediaType = "application/json",
@@ -55,11 +57,12 @@ public class CaseFlagsDataMigrationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseFlagsService.setupCaseFlags(caseData);
-        log.info("Migrating existing case: {} for claimant: {},  respondent: {},",
-                ccdRequest.getCaseDetails().getCaseTypeId(),
-                caseData.getClaimantFlags().getPartyName(),
-                caseData.getRespondentFlags().getPartyName());
+        caseFlagsService.migrateExistingClaimantAndRespondentCaseFlags(
+                caseData,
+                caseFlagsReferenceDataService.getPartyFlagVisibilities(userToken)
+        );
+
+        log.info("Migrating existing case: {}", ccdRequest.getCaseDetails().getCaseId());
 
         return getCallbackRespEntityErrors(List.of(), caseData);
     }

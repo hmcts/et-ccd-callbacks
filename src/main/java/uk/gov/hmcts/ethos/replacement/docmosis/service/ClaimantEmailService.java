@@ -44,21 +44,23 @@ public class ClaimantEmailService {
      */
     public List<String> initialise(CaseData caseData) {
         caseData.setNewClaimantEmail(null);
-        caseData.setCurrentClaimantEmail(caseData.getClaimantType() == null
+        String existingEmail = caseData.getClaimantType() == null
                 ? null
-                : caseData.getClaimantType().getClaimantEmailAddress());
+                : caseData.getClaimantType().getClaimantEmailAddress();
+        caseData.setCurrentClaimantEmail(StringUtils.defaultIfBlank(existingEmail, "No email address on case"));
         return List.of();
     }
 
-    public List<String> validateNewEmail(CaseData caseData) {
+    public List<String> validateNewEmail(CaseData caseData, String userToken) {
         List<String> errors = validateEmailInput(caseData);
         if (errors.isEmpty()) {
-            partyEmailUpdateSupport.findCitizenUserByEmail(caseData.getNewClaimantEmail(), MESSAGES, errors);
+            partyEmailUpdateSupport.findCitizenUserByEmail(
+                    caseData.getNewClaimantEmail(), userToken, MESSAGES, errors);
         }
         return errors;
     }
 
-    public List<String> prepareUpdate(CaseDetails caseDetails) {
+    public List<String> prepareUpdate(CaseDetails caseDetails, String userToken) {
         CaseData caseData = caseDetails.getCaseData();
         List<String> errors = validateEmailInput(caseData);
         if (CollectionUtils.isNotEmpty(errors)) {
@@ -66,7 +68,7 @@ public class ClaimantEmailService {
         }
 
         Optional<UserDetails> newUser = partyEmailUpdateSupport.findCitizenUserByEmail(
-                caseData.getNewClaimantEmail(), MESSAGES, errors);
+                caseData.getNewClaimantEmail(), userToken, MESSAGES, errors);
         if (newUser.isEmpty()) {
             return errors;
         }

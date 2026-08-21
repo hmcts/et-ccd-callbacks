@@ -935,7 +935,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "ID": "hearingDetailsAttendeeNonAttendees",
-    "Label": "Number of Non Attendees (Respondent)",
+    "Label": "Number of Non Attendees (Respondent) ",
     "FieldType": "Number",
     "SecurityClassification": "Public",
     "Searchable": "N"
@@ -4473,7 +4473,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "ID": "resTseGuidanceLabel2",
-    "Label": "<hr>Use this form to apply to change details like the company address, email or telephone number. <br><br>If you change the postal or email address, we'll send any letters to the new address.<br><br>If you change the telephone number, we'll contact you using the new number if we have questions about your response.<h3>Details you can apply to change:</h3><ul><li>name</li><li>sex and preferred title</li><li>address</li><li>telephone number</li><li>email address</li></ul><h3>Consider when providing material that:</h3><ul><li>you can upload letters, photos or documents if they are relevant to what you want to tell or ask the tribunal. Please do not upload any other material at this stage. If the tribunal needs to see documents before making a decision then you may be asked to provide them at a later stage</li><li>if you are taking a picture of a letter, place it on a flat surface and take the picture from above</li><li>if you are uploading written documents with tracked changes, make sure that tracked changes are turned on</li></ul><h3>Give details of your application in the text box or upload a file</h3>",
+    "Label": "<hr>Use this form to apply to change details like the company address, email or telephone number. <br><br>If you change the postal or email address, we’ll send any letters to the new address.<br><br>If you change the telephone number, we’ll contact you using the new number if we have questions about your response.<h3>Details you can apply to change:</h3><ul><li>name</li><li>sex and preferred title</li><li>address</li><li>telephone number</li><li>email address</li></ul><h3>Consider when providing material that:</h3><ul><li>you can upload letters, photos or documents if they are relevant to what you want to tell or ask the tribunal. Please do not upload any other material at this stage. If the tribunal needs to see documents before making a decision then you may be asked to provide them at a later stage</li><li>if you are taking a picture of a letter, place it on a flat surface and take the picture from above</li><li>if you are uploading written documents with tracked changes, make sure that tracked changes are turned on</li></ul><h3>Give details of your application in the text box or upload a file</h3>",
     "FieldType": "Label",
     "SecurityClassification": "Public"
   },

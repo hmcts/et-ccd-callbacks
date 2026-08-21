@@ -19,7 +19,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
@@ -32,12 +31,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRestr
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClaimantEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
@@ -91,9 +87,6 @@ public class CaseActionsForCaseWorkerController {
     public static final String CREATE_ECM_CASE = "createEcmCase";
 
     private final CaseCloseValidator caseCloseValidator;
-    private final CaseCreationForCaseWorkerService caseCreationForCaseWorkerService;
-    private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
-    private final CaseUpdateForCaseWorkerService caseUpdateForCaseWorkerService;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private final ConciliationTrackService conciliationTrackService;
     private final DefaultValuesReaderService defaultValuesReaderService;
@@ -116,99 +109,6 @@ public class CaseActionsForCaseWorkerController {
     private final NocRespondentHelper nocRespondentHelper;
     private final ClaimantEmailService claimantEmailService;
     private final RespondentEmailService respondentEmailService;
-
-    @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "create a case for a caseWorker.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
-        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
-    })
-    public ResponseEntity<CCDCallbackResponse> createCase(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("CREATE CASE ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
-
-        SubmitEvent submitEvent = caseCreationForCaseWorkerService.caseCreationRequest(ccdRequest, userToken);
-        log.info("Case created correctly with case Id: {}", submitEvent.getCaseId());
-
-        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
-    }
-
-    @PostMapping(value = "/retrieveCase", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "retrieve a case for a caseWorker.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
-        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
-    })
-    /*
-      @deprecated
-     */
-    public ResponseEntity<CCDCallbackResponse> retrieveCase(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("RETRIEVE CASE ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
-
-        SubmitEvent submitEvent = caseRetrievalForCaseWorkerService.caseRetrievalRequest(userToken,
-                ccdRequest.getCaseDetails().getCaseTypeId(),
-                ccdRequest.getCaseDetails().getJurisdiction(), "1550576532211563");
-        log.info("Case received correctly with id: {}", submitEvent.getCaseId());
-
-        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
-    }
-
-    @PostMapping(value = "/retrieveCases", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "retrieve cases for a caseWorker.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
-        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
-    })
-    public ResponseEntity<CCDCallbackResponse> retrieveCases(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("RETRIEVE CASES ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
-
-        List<SubmitEvent> submitEvents = caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, userToken);
-        log.info("Cases received: {}", submitEvents.size());
-        submitEvents.forEach(submitEvent -> log.info(String.valueOf(submitEvent.getCaseId())));
-
-        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
-    }
-
-    @PostMapping(value = "/updateCase", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "update a case for a caseWorker.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
-        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
-    })
-    /*
-      @deprecated
-     */
-    public ResponseEntity<CCDCallbackResponse> updateCase(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(AUTHORIZATION) String userToken) throws Throwable {
-        log.info("UPDATE CASE ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
-
-        SubmitEvent submitEvent = caseUpdateForCaseWorkerService.caseUpdateRequest(ccdRequest, userToken);
-        log.info("Case updated correctly with id: {}", submitEvent.getCaseId());
-
-        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
-    }
 
     @PostMapping(value = "/preDefaultValues", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update pre default values in a case.")
@@ -463,18 +363,21 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/updateClaimantEmail/validate", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Validate the claimant's new email address.")
     public ResponseEntity<CCDCallbackResponse> validateClaimantEmailUpdate(
-            @RequestBody CCDRequest ccdRequest) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        return getCallbackRespEntityErrors(claimantEmailService.validateNewEmail(caseData), caseData);
+        return getCallbackRespEntityErrors(
+                claimantEmailService.validateNewEmail(caseData, userToken), caseData);
     }
 
     @PostMapping(value = "/updateClaimantEmail/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Update claimant email and case access.")
     public ResponseEntity<CCDCallbackResponse> updateClaimantEmail(
-            @RequestBody CCDRequest ccdRequest) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         return getCallbackRespEntityErrors(
-                claimantEmailService.prepareUpdate(ccdRequest.getCaseDetails()), caseData);
+                claimantEmailService.prepareUpdate(ccdRequest.getCaseDetails(), userToken), caseData);
     }
 
     @PostMapping(value = "/updateRespondentEmail/aboutToStart", consumes = APPLICATION_JSON_VALUE)
@@ -496,18 +399,21 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/updateRespondentEmail/validate", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Validate the respondent's new email address.")
     public ResponseEntity<CCDCallbackResponse> validateRespondentEmailUpdate(
-            @RequestBody CCDRequest ccdRequest) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        return getCallbackRespEntityErrors(respondentEmailService.validateNewEmail(caseData), caseData);
+        return getCallbackRespEntityErrors(
+                respondentEmailService.validateNewEmail(caseData, userToken), caseData);
     }
 
     @PostMapping(value = "/updateRespondentEmail/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Update the selected respondent's email address and case access.")
     public ResponseEntity<CCDCallbackResponse> updateRespondentEmail(
-            @RequestBody CCDRequest ccdRequest) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         return getCallbackRespEntityErrors(
-                respondentEmailService.prepareUpdate(ccdRequest.getCaseDetails()), caseData);
+                respondentEmailService.prepareUpdate(ccdRequest.getCaseDetails(), userToken), caseData);
     }
 
     @PostMapping(value = "/amendRespondentDetails", consumes = APPLICATION_JSON_VALUE)
@@ -773,7 +679,7 @@ public class CaseActionsForCaseWorkerController {
         buildFlagsImageFileName(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
-  
+
     @PostMapping(value = "/singleCaseMultipleMidEventValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates the multiple and sub multiple in the single case when moving to a multiple.")
     @ApiResponses(value = {

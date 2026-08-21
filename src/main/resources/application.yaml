@@ -120,9 +120,8 @@ idam:
     jwkUrl: ${IDAM_API_JWK_URL:http://sidam-api:5000/jwks}
     jwksUrl: ${IDAM_JWKS_BASEURL:${IDAM_API_JWK_URL:http://sidam-api:5000/jwks}}
   client:
-    # search-user is required for GET /api/v1/users (claimant email update mid-event validation).
-    # The et-cos IdAM client must also have this scope registered in each environment.
-    scope: ${IDAM_CLIENT_SCOPE:openid profile roles manage-user search-user}
+    # User search for party email update uses the incoming ExUI token, not this et-cos password grant.
+    scope: ${IDAM_CLIENT_SCOPE:openid profile roles manage-user}
     secret: ${IDAM_CLIENT_SECRET:${ET_SYA_API_IDAM_CLIENT_SECRET:AAAAAAAAAAAAAAAA}}
     id: ${REFORM_SERVICE_NAME:et-cos}
 
@@ -398,3 +397,4 @@ notifications:
     respondentResponse: ${RESPONDENT_RESPONSE:9ea43b1d-7029-48ea-a0bd-b9fc4c3c8b66}
   bundles:
     claimantSubmitted: ${BUNDLES_SUBMITTED_TEMPLATE_ID:5c829358-0b54-4335-9d60-1c8296c4a516}
+  dataQualityReportTemplateId: ${DATA_QUALITY_REPORT_TEMPLATE_ID:57a8cba5-9885-4772-876b-09a3fe0abe94

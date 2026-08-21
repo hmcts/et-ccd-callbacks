@@ -50,15 +50,16 @@ public class RespondentEmailService {
         return RespondentEmailUpdateHelper.populateCurrentEmail(caseData);
     }
 
-    public List<String> validateNewEmail(CaseData caseData) {
+    public List<String> validateNewEmail(CaseData caseData, String userToken) {
         List<String> errors = RespondentEmailUpdateHelper.validateInput(caseData);
         if (errors.isEmpty()) {
-            partyEmailUpdateSupport.findCitizenUserByEmail(caseData.getNewRespondentEmail(), MESSAGES, errors);
+            partyEmailUpdateSupport.findCitizenUserByEmail(
+                    caseData.getNewRespondentEmail(), userToken, MESSAGES, errors);
         }
         return errors;
     }
 
-    public List<String> prepareUpdate(CaseDetails caseDetails) {
+    public List<String> prepareUpdate(CaseDetails caseDetails, String userToken) {
         CaseData caseData = caseDetails.getCaseData();
         List<String> errors = RespondentEmailUpdateHelper.validateInput(caseData);
         if (CollectionUtils.isNotEmpty(errors)) {
@@ -72,7 +73,7 @@ public class RespondentEmailService {
         }
 
         Optional<UserDetails> newUser = partyEmailUpdateSupport.findCitizenUserByEmail(
-                caseData.getNewRespondentEmail(), MESSAGES, errors);
+                caseData.getNewRespondentEmail(), userToken, MESSAGES, errors);
         if (CollectionUtils.isNotEmpty(errors) || newUser.isEmpty()) {
             return errors;
         }

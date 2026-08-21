@@ -43,13 +43,13 @@ class PartyEmailUpdateSupportTest {
 
     private static final String CASE_ID = "1234567890123456";
     private static final String EMAIL = "new@example.com";
+    private static final String USER_TOKEN = "Bearer exui-token";
+    private static final String EMAIL_QUERY = "email:" + EMAIL;
     private static final String OLD_USER_ID = "old-user-id";
     private static final String NEW_USER_ID = "new-user-id";
 
     @Mock
     private IdamApi idamApi;
-    @Mock
-    private AdminUserService adminUserService;
     @Mock
     private CcdCaseAssignment ccdCaseAssignment;
 
@@ -57,18 +57,17 @@ class PartyEmailUpdateSupportTest {
 
     @BeforeEach
     void setUp() {
-        support = new PartyEmailUpdateSupport(idamApi, adminUserService, ccdCaseAssignment);
+        support = new PartyEmailUpdateSupport(idamApi, ccdCaseAssignment);
     }
 
     @Test
     void findCitizenUserByEmailReturnsExactCitizenMatchIgnoringCase() {
-        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
-        when(idamApi.searchUsersByQuery("admin-token", EMAIL, 0, 50))
+        when(idamApi.searchUsersByQuery(USER_TOKEN, EMAIL_QUERY, 0, 50))
                 .thenReturn(List.of(user(EMAIL.toUpperCase(Locale.ROOT), NEW_USER_ID)));
 
         List<String> errors = new ArrayList<>();
         Optional<UserDetails> result = support.findCitizenUserByEmail(
-                EMAIL, PartyEmailMessages.claimant(), errors);
+                EMAIL, USER_TOKEN, PartyEmailMessages.claimant(), errors);
 
         assertThat(result).isPresent();
         assertThat(result.get().getUid()).isEqualTo(NEW_USER_ID);
@@ -77,30 +76,28 @@ class PartyEmailUpdateSupportTest {
 
     @Test
     void findCitizenUserByEmailAddsLookupErrorWhenIdamSearchFails() {
-        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
-        when(idamApi.searchUsersByQuery("admin-token", EMAIL, 0, 50))
+        when(idamApi.searchUsersByQuery(USER_TOKEN, EMAIL_QUERY, 0, 50))
                 .thenThrow(forbiddenIdamSearchException());
 
         List<String> errors = new ArrayList<>();
-        assertThat(support.findCitizenUserByEmail(EMAIL, PartyEmailMessages.respondent(), errors))
+        assertThat(support.findCitizenUserByEmail(EMAIL, USER_TOKEN, PartyEmailMessages.respondent(), errors))
                 .isEmpty();
         assertThat(errors).containsExactly(PartyEmailMessages.respondent().idamUserLookupError());
     }
 
     @Test
     void findCitizenUserByEmailRejectsNonCitizenAndAmbiguousMatches() {
-        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
-        when(idamApi.searchUsersByQuery("admin-token", EMAIL, 0, 50))
+        when(idamApi.searchUsersByQuery(USER_TOKEN, EMAIL_QUERY, 0, 50))
                 .thenReturn(List.of(user(EMAIL, NEW_USER_ID, List.of("caseworker"))))
                 .thenReturn(List.of(user(EMAIL, NEW_USER_ID), user(EMAIL, "other-id")));
 
         List<String> nonCitizenErrors = new ArrayList<>();
-        assertThat(support.findCitizenUserByEmail(EMAIL, PartyEmailMessages.claimant(), nonCitizenErrors))
+        assertThat(support.findCitizenUserByEmail(EMAIL, USER_TOKEN, PartyEmailMessages.claimant(), nonCitizenErrors))
                 .isEmpty();
         assertThat(nonCitizenErrors).containsExactly(PartyEmailMessages.claimant().idamUserNotCitizenError());
 
         List<String> ambiguousErrors = new ArrayList<>();
-        assertThat(support.findCitizenUserByEmail(EMAIL, PartyEmailMessages.claimant(), ambiguousErrors))
+        assertThat(support.findCitizenUserByEmail(EMAIL, USER_TOKEN, PartyEmailMessages.claimant(), ambiguousErrors))
                 .isEmpty();
         assertThat(ambiguousErrors).containsExactly(PartyEmailMessages.claimant().idamUserAmbiguousError());
     }

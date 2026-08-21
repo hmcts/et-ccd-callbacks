@@ -28,18 +28,22 @@ import java.util.Optional;
 public class PartyEmailUpdateSupport {
 
     private static final String CITIZEN_ROLE = "citizen";
+    private static final String EMAIL_QUERY_PREFIX = "email:";
 
     private final IdamApi idamApi;
-    private final AdminUserService adminUserService;
     private final CcdCaseAssignment ccdCaseAssignment;
 
+    /**
+     * Looks up a citizen IdAM user using the incoming ExUI token (not the et-cos password grant).
+     * The ExUI token must include search-user scope; otherwise IdAM returns 403.
+     */
     public Optional<UserDetails> findCitizenUserByEmail(String email,
+                                                        String userToken,
                                                         PartyEmailMessages messages,
                                                         List<String> errors) {
         List<UserDetails> exactMatches;
         try {
-            exactMatches = idamApi.searchUsersByQuery(
-                            adminUserService.getAdminUserToken(), email, 0, 50)
+            exactMatches = idamApi.searchUsersByQuery(userToken, EMAIL_QUERY_PREFIX + email, 0, 50)
                     .stream()
                     .filter(user -> StringUtils.equalsIgnoreCase(email, user.getEmail()))
                     .toList();

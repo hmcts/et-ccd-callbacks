@@ -96,7 +96,7 @@ test.describe( 'Legal Rep updates update contact to colleagues in his org', () =
   });
 
   //RET-6237 to be released before testing this for Respondent LR
-  test.skip('Respondent Legal Rep updates contact to colleagues in his org',
+  test('Respondent Legal Rep updates contact to colleagues in his org',
     async ({
              nocPage, manageCaseDashboardPage, caseDetailsPage, amendContactDetailsLrPage, checkYourAnswersPage
            }) => {
@@ -150,7 +150,7 @@ test.describe( 'Legal Rep updates update contact to colleagues in his org', () =
 
 //Ret-6041 skipped till dev ticket is released.
 test.describe("Legal Rep Amend contact details for multiple respondents", () => {
-  test.skip('Create a claim with multiple ACAS certificates, submit and process within manage cases, LR assigns each respondents,' +
+  test('Create a claim with multiple ACAS certificates, submit and process within manage cases, LR assigns each respondents,' +
     'Caseworker removes LR2 and LR1 tries to amend contact details',
     async ({
             page,
@@ -160,25 +160,26 @@ test.describe("Legal Rep Amend contact details for multiple respondents", () => 
             personalDetailsPage,
             employmentAndRespondentDetailsPage,
             claimDetailsPage,
-            submitClaimPage, browserUtils
+            submitClaimPage, browserUtils,singleOrMultipleClaimPage
           }) => {
 
       ({caseId, caseNumber} = await createCaseViaCitizenUI(
-      page,
-      citizenPreLoginPage,
-      citizenPostLoginPage,
-      personalDetailsPage,
-      employmentAndRespondentDetailsPage,
-      claimDetailsPage,
-      submitClaimPage,
-      'EnglandWales',
-      async() => { await loginPage.processLogin(users.etClaimant, config.etSyaUiUrl) },
-      employmentAndRespondentDetailsPage =>
-        employmentAndRespondentDetailsPage.multipleAcasCertificate(
-          userDetailsData.workPostcode,
-          userDetailsData.selectedWorkAddress,
-          userDetailsData.firstLineOfAddress,
-        ),
+          page,
+          citizenPreLoginPage,
+          citizenPostLoginPage,
+          personalDetailsPage,
+          employmentAndRespondentDetailsPage,
+          claimDetailsPage,
+          submitClaimPage,
+          singleOrMultipleClaimPage,
+          'EnglandWales', 'Claiming for myself', false,
+          async() => { await loginPage.processLogin(users.etClaimant, config.etSyaUiUrl) },
+          employmentAndRespondentDetailsPage =>
+            employmentAndRespondentDetailsPage.multipleAcasCertificateAndMultipleRespondents(
+              userDetailsData.workPostcode,
+              userDetailsData.selectedWorkAddress,
+              userDetailsData.firstLineOfAddress,
+            ),
     ));
     ({caseId, caseNumber} = await CaseEventApi.caseWorkerDoesEt1VettingAndAcceptCaseEngland(caseId));
 
@@ -224,7 +225,7 @@ test.describe("Legal Rep Amend contact details for multiple respondents", () => 
     ({ addressDetails, phNumber} = await amendContactDetailsLrPageLr1.amendLegalRepContactDetails('Amend contact details', checkYourAnswersPageLr1));
     const tabData = [
       {
-        tabName: 'Claimant Representative',
+        tabName: 'Respondent Representative',
         tabContent: [
           { tabItem: 'Phone number', value: phNumber },
           { tabItem: 'Building and Street', value: addressDetails.addressLine1 },

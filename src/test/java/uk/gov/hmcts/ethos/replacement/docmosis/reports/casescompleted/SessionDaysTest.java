@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -24,7 +22,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICI
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 
-@ExtendWith(SpringExtension.class)
 class SessionDaysTest {
 
     @Test

@@ -22,6 +22,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentEmailUpdateHelper;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -163,7 +164,7 @@ class RespondentEmailServiceTest {
 
         assertThat(service.populateCurrentEmail(caseDetails.getCaseData())).isEmpty();
         assertThat(caseDetails.getCaseData().getCurrentRespondentEmail())
-                .isEqualTo("No email address on case");
+                .isEqualTo(RespondentEmailUpdateHelper.NO_EMAIL_ADDRESS_ON_CASE);
     }
 
     @Test
@@ -239,7 +240,7 @@ class RespondentEmailServiceTest {
         selectRespondent(RESPONDENT_ID_ONE);
         firstRespondent.getValue().setRespondentEmail(null);
         firstRespondent.getValue().setResponseRespondentEmail(null);
-        caseDetails.getCaseData().setCurrentRespondentEmail("No email address on case");
+        caseDetails.getCaseData().setCurrentRespondentEmail(RespondentEmailUpdateHelper.NO_EMAIL_ADDRESS_ON_CASE);
         caseDetails.getCaseData().setNewRespondentEmail(NEW_EMAIL);
         mockNewIdamUser();
 

@@ -27,6 +27,8 @@ public final class RespondentEmailUpdateHelper {
     // Shown when the user enters a new email that is the same as the email already on the case.
     public static final String EMAIL_UNCHANGED_ERROR =
             "Enter an email address that is different from the current respondent email address.";
+    // Shown on the event screen when the selected respondent has no live email.
+    public static final String NO_EMAIL_ADDRESS_ON_CASE = "No email address on case";
 
     private RespondentEmailUpdateHelper() {
         // Utility classes should not have a public or default constructor.
@@ -53,7 +55,7 @@ public final class RespondentEmailUpdateHelper {
         }
 
         String existingEmail = getLiveRespondentEmail(selectedRespondent.get().getValue());
-        caseData.setCurrentRespondentEmail(StringUtils.defaultIfBlank(existingEmail, "No email address on case"));
+        caseData.setCurrentRespondentEmail(StringUtils.defaultIfBlank(existingEmail, NO_EMAIL_ADDRESS_ON_CASE));
         caseData.setNewRespondentEmail(null);
         return List.of();
     }

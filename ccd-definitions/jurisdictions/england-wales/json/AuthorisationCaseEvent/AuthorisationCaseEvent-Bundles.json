@@ -97,6 +97,12 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "SUBMIT_RESPONDENT_BUNDLES",
+    "UserRole": "[DEFENDANT]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "removeHearingBundles",
     "UserRole": "caseworker-employment-englandwales",
     "CRUD": "CRUD"

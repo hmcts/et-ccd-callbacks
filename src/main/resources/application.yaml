@@ -396,4 +396,6 @@ notifications:
     respondentResponse: ${RESPONDENT_RESPONSE:9ea43b1d-7029-48ea-a0bd-b9fc4c3c8b66}
   bundles:
     claimantSubmitted: ${BUNDLES_SUBMITTED_TEMPLATE_ID:5c829358-0b54-4335-9d60-1c8296c4a516}
-  dataQualityReportTemplateId: ${DATA_QUALITY_REPORT_TEMPLATE_ID:57a8cba5-9885-4772-876b-09a3fe0abe94
+    respondentSubmittedForClaimant: ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_CLAIMANT_TEMPLATE_ID:cdb6288d-8247-435a-875f-4ea48ca23c9e}
+    respondentSubmittedForTribunal: ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID:12d604ce-df82-4c64-8544-ebbef66eb8c4}
+  dataQualityReportTemplateId: ${DATA_QUALITY_REPORT_TEMPLATE_ID:57a8cba5-9885-4772-876b-09a3fe0abe94}

@@ -82,6 +82,19 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "SUBMIT_RESPONDENT_BUNDLES",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[DEFENDANT]",
+          "caseworker-employment-api"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
     "CaseEventID": "removeHearingBundles",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"

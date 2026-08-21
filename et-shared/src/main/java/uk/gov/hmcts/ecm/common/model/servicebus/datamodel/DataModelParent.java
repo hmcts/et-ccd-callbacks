@@ -26,7 +26,8 @@ import lombok.experimental.SuperBuilder;
     @JsonSubTypes.Type(value = TransferToEcmDataModel.class, name = "transferToEcmDataModel"),
     @JsonSubTypes.Type(value = SendNotificationDataModel.class, name = "SendNotificationDataModel"),
     @JsonSubTypes.Type(value = LegalRepDataModel.class, name = "LegalRepDataModel"),
-    @JsonSubTypes.Type(value = DigitalCaseFileDataModel.class, name = "DigitalCaseFileDataModel")
+    @JsonSubTypes.Type(value = DigitalCaseFileDataModel.class, name = "DigitalCaseFileDataModel"),
+    @JsonSubTypes.Type(value = CreateMultiplesDataModel.class, name = "createMultiplesDataModel")
 
 })
 public class DataModelParent {

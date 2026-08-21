@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -32,11 +31,11 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -56,8 +55,6 @@ class MultipleCreationServiceTest {
     @Mock
     private MultipleHelperService multipleHelperService;
     @Mock
-    private SubMultipleUpdateService subMultipleUpdateService;
-    @Mock
     private MultipleTransferService multipleTransferService;
     @Mock
     private CaseManagementLocationService caseManagementLocationService;
@@ -74,7 +71,6 @@ class MultipleCreationServiceTest {
     @Mock
     private AuthTokenGenerator authTokenGenerator;
 
-    @InjectMocks
     private MultipleCreationService multipleCreationService;
 
     private MultipleDetails multipleDetails;
@@ -83,6 +79,19 @@ class MultipleCreationServiceTest {
 
     @BeforeEach
     public void setUp() {
+        multipleCreationService = new MultipleCreationService(
+                excelDocManagementService,
+                multipleReferenceService,
+                multipleHelperService,
+                multipleTransferService,
+                caseManagementLocationService,
+                featureToggleService,
+                ccdClient,
+                adminUserService,
+                organisationClient,
+                authTokenGenerator,
+                createUpdatesBusSender
+        );
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseTypeId(ENGLANDWALES_BULK_CASE_TYPE_ID);
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
@@ -124,10 +133,9 @@ class MultipleCreationServiceTest {
         multipleCreationService.bulkCreationLogic(userToken,
                 multipleDetails,
                 new ArrayList<>());
-        verify(excelDocManagementService, times(1)).writeAndUploadExcelDocument(ethosCaseRefCollection,
+        verify(excelDocManagementService, times(1)).generateAndUploadExcel(ethosCaseRefCollection,
                 userToken,
-                multipleDetails,
-                new ArrayList<>());
+                multipleDetails);
         verifyNoMoreInteractions(excelDocManagementService);
     }
 
@@ -140,11 +148,10 @@ class MultipleCreationServiceTest {
         multipleCreationService.bulkCreationLogic(userToken,
                 multipleDetails,
                 new ArrayList<>());
-        verify(excelDocManagementService, times(1)).writeAndUploadExcelDocument(
-                MultipleUtil.getCaseMultipleObjectCollection(),
-                userToken,
-                multipleDetails,
-                new ArrayList<>(Arrays.asList("Sub3", "Sub2", "Sub1")));
+        verify(excelDocManagementService, times(1)).generateAndUploadExcel(
+                any(),
+                eq(userToken),
+                eq(multipleDetails));
         verifyNoMoreInteractions(excelDocManagementService);
     }
 
@@ -157,11 +164,10 @@ class MultipleCreationServiceTest {
         multipleCreationService.bulkCreationLogic(userToken,
                 multipleDetails,
                 new ArrayList<>());
-        verify(excelDocManagementService, times(1)).writeAndUploadExcelDocument(
-                new ArrayList<>(),
-                userToken,
-                multipleDetails,
-                new ArrayList<>());
+        verify(excelDocManagementService, times(1)).generateAndUploadExcel(
+                any(),
+                eq(userToken),
+                eq(multipleDetails));
         verifyNoMoreInteractions(excelDocManagementService);
     }
 
@@ -242,11 +248,9 @@ class MultipleCreationServiceTest {
         assertEquals(1, dataModel.getLegalRepIdsByCase().size());
         assertEquals(user.getUserIdentifier(), dataModel.getLegalRepIdsByCase().get("1718968200").get(0));
         assertEquals(user2.getUserIdentifier(), dataModel.getLegalRepIdsByCase().get("1718968200").get(1));
-
-        verify(excelDocManagementService, times(1)).writeAndUploadExcelDocument(ethosCaseRefCollection,
+        verify(excelDocManagementService, times(1)).generateAndUploadExcel(ethosCaseRefCollection,
                 userToken,
-                multipleDetails,
-                new ArrayList<>());
+                multipleDetails);
         verifyNoMoreInteractions(excelDocManagementService);
     }
 
@@ -258,17 +262,14 @@ class MultipleCreationServiceTest {
         multipleDetails.getCaseData().setLeadCaseId(null);
         multipleDetails.getCaseData().setCaseIdCollection(new ArrayList<>());
 
-        when(ccdClient.retrieveCasesElasticSearch(any(), any(), any())).thenReturn(List.of());
-
         multipleDetails.getCaseData().setMultipleSource(ET1_ONLINE_CASE_SOURCE);
         multipleCreationService.bulkCreationLogic(userToken,
                 multipleDetails,
                 new ArrayList<>());
 
-        verify(excelDocManagementService, times(1)).writeAndUploadExcelDocument(List.of(),
+        verify(excelDocManagementService, times(1)).generateAndUploadExcel(List.of(),
                 userToken,
-                multipleDetails,
-                new ArrayList<>());
+                multipleDetails);
         verifyNoMoreInteractions(excelDocManagementService);
     }
 
@@ -288,10 +289,9 @@ class MultipleCreationServiceTest {
                 multipleDetails,
                 new ArrayList<>());
 
-        verify(excelDocManagementService, times(1)).writeAndUploadExcelDocument(ethosCaseRefCollection,
+        verify(excelDocManagementService, times(1)).generateAndUploadExcel(ethosCaseRefCollection,
                 userToken,
-                multipleDetails,
-                new ArrayList<>());
+                multipleDetails);
         verifyNoMoreInteractions(excelDocManagementService);
         verifyNoMoreInteractions(createUpdatesBusSender);
     }

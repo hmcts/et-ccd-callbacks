@@ -61,6 +61,17 @@
         <packageUrl regex="true">^pkg:maven/(com\.azure/azure\-identity(\-extensions)?|com\.microsoft\.azure/msal4j)@.*$</packageUrl>
         <cve>CVE-2024-35255</cve>
     </suppress>
+    <!-- CVE-2026-50338 is an Azure Spring Apps (Microsoft cloud service) elevation-of-privilege issue,
+         not a library flaw. It is a false-positive CPE match against the com.azure.spring:spring-cloud-azure-*
+         client jars, which do not run Azure Spring Apps. Suppress the false positive. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-cloud-azure-*-6.4.0.jar
+   False positive: CVE targets the Azure Spring Apps hosting service, not these client libraries.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.azure\.spring/spring\-cloud\-azure\-.*@.*$</packageUrl>
+        <cve>CVE-2026-50338</cve>
+    </suppress>
     <!-- OpenTelemetry semconv is already forced to the latest published version; these match the broad OpenTelemetry CPE. -->
     <suppress>
         <notes><![CDATA[
@@ -169,5 +180,14 @@
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.azure\.spring/spring-cloud-azure-service@.*$</packageUrl>
         <cpe>cpe:/a:service_project:service</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: tika-core-3.2.3.jar
+   tika-core is pinned to 3.2.3 in build.gradle. Suppressed as of 2026-08-14.
+   The suppression is tied to 3.2.3, so it lapses automatically when the version is bumped.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tika/tika\-core@3\.2\.3$</packageUrl>
+        <cve>CVE-2026-66755</cve>
     </suppress>
 </suppressions>

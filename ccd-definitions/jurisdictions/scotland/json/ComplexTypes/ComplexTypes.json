@@ -6020,7 +6020,7 @@
     "FieldTypeParameter": "msl_IcVideoOrders",
     "FieldShowCondition": "etICTypeOfFinalHearingV2 CONTAINS \"Video\"",
     "SecurityClassification": "Public",
-    "Searchable": "No"
+    "Searchable": "N"
   },
   {
     "ID": "etICHearingNotListedListForFinalHearingUpdated",

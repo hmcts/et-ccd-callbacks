@@ -6054,7 +6054,7 @@
     "CaseEventID": "initialConsideration",
     "CaseFieldID": "etICHearingNotListedListForFinalHearingUpdated",
     "ListElementCode": "etICFinalHearingIsEJSitAloneReasonYesOther",
-    "EventElementLabel": "Reason for JSA",
+    "EventElementLabel": "Other Reason (EJ Sit Alone: Yes)",
     "FieldDisplayOrder": 10,
     "DisplayContext": "MANDATORY"
   },

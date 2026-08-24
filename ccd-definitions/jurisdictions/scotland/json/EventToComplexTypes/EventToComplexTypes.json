@@ -5942,6 +5942,24 @@
   {
     "ID": "InitialConsideration",
     "CaseEventID": "initialConsideration",
+    "CaseFieldID": "etICHearingNotListedListForPrelimHearingUpdated",
+    "ListElementCode": "etICIsPreliminaryHearingWithMembersYes",
+    "EventElementLabel": "Reason for full Panel",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "InitialConsideration",
+    "CaseEventID": "initialConsideration",
+    "CaseFieldID": "etICHearingNotListedListForPrelimHearingUpdated",
+    "ListElementCode": "etICIsPreliminaryHearingWithMembersYesOther",
+    "EventElementLabel": "Other Reason (EJ Sit Alone: No)",
+    "FieldDisplayOrder": 8,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "InitialConsideration",
+    "CaseEventID": "initialConsideration",
     "CaseFieldID": "etICHearingNotListedListForFinalHearingUpdated",
     "ListElementCode": "etICTypeOfFinalHearingV2",
     "EventElementLabel": "Type of final hearing",

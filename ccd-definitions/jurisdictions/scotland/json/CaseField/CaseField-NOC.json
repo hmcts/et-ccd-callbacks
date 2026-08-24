@@ -1,0 +1,18 @@
+[
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "repCollectionToRemove",
+    "Label": "Respondent representative(s) to remove",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "RespondentRepresentative",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "repCollectionToAdd",
+    "Label": "Respondent representative(s) to add",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "RespondentRepresentative",
+    "SecurityClassification": "Public"
+  }
+]

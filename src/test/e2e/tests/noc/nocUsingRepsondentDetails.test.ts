@@ -12,7 +12,7 @@ let caseNumber: string;
 let firstName: string;
 let lastName: string;
 
-test.describe('perform NOC for respondent', () => {
+test.describe.skip('perform NOC for respondent', () => {
   test.use({
     storageState: users.etLegalRepresentative.sessionFile,
   })

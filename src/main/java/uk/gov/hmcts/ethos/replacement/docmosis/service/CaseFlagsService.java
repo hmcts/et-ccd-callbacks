@@ -729,10 +729,8 @@ public class CaseFlagsService {
             return EXTERNAL.equals(referenceDataVisibilityValue);
         }
 
-        String availableExternally = StringUtils.trimToEmpty(flagDetail.getAvailableExternally());
-        return YES.equalsIgnoreCase(availableExternally)
-                || Boolean.TRUE.toString().equalsIgnoreCase(availableExternally)
-                || EXTERNAL.equalsIgnoreCase(availableExternally);
+        // A legacy flag no longer configured in Reference Data defaults to Internal.
+        return false;
     }
 
     private static String getPartyName(CaseData caseData, PartyFlag flag) {

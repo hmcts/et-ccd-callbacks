@@ -67,7 +67,7 @@ class EcmMigrationCaseNotesTaskTest {
     void run_prependsEcmNotesToExistingReformNotes() throws IOException {
         mockEcmCaseType(ECM_CASE_ID, "Newcastle");
         when(ccdClient.startEventForEcmCase(ADMIN_TOKEN, "Newcastle", EMPLOYMENT, ECM_CASE_ID,
-                "rollbackMigrateCase")).thenReturn(ecmRequest(ecmNote()));
+                "fixCaseAPI")).thenReturn(ecmRequest(ecmNote()));
         when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, REFORM_CASE_ID,
                 "fixCaseAPI")).thenReturn(reformRequest(reformNote()));
 
@@ -124,11 +124,11 @@ class EcmMigrationCaseNotesTaskTest {
         task.run();
 
         verify(ccdClient).startEventForEcmCase(ADMIN_TOKEN, "Newcastle", EMPLOYMENT, ECM_CASE_ID,
-                "rollbackMigrateCase");
+                "fixCaseAPI");
         verify(ccdClient).startEventForEcmCase(ADMIN_TOKEN, "MidlandsEast", EMPLOYMENT, midlandsEastCaseId,
-                "rollbackMigrateCase");
+                "fixCaseAPI");
         verify(ccdClient).startEventForEcmCase(ADMIN_TOKEN, "Wales", EMPLOYMENT, walesCaseId,
-                "rollbackMigrateCase");
+                "fixCaseAPI");
     }
 
     @Test
@@ -148,9 +148,9 @@ class EcmMigrationCaseNotesTaskTest {
         mockEcmCaseType(ECM_CASE_ID, "Newcastle");
         mockEcmCaseType(successfulCaseId, "Wales");
         when(ccdClient.startEventForEcmCase(ADMIN_TOKEN, "Newcastle", EMPLOYMENT, ECM_CASE_ID,
-                "rollbackMigrateCase")).thenThrow(new IOException("CCD unavailable"));
+                "fixCaseAPI")).thenThrow(new IOException("CCD unavailable"));
         when(ccdClient.startEventForEcmCase(ADMIN_TOKEN, "Wales", EMPLOYMENT, successfulCaseId,
-                "rollbackMigrateCase")).thenReturn(ecmRequest(ecmNote()));
+                "fixCaseAPI")).thenReturn(ecmRequest(ecmNote()));
         when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, REFORM_CASE_ID,
                 "fixCaseAPI")).thenReturn(reformRequest());
 

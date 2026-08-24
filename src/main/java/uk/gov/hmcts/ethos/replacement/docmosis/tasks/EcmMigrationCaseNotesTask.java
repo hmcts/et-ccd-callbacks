@@ -166,7 +166,7 @@ public class EcmMigrationCaseNotesTask implements Runnable {
         return new ArrayList<>(notesById.values());
     }
 
-    private static class TaskSummary {
+    public static class TaskSummary {
         private final List<String> updatedCaseIds = new ArrayList<>();
         private final List<String> skippedCaseIds = new ArrayList<>();
         private final List<String> failedCaseIds = new ArrayList<>();

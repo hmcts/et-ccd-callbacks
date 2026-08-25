@@ -34,7 +34,8 @@ class InitialConsiderationHelperTest {
         setCaseDataValues(caseDataForEnglandWales);
         caseDataForEnglandWales.setEtICHearingNotListedListUpdated(
                 Collections.singletonList("List for preliminary hearing"));
-        caseDataForEnglandWales.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdated());
+        caseDataForEnglandWales.setEtICHearingNotListedListForPrelimHearingUpdated(
+            populatePreliminaryHearingUpdatedEW());
 
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataForEnglandWales, "key",
                 ENGLANDWALES_CASE_TYPE_ID);
@@ -150,7 +151,7 @@ class InitialConsiderationHelperTest {
         caseData = CaseDataBuilder.builder().build();
         setCaseDataValues(caseData);
         caseData.setEtICHearingNotListedListUpdated(Collections.singletonList("List for preliminary hearing"));
-        caseData.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdated());
+        caseData.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdatedEW());
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseData,
                 "key", ENGLANDWALES_CASE_TYPE_ID);
 
@@ -392,11 +393,7 @@ class InitialConsiderationHelperTest {
         CaseData caseDataScotland = CaseDataBuilder.builder().build();
         setCaseDataValues(caseDataScotland);
         caseDataScotland.setEtICHearingNotListedListUpdated(Collections.singletonList("List for preliminary hearing"));
-        caseDataScotland.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdated());
-        caseDataScotland.getEtICHearingNotListedListForPrelimHearingUpdated()
-                .setEtICIsPreliminaryHearingWithMembersYes(List.of("No views expressed by parties", "Others"));
-        caseDataScotland.getEtICHearingNotListedListForPrelimHearingUpdated()
-                .setEtICIsPreliminaryHearingWithMembersYesOther("TestYesOther");
+        caseDataScotland.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdatedSC());
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataScotland,
                 "key", "ET_Scotland");
 
@@ -507,7 +504,20 @@ class InitialConsiderationHelperTest {
         preliminaryHearingUpdated.setEtICLengthOfPrelimHearing("1");
         preliminaryHearingUpdated.setPrelimHearingLengthNumType("Hours");
         preliminaryHearingUpdated.setEtICIsPreliminaryHearingWithMembers("Yes");
+        return preliminaryHearingUpdated;
+    }
+
+    private EtICListForPreliminaryHearingUpdated populatePreliminaryHearingUpdatedEW() {
+        EtICListForPreliminaryHearingUpdated preliminaryHearingUpdated = populatePreliminaryHearingUpdated();
         preliminaryHearingUpdated.setEtICIsPreliminaryHearingWithMembersReason("reasons for requiring members");
+        return preliminaryHearingUpdated;
+    }
+
+    private EtICListForPreliminaryHearingUpdated populatePreliminaryHearingUpdatedSC() {
+        EtICListForPreliminaryHearingUpdated preliminaryHearingUpdated = populatePreliminaryHearingUpdated();
+        preliminaryHearingUpdated.setEtICIsPreliminaryHearingWithMembersYes(
+            List.of("No views expressed by parties", "Others"));
+        preliminaryHearingUpdated.setEtICIsPreliminaryHearingWithMembersYesOther("TestYesOther");
         return preliminaryHearingUpdated;
     }
 

@@ -167,6 +167,8 @@ class InitialConsiderationHelperTest {
                 + "\"preliminaryHearingType\":[\"Video\",\"F2F\"],\"preliminaryHearingPurpose\":[\"Case management\"],"
                 + "\"preliminaryHearingNotice\":\"Purpose of preliminary hearing\",\"preliminaryHearingLength\":\"1\","
                 + "\"preliminaryHearingLengthType\":\"Hours\",\"preliminaryHearingWithMembers\":\"Yes\","
+                + "\"preliminaryHearingWithMembersYes\":[],"
+                + "\"preliminaryHearingWithMembersYesOther\":null,"
                 + "\"preliminaryHearingWithMembersReason\":\"reasons for requiring members\","
                 + "\"hearingNotListedListAnyOtherDirections\":null,"
                 + "\"etICFinalHearingType\":null,"
@@ -221,6 +223,8 @@ class InitialConsiderationHelperTest {
                 + "\"preliminaryHearingType\":null,\"preliminaryHearingPurpose\":null,"
                 + "\"preliminaryHearingNotice\":null,\"preliminaryHearingLength\":null,"
                 + "\"preliminaryHearingLengthType\":null,\"preliminaryHearingWithMembers\":null,"
+                + "\"preliminaryHearingWithMembersYes\":[],"
+                + "\"preliminaryHearingWithMembersYesOther\":null,"
                 + "\"preliminaryHearingWithMembersReason\":null,"
                 + "\"hearingNotListedListAnyOtherDirections\":null,"
                 + "\"etICFinalHearingType\":[\"Video\",\"F2F\"],"
@@ -349,7 +353,7 @@ class InitialConsiderationHelperTest {
                 + "\"preliminaryHearingLengthType\":null,\"preliminaryHearingWithMembers\":null,"
                 + "\"preliminaryHearingWithMembersYes\":[],"
                 + "\"preliminaryHearingWithMembersYesOther\":null,"
-                + "\"hearingNotListedListAnyOtherDirections\":null,"
+                + "\"preliminaryHearingWithMembersReason\":null,\"hearingNotListedListAnyOtherDirections\":null,"
                 + "\"etICFinalHearingType\":[\"Video\",\"F2F\"],"
                 + "\"etICTypeOfVideoHearingOrder\":null,\"etICTypeOfF2fHearingOrder\":null,"
                 + "\"etICHearingOrderBUCompliance\":null,"
@@ -390,9 +394,7 @@ class InitialConsiderationHelperTest {
         caseDataScotland.setEtICHearingNotListedListUpdated(Collections.singletonList("List for preliminary hearing"));
         caseDataScotland.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdated());
         caseDataScotland.getEtICHearingNotListedListForPrelimHearingUpdated()
-                .setEtICIsPreliminaryHearingWithMembersYes(List.of("No views expressed by parties", "Others"));
-        caseDataScotland.getEtICHearingNotListedListForPrelimHearingUpdated()
-                .setEtICIsPreliminaryHearingWithMembersYesOther("TestYesOther");
+                .setEtICIsPreliminaryHearingWithMembersReason("reasons for requiring members");
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataScotland,
                 "key", "ET_Scotland");
 
@@ -411,6 +413,7 @@ class InitialConsiderationHelperTest {
                 + "\"preliminaryHearingLengthType\":\"Hours\",\"preliminaryHearingWithMembers\":\"Yes\","
                 + "\"preliminaryHearingWithMembersYes\":[\"No views expressed by parties\",\"Others\"],"
                 + "\"preliminaryHearingWithMembersYesOther\":\"TestYesOther\","
+                + "\"preliminaryHearingWithMembersReason\":\"reasons for requiring members\","
                 + "\"hearingNotListedListAnyOtherDirections\":null,"
                 + "\"etICFinalHearingType\":null,"
                 + "\"etICTypeOfVideoHearingOrder\":null,\"etICTypeOfF2fHearingOrder\":null,"
@@ -464,6 +467,7 @@ class InitialConsiderationHelperTest {
                 + "\"preliminaryHearingWithMembers\":null,"
                 + "\"preliminaryHearingWithMembersYes\":[],"
                 + "\"preliminaryHearingWithMembersYesOther\":null,"
+                + "\"preliminaryHearingWithMembersReason\":null,"
                 + "\"hearingNotListedListAnyOtherDirections\":null,\"etICFinalHearingType\":null,"
                 + "\"etICTypeOfVideoHearingOrder\":null,\"etICTypeOfF2fHearingOrder\":null,"
                 + "\"etICHearingOrderBUCompliance\":null,"
@@ -538,6 +542,8 @@ class InitialConsiderationHelperTest {
                 + "\"preliminaryHearingType\":null,\"preliminaryHearingPurpose\":null,"
                 + "\"preliminaryHearingNotice\":null,\"preliminaryHearingLength\":null,"
                 + "\"preliminaryHearingLengthType\":null,\"preliminaryHearingWithMembers\":null,"
+                + "\"preliminaryHearingWithMembersYes\":[],"
+                + "\"preliminaryHearingWithMembersYesOther\":null,"
                 + "\"preliminaryHearingWithMembersReason\":null,"
                 + "\"hearingNotListedListAnyOtherDirections\":null,"
                 + "\"etICFinalHearingType\":null,"
@@ -595,6 +601,7 @@ class InitialConsiderationHelperTest {
                 + "\"preliminaryHearingLengthType\":null,\"preliminaryHearingWithMembers\":null,"
                 + "\"preliminaryHearingWithMembersYes\":[],"
                 + "\"preliminaryHearingWithMembersYesOther\":null,"
+                + "\"preliminaryHearingWithMembersReason\":null,"
                 + "\"hearingNotListedListAnyOtherDirections\":null,"
                 + "\"etICFinalHearingType\":null,"
                 + "\"etICTypeOfVideoHearingOrder\":null,\"etICTypeOfF2fHearingOrder\":null,"

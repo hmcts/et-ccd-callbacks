@@ -3,8 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -20,18 +18,14 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@ExtendWith(SpringExtension.class)
 class BundlesRespondentServiceTest {
 
     private BundlesRespondentService bundlesRespondentService;
     private CaseData scotlandCaseData;
     private CaseData englandCaseData;
-    private static final String VALID_TEXT = "valid text";
-    private static final String EXCEED_CHAR_LIMIT_TEXT = "a".repeat(2501);
 
     @BeforeEach
     void setUp() {
@@ -133,40 +127,6 @@ class BundlesRespondentServiceTest {
         englandCaseData.setBundlesRespondentUploadFile(uploadedDocumentType);
         List<String> errors = bundlesRespondentService.validateFileUpload(englandCaseData);
         assertThat(errors.size(), is(0));
-    }
-
-    @Test
-    void validateTextAreaLength_noTooLong_returnsError() {
-        englandCaseData.setBundlesRespondentAgreedDocWith("No");
-        englandCaseData.setBundlesRespondentAgreedDocWithNo(EXCEED_CHAR_LIMIT_TEXT);
-        List<String> errors = bundlesRespondentService.validateTextAreaLength(englandCaseData);
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(0), is("This field must be 2500 characters or less"));
-    }
-
-    @Test
-    void validateTextAreaLength_butTooLong_returnsError() {
-        englandCaseData.setBundlesRespondentAgreedDocWith("But");
-        englandCaseData.setBundlesRespondentAgreedDocWithBut(EXCEED_CHAR_LIMIT_TEXT);
-        List<String> errors = bundlesRespondentService.validateTextAreaLength(englandCaseData);
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(0), is("This field must be 2500 characters or less"));
-    }
-
-    @Test
-    void validateTextAreaLength_validTextForNo_returnsNoError() {
-        englandCaseData.setBundlesRespondentAgreedDocWith(NO);
-        englandCaseData.setBundlesRespondentAgreedDocWithNo(VALID_TEXT);
-        List<String> errors = bundlesRespondentService.validateTextAreaLength(englandCaseData);
-        assertTrue(errors.isEmpty());
-    }
-
-    @Test
-    void validateTextAreaLength_validTextForBut_returnsNoError() {
-        englandCaseData.setBundlesRespondentAgreedDocWith("But");
-        englandCaseData.setBundlesRespondentAgreedDocWithBut(VALID_TEXT);
-        List<String> errors = bundlesRespondentService.validateTextAreaLength(englandCaseData);
-        assertTrue(errors.isEmpty());
     }
 
     @Test

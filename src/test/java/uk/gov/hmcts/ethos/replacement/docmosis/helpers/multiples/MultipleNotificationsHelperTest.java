@@ -3,8 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers.multiples;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.NotificationSchedulePayload;
 import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.multiples.NotificationGroup;
@@ -20,7 +18,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.SendNotificationUtil.getPseResponseType;
 
-@ExtendWith(SpringExtension.class)
 class MultipleNotificationsHelperTest {
     private static final String MULTIPLE_REF = "60001";
     private static final String ETHOS_CASE_REFERENCE_1 = "6047765/2023";

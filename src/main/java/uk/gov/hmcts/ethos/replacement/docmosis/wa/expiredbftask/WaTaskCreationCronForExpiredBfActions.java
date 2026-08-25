@@ -16,6 +16,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -45,6 +46,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
     private int maxCasesToProcess;
 
     private static final int MAX_VALID_CASE_TO_UPDATE = 300;
+    private static final LocalDate FIRST_ELIGIBLE_BF_DATE = LocalDate.of(2026, Month.AUGUST, 1);
 
     /**
      * This cron job runs every day at 00:01 to create WA tasks for expired BF actions.
@@ -114,8 +116,9 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                 .filter(bfAction -> bfAction != null && bfAction.getValue() != null)
                 .map(BFActionTypeItem::getValue)
                 .anyMatch(bfActionValue -> !isNullOrEmpty(bfActionValue.getBfDate())
+                        && !LocalDate.parse(bfActionValue.getBfDate()).isBefore(FIRST_ELIGIBLE_BF_DATE)
                         && BFHelper.isBfExpired(bfActionValue, BFHelper.getEffectiveYesterday(
-                                LocalDate.now().minusDays(90)))
+                                FIRST_ELIGIBLE_BF_DATE))
                         && isNullOrEmpty(bfActionValue.getIsWaTaskCreated()));
     }
 
@@ -144,7 +147,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                 .initialSearch(true)
                 .size(maxCasesPerSearch)
                 .build()
-                .getQuery(BFHelper.getEffectiveYesterday(LocalDate.now().minusDays(90)));
+                .getQuery(FIRST_ELIGIBLE_BF_DATE.toString());
 
         List<SubmitEvent> searchResults = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
         if (CollectionUtils.isEmpty(searchResults)) {
@@ -167,7 +170,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                     .size(maxCasesPerSearch)
                     .searchAfterValue(searchAfterValue)
                     .build()
-                    .getQuery(BFHelper.getEffectiveYesterday(LocalDate.now().minusDays(90)));
+                    .getQuery(FIRST_ELIGIBLE_BF_DATE.toString());
 
             List<SubmitEvent> nextResults = ccdClient.buildAndGetElasticSearchRequest(
                     adminUserToken, caseTypeId, query);

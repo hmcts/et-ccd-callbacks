@@ -6,6 +6,7 @@ export default class InitialConsiderationPage extends BasePage {
   private readonly hearingDetails: Locator;
   private readonly jurisdictionCodeInvalidYes: Locator;
   private readonly claimCamProceedYes: Locator;
+  private readonly isThisUrgentYes: Locator;
   private readonly proceedToHearingListed: Locator;
   private readonly preliminaryHearingOptions: Locator;
   private readonly alreadyDecided: Locator;
@@ -20,6 +21,7 @@ export default class InitialConsiderationPage extends BasePage {
     this.hearingDetails = page.locator('#etInitialConsiderationHearingLabel td:nth-child(2)');
     this.jurisdictionCodeInvalidYes = page.locator('#etICJuridictionCodesInvalid_No');
     this.claimCamProceedYes = page.locator('#etICCanProceed_Yes');
+    this.isThisUrgentYes = page.locator('#etICIsUrgent_Yes');
     this.proceedToHearingListed = page.locator('#etICHearingListedAnswers_etICHearingListed-Proceed to the hearing already listed');
     this.preliminaryHearingOptions = page.locator('#etICHearingNotListedListForPrelimHearingUpdated_prelimHearingLengthNumTypeV2');
     this.alreadyDecided = page.locator('#etICHearingListedAnswers_etICIsFinalHearingWithJudgeOrMembersJsaReason-Already decided');
@@ -80,6 +82,7 @@ export default class InitialConsiderationPage extends BasePage {
   async proceedToSecondPageIC() {
     await this.jurisdictionCodeInvalidYes.click();
     await this.claimCamProceedYes.click();
+    await this.isThisUrgentYes.click();
     await this.clickContinue();
     await this.delay(2000);
   }

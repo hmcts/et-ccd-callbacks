@@ -387,14 +387,16 @@ class InitialConsiderationHelperTest {
     }
 
     @Test
-    void getDocumentRequestSC_withValidCaseData_And_PreliminaryHearingWithMembersReason_returnsExpectedJson()
+    void getDocumentRequestSC_withValidCaseData_And_PreliminaryHearingWithMembersYes_returnsExpectedJson()
             throws JsonProcessingException {
         CaseData caseDataScotland = CaseDataBuilder.builder().build();
         setCaseDataValues(caseDataScotland);
         caseDataScotland.setEtICHearingNotListedListUpdated(Collections.singletonList("List for preliminary hearing"));
         caseDataScotland.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdated());
         caseDataScotland.getEtICHearingNotListedListForPrelimHearingUpdated()
-                .setEtICIsPreliminaryHearingWithMembersReason("reasons for requiring members");
+                .setEtICIsPreliminaryHearingWithMembersYes(List.of("No views expressed by parties", "Others"));
+        caseDataScotland.getEtICHearingNotListedListForPrelimHearingUpdated()
+                .setEtICIsPreliminaryHearingWithMembersYesOther("TestYesOther");
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataScotland,
                 "key", "ET_Scotland");
 

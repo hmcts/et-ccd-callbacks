@@ -1,12 +1,15 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.EtICHearingListedAnswers;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearingUpdated;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearingUpdated;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.InitialConsiderationData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.InitialConsiderationDocument;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -16,6 +19,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
@@ -332,55 +336,78 @@ class InitialConsiderationHelperTest {
         caseDataScotland.setEtICHearingNotListedListForFinalHearingUpdated(populateFinalHearingUpdated());
         caseDataScotland.getEtICHearingNotListedListForFinalHearingUpdated()
                 .setEtICFinalHearingIsEJSitAloneFurtherDetails("Test SC - EJ Sit Alone Further Details");
+
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataScotland,
                 "key", "ET_Scotland");
 
-        String expected = "{\"accessKey\":\"key\",\"templateName\":\"EM-TRB-SCO-ENG-02204.docx\","
-                + "\"outputName\":\"Initial Consideration.pdf\",\"data\":{\"caseNumber\":\"6000001/2024\","
-                + "\"issuesJurisdiction\":\"No\",\"issuesJurCodesGiveDetails\":null,\"canProceed\":\"Yes\","
-                + "\"hearingAlreadyListed\":\"No\",\"hearingListed\":null,\"hearingPostpone\":null,"
-                + "\"hearingExtend\":null,\"hearingConvertFinal\":null,\"hearingConvertF2f\":null,"
-                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":[\"\"],"
-                + "\"hearingWithJsa\":null,\"hearingWithMembersLabel\":null,\"hearingWithMembers\":null,"
-                + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
-                + "\"hearingNotListed\":[\"List for final hearing\"],\"cvpHearingType\":null,"
-                + "\"cvpFinalDetails\":null,\"cvpPreliminaryDetails\":null,\"cvpPreliminaryYesNo\":null,"
-                + "\"preliminaryHearingType\":null,\"preliminaryHearingPurpose\":null,"
-                + "\"preliminaryHearingNotice\":null,\"preliminaryHearingLength\":null,"
-                + "\"preliminaryHearingLengthType\":null,\"preliminaryHearingWithMembers\":null,"
-                + "\"preliminaryHearingWithMembersYes\":[],"
-                + "\"preliminaryHearingWithMembersYesOther\":null,"
-                + "\"hearingNotListedListAnyOtherDirections\":null,"
-                + "\"etICFinalHearingType\":[\"Video\",\"F2F\"],"
-                + "\"etICTypeOfVideoHearingOrder\":null,\"etICTypeOfF2fHearingOrder\":null,"
-                + "\"etICHearingOrderBUCompliance\":null,"
-                + "\"etICFinalHearingLength\":\"1\","
-                + "\"etICFinalHearingLengthType\":\"Hours\",\"etICFinalHearingIsEJSitAlone\":\"JSA\","
-                + "\"etICFinalHearingIsEJSitAloneReasonYes\":[],\"etICFinalHearingIsEJSitAloneReasonYesOther\":null,"
-                + "\"etICFinalHearingIsEJSitAloneReasonNo\":[],\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
-                + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":[\"Members experience is likely to add significant "
-                + "value to the process of adjudication\"],\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther"
-                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
-                + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
-                + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":"
-                + "\"Test SC - EJ Sit Alone Further Details\","
-                + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
-                + "\"udlLittleOrNoAgreement\":null,\"udlIssueOfLawArising\":null,\"udlViewsOfParties\":null,"
-                + "\"udlNoViewsExpressedByParties\":null,\"udlConcurrentProceedings\":null,\"udlOther\":null,"
-                + "\"udlHearingFormat\":null,\"udlCVPIssue\":null,\"udlFinalF2FIssue\":null,"
-                + "\"udlCheckComplianceOrders\":null,\"hearingNotListedOtherDirections\":null,"
-                + "\"furtherInformation\":[],\"furtherInfoGiveDetails\":null,\"furtherInfoTimeToComply\":null,"
-                + "\"r27ClaimToBe\":null,\"r27WhichPart\":null,\"r27Direction\":null,\"r27DirectionReason\":null,"
-                + "\"r27NoJurisdictionReason\":null,\"r27NumberOfDays\":null,\"r28ClaimToBe\":null,"
-                + "\"r28WhichPart\":null,\"r28DirectionReason\":null,\"r28NumberOfDays\":null,"
-                + "\"furtherInfoAnyOtherDirections\":null,\"icReceiptET3FormIssues\":null,"
-                + "\"icRespondentsNameIdentityIssues\":null,\"icJurisdictionCodeIssues\":null,"
-                + "\"icApplicationIssues\":null,"
-                + "\"icEmployersContractClaimIssues\":null,\"icClaimProspectIssues\":null,\"icListingIssues\":null,"
-                + "\"icDdaDisabilityIssues\":null,\"icOrderForFurtherInformation\":null,"
-                + "\"icOtherIssuesOrFinalOrders\":null,"
-                + "\"icCompletedBy\":\"A User\",\"icDateCompleted\":\"20 Nov 2024\"}}";
-        assertEquals(expected, documentRequest);
+        InitialConsiderationDocument actual =
+            new ObjectMapper().readValue(documentRequest, InitialConsiderationDocument.class);
+        assertEquals("key", actual.getAccessKey());
+        assertEquals("EM-TRB-SCO-ENG-02204.docx", actual.getTemplateName());
+        assertEquals("Initial Consideration.pdf", actual.getOutputName());
+
+        InitialConsiderationData data = actual.getData();
+        assertEquals("6000001/2024", data.getCaseNumber());
+        assertEquals("No", data.getIssuesJurisdiction());
+        assertNull(data.getIssuesJurCodesGiveDetails());
+        assertEquals("Yes", data.getIcCanProceed());
+        assertEquals("No", data.getHearingAlreadyListed());
+
+        assertNull(data.getHearingListed());
+        assertNull(data.getHearingPostpone());
+        assertNull(data.getHearingExtend());
+        assertNull(data.getHearingConvertF2f());
+        assertNull(data.getHearingOther());
+        assertNull(data.getHearingWithJudgeOrMembers());
+        assertEquals(List.of(""), data.getHearingWithJudgeOrMembersReason());
+        assertNull(data.getHearingWithJudgeOrMembersFurtherDetails());
+        assertNull(data.getOtherDirections());
+
+        assertEquals(List.of("List for final hearing"), data.getHearingNotListed());
+        assertNull(data.getPreliminaryHearingType());
+        assertNull(data.getPreliminaryHearingPurpose());
+        assertNull(data.getPreliminaryHearingNotice());
+        assertNull(data.getPreliminaryHearingLength());
+        assertNull(data.getPreliminaryHearingLengthType());
+        assertNull(data.getPreliminaryHearingWithMembers());
+        assertEquals(List.of(), data.getPreliminaryHearingWithMembersYes());
+        assertNull(data.getPreliminaryHearingWithMembersYesOther());
+
+        assertEquals(List.of("Video", "F2F"), data.getEtICFinalHearingType());
+        assertNull(data.getEtICTypeOfVideoHearingOrder());
+        assertNull(data.getEtICTypeOfF2fHearingOrder());
+        assertNull(data.getEtICHearingOrderBUCompliance());
+        assertEquals("1", data.getEtICFinalHearingLength());
+        assertEquals("Hours", data.getEtICFinalHearingLengthType());
+        assertEquals("JSA", data.getEtICFinalHearingIsEJSitAlone());
+        assertEquals(List.of(), data.getEtICFinalHearingIsEJSitAloneReasonYes());
+        assertNull(data.getEtICFinalHearingIsEJSitAloneReasonYesOther());
+        assertEquals(List.of(), data.getEtICFinalHearingIsEJSitAloneReasonNo());
+        assertNull(data.getEtICFinalHearingIsEJSitAloneReasonNoOther());
+        assertEquals("Test SC - EJ Sit Alone Further Details", data.getEtICFinalHearingIsEJSitAloneFurtherDetails());
+
+        assertNull(data.getHearingNotListedListAnyOtherDirections());
+
+        assertEquals(List.of(), data.getFurtherInformation());
+        assertNull(data.getFurtherInfoGiveDetails());
+        assertNull(data.getFurtherInfoTimeToComply());
+
+        assertNull(data.getR27ClaimToBe());
+        assertNull(data.getR27WhichPart());
+        assertNull(data.getR27Direction());
+        assertNull(data.getR27NoJurisdictionReason());
+        assertNull(data.getR27DirectionReason());
+        assertNull(data.getR27NumberOfDays());
+
+        assertNull(data.getR28ClaimToBe());
+        assertNull(data.getR28WhichPart());
+        assertNull(data.getR28DirectionReason());
+        assertNull(data.getR28NumberOfDays());
+
+        assertNull(data.getFurtherInfoAnyOtherDirections());
+
+        assertEquals("A User", data.getIcCompletedBy());
+        assertEquals("20 Nov 2024", data.getIcDateCompleted());
     }
 
     @Test

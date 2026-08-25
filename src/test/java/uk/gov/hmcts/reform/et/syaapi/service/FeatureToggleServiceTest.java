@@ -81,6 +81,14 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isAcasVetAndAcceptEnabled()).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValueWhenAcasDocumentsPhase2IsEnabled(boolean toggleStat) {
+        givenToggle("acasDocumentsPhase2", toggleStat);
+
+        assertThat(featureToggleService.isAcasDocumentsPhase2Enabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(feature)).thenReturn(state);
     }

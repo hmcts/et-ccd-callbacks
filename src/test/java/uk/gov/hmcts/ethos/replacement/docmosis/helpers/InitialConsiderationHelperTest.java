@@ -397,6 +397,8 @@ class InitialConsiderationHelperTest {
                 .setEtICIsPreliminaryHearingWithMembersYes(List.of("No views expressed by parties", "Others"));
         caseDataScotland.getEtICHearingNotListedListForPrelimHearingUpdated()
                 .setEtICIsPreliminaryHearingWithMembersYesOther("TestYesOther");
+        caseDataScotland.getEtICHearingNotListedListForPrelimHearingUpdated()
+                .setEtICIsPreliminaryHearingWithMembersReason(null);
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataScotland,
                 "key", "ET_Scotland");
 

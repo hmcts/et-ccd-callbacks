@@ -327,6 +327,8 @@ cron:
   acasCertSubmission: ${CRON_ACAS_CERT_SUBMISSION_TASK:0 */5 * * * ?}
   reconfigurationCaseIds: ${CRON_RECONFIGURATION_CASE_IDS:}
   reconfigurationLimit: ${CRON_RECONFIGURATION_LIMIT:1000}
+  ecmMigrationCaseNoteIds: ${CRON_ECM_MIGRATION_CASE_NOTE_IDS:}
+  ecmMigrationCaseNotesDryRun: ${CRON_ECM_MIGRATION_CASE_NOTES_DRY_RUN:true}
 
 pdf:
   english: "ET1_0224.pdf"

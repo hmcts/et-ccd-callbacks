@@ -29,7 +29,7 @@ public class EcmMigrationService {
     public void rollbackEcmMigration(CaseDetails caseDetails) throws IOException {
         log.info("Rolling back migration for case {}", caseDetails.getCaseId());
         CaseData caseData = caseDetails.getCaseData();
-        String ecmCaseId = getEcmCaseId(caseData.getEcmCaseLink());
+        String ecmCaseId = getCaseIdFromLink(caseData.getEcmCaseLink());
         String ecmCaseType = SCOTLAND_CASE_TYPE_ID.equals(caseDetails.getCaseTypeId())
                 ? "Scotland"
                 : getEcmCaseType(caseData.getManagingOffice());
@@ -59,17 +59,17 @@ public class EcmMigrationService {
         return deleteWhitespace(managingOffice);
     }
 
-    private String getEcmCaseId(String ecmCaseLink) {
-        if (isNullOrEmpty(ecmCaseLink)) {
-            throw new IllegalArgumentException("ECM case link is null or empty");
+    public static String getCaseIdFromLink(String caseLink) {
+        if (isNullOrEmpty(caseLink)) {
+            throw new IllegalArgumentException("Case link is null or empty");
         }
 
         Pattern pattern = Pattern.compile("(\\d{16})");
-        Matcher matcher = pattern.matcher(ecmCaseLink);
+        Matcher matcher = pattern.matcher(caseLink);
         if (matcher.find()) {
             return matcher.group(1);
         } else {
-            throw new IllegalArgumentException("Could not find 16 digit case id for ECM case");
+            throw new IllegalArgumentException("Could not find 16 digit case id in case link");
         }
     }
 }

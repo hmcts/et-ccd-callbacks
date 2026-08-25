@@ -289,7 +289,8 @@
     "Label": "Which notification is required?",
     "FieldType": "FixedRadioList",
     "FieldTypeParameter": "fl_sendNotificationGroupClaims",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   },
   {
     "CaseTypeID": "ET_EnglandWales_Multiple",
@@ -320,14 +321,16 @@
     "Label": "Who made the order?",
     "FieldType": "FixedRadioList",
     "FieldTypeParameter": "fl_sendNotificationWhoCaseOrder",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   },
   {
     "CaseTypeID": "ET_EnglandWales_Multiple",
     "ID": "sendNotificationFullName3",
     "Label": "Full name",
     "FieldType": "Text",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
@@ -335,7 +338,8 @@
     "Label": "Which notification is required?",
     "FieldType": "FixedRadioList",
     "FieldTypeParameter": "fl_sendNotificationGroupClaims",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
@@ -343,14 +347,16 @@
     "Label": "Who made the order?",
     "FieldType": "FixedRadioList",
     "FieldTypeParameter": "fl_sendNotificationWhoCaseOrder",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "ID": "sendNotificationFullName3",
     "Label": "Full name",
     "FieldType": "Text",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   },
   {
     "CaseTypeID": "ET_EnglandWales_Multiple",

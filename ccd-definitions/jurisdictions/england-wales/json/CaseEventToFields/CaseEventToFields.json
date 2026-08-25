@@ -6908,8 +6908,8 @@
     "DisplayContext": "MANDATORY",
     "PageID": 1,
     "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 8,
-    "FieldShowCondition": "sendNotificationSubject CONTAINS \"Case management orders / requests\" OR sendNotificationSubject CONTAINS \"Employer Contract Claim\" OR sendNotificationSubject CONTAINS \"Group claims\"",
+    "PageFieldDisplayOrder": 9,
+    "FieldShowCondition": "sendNotificationSubject CONTAINS \"Case management orders / requests\" OR sendNotificationSubject CONTAINS \"Employer Contract Claim\" OR sendNotificationSubject CONTAINS \"Group claims\" AND sendNotificationGroupClaims=\"Considering claims together\"",
     "RetainHiddenValue": "No",
     "ShowSummaryChangeOption": "Y",
     "Publish": "N"
@@ -6921,7 +6921,7 @@
     "DisplayContext": "MANDATORY",
     "PageID": 1,
     "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 10,
+    "PageFieldDisplayOrder": 11,
     "FieldShowCondition": "sendNotificationSubject CONTAINS \"Case management orders / requests\" AND sendNotificationCaseManagement=\"Case management order\"",
     "RetainHiddenValue": "No",
     "ShowSummaryChangeOption": "Y"
@@ -6933,7 +6933,7 @@
     "DisplayContext": "MANDATORY",
     "PageID": 1,
     "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 11,
+    "PageFieldDisplayOrder": 12,
     "FieldShowCondition": "sendNotificationSubject CONTAINS \"Case management orders / requests\" AND sendNotificationCaseManagement!=\"\"",
     "RetainHiddenValue": "No",
     "ShowSummaryChangeOption": "Y"
@@ -6945,8 +6945,8 @@
     "DisplayContext": "MANDATORY",
     "PageID": 1,
     "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 9,
-    "FieldShowCondition": "sendNotificationResponseTribunal=\"Yes - view document for details\" AND sendNotificationSubject CONTAINS \"Case management orders / requests\" OR sendNotificationResponseTribunal=\"Yes - view document for details\" AND sendNotificationSubject CONTAINS \"Employer Contract Claim\" OR sendNotificationResponseTribunal=\"Yes - view document for details\" AND sendNotificationSubject CONTAINS \"Group claims\"",
+    "PageFieldDisplayOrder": 10,
+    "FieldShowCondition": "sendNotificationResponseTribunal=\"Yes - view document for details\" AND sendNotificationSubject CONTAINS \"Case management orders / requests\" OR sendNotificationResponseTribunal=\"Yes - view document for details\" AND sendNotificationSubject CONTAINS \"Employer Contract Claim\" OR sendNotificationResponseTribunal=\"Yes - view document for details\" AND sendNotificationSubject CONTAINS \"Group claims\" AND sendNotificationGroupClaims=\"Considering claims together\"",
     "RetainHiddenValue": "No",
     "ShowSummaryChangeOption": "Y",
     "Publish": "N"

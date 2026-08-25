@@ -239,12 +239,24 @@
   {
     "CaseTypeID": "ET_Scotland_Multiple",
     "CaseEventID": "sendNotification",
-    "CaseFieldID": "sendNotificationResponseTribunal",
+    "CaseFieldID": "sendNotificationGroupClaims",
     "DisplayContext": "MANDATORY",
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 8,
-    "FieldShowCondition": "sendNotificationSubject CONTAINS \"Case management orders / requests\" OR sendNotificationSubject CONTAINS \"Group claims\"",
+    "FieldShowCondition": "sendNotificationSubject CONTAINS \"Group claims\"",
+    "RetainHiddenValue": "No",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "ET_Scotland_Multiple",
+    "CaseEventID": "sendNotification",
+    "CaseFieldID": "sendNotificationResponseTribunal",
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 9,
+    "FieldShowCondition": "sendNotificationSubject CONTAINS \"Case management orders / requests\" OR sendNotificationSubject CONTAINS \"Group claims\" AND sendNotificationGroupClaims=\"Considering claims together\"",
     "RetainHiddenValue": "No",
     "ShowSummaryChangeOption": "Y"
   },
@@ -255,7 +267,7 @@
     "DisplayContext": "MANDATORY",
     "PageID": 1,
     "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 10,
+    "PageFieldDisplayOrder": 11,
     "FieldShowCondition": "sendNotificationSubject CONTAINS \"Case management orders / requests\" AND sendNotificationCaseManagement=\"Case management order\"",
     "RetainHiddenValue": "No",
     "ShowSummaryChangeOption": "Y"
@@ -267,7 +279,7 @@
     "DisplayContext": "MANDATORY",
     "PageID": 1,
     "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 11,
+    "PageFieldDisplayOrder": 12,
     "FieldShowCondition": "sendNotificationSubject CONTAINS \"Case management orders / requests\" AND sendNotificationCaseManagement!=\"\"",
     "RetainHiddenValue": "No",
     "ShowSummaryChangeOption": "Y"
@@ -275,24 +287,12 @@
   {
     "CaseTypeID": "ET_Scotland_Multiple",
     "CaseEventID": "sendNotification",
-    "CaseFieldID": "sendNotificationGroupClaims",
-    "DisplayContext": "MANDATORY",
-    "PageID": 1,
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 12,
-    "FieldShowCondition": "sendNotificationSubject CONTAINS \"Group claims\"",
-    "RetainHiddenValue": "No",
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "CaseTypeID": "ET_Scotland_Multiple",
-    "CaseEventID": "sendNotification",
     "CaseFieldID": "sendNotificationGroupClaimsMadeBy",
     "DisplayContext": "MANDATORY",
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 13,
-    "FieldShowCondition": "sendNotificationSubject CONTAINS \"Group claims\"",
+    "FieldShowCondition": "sendNotificationSubject CONTAINS \"Group claims\" AND sendNotificationGroupClaims=\"Considering claims together\"",
     "RetainHiddenValue": "No",
     "ShowSummaryChangeOption": "Y"
   },
@@ -304,7 +304,7 @@
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 14,
-    "FieldShowCondition": "sendNotificationSubject CONTAINS \"Group claims\"",
+    "FieldShowCondition": "sendNotificationSubject CONTAINS \"Group claims\" AND sendNotificationGroupClaims=\"Considering claims together\" AND sendNotificationGroupClaimsMadeBy!=\"\"",
     "RetainHiddenValue": "No",
     "ShowSummaryChangeOption": "Y"
   },
@@ -315,7 +315,7 @@
     "DisplayContext": "MANDATORY",
     "PageID": 1,
     "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 12,
+    "PageFieldDisplayOrder": 8,
     "FieldShowCondition": "sendNotificationSubject CONTAINS \"Group claims\"",
     "RetainHiddenValue": "No",
     "ShowSummaryChangeOption": "Y"
@@ -328,7 +328,7 @@
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 13,
-    "FieldShowCondition": "sendNotificationSubject CONTAINS \"Group claims\"",
+    "FieldShowCondition": "sendNotificationSubject CONTAINS \"Group claims\" AND sendNotificationGroupClaims=\"Considering claims together\"",
     "RetainHiddenValue": "No",
     "ShowSummaryChangeOption": "Y"
   },
@@ -340,7 +340,7 @@
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 14,
-    "FieldShowCondition": "sendNotificationSubject CONTAINS \"Group claims\"",
+    "FieldShowCondition": "sendNotificationSubject CONTAINS \"Group claims\" AND sendNotificationGroupClaims=\"Considering claims together\" AND sendNotificationGroupClaimsMadeBy!=\"\"",
     "RetainHiddenValue": "No",
     "ShowSummaryChangeOption": "Y"
   },
@@ -351,8 +351,8 @@
     "DisplayContext": "MANDATORY",
     "PageID": 1,
     "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 9,
-    "FieldShowCondition": "sendNotificationResponseTribunal=\"Yes - view document for details\" AND sendNotificationSubject CONTAINS \"Case management orders / requests\" OR sendNotificationResponseTribunal=\"Yes - view document for details\" AND sendNotificationSubject CONTAINS \"Group claims\"",
+    "PageFieldDisplayOrder": 10,
+    "FieldShowCondition": "sendNotificationResponseTribunal=\"Yes - view document for details\" AND sendNotificationSubject CONTAINS \"Case management orders / requests\" OR sendNotificationResponseTribunal=\"Yes - view document for details\" AND sendNotificationSubject CONTAINS \"Group claims\" AND sendNotificationGroupClaims=\"Considering claims together\"",
     "RetainHiddenValue": "No",
     "ShowSummaryChangeOption": "Y"
   },

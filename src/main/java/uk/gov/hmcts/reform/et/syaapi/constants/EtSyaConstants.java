@@ -92,6 +92,10 @@ public final class EtSyaConstants {
         "Notice of Preliminary Hearing");
     public static final List<String> ACAS_SERVING_DOCUMENTS =
         Stream.of(EW_ACAS_SERVING_DOCUMENTS, SCOT_ACAS_SERVING_DOCUMENTS).flatMap(List::stream).toList();
+    public static final List<String> NOTICE_OF_CLAIM_DOCUMENTS = List.of("2.6", "2.7", "2.8", "Letter 7",
+        "Letter 72 short track notice of claim and notice of hearing", "Letter 76 Notice of Claim", "Notice of Claim");
+    public static final List<String> NOTICE_OF_HEARING_DOCUMENTS =
+        List.of("7.7", "7.8", "7.8a", "Notice of Preliminary Hearing");
 
     private EtSyaConstants() {
         // restrict instantiation

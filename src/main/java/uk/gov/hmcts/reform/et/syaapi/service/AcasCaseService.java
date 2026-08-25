@@ -37,6 +37,8 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.postgresql.shaded.com.ongres.scram.common.util.Preconditions.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.NOTICE_OF_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.NOTICE_OF_HEARING;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ACAS_PHASE2_VISIBLE_DOCS;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ACAS_SERVING_DOCUMENTS;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ACAS_VISIBLE_DOCS;
@@ -45,6 +47,8 @@ import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ET1_ATTACHM
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ET3;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ET3_ATTACHMENT;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.NO;
+import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.NOTICE_OF_CLAIM_DOCUMENTS;
+import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.NOTICE_OF_HEARING_DOCUMENTS;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SCOTLAND_CASE_TYPE;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.YES;
 import static uk.gov.hmcts.reform.et.syaapi.helper.EmployeeObjectMapper.convertCaseDataMapToCaseDataObject;
@@ -206,8 +210,9 @@ public class AcasCaseService {
         List<String> acasVisibleDocs = new ArrayList<>(ACAS_VISIBLE_DOCS);
         if (featureToggleService.isAcasDocumentsPhase2Enabled()) {
             acasVisibleDocs.addAll(ACAS_PHASE2_VISIBLE_DOCS);
-            List<DocumentTypeItem> servingDocuments = caseData.getServingDocumentCollection().stream()
+            List<DocumentTypeItem> servingDocuments = emptyIfNull(caseData.getServingDocumentCollection()).stream()
                 .filter(d -> !isNullOrEmpty(getDocumentType(d)) && ACAS_SERVING_DOCUMENTS.contains(getDocumentType(d)))
+                .map(AcasCaseService::normaliseServingDocumentType)
                 .toList();
             acasDocuments.addAll(servingDocuments);
         }
@@ -217,6 +222,16 @@ public class AcasCaseService {
             .toList();
         acasDocuments.addAll(list);
         return acasDocuments;
+    }
+
+    private static DocumentTypeItem normaliseServingDocumentType(DocumentTypeItem document) {
+        String documentType = getDocumentType(document);
+        if (NOTICE_OF_CLAIM_DOCUMENTS.contains(documentType)) {
+            document.getValue().setDocumentType(NOTICE_OF_CLAIM);
+        } else if (NOTICE_OF_HEARING_DOCUMENTS.contains(documentType)) {
+            document.getValue().setDocumentType(NOTICE_OF_HEARING);
+        }
+        return document;
     }
 
     private void retrieveRespondentDocuments(String authorisation, List<CaseDocumentAcasResponse> documents,
@@ -311,11 +326,11 @@ public class AcasCaseService {
 
     private List<CaseData> searchAndReturnCaseDataList(String authorisation, String query) {
         List<CaseDetails> searchResults = searchEnglandScotlandCases(authorisation, query);
-        List<CaseData> caseDataList = new ArrayList<>();
-        for (CaseDetails caseDetails : searchResults) {
-            caseDataList.add(convertCaseDataMapToCaseDataObject(caseDetails.getData()));
-        }
-        return caseDataList;
+        return searchResults.stream()
+            .map(caseDetails -> ccdApiClient.getCase(authorisation, authTokenGenerator.generate(),
+                String.valueOf(caseDetails.getId())))
+            .map(ccdCaseDetails -> convertCaseDataMapToCaseDataObject(ccdCaseDetails.getData()))
+            .toList();
     }
 
     /**

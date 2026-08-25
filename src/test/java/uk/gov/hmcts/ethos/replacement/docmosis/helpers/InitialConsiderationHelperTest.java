@@ -397,8 +397,6 @@ class InitialConsiderationHelperTest {
                 .setEtICIsPreliminaryHearingWithMembersYes(List.of("No views expressed by parties", "Others"));
         caseDataScotland.getEtICHearingNotListedListForPrelimHearingUpdated()
                 .setEtICIsPreliminaryHearingWithMembersYesOther("TestYesOther");
-        caseDataScotland.getEtICHearingNotListedListForPrelimHearingUpdated()
-                .setEtICIsPreliminaryHearingWithMembersReason(null);
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataScotland,
                 "key", "ET_Scotland");
 
@@ -417,7 +415,7 @@ class InitialConsiderationHelperTest {
                 + "\"preliminaryHearingLengthType\":\"Hours\",\"preliminaryHearingWithMembers\":\"Yes\","
                 + "\"preliminaryHearingWithMembersYes\":[\"No views expressed by parties\",\"Others\"],"
                 + "\"preliminaryHearingWithMembersYesOther\":\"TestYesOther\","
-                + "\"preliminaryHearingWithMembersReason\":\"reasons for requiring members\","
+                + "\"preliminaryHearingWithMembersReason\":null,"
                 + "\"hearingNotListedListAnyOtherDirections\":null,"
                 + "\"etICFinalHearingType\":null,"
                 + "\"etICTypeOfVideoHearingOrder\":null,\"etICTypeOfF2fHearingOrder\":null,"

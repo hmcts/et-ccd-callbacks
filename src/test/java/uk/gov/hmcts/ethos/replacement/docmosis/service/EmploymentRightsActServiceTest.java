@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
-
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +34,8 @@ class EmploymentRightsActServiceTest {
 
     @BeforeEach
     void setUp() {
-        employmentRightsActService = new EmploymentRightsActService(featureToggleService);
+        employmentRightsActService = new EmploymentRightsActService(featureToggleService,
+                LocalDate.of(2026, 10, 1));
         caseData = new CaseData();
         when(featureToggleService.isEraOctober2026Enabled()).thenReturn(true);
     }
@@ -161,6 +162,15 @@ class EmploymentRightsActServiceTest {
     void isEraOctober2026_BeforeOctoberFirst2026_ReturnsFalse() {
         caseData.setReceiptDate("2026-09-30");
         assertFalse(employmentRightsActService.isEraOctober2026(caseData));
+    }
+
+    @Test
+    void isEraOctober2026_UsesConfiguredEraStartDate() {
+        employmentRightsActService = new EmploymentRightsActService(featureToggleService,
+                LocalDate.of(2025, 1, 1));
+        caseData.setReceiptDate("2025-01-01");
+
+        assertTrue(employmentRightsActService.isEraOctober2026(caseData));
     }
 
     @Test

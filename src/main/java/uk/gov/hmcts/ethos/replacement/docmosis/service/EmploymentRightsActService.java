@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
@@ -11,7 +11,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 
 import java.time.LocalDate;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,31 +22,33 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
  * Service class dedicated to logic relating to the Employment Rights Act.
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class EmploymentRightsActService {
 
-    // TODO try and make this configurable to make this easier to test. Current validation prevents us submitting a
-    //  claim after October 2026 so we can't test the logic in a real case. We could make this configurable and then
-    //  have a test profile that sets it to a date in the past so we can test the logic.
-    private static final LocalDate ERA_START_DATE = LocalDate.of(2026, Month.OCTOBER, 1);
     public static final String UDL_JURISDICTION_CODE = "UDL";
     public static final String NOT_APPLICABLE = "Not applicable";
 
     private final FeatureToggleService featureToggleService;
+    private final LocalDate eraStartDate;
+
+    public EmploymentRightsActService(FeatureToggleService featureToggleService,
+                                      @Value("${employment-rights-act.era-start-date}") LocalDate eraStartDate) {
+        this.featureToggleService = featureToggleService;
+        this.eraStartDate = eraStartDate;
+    }
 
     /**
-     * Checks if the case is submitted on or after 1st October 2026 and ERA October 2026 feature is enabled.
+     * Checks if the case is submitted on or after the configured ERA start date and ERA feature is enabled.
      *
      * @param caseData the case data
-     * @return true if case is submitted on or after 1st October 2026 and ERA October 2026 feature is enabled
+     * @return true if case is submitted on or after the configured ERA start date and ERA feature is enabled
      */
     public boolean isEraOctober2026(CaseData caseData) {
         if (!featureToggleService.isEraOctober2026Enabled()) {
             return false;
         }
         return getParsedReceiptDate(caseData)
-                .map(date -> !date.isBefore(ERA_START_DATE))
+                .map(date -> !date.isBefore(eraStartDate))
                 .orElse(false);
     }
 
@@ -65,7 +66,7 @@ public class EmploymentRightsActService {
     }
 
     /**
-     * Sets the era flag on AdditionalCaseInfoType to No if receiptDate is before 1st October 2026.
+     * Sets the era flag on AdditionalCaseInfoType to No if receiptDate is before the configured ERA start date.
      *
      * @param caseData the case data
      */
@@ -75,7 +76,7 @@ public class EmploymentRightsActService {
         }
 
         getParsedReceiptDate(caseData).ifPresent(receiptDate -> {
-            if (receiptDate.isBefore(ERA_START_DATE)) {
+            if (receiptDate.isBefore(eraStartDate)) {
                 if (ObjectUtils.isEmpty(caseData.getAdditionalCaseInfoType())) {
                     caseData.setAdditionalCaseInfoType(new AdditionalCaseInfoType());
                 }
@@ -85,7 +86,7 @@ public class EmploymentRightsActService {
     }
 
     /**
-     * Sets etICUnfairDismissalEra to Not applicable if receiptDate is before 1st October 2026.
+     * Sets etICUnfairDismissalEra to Not applicable if receiptDate is before the configured ERA start date.
      *
      * @param caseData the case data
      */
@@ -95,7 +96,7 @@ public class EmploymentRightsActService {
         }
 
         getParsedReceiptDate(caseData).ifPresent(receiptDate -> {
-            if (receiptDate.isBefore(ERA_START_DATE)) {
+            if (receiptDate.isBefore(eraStartDate)) {
                 caseData.setEtICUnfairDismissalEra(NOT_APPLICABLE);
             }
         });

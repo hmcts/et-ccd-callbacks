@@ -28,9 +28,11 @@ export default class LoginPage extends BasePage {
   }
 
   async processLogin(user: UserCredentials, baseUrl : string = aatUrl) {
-    await this.page.waitForTimeout(1000);
     await this.page.waitForLoadState('load');
-    if (await this.signOutLink.count() > 0 || await this.username.count() === 0) {
+
+    await expect(this.username.or(this.signOutLink).first()).toBeVisible({ timeout: 10000 });
+
+    if (await this.signOutLink.isVisible()) {
       // Do not overwrite the canonical session file when a context is already authenticated.
       return;
     }

@@ -375,6 +375,7 @@ public class Constants {
     public static final String CASE_MANAGEMENT_ORDER = "Case management order";
     public static final String REQUEST = "Request";
     public static final String NEITHER = "Neither";
+    public static final String GROUP_CLAIMS = "Group claims";
 
     public static final String TRIBUNAL = "Tribunal";
     // Hub link statuses / application states

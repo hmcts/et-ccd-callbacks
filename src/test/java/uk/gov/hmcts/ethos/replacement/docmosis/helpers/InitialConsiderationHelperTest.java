@@ -34,7 +34,8 @@ class InitialConsiderationHelperTest {
         setCaseDataValues(caseDataForEnglandWales);
         caseDataForEnglandWales.setEtICHearingNotListedListUpdated(
                 Collections.singletonList("List for preliminary hearing"));
-        caseDataForEnglandWales.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdated());
+        caseDataForEnglandWales.setEtICHearingNotListedListForPrelimHearingUpdated(
+            populatePreliminaryHearingUpdatedEW());
 
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataForEnglandWales, "key",
                 ENGLANDWALES_CASE_TYPE_ID);
@@ -150,7 +151,7 @@ class InitialConsiderationHelperTest {
         caseData = CaseDataBuilder.builder().build();
         setCaseDataValues(caseData);
         caseData.setEtICHearingNotListedListUpdated(Collections.singletonList("List for preliminary hearing"));
-        caseData.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdated());
+        caseData.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdatedEW());
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseData,
                 "key", ENGLANDWALES_CASE_TYPE_ID);
 
@@ -167,6 +168,8 @@ class InitialConsiderationHelperTest {
                 + "\"preliminaryHearingType\":[\"Video\",\"F2F\"],\"preliminaryHearingPurpose\":[\"Case management\"],"
                 + "\"preliminaryHearingNotice\":\"Purpose of preliminary hearing\",\"preliminaryHearingLength\":\"1\","
                 + "\"preliminaryHearingLengthType\":\"Hours\",\"preliminaryHearingWithMembers\":\"Yes\","
+                + "\"preliminaryHearingWithMembersYes\":null,"
+                + "\"preliminaryHearingWithMembersYesOther\":null,"
                 + "\"preliminaryHearingWithMembersReason\":\"reasons for requiring members\","
                 + "\"hearingNotListedListAnyOtherDirections\":null,"
                 + "\"etICFinalHearingType\":null,"
@@ -221,6 +224,8 @@ class InitialConsiderationHelperTest {
                 + "\"preliminaryHearingType\":null,\"preliminaryHearingPurpose\":null,"
                 + "\"preliminaryHearingNotice\":null,\"preliminaryHearingLength\":null,"
                 + "\"preliminaryHearingLengthType\":null,\"preliminaryHearingWithMembers\":null,"
+                + "\"preliminaryHearingWithMembersYes\":null,"
+                + "\"preliminaryHearingWithMembersYesOther\":null,"
                 + "\"preliminaryHearingWithMembersReason\":null,"
                 + "\"hearingNotListedListAnyOtherDirections\":null,"
                 + "\"etICFinalHearingType\":[\"Video\",\"F2F\"],"
@@ -347,6 +352,8 @@ class InitialConsiderationHelperTest {
                 + "\"preliminaryHearingType\":null,\"preliminaryHearingPurpose\":null,"
                 + "\"preliminaryHearingNotice\":null,\"preliminaryHearingLength\":null,"
                 + "\"preliminaryHearingLengthType\":null,\"preliminaryHearingWithMembers\":null,"
+                + "\"preliminaryHearingWithMembersYes\":null,"
+                + "\"preliminaryHearingWithMembersYesOther\":null,"
                 + "\"preliminaryHearingWithMembersReason\":null,\"hearingNotListedListAnyOtherDirections\":null,"
                 + "\"etICFinalHearingType\":[\"Video\",\"F2F\"],"
                 + "\"etICTypeOfVideoHearingOrder\":null,\"etICTypeOfF2fHearingOrder\":null,"
@@ -381,14 +388,12 @@ class InitialConsiderationHelperTest {
     }
 
     @Test
-    void getDocumentRequestSC_withValidCaseData_And_PreliminaryHearingWithMembersReason_returnsExpectedJson()
+    void getDocumentRequestSC_withValidCaseData_And_PreliminaryHearingWithMembersYes_returnsExpectedJson()
             throws JsonProcessingException {
         CaseData caseDataScotland = CaseDataBuilder.builder().build();
         setCaseDataValues(caseDataScotland);
         caseDataScotland.setEtICHearingNotListedListUpdated(Collections.singletonList("List for preliminary hearing"));
-        caseDataScotland.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdated());
-        caseDataScotland.getEtICHearingNotListedListForPrelimHearingUpdated()
-                .setEtICIsPreliminaryHearingWithMembersReason("reasons for requiring members");
+        caseDataScotland.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdatedSC());
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataScotland,
                 "key", "ET_Scotland");
 
@@ -405,7 +410,9 @@ class InitialConsiderationHelperTest {
                 + "\"preliminaryHearingType\":[\"Video\",\"F2F\"],\"preliminaryHearingPurpose\":[\"Case management\"],"
                 + "\"preliminaryHearingNotice\":\"Purpose of preliminary hearing\",\"preliminaryHearingLength\":\"1\","
                 + "\"preliminaryHearingLengthType\":\"Hours\",\"preliminaryHearingWithMembers\":\"Yes\","
-                + "\"preliminaryHearingWithMembersReason\":\"reasons for requiring members\","
+                + "\"preliminaryHearingWithMembersYes\":[\"No views expressed by parties\",\"Others\"],"
+                + "\"preliminaryHearingWithMembersYesOther\":\"TestYesOther\","
+                + "\"preliminaryHearingWithMembersReason\":null,"
                 + "\"hearingNotListedListAnyOtherDirections\":null,"
                 + "\"etICFinalHearingType\":null,"
                 + "\"etICTypeOfVideoHearingOrder\":null,\"etICTypeOfF2fHearingOrder\":null,"
@@ -456,7 +463,10 @@ class InitialConsiderationHelperTest {
                 + "\"cvpPreliminaryDetails\":null,\"cvpPreliminaryYesNo\":null,\"preliminaryHearingType\":null,"
                 + "\"preliminaryHearingPurpose\":null,\"preliminaryHearingNotice\":null,"
                 + "\"preliminaryHearingLength\":null,\"preliminaryHearingLengthType\":null,"
-                + "\"preliminaryHearingWithMembers\":null,\"preliminaryHearingWithMembersReason\":null,"
+                + "\"preliminaryHearingWithMembers\":null,"
+                + "\"preliminaryHearingWithMembersYes\":null,"
+                + "\"preliminaryHearingWithMembersYesOther\":null,"
+                + "\"preliminaryHearingWithMembersReason\":null,"
                 + "\"hearingNotListedListAnyOtherDirections\":null,\"etICFinalHearingType\":null,"
                 + "\"etICTypeOfVideoHearingOrder\":null,\"etICTypeOfF2fHearingOrder\":null,"
                 + "\"etICHearingOrderBUCompliance\":null,"
@@ -494,7 +504,20 @@ class InitialConsiderationHelperTest {
         preliminaryHearingUpdated.setEtICLengthOfPrelimHearing("1");
         preliminaryHearingUpdated.setPrelimHearingLengthNumType("Hours");
         preliminaryHearingUpdated.setEtICIsPreliminaryHearingWithMembers("Yes");
+        return preliminaryHearingUpdated;
+    }
+
+    private EtICListForPreliminaryHearingUpdated populatePreliminaryHearingUpdatedEW() {
+        EtICListForPreliminaryHearingUpdated preliminaryHearingUpdated = populatePreliminaryHearingUpdated();
         preliminaryHearingUpdated.setEtICIsPreliminaryHearingWithMembersReason("reasons for requiring members");
+        return preliminaryHearingUpdated;
+    }
+
+    private EtICListForPreliminaryHearingUpdated populatePreliminaryHearingUpdatedSC() {
+        EtICListForPreliminaryHearingUpdated preliminaryHearingUpdated = populatePreliminaryHearingUpdated();
+        preliminaryHearingUpdated.setEtICIsPreliminaryHearingWithMembersYes(
+            List.of("No views expressed by parties", "Others"));
+        preliminaryHearingUpdated.setEtICIsPreliminaryHearingWithMembersYesOther("TestYesOther");
         return preliminaryHearingUpdated;
     }
 
@@ -531,6 +554,8 @@ class InitialConsiderationHelperTest {
                 + "\"preliminaryHearingType\":null,\"preliminaryHearingPurpose\":null,"
                 + "\"preliminaryHearingNotice\":null,\"preliminaryHearingLength\":null,"
                 + "\"preliminaryHearingLengthType\":null,\"preliminaryHearingWithMembers\":null,"
+                + "\"preliminaryHearingWithMembersYes\":null,"
+                + "\"preliminaryHearingWithMembersYesOther\":null,"
                 + "\"preliminaryHearingWithMembersReason\":null,"
                 + "\"hearingNotListedListAnyOtherDirections\":null,"
                 + "\"etICFinalHearingType\":null,"
@@ -586,6 +611,8 @@ class InitialConsiderationHelperTest {
                 + "\"preliminaryHearingType\":null,\"preliminaryHearingPurpose\":null,"
                 + "\"preliminaryHearingNotice\":null,\"preliminaryHearingLength\":null,"
                 + "\"preliminaryHearingLengthType\":null,\"preliminaryHearingWithMembers\":null,"
+                + "\"preliminaryHearingWithMembersYes\":null,"
+                + "\"preliminaryHearingWithMembersYesOther\":null,"
                 + "\"preliminaryHearingWithMembersReason\":null,"
                 + "\"hearingNotListedListAnyOtherDirections\":null,"
                 + "\"etICFinalHearingType\":null,"

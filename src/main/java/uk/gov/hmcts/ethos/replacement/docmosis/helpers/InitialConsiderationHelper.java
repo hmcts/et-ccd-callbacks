@@ -145,10 +145,16 @@ public final class InitialConsiderationHelper {
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearingUpdated())
                                 .map(EtICListForPreliminaryHearingUpdated::getEtICIsPreliminaryHearingWithMembers)
                                 .orElse(null))
-                .preliminaryHearingWithMembersReason(
-                        Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearingUpdated())
-                                .map(EtICListForPreliminaryHearingUpdated::getEtICIsPreliminaryHearingWithMembersReason)
-                                .orElse(null))
+                .preliminaryHearingWithMembersYes(
+                    Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearingUpdated())
+                        .map(reasons -> getSortedEJSitAloneReasons(
+                            caseData.getEtICHearingNotListedListForPrelimHearingUpdated()
+                                .getEtICIsPreliminaryHearingWithMembersYes()))
+                        .orElse(null))
+                .preliminaryHearingWithMembersYesOther(
+                    Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearingUpdated())
+                        .map(EtICListForPreliminaryHearingUpdated::getEtICIsPreliminaryHearingWithMembersYesOther)
+                        .orElse(null))
 
                 //final
                 .etICFinalHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())

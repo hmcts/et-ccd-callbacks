@@ -14,7 +14,6 @@ export default class Et3LoginPage extends LoginPage {
   private readonly appointLegalRepLink: Locator;
   private readonly errorMessage = (text: string): Locator => this.page.getByText(text).first();
   private readonly etAccountRadio: Locator;
-  private readonly signInOptionLink: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -28,7 +27,6 @@ export default class Et3LoginPage extends LoginPage {
     this.claimantLastName = page.locator('#claimantLastName');
     this.appointLegalRepLink = page.locator('[href="/appoint-legal-representative"]');
     this.etAccountRadio = page.locator(`#return_number_or_account-2`);
-    this.signInOptionLink = page.locator('//a[@href="/enter-email"]');
   }
 
   async processRespondentLogin(user: UserCredentials) {
@@ -38,11 +36,6 @@ export default class Et3LoginPage extends LoginPage {
     await this.page.waitForTimeout(1000);
     await this.etAccountRadio.click();
     await this.clickContinue();
-    const isNewIdam = await this.signInOptionLink.isVisible().catch(() => false);
-    if(isNewIdam) { // Remove if condition when new IDAM is rolled out to all environments
-      await this.signInOptionLink.click();
-      await this.page.waitForLoadState('load');
-    }
     await this.processLogin(user, config.etSyrUiUrl);
     await this.page.waitForLoadState('load');
   }

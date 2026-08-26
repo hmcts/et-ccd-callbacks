@@ -2670,6 +2670,30 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
+    "ID": "et1VettingEraAssessmentMarkUp",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "et1VettingEraAssessmentMarkUpLabel",
+    "Label": "${et1VettingEraAssessmentMarkUp}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "et1VettingEra",
+    "Label": "Is this claim proceeding under the ERA regulations?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "frl_yes_no_not_applicable",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
     "ID": "et1VettingRespondentAcasDetailsLabel1",
     "Label": "${et1VettingRespondentAcasDetails1}",
     "FieldType": "Label",

@@ -150,8 +150,8 @@ class AcasServiceTest {
         AcasCertificate acasCertificate = new AcasCertificate();
         acasCertificate.setCertificateNumber("R111111/11/11");
         acasCertificate.setCertificateDocument("dGVzdCBwZGYgZGF0YQ=="); // Base64 encoded "test pdf data"
-        acasCertificate.setDateOfReceipt("2026-08-01");
-        acasCertificate.setDateOfIssue("2026-08-04");
+        acasCertificate.setDateOfNotification("2026-08-01");
+        acasCertificate.setDateCertificateIssued("2026-08-04");
         
         List<AcasCertificate> certificates = List.of(acasCertificate);
         

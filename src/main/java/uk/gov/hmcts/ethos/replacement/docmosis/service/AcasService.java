@@ -140,10 +140,10 @@ public class AcasService {
                 Optional<AcasCertificate> certOpt = emptyIfNull(acasCertificateList).stream()
                     .filter(c -> acasNum.equals(c.getCertificateNumber()))
                     .findFirst();
-                String receiptDate = certOpt.map(AcasCertificate::getDateOfReceipt)
+                String receiptDate = certOpt.map(AcasCertificate::getDateOfNotification)
                     .filter(d -> !isNullOrEmpty(d))
                     .orElse(null);
-                String issueDate = certOpt.map(AcasCertificate::getDateOfIssue)
+                String issueDate = certOpt.map(AcasCertificate::getDateCertificateIssued)
                     .filter(d -> !isNullOrEmpty(d))
                     .orElse(null);
                 respondent.setAcasCertificateReceiptDate(receiptDate);

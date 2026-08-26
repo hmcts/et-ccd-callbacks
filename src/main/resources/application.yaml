@@ -328,13 +328,19 @@ cron:
   reconfigurationLimit: ${CRON_RECONFIGURATION_LIMIT:1000}
 
 pdf:
-  english: "ET1_1026.pdf"
-  welsh: "CY_ET1_1026.pdf"
-  et3form: "ET3_1026.pdf"
-  et3English: "ET3_1026.pdf"
-  et3Welsh: "CY_ET3_1026.pdf"
+  english: "ET1_0224.pdf"
+  welsh: "CY_ET1_0224.pdf"
+  et3form: "ET3_0224.pdf"
+  et3English: "ET3_0224.pdf"
+  et3Welsh: "CY_ET3_0224.pdf"
   contact_tribunal_template: "EM-TRB-EGW-ENG-00068.docx"
   claimant_response_template: "EM-TRB-EGW-ENG-00069.docx"
+  era:
+    english: "ET1_1026.pdf"
+    welsh: "CY_ET1_1026.pdf"
+    et3form: "ET3_1026.pdf"
+    et3English: "ET3_1026.pdf"
+    et3Welsh: "CY_ET3_1026.pdf"
 
 caching:
   adminUserService: ${CACHING_ADMIN_USER_SERVICE:21600000}

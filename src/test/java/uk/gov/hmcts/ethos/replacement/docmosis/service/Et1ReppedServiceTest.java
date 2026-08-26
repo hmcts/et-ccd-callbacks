@@ -102,6 +102,8 @@ class Et1ReppedServiceTest {
     private ET1PdfMapperService et1PdfMapperService;
     @MockitoBean
     private MyHmctsService myHmctsService;
+    @MockitoBean
+    private FeatureToggleService featureToggleService;
 
     private CaseDetails caseDetails;
     private CaseData caseData;
@@ -139,9 +141,10 @@ class Et1ReppedServiceTest {
                 postcodeToOfficeService);
         et1ReppedService = new Et1ReppedService(authTokenGenerator, ccdCaseAssignment,
                 jurisdictionCodesMapperService, organisationClient, postcodeToOfficeService, tribunalOfficesService,
-                userIdamService, adminUserService, et1SubmissionService, myHmctsService);
+                userIdamService, adminUserService, et1SubmissionService, myHmctsService, featureToggleService);
         when(postcodeToOfficeMappings.getPostcodes()).thenReturn(getPostcodes());
-        ReflectionTestUtils.setField(et1ReppedService, "et1EnPdf", "ET1_1026.pdf");
+        ReflectionTestUtils.setField(et1ReppedService, "et1EnPdf", "ET1_0224.pdf");
+        ReflectionTestUtils.setField(et1ReppedService, "et1EnEraPdf", "ET1_1026.pdf");
 
     }
 

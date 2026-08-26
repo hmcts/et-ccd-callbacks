@@ -82,6 +82,10 @@ public class Et1SubmissionService {
     private String et1EnPdf;
     @Value("${pdf.welsh}")
     private String et1CyPdf;
+    @Value("${pdf.era.english}")
+    private String et1EnPdfEra;
+    @Value("${pdf.era.welsh}")
+    private String et1CyPdfEra;
 
     /**
      * Creates the ET1 PDF and calls off to ACAS to retrieve the certificates.
@@ -91,10 +95,13 @@ public class Et1SubmissionService {
      */
     public void createAndUploadEt1Docs(CaseDetails caseDetails, String userToken) {
         try {
-            DocumentTypeItem englishEt1 = createEt1DocumentType(caseDetails, userToken, et1EnPdf);
+            String englishPdfSource = featureToggleService.isEraOctober2026Enabled() ? et1EnPdfEra : et1EnPdf;
+            String welshPdfSource = featureToggleService.isEraOctober2026Enabled() ? et1CyPdfEra : et1CyPdf;
+
+            DocumentTypeItem englishEt1 = createEt1DocumentType(caseDetails, userToken, englishPdfSource);
             DocumentTypeItem welshEt1 = null;
             if (WELSH_LANGUAGE.equals(findLanguagePreference(caseDetails.getCaseData()))) {
-                welshEt1 = createEt1DocumentType(caseDetails, userToken, et1CyPdf);
+                welshEt1 = createEt1DocumentType(caseDetails, userToken, welshPdfSource);
             }
 
             List<DocumentTypeItem> acasCertificates = new ArrayList<>();
@@ -177,8 +184,19 @@ public class Et1SubmissionService {
                 caseDetails.getCaseTypeId());
     }
 
+    /** Builds the ET1 PDF document filename from the claimant name and PDF source.
+     <ul>
+     <li>If {@code pdfSource} starts with {@code "CY_"}, the file is treated as Welsh and uses the prefix
+     {@code "ET1 CY - "} with the claimant name as stored.</li>
+     <li>Otherwise, the file is treated as non-Welsh and uses the prefix {@code "ET1 - "} with a sanitized
+     claimant name to avoid invalid characters in the filename.</li>
+     </ul>
+     @param caseData  case data containing claimant details
+     @param pdfSource source/template identifier used to determine language variant
+     @return the generated ET1 filename ending in {@code .pdf}
+     */
     private String getEt1DocumentName(CaseData caseData, String pdfSource) {
-        return et1CyPdf.equals(pdfSource) ? "ET1 CY - " + caseData.getClaimant() + ".pdf"
+        return pdfSource.startsWith("CY_") ? "ET1 CY - " + caseData.getClaimant() + ".pdf"
                 : "ET1 - " + sanitizePartyName(caseData.getClaimant()) + ".pdf";
     }
 

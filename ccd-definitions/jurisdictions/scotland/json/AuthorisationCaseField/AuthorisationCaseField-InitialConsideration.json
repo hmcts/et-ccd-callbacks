@@ -103,34 +103,6 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "etICHearingListedReferVP",
-    "AccessControl": [
-      {
-        "UserRoles": [
-          "caseworker-employment-api",
-          "caseworker-employment-scotland",
-          "caseworker-employment-etjudge-scotland"
-        ],
-        "CRUD": "CRUD"
-      }
-    ]
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "etICHearingListedReferVPFurtherDetails",
-    "AccessControl": [
-      {
-        "UserRoles": [
-          "caseworker-employment-api",
-          "caseworker-employment-scotland",
-          "caseworker-employment-etjudge-scotland"
-        ],
-        "CRUD": "CRUD"
-      }
-    ]
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "etICIssuesArisingFromVettingLabel",
     "UserRole": "caseworker-employment-etjudge",
     "CRUD": "R"
@@ -1508,34 +1480,6 @@
     "CaseFieldID": "etICHearingNotListedUDLHearing",
     "UserRole": "et-acas-api",
     "CRUD": "R"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "etICHearingNotListedReferVP",
-    "AccessControl": [
-      {
-        "UserRoles": [
-          "caseworker-employment-api",
-          "caseworker-employment-scotland",
-          "caseworker-employment-etjudge-scotland"
-        ],
-        "CRUD": "CRUD"
-      }
-    ]
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "etICHearingNotListedReferVPFurtherDetails",
-    "AccessControl": [
-      {
-        "UserRoles": [
-          "caseworker-employment-api",
-          "caseworker-employment-scotland",
-          "caseworker-employment-etjudge-scotland"
-        ],
-        "CRUD": "CRUD"
-      }
-    ]
   },
   {
     "CaseTypeId": "ET_Scotland",
@@ -1997,6 +1941,62 @@
           "caseworker-employment-etjudge-scotland",
           "caseworker-employment-api",
           "caseworker-wa-task-configuration"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "etICHearingNotListedReferVP",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-api",
+          "caseworker-employment-scotland",
+          "caseworker-employment-etjudge-scotland"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "etICHearingNotListedReferVPFurtherDetails",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-api",
+          "caseworker-employment-scotland",
+          "caseworker-employment-etjudge-scotland"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "etICHearingListedReferVP",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-api",
+          "caseworker-employment-scotland",
+          "caseworker-employment-etjudge-scotland"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "etICHearingListedReferVPFurtherDetails",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-api",
+          "caseworker-employment-scotland",
+          "caseworker-employment-etjudge-scotland"
         ],
         "CRUD": "CRUD"
       }

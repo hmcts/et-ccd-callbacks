@@ -211,6 +211,16 @@ public class InitialConsiderationData {
     @JsonProperty("icOtherIssuesOrFinalOrders")
     private String icOtherIssuesOrFinalOrders;
 
+    // Refer VP
+    @JsonProperty("hearingNotListedReferVP")
+    private String hearingNotListedReferVP;
+    @JsonProperty("hearingNotListedReferVPDetails")
+    private String hearingNotListedReferVPDetails;
+    @JsonProperty("hearingListedReferVP")
+    private String hearingListedReferVP;
+    @JsonProperty("hearingListedReferVPDetails")
+    private String hearingListedReferVPDetails;
+
     // All
     @JsonProperty("icCompletedBy")
     private String icCompletedBy;

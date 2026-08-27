@@ -287,6 +287,14 @@ public final class InitialConsiderationHelper {
 
                 .furtherInfoAnyOtherDirections(
                         defaultIfEmpty(caseData.getEtICFurtherInformationHearingAnyOtherDirections(), null))
+
+                // Refer VP
+                .hearingNotListedReferVP(defaultIfEmpty(caseData.getEtICHearingNotListedReferVP(), null))
+                .hearingNotListedReferVPDetails(
+                    defaultIfEmpty(caseData.getEtICHearingNotListedReferVPFurtherDetails(), null))
+                .hearingListedReferVP(defaultIfEmpty(caseData.getEtICHearingListedReferVP(), null))
+                .hearingListedReferVPDetails(defaultIfEmpty(caseData.getEtICHearingListedReferVPFurtherDetails(), null))
+
                 // Common
                 .icDateCompleted(defaultIfEmpty(caseData.getIcDateCompleted(), formattedNow))
                 .icCompletedBy(defaultIfEmpty(caseData.getIcCompletedBy(), null))

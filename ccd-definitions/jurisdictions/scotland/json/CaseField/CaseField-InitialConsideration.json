@@ -285,22 +285,6 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "ID": "etICHearingNotListedReferVP",
-    "Label": "Refer to VP as suitable for Judicial Mediation?",
-    "FieldType": "YesOrNo",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
-    "ID": "etICHearingNotListedReferVPFurtherDetails",
-    "Label": "Further details",
-    "FieldType": "Text",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
     "ID": "etICRespondentHearingListed",
     "Label": "${etInitialConsiderationRespondent}",
     "FieldType": "Label",
@@ -325,22 +309,6 @@
     "ID": "etICHearingListedAnswers",
     "Label": "Hearing already listed",
     "FieldType": "etICHearingListedAnswers",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
-    "ID": "etICHearingListedReferVP",
-    "Label": "Refer to VP as suitable for Judicial Mediation?",
-    "FieldType": "YesOrNo",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
-    "ID": "etICHearingListedReferVPFurtherDetails",
-    "Label": "Further details",
-    "FieldType": "Text",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },
@@ -483,6 +451,38 @@
     "ID": "etICIsUrgent",
     "Label": "Is this urgent?",
     "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "etICHearingNotListedReferVP",
+    "Label": "Refer to VP as suitable for Judicial Mediation?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "etICHearingNotListedReferVPFurtherDetails",
+    "Label": "Further details",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "etICHearingListedReferVP",
+    "Label": "Refer to VP as suitable for Judicial Mediation?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "etICHearingListedReferVPFurtherDetails",
+    "Label": "Further details",
+    "FieldType": "Text",
     "SecurityClassification": "Public",
     "Searchable": "N"
   }

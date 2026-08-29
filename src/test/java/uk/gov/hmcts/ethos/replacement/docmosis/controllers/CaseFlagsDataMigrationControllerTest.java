@@ -20,6 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsReferenceDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
@@ -34,6 +35,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -58,6 +60,9 @@ class CaseFlagsDataMigrationControllerTest {
     @MockitoBean
     private CaseFlagsReferenceDataService caseFlagsReferenceDataService;
 
+    @MockitoBean
+    private FeatureToggleService featureToggleService;
+
     @Autowired
     private WebApplicationContext applicationContext;
     private JsonNode requestContent;
@@ -76,6 +81,7 @@ class CaseFlagsDataMigrationControllerTest {
     @SneakyThrows
     void shouldMigrateCaseFlags() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled("ET_EnglandWales")).thenReturn(true);
         Map<String, String> partyFlagVisibilities = Map.of("ra0010", "External");
         when(caseFlagsReferenceDataService.getPartyFlagVisibilities(AUTH_TOKEN)).thenReturn(partyFlagVisibilities);
 
@@ -112,8 +118,68 @@ class CaseFlagsDataMigrationControllerTest {
 
     @Test
     @SneakyThrows
+    void shouldUseLegacyMigrationWhenV2IsDisabledForCaseType() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled("ET_EnglandWales")).thenReturn(false);
+        when(featureToggleService.isCaseFlagsV2Enabled("ET_Scotland")).thenReturn(true);
+
+        mvc.perform(post(CASE_FLAGS_DATA_MIGRATION)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(caseFlagsReferenceDataService, never()).getPartyFlagVisibilities(any());
+        verify(caseFlagsService, never()).migrateExistingClaimantAndRespondentCaseFlags(any(), any());
+        verify(caseFlagsService).setupLegacyCaseFlags(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldMigrateScotlandCaseFlagsIndependentlyOfEnglandWales() {
+        requestContent.withObject("/case_details").put("case_type_id", "ET_Scotland");
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled("ET_EnglandWales")).thenReturn(false);
+        when(featureToggleService.isCaseFlagsV2Enabled("ET_Scotland")).thenReturn(true);
+        Map<String, String> partyFlagVisibilities = Map.of("ra0010", "External");
+        when(caseFlagsReferenceDataService.getPartyFlagVisibilities(AUTH_TOKEN)).thenReturn(partyFlagVisibilities);
+
+        mvc.perform(post(CASE_FLAGS_DATA_MIGRATION)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(caseFlagsService).migrateExistingClaimantAndRespondentCaseFlags(
+                any(CaseData.class),
+                eq(partyFlagVisibilities)
+        );
+        verify(caseFlagsService, never()).setupLegacyCaseFlags(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldKeepScotlandMigrationOnV1WhenOnlyEnglandWalesV2IsEnabled() {
+        requestContent.withObject("/case_details").put("case_type_id", "ET_Scotland");
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled("ET_EnglandWales")).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled("ET_Scotland")).thenReturn(false);
+
+        mvc.perform(post(CASE_FLAGS_DATA_MIGRATION)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(caseFlagsService).setupLegacyCaseFlags(any(CaseData.class));
+        verify(caseFlagsService, never()).migrateExistingClaimantAndRespondentCaseFlags(any(), any());
+    }
+
+    @Test
+    @SneakyThrows
     void shouldRollbackCaseFlags() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled("ET_EnglandWales")).thenReturn(true);
         mvc.perform(post(CASE_FLAGS_DATA_ROLLBACK)
                         .content(requestContent.toString())
                         .header(AUTHORIZATION, AUTH_TOKEN)
@@ -124,6 +190,57 @@ class CaseFlagsDataMigrationControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(caseFlagsService).rollbackCaseFlags(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldRollbackLegacyCaseFlagsWhenV2IsDisabledForCaseType() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mvc.perform(post(CASE_FLAGS_DATA_ROLLBACK)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(caseFlagsService).rollbackLegacyCaseFlags(any(CaseData.class));
+        verify(caseFlagsService, never()).rollbackCaseFlags(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldRollbackScotlandV2CaseFlagsIndependentlyOfEnglandWales() {
+        requestContent.withObject("/case_details").put("case_type_id", "ET_Scotland");
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled("ET_EnglandWales")).thenReturn(false);
+        when(featureToggleService.isCaseFlagsV2Enabled("ET_Scotland")).thenReturn(true);
+
+        mvc.perform(post(CASE_FLAGS_DATA_ROLLBACK)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(caseFlagsService).rollbackCaseFlags(any(CaseData.class));
+        verify(caseFlagsService, never()).rollbackLegacyCaseFlags(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldKeepScotlandRollbackOnV1WhenOnlyEnglandWalesV2IsEnabled() {
+        requestContent.withObject("/case_details").put("case_type_id", "ET_Scotland");
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled("ET_EnglandWales")).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled("ET_Scotland")).thenReturn(false);
+
+        mvc.perform(post(CASE_FLAGS_DATA_ROLLBACK)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(caseFlagsService).rollbackLegacyCaseFlags(any(CaseData.class));
+        verify(caseFlagsService, never()).rollbackCaseFlags(any(CaseData.class));
     }
 
     @Test

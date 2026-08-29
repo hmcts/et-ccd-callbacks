@@ -521,9 +521,8 @@ public class Et1ReppedController {
         Et1ReppedHelper.clearEt1ReppedCreationFields(caseData);
         caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
 
-        boolean caseFlagsToggle = featureToggleService.isCaseFlagsEnabled();
-        log.info("Case flags feature flag is {}", caseFlagsToggle);
-        if (caseFlagsToggle && caseFlagsService.caseFlagsSetupRequired(caseData)) {
+        boolean caseFlagsV2Toggle = featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId());
+        if (caseFlagsV2Toggle && caseFlagsService.caseFlagsSetupRequired(caseData)) {
             caseFlagsService.setupCaseFlags(caseData);
             caseFlagsService.processNewlySetCaseFlags(caseData);
         }

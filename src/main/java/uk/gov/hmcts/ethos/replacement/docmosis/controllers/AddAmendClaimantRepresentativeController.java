@@ -120,7 +120,7 @@ public class AddAmendClaimantRepresentativeController {
                     callbackRequest.getCaseDetails());
         }
 
-        if (featureToggleService.isCaseFlagsEnabled()) {
+        if (featureToggleService.isCaseFlagsV2Enabled(callbackRequest.getCaseDetails().getCaseTypeId())) {
             caseFlagsService.clearClaimantRepresentativeFlagsIfRepresentativeChanged(caseData,
                     callbackRequest.getCaseDetailsBefore() == null
                             ? null

@@ -181,6 +181,14 @@ public class CaseFlagsService {
                 || hasStaleRespondentRepresentativeFlags(caseData);
     }
 
+    public boolean legacyCaseFlagsSetupRequired(CaseData caseData) {
+        return getCaseFlags(caseData) == null
+                || legacyPartyFlagSetupRequired(caseData.getAllPartyFlags() == null
+                        ? null : caseData.getAllPartyFlags().getClaimantFlags())
+                || legacyPartyFlagSetupRequired(caseData.getAllPartyFlags() == null
+                        ? null : caseData.getAllPartyFlags().getRespondentFlags());
+    }
+
     /**
      * Setup case flags for Claimant, Respondent, Representative and Case level.
      *
@@ -199,6 +207,22 @@ public class CaseFlagsService {
 
         alignRespondentRepresentativeFlagDetails(caseData, existingRepresentativeFlags);
         clearStaleRespondentRepresentativeFlags(caseData);
+    }
+
+    /**
+     * Preserves the Case Flags v1.0 setup for case types that have not moved to v2.1.
+     *
+     * @param caseData Data about the current case
+     */
+    public void setupLegacyCaseFlags(CaseData caseData) {
+        if (getCaseFlags(caseData) == null) {
+            setCaseFlags(caseData, CaseFlagsType.builder().build());
+        }
+
+        AllPartyFlags flags = getOrCreateAllPartyFlags(caseData);
+        flags.setClaimantFlags(setupLegacyPartyFlag(flags.getClaimantFlags(), caseData.getClaimant(), CLAIMANT));
+        flags.setRespondentFlags(setupLegacyPartyFlag(flags.getRespondentFlags(), caseData.getRespondent(),
+                "respondent"));
     }
 
     /**
@@ -233,13 +257,106 @@ public class CaseFlagsService {
     }
 
     /**
-     * Sets case flags for Claimant, Respondent, Representative and Case level to null.
+     * Consolidates v2.1 party flags into the sections retained during rollback.
      *
      * @param caseData Data about the current case
      */
     public void rollbackCaseFlags(CaseData caseData) {
+        if (caseData == null || caseData.getAllPartyFlags() == null) {
+            return;
+        }
+
+        PartyFlag claimantInternal = partyFlag(PartyType.CLAIMANT, INTERNAL, NOT_INDEXED);
+        consolidateFlagDetails(caseData, claimantInternal, partyFlags(PartyType.CLAIMANT, null));
+        partyFlag(PartyType.CLAIMANT, EXTERNAL, NOT_INDEXED).clear(caseData);
+
+        PartyFlag firstRespondentInternal = partyFlag(PartyType.RESPONDENT, INTERNAL, 0);
+        consolidateFlagDetails(caseData, firstRespondentInternal, partyFlags(PartyType.RESPONDENT, null));
+
+        PARTY_FLAGS.stream()
+                .filter(flag -> PartyType.RESPONDENT.equals(flag.partyType()))
+                .filter(flag -> flag.index() > 0 || EXTERNAL.equals(flag.visibility()))
+                .forEach(flag -> flag.clear(caseData));
+        PARTY_FLAGS.stream()
+                .filter(flag -> PartyType.CLAIMANT_REPRESENTATIVE.equals(flag.partyType())
+                        || PartyType.RESPONDENT_REPRESENTATIVE.equals(flag.partyType()))
+                .forEach(flag -> flag.clear(caseData));
+
+        AllPartyFlags flags = caseData.getAllPartyFlags();
+        flags.setClaimantFlags(setupLegacyPartyFlag(flags.getClaimantFlags(), caseData.getClaimant(), CLAIMANT));
+        flags.setRespondentFlags(setupLegacyPartyFlag(flags.getRespondentFlags(), caseData.getRespondent(),
+                "respondent"));
+    }
+
+    private static void consolidateFlagDetails(
+            CaseData caseData, PartyFlag destination, List<PartyFlag> sourceFlags) {
+        List<CaseFlagsType> sources = sourceFlags.stream()
+                .map(flag -> flag.get(caseData))
+                .filter(Objects::nonNull)
+                .toList();
+        List<GenericTypeItem<FlagDetailType>> details = existingDetails(sources.toArray(CaseFlagsType[]::new));
+        CaseFlagsType destinationFlags = destination.get(caseData);
+
+        if (destinationFlags == null && !details.isEmpty()) {
+            String partyName = rollbackDestinationPartyName(caseData, destination, sources);
+            destinationFlags = createShellFlag(partyName, destination.roleOnCase(), destination.visibility());
+            destination.set(caseData, destinationFlags);
+        }
+
+        if (destinationFlags != null) {
+            destinationFlags.setDetails(details.isEmpty() ? null : ListTypeItem.from(details.stream()));
+        }
+    }
+
+    private static String rollbackDestinationPartyName(
+            CaseData caseData, PartyFlag destination, List<CaseFlagsType> sources) {
+        String currentPartyName = hasParty(caseData, destination) ? getPartyName(caseData, destination) : null;
+        return StringUtils.firstNonBlank(
+                currentPartyName,
+                sources.stream()
+                        .map(CaseFlagsType::getPartyName)
+                        .filter(StringUtils::isNotBlank)
+                        .findFirst()
+                        .orElse(null));
+    }
+
+    private static List<PartyFlag> partyFlags(PartyType partyType, @Nullable String visibility) {
+        return PARTY_FLAGS.stream()
+                .filter(flag -> partyType.equals(flag.partyType()))
+                .filter(flag -> visibility == null || visibility.equals(flag.visibility()))
+                .toList();
+    }
+
+    private static PartyFlag partyFlag(PartyType partyType, String visibility, int index) {
+        return PARTY_FLAGS.stream()
+                .filter(flag -> partyType.equals(flag.partyType()))
+                .filter(flag -> visibility.equals(flag.visibility()))
+                .filter(flag -> index == flag.index())
+                .findFirst()
+                .orElseThrow();
+    }
+
+    public void rollbackLegacyCaseFlags(CaseData caseData) {
         setCaseFlags(caseData, null);
-        PARTY_FLAGS.forEach(flag -> flag.clear(caseData));
+        if (caseData.getAllPartyFlags() != null) {
+            caseData.getAllPartyFlags().setClaimantFlags(null);
+            caseData.getAllPartyFlags().setRespondentFlags(null);
+        }
+    }
+
+    private static boolean legacyPartyFlagSetupRequired(CaseFlagsType flags) {
+        return flags == null || StringUtils.isEmpty(flags.getRoleOnCase());
+    }
+
+    private static CaseFlagsType setupLegacyPartyFlag(CaseFlagsType flags, String partyName, String roleOnCase) {
+        if (flags == null) {
+            return CaseFlagsType.builder().partyName(partyName).roleOnCase(roleOnCase).build();
+        }
+        flags.setPartyName(partyName);
+        flags.setRoleOnCase(roleOnCase);
+        flags.setGroupId(null);
+        flags.setVisibility(null);
+        return flags;
     }
 
     /**
@@ -729,7 +846,7 @@ public class CaseFlagsService {
             return EXTERNAL.equals(referenceDataVisibilityValue);
         }
 
-        // A legacy flag no longer configured in Reference Data defaults to Internal.
+        // Flags no longer present in Reference Data are treated as internal.
         return false;
     }
 

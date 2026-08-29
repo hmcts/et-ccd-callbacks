@@ -34,6 +34,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -93,6 +94,7 @@ class AddAmendClaimantRepresentativeControllerTest {
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseDetails.getCaseData())
                 .withCaseId(CASE_ID)
+                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
         callbackRequest = CallbackRequest.builder()
                 .caseDetails(caseDetails)
@@ -143,7 +145,7 @@ class AddAmendClaimantRepresentativeControllerTest {
     @SneakyThrows
     void testAmendClaimantRepresentativeSubmitted() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
 
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -179,7 +181,7 @@ class AddAmendClaimantRepresentativeControllerTest {
     @SneakyThrows
     void testAmendClaimantRepSubmittedDoesNotSetUpCaseFlagsWhenEnabled() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
 
         mockMvc.perform(post(SUBMITTED_URL)
                 .content(jsonMapper.toJson(callbackRequest))

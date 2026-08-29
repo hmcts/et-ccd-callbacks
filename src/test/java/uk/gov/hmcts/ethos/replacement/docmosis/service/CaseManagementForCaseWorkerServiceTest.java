@@ -159,6 +159,7 @@ class CaseManagementForCaseWorkerServiceTest {
         when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
@@ -501,6 +502,16 @@ class CaseManagementForCaseWorkerServiceTest {
                 caseData,
                 caseData.getRespondentCollection().get(2)
         );
+    }
+
+    @Test
+    void struckOutRespondentDoesNotInactivateCaseFlagsWhenDisabledForScotland() {
+        when(featureToggleService.isCaseFlagsV2Enabled(SCOTLAND_CASE_TYPE_ID)).thenReturn(false);
+
+        caseManagementForCaseWorkerService.struckOutRespondents(scotlandCcdRequest1);
+
+        verify(caseFlagsService, never()).inactivateRespondentCaseFlags(any(), anyString());
+        verify(caseFlagsService, never()).inactivateRespondentRepresentativeCaseFlags(any(), any());
     }
 
     @Test

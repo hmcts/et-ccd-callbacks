@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -60,6 +61,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.ObjectUtils.getIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -616,14 +618,20 @@ public class NocRespondentRepresentativeService {
         List<RepresentedTypeRItem> representativesToRevoke = new ArrayList<>();
         List<CaseUserAssignment> caseUserAssignmentsToRevoke = new ArrayList<>();
         Set<UserRoleAssignment> caseUserAssignmentsToRevokeIndex = new LinkedHashSet<>();
+        CaseData currentCaseData = callbackRequest.getCaseDetails() == null
+                ? null : callbackRequest.getCaseDetails().getCaseData();
         for (RepresentedTypeRItem representative : representativesToRemove) {
             if (!RespondentRepresentativeUtils.isValidRepresentative(representative)) {
                 continue;
             }
+            Set<String> currentRepresentativeRoles = currentRespondentRepresentativeRoles(
+                    currentCaseData, representative);
             List<CaseUserAssignment> assignmentsForRepresentative = findCaseAssignmentsToRevokeForRep(
                     oldCaseDetails.getCaseId(),
                     respondentRepresentativeAssignments,
-                    representative);
+                    representative).stream()
+                    .filter(assignment -> !currentRepresentativeRoles.contains(assignment.getCaseRole()))
+                    .toList();
             if (CollectionUtils.isEmpty(assignmentsForRepresentative)) {
                 continue;
             }
@@ -641,6 +649,35 @@ public class NocRespondentRepresentativeService {
             return new ArrayList<>();
         }
         return representativesToRevoke;
+    }
+
+    private static Set<String> currentRespondentRepresentativeRoles(
+            CaseData caseData, RepresentedTypeRItem removedRepresentative) {
+        if (ObjectUtils.isEmpty(caseData) || CollectionUtils.isEmpty(caseData.getRepCollection())
+                || !RespondentRepresentativeUtils.isValidRepresentative(removedRepresentative)) {
+            return Set.of();
+        }
+
+        RepresentedTypeR removedRepresentativeValue = removedRepresentative.getValue();
+        return caseData.getRepCollection().stream()
+                .filter(RespondentRepresentativeUtils::isValidRepresentative)
+                .map(RepresentedTypeRItem::getValue)
+                .filter(currentRepresentative -> sameRepresentativeUser(
+                        removedRepresentativeValue, currentRepresentative))
+                .map(RepresentedTypeR::getRole)
+                .filter(RoleUtils::isRespondentRepresentativeRole)
+                .collect(Collectors.toSet());
+    }
+
+    private static boolean sameRepresentativeUser(
+            RepresentedTypeR firstRepresentative, RepresentedTypeR secondRepresentative) {
+        if (StringUtils.isNotBlank(firstRepresentative.getIdamId())
+                && StringUtils.isNotBlank(secondRepresentative.getIdamId())) {
+            return Strings.CS.equals(firstRepresentative.getIdamId(), secondRepresentative.getIdamId());
+        }
+        return StringUtils.isNotBlank(firstRepresentative.getRepresentativeEmailAddress())
+                && Strings.CI.equals(firstRepresentative.getRepresentativeEmailAddress(),
+                secondRepresentative.getRepresentativeEmailAddress());
     }
 
     /**

@@ -35,6 +35,7 @@ import java.util.Objects;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -119,7 +120,7 @@ class NoticeOfChangeControllerTest {
     @Test
     void handleAboutToSubmitSetsUpCaseFlagsWhenEnabled() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
         when(nocRepresentativeService.updateRepresentation(any(), any())).thenReturn(caseData);
         when(ccdCaseAssignment.applyNoc(any(), any())).thenReturn(CCDCallbackResponse.builder()
                 .data(caseData)

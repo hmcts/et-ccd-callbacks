@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,6 +66,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
@@ -72,6 +74,7 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.same;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -311,6 +314,28 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
+    void postDefaultValuesSetsUpLegacyFlagsOnPrepopulatedCaseData() {
+        CaseData prepopulatedCaseData = new CaseData();
+        ((ObjectNode) requestContent2).put("event_id", "initiateCase");
+        when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
+        when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+        when(caseFlagsService.legacyCaseFlagsSetupRequired(any(CaseData.class))).thenReturn(true);
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
+                .thenReturn(prepopulatedCaseData);
+
+        mvc.perform(post(POST_DEFAULT_VALUES_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(caseFlagsService).setupLegacyCaseFlags(same(prepopulatedCaseData));
+    }
+
+    @Test
+    @SneakyThrows
     void amendCaseDetails() {
         when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -361,7 +386,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
-    void amendClaimantDetails() {
+    void amendClaimantDetailsUsesLegacyCaseFlagsWhenV2IsDisabled() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_CLAIMANT_DETAILS_URL)
                 .content(requestContent2.toString())
@@ -373,13 +398,14 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(caseFlagsService, times(0)).setupCaseFlags(any(CaseData.class));
+        verify(caseFlagsService).setupLegacyCaseFlags(any(CaseData.class));
     }
 
     @Test
     @SneakyThrows
     void amendClaimantDetailsSetsUpCaseFlagsWhenEnabled() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
 
         mvc.perform(post(AMEND_CLAIMANT_DETAILS_URL)
                         .content(requestContent2.toString())
@@ -391,11 +417,12 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(caseFlagsService, times(1)).setupCaseFlags(any(CaseData.class));
+        verify(caseFlagsService, times(0)).setupLegacyCaseFlags(any(CaseData.class));
     }
 
     @Test
     @SneakyThrows
-    void amendRespondentDetails() {
+    void amendRespondentDetailsUsesLegacyCaseFlagsWhenV2IsDisabled() {
         when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -410,6 +437,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(caseFlagsService, times(0)).setupCaseFlags(any(CaseData.class));
+        verify(caseFlagsService).setupLegacyCaseFlags(any(CaseData.class));
         verify(nocRespondentHelper, times(1)).amendRespondentNameRepresentativeNames(any(CaseData.class));
         verify(nocRespondentRepresentativeService, times(1))
                 .prepopulateOrgPolicyAndNoc(any(CaseData.class));
@@ -421,7 +449,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
         doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any(CaseData.class));
 
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
@@ -434,6 +462,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(caseFlagsService, times(1)).setupCaseFlags(any(CaseData.class));
+        verify(caseFlagsService, times(0)).setupLegacyCaseFlags(any(CaseData.class));
     }
 
     @Test

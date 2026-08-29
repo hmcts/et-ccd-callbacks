@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsReferenceDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.List;
@@ -35,6 +36,7 @@ public class CaseFlagsDataMigrationController {
     private final VerifyTokenService verifyTokenService;
     private final CaseFlagsService caseFlagsService;
     private final CaseFlagsReferenceDataService caseFlagsReferenceDataService;
+    private final FeatureToggleService featureToggleService;
 
     @PostMapping(value = "/case-flags-migration/about-to-submit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "migrate existing party case flags into internal and external sections.")
@@ -57,10 +59,14 @@ public class CaseFlagsDataMigrationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseFlagsService.migrateExistingClaimantAndRespondentCaseFlags(
-                caseData,
-                caseFlagsReferenceDataService.getPartyFlagVisibilities(userToken)
-        );
+        if (featureToggleService.isCaseFlagsV2Enabled(ccdRequest.getCaseDetails().getCaseTypeId())) {
+            caseFlagsService.migrateExistingClaimantAndRespondentCaseFlags(
+                    caseData,
+                    caseFlagsReferenceDataService.getPartyFlagVisibilities(userToken)
+            );
+        } else {
+            caseFlagsService.setupLegacyCaseFlags(caseData);
+        }
 
         log.info("Migrating existing case: {}", ccdRequest.getCaseDetails().getCaseId());
 
@@ -88,7 +94,11 @@ public class CaseFlagsDataMigrationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseFlagsService.rollbackCaseFlags(caseData);
+        if (featureToggleService.isCaseFlagsV2Enabled(ccdRequest.getCaseDetails().getCaseTypeId())) {
+            caseFlagsService.rollbackCaseFlags(caseData);
+        } else {
+            caseFlagsService.rollbackLegacyCaseFlags(caseData);
+        }
 
         return getCallbackRespEntityErrors(List.of(), caseData);
     }

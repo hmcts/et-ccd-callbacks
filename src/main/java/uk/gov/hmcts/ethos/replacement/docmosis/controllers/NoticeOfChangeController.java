@@ -75,7 +75,7 @@ public class NoticeOfChangeController {
         CaseData caseData = nocRepresentativeService
                 .updateRepresentation(callbackRequest.getCaseDetails(), userToken);
 
-        if (featureToggleService.isCaseFlagsEnabled()) {
+        if (featureToggleService.isCaseFlagsV2Enabled(callbackRequest.getCaseDetails().getCaseTypeId())) {
             caseFlagsService.setupCaseFlags(caseData);
         }
 

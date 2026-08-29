@@ -783,6 +783,51 @@ class NocRespondentRepresentativeServiceTest {
 
     @Test
     @SneakyThrows
+    void revokeOldRespondentRepresentativeAccessRetainsRoleForAnotherRespondentRepresentedBySameUser() {
+        RepresentedTypeRItem removedRespondentOneRepresentative = removableRepresentativeForRespondent(
+                "rep-item-1", RESPONDENT_ID_ONE, RESPONDENT_NAME_ONE, ROLE_SOLICITORA,
+                REPRESENTATIVE_ID_ONE, REPRESENTATIVE_EMAIL_1, ORGANISATION_ID_ONE);
+        RepresentedTypeRItem remainingRespondentTwoRepresentative = removableRepresentativeForRespondent(
+                "rep-item-2", RESPONDENT_ID_TWO, RESPONDENT_NAME_TWO, ROLE_SOLICITORB,
+                REPRESENTATIVE_ID_ONE, REPRESENTATIVE_EMAIL_1, ORGANISATION_ID_ONE);
+        CaseData previousCaseData = new CaseData();
+        previousCaseData.setRepCollection(List.of(
+                removedRespondentOneRepresentative, remainingRespondentTwoRepresentative));
+        CaseData currentCaseData = new CaseData();
+        currentCaseData.setRepCollection(List.of(remainingRespondentTwoRepresentative));
+        CaseDetails previousCaseDetails = new CaseDetails();
+        previousCaseDetails.setCaseId(CASE_ID_1);
+        previousCaseDetails.setCaseData(previousCaseData);
+        CaseDetails currentCaseDetails = new CaseDetails();
+        currentCaseDetails.setCaseId(CASE_ID_1);
+        currentCaseDetails.setCaseData(currentCaseData);
+        CallbackRequest callbackRequest = CallbackRequest.builder()
+                .caseDetailsBefore(previousCaseDetails)
+                .caseDetails(currentCaseDetails)
+                .build();
+
+        CaseUserAssignment removedRespondentAssignment = assignment(REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
+        CaseUserAssignment remainingRespondentAssignment = assignment(REPRESENTATIVE_ID_ONE, ROLE_SOLICITORB);
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1))
+                .thenReturn(CaseUserAssignmentData.builder()
+                        .caseUserAssignments(List.of(removedRespondentAssignment, remainingRespondentAssignment))
+                        .build());
+
+        List<RepresentedTypeRItem> revokedRepresentatives = nocRespondentRepresentativeService
+                .revokeOldRespondentRepresentativeAccess(
+                        callbackRequest, USER_TOKEN, List.of(removedRespondentOneRepresentative));
+
+        assertThat(revokedRepresentatives).containsExactly(removedRespondentOneRepresentative);
+        ArgumentCaptor<CaseUserAssignmentData> revokedAssignments =
+                ArgumentCaptor.forClass(CaseUserAssignmentData.class);
+        verify(ccdClient).revokeCaseAssignments(eq(USER_TOKEN), revokedAssignments.capture());
+        assertThat(revokedAssignments.getValue().getCaseUserAssignments())
+                .containsExactly(removedRespondentAssignment);
+    }
+
+    @Test
+    @SneakyThrows
     void revokeOldRespondentRepresentativeAccessOnlyRevokesDeletedMiddleRepresentativeAssignments() {
         RepresentedTypeRItem removedRespondentTwoRepresentative = removableRepresentativeForRespondent(
                 "rep-item-2",

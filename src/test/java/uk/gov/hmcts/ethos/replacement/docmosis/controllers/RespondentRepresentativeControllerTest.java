@@ -48,6 +48,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({RespondentRepresentativeController.class, JsonMapper.class})
@@ -57,6 +58,7 @@ class RespondentRepresentativeControllerTest {
     private static final String DUMMY_SUBMISSION_REFERENCE = "1234567890123456";
     private static final String HEADER_AUTHORIZATION = "Authorization";
     private static final String ID_RESPONDENT_1 = "12345acc-be68-4614-b6ad-0ca1cfa9e1d5";
+    private static final String ID_RESPONDENT_2 = "22345acc-be68-4614-b6ad-0ca1cfa9e1d5";
     private static final String ID_REPRESENTATIVE_1 = "71240acc-be68-4614-b6ad-0ca1cfa9e1d5";
     private static final String ID_REPRESENTATIVE_2 = "3130e246-5fee-4b35-b805-41d58099625c";
     private static final String RESPONDENT_NAME_1 = "Respondent Name 1";
@@ -176,8 +178,11 @@ class RespondentRepresentativeControllerTest {
         RepresentedTypeRItem representedTypeRItem = RepresentedTypeRItem.builder().id(ID_REPRESENTATIVE_1).build();
         caseData.setRepCollection(List.of(representedTypeRItem));
         caseData.setRepCollectionToRemove(List.of(representedTypeRItem));
-        CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
-        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+        CCDRequest ccdRequest = CCDRequestBuilder.builder()
+                .withCaseData(caseData)
+                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+                .build();
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
         when(caseFlagsService.caseFlagsSetupRequired(any(CaseData.class))).thenReturn(true);
 
         mockMvc.perform(post(URL_REMOVE_OWN_REPRESENTATIVE)
@@ -266,6 +271,7 @@ class RespondentRepresentativeControllerTest {
                         .nameOfRepresentative(REPRESENTATIVE_NAME).build()).build()));
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId(DUMMY_SUBMISSION_REFERENCE);
+        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseData(caseData);
         CaseDetails caseDetailsBefore = new CaseDetails();
         caseDetailsBefore.setCaseId(DUMMY_SUBMISSION_REFERENCE);
@@ -274,7 +280,7 @@ class RespondentRepresentativeControllerTest {
                 .caseDetails(caseDetails)
                 .caseDetailsBefore(caseDetailsBefore)
                 .build();
-        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
 
         mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(callbackRequest))
@@ -318,6 +324,7 @@ class RespondentRepresentativeControllerTest {
                         .build()).build()));
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId(DUMMY_SUBMISSION_REFERENCE);
+        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseData(caseData);
         CaseDetails caseDetailsBefore = new CaseDetails();
         caseDetailsBefore.setCaseId(DUMMY_SUBMISSION_REFERENCE);
@@ -326,7 +333,7 @@ class RespondentRepresentativeControllerTest {
                 .caseDetails(caseDetails)
                 .caseDetailsBefore(caseDetailsBefore)
                 .build();
-        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
 
         mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(callbackRequest))
@@ -340,6 +347,83 @@ class RespondentRepresentativeControllerTest {
         verify(caseFlagsService, times(1)).clearRespondentRepresentativeFlags(
                 any(CaseData.class), eq(List.of(0)));
         verify(caseFlagsService, times(1)).setupCaseFlags(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void amendRespondentRepresentativeAboutToSubmitReconcilesFlagsWhenOneRepresentationIsRemoved() {
+        DynamicValueType respondent2Selection = new DynamicValueType();
+        respondent2Selection.setLabel(RESPONDENT_NAME_2);
+        DynamicFixedListType respondent2DynamicList = new DynamicFixedListType();
+        respondent2DynamicList.setValue(respondent2Selection);
+        RepresentedTypeRItem respondent1Representative = RepresentedTypeRItem.builder()
+                .id(ID_REPRESENTATIVE_1)
+                .value(RepresentedTypeR.builder()
+                        .respondentId(ID_RESPONDENT_1)
+                        .respRepName(RESPONDENT_NAME_1)
+                        .nameOfRepresentative(REPRESENTATIVE_NAME)
+                        .representativeEmailAddress("representative@example.com")
+                        .role(ROLE_SOLICITOR_A)
+                        .build())
+                .build();
+        RepresentedTypeRItem respondent2Representative = RepresentedTypeRItem.builder()
+                .id(ID_REPRESENTATIVE_2)
+                .value(RepresentedTypeR.builder()
+                        .respondentId(ID_RESPONDENT_2)
+                        .dynamicRespRepName(respondent2DynamicList)
+                        .respRepName(RESPONDENT_NAME_2)
+                        .nameOfRepresentative(REPRESENTATIVE_NAME)
+                        .representativeEmailAddress("representative@example.com")
+                        .role(ROLE_SOLICITOR_B)
+                        .build())
+                .build();
+        CaseData previousCaseData = new CaseData();
+        previousCaseData.setRepCollection(List.of(respondent1Representative, respondent2Representative));
+        CaseData currentCaseData = new CaseData();
+        currentCaseData.setRepCollection(List.of(respondent2Representative));
+
+        CallbackRequest callbackRequest = respondentRepresentativeCallback(previousCaseData, currentCaseData);
+        when(featureToggleService.isCaseFlagsV2Enabled(ENGLANDWALES_CASE_TYPE_ID)).thenReturn(true);
+
+        mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_SUBMIT)
+                        .content(jsonMapper.toJson(callbackRequest))
+                        .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(caseFlagsService, never()).clearRespondentRepresentativeFlags(any(CaseData.class), any());
+        verify(caseFlagsService).setupCaseFlags(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void amendRespondentRepresentativeAboutToSubmitDeletesFlagsWhenFinalRepresentationIsRemoved() {
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder()
+                .id(ID_REPRESENTATIVE_1)
+                .value(RepresentedTypeR.builder()
+                        .respondentId(ID_RESPONDENT_1)
+                        .respRepName(RESPONDENT_NAME_1)
+                        .nameOfRepresentative(REPRESENTATIVE_NAME)
+                        .representativeEmailAddress("representative@example.com")
+                        .role(ROLE_SOLICITOR_A)
+                        .build())
+                .build();
+        CaseData previousCaseData = new CaseData();
+        previousCaseData.setRepCollection(List.of(representative));
+        CaseData currentCaseData = new CaseData();
+        currentCaseData.setRepCollection(List.of());
+
+        CallbackRequest callbackRequest = respondentRepresentativeCallback(previousCaseData, currentCaseData);
+        when(featureToggleService.isCaseFlagsV2Enabled(ENGLANDWALES_CASE_TYPE_ID)).thenReturn(true);
+
+        mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_SUBMIT)
+                        .content(jsonMapper.toJson(callbackRequest))
+                        .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(caseFlagsService, never()).clearRespondentRepresentativeFlags(any(CaseData.class), any());
+        verify(caseFlagsService).setupCaseFlags(any(CaseData.class));
     }
 
     @Test
@@ -590,5 +674,28 @@ class RespondentRepresentativeControllerTest {
                         .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    private static CallbackRequest respondentRepresentativeCallback(
+            CaseData previousCaseData, CaseData currentCaseData) {
+        RespondentSumTypeItem respondent1 = new RespondentSumTypeItem();
+        respondent1.setId(ID_RESPONDENT_1);
+        respondent1.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_1).build());
+        RespondentSumTypeItem respondent2 = new RespondentSumTypeItem();
+        respondent2.setId(ID_RESPONDENT_2);
+        respondent2.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_2).build());
+        currentCaseData.setRespondentCollection(List.of(respondent1, respondent2));
+
+        CaseDetails previousCaseDetails = new CaseDetails();
+        previousCaseDetails.setCaseId(DUMMY_SUBMISSION_REFERENCE);
+        previousCaseDetails.setCaseData(previousCaseData);
+        CaseDetails currentCaseDetails = new CaseDetails();
+        currentCaseDetails.setCaseId(DUMMY_SUBMISSION_REFERENCE);
+        currentCaseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
+        currentCaseDetails.setCaseData(currentCaseData);
+        return CallbackRequest.builder()
+                .caseDetailsBefore(previousCaseDetails)
+                .caseDetails(currentCaseDetails)
+                .build();
     }
 }

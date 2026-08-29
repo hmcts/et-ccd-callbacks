@@ -947,7 +947,7 @@ class Et1ReppedControllerTest {
     void submitClaim_caseFlagToggleOn() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(featureToggleService.isEt1DocGenEnabled()).thenReturn(true);
-        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
         when(caseFlagsService.caseFlagsSetupRequired(any())).thenReturn(false);
 
         mockMvc.perform(post(SUBMIT_CLAIM)
@@ -968,7 +968,7 @@ class Et1ReppedControllerTest {
     void submitClaim_caseFlagSetupToggleOn() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(featureToggleService.isEt1DocGenEnabled()).thenReturn(true);
-        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
         when(caseFlagsService.caseFlagsSetupRequired(any())).thenReturn(true);
 
         mockMvc.perform(post(SUBMIT_CLAIM)

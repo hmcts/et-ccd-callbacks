@@ -256,7 +256,7 @@ public class RespondentRepresentativeController {
         // Clears the changeOrganisationRequestField to prevent errors in the existing representative process
         // and to allow further changes to be made
         caseData.setChangeOrganisationRequestField(null);
-        setupCaseFlagsIfRequired(caseData);
+        setupCaseFlagsIfRequired(caseDetails);
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 
@@ -287,12 +287,14 @@ public class RespondentRepresentativeController {
             caseData.getRepCollection().removeAll(caseData.getRepCollectionToRemove());
             caseData.setRepCollectionToRemove(null);
         }
-        setupCaseFlagsIfRequired(caseData);
+        setupCaseFlagsIfRequired(caseDetails);
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 
-    private void setupCaseFlagsIfRequired(CaseData caseData) {
-        if (featureToggleService.isCaseFlagsEnabled() && caseFlagsService.caseFlagsSetupRequired(caseData)) {
+    private void setupCaseFlagsIfRequired(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())
+                && caseFlagsService.caseFlagsSetupRequired(caseData)) {
             caseFlagsService.setupCaseFlags(caseData);
         }
     }
@@ -300,10 +302,31 @@ public class RespondentRepresentativeController {
     private void setupCaseFlagsIfRespondentRepresentativeChanged(CallbackRequest callbackRequest) {
         CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
         List<Integer> changedRepresentativeIndexes = changedRespondentRepresentativeIndexes(callbackRequest);
-        if (featureToggleService.isCaseFlagsEnabled() && CollectionUtils.isNotEmpty(changedRepresentativeIndexes)) {
-            caseFlagsService.clearRespondentRepresentativeFlags(caseData, changedRepresentativeIndexes);
+        boolean representativeRemoved = respondentRepresentativeRemoved(callbackRequest);
+        if (featureToggleService.isCaseFlagsV2Enabled(callbackRequest.getCaseDetails().getCaseTypeId())
+                && (CollectionUtils.isNotEmpty(changedRepresentativeIndexes) || representativeRemoved)) {
+            if (CollectionUtils.isNotEmpty(changedRepresentativeIndexes)) {
+                caseFlagsService.clearRespondentRepresentativeFlags(caseData, changedRepresentativeIndexes);
+            }
             caseFlagsService.setupCaseFlags(caseData);
         }
+    }
+
+    private static boolean respondentRepresentativeRemoved(CallbackRequest callbackRequest) {
+        if (callbackRequest.getCaseDetailsBefore() == null
+                || callbackRequest.getCaseDetailsBefore().getCaseData() == null
+                || CollectionUtils.isEmpty(callbackRequest.getCaseDetailsBefore().getCaseData().getRepCollection())) {
+            return false;
+        }
+
+        List<RepresentedTypeRItem> previousRepresentatives =
+                callbackRequest.getCaseDetailsBefore().getCaseData().getRepCollection();
+        List<RepresentedTypeRItem> currentRepresentatives = callbackRequest.getCaseDetails().getCaseData()
+                .getRepCollection();
+        return previousRepresentatives.stream().anyMatch(previousRepresentative ->
+                CollectionUtils.isEmpty(currentRepresentatives)
+                        || currentRepresentatives.stream().noneMatch(currentRepresentative ->
+                        sameRepresentative(previousRepresentative, currentRepresentative)));
     }
 
     private static List<Integer> changedRespondentRepresentativeIndexes(CallbackRequest callbackRequest) {

@@ -10,6 +10,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.FlagDetailType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -202,6 +203,38 @@ class CaseFlagsServiceTest {
         assertNotNull(allPartyFlags(caseData).getCaseFlags());
         assertNotNull(allPartyFlags(caseData).getClaimantFlags());
         assertNotNull(allPartyFlags(caseData).getClaimantExternalFlags());
+    }
+
+    @Test
+    void setupLegacyCaseFlags_shouldOnlyCreateV1CaseClaimantAndRespondentFlags() {
+        caseFlagsService.setupLegacyCaseFlags(caseData);
+
+        AllPartyFlags flags = allPartyFlags(caseData);
+        assertNotNull(flags.getCaseFlags());
+        assertThat(flags.getClaimantFlags().getPartyName(), is(CLAIMANT_NAME));
+        assertThat(flags.getClaimantFlags().getRoleOnCase(), is(CLAIMANT));
+        assertThat(flags.getRespondentFlags().getPartyName(), is(RESPONDENT_NAME));
+        assertThat(flags.getRespondentFlags().getRoleOnCase(), is("respondent"));
+        assertNull(flags.getClaimantExternalFlags());
+        assertNull(flags.getRespondentExternalFlags());
+        assertNull(flags.getClaimantRepresentativeFlags());
+        assertNull(flags.getRepresentativeFlags());
+        assertFalse(caseFlagsService.legacyCaseFlagsSetupRequired(caseData));
+    }
+
+    @Test
+    void rollbackLegacyCaseFlags_shouldLeaveV2OnlyFieldsUnchanged() {
+        caseFlagsService.setupCaseFlags(caseData);
+        final CaseFlagsType claimantExternalFlags = allPartyFlags(caseData).getClaimantExternalFlags();
+        final CaseFlagsType representativeFlags = allPartyFlags(caseData).getRepresentativeFlags();
+
+        caseFlagsService.rollbackLegacyCaseFlags(caseData);
+
+        assertNull(allPartyFlags(caseData).getCaseFlags());
+        assertNull(allPartyFlags(caseData).getClaimantFlags());
+        assertNull(allPartyFlags(caseData).getRespondentFlags());
+        assertSame(claimantExternalFlags, allPartyFlags(caseData).getClaimantExternalFlags());
+        assertSame(representativeFlags, allPartyFlags(caseData).getRepresentativeFlags());
     }
 
     @Test
@@ -442,6 +475,43 @@ class CaseFlagsServiceTest {
     }
 
     @Test
+    void setupCaseFlags_shouldRetainSharedRepresentativeDetailsUntilFinalRepresentationIsRemoved() {
+        caseData.setRespondentCollection(respondentCollection(2));
+        List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
+        RepresentedTypeRItem respondent1Representative = representativeItemForRespondent(
+                "1", "Shared Representative", "shared@example.com", respondents.get(0), "[SOLICITORA]");
+        RepresentedTypeRItem respondent2Representative = representativeItemForRespondent(
+                "2", "Shared Representative", "shared@example.com", respondents.get(1), "[SOLICITORB]");
+        caseData.setRepCollection(List.of(respondent1Representative, respondent2Representative));
+
+        caseFlagsService.setupCaseFlags(caseData);
+        AllPartyFlags allPartyFlags = allPartyFlags(caseData);
+        allPartyFlags.getRepresentativeFlags().setDetails(
+                ListTypeItem.from(activeFlag("Representative internal flag")));
+        allPartyFlags.getRepresentativeExternalFlags().setDetails(
+                ListTypeItem.from(activeFlag("Representative external flag")));
+
+        caseData.setRepCollection(List.of(respondent2Representative));
+        caseFlagsService.setupCaseFlags(caseData);
+
+        assertAll(
+                () -> assertNull(allPartyFlags.getRepresentativeFlags()),
+                () -> assertEquals("Representative internal flag",
+                        allPartyFlags.getRepresentative1Flags().getDetails().getFirst().getValue().getName()),
+                () -> assertEquals("Representative external flag",
+                        allPartyFlags.getRepresentative1ExternalFlags().getDetails().getFirst().getValue().getName())
+        );
+
+        caseData.setRepCollection(List.of());
+        caseFlagsService.setupCaseFlags(caseData);
+
+        assertAll(
+                () -> assertNull(allPartyFlags.getRepresentative1Flags()),
+                () -> assertNull(allPartyFlags.getRepresentative1ExternalFlags())
+        );
+    }
+
+    @Test
     void setupCaseFlags_shouldCreateSeparateRespondentRepresentativeFlagsForSameNameWithDifferentEmails() {
         String sharedRepresentativeName = "Shared Representative";
         caseData.setRepCollection(List.of(
@@ -633,16 +703,57 @@ class CaseFlagsServiceTest {
     }
 
     @Test
-    void rollbackCaseFlags_shouldSetToNull() {
+    void rollbackCaseFlags_shouldConsolidateV2PartyFlagsAndKeepCaseFlags() {
         caseFlagsService.setupCaseFlags(caseData);
+        AllPartyFlags flags = allPartyFlags(caseData);
+        CaseFlagsType caseFlags = flags.getCaseFlags();
+        caseFlags.setDetails(ListTypeItem.from(activeFlag("Case flag")));
+
+        flags.getClaimantFlags().setDetails(ListTypeItem.from(activeFlag("Claimant internal flag")));
+        flags.getClaimantExternalFlags().setDetails(ListTypeItem.from(activeFlag("Claimant external flag")));
+
+        flags.getRespondentFlags().setDetails(ListTypeItem.from(activeFlag("Respondent 1 internal flag")));
+        flags.getRespondentExternalFlags().setDetails(ListTypeItem.from(activeFlag("Respondent 1 external flag")));
+        flags.getRespondent1Flags().setDetails(ListTypeItem.from(activeFlag("Respondent 2 internal flag")));
+        flags.getRespondent1ExternalFlags().setDetails(ListTypeItem.from(activeFlag("Respondent 2 external flag")));
+        flags.getRespondent2Flags().setDetails(ListTypeItem.from(activeFlag("Respondent 3 internal flag")));
+        flags.getRespondent2ExternalFlags().setDetails(ListTypeItem.from(activeFlag("Respondent 3 external flag")));
+
+        flags.getClaimantRepresentativeFlags().setDetails(
+                ListTypeItem.from(activeFlag("Claimant representative flag")));
+        flags.getRepresentativeFlags().setDetails(ListTypeItem.from(activeFlag("Respondent representative flag")));
+
         caseFlagsService.rollbackCaseFlags(caseData);
 
-        assertThat(allPartyFlags(caseData).getCaseFlags(), is(nullValue()));
-        assertThat(allPartyFlags(caseData).getClaimantFlags(), is(nullValue()));
-        assertThat(allPartyFlags(caseData).getRespondentFlags(), is(nullValue()));
-        assertThat(allPartyFlags(caseData).getClaimantExternalFlags(), is(nullValue()));
-        assertThat(allPartyFlags(caseData).getRespondentExternalFlags(), is(nullValue()));
-        allPartyFlagSlots().forEach(slot -> assertNull(slot.get(caseData), slot + " should be cleared"));
+        assertSame(caseFlags, flags.getCaseFlags());
+        assertEquals(List.of("Case flag"), flagNames(flags.getCaseFlags()));
+        assertEquals(List.of("Claimant internal flag", "Claimant external flag"),
+                flagNames(flags.getClaimantFlags()));
+        assertEquals(CLAIMANT_NAME, flags.getClaimantFlags().getPartyName());
+        assertEquals(CLAIMANT, flags.getClaimantFlags().getRoleOnCase());
+        assertNull(flags.getClaimantFlags().getGroupId());
+        assertNull(flags.getClaimantFlags().getVisibility());
+        assertNull(flags.getClaimantExternalFlags());
+        assertEquals(List.of(
+                "Respondent 1 internal flag",
+                "Respondent 1 external flag",
+                "Respondent 2 internal flag",
+                "Respondent 2 external flag",
+                "Respondent 3 internal flag",
+                "Respondent 3 external flag"), flagNames(flags.getRespondentFlags()));
+        assertEquals(RESPONDENT_NAME, flags.getRespondentFlags().getPartyName());
+        assertEquals("respondent", flags.getRespondentFlags().getRoleOnCase());
+        assertNull(flags.getRespondentFlags().getGroupId());
+        assertNull(flags.getRespondentFlags().getVisibility());
+        assertNull(flags.getRespondentExternalFlags());
+
+        respondentPartyFlagSlots()
+                .filter(slot -> slot.respondentIndex > 0)
+                .forEach(slot -> assertNull(slot.get(caseData), slot + " should be cleared"));
+        assertNull(flags.getClaimantRepresentativeFlags());
+        assertNull(flags.getClaimantRepresentativeExternalFlags());
+        respondentRepresentativePartyFlagSlots()
+                .forEach(slot -> assertNull(slot.get(caseData), slot + " should be cleared"));
     }
 
     @Test
@@ -650,6 +761,34 @@ class CaseFlagsServiceTest {
         caseFlagsService.rollbackCaseFlags(caseData);
 
         assertNull(caseData.getAllPartyFlags());
+    }
+
+    @Test
+    void rollbackCaseFlags_shouldCreateMissingConsolidationSectionsWithoutLosingFlags() {
+        AllPartyFlags flags = AllPartyFlags.builder()
+                .claimantExternalFlags(legacyCaseFlags(activeFlag("Claimant external flag")))
+                .respondent1Flags(legacyCaseFlags(activeFlag("Respondent 2 internal flag")))
+                .respondent1ExternalFlags(legacyCaseFlags(activeFlag("Respondent 2 external flag")))
+                .build();
+        caseData.setAllPartyFlags(flags);
+
+        caseFlagsService.rollbackCaseFlags(caseData);
+
+        assertEquals(List.of("Claimant external flag"), flagNames(flags.getClaimantFlags()));
+        assertEquals(CLAIMANT_NAME, flags.getClaimantFlags().getPartyName());
+        assertEquals(CLAIMANT, flags.getClaimantFlags().getRoleOnCase());
+        assertNull(flags.getClaimantFlags().getGroupId());
+        assertNull(flags.getClaimantFlags().getVisibility());
+        assertEquals(List.of("Respondent 2 internal flag", "Respondent 2 external flag"),
+                flagNames(flags.getRespondentFlags()));
+        assertEquals(RESPONDENT_NAME, flags.getRespondentFlags().getPartyName());
+        assertEquals("respondent", flags.getRespondentFlags().getRoleOnCase());
+        assertNull(flags.getRespondentFlags().getGroupId());
+        assertNull(flags.getRespondentFlags().getVisibility());
+        assertNull(flags.getRespondentExternalFlags());
+        assertNull(flags.getClaimantExternalFlags());
+        assertNull(flags.getRespondent1Flags());
+        assertNull(flags.getRespondent1ExternalFlags());
     }
 
     @Test
@@ -1638,6 +1777,13 @@ class CaseFlagsServiceTest {
 
     private static String firstFlagStatus(CaseFlagsType flags) {
         return flags.getDetails().getFirst().getValue().getStatus();
+    }
+
+    private static List<String> flagNames(CaseFlagsType flags) {
+        return flags.getDetails().stream()
+                .map(GenericTypeItem::getValue)
+                .map(FlagDetailType::getName)
+                .toList();
     }
 
     private static String firstFlagComment(CaseFlagsType flags) {

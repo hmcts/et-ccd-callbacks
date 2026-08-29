@@ -166,10 +166,10 @@ public class CaseActionsForCaseWorkerController {
             }
             defaultValuesReaderService.setPositionAndOffice(caseDetails.getCaseTypeId(), caseData);
 
-            boolean caseFlagsToggle = featureToggleService.isCaseFlagsEnabled();
-            log.info("Caseflags feature flag is {}", caseFlagsToggle);
-            if (caseFlagsToggle && caseFlagsService.caseFlagsSetupRequired(caseData)) {
-                caseFlagsService.setupCaseFlags(caseData);
+            boolean caseFlagsToggle = featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())
+                    || featureToggleService.isCaseFlagsEnabled();
+            if (caseFlagsToggle && caseFlagsSetupRequired(caseDetails.getCaseTypeId(), caseData)) {
+                setupCaseFlags(caseDetails.getCaseTypeId(), caseData);
             }
 
             boolean hmcToggle = featureToggleService.isHmcEnabled();
@@ -343,9 +343,7 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setPublicCaseName(caseData);
         }
 
-        if (featureToggleService.isCaseFlagsEnabled()) {
-            caseFlagsService.setupCaseFlags(caseData);
-        }
+        setupCaseFlags(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
 
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         removeSpacesFromPartyNames(caseData);
@@ -400,9 +398,7 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setPublicCaseName(caseData);
         }
 
-        if (featureToggleService.isCaseFlagsEnabled()) {
-            caseFlagsService.setupCaseFlags(caseData);
-        }
+        setupCaseFlags(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
 
         caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
         removeSpacesFromPartyNames(caseData);
@@ -909,6 +905,20 @@ public class CaseActionsForCaseWorkerController {
 
     private DefaultValues getPostDefaultValues(CaseDetails caseDetails) {
         return defaultValuesReaderService.getDefaultValues(caseDetails.getCaseData().getManagingOffice());
+    }
+
+    private boolean caseFlagsSetupRequired(String caseTypeId, CaseData caseData) {
+        return featureToggleService.isCaseFlagsV2Enabled(caseTypeId)
+                ? caseFlagsService.caseFlagsSetupRequired(caseData)
+                : caseFlagsService.legacyCaseFlagsSetupRequired(caseData);
+    }
+
+    private void setupCaseFlags(String caseTypeId, CaseData caseData) {
+        if (featureToggleService.isCaseFlagsV2Enabled(caseTypeId)) {
+            caseFlagsService.setupCaseFlags(caseData);
+        } else {
+            caseFlagsService.setupLegacyCaseFlags(caseData);
+        }
     }
 
     private void generateEthosCaseReference(CaseData caseData, CCDRequest ccdRequest) {

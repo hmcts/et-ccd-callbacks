@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.et.syaapi.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -10,6 +11,8 @@ import uk.gov.hmcts.ecm.common.launchdarkly.FeatureToggleApi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
 @ExtendWith(MockitoExtension.class)
 class FeatureToggleServiceTest {
@@ -35,10 +38,31 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValueWhenCaseFlagsLinkingIsEnabled(boolean toggleStat) {
+    void shouldReturnCorrectValueWhenEnglandWalesCaseFlagsLinkingIsEnabled(boolean toggleStat) {
+        givenToggle("case-flags-v2-enabled-england-wales", toggleStat);
+
+        assertThat(featureToggleService.isCaseFlagsV2Enabled(ENGLANDWALES_CASE_TYPE_ID)).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValueWhenLegacyCaseFlagsLinkingIsEnabled(boolean toggleStat) {
         givenToggle("case-flags-linking-enabled", toggleStat);
 
         assertThat(featureToggleService.isCaseFlagsEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValueWhenScotlandCaseFlagsLinkingIsEnabled(boolean toggleStat) {
+        givenToggle("case-flags-v2-enabled-scotland", toggleStat);
+
+        assertThat(featureToggleService.isCaseFlagsV2Enabled(SCOTLAND_CASE_TYPE_ID)).isEqualTo(toggleStat);
+    }
+
+    @Test
+    void shouldDisableCaseFlagsForUnknownCaseType() {
+        assertThat(featureToggleService.isCaseFlagsV2Enabled("unknown")).isFalse();
     }
 
     @ParameterizedTest

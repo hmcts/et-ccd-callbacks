@@ -247,7 +247,7 @@ class NocRespondentHelperTest {
     void amendRespondentNameRepresentativeNamesReordersRepresentativesAndRolesWithRespondents() {
         RespondentSumTypeItem amendedRespondent = caseData.getRespondentCollection().get(2);
         amendedRespondent.getValue().setRespondentName(AMENDED_RESP_NAME);
-        nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData);
+        nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData, true);
 
         RepresentedTypeR rep = caseData.getRepCollection().getFirst().getValue();
         assertThat(caseData.getRepCollection().getFirst().getId()).isEqualTo(RESPONDENT_REP_ID_THREE);
@@ -272,11 +272,28 @@ class NocRespondentHelperTest {
     }
 
     @Test
+    void amendRespondentNameRepresentativeNamesRetainsLegacyOrderWhenV2IsDisabled() {
+        List<String> representativeIds = caseData.getRepCollection().stream()
+                .map(RepresentedTypeRItem::getId)
+                .toList();
+        List<String> representativeRoles = caseData.getRepCollection().stream()
+                .map(item -> item.getValue().getRole())
+                .toList();
+
+        nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData, false);
+
+        Assertions.assertThat(caseData.getRepCollection()).extracting(RepresentedTypeRItem::getId)
+                .containsExactlyElementsOf(representativeIds);
+        Assertions.assertThat(caseData.getRepCollection()).extracting(item -> item.getValue().getRole())
+                .containsExactlyElementsOf(representativeRoles);
+    }
+
+    @Test
     void amendRespondentNameRepresentativeNamesIgnoresRepresentativesWithoutRespondentId() {
         caseData.getRespondentCollection().getFirst().setId(null);
         caseData.getRepCollection().getFirst().getValue().setRespondentId(null);
 
-        assertDoesNotThrow(() -> nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData));
+        assertDoesNotThrow(() -> nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData, true));
     }
 
     @Test

@@ -118,6 +118,8 @@ class RespondentRepresentativeControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(caseFlagsService, never()).removeRespondentRepresentativeFlags(any(), any());
     }
 
     @Test
@@ -195,6 +197,8 @@ class RespondentRepresentativeControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(caseFlagsService, times(1)).setupCaseFlags(any(CaseData.class));
+        verify(caseFlagsService).removeRespondentRepresentativeFlags(
+                any(CaseData.class), eq(List.of(representedTypeRItem)));
     }
 
     @Test

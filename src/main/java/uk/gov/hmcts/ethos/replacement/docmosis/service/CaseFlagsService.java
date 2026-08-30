@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -29,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.ACTIVE;
@@ -463,6 +465,108 @@ public class CaseFlagsService {
                 .map(flag -> flag.get(caseData))
                 .filter(Objects::nonNull)
                 .forEach(flags -> flags.setDetails(null));
+    }
+
+    /**
+     * Removes Case Flags for respondent representatives being removed through the respondent self-service flow.
+     * If the same representative still represents another respondent, their flags are moved to that remaining
+     * representative role instead.
+     *
+     * @param caseData case data before the representative collection entries are removed
+     * @param representativesToRemove representative collection entries selected for removal
+     */
+    public void removeRespondentRepresentativeFlags(
+            CaseData caseData, List<RepresentedTypeRItem> representativesToRemove) {
+        if (caseData == null || CollectionUtils.isEmpty(caseData.getRepCollection())
+                || CollectionUtils.isEmpty(representativesToRemove)) {
+            return;
+        }
+
+        List<RepresentedTypeRItem> currentRepresentatives = caseData.getRepCollection();
+        List<RepresentedTypeRItem> remainingRepresentatives = currentRepresentatives.stream()
+                .filter(representative -> representativesToRemove.stream()
+                        .noneMatch(removed -> sameRepresentativeCollectionItem(removed, representative)))
+                .toList();
+
+        for (RepresentedTypeRItem removedRepresentative : representativesToRemove) {
+            int collectionIndex = representativeCollectionIndex(currentRepresentatives, removedRepresentative);
+            if (collectionIndex < 0) {
+                continue;
+            }
+
+            int sourceSlot = representativeFlagSlotIndex(removedRepresentative, collectionIndex);
+            RepresentativeIdentity removedIdentity = representativeIdentity(removedRepresentative.getValue());
+            int targetSlot = remainingRepresentativeFlagSlot(remainingRepresentatives, removedIdentity);
+            moveOrClearRepresentativeFlag(caseData, sourceSlot, targetSlot, INTERNAL);
+            moveOrClearRepresentativeFlag(caseData, sourceSlot, targetSlot, EXTERNAL);
+        }
+    }
+
+    private static int representativeCollectionIndex(
+            List<RepresentedTypeRItem> representatives, RepresentedTypeRItem representative) {
+        return IntStream.range(0, representatives.size())
+                .filter(index -> sameRepresentativeCollectionItem(representatives.get(index), representative))
+                .findFirst()
+                .orElse(-1);
+    }
+
+    private static boolean sameRepresentativeCollectionItem(
+            RepresentedTypeRItem first, RepresentedTypeRItem second) {
+        if (first == null || second == null) {
+            return false;
+        }
+        if (StringUtils.isNotBlank(first.getId()) && StringUtils.isNotBlank(second.getId())) {
+            return Objects.equals(first.getId(), second.getId());
+        }
+        return first == second || Objects.equals(first, second);
+    }
+
+    private static int remainingRepresentativeFlagSlot(
+            List<RepresentedTypeRItem> remainingRepresentatives, RepresentativeIdentity removedIdentity) {
+        if (removedIdentity == null) {
+            return -1;
+        }
+        return IntStream.range(0, remainingRepresentatives.size())
+                .filter(index -> Objects.equals(removedIdentity,
+                        representativeIdentity(remainingRepresentatives.get(index).getValue())))
+                .map(index -> representativeFlagSlotIndex(remainingRepresentatives.get(index), index))
+                .findFirst()
+                .orElse(-1);
+    }
+
+    private static void moveOrClearRepresentativeFlag(
+            CaseData caseData, int sourceSlot, int targetSlot, String visibility) {
+        PartyFlag sourceFlag = respondentRepresentativeFlag(sourceSlot, visibility);
+        if (sourceFlag == null) {
+            return;
+        }
+
+        CaseFlagsType source = sourceFlag.get(caseData);
+        if (source == null || sourceSlot == targetSlot) {
+            return;
+        }
+        if (targetSlot >= 0) {
+            PartyFlag targetFlag = respondentRepresentativeFlag(targetSlot, visibility);
+            if (targetFlag != null) {
+                CaseFlagsType target = targetFlag.get(caseData);
+                if (target == null) {
+                    targetFlag.set(caseData, source);
+                } else if (!Objects.equals(target.getDetails(), source.getDetails())) {
+                    target.setDetails(concatFlagDetails(target.getDetails(), source.getDetails()));
+                }
+            }
+        }
+        sourceFlag.clear(caseData);
+    }
+
+    @Nullable
+    private static PartyFlag respondentRepresentativeFlag(int slot, String visibility) {
+        return PARTY_FLAGS.stream()
+                .filter(flag -> PartyType.RESPONDENT_REPRESENTATIVE.equals(flag.partyType()))
+                .filter(flag -> flag.index() == slot)
+                .filter(flag -> visibility.equals(flag.visibility()))
+                .findFirst()
+                .orElse(null);
     }
 
     public void clearClaimantRepresentativeFlagsIfRepresentativeChanged(CaseData caseData, CaseData caseDataBefore) {

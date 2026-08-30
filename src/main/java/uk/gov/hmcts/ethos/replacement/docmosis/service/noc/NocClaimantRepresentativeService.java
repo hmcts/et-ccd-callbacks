@@ -227,14 +227,14 @@ public class NocClaimantRepresentativeService {
         }
     }
 
-    public void updateClaimantRepAccess(CallbackRequest callbackRequest)
+    public void updateClaimantRepAccess(CallbackRequest callbackRequest, boolean caseFlagsV2Enabled)
             throws IOException {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
         CaseDetails caseDetailsBefore = callbackRequest.getCaseDetailsBefore();
         CaseData caseDataBefore = caseDetailsBefore.getCaseData();
         CaseData caseData = caseDetails.getCaseData();
-        ChangeOrganisationRequest changeRequest = identifyRepresentationChanges(caseData,
-                caseDataBefore);
+        ChangeOrganisationRequest changeRequest = identifyRepresentationChanges(
+                caseData, caseDataBefore, caseFlagsV2Enabled);
         try {
             nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest, true);
         } catch (Exception exception) {
@@ -265,14 +265,16 @@ public class NocClaimantRepresentativeService {
         }
     }
 
-    public ChangeOrganisationRequest identifyRepresentationChanges(CaseData  after, CaseData before) {
+    public ChangeOrganisationRequest identifyRepresentationChanges(
+            CaseData after, CaseData before, boolean caseFlagsV2Enabled) {
         RepresentedTypeC newRep = after.getRepresentativeClaimantType();
         RepresentedTypeC oldRep = before.getRepresentativeClaimantType();
         Organisation newRepOrg = newRep != null ? newRep.getMyHmctsOrganisation() : null;
         Organisation oldRepOrg = oldRep != null ? oldRep.getMyHmctsOrganisation() : null;
         ChangeOrganisationRequest changeRequests;
 
-        if (!Objects.equals(newRepOrg, oldRepOrg) || claimantRepresentativeChanged(newRep, oldRep)) {
+        if (!Objects.equals(newRepOrg, oldRepOrg)
+                || (caseFlagsV2Enabled && claimantRepresentativeChanged(newRep, oldRep))) {
             changeRequests = NocUtils.buildApprovedChangeOrganisationRequest(newRepOrg, oldRepOrg,
                     ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
         } else {

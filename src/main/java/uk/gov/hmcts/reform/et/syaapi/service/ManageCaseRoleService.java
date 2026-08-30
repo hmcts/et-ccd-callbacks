@@ -795,12 +795,10 @@ public class ManageCaseRoleService {
         if (StringUtils.isNotBlank(caseUserRole)) {
             try {
                 revokeCaseUserRole(caseDetails, caseUserRole);
-            } catch (IOException | ManageCaseRoleException e) {
-                log.info(
-                    "No case user role revoked for respondent index: {}, in case with submission reference: {}. "
-                        + "This maybe because respondent representative does not have any organisation defined in "
-                        + "ref data.",
-                    respondentIndex, caseSubmissionReference
+            } catch (IOException e) {
+                throw new ManageCaseRoleException(
+                    "Unable to revoke respondent representative access for respondent index " + respondentIndex,
+                    e
                 );
             }
         }
@@ -966,6 +964,8 @@ public class ManageCaseRoleService {
                                                               startedCaseDetails.getId().toString());
         }
         respondentSumTypeItem.getValue().setRepresentativeRemoved(YES);
+        respondentSumTypeItem.getValue().setRepresented(NO);
+        respondentSumTypeItem.getValue().setRepresentativeId(null);
         RepresentedTypeRItem representativeRItem =
             RespondentUtil.findRespondentRepresentative(respondentSumTypeItem,
                                                         caseData.getRepCollection(),

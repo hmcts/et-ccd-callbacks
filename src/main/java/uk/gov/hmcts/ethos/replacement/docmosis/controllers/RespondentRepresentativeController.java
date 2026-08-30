@@ -284,6 +284,10 @@ public class RespondentRepresentativeController {
         CaseData caseData = caseDetails.getCaseData();
         if (CollectionUtils.isNotEmpty(caseData.getRepCollection())
                 && CollectionUtils.isNotEmpty(caseData.getRepCollectionToRemove())) {
+            if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())) {
+                caseFlagsService.removeRespondentRepresentativeFlags(
+                        caseData, caseData.getRepCollectionToRemove());
+            }
             caseData.getRepCollection().removeAll(caseData.getRepCollectionToRemove());
             caseData.setRepCollectionToRemove(null);
         }

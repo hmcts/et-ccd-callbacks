@@ -65,7 +65,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CCD_API_POST_METHOD_NAME;
@@ -77,6 +82,7 @@ import static uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent.REMOVE_OWN_REP_AS_RE
 import static uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent.UPDATE_CASE_SUBMITTED;
 import static uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent.UPDATE_ET3_FORM;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.DUMMY_AUTHORISATION_TOKEN;
+import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.NO;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_APPLICATION_NAME;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_CASE_ID_LONG;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_CASE_ID_STRING;
@@ -1081,6 +1087,8 @@ class ManageCaseRoleServiceTest {
         CaseDetails caseDetails = new CaseTestData().getCaseDetailsWithCaseData();
         CaseData caseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(caseDetails.getData());
         caseData.getRespondentCollection().getFirst().setId(USER_ID);
+        caseData.getRespondentCollection().getFirst().getValue().setRepresented(YES);
+        caseData.getRespondentCollection().getFirst().getValue().setRepresentativeId("representative-id");
         caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().value(
             RepresentedTypeR.builder().respondentId(USER_ID).build()).build()));
         caseDetails.setData(EmployeeObjectMapper.mapCaseDataToLinkedHashMap(caseData));
@@ -1113,6 +1121,31 @@ class ManageCaseRoleServiceTest {
         CaseDetails updatedCaseDetails = manageCaseRoleService.removeRespondentRepresentativeFromCaseData(
             DUMMY_AUTHORISATION_TOKEN, caseDetails, "0", "[SOLICITORA]");
         assertThat(updatedCaseDetails).isNotNull();
+        CaseData updatedCaseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(caseDetails.getData());
+        assertThat(updatedCaseData.getRespondentCollection().getFirst().getValue().getRepresentativeRemoved())
+            .isEqualTo(YES);
+        assertThat(updatedCaseData.getRespondentCollection().getFirst().getValue().getRepresented()).isEqualTo(NO);
+        assertThat(updatedCaseData.getRespondentCollection().getFirst().getValue().getRepresentativeId()).isNull();
+    }
+
+    @Test
+    void revokeRespondentSolicitorRoleDoesNotRemoveRepresentativeWhenAccessRevocationFails() throws IOException {
+        CaseDetails caseDetails = new CaseTestData().getCaseDetailsWithCaseData();
+        caseDetails.setId(TEST_CASE_ID_LONG);
+        CaseData caseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(caseDetails.getData());
+        caseData.setNoticeOfChangeAnswers0(
+            NoticeOfChangeAnswers.builder().respondentName(TEST_RESPONDENT_ORGANISATION_NAME).build());
+        caseDetails.setData(EmployeeObjectMapper.mapCaseDataToLinkedHashMap(caseData));
+        ManageCaseRoleService service = spy(manageCaseRoleService);
+        doReturn(caseDetails).when(service).getUserCaseByCaseUserRole(
+            DUMMY_AUTHORISATION_TOKEN, TEST_CASE_ID_STRING, CASE_USER_ROLE_DEFENDANT);
+        doThrow(new IOException("CCD unavailable")).when(service)
+            .revokeCaseUserRole(eq(caseDetails), anyString());
+
+        assertThrows(ManageCaseRoleException.class, () -> service.revokeRespondentSolicitorRole(
+            DUMMY_AUTHORISATION_TOKEN, TEST_CASE_ID_STRING, NumberUtils.INTEGER_ZERO.toString()));
+
+        verify(service, never()).removeRespondentRepresentativeFromCaseData(anyString(), any(), anyString(), any());
     }
 
     @Test

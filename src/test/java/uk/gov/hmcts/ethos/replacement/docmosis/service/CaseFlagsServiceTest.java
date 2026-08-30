@@ -540,6 +540,57 @@ class CaseFlagsServiceTest {
     }
 
     @Test
+    void removeRespondentRepresentativeFlags_shouldDeleteOnlyRemovedRepresentativeWithSameName() {
+        caseData.setRespondentCollection(respondentCollection(2));
+        List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
+        RepresentedTypeRItem firstRepresentative = representativeItemForRespondent(
+                "1", "Shared Name", "first@example.com", respondents.get(0), "[SOLICITORA]");
+        RepresentedTypeRItem secondRepresentative = representativeItemForRespondent(
+                "2", "Shared Name", "second@example.com", respondents.get(1), "[SOLICITORB]");
+        caseData.setRepCollection(new ArrayList<>(List.of(firstRepresentative, secondRepresentative)));
+        caseFlagsService.setupCaseFlags(caseData);
+        AllPartyFlags allPartyFlags = allPartyFlags(caseData);
+        allPartyFlags.getRepresentativeFlags().setDetails(ListTypeItem.from(activeFlag("First flag")));
+        allPartyFlags.getRepresentative1Flags().setDetails(ListTypeItem.from(activeFlag("Second flag")));
+
+        caseFlagsService.removeRespondentRepresentativeFlags(caseData, List.of(firstRepresentative));
+        caseData.getRepCollection().remove(firstRepresentative);
+        caseFlagsService.setupCaseFlags(caseData);
+
+        assertAll(
+                () -> assertNull(allPartyFlags.getRepresentativeFlags()),
+                () -> assertEquals("second@example.com",
+                        caseData.getRepCollection().getFirst().getValue().getRepresentativeEmailAddress()),
+                () -> assertEquals("Second flag",
+                        allPartyFlags.getRepresentative1Flags().getDetails().getFirst().getValue().getName())
+        );
+    }
+
+    @Test
+    void removeRespondentRepresentativeFlags_shouldRetainFlagsWhenRepresentativeStillRepresentsAnotherRespondent() {
+        caseData.setRespondentCollection(respondentCollection(2));
+        List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
+        RepresentedTypeRItem firstRepresentation = representativeItemForRespondent(
+                "1", "Shared Representative", "shared@example.com", respondents.get(0), "[SOLICITORA]");
+        RepresentedTypeRItem secondRepresentation = representativeItemForRespondent(
+                "2", "Shared Representative", "shared@example.com", respondents.get(1), "[SOLICITORB]");
+        caseData.setRepCollection(new ArrayList<>(List.of(firstRepresentation, secondRepresentation)));
+        caseFlagsService.setupCaseFlags(caseData);
+        AllPartyFlags allPartyFlags = allPartyFlags(caseData);
+        allPartyFlags.getRepresentativeFlags().setDetails(ListTypeItem.from(activeFlag("Shared flag")));
+
+        caseFlagsService.removeRespondentRepresentativeFlags(caseData, List.of(firstRepresentation));
+        caseData.getRepCollection().remove(firstRepresentation);
+        caseFlagsService.setupCaseFlags(caseData);
+
+        assertAll(
+                () -> assertNull(allPartyFlags.getRepresentativeFlags()),
+                () -> assertEquals("Shared flag",
+                        allPartyFlags.getRepresentative1Flags().getDetails().getFirst().getValue().getName())
+        );
+    }
+
+    @Test
     void caseFlagsSetupRequired_shouldBeTrueWhenCompactedRepresentativeNeedsMovingToRoleAlignedSlot() {
         String representative1Name = "Representative 1";
         String representative2Name = "Representative 2";

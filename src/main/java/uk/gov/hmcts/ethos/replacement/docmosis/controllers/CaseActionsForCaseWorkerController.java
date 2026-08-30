@@ -381,8 +381,12 @@ public class CaseActionsForCaseWorkerController {
         eventValidationService.validateMaximumSize(caseData).ifPresent(errors::add);
         if (errors.isEmpty() && isNotEmpty(caseData.getRepCollection())) {
             //Needed to keep the respondent names in the rep collection sync
-            nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData);
-            caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
+            boolean caseFlagsV2Enabled = featureToggleService.isCaseFlagsV2Enabled(
+                    ccdRequest.getCaseDetails().getCaseTypeId());
+            nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData, caseFlagsV2Enabled);
+            if (caseFlagsV2Enabled) {
+                caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
+            }
         }
 
         if (errors.isEmpty() && isNotEmpty(caseData.getRespondentCollection())) {
@@ -410,6 +414,9 @@ public class CaseActionsForCaseWorkerController {
     public void amendRespondentDetailsSubmitted(
             @RequestBody CallbackRequest callbackRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
+        if (!featureToggleService.isCaseFlagsV2Enabled(callbackRequest.getCaseDetails().getCaseTypeId())) {
+            return;
+        }
         try {
             nocRespondentRepresentativeService.realignRespondentRepresentativeAccess(callbackRequest);
         } catch (RuntimeException exception) {

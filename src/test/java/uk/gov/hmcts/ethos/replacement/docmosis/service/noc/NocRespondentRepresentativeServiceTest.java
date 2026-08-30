@@ -31,6 +31,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.AllPartyFlags;
+import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
@@ -49,6 +51,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
@@ -185,6 +188,8 @@ class NocRespondentRepresentativeServiceTest {
     @MockitoBean
     private AdminUserService adminUserService;
     @MockitoBean
+    private FeatureToggleService featureToggleService;
+    @MockitoBean
     private NocCcdService nocCcdService;
     @MockitoBean
     private NocNotificationService nocNotificationService;
@@ -219,7 +224,8 @@ class NocRespondentRepresentativeServiceTest {
         nocRespondentRepresentativeService =
                 new NocRespondentRepresentativeService(noticeOfChangeFieldPopulator, converter, nocCcdService,
                         adminUserService, nocRespondentHelper, nocNotificationService, ccdClient, organisationClient,
-                        authTokenGenerator, nocService, userIdamService, organisationService, myHmctsService);
+                        authTokenGenerator, nocService, userIdamService, organisationService, myHmctsService,
+                        featureToggleService);
 
         // Respondent
         caseData.setRespondentCollection(new ArrayList<>());
@@ -1498,6 +1504,13 @@ class NocRespondentRepresentativeServiceTest {
         // representative case assignment and return case data.
         tmpCaseData.getRepresentativeClaimantType().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_1);
         tmpCaseData.getRepCollection().getFirst().getValue().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_1);
+        tmpCaseData.setAllPartyFlags(AllPartyFlags.builder()
+                .claimantFlags(CaseFlagsType.builder().build())
+                .claimantExternalFlags(CaseFlagsType.builder().build())
+                .claimantRepresentativeFlags(CaseFlagsType.builder().build())
+                .claimantRepresentativeExternalFlags(CaseFlagsType.builder().build())
+                .build());
+        when(featureToggleService.isCaseFlagsV2Enabled(CASE_TYPE_ID_ENGLAND_WALES)).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         doNothing().when(nocCcdService).revokeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
         assertThat(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails))
@@ -1507,6 +1520,10 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(tmpCaseData.getClaimantRepresentedQuestion()).isEqualTo(NO);
         assertThat(tmpCaseData.getClaimantRepresentativeRemoved()).isEqualTo(YES);
         assertThat(tmpCaseData.getRepresentativeClaimantType()).isNull();
+        assertThat(tmpCaseData.getAllPartyFlags().getClaimantRepresentativeFlags()).isNull();
+        assertThat(tmpCaseData.getAllPartyFlags().getClaimantRepresentativeExternalFlags()).isNull();
+        assertThat(tmpCaseData.getAllPartyFlags().getClaimantFlags()).isNotNull();
+        assertThat(tmpCaseData.getAllPartyFlags().getClaimantExternalFlags()).isNotNull();
         OrganisationPolicy tmpClaimantOrganisationPolicy = OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
                 ROLE_CLAIMANT_SOLICITOR).build();
         assertThat(tmpCaseData.getClaimantRepresentativeOrganisationPolicy()).isEqualTo(tmpClaimantOrganisationPolicy);

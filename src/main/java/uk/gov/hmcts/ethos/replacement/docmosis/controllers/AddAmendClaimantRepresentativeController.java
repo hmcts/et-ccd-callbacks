@@ -114,13 +114,15 @@ public class AddAmendClaimantRepresentativeController {
             errors.add(error);
         }
         CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
+        boolean caseFlagsV2Enabled = featureToggleService.isCaseFlagsV2Enabled(
+                callbackRequest.getCaseDetails().getCaseTypeId());
         if (errors.isEmpty()) {
-            ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData);
+            ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData, caseFlagsV2Enabled);
             nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(
                     callbackRequest.getCaseDetails());
         }
 
-        if (featureToggleService.isCaseFlagsV2Enabled(callbackRequest.getCaseDetails().getCaseTypeId())) {
+        if (caseFlagsV2Enabled) {
             caseFlagsService.clearClaimantRepresentativeFlagsIfRepresentativeChanged(caseData,
                     callbackRequest.getCaseDetailsBefore() == null
                             ? null
@@ -144,7 +146,8 @@ public class AddAmendClaimantRepresentativeController {
         log.info("AMEND CLAIMANT REPRESENTATIVE SUBMITTED ---> " + LOG_MESSAGE + "{}",
                 callbackRequest.getCaseDetails().getCaseId());
         try {
-            nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest);
+            nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest,
+                    featureToggleService.isCaseFlagsV2Enabled(callbackRequest.getCaseDetails().getCaseTypeId()));
         } catch (IOException e) {
             throw new CcdInputOutputException("Failed to update claimant representatives access", e);
         }

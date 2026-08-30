@@ -38,6 +38,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.MyHmctsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
@@ -106,6 +107,7 @@ public class NocRespondentRepresentativeService {
     private final UserIdamService userIdamService;
     private final OrganisationService organisationService;
     private final MyHmctsService myHmctsService;
+    private final FeatureToggleService featureToggleService;
 
     private static final String CLASS_NAME = NocRespondentRepresentativeService.class.getSimpleName();
 
@@ -1202,7 +1204,8 @@ public class NocRespondentRepresentativeService {
         }
         final String adminUserToken = adminUserService.getAdminUserToken();
         nocCcdService.revokeClaimantRepresentation(adminUserToken, caseDetails);
-        ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseDetails.getCaseData());
+        ClaimantRepresentativeUtils.markClaimantAsUnrepresented(
+                caseDetails.getCaseData(), featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId()));
         return caseDetails.getCaseData();
     }
 

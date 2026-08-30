@@ -179,7 +179,12 @@ public class NocRespondentHelper {
         respondent.getValue().setRepresentativeId(null);
     }
 
-    public void amendRespondentNameRepresentativeNames(CaseData caseData) {
+    public void amendRespondentNameRepresentativeNames(CaseData caseData, boolean caseFlagsV2Enabled) {
+        if (!caseFlagsV2Enabled) {
+            amendRespondentNameRepresentativeNamesLegacy(caseData);
+            return;
+        }
+
         List<RepresentedTypeRItem> representatives = emptyIfNull(caseData.getRepCollection());
         List<RespondentSumTypeItem> respondents = emptyIfNull(caseData.getRespondentCollection());
         List<RepresentedTypeRItem> alignedRepCollection = new ArrayList<>();
@@ -202,6 +207,20 @@ public class NocRespondentHelper {
 
         alignedRepCollection.addAll(unmatchedRepresentatives);
         caseData.setRepCollection(alignedRepCollection);
+    }
+
+    private void amendRespondentNameRepresentativeNamesLegacy(CaseData caseData) {
+        List<RepresentedTypeRItem> repCollection = new ArrayList<>();
+        for (RepresentedTypeRItem respondentRep : emptyIfNull(caseData.getRepCollection())) {
+            Optional<RespondentSumTypeItem> matchedRespondent = emptyIfNull(caseData.getRespondentCollection()).stream()
+                    .filter(respondent -> respondent.getId().equals(respondentRep.getValue().getRespondentId()))
+                    .findFirst();
+
+            matchedRespondent.ifPresent(respondent -> updateRepWithRespondentDetails(
+                    respondent, respondentRep, caseData.getRespondentCollection()));
+            repCollection.add(respondentRep);
+        }
+        caseData.setRepCollection(repCollection);
     }
 
     private Optional<RepresentedTypeRItem> findRepresentativeByRespondentId(

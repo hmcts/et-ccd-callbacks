@@ -65,6 +65,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -426,7 +427,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any(CaseData.class));
+        doNothing().when(nocRespondentHelper)
+                .amendRespondentNameRepresentativeNames(any(CaseData.class), eq(false));
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                         .content(requestContent2.toString())
                         .header(AUTHORIZATION, AUTH_TOKEN)
@@ -438,8 +440,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
         verify(caseFlagsService, times(0)).setupCaseFlags(any(CaseData.class));
         verify(caseFlagsService).setupLegacyCaseFlags(any(CaseData.class));
-        verify(nocRespondentHelper, times(1)).amendRespondentNameRepresentativeNames(any(CaseData.class));
-        verify(nocRespondentRepresentativeService, times(1))
+        verify(nocRespondentHelper, times(1))
+                .amendRespondentNameRepresentativeNames(any(CaseData.class), eq(false));
+        verify(nocRespondentRepresentativeService, never())
                 .prepopulateOrgPolicyAndNoc(any(CaseData.class));
     }
 
@@ -450,7 +453,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
-        doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any(CaseData.class));
+        doNothing().when(nocRespondentHelper)
+                .amendRespondentNameRepresentativeNames(any(CaseData.class), eq(true));
 
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                         .content(requestContent2.toString())
@@ -483,7 +487,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(nocRespondentHelper, times(0)).amendRespondentNameRepresentativeNames(any(CaseData.class));
+        verify(nocRespondentHelper, times(0))
+                .amendRespondentNameRepresentativeNames(any(CaseData.class), anyBoolean());
         verify(nocRespondentRepresentativeService, never()).prepopulateOrgPolicyAndNoc(any(CaseData.class));
     }
 
@@ -505,7 +510,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(nocRespondentHelper, times(0)).amendRespondentNameRepresentativeNames(any(CaseData.class));
+        verify(nocRespondentHelper, times(0))
+                .amendRespondentNameRepresentativeNames(any(CaseData.class), anyBoolean());
         verify(nocRespondentRepresentativeService, never()).prepopulateOrgPolicyAndNoc(any(CaseData.class));
     }
 
@@ -515,7 +521,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any(CaseData.class));
+        doNothing().when(nocRespondentHelper)
+                .amendRespondentNameRepresentativeNames(any(CaseData.class), anyBoolean());
 
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
 
@@ -540,7 +547,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
             .thenReturn(ccdRequest.getCaseDetails().getCaseData());
-        doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any(CaseData.class));
+        doNothing().when(nocRespondentHelper)
+                .amendRespondentNameRepresentativeNames(any(CaseData.class), anyBoolean());
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -562,6 +570,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .caseDetails(ccdRequest.getCaseDetails())
                 .build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
 
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_SUBMITTED_URL)
                         .content(jsonMapper.toJson(callbackRequest))
@@ -570,6 +579,24 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isOk());
 
         verify(nocRespondentRepresentativeService)
+                .realignRespondentRepresentativeAccess(any(CallbackRequest.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void amendRespondentDetailsSubmittedDoesNotRealignRepresentativeAccessWhenV2IsDisabled() {
+        CallbackRequest callbackRequest = CallbackRequest.builder()
+                .caseDetails(ccdRequest.getCaseDetails())
+                .build();
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mvc.perform(post(AMEND_RESPONDENT_DETAILS_SUBMITTED_URL)
+                        .content(jsonMapper.toJson(callbackRequest))
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(nocRespondentRepresentativeService, never())
                 .realignRespondentRepresentativeAccess(any(CallbackRequest.class));
     }
 

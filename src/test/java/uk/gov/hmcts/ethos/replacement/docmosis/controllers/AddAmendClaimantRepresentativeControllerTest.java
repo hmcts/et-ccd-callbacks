@@ -35,6 +35,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -173,7 +174,7 @@ class AddAmendClaimantRepresentativeControllerTest {
                 .andExpect(jsonPath("$.warnings", nullValue()));
 
         verify(nocClaimantRepresentativeService, times(1))
-                .updateClaimantRepAccess(any());
+                .updateClaimantRepAccess(any(), eq(false));
         verify(caseFlagsService, never()).setupCaseFlags(any());
     }
 
@@ -193,7 +194,7 @@ class AddAmendClaimantRepresentativeControllerTest {
                 .andExpect(jsonPath("$.warnings", nullValue()));
 
         verify(nocClaimantRepresentativeService, times(1))
-                .updateClaimantRepAccess(any());
+                .updateClaimantRepAccess(any(), eq(true));
         verify(caseFlagsService, never()).setupCaseFlags(any());
     }
 

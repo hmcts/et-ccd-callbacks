@@ -232,16 +232,6 @@ public class CaseFlagsService {
      * the v2.1 internal and external sections.
      *
      * @param caseData Data about the current case
-     */
-    public void migrateExistingClaimantAndRespondentCaseFlags(CaseData caseData) {
-        migrateExistingClaimantAndRespondentCaseFlags(caseData, Map.of());
-    }
-
-    /**
-     * Migrates existing claimant and respondent case flags from the v1.0 fields into
-     * the v2.1 internal and external sections.
-     *
-     * @param caseData Data about the current case
      * @param referenceDataVisibilityByFlagCodeOrName flag visibility from reference data, keyed by flag code or name
      */
     public void migrateExistingClaimantAndRespondentCaseFlags(
@@ -269,11 +259,11 @@ public class CaseFlagsService {
         }
 
         PartyFlag claimantInternal = partyFlag(PartyType.CLAIMANT, INTERNAL, NOT_INDEXED);
-        consolidateFlagDetails(caseData, claimantInternal, partyFlags(PartyType.CLAIMANT, null));
+        consolidateFlagDetails(caseData, claimantInternal, partyFlags(PartyType.CLAIMANT));
         partyFlag(PartyType.CLAIMANT, EXTERNAL, NOT_INDEXED).clear(caseData);
 
         PartyFlag firstRespondentInternal = partyFlag(PartyType.RESPONDENT, INTERNAL, 0);
-        consolidateFlagDetails(caseData, firstRespondentInternal, partyFlags(PartyType.RESPONDENT, null));
+        consolidateFlagDetails(caseData, firstRespondentInternal, partyFlags(PartyType.RESPONDENT));
 
         PARTY_FLAGS.stream()
                 .filter(flag -> PartyType.RESPONDENT.equals(flag.partyType()))
@@ -322,10 +312,9 @@ public class CaseFlagsService {
                         .orElse(null));
     }
 
-    private static List<PartyFlag> partyFlags(PartyType partyType, @Nullable String visibility) {
+    private static List<PartyFlag> partyFlags(PartyType partyType) {
         return PARTY_FLAGS.stream()
                 .filter(flag -> partyType.equals(flag.partyType()))
-                .filter(flag -> visibility == null || visibility.equals(flag.visibility()))
                 .toList();
     }
 
@@ -832,7 +821,6 @@ public class CaseFlagsService {
                 .orElseThrow();
     }
 
-    @SafeVarargs
     private static List<GenericTypeItem<FlagDetailType>> existingDetails(CaseFlagsType...flags) {
         List<GenericTypeItem<FlagDetailType>> details = new ArrayList<>();
         for (CaseFlagsType flagsType : flags) {

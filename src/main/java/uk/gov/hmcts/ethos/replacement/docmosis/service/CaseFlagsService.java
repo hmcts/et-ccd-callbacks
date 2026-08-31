@@ -246,6 +246,7 @@ public class CaseFlagsService {
         List<ExistingPartyFlagDetails> existingFlagDetails = currentClaimantAndRespondentFlagDetails(caseData);
         setupCaseFlags(caseData);
         existingFlagDetails.forEach(details -> migrateExistingFlagDetails(caseData, details, referenceDataVisibility));
+        processNewlySetCaseFlags(caseData);
     }
 
     /**

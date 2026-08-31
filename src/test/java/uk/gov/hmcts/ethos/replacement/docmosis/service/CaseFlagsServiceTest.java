@@ -279,6 +279,26 @@ class CaseFlagsServiceTest {
     }
 
     @Test
+    void migrateExistingClaimantAndRespondentCaseFlags_shouldRecalculateDependentIndicators() {
+        FlagDetailType interpreterFlag = flagDetail(LANGUAGE_INTERPRETER, ACTIVE, NO);
+        FlagDetailType securityFlag = flagDetail(DISRUPTIVE_CUSTOMER, ACTIVE, YES);
+        AllPartyFlags allPartyFlags = getOrCreateAllPartyFlags(caseData);
+        allPartyFlags.setClaimantFlags(legacyCaseFlags(interpreterFlag));
+        allPartyFlags.setRespondentFlags(legacyCaseFlags(securityFlag));
+
+        caseFlagsService.migrateExistingClaimantAndRespondentCaseFlags(
+                caseData,
+                Map.of(
+                        LANGUAGE_INTERPRETER, INTERNAL,
+                        DISRUPTIVE_CUSTOMER, EXTERNAL
+                )
+        );
+
+        assertEquals(YES, caseData.getCaseInterpreterRequiredFlag());
+        assertEquals(YES, caseData.getCaseAdditionalSecurityFlag());
+    }
+
+    @Test
     void migrateExistingClaimantAndRespondentCaseFlags_shouldKeepFlagsMissingFromReferenceDataInternal() {
         FlagDetailType claimantFlagMissingFromReferenceData = flagDetail("Missing claimant flag", ACTIVE, YES);
         FlagDetailType respondentFlagMissingFromReferenceData = flagDetail("Missing respondent flag", ACTIVE, YES);

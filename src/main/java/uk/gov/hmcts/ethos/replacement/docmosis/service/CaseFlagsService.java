@@ -518,7 +518,7 @@ public class CaseFlagsService {
         if (StringUtils.isNotBlank(first.getId()) && StringUtils.isNotBlank(second.getId())) {
             return Objects.equals(first.getId(), second.getId());
         }
-        return first == second || Objects.equals(first, second);
+        return Objects.equals(first, second);
     }
 
     private static int remainingRepresentativeFlagSlot(

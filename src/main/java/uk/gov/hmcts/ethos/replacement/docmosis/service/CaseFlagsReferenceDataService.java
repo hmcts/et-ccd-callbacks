@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseflags.CaseFlagReferenceDataDetail;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseflags.CaseFlagReferenceDataGroup;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseflags.CaseFlagReferenceDataResponse;
-import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.rdcommondata.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.util.HashMap;
@@ -21,8 +21,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.INTERNAL;
 @Service
 public class CaseFlagsReferenceDataService {
     private static final String PARTY_FLAG_TYPE = "PARTY";
-    private static final String WELSH_REQUIRED = "Y";
-    private static final String AVAILABLE_EXTERNAL_FLAG = "N";
 
     private final OrganisationClient organisationClient;
     private final AuthTokenGenerator authTokenGenerator;
@@ -42,9 +40,7 @@ public class CaseFlagsReferenceDataService {
                 userToken,
                 authTokenGenerator.generate(),
                 hmctsServiceId,
-                PARTY_FLAG_TYPE,
-                WELSH_REQUIRED,
-                AVAILABLE_EXTERNAL_FLAG
+                PARTY_FLAG_TYPE
         );
 
         return visibilityByFlagCodeOrName(response);

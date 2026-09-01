@@ -11,13 +11,12 @@ import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationUsersResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseflags.CaseFlagReferenceDataResponse;
 
 import java.util.List;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi.SERVICE_AUTHORIZATION;
 
-@FeignClient(name = "organisation-client", url = "${rd_professional-api-url}")
+@FeignClient(name = "professional-organisation-client", url = "${rd_professional-api-url}")
 public interface OrganisationClient {
 
     @GetMapping(
@@ -71,20 +70,6 @@ public interface OrganisationClient {
             @RequestHeader(AUTHORIZATION) String authorisation,
             @RequestHeader(SERVICE_AUTHORIZATION) String s2sToken,
             @RequestParam("email") String email
-    );
-
-    @GetMapping(
-            value = "/refdata/commondata/caseflags/service-id={serviceId}",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    CaseFlagReferenceDataResponse getCaseFlags(
-            @RequestHeader(AUTHORIZATION) String authorisation,
-            @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
-            @PathVariable("serviceId") String serviceId,
-            @RequestParam("flag-type") String flagType,
-            @RequestParam("welsh-required") String welshRequired,
-            @RequestParam("available-external-flag") String availableExternalFlag
     );
 
 }

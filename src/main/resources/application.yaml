@@ -131,6 +131,7 @@ case_document_am:
   max_retries: ${CASE_DOCUMENT_AM_MAX_RETRIES:3}
 
 rd_professional-api-url: ${RD_PROFESSIONAL_API_URL:http://localhost:4507}
+rd_commondata-api-url: ${RD_COMMONDATA_API_URL:http://localhost:4507}
 
 feature:
   secure-doc-store:

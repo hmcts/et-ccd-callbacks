@@ -184,6 +184,8 @@
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.springframework/spring-.*@6\.2\.19$</packageUrl>
         <cve>CVE-2026-59313</cve>
+    </suppress>
+    <suppress>
         <cve>CVE-2026-59314</cve>
     </suppress>
 </suppressions>

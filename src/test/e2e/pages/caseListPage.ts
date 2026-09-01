@@ -11,6 +11,7 @@ export default class CaseListPage extends BasePage {
   private readonly createCaseLink: string = 'Create case';
   private readonly jurisdictionDropdownLR: Locator;
   private readonly casetypeDropdownLR: Locator;
+  private readonly createDraftClaimButton: Locator;
   private readonly eventLR: Locator;
   private readonly venueDropdown: Locator;
   private readonly causeListText: Locator;
@@ -28,6 +29,7 @@ export default class CaseListPage extends BasePage {
     this.applyButton = page.locator('//button[@class="button workbasket-filters-apply"]');
     this.jurisdictionDropdownLR = page.locator('#cc-jurisdiction');
     this.casetypeDropdownLR = page.locator('#cc-case-type');
+    this.createDraftClaimButton = this.page.getByRole('button', { name: 'Create draft claim' });
     this.eventLR = page.locator('#cc-event');
     this.venueDropdown = page.locator('#listingVenue');
     this.causeListText = page.locator('//div[@class="alert-message"]');
@@ -125,7 +127,7 @@ export default class CaseListPage extends BasePage {
     await this.page.getByRole('button', { name: 'Start' }).click();
 
     await this.enterPostCode(postcode);
-    await this.clickSubmitButton();
+    await this.createDraftClaimButton.click();
     await this.page.waitForLoadState('load', {timeout: 3000});
   }
 

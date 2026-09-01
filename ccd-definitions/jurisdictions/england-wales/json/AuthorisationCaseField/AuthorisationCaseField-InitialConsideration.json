@@ -2305,19 +2305,5 @@
         "CRUD": "CRUD"
       }
     ]
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "etICUnfairDismissalEra",
-    "AccessControl": [
-      {
-        "UserRoles": [
-          "caseworker-employment-englandwales",
-          "caseworker-employment-etjudge-englandwales",
-          "caseworker-employment-api"
-        ],
-        "CRUD": "CRUD"
-      }
-    ]
   }
 ]

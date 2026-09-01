@@ -1945,19 +1945,5 @@
         "CRUD": "CRUD"
       }
     ]
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "etICUnfairDismissalEra",
-    "AccessControl": [
-      {
-        "UserRoles": [
-          "caseworker-employment-scotland",
-          "caseworker-employment-etjudge-scotland",
-          "caseworker-employment-api"
-        ],
-        "CRUD": "CRUD"
-      }
-    ]
   }
 ]

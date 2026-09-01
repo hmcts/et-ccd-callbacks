@@ -77,6 +77,10 @@ dependencies:
     version: ~0.0.25
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: rd-professional-api.enabled
+  - name: rd-commondata-api
+    version: ~0.0.21
+    repository: 'oci://hmctsprod.azurecr.io/helm'
+    condition: rd-commondata-api.enabled
   - name: rd-user-profile-api
     version: ~0.0.28
     repository: 'oci://hmctsprod.azurecr.io/helm'

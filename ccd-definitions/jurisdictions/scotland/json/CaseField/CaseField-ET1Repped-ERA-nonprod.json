@@ -1,0 +1,10 @@
+[
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "et1SectionThreeDateOfLastEvent",
+    "Label": "What is the date of the most recent event complained about?",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

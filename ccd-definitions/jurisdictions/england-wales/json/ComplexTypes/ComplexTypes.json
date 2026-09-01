@@ -541,14 +541,6 @@
     "Searchable": "N"
   },
   {
-    "ID": "EmploymentDetails",
-    "ListElementCode": "dateOfLastEvent",
-    "FieldType": "Date",
-    "ElementLabel": "Date of last event",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
     "ID": "NewEmploymentDetails",
     "ListElementCode": "new_job",
     "FieldType": "YesOrNo",

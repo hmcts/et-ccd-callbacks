@@ -986,7 +986,7 @@
   {
     "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "claimantExternalFlags",
-    "UserRole": "citizen",
-    "CRUD": "R"
+    "UserRole": "[CREATOR]",
+    "CRUD": "CRU"
   }
 ]

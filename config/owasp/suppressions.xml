@@ -144,8 +144,6 @@
         <cve>CVE-2026-54513</cve>
         <cve>CVE-2026-54514</cve>
         <cve>CVE-2026-54515</cve>
-        <cve>CVE-2026-59313</cve>
-        <cve>CVE-2026-59314</cve>
     </suppress>
     <!-- spring-cloud-azure 6.4.0 is pinned by com.github.hmcts:ccd-servicebus-support:6.29.0 via the
          hmcts.ccd.sdk plugin. No 6.x release of spring-cloud-azure exists on Maven Central, so the
@@ -171,5 +169,9 @@
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.azure\.spring/spring-cloud-azure-service@.*$</packageUrl>
         <cpe>cpe:/a:service_project:service</cpe>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-59313</cve>
+        <cve>CVE-2026-59314</cve>
     </suppress>
 </suppressions>

@@ -170,7 +170,7 @@
         <packageUrl regex="true">^pkg:maven/com\.azure\.spring/spring-cloud-azure-service@.*$</packageUrl>
         <cpe>cpe:/a:service_project:service</cpe>
     </suppress>
-    <suppress>
+        <suppress>
         <cve>CVE-2026-59313</cve>
     </suppress>
     <suppress>

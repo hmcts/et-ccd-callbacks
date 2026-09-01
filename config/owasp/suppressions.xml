@@ -170,4 +170,20 @@
         <packageUrl regex="true">^pkg:maven/com\.azure\.spring/spring-cloud-azure-service@.*$</packageUrl>
         <cpe>cpe:/a:service_project:service</cpe>
     </suppress>
+    <!-- CVE-2026-59313 / CVE-2026-59314: last OSS Spring Framework on Boot 3.5 is 6.2.19.
+         6.2.20 is Broadcom enterprise-only (not on Maven Central). OSS fix is 7.0.9, which
+         requires Spring Boot 4. This service does not use MVC functional SSE or
+         Content-Disposition from untrusted input. -->
+    <suppress until="2026-12-01">
+        <notes><![CDATA[
+   file name: spring-*-6.2.19.jar
+   CVE-2026-59313 requires RouterFunction + ServerResponse.sse() with attacker-controlled
+   plain-text SSE (not used). CVE-2026-59314 requires Content-Disposition from untrusted
+   filenames; this service does not set that header, and Tomcat rejects CRLF in headers.
+   Suppressed until Spring Boot 4 / Spring Framework 7.0.9+ can be adopted.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework/spring-.*@6\.2\.19$</packageUrl>
+        <cve>CVE-2026-59313</cve>
+        <cve>CVE-2026-59314</cve>
+    </suppress>
 </suppressions>

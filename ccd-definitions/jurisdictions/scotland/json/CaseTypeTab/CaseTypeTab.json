@@ -233,13 +233,6 @@
     "CaseTypeID": "ET_Scotland",
     "Channel": "CaseWorker",
     "TabID": "Et1Vetting",
-    "CaseFieldID": "et1VettingEra",
-    "TabFieldDisplayOrder": 20
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
-    "Channel": "CaseWorker",
-    "TabID": "Et1Vetting",
     "CaseFieldID": "substantiveDefectsList",
     "TabFieldDisplayOrder": 20
   },
@@ -804,13 +797,6 @@
     "CaseFieldID": "etICInvalidDetails",
     "TabFieldDisplayOrder": 3,
     "FieldShowCondition": "etICJuridictionCodesInvalid=\"Yes\""
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
-    "Channel": "CaseWorker",
-    "TabID": "initialConsideration",
-    "CaseFieldID": "etICUnfairDismissalEra",
-    "TabFieldDisplayOrder": 4
   },
   {
     "CaseTypeID": "ET_Scotland",

@@ -2448,35 +2448,6 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "et1Vetting",
-    "CaseFieldID": "et1VettingEraAssessmentMarkUp",
-    "DisplayContext": "READONLY",
-    "PageID": 3,
-    "PageDisplayOrder": 3,
-    "PageFieldDisplayOrder": 27,
-    "FieldShowCondition": "et1VettingEraAssessmentMarkUpLabel =\"dummy\""
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "et1Vetting",
-    "CaseFieldID": "et1VettingEraAssessmentMarkUpLabel",
-    "DisplayContext": "READONLY",
-    "PageID": 3,
-    "PageDisplayOrder": 3,
-    "PageFieldDisplayOrder": 28
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "et1Vetting",
-    "CaseFieldID": "et1VettingEra",
-    "DisplayContext": "MANDATORY",
-    "PageID": 3,
-    "PageDisplayOrder": 3,
-    "PageFieldDisplayOrder": 29,
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "et1Vetting",
     "CaseFieldID": "et1VettingAcasCertGeneralNote",
     "DisplayContext": "OPTIONAL",
     "PageID": 3,
@@ -4581,68 +4552,6 @@
     "PageID": 7,
     "PageDisplayOrder": 7,
     "PageFieldDisplayOrder": 3,
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "et3Response",
-    "CaseFieldID": "et3ResponseHearingPanelPreamble",
-    "DisplayContext": "READONLY",
-    "PageID": 8,
-    "PageDisplayOrder": 8,
-    "PageFieldDisplayOrder": 1,
-    "PageLabel": "Hearing panel preference"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "et3Response",
-    "CaseFieldID": "et3ResponseHearingPanelInset1",
-    "DisplayContext": "READONLY",
-    "PageID": 8,
-    "PageDisplayOrder": 8,
-    "PageFieldDisplayOrder": 2,
-    "PageLabel": "Hearing panel preference"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "et3Response",
-    "CaseFieldID": "et3ResponseHearingPanelInset2",
-    "DisplayContext": "READONLY",
-    "PageID": 8,
-    "PageDisplayOrder": 8,
-    "PageFieldDisplayOrder": 3,
-    "PageLabel": "Hearing panel preference"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "et3Response",
-    "CaseFieldID": "et3ResponseHearingPanelMainBody",
-    "DisplayContext": "READONLY",
-    "PageID": 8,
-    "PageDisplayOrder": 8,
-    "PageFieldDisplayOrder": 4,
-    "PageLabel": "Hearing panel preference"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "et3Response",
-    "CaseFieldID": "et3ResponseHearingPanelPreference",
-    "DisplayContext": "OPTIONAL",
-    "PageID": 8,
-    "PageDisplayOrder": 8,
-    "PageFieldDisplayOrder": 5,
-    "PageLabel": "Hearing panel preference"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "et3Response",
-    "CaseFieldID": "et3HearingPanelPreferenceReason",
-    "DisplayContext": "MANDATORY",
-    "PageID": 8,
-    "PageDisplayOrder": 8,
-    "PageFieldDisplayOrder": 6,
-    "FieldShowCondition": "et3ResponseHearingPanelPreference=\"Judge\" OR et3ResponseHearingPanelPreference=\"Panel\"",
-    "RetainHiddenValue": "Yes",
     "ShowSummaryChangeOption": "Y"
   },
   {

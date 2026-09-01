@@ -6,5 +6,23 @@
     "FieldType": "Date",
     "SecurityClassification": "Public",
     "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "claimantHearingPanelPreference",
+    "Label": "How do you prefer your case heard?",
+    "FieldType": "FixedRadioList",
+    "SecurityClassification": "Public",
+    "FieldTypeParameter": "fl_hearing_panel_preference_long",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "claimantHearingPanelPreferenceWhy",
+    "Label": "Give reason",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Max": 500,
+    "Searchable": "N"
   }
 ]

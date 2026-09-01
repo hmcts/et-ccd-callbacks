@@ -233,13 +233,6 @@
     "CaseTypeID": "ET_EnglandWales",
     "Channel": "CaseWorker",
     "TabID": "Et1Vetting",
-    "CaseFieldID": "et1VettingEra",
-    "TabFieldDisplayOrder": 20
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "Channel": "CaseWorker",
-    "TabID": "Et1Vetting",
     "CaseFieldID": "substantiveDefectsList",
     "TabFieldDisplayOrder": 20
   },

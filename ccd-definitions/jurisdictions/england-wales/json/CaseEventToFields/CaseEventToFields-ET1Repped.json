@@ -16,12 +16,6 @@
   {"CaseTypeID": "ET_EnglandWales", "CaseEventID": "et1SectionOne", "CaseFieldID": "claimantAttendHearing", "DisplayContext": "OPTIONAL", "PageID": 5, "PageDisplayOrder": 5, "PageFieldDisplayOrder": 4, "ShowSummaryChangeOption": "Y"},
   {"CaseTypeID": "ET_EnglandWales", "CaseEventID": "et1SectionOne", "CaseFieldID": "claimantHearingContactLanguage", "DisplayContext": "OPTIONAL", "PageID": 5, "PageDisplayOrder": 5, "PageFieldDisplayOrder": 5, "ShowSummaryChangeOption": "Y"},
 
-  {"CaseTypeID": "ET_EnglandWales", "CaseEventID": "et1SectionOne", "CaseFieldID": "et3ResponseHearingPanelPreamble", "DisplayContext": "READONLY", "PageID": 6, "PageDisplayOrder": 6, "PageFieldDisplayOrder": 1, "PageLabel": "Preference for judge or panel"},
-  {"CaseTypeID": "ET_EnglandWales", "CaseEventID": "et1SectionOne", "CaseFieldID": "et3ResponseHearingPanelInset1", "DisplayContext": "READONLY", "PageID": 6, "PageDisplayOrder": 6, "PageFieldDisplayOrder": 2},
-  {"CaseTypeID": "ET_EnglandWales", "CaseEventID": "et1SectionOne", "CaseFieldID": "et3ResponseHearingPanelInset2", "DisplayContext": "READONLY", "PageID": 6, "PageDisplayOrder": 6, "PageFieldDisplayOrder": 3},
-  {"CaseTypeID": "ET_EnglandWales", "CaseEventID": "et1SectionOne", "CaseFieldID": "et3ResponseHearingPanelMainBody", "DisplayContext": "READONLY", "PageID": 6, "PageDisplayOrder": 6, "PageFieldDisplayOrder": 4},
-  {"CaseTypeID": "ET_EnglandWales", "CaseEventID": "et1SectionOne", "CaseFieldID": "claimantHearingPanelPreference", "DisplayContext": "OPTIONAL", "PageID": 6, "PageDisplayOrder": 6, "PageFieldDisplayOrder": 5},
-  {"CaseTypeID": "ET_EnglandWales", "CaseEventID": "et1SectionOne", "CaseFieldID": "claimantHearingPanelPreferenceWhy", "DisplayContext": "MANDATORY", "PageID": 6, "PageDisplayOrder": 6, "PageFieldDisplayOrder": 6, "FieldShowCondition": "claimantHearingPanelPreference=\"Judge\" OR claimantHearingPanelPreference=\"Panel\"", "RetainHiddenValue": "Yes", "ShowSummaryChangeOption": "Y"},
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "et1SectionOne",

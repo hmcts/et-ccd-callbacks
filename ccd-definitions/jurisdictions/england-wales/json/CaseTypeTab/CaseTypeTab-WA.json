@@ -27,13 +27,6 @@
     "CaseTypeID": "ET_EnglandWales",
     "Channel": "CaseWorker",
     "TabID": "initialConsideration",
-    "CaseFieldID": "etICUnfairDismissalEra",
-    "TabFieldDisplayOrder": 15
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "Channel": "CaseWorker",
-    "TabID": "initialConsideration",
     "CaseFieldID": "etICCanProceed",
     "TabFieldDisplayOrder": 16
   },

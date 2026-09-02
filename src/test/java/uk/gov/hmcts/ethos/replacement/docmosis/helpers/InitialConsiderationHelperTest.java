@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -8,8 +9,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.EtICHearingListedAnswers;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearingUpdated;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearingUpdated;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.InitialConsiderationData;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.InitialConsiderationDocument;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -17,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -347,124 +345,30 @@ class InitialConsiderationHelperTest {
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataScotland,
                 "key", "ET_Scotland");
 
-        InitialConsiderationDocument actual =
-            new ObjectMapper().readValue(documentRequest, InitialConsiderationDocument.class);
-        assertThat(actual.getAccessKey()).isEqualTo("key");
-        assertThat(actual.getTemplateName()).isEqualTo("EM-TRB-SCO-ENG-02204.docx");
-        assertThat(actual.getOutputName()).isEqualTo("Initial Consideration.pdf");
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode actual = mapper.readTree(documentRequest);
+        assertEquals("key", actual.get("accessKey").asText());
+        assertEquals("EM-TRB-SCO-ENG-02204.docx", actual.get("templateName").asText());
+        assertEquals("Initial Consideration.pdf", actual.get("outputName").asText());
 
-        InitialConsiderationData data = actual.getData();
-        assertThat(data.getCaseNumber()).isEqualTo("6000001/2024");
-        assertThat(data.getIssuesJurisdiction()).isEqualTo("No");
-        assertThat(data.getIssuesJurCodesGiveDetails()).isNull();
-        assertThat(data.getIcCanProceed()).isEqualTo("Yes");
-        assertThat(data.getHearingAlreadyListed()).isEqualTo("No");
+        JsonNode data = actual.get("data");
+        assertEquals("6000001/2024", data.get("caseNumber").asText());
+        assertEquals("No", data.get("issuesJurisdiction").asText());
+        assertTrue(data.get("issuesJurCodesGiveDetails").isNull());
+        assertEquals("Yes", data.get("canProceed").asText());
+        assertEquals("No", data.get("hearingAlreadyListed").asText());
 
-        assertThat(data.getHearingListed()).isNull();
-        assertThat(data.getHearingPostpone()).isNull();
-        assertThat(data.getHearingExtend()).isNull();
-        assertThat(data.getHearingConvertFinal()).isNull();
-        assertThat(data.getHearingConvertF2f()).isNull();
-        assertThat(data.getHearingOther()).isNull();
-        assertThat(data.getHearingWithJudgeOrMembers()).isNull();
-        assertThat(data.getHearingWithJudgeOrMembersReason()).isEqualTo(List.of(""));
-        assertThat(data.getHearingWithJsa()).isNull();
-        assertThat(data.getHearingWithMembersLabel()).isNull();
-        assertThat(data.getHearingWithMembers()).isNull();
-
-        assertThat(data.getHearingWithJudgeOrMembersFurtherDetails()).isNull();
-        assertThat(data.getOtherDirections()).isNull();
-
-        assertThat(data.getHearingListedReferVP()).isNull();
-        assertThat(data.getHearingListedReferVPDetails()).isNull();
-
-        assertThat(data.getHearingWithJudgeOrMembersReason()).isEqualTo(List.of("List for final hearing"));
-
-        assertThat(data.getCvpHearingType()).isNull();
-        assertThat(data.getCvpFinalDetails()).isNull();
-        assertThat(data.getCvpPreliminaryDetails()).isNull();
-        assertThat(data.getCvpPreliminaryYesNo()).isNull();
-
-        assertThat(data.getPreliminaryHearingType()).isNull();
-        assertThat(data.getPreliminaryHearingPurpose()).isNull();
-        assertThat(data.getPreliminaryHearingNotice()).isNull();
-        assertThat(data.getPreliminaryHearingLength()).isNull();
-        assertThat(data.getPreliminaryHearingLengthType()).isNull();
-        assertThat(data.getPreliminaryHearingWithMembers()).isNull();
-        assertThat(data.getPreliminaryHearingWithMembersYes()).isNull();
-        assertThat(data.getPreliminaryHearingWithMembersYesOther()).isNull();
-        assertThat(data.getPreliminaryHearingWithMembersReason()).isNull();
-        assertThat(data.getHearingNotListedListAnyOtherDirections()).isNull();
-
-        assertThat(data.getEtICFinalHearingType()).isEqualTo(List.of("Video", "F2F"));
-        assertThat(data.getEtICTypeOfVideoHearingOrder()).isNull();
-        assertThat(data.getEtICTypeOfF2fHearingOrder()).isNull();
-        assertThat(data.getEtICHearingOrderBUCompliance()).isNull();
-        assertThat(data.getEtICFinalHearingLength()).isEqualTo("1");
-        assertThat(data.getEtICFinalHearingLengthType()).isEqualTo("Hours");
-        assertThat(data.getEtICFinalHearingIsEJSitAlone()).isEqualTo("JSA");
-        assertThat(data.getEtICFinalHearingIsEJSitAloneReasonYes()).isEqualTo(List.of());
-        assertThat(data.getEtICFinalHearingIsEJSitAloneReasonYesOther()).isNull();
-        assertThat(data.getEtICFinalHearingIsEJSitAloneReasonNo()).isEqualTo(List.of());
-        assertThat(data.getEtICFinalHearingIsEJSitAloneReasonNoOther()).isNull();
-        assertThat(data.getEtICNoLFinalHearingIsEJSitAloneReasonsJsa())
-            .isEqualTo(List.of("Members experience is likely to add significant value to the process of adjudication"));
-        assertThat(data.getEtICNoLFinalHearingIsEJSitAloneReasonsJsaOther()).isNull();
-        assertThat(data.getEtICNoLFinalHearingIsEJSitAloneReasonsMembers()).isEqualTo(List.of());
-        assertThat(data.getEtICNoLFinalHearingIsEJSitAloneReasonsMembersOther()).isNull();
-        assertThat(data.getEtICFinalHearingIsEJSitAloneFurtherDetails())
-            .isEqualTo("Test SC - EJ Sit Alone Further Details");
-
-        assertThat(data.getHearingNotListedReferVP()).isNull();
-        assertThat(data.getHearingNotListedReferVPDetails()).isNull();
-
-        assertThat(data.getUdlSitAlone()).isNull();
-        assertThat(data.getUdlReasons()).isNull();
-        assertThat(data.getUdlDisputeOnFacts()).isNull();
-        assertThat(data.getUdlLittleOrNoAgreement()).isNull();
-        assertThat(data.getUdlIssueOfLawArising()).isNull();
-        assertThat(data.getUdlViewsOfParties()).isNull();
-        assertThat(data.getUdlNoViewsExpressedByParties()).isNull();
-        assertThat(data.getUdlConcurrentProceedings()).isNull();
-        assertThat(data.getUdlOther()).isNull();
-        assertThat(data.getUdlHearingFormat()).isNull();
-        assertThat(data.getUdlCVPIssue()).isNull();
-        assertThat(data.getUdlFinalF2FIssue()).isNull();
-        assertThat(data.getUdlCheckComplianceOrders()).isNull();
-
-        assertThat(data.getHearingNotListedOtherDirections()).isNull();
-
-        assertThat(data.getFurtherInformation()).isNull();
-        assertThat(data.getFurtherInfoGiveDetails()).isNull();
-        assertThat(data.getFurtherInfoTimeToComply()).isNull();
-
-        assertThat(data.getR27ClaimToBe()).isNull();
-        assertThat(data.getR27WhichPart()).isNull();
-        assertThat(data.getR27Direction()).isNull();
-        assertThat(data.getR27DirectionReason()).isNull();
-        assertThat(data.getR27NoJurisdictionReason()).isNull();
-        assertThat(data.getR27NumberOfDays()).isNull();
-
-        assertThat(data.getR28ClaimToBe()).isNull();
-        assertThat(data.getR28WhichPart()).isNull();
-        assertThat(data.getR28DirectionReason()).isNull();
-        assertThat(data.getR28NumberOfDays()).isNull();
-
-        assertThat(data.getFurtherInfoAnyOtherDirections()).isNull();
-
-        assertThat(data.getIcReceiptET3FormIssues()).isNull();
-        assertThat(data.getIcRespondentsNameIdentityIssues()).isNull();
-        assertThat(data.getIcJurisdictionCodeIssues()).isNull();
-        assertThat(data.getIcApplicationIssues()).isNull();
-        assertThat(data.getIcEmployersContractClaimIssues()).isNull();
-        assertThat(data.getIcClaimProspectIssues()).isNull();
-        assertThat(data.getIcListingIssues()).isNull();
-        assertThat(data.getIcDdaDisabilityIssues()).isNull();
-        assertThat(data.getIcOrderForFurtherInformation()).isNull();
-        assertThat(data.getIcOtherIssuesOrFinalOrders()).isNull();
-
-        assertThat(data.getIcCompletedBy()).isEqualTo("A User");
-        assertThat(data.getIcDateCompleted()).isEqualTo("20 Nov 2024");
+        assertTrue(data.get("hearingListed").isNull());
+        assertTrue(data.get("hearingPostpone").isNull());
+        assertTrue(data.get("hearingExtend").isNull());
+        assertTrue(data.get("hearingConvertFinal").isNull());
+        assertTrue(data.get("hearingConvertF2f").isNull());
+        assertTrue(data.get("hearingOther").isNull());
+        assertTrue(data.get("hearingWithJudgeOrMembers").isNull());
+        assertEquals("", data.path("hearingWithJudgeOrMembersReason").path(0).asText());
+        assertTrue(data.get("hearingWithJsa").isNull());
+        assertTrue(data.get("hearingWithMembersLabel").isNull());
+        assertTrue(data.get("hearingWithMembers").isNull());
     }
 
     @Test

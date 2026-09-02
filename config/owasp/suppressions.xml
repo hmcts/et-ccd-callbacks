@@ -61,6 +61,17 @@
         <packageUrl regex="true">^pkg:maven/(com\.azure/azure\-identity(\-extensions)?|com\.microsoft\.azure/msal4j)@.*$</packageUrl>
         <cve>CVE-2024-35255</cve>
     </suppress>
+    <!-- CVE-2026-50338 is an Azure Spring Apps (Microsoft cloud service) elevation-of-privilege issue,
+         not a library flaw. It is a false-positive CPE match against the com.azure.spring:spring-cloud-azure-*
+         client jars, which do not run Azure Spring Apps. Suppress the false positive. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-cloud-azure-*-6.4.0.jar
+   False positive: CVE targets the Azure Spring Apps hosting service, not these client libraries.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.azure\.spring/spring\-cloud\-azure\-.*@.*$</packageUrl>
+        <cve>CVE-2026-50338</cve>
+    </suppress>
     <!-- OpenTelemetry semconv is already forced to the latest published version; these match the broad OpenTelemetry CPE. -->
     <suppress>
         <notes><![CDATA[
@@ -170,10 +181,28 @@
         <packageUrl regex="true">^pkg:maven/com\.azure\.spring/spring-cloud-azure-service@.*$</packageUrl>
         <cpe>cpe:/a:service_project:service</cpe>
     </suppress>
-        <suppress>
+    <suppress>
         <cve>CVE-2026-59313</cve>
     </suppress>
     <suppress>
         <cve>CVE-2026-59314</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-47893</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-47892</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-59283</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-59284</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-59280</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-59270</cve>
     </suppress>
 </suppressions>

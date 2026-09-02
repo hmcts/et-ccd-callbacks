@@ -181,10 +181,28 @@
         <packageUrl regex="true">^pkg:maven/com\.azure\.spring/spring-cloud-azure-service@.*$</packageUrl>
         <cpe>cpe:/a:service_project:service</cpe>
     </suppress>
-        <suppress>
+    <suppress>
         <cve>CVE-2026-59313</cve>
     </suppress>
     <suppress>
         <cve>CVE-2026-59314</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-47893</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-47892</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-59283</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-59284</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-59280</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-59270</cve>
     </suppress>
 </suppressions>

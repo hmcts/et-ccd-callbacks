@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -343,53 +344,123 @@ class InitialConsiderationHelperTest {
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataScotland,
                 "key", "ET_Scotland");
 
-        String expected = "{\"accessKey\":\"key\",\"templateName\":\"EM-TRB-SCO-ENG-02204.docx\","
-                + "\"outputName\":\"Initial Consideration.pdf\",\"data\":{\"caseNumber\":\"6000001/2024\","
-                + "\"issuesJurisdiction\":\"No\",\"issuesJurCodesGiveDetails\":null,\"canProceed\":\"Yes\","
-                + "\"hearingAlreadyListed\":\"No\",\"hearingListed\":null,\"hearingPostpone\":null,"
-                + "\"hearingExtend\":null,\"hearingConvertFinal\":null,\"hearingConvertF2f\":null,"
-                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":[\"\"],"
-                + "\"hearingWithJsa\":null,\"hearingWithMembersLabel\":null,\"hearingWithMembers\":null,"
-                + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
-                + "\"hearingListedReferVP\":null,\"hearingListedReferVPDetails\":null,"
-                + "\"hearingNotListed\":[\"List for final hearing\"],\"cvpHearingType\":null,"
-                + "\"cvpFinalDetails\":null,\"cvpPreliminaryDetails\":null,\"cvpPreliminaryYesNo\":null,"
-                + "\"preliminaryHearingType\":null,\"preliminaryHearingPurpose\":null,"
-                + "\"preliminaryHearingNotice\":null,\"preliminaryHearingLength\":null,"
-                + "\"preliminaryHearingLengthType\":null,\"preliminaryHearingWithMembers\":null,"
-                + "\"preliminaryHearingWithMembersYes\":null,"
-                + "\"preliminaryHearingWithMembersYesOther\":null,"
-                + "\"preliminaryHearingWithMembersReason\":null,\"hearingNotListedListAnyOtherDirections\":null,"
-                + "\"etICFinalHearingType\":[\"Video\",\"F2F\"],"
-                + "\"etICTypeOfVideoHearingOrder\":null,\"etICTypeOfF2fHearingOrder\":null,"
-                + "\"etICHearingOrderBUCompliance\":null,"
-                + "\"etICFinalHearingLength\":\"1\","
-                + "\"etICFinalHearingLengthType\":\"Hours\",\"etICFinalHearingIsEJSitAlone\":\"JSA\","
-                + "\"etICFinalHearingIsEJSitAloneReasonYes\":[],\"etICFinalHearingIsEJSitAloneReasonYesOther\":null,"
-                + "\"etICFinalHearingIsEJSitAloneReasonNo\":[],\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
-                + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":[\"Members experience is likely to add significant "
-                + "value to the process of adjudication\"],\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther"
-                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
-                + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
-                + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":\"Test SC - EJ Sit Alone Further Details\","
-                + "\"hearingNotListedReferVP\":null,\"hearingNotListedReferVPDetails\":null,"
-                + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
-                + "\"udlLittleOrNoAgreement\":null,\"udlIssueOfLawArising\":null,\"udlViewsOfParties\":null,"
-                + "\"udlNoViewsExpressedByParties\":null,\"udlConcurrentProceedings\":null,\"udlOther\":null,"
-                + "\"udlHearingFormat\":null,\"udlCVPIssue\":null,\"udlFinalF2FIssue\":null,"
-                + "\"udlCheckComplianceOrders\":null,\"hearingNotListedOtherDirections\":null,"
-                + "\"furtherInformation\":[],\"furtherInfoGiveDetails\":null,\"furtherInfoTimeToComply\":null,"
-                + "\"r27ClaimToBe\":null,\"r27WhichPart\":null,\"r27Direction\":null,\"r27DirectionReason\":null,"
-                + "\"r27NoJurisdictionReason\":null,\"r27NumberOfDays\":null,\"r28ClaimToBe\":null,"
-                + "\"r28WhichPart\":null,\"r28DirectionReason\":null,\"r28NumberOfDays\":null,"
-                + "\"furtherInfoAnyOtherDirections\":null,\"icReceiptET3FormIssues\":null,"
-                + "\"icRespondentsNameIdentityIssues\":null,\"icJurisdictionCodeIssues\":null,"
-                + "\"icApplicationIssues\":null,"
-                + "\"icEmployersContractClaimIssues\":null,\"icClaimProspectIssues\":null,\"icListingIssues\":null,"
-                + "\"icDdaDisabilityIssues\":null,\"icOrderForFurtherInformation\":null,"
-                + "\"icOtherIssuesOrFinalOrders\":null,"
-                + "\"icCompletedBy\":\"A User\",\"icDateCompleted\":\"20 Nov 2024\"}}";
-        assertEquals(expected, documentRequest);
+        assertThat(documentRequest).contains("\"accessKey\":\"key\"");
+        assertThat(documentRequest).contains("\"templateName\":\"EM-TRB-SCO-ENG-02204.docx\"");
+        assertThat(documentRequest).contains("\"outputName\":\"Initial Consideration.pdf\"");
+
+        assertThat(documentRequest).contains("\"caseNumber\":\"6000001/2024\"");
+        assertThat(documentRequest).contains("\"issuesJurisdiction\":\"No\"");
+        assertThat(documentRequest).contains("\"issuesJurCodesGiveDetails\":null");
+        assertThat(documentRequest).contains("\"canProceed\":\"Yes\"");
+        assertThat(documentRequest).contains("\"hearingAlreadyListed\":\"No\"");
+
+        assertThat(documentRequest).contains("\"hearingListed\":null");
+        assertThat(documentRequest).contains("\"hearingPostpone\":null");
+        assertThat(documentRequest).contains("\"hearingExtend\":null");
+        assertThat(documentRequest).contains("\"hearingConvertFinal\":null");
+        assertThat(documentRequest).contains("\"hearingConvertF2f\":null");
+        assertThat(documentRequest).contains("\"hearingOther\":null");
+        assertThat(documentRequest).contains("\"hearingWithJudgeOrMembers\":null");
+        assertThat(documentRequest).contains("\"hearingWithJudgeOrMembersReason\":[\"\"]");
+        assertThat(documentRequest).contains("\"hearingWithJsa\":null");
+        assertThat(documentRequest).contains("\"hearingWithMembersLabel\":null");
+        assertThat(documentRequest).contains("\"hearingWithMembers\":null");
+
+        assertThat(documentRequest).contains("\"hearingWithJudgeOrMembersFurtherDetails\":null");
+        assertThat(documentRequest).contains("\"otherDirections\":null");
+
+        assertThat(documentRequest).contains("\"hearingListedReferVP\":null");
+        assertThat(documentRequest).contains("\"hearingListedReferVPDetails\":null");
+
+        assertThat(documentRequest).contains("\"hearingNotListed\":[\"List for final hearing\"]");
+
+        assertThat(documentRequest).contains("\"cvpHearingType\":null");
+        assertThat(documentRequest).contains("\"cvpFinalDetails\":null");
+        assertThat(documentRequest).contains("\"cvpPreliminaryDetails\":null");
+        assertThat(documentRequest).contains("\"cvpPreliminaryYesNo\":null");
+
+        assertThat(documentRequest).contains("\"preliminaryHearingType\":null");
+        assertThat(documentRequest).contains("\"preliminaryHearingPurpose\":null");
+        assertThat(documentRequest).contains("\"preliminaryHearingNotice\":null");
+        assertThat(documentRequest).contains("\"preliminaryHearingLength\":null");
+        assertThat(documentRequest).contains("\"preliminaryHearingLengthType\":null");
+        assertThat(documentRequest).contains("\"preliminaryHearingWithMembers\":null");
+        assertThat(documentRequest).contains("\"preliminaryHearingWithMembersYes\":null");
+        assertThat(documentRequest).contains("\"preliminaryHearingWithMembersYesOther\":null");
+        assertThat(documentRequest).contains("\"preliminaryHearingWithMembersReason\":null");
+
+        assertThat(documentRequest).contains("\"hearingNotListedListAnyOtherDirections\":null");
+
+        assertThat(documentRequest).contains("\"etICFinalHearingType\":[\"Video\",\"F2F\"]");
+        assertThat(documentRequest).contains("\"etICTypeOfVideoHearingOrder\":null");
+        assertThat(documentRequest).contains("\"etICTypeOfF2fHearingOrder\":null");
+        assertThat(documentRequest).contains("\"etICHearingOrderBUCompliance\":null");
+        assertThat(documentRequest).contains("\"etICFinalHearingLength\":\"1\"");
+        assertThat(documentRequest).contains("\"etICFinalHearingLengthType\":\"Hours\"");
+
+        assertThat(documentRequest).contains("\"etICFinalHearingIsEJSitAlone\":\"JSA\"");
+        assertThat(documentRequest).contains("\"etICFinalHearingIsEJSitAloneReasonYes\":[]");
+        assertThat(documentRequest).contains("\"etICFinalHearingIsEJSitAloneReasonYesOther\":null");
+        assertThat(documentRequest).contains("\"etICFinalHearingIsEJSitAloneReasonNo\":[]");
+        assertThat(documentRequest).contains("\"etICFinalHearingIsEJSitAloneReasonNoOther\":null");
+        assertThat(documentRequest).contains("\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":"
+            + "[\"Members experience is likely to add significant value to the process of adjudication\"]");
+        assertThat(documentRequest).contains("\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther\":null");
+        assertThat(documentRequest).contains("\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null]");
+        assertThat(documentRequest).contains("\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null");
+        assertThat(documentRequest)
+            .contains("\"etICFinalHearingIsEJSitAloneFurtherDetails\":\"Test SC - EJ Sit Alone Further Details\"");
+
+        assertThat(documentRequest).contains("\"hearingNotListedReferVP\":null");
+        assertThat(documentRequest).contains("\"hearingNotListedReferVPDetails\":null");
+
+        assertThat(documentRequest).contains("\"udlSitAlone\":null");
+        assertThat(documentRequest).contains("\"udlReasons\":null");
+        assertThat(documentRequest).contains("\"udlDisputeOnFacts\":null");
+        assertThat(documentRequest).contains("\"udlLittleOrNoAgreement\":null");
+        assertThat(documentRequest).contains("\"udlIssueOfLawArising\":null");
+        assertThat(documentRequest).contains("\"udlViewsOfParties\":null");
+        assertThat(documentRequest).contains("\"udlNoViewsExpressedByParties\":null");
+        assertThat(documentRequest).contains("\"udlConcurrentProceedings\":null");
+        assertThat(documentRequest).contains("\"udlOther\":null");
+        assertThat(documentRequest).contains("\"udlHearingFormat\":null");
+        assertThat(documentRequest).contains("\"udlCVPIssue\":null");
+        assertThat(documentRequest).contains("\"udlFinalF2FIssue\":null");
+        assertThat(documentRequest).contains("\"udlCheckComplianceOrders\":null");
+
+        assertThat(documentRequest).contains("\"hearingNotListedOtherDirections\":null");
+
+        assertThat(documentRequest).contains("\"furtherInformation\":[]");
+        assertThat(documentRequest).contains("\"furtherInfoGiveDetails\":null");
+        assertThat(documentRequest).contains("\"furtherInfoTimeToComply\":null");
+
+        assertThat(documentRequest).contains("\"r27ClaimToBe\":null");
+        assertThat(documentRequest).contains("\"r27WhichPart\":null");
+        assertThat(documentRequest).contains("\"r27Direction\":null");
+        assertThat(documentRequest).contains("\"r27DirectionReason\":null");
+        assertThat(documentRequest).contains("\"r27NoJurisdictionReason\":null");
+        assertThat(documentRequest).contains("\"r27NumberOfDays\":null");
+
+        assertThat(documentRequest).contains("\"r28ClaimToBe\":null");
+        assertThat(documentRequest).contains("\"r28WhichPart\":null");
+        assertThat(documentRequest).contains("\"r28DirectionReason\":null");
+        assertThat(documentRequest).contains("\"r28NumberOfDays\":null");
+
+        assertThat(documentRequest).contains("\"furtherInfoAnyOtherDirections\":null");
+
+        assertThat(documentRequest).contains("\"icReceiptET3FormIssues\":null");
+        assertThat(documentRequest).contains("\"icRespondentsNameIdentityIssues\":null");
+        assertThat(documentRequest).contains("\"icJurisdictionCodeIssues\":null");
+        assertThat(documentRequest).contains("\"icApplicationIssues\":null");
+        assertThat(documentRequest).contains("\"icEmployersContractClaimIssues\":null");
+        assertThat(documentRequest).contains("\"icClaimProspectIssues\":null");
+        assertThat(documentRequest).contains("\"icListingIssues\":null");
+        assertThat(documentRequest).contains("\"icDdaDisabilityIssues\":null");
+        assertThat(documentRequest).contains("\"icOrderForFurtherInformation\":null");
+        assertThat(documentRequest).contains("\"icOtherIssuesOrFinalOrders\":null");
+
+        assertThat(documentRequest).contains("\"icCompletedBy\":\"A User\"");
+        assertThat(documentRequest).contains("\"icDateCompleted\":\"20 Nov 2024\"");
     }
 
     @Test

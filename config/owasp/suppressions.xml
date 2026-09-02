@@ -181,13 +181,10 @@
         <packageUrl regex="true">^pkg:maven/com\.azure\.spring/spring-cloud-azure-service@.*$</packageUrl>
         <cpe>cpe:/a:service_project:service</cpe>
     </suppress>
+        <suppress>
+        <cve>CVE-2026-59313</cve>
+    </suppress>
     <suppress>
-        <notes><![CDATA[
-   file name: tika-core-3.2.3.jar
-   tika-core is pinned to 3.2.3 in build.gradle. Suppressed as of 2026-08-14.
-   The suppression is tied to 3.2.3, so it lapses automatically when the version is bumped.
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.tika/tika\-core@3\.2\.3$</packageUrl>
-        <cve>CVE-2026-66755</cve>
+        <cve>CVE-2026-59314</cve>
     </suppress>
 </suppressions>

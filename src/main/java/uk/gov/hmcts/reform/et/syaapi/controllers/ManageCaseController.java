@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.et.syaapi.service.CaseService;
 import uk.gov.hmcts.reform.et.syaapi.service.CaseTransferInfoService;
 import uk.gov.hmcts.reform.et.syaapi.service.HubLinkService;
 import uk.gov.hmcts.reform.et.syaapi.service.ManageCaseRoleService;
+import uk.gov.hmcts.reform.et.syaapi.service.utils.ManageCaseRoleServiceUtil;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.util.List;
@@ -60,14 +61,17 @@ public class ManageCaseController {
      * @return the requested case wrapped in a {@link CaseDetails} object
      */
     @PostMapping("/user-case")
-    @Operation(summary = "Return individual case details")
+    @Operation(summary = "Return individual case details, filtered by case role (defaults to CREATOR). A request "
+        + "for CREATOR also matches the user's CLAIMANTNONLEGALREPRESENTATIVE case. The matched role is carried "
+        + "under 'caseUserRole' in the case data.")
     @ApiResponseGroup
     public ResponseEntity<CaseDetails> getUserCaseDetails(
         @RequestHeader(AUTHORIZATION) String authorization,
         @RequestParam(value = CASE_USER_ROLE_API_PARAMETER_NAME, required = false) String caseUserRole,
         @RequestBody CaseRequest caseRequest) {
-        CaseDetails caseDetails = manageCaseRoleService.getUserCaseByCaseUserRole(
-            authorization, caseRequest.getCaseId(), formatCaseUserRole(caseUserRole));
+        CaseDetails caseDetails = manageCaseRoleService.getUserCaseByCaseUserRoles(
+            authorization, caseRequest.getCaseId(),
+            ManageCaseRoleServiceUtil.getCaseUserRoles(caseUserRole));
         return ok(caseDetails);
     }
 
@@ -102,14 +106,16 @@ public class ManageCaseController {
      * @return a list of cases for the given user wrapped in a {@link CaseDetails} object
      */
     @GetMapping("/user-cases")
-    @Operation(summary = "Return list of case details for a given user")
+    @Operation(summary = "Return list of case details for a given user, filtered by case role (defaults to "
+        + "CREATOR). A request for CREATOR also returns the user's CLAIMANTNONLEGALREPRESENTATIVE cases. Each "
+        + "case carries its matched role under 'caseUserRole' in the case data.")
     @ApiResponseGroup
     public ResponseEntity<List<CaseDetails>> getUserCasesByCaseUserRole(
         @RequestHeader(AUTHORIZATION) String authorization,
         @RequestParam(value = CASE_USER_ROLE_API_PARAMETER_NAME, required = false) String caseUserRole) {
-        var caseDetails = manageCaseRoleService.getUserCasesByCaseUserRole(
+        var caseDetails = manageCaseRoleService.getUserCasesByCaseUserRoles(
             authorization,
-            formatCaseUserRole(caseUserRole));
+            ManageCaseRoleServiceUtil.getCaseUserRoles(caseUserRole));
         return ok(caseDetails);
     }
 
@@ -130,6 +136,7 @@ public class ManageCaseController {
         log.info("Received initiate-case request");
 
         var caseDetails = caseService.createCase(authorization, caseRequest);
+        manageCaseRoleService.assignClaimantNonLegalRepresentativeRole(authorization, caseDetails);
         return ok(caseDetails);
     }
 
@@ -196,7 +203,7 @@ public class ManageCaseController {
         return ok(hubLinkService.updateHubLinkStatuses(
             request,
             authorization,
-            formatCaseUserRole(caseUserRole)));
+            ManageCaseRoleServiceUtil.getCaseUserRoles(caseUserRole)));
     }
 
     /**

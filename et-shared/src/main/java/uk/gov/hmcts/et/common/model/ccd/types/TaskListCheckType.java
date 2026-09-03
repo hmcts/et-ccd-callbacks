@@ -16,4 +16,12 @@ public class TaskListCheckType {
     private String employmentAndRespondentCheck;
     @JsonProperty("claimDetailsCheck")
     private String claimDetailsCheck;
+    @JsonProperty("representativeDetailsCheck")
+    private String representativeDetailsCheck;
+    @JsonProperty("representedClaimantDetailsCheck")
+    private String representedClaimantDetailsCheck;
+    @JsonProperty("representedClaimantNameProvided")
+    private String representedClaimantNameProvided;
+    @JsonProperty("representedClaimantEmailProvided")
+    private String representedClaimantEmailProvided;
 }

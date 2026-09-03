@@ -38,6 +38,10 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("work-allocation");
     }
 
+    public boolean isReferralTaskCompletionEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("referral-task-completion");
+    }
+
     public boolean isWelshEnabled() {
         return this.featureToggleApi.isFeatureEnabled("welsh-language");
     }

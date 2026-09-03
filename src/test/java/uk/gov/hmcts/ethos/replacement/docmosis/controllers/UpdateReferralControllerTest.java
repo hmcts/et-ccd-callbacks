@@ -26,6 +26,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
+import uk.gov.hmcts.ethos.replacement.docmosis.wa.ReferralTaskCompletionService;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
@@ -54,6 +55,8 @@ class UpdateReferralControllerTest {
 
     @MockitoBean
     private VerifyTokenService verifyTokenService;
+    @MockitoBean
+    private ReferralTaskCompletionService referralTaskCompletionService;
     @MockitoBean
     private UserIdamService userIdamService;
     @MockitoBean

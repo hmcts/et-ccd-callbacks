@@ -7,7 +7,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ethos.replacement.docmosis.client.WaTaskApiClient;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.wa.model.TaskSearchParameter;
 import uk.gov.hmcts.ethos.replacement.docmosis.wa.model.TaskSearchRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.wa.model.TaskSearchResponse;
@@ -39,19 +38,15 @@ class ReferralTaskCompletionServiceTest {
     private WaTaskApiClient waTaskApiClient;
     @Mock
     private AuthTokenGenerator serviceAuthTokenGenerator;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     private ReferralTaskCompletionService service;
 
     @BeforeEach
     void setUp() {
-        service = new ReferralTaskCompletionService(
-            waTaskApiClient, serviceAuthTokenGenerator, featureToggleService);
+        service = new ReferralTaskCompletionService(waTaskApiClient, serviceAuthTokenGenerator);
     }
 
-    private void toggleOn() {
-        when(featureToggleService.isReferralTaskCompletionEnabled()).thenReturn(true);
+    private void stubServiceToken() {
         when(serviceAuthTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
     }
 
@@ -70,7 +65,7 @@ class ReferralTaskCompletionServiceTest {
 
     @Test
     void shouldOnlyCompleteTasksForTheReferralActedOn() {
-        toggleOn();
+        stubServiceToken();
         tasksReturned(
             task("task-for-5", "ReviewReferralAdmin", "5"),
             task("task-for-32", "ReviewReferralAdmin", "32"),
@@ -86,7 +81,7 @@ class ReferralTaskCompletionServiceTest {
 
     @Test
     void shouldCompleteEveryTaskBelongingToTheReferral() {
-        toggleOn();
+        stubServiceToken();
         tasksReturned(
             task("review-32", "ReviewReferralAdmin", "32"),
             task("response-32", "ReviewReferralResponseAdmin", "32"),
@@ -100,7 +95,7 @@ class ReferralTaskCompletionServiceTest {
 
     @Test
     void shouldTerminateWithCompletedReason() {
-        toggleOn();
+        stubServiceToken();
         tasksReturned(task("review-32", "ReviewReferralAdmin", "32"));
 
         service.completeTasksForClosedReferral(CASE_ID, "32", USER_TOKEN);
@@ -112,7 +107,7 @@ class ReferralTaskCompletionServiceTest {
 
     @Test
     void shouldSearchOnlyActiveTasksForTheCase() {
-        toggleOn();
+        stubServiceToken();
         tasksReturned();
 
         service.completeTasksForClosedReferral(CASE_ID, "32", USER_TOKEN);
@@ -130,7 +125,7 @@ class ReferralTaskCompletionServiceTest {
 
     @Test
     void shouldOnlySearchLegalOpsTasksWhenReferralUpdated() {
-        toggleOn();
+        stubServiceToken();
         tasksReturned();
 
         service.completeTasksForUpdatedReferral(CASE_ID, "32", USER_TOKEN);
@@ -143,7 +138,7 @@ class ReferralTaskCompletionServiceTest {
 
     @Test
     void shouldIgnoreTasksWithoutAReferralNumber() {
-        toggleOn();
+        stubServiceToken();
         tasksReturned(task("legacy-task", "ReviewReferralAdmin", null));
 
         service.completeTasksForClosedReferral(CASE_ID, "32", USER_TOKEN);
@@ -152,26 +147,15 @@ class ReferralTaskCompletionServiceTest {
     }
 
     @Test
-    void shouldDoNothingWhenToggleIsOff() {
-        when(featureToggleService.isReferralTaskCompletionEnabled()).thenReturn(false);
-
-        service.completeTasksForClosedReferral(CASE_ID, "32", USER_TOKEN);
+    void shouldSkipWhenReferralNumberIsMissing() {
+        service.completeTasksForClosedReferral(CASE_ID, null, USER_TOKEN);
 
         verifyNoInteractions(waTaskApiClient, serviceAuthTokenGenerator);
     }
 
     @Test
-    void shouldSkipWhenReferralNumberIsMissing() {
-        when(featureToggleService.isReferralTaskCompletionEnabled()).thenReturn(true);
-
-        service.completeTasksForClosedReferral(CASE_ID, null, USER_TOKEN);
-
-        verifyNoInteractions(waTaskApiClient);
-    }
-
-    @Test
     void shouldNotPropagateWorkAllocationFailures() {
-        toggleOn();
+        stubServiceToken();
         when(waTaskApiClient.searchTasks(anyString(), anyString(), any()))
             .thenThrow(new IllegalStateException("task management unavailable"));
 

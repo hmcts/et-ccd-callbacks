@@ -115,7 +115,6 @@ public class CloseReferralController {
         ReferralHelper.addReferralDocumentToDocumentCollection(caseData);
         ReferralHelper.setReferralStatusToClosed(caseData);
 
-        // Read before clearing - clearCloseReferralDataFromCaseData nulls the referral selection.
         String referralNumber = ReferralHelper.getSelectedReferral(caseData).getReferralNumber();
         ReferralHelper.clearCloseReferralDataFromCaseData(caseData);
 

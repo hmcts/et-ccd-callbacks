@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ethos.replacement.docmosis.client.WaTaskApiClient;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.wa.model.TaskSearchParameter;
 import uk.gov.hmcts.ethos.replacement.docmosis.wa.model.TaskSearchRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.wa.model.TaskSearchResponse;
@@ -62,7 +61,6 @@ public class ReferralTaskCompletionService {
 
     private final WaTaskApiClient waTaskApiClient;
     private final AuthTokenGenerator serviceAuthTokenGenerator;
-    private final FeatureToggleService featureToggleService;
 
     /**
      * Closes every referral task raised for the referral that has just been closed.
@@ -88,10 +86,6 @@ public class ReferralTaskCompletionService {
     }
 
     private void completeTasks(String caseId, String referralNumber, String userToken, List<String> taskTypes) {
-        if (!featureToggleService.isReferralTaskCompletionEnabled()) {
-            return;
-        }
-
         if (isNullOrEmpty(caseId) || isNullOrEmpty(referralNumber)) {
             log.warn("Skipping referral task completion, case id or referral number missing for case {}", caseId);
             return;

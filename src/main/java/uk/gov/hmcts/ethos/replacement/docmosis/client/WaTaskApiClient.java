@@ -14,10 +14,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.wa.model.TerminateTaskRequest;
 
 /**
  * Client for the Work Allocation task management API.
- *
- * <p>Note the differing auth requirements. Search runs on behalf of the signed in user and only
- * needs Read permission on the tasks. Terminate is service-to-service only - it carries no user
- * token and performs no permission check, so it can close a task held by another user.</p>
  */
 @FeignClient(name = "wa-task-management-api", url = "${wa.task-management.api.url}",
         configuration = FeignClientProperties.FeignClientConfiguration.class)

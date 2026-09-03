@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -170,6 +171,10 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
     @SneakyThrows
     void theAboutToSubmitRepresentativeContactDetails() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        Address stagingAddress = new Address();
+        stagingAddress.setAddressLine1("221b Baker Street");
+        ccdRequest.getCaseDetails().getCaseData().setEt3ResponseAddress(stagingAddress);
+        ccdRequest.getCaseDetails().getCaseData().setMyHmctsAddressText("221b Baker Street, London");
         doNothing().when(amendRepresentativeContactService).updateRepresentativeContactDetails(AUTH_TOKEN,
                 ccdRequest.getCaseDetails().getCaseData(), ccdRequest.getCaseDetails().getCaseId());
         mvc.perform(post(ABOUT_TO_SUBMIT)
@@ -178,6 +183,8 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.data.et3ResponseAddress", nullValue()))
+                .andExpect(jsonPath("$.data.myHmctsAddressText", nullValue()))
                 .andExpect(jsonPath("$.errors.size()", is(LoggerTestUtils.INTEGER_ZERO)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }

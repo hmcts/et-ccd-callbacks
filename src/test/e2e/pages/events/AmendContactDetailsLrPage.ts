@@ -92,6 +92,7 @@ export default class AmendContactDetailsLrPage extends BasePage {
       await cyaPage.assertCheckYourAnswersPage({
         tableName: 'Check your answers',
         rows :[
+          'Contact address if different from registered address',
           { cellItem: 'Building and Street', value: addressDetails.addressLine1 },
           { cellItem: 'Town or City', value: addressDetails.townOrCity },
           { cellItem: 'Postcode/Zipcode', value: addressDetails.postcode },

@@ -80,8 +80,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_FIND_ORGANISATION_BY_EMAIL_SYSTEM_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.getOrganisationAddressAsText;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.mapOrganisationAddressToAddress;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.applyMyHmctsOrganisationAddress;
 
 @Service
 @RequiredArgsConstructor
@@ -1245,8 +1244,7 @@ public class NocRespondentRepresentativeService {
     public void populateMyHmctsOrganisationAddress(String userToken, CaseData caseData)
             throws GenericServiceException {
         OrganisationAddress organisationAddress = myHmctsService.getUserOrganisationAddress(userToken);
-        caseData.setEt3ResponseAddress(mapOrganisationAddressToAddress(organisationAddress));
-        caseData.setMyHmctsAddressText(getOrganisationAddressAsText(organisationAddress));
+        caseData.setEt3ResponseAddress(applyMyHmctsOrganisationAddress(caseData, organisationAddress));
     }
 
     /**
@@ -1275,6 +1273,6 @@ public class NocRespondentRepresentativeService {
             item.getValue().setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
             item.getValue().setRepresentativeAddress(caseData.getEt3ResponseAddress());
         }
-        caseData.setMyHmctsAddressText(null);
+        AddressUtils.clearMyHmctsAddressText(caseData);
     }
 }

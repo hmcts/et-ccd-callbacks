@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.AmendRepresentativeContactService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,7 +139,7 @@ public class AmendRepresentativeContactController {
         try {
             amendRepresentativeContactService.updateRepresentativeContactDetails(
                     userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
-            caseData.setMyHmctsAddressText(null);
+            AddressUtils.clearMyHmctsAddressText(caseData);
             caseData.setEt3ResponseAddress(null);
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());

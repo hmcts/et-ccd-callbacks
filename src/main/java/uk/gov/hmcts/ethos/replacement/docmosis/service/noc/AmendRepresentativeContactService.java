@@ -15,8 +15,7 @@ import java.util.List;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole.CLAIMANTSOLICITOR;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.getOrganisationAddressAsText;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.mapOrganisationAddressToAddress;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.applyMyHmctsOrganisationAddress;
 
 @Service("amendRepresentativeContactService")
 @RequiredArgsConstructor
@@ -100,8 +99,7 @@ public class AmendRepresentativeContactService {
     public void setRepresentativeMyHmctsContactAddress(String userToken, CaseData caseData)
             throws GenericServiceException {
         OrganisationAddress organisationAddress = myHmctsService.getUserOrganisationAddress(userToken);
-        caseData.setEt3ResponseAddress(mapOrganisationAddressToAddress(organisationAddress));
-        caseData.setMyHmctsAddressText(getOrganisationAddressAsText(organisationAddress));
+        caseData.setEt3ResponseAddress(applyMyHmctsOrganisationAddress(caseData, organisationAddress));
     }
 
     /**

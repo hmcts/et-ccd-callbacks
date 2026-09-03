@@ -4903,7 +4903,6 @@
     "PageID": 2,
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder": 1,
-    "retainHiddenValue": "Yes",
     "PageShowCondition": "representativeContactChangeOption=\"Amend contact details\"",
     "ShowSummaryChangeOption": "Y"
   },
@@ -4915,7 +4914,6 @@
     "PageID": 2,
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder": 2,
-    "retainHiddenValue": "Yes",
     "ShowSummaryChangeOption": "Y"
   },
   {

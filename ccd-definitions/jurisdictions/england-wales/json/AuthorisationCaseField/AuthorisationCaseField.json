@@ -2936,6 +2936,12 @@
   {
     "CaseTypeId": "ET_EnglandWales",
     "CaseFieldID": "documentCollection",
+    "UserRole": "[CLAIMANTNONLEGALREPRESENTATIVE]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "documentCollection",
     "UserRole": "[DEFENDANT]",
     "CRUD": "CRUD"
   },
@@ -25382,6 +25388,12 @@
     "CaseTypeId": "ET_EnglandWales",
     "CaseFieldID": "acasCertificateRequired",
     "UserRole": "[CREATOR]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "acasCertificateRequired",
+    "UserRole": "[CLAIMANTNONLEGALREPRESENTATIVE]",
     "CRUD": "CRUD"
   },
   {

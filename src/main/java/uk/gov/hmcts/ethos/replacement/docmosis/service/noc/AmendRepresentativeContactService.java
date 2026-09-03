@@ -103,6 +103,83 @@ public class AmendRepresentativeContactService {
     }
 
     /**
+     * Populates the staged representative address from the authenticated user's MyHMCTS
+     * organisation address, for the respondent legal representative "Amend contact details" event.
+     *
+     * <p>Writes to the dedicated staging field {@code respRepAddress} and the
+     * shared Check your answers field {@code myHmctsAddressText}. The live ET3 response fields are
+     * not touched.
+     *
+     * @param userToken the authenticated user token used to retrieve organisation details
+     * @param caseData the case data to update with the staged representative address
+     * @throws GenericServiceException if the organisation address cannot be retrieved
+     *                                 or organisation details are missing
+     */
+    public void setStagedMyHmctsContactAddress(String userToken, CaseData caseData)
+            throws GenericServiceException {
+        OrganisationAddress organisationAddress = myHmctsService.getUserOrganisationAddress(userToken);
+        caseData.setRespRepAddress(applyMyHmctsOrganisationAddress(caseData, organisationAddress));
+    }
+
+    /**
+     * Pre-fills the staged contact fields for the respondent legal representative
+     * "Amend contact details" event.
+     *
+     * <p>Resolves the case roles held by the authenticated user, then copies the current phone
+     * number and address of the matching representatives into
+     * {@code respRepPhoneNumber} and {@code respRepAddress}.
+     *
+     * <p>This event is authorised for respondent solicitor roles only
+     * ({@code [SOLICITORA]}–{@code [SOLICITORJ]}), so no claimant representative branch applies.
+     *
+     * @param userToken the authentication token associated with the user
+     * @param caseData the case data containing respondent and representative details
+     * @param submissionReference the unique reference identifying the submission/case
+     * @throws GenericServiceException if the case data or token is invalid, or the representative
+     *                                 roles cannot be retrieved or validated
+     */
+    public void loadStagedContactDetails(String userToken, CaseData caseData, String submissionReference)
+            throws GenericServiceException {
+        CaseDataUtils.validateCaseData(caseData, submissionReference);
+        UserUtils.validateToken(userToken, submissionReference);
+
+        List<String> roles = nocRepresentativeService
+                .getValidatedRepresentativeRolesByUserToken(userToken, submissionReference);
+        RespondentRepresentativeUtils.loadStagedRepresentativeContactDetails(caseData, roles);
+    }
+
+    /**
+     * Persists the staged contact details onto the respondent representatives held by the
+     * authenticated user, then clears the staged and Check your answers fields.
+     *
+     * <p>When the user chose "Use MyHMCTS details", the organisation address is re-fetched and
+     * applied to the staging field first, so submit does not depend on the mid-event payload
+     * surviving.
+     *
+     * <p>The live ET3 response fields are deliberately not read or written by this method.
+     *
+     * @param userToken the authentication token associated with the user
+     * @param caseData the case data containing respondent, representative and staged details
+     * @param submissionReference the unique reference identifying the submission/case
+     * @throws GenericServiceException if the case data or token is invalid, the representative
+     *                                 roles cannot be retrieved, or the MyHMCTS organisation
+     *                                 address cannot be retrieved
+     */
+    public void saveStagedContactDetails(String userToken, CaseData caseData, String submissionReference)
+            throws GenericServiceException {
+        CaseDataUtils.validateCaseData(caseData, submissionReference);
+        UserUtils.validateToken(userToken, submissionReference);
+
+        List<String> roles = nocRepresentativeService
+                .getValidatedRepresentativeRolesByUserToken(userToken, submissionReference);
+        if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS.equals(caseData.getRepresentativeContactChangeOption())) {
+            setStagedMyHmctsContactAddress(userToken, caseData);
+        }
+        RespondentRepresentativeUtils.saveStagedRepresentativeContactDetails(caseData, roles);
+        RespondentRepresentativeUtils.clearStagedRepresentativeContactDetails(caseData);
+    }
+
+    /**
      * Updates the ET3 response contact address and phone details based on the
      * representative roles associated with the authenticated user.
      * <p>

@@ -18,7 +18,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.AmendRepresentativeContactService;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,8 +50,8 @@ public class AmendRepresentativeContactController {
     private final AmendRepresentativeContactService amendRepresentativeContactService;
 
     @PostMapping(value = "/aboutToStart", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Updates caseData Et3ResponseAddress and MyHmctsAddressText fields if the user selects the"
-            + "option to use MyHmcts details")
+    @Operation(summary = "Pre-fills the staged respRepPhoneNumber and "
+            + "respRepAddress fields from the current respondent representative details")
     @ApiResponses(value = {
         @ApiResponse(responseCode = HTTP_CODE_TWO_HUNDRED, description = HTTP_MESSAGE_TWO_HUNDRED,
             content = {
@@ -73,7 +72,7 @@ public class AmendRepresentativeContactController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         try {
-            amendRepresentativeContactService.setEt3ResponseContactAddress(userToken, caseData,
+            amendRepresentativeContactService.loadStagedContactDetails(userToken, caseData,
                     ccdRequest.getCaseDetails().getCaseId());
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
@@ -82,8 +81,8 @@ public class AmendRepresentativeContactController {
     }
 
     @PostMapping(value = "/midEvent", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Updates caseData Et3ResponseAddress and MyHmctsAddressText fields if the user selects the"
-            + "option to use MyHmcts details")
+    @Operation(summary = "Updates caseData respRepAddress and MyHmctsAddressText fields if the user "
+            + "selects the option to use MyHmcts details")
     @ApiResponses(value = {
         @ApiResponse(responseCode = HTTP_CODE_TWO_HUNDRED, description = HTTP_MESSAGE_TWO_HUNDRED,
             content = {
@@ -106,7 +105,7 @@ public class AmendRepresentativeContactController {
         try {
             if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS.equals(
                     caseData.getRepresentativeContactChangeOption())) {
-                amendRepresentativeContactService.setRepresentativeMyHmctsContactAddress(userToken, caseData);
+                amendRepresentativeContactService.setStagedMyHmctsContactAddress(userToken, caseData);
             }
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
@@ -116,7 +115,7 @@ public class AmendRepresentativeContactController {
 
     @PostMapping(value = "/aboutToSubmit", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
     @Operation(summary = "Updates RepresentedTypeR model of the respondent representative with new address and phone"
-            + "values")
+            + "values, then clears the staged fields")
     @ApiResponses(value = {
         @ApiResponse(responseCode = HTTP_CODE_TWO_HUNDRED, description = HTTP_MESSAGE_TWO_HUNDRED,
             content = {
@@ -137,10 +136,8 @@ public class AmendRepresentativeContactController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         try {
-            amendRepresentativeContactService.updateRepresentativeContactDetails(
+            amendRepresentativeContactService.saveStagedContactDetails(
                     userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
-            AddressUtils.clearMyHmctsAddressText(caseData);
-            caseData.setEt3ResponseAddress(null);
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
         }

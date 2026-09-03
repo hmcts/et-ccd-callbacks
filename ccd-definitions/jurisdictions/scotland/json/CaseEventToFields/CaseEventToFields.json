@@ -5080,7 +5080,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseEventID": "amendRepresentativeContact",
-    "CaseFieldID": "et3ResponsePhone",
+    "CaseFieldID": "respRepPhoneNumber",
     "DisplayContext": "OPTIONAL",
     "PageID": 2,
     "PageDisplayOrder": 2,
@@ -5091,7 +5091,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseEventID": "amendRepresentativeContact",
-    "CaseFieldID": "et3ResponseAddress",
+    "CaseFieldID": "respRepAddress",
     "DisplayContext": "OPTIONAL",
     "PageID": 2,
     "PageDisplayOrder": 2,

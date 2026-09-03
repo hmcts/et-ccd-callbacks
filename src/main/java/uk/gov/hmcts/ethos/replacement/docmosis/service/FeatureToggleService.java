@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.launchdarkly.FeatureToggleApi;
 
@@ -8,6 +9,14 @@ import uk.gov.hmcts.ecm.common.launchdarkly.FeatureToggleApi;
 public class FeatureToggleService {
 
     private final FeatureToggleApi featureToggleApi;
+
+    /**
+     * Fallback used when LaunchDarkly cannot resolve the flag, which is always the case locally
+     * where the SDK key is a placeholder. Defaults to off so deployed environments stay
+     * LaunchDarkly controlled; application-cftlib.yaml turns it on for local runs.
+     */
+    @Value("${et.referral-task-completion.default-enabled:false}")
+    private boolean referralTaskCompletionDefault;
 
     @Autowired
     public FeatureToggleService(FeatureToggleApi featureToggleApi) {
@@ -39,7 +48,8 @@ public class FeatureToggleService {
     }
 
     public boolean isReferralTaskCompletionEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("referral-task-completion");
+        return this.featureToggleApi.isFeatureEnabled("referral-task-completion",
+            referralTaskCompletionDefault);
     }
 
     public boolean isWelshEnabled() {

@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -40,6 +42,18 @@ public class ReferralTaskCompletionService {
 
     private static final String TERMINATE_REASON_COMPLETED = "completed";
     private static final String REFERRAL_NUMBER = "referralNumber";
+
+    /**
+     * Fallback for tasks created before the referralNumber property existed. The configuration DMN
+     * has long titled these tasks "Review Referral #32 - Subject" (with EJ - / LO - prefixes and a
+     * Response variant), so the number can be recovered from the title.
+     *
+     * <p>Additional properties cannot be written to an existing task - CFTTaskMapper only
+     * reconfigures a fixed list of fields and additionalProperties is not on it - so pre-existing
+     * tasks can never acquire the property and would otherwise be left permanently open once the
+     * completion DMN rules are removed. This can be deleted once no such tasks remain.</p>
+     */
+    private static final Pattern TITLE_REFERRAL_NUMBER = Pattern.compile("#(\\d+)");
     private static final String OPERATOR_IN = "IN";
 
     private static final List<String> ALL_REFERRAL_TASK_TYPES = List.of(
@@ -145,8 +159,21 @@ public class ReferralTaskCompletionService {
         return TaskSearchParameter.builder().key(key).operator(OPERATOR_IN).values(values).build();
     }
 
+    /**
+     * Prefers the referralNumber additional property, falling back to the number embedded in the
+     * task title for tasks created before that property existed.
+     */
     private static String referralNumberOf(WaTask task) {
         Map<String, String> additionalProperties = task.getAdditionalProperties();
-        return additionalProperties == null ? null : additionalProperties.get(REFERRAL_NUMBER);
+        String fromProperty = additionalProperties == null ? null : additionalProperties.get(REFERRAL_NUMBER);
+        return isBlank(fromProperty) ? referralNumberFromTitle(task.getTaskTitle()) : fromProperty;
+    }
+
+    private static String referralNumberFromTitle(String taskTitle) {
+        if (isBlank(taskTitle)) {
+            return null;
+        }
+        Matcher matcher = TITLE_REFERRAL_NUMBER.matcher(taskTitle);
+        return matcher.find() ? matcher.group(1) : null;
     }
 }

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
@@ -57,6 +58,10 @@ class ReferralTaskCompletionServiceTest {
     private void tasksReturned(WaTask... tasks) {
         when(waTaskApiClient.searchTasks(anyString(), anyString(), any(TaskSearchRequest.class)))
             .thenReturn(TaskSearchResponse.builder().tasks(List.of(tasks)).build());
+    }
+
+    private static WaTask legacyTask(String id, String type, String taskTitle) {
+        return WaTask.builder().id(id).type(type).taskTitle(taskTitle).build();
     }
 
     private static WaTask task(String id, String type, String referralNumber) {
@@ -261,5 +266,77 @@ class ReferralTaskCompletionServiceTest {
         service.completeTasksForClosedReferral(caseId, "32", USER_TOKEN);
 
         verifyNoInteractions(waTaskApiClient, serviceAuthTokenGenerator);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "Review Referral #32 - Orders,32",
+        "EJ - Review Referral #32 - Orders,32",
+        "LO - Review Referral #32 - Orders,32",
+        "Review Referral Response #32 - Orders,32",
+        "EJ - Review Referral Response #32 - Other - please specify,32",
+        "Review Referral #7 - Orders,7"
+    })
+    void shouldFallBackToTheReferralNumberInTheTitle(String taskTitle, String expectedMatch) {
+        stubServiceToken();
+        tasksReturned(legacyTask("legacy", "ReviewReferralAdmin", taskTitle));
+
+        service.completeTasksForClosedReferral(CASE_ID, expectedMatch, USER_TOKEN);
+
+        verify(waTaskApiClient).terminateTask(eq(SERVICE_TOKEN), eq("legacy"), any());
+    }
+
+    @Test
+    void shouldNotMatchALegacyTaskBelongingToADifferentReferral() {
+        stubServiceToken();
+        tasksReturned(legacyTask("legacy-5", "ReviewReferralAdmin", "Review Referral #5 - Orders"));
+
+        service.completeTasksForClosedReferral(CASE_ID, "32", USER_TOKEN);
+
+        verify(waTaskApiClient, never()).terminateTask(anyString(), anyString(), any());
+    }
+
+    @Test
+    void shouldPreferTheAdditionalPropertyOverTheTitle() {
+        stubServiceToken();
+        WaTask conflicting = WaTask.builder()
+            .id("conflict")
+            .type("ReviewReferralAdmin")
+            .taskTitle("Review Referral #5 - Orders")
+            .additionalProperties(Map.of("referralNumber", "32"))
+            .build();
+        tasksReturned(conflicting);
+
+        service.completeTasksForClosedReferral(CASE_ID, "32", USER_TOKEN);
+
+        verify(waTaskApiClient).terminateTask(eq(SERVICE_TOKEN), eq("conflict"), any());
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"", "Review Referral", "Review Referral - Orders"})
+    void shouldIgnoreLegacyTasksWithNoNumberInTheTitle(String taskTitle) {
+        stubServiceToken();
+        tasksReturned(legacyTask("no-number", "ReviewReferralAdmin", taskTitle));
+
+        service.completeTasksForClosedReferral(CASE_ID, "32", USER_TOKEN);
+
+        verify(waTaskApiClient, never()).terminateTask(anyString(), anyString(), any());
+    }
+
+    @Test
+    void shouldFallBackWhenTheAdditionalPropertyIsPresentButBlank() {
+        stubServiceToken();
+        WaTask blankProperty = WaTask.builder()
+            .id("blank-prop")
+            .type("ReviewReferralAdmin")
+            .taskTitle("Review Referral #32 - Orders")
+            .additionalProperties(Map.of("referralNumber", ""))
+            .build();
+        tasksReturned(blankProperty);
+
+        service.completeTasksForClosedReferral(CASE_ID, "32", USER_TOKEN);
+
+        verify(waTaskApiClient).terminateTask(eq(SERVICE_TOKEN), eq("blank-prop"), any());
     }
 }

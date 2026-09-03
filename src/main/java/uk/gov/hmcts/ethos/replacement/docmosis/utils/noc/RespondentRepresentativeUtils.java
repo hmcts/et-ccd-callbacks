@@ -1077,7 +1077,7 @@ public final class RespondentRepresentativeUtils {
      * Persists the staged contact details onto every representative linked to the given case roles.
      * <p>
      * Reads {@code respRepPhoneNumber} and {@code respRepAddress}
-     * rather than the live ET3 response fields.
+     * rather than the live ET3 response fields. Use this for the "Amend contact details" option.
      *
      * @param caseData the case data containing respondent and representative details
      * @param roles the list of case role labels used to identify respondents
@@ -1085,6 +1085,21 @@ public final class RespondentRepresentativeUtils {
     public static void saveStagedRepresentativeContactDetails(CaseData caseData, List<String> roles) {
         for (RepresentedTypeR representative : findRepresentativesByRoles(caseData, roles)) {
             representative.setRepresentativePhoneNumber(caseData.getRespRepPhoneNumber());
+            representative.setRepresentativeAddress(caseData.getRespRepAddress());
+        }
+    }
+
+    /**
+     * Persists only the staged address onto every representative linked to the given case roles.
+     * <p>
+     * Used for the "Use MyHMCTS details" option, where the phone staging field is hidden and must
+     * not overwrite the existing representative phone number.
+     *
+     * @param caseData the case data containing respondent and representative details
+     * @param roles the list of case role labels used to identify respondents
+     */
+    public static void saveStagedRepresentativeAddress(CaseData caseData, List<String> roles) {
+        for (RepresentedTypeR representative : findRepresentativesByRoles(caseData, roles)) {
             representative.setRepresentativeAddress(caseData.getRespRepAddress());
         }
     }

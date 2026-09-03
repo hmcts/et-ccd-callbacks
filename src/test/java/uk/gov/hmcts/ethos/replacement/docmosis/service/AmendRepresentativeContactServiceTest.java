@@ -228,12 +228,16 @@ class AmendRepresentativeContactServiceTest {
     void theSaveStagedContactDetails_withMyHmctsOption_usesOrganisationAddress() {
         CaseData caseData = new CaseData();
         caseData.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS);
-        caseData.setRespRepPhoneNumber(REPRESENTATIVE_PHONE_NUMBER);
+        // CCD clears the hidden phone staging field for the MyHMCTS option
+        caseData.setRespRepPhoneNumber(null);
         when(myHmctsService.getUserOrganisationAddress(VALID_USER_TOKEN)).thenReturn(OrganisationAddress.builder()
                 .addressLine1(ADDRESS_LINE_1).addressLine2(ADDRESS_LINE_2).addressLine3(ADDRESS_LINE_3)
                 .country(COUNTRY).county(COUNTY).postCode(POSTAL_CODE).townCity(TOWN_CITY).build());
 
-        RepresentedTypeR representativeValue = RepresentedTypeR.builder().respondentId(RESPONDENT_ID).build();
+        RepresentedTypeR representativeValue = RepresentedTypeR.builder()
+                .respondentId(RESPONDENT_ID)
+                .representativePhoneNumber(REPRESENTATIVE_PHONE_NUMBER)
+                .build();
         caseData.setRepCollection(List.of(RepresentedTypeRItem.builder()
                 .id(RESPONDENT_REPRESENTATIVE_ID).value(representativeValue).build()));
         RespondentSumTypeItem respondent = new RespondentSumTypeItem();
@@ -246,6 +250,7 @@ class AmendRepresentativeContactServiceTest {
         amendRepresentativeContactService.saveStagedContactDetails(VALID_USER_TOKEN, caseData, SUBMISSION_REFERENCE);
 
         assertThat(representativeValue.getRepresentativeAddress()).isEqualTo(createAddress());
+        // existing phone must not be wiped when the staging phone field is hidden/null
         assertThat(representativeValue.getRepresentativePhoneNumber()).isEqualTo(REPRESENTATIVE_PHONE_NUMBER);
         assertThat(caseData.getEt3ResponseAddress()).isNull();
         assertThat(caseData.getRespRepAddress()).isNull();

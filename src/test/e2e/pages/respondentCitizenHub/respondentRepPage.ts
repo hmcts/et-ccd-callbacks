@@ -10,7 +10,7 @@ export default class RespondentRepPage extends BasePage {
   private readonly selectOrgFromSearchResult: Locator;
   private readonly respondentName: Locator;
   private readonly respondentRepresentativeName: Locator;
-  private readonly respRepPhoneNumber: Locator;
+  private readonly respondentRepresentativePhoneNumber: Locator;
   private readonly respondentRepresentativeEmailAddress: Locator;
   private readonly respondentRepresentativeContactPreference: Locator;
   private readonly respondentTypeInd: Locator;
@@ -40,7 +40,7 @@ export default class RespondentRepPage extends BasePage {
     this.selectOrgFromSearchResult = page.locator('//a[contains(.,"Select")]');
     this.respondentName = page.locator('#repCollection_0_name_of_representative');
     this.respondentRepresentativeName = page.locator('#repCollection_0_name_of_representative');
-    this.respRepPhoneNumber = page.locator('#repCollection_0_representative_phone_number');
+    this.respondentRepresentativePhoneNumber = page.locator('#repCollection_0_representative_phone_number');
     this.respondentRepresentativeEmailAddress = page.locator('#repCollection_0_representative_email_address');
     this.respondentRepresentativeContactPreference = page.locator('#repCollection_0_representative_preference');
     this.respondentTypeInd = page.locator('#respondentCollection_0_respondentType-Individual');
@@ -66,7 +66,7 @@ export default class RespondentRepPage extends BasePage {
     await expect(this.page.getByRole('heading', { name: 'Respondent Representative(s)', level: 2})).toBeVisible();
     await this.selectRespondent.selectOption(CaseDetailsValues.respondentName);
     await this.respondentName.fill(CaseDetailsValues.respondentName);
-    await this.respRepPhoneNumber.fill('01234657895');
+    await this.respondentRepresentativePhoneNumber.fill('01234657895');
     await this.respondentRepresentativeEmailAddress.fill('et.legalrep.1@gmail.com');
     await this.respondentRepresentativeContactPreference.selectOption('1: Email');
 

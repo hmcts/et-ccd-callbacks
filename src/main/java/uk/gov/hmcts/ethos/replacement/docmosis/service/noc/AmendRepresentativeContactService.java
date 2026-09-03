@@ -154,7 +154,11 @@ public class AmendRepresentativeContactService {
      *
      * <p>When the user chose "Use MyHMCTS details", the organisation address is re-fetched and
      * applied to the staging field first, so submit does not depend on the mid-event payload
-     * surviving.
+     * surviving. Only the representative address is updated in that path — the existing phone
+     * number is left unchanged, because the phone staging field is hidden for that option and
+     * must not be written as null.
+     *
+     * <p>When the user chose "Amend contact details", both staged phone and address are saved.
      *
      * <p>The live ET3 response fields are deliberately not read or written by this method.
      *
@@ -174,8 +178,10 @@ public class AmendRepresentativeContactService {
                 .getValidatedRepresentativeRolesByUserToken(userToken, submissionReference);
         if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS.equals(caseData.getRepresentativeContactChangeOption())) {
             setStagedMyHmctsContactAddress(userToken, caseData);
+            RespondentRepresentativeUtils.saveStagedRepresentativeAddress(caseData, roles);
+        } else {
+            RespondentRepresentativeUtils.saveStagedRepresentativeContactDetails(caseData, roles);
         }
-        RespondentRepresentativeUtils.saveStagedRepresentativeContactDetails(caseData, roles);
         RespondentRepresentativeUtils.clearStagedRepresentativeContactDetails(caseData);
     }
 

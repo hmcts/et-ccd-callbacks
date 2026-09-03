@@ -908,6 +908,30 @@ final class RespondentRepresentativeUtilsTest {
     }
 
     @Test
+    void theSaveStagedRepresentativeAddress_leavesPhoneUnchanged() {
+        CaseData caseData = new CaseData();
+        RepresentedTypeR representativeValue = RepresentedTypeR.builder()
+                .respondentId(RESPONDENT_ID_1)
+                .representativePhoneNumber(REPRESENTATIVE_1_PHONE)
+                .build();
+        caseData.setRepCollection(List.of(RepresentedTypeRItem.builder()
+                .id(REPRESENTATIVE_ID_1).value(representativeValue).build()));
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setId(RESPONDENT_ID_1);
+        caseData.setRespondentCollection(List.of(respondent));
+
+        Address newAddress = new Address();
+        newAddress.setAddressLine1("1 New Street");
+        caseData.setRespRepAddress(newAddress);
+        caseData.setRespRepPhoneNumber(null);
+
+        RespondentRepresentativeUtils.saveStagedRepresentativeAddress(caseData, List.of(ROLE_SOLICITOR_A));
+
+        assertThat(representativeValue.getRepresentativeAddress()).isEqualTo(newAddress);
+        assertThat(representativeValue.getRepresentativePhoneNumber()).isEqualTo(REPRESENTATIVE_1_PHONE);
+    }
+
+    @Test
     void theClearStagedRepresentativeContactDetails() {
         CaseData caseData = new CaseData();
         Address et3Address = createRepresentativeAddress();

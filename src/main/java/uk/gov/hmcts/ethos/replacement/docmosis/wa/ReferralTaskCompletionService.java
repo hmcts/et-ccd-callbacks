@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import java.util.List;
 import java.util.Map;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * Completes the Work Allocation tasks belonging to one specific referral.
@@ -86,7 +86,7 @@ public class ReferralTaskCompletionService {
     }
 
     private void completeTasks(String caseId, String referralNumber, String userToken, List<String> taskTypes) {
-        if (isNullOrEmpty(caseId) || isNullOrEmpty(referralNumber)) {
+        if (isBlank(caseId) || isBlank(referralNumber)) {
             log.warn("Skipping referral task completion, case id or referral number missing for case {}", caseId);
             return;
         }
@@ -123,13 +123,22 @@ public class ReferralTaskCompletionService {
         return response == null || response.getTasks() == null ? List.of() : response.getTasks();
     }
 
+    /**
+     * Failures are contained per task so that one task refusing to close does not leave the
+     * remaining tasks for the same referral open.
+     */
     private void terminate(WaTask task, String caseId, String serviceToken) {
         TerminateTaskRequest request = TerminateTaskRequest.builder()
             .terminateInfo(TerminateInfo.builder().terminateReason(TERMINATE_REASON_COMPLETED).build())
             .build();
 
-        waTaskApiClient.terminateTask(serviceToken, task.getId(), request);
-        log.info("Completed task {} ({}) on case {}", task.getId(), task.getType(), caseId);
+        try {
+            waTaskApiClient.terminateTask(serviceToken, task.getId(), request);
+            log.info("Completed task {} ({}) on case {}", task.getId(), task.getType(), caseId);
+        } catch (Exception e) {
+            log.error("Could not complete task {} ({}) on case {}: {}",
+                task.getId(), task.getType(), caseId, e.getMessage(), e);
+        }
     }
 
     private static TaskSearchParameter searchParameter(String key, List<String> values) {

@@ -36,6 +36,8 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -232,4 +234,31 @@ class UpdateReferralControllerTest {
             .andExpect(status().isForbidden());
     }
 
+    @Test
+    void aboutToSubmitUpdateReferral_completesTasksForTheUpdatedReferral() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        UserDetails details = new UserDetails();
+        details.setName("First Last");
+        when(userIdamService.getUserDetails(any())).thenReturn(details);
+
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setId(UUID.randomUUID().toString());
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentName("respondent Name");
+        respondentSumTypeItem.setValue(respondentSumType);
+        ccdRequest.getCaseDetails().getCaseData().setRespondentCollection(List.of(respondentSumTypeItem));
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setUpdateIsUrgent("Yes");
+        caseData.setUpdateReferentEmail("example@example.com");
+        caseData.setUpdateReferralSubject("subject");
+
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk());
+
+        verify(referralTaskCompletionService)
+            .completeTasksForUpdatedReferral(any(), eq("1"), eq(AUTH_TOKEN));
+    }
 }

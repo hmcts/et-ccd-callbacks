@@ -3,6 +3,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.wa;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -162,5 +166,100 @@ class ReferralTaskCompletionServiceTest {
         service.completeTasksForClosedReferral(CASE_ID, "32", USER_TOKEN);
 
         verify(waTaskApiClient, never()).terminateTask(anyString(), anyString(), any());
+    }
+
+    @Test
+    void shouldSearchAllReferralTaskTypesWhenReferralRepliedTo() {
+        stubServiceToken();
+        tasksReturned(task("review-32", "ReviewReferralAdmin", "32"));
+
+        service.completeTasksForReferralReply(CASE_ID, "32", USER_TOKEN);
+
+        ArgumentCaptor<TaskSearchRequest> request = ArgumentCaptor.forClass(TaskSearchRequest.class);
+        verify(waTaskApiClient).searchTasks(eq(USER_TOKEN), eq(SERVICE_TOKEN), request.capture());
+        assertThat(request.getValue().getSearchParameters().get(1).getValues())
+            .containsExactly("ReviewReferralAdmin", "ReviewReferralJudiciary", "ReviewReferralLegalOps",
+                "ReviewReferralResponseAdmin", "ReviewReferralResponseJudiciary",
+                "ReviewReferralResponseLegalOps");
+        verify(waTaskApiClient).terminateTask(eq(SERVICE_TOKEN), eq("review-32"), any());
+    }
+
+    @Test
+    void shouldTerminateEveryMatchingTaskById() {
+        stubServiceToken();
+        tasksReturned(
+            task("review-32", "ReviewReferralAdmin", "32"),
+            task("judicial-32", "ReviewReferralJudiciary", "32"),
+            task("review-5", "ReviewReferralAdmin", "5"));
+
+        service.completeTasksForClosedReferral(CASE_ID, "32", USER_TOKEN);
+
+        ArgumentCaptor<String> ids = ArgumentCaptor.forClass(String.class);
+        verify(waTaskApiClient, times(2))
+            .terminateTask(eq(SERVICE_TOKEN), ids.capture(), any(TerminateTaskRequest.class));
+        assertThat(ids.getAllValues()).containsExactlyInAnyOrder("review-32", "judicial-32");
+    }
+
+    @Test
+    void shouldStillCompleteRemainingTasksWhenOneTerminateFails() {
+        stubServiceToken();
+        tasksReturned(
+            task("fails", "ReviewReferralAdmin", "32"),
+            task("succeeds", "ReviewReferralJudiciary", "32"));
+        doThrow(new IllegalStateException("boom"))
+            .when(waTaskApiClient).terminateTask(anyString(), eq("fails"), any());
+
+        service.completeTasksForClosedReferral(CASE_ID, "32", USER_TOKEN);
+
+        verify(waTaskApiClient).terminateTask(eq(SERVICE_TOKEN), eq("succeeds"), any());
+    }
+
+    @Test
+    void shouldDoNothingWhenSearchReturnsNoTasks() {
+        stubServiceToken();
+        tasksReturned();
+
+        service.completeTasksForClosedReferral(CASE_ID, "32", USER_TOKEN);
+
+        verify(waTaskApiClient, never()).terminateTask(anyString(), anyString(), any());
+    }
+
+    @Test
+    void shouldTolerateANullSearchResponse() {
+        stubServiceToken();
+        when(waTaskApiClient.searchTasks(anyString(), anyString(), any())).thenReturn(null);
+
+        service.completeTasksForClosedReferral(CASE_ID, "32", USER_TOKEN);
+
+        verify(waTaskApiClient, never()).terminateTask(anyString(), anyString(), any());
+    }
+
+    @Test
+    void shouldTolerateAResponseWithNoTaskList() {
+        stubServiceToken();
+        when(waTaskApiClient.searchTasks(anyString(), anyString(), any()))
+            .thenReturn(TaskSearchResponse.builder().tasks(null).build());
+
+        service.completeTasksForClosedReferral(CASE_ID, "32", USER_TOKEN);
+
+        verify(waTaskApiClient, never()).terminateTask(anyString(), anyString(), any());
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"", "   "})
+    void shouldSkipWhenReferralNumberIsMissingOrBlank(String referralNumber) {
+        service.completeTasksForClosedReferral(CASE_ID, referralNumber, USER_TOKEN);
+
+        verifyNoInteractions(waTaskApiClient, serviceAuthTokenGenerator);
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {""})
+    void shouldSkipWhenCaseIdIsMissing(String caseId) {
+        service.completeTasksForClosedReferral(caseId, "32", USER_TOKEN);
+
+        verifyNoInteractions(waTaskApiClient, serviceAuthTokenGenerator);
     }
 }

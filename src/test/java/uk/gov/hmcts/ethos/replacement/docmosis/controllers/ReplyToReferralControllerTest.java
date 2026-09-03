@@ -43,6 +43,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -288,5 +289,22 @@ class ReplyToReferralControllerTest {
         respondentSumTypeItem.setValue(respondentSumType);
 
         return respondentSumTypeItem;
+    }
+
+    @Test
+    void aboutToSubmitReferralReply_completesTasksForTheReferralRepliedTo() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        // No reply-to address keeps this off the notification path, which needs far more fixture
+        // data and is already covered elsewhere.
+        ccdRequest.getCaseDetails().getCaseData().setReplyToEmailAddress("");
+
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk());
+
+        verify(referralTaskCompletionService)
+            .completeTasksForReferralReply(any(), eq("1"), eq(AUTH_TOKEN));
     }
 }

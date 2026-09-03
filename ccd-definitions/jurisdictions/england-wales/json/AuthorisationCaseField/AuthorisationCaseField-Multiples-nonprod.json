@@ -1021,6 +1021,32 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales_Multiple",
+    "CaseFieldID": "sendNotificationGroupClaims",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-api"
+        ],
+        "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment",
+          "caseworker-employment-etjudge"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment-etjudge-englandwales",
+          "caseworker-employment-englandwales"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales_Multiple",
     "CaseFieldID": "sendNotificationResponseTribunal",
     "UserRole": "et-acas-api",
     "CRUD": "R"
@@ -1144,6 +1170,137 @@
     "CaseFieldID": "sendNotificationFullName",
     "UserRole": "citizen",
     "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales_Multiple",
+    "CaseFieldID": "sendNotificationGroupClaimsMadeBy",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-api"
+        ],
+        "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment",
+          "caseworker-employment-etjudge"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment-etjudge-englandwales",
+          "caseworker-employment-englandwales"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales_Multiple",
+    "CaseFieldID": "sendNotificationFullName3",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-api"
+        ],
+        "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment",
+          "caseworker-employment-etjudge"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment-etjudge-englandwales",
+          "caseworker-employment-englandwales"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "sendNotificationGroupClaims",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-api"
+        ],
+        "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment",
+          "caseworker-employment-etjudge"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment-etjudge-englandwales",
+          "caseworker-employment-englandwales"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "sendNotificationGroupClaimsMadeBy",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-api"
+        ],
+        "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment",
+          "caseworker-employment-etjudge"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment-etjudge-englandwales",
+          "caseworker-employment-englandwales"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "sendNotificationFullName3",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-api"
+        ],
+        "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment",
+          "caseworker-employment-etjudge"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment-etjudge-englandwales",
+          "caseworker-employment-englandwales",
+          "citizen"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
   },
   {
     "CaseTypeId": "ET_EnglandWales_Multiple",

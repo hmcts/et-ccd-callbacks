@@ -708,6 +708,38 @@
     "Searchable": "N"
   },
   {
+    "ID": "TaskListCheck",
+    "ListElementCode": "representativeDetailsCheck",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Have you completed this section?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "TaskListCheck",
+    "ListElementCode": "representedClaimantDetailsCheck",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Have you completed this section?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "TaskListCheck",
+    "ListElementCode": "representedClaimantNameProvided",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Has the representative provided the claimant's name?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "TaskListCheck",
+    "ListElementCode": "representedClaimantEmailProvided",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Has the representative provided the claimant's email address?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
     "ID": "CompanyPremises",
     "ListElementCode": "premises",
     "FieldType": "Text",

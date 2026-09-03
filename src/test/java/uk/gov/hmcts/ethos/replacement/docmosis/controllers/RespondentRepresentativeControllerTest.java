@@ -4,6 +4,9 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -298,6 +301,62 @@ class RespondentRepresentativeControllerTest {
         verify(caseFlagsService, times(1)).clearRespondentRepresentativeFlags(
                 any(CaseData.class), eq(List.of(0)));
         verify(caseFlagsService, times(1)).setupCaseFlags(any(CaseData.class));
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = "representative@example.com")
+    @SneakyThrows
+    void amendRespondentRepresentativePreservesSharedFlagsWhenNameChangesForOneRespondent(String email) {
+        CaseData previousCaseData = new CaseData();
+        previousCaseData.setRepCollection(List.of(
+                respondentRepresentative(ID_REPRESENTATIVE_1, "Representative X", email, ID_RESPONDENT_1),
+                respondentRepresentative(ID_REPRESENTATIVE_2, "Representative X", email, ID_RESPONDENT_2)
+        ));
+        CaseData currentCaseData = new CaseData();
+        currentCaseData.setRepCollection(List.of(
+                respondentRepresentative(ID_REPRESENTATIVE_1, "Representative Y", email, ID_RESPONDENT_1),
+                respondentRepresentative(ID_REPRESENTATIVE_2, "Representative X", email, ID_RESPONDENT_2)
+        ));
+        CallbackRequest callbackRequest = respondentRepresentativeCallback(previousCaseData, currentCaseData);
+        when(featureToggleService.isCaseFlagsV2Enabled(ENGLANDWALES_CASE_TYPE_ID)).thenReturn(true);
+
+        mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_SUBMIT)
+                        .content(jsonMapper.toJson(callbackRequest))
+                        .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(caseFlagsService, never()).clearRespondentRepresentativeFlags(any(CaseData.class), any());
+        verify(caseFlagsService).setupCaseFlags(any(CaseData.class));
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = "representative@example.com")
+    @SneakyThrows
+    void amendRespondentRepresentativeClearsSharedFlagsAfterFinalNameChange(String email) {
+        CaseData previousCaseData = new CaseData();
+        previousCaseData.setRepCollection(List.of(
+                respondentRepresentative(ID_REPRESENTATIVE_1, "Representative Y", email, ID_RESPONDENT_1),
+                respondentRepresentative(ID_REPRESENTATIVE_2, "Representative X", email, ID_RESPONDENT_2)
+        ));
+        CaseData currentCaseData = new CaseData();
+        currentCaseData.setRepCollection(List.of(
+                respondentRepresentative(ID_REPRESENTATIVE_1, "Representative Y", email, ID_RESPONDENT_1),
+                respondentRepresentative(ID_REPRESENTATIVE_2, "Representative Y", email, ID_RESPONDENT_2)
+        ));
+        CallbackRequest callbackRequest = respondentRepresentativeCallback(previousCaseData, currentCaseData);
+        when(featureToggleService.isCaseFlagsV2Enabled(ENGLANDWALES_CASE_TYPE_ID)).thenReturn(true);
+
+        mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_SUBMIT)
+                        .content(jsonMapper.toJson(callbackRequest))
+                        .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(caseFlagsService).clearRespondentRepresentativeFlags(any(CaseData.class), eq(List.of(1)));
+        verify(caseFlagsService).setupCaseFlags(any(CaseData.class));
     }
 
     @Test
@@ -700,6 +759,24 @@ class RespondentRepresentativeControllerTest {
         return CallbackRequest.builder()
                 .caseDetailsBefore(previousCaseDetails)
                 .caseDetails(currentCaseDetails)
+                .build();
+    }
+
+    private static RepresentedTypeRItem respondentRepresentative(
+            String id, String name, String email, String respondentId) {
+        DynamicValueType respondentSelection = new DynamicValueType();
+        respondentSelection.setLabel(ID_RESPONDENT_1.equals(respondentId) ? RESPONDENT_NAME_1 : RESPONDENT_NAME_2);
+        DynamicFixedListType respondentList = new DynamicFixedListType();
+        respondentList.setValue(respondentSelection);
+        return RepresentedTypeRItem.builder()
+                .id(id)
+                .value(RepresentedTypeR.builder()
+                        .nameOfRepresentative(name)
+                        .representativeEmailAddress(email)
+                        .respondentId(respondentId)
+                        .respRepName(ID_RESPONDENT_1.equals(respondentId) ? RESPONDENT_NAME_1 : RESPONDENT_NAME_2)
+                        .dynamicRespRepName(respondentList)
+                        .build())
                 .build();
     }
 }

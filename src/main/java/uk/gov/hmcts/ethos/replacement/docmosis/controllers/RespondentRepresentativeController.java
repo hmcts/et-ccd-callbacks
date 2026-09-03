@@ -309,11 +309,46 @@ public class RespondentRepresentativeController {
         boolean representativeRemoved = respondentRepresentativeRemoved(callbackRequest);
         if (featureToggleService.isCaseFlagsV2Enabled(callbackRequest.getCaseDetails().getCaseTypeId())
                 && (CollectionUtils.isNotEmpty(changedRepresentativeIndexes) || representativeRemoved)) {
-            if (CollectionUtils.isNotEmpty(changedRepresentativeIndexes)) {
-                caseFlagsService.clearRespondentRepresentativeFlags(caseData, changedRepresentativeIndexes);
+            List<Integer> representativeIndexesToClear = changedRepresentativeIndexes.stream()
+                    .filter(index -> shouldClearChangedRepresentativeFlags(callbackRequest, index))
+                    .toList();
+            if (CollectionUtils.isNotEmpty(representativeIndexesToClear)) {
+                caseFlagsService.clearRespondentRepresentativeFlags(caseData, representativeIndexesToClear);
             }
             caseFlagsService.setupCaseFlags(caseData);
         }
+    }
+
+    private static boolean shouldClearChangedRepresentativeFlags(
+            CallbackRequest callbackRequest, int currentRepresentativeIndex) {
+        List<RepresentedTypeRItem> previousRepresentatives =
+                callbackRequest.getCaseDetailsBefore().getCaseData().getRepCollection();
+        List<RepresentedTypeRItem> currentRepresentatives =
+                callbackRequest.getCaseDetails().getCaseData().getRepCollection();
+        RepresentedTypeRItem currentRepresentative = currentRepresentatives.get(currentRepresentativeIndex);
+        RepresentedTypeRItem previousRepresentative = previousRepresentatives.stream()
+                .filter(previous -> sameRepresentative(previous, currentRepresentative))
+                .findFirst()
+                .orElse(null);
+
+        if (previousRepresentative == null) {
+            return true;
+        }
+
+        return IntStream.range(0, currentRepresentatives.size())
+                .filter(index -> index != currentRepresentativeIndex)
+                .mapToObj(currentRepresentatives::get)
+                .noneMatch(representative -> sameRepresentativeIdentity(previousRepresentative, representative));
+    }
+
+    private static boolean sameRepresentativeIdentity(
+            RepresentedTypeRItem firstRepresentative, RepresentedTypeRItem secondRepresentative) {
+        return Strings.CI.equals(
+                StringUtils.trimToEmpty(representativeName(firstRepresentative)),
+                StringUtils.trimToEmpty(representativeName(secondRepresentative)))
+                && Strings.CI.equals(
+                        StringUtils.trimToEmpty(representativeEmail(firstRepresentative)),
+                        StringUtils.trimToEmpty(representativeEmail(secondRepresentative)));
     }
 
     private static boolean respondentRepresentativeRemoved(CallbackRequest callbackRequest) {

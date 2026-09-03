@@ -789,6 +789,62 @@ class NocRespondentRepresentativeServiceTest {
 
     @Test
     @SneakyThrows
+    void revokeOldRespondentRepresentativeAccessOnlyRevokesRoleForChangedRepresentativeName() {
+        RepresentedTypeRItem representative1 = removableRepresentativeForRespondent(
+                "rep-item-1", RESPONDENT_ID_ONE, RESPONDENT_NAME_ONE, ROLE_SOLICITORA,
+                REPRESENTATIVE_ID_ONE, REPRESENTATIVE_EMAIL_1, ORGANISATION_ID_ONE);
+        representative1.getValue().setNameOfRepresentative(RESPONDENT_REP_NAME);
+        RepresentedTypeRItem representative2 = removableRepresentativeForRespondent(
+                "rep-item-2", RESPONDENT_ID_TWO, RESPONDENT_NAME_TWO, ROLE_SOLICITORB,
+                REPRESENTATIVE_ID_TWO, REPRESENTATIVE_EMAIL_2, ORGANISATION_ID_TWO);
+        representative2.getValue().setNameOfRepresentative(RESPONDENT_REP_NAME_TWO);
+        RepresentedTypeRItem representative3 = removableRepresentativeForRespondent(
+                "rep-item-3", RESPONDENT_ID_THREE, RESPONDENT_NAME_THREE, ROLE_SOLICITORC,
+                REPRESENTATIVE_ID_THREE, RESPONDENT_REPRESENTATIVE_EMAIL, ORGANISATION_ID_THREE);
+        representative3.getValue().setNameOfRepresentative(RESPONDENT_REP_NAME_THREE);
+
+        RepresentedTypeRItem representative4 = removableRepresentativeForRespondent(
+                "rep-item-2", RESPONDENT_ID_TWO, RESPONDENT_NAME_TWO, ROLE_SOLICITORB,
+                REPRESENTATIVE_ID_TWO, REPRESENTATIVE_EMAIL_2, ORGANISATION_ID_TWO);
+        representative4.getValue().setNameOfRepresentative("Legal Four");
+        CaseData previousCaseData = new CaseData();
+        previousCaseData.setRepCollection(List.of(representative1, representative2, representative3));
+        CaseData currentCaseData = new CaseData();
+        currentCaseData.setRepCollection(List.of(representative1, representative4, representative3));
+        CaseDetails previousCaseDetails = new CaseDetails();
+        previousCaseDetails.setCaseId(CASE_ID_1);
+        previousCaseDetails.setCaseData(previousCaseData);
+        CaseDetails currentCaseDetails = new CaseDetails();
+        currentCaseDetails.setCaseId(CASE_ID_1);
+        currentCaseDetails.setCaseData(currentCaseData);
+        CallbackRequest callbackRequest = CallbackRequest.builder()
+                .caseDetailsBefore(previousCaseDetails)
+                .caseDetails(currentCaseDetails)
+                .build();
+
+        CaseUserAssignment representative1Assignment = assignment(REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
+        CaseUserAssignment representative2Assignment = assignment(REPRESENTATIVE_ID_TWO, ROLE_SOLICITORB);
+        CaseUserAssignment representative3Assignment = assignment(REPRESENTATIVE_ID_THREE, ROLE_SOLICITORC);
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1))
+                .thenReturn(CaseUserAssignmentData.builder()
+                        .caseUserAssignments(List.of(
+                                representative1Assignment, representative2Assignment, representative3Assignment))
+                        .build());
+
+        List<RepresentedTypeRItem> revokedRepresentatives = nocRespondentRepresentativeService
+                .revokeOldRespondentRepresentativeAccess(callbackRequest, USER_TOKEN, List.of(representative2));
+
+        assertThat(revokedRepresentatives).containsExactly(representative2);
+        ArgumentCaptor<CaseUserAssignmentData> revokedAssignments =
+                ArgumentCaptor.forClass(CaseUserAssignmentData.class);
+        verify(ccdClient).revokeCaseAssignments(eq(USER_TOKEN), revokedAssignments.capture());
+        assertThat(revokedAssignments.getValue().getCaseUserAssignments())
+                .containsExactly(representative2Assignment);
+    }
+
+    @Test
+    @SneakyThrows
     void revokeOldRespondentRepresentativeAccessRetainsRoleForAnotherRespondentRepresentedBySameUser() {
         RepresentedTypeRItem removedRespondentOneRepresentative = removableRepresentativeForRespondent(
                 "rep-item-1", RESPONDENT_ID_ONE, RESPONDENT_NAME_ONE, ROLE_SOLICITORA,
@@ -1652,6 +1708,54 @@ class NocRespondentRepresentativeServiceTest {
     }
 
     @Test
+    @SneakyThrows
+    void addNewRepresentativesGrantsRespondentAccessWhenRepresentativeNameChanges() {
+        final Organisation organisation = Organisation.builder().organisationID(ORGANISATION_ID_TWO).build();
+        RepresentedTypeRItem oldRepresentative = removableRepresentativeForRespondent(
+                "rep-item-2", RESPONDENT_ID_TWO, RESPONDENT_NAME_TWO, ROLE_SOLICITORB,
+                REPRESENTATIVE_ID_TWO, REPRESENTATIVE_EMAIL_2, ORGANISATION_ID_TWO);
+        oldRepresentative.getValue().setNameOfRepresentative(RESPONDENT_REP_NAME_TWO);
+        RepresentedTypeRItem newRepresentative = removableRepresentativeForRespondent(
+                "rep-item-2", RESPONDENT_ID_TWO, RESPONDENT_NAME_TWO, ROLE_SOLICITORB,
+                REPRESENTATIVE_ID_TWO, REPRESENTATIVE_EMAIL_2, ORGANISATION_ID_TWO);
+        newRepresentative.getValue().setNameOfRepresentative("Legal Four");
+
+        CaseData previousCaseData = new CaseData();
+        previousCaseData.setRepCollection(List.of(oldRepresentative));
+        final CaseData currentCaseData = new CaseData();
+        RespondentSumTypeItem respondent1 = new RespondentSumTypeItem();
+        respondent1.setId(RESPONDENT_ID_ONE);
+        respondent1.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_ONE).build());
+        RespondentSumTypeItem respondent2 = new RespondentSumTypeItem();
+        respondent2.setId(RESPONDENT_ID_TWO);
+        respondent2.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_TWO).build());
+        currentCaseData.setRespondentCollection(List.of(respondent1, respondent2));
+        currentCaseData.setRepCollection(List.of(newRepresentative));
+        CaseDetails previousCaseDetails = new CaseDetails();
+        previousCaseDetails.setCaseData(previousCaseData);
+        CaseDetails currentCaseDetails = new CaseDetails();
+        currentCaseDetails.setCaseId(CASE_ID_1);
+        currentCaseDetails.setCaseData(currentCaseData);
+        final CallbackRequest callbackRequest = CallbackRequest.builder()
+                .caseDetailsBefore(previousCaseDetails)
+                .caseDetails(currentCaseDetails)
+                .build();
+
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1))
+                .thenReturn(new CaseUserAssignmentData());
+        when(nocService.grantRepresentativeAccess(
+                ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL_2, CASE_ID_1, organisation, ROLE_SOLICITORB))
+                .thenReturn(REPRESENTATIVE_ID_TWO);
+
+        nocRespondentRepresentativeService.addNewRepresentatives(callbackRequest);
+
+        verify(nocService).grantRepresentativeAccess(
+                ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL_2, CASE_ID_1, organisation, ROLE_SOLICITORB);
+        assertThat(currentCaseData.getRepCollectionToAdd()).containsExactly(newRepresentative);
+    }
+
+    @Test
     void theFindRepresentativesToRemove() {
         List<RepresentedTypeRItem> oldRepresentatives = new ArrayList<>();
         List<RepresentedTypeRItem> newRepresentatives = new ArrayList<>();
@@ -1728,6 +1832,22 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(representativesToRemove).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE);
         assertThat(representativesToRemove.getFirst()).isEqualTo(validOldRepresentative);
         assertThat(newRepresentatives).hasSize(NumberUtils.INTEGER_ONE);
+    }
+
+    @Test
+    void findRepresentativesToRemoveReturnsPreviousRepresentativeWhenNameChanges() {
+        RepresentedTypeRItem oldRepresentative = removableRepresentativeForRespondent(
+                "rep-item-2", RESPONDENT_ID_TWO, RESPONDENT_NAME_TWO, ROLE_SOLICITORB,
+                REPRESENTATIVE_ID_TWO, REPRESENTATIVE_EMAIL_2, ORGANISATION_ID_TWO);
+        oldRepresentative.getValue().setNameOfRepresentative(RESPONDENT_REP_NAME_TWO);
+        RepresentedTypeRItem newRepresentative = removableRepresentativeForRespondent(
+                "rep-item-2", RESPONDENT_ID_TWO, RESPONDENT_NAME_TWO, ROLE_SOLICITORB,
+                REPRESENTATIVE_ID_TWO, REPRESENTATIVE_EMAIL_2, ORGANISATION_ID_TWO);
+        newRepresentative.getValue().setNameOfRepresentative("Legal Four");
+
+        assertThat(nocRespondentRepresentativeService.findRepresentativesToRemove(
+                List.of(oldRepresentative), List.of(newRepresentative)))
+                .containsExactly(oldRepresentative);
     }
 
     @Test

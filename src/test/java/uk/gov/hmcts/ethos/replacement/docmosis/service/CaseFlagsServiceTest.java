@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.FlagDetailType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
@@ -528,6 +530,182 @@ class CaseFlagsServiceTest {
         assertAll(
                 () -> assertNull(allPartyFlags.getRepresentative1Flags()),
                 () -> assertNull(allPartyFlags.getRepresentative1ExternalFlags())
+        );
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = "representative@example.com")
+    void setupCaseFlags_shouldPreserveRepresentativeFlagsUntilFinalNameChange(String email) {
+        caseData.setRespondentCollection(respondentCollection(2));
+        List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
+        RepresentedTypeRItem respondent1Representative = representativeItemForRespondent(
+                "1", "Representative X", email, respondents.get(0), "[SOLICITORA]");
+        RepresentedTypeRItem respondent2Representative = representativeItemForRespondent(
+                "2", "Representative X", email, respondents.get(1), "[SOLICITORB]");
+        caseData.setRepCollection(List.of(respondent1Representative, respondent2Representative));
+
+        caseFlagsService.setupCaseFlags(caseData);
+        AllPartyFlags allPartyFlags = allPartyFlags(caseData);
+        allPartyFlags.getRepresentativeFlags().setDetails(
+                ListTypeItem.from(activeFlag("Representative internal flag")));
+        allPartyFlags.getRepresentativeExternalFlags().setDetails(
+                ListTypeItem.from(activeFlag("Representative external flag")));
+
+        respondent1Representative.getValue().setNameOfRepresentative("Representative Y");
+        caseFlagsService.setupCaseFlags(caseData);
+
+        assertAll(
+                () -> assertEquals("Representative Y", allPartyFlags.getRepresentativeFlags().getPartyName()),
+                () -> assertNull(allPartyFlags.getRepresentativeFlags().getDetails()),
+                () -> assertEquals("Representative Y",
+                        allPartyFlags.getRepresentativeExternalFlags().getPartyName()),
+                () -> assertNull(allPartyFlags.getRepresentativeExternalFlags().getDetails()),
+                () -> assertEquals("Representative X", allPartyFlags.getRepresentative1Flags().getPartyName()),
+                () -> assertEquals("Representative internal flag",
+                        allPartyFlags.getRepresentative1Flags().getDetails().getFirst().getValue().getName()),
+                () -> assertEquals("Representative external flag",
+                        allPartyFlags.getRepresentative1ExternalFlags().getDetails().getFirst().getValue().getName())
+        );
+
+        respondent2Representative.getValue().setNameOfRepresentative("Representative Y");
+        caseFlagsService.clearRespondentRepresentativeFlags(caseData, List.of(1));
+        caseFlagsService.setupCaseFlags(caseData);
+
+        assertAll(
+                () -> assertEquals("Representative Y", allPartyFlags.getRepresentativeFlags().getPartyName()),
+                () -> assertNull(allPartyFlags.getRepresentativeFlags().getDetails()),
+                () -> assertEquals("Representative Y",
+                        allPartyFlags.getRepresentativeExternalFlags().getPartyName()),
+                () -> assertNull(allPartyFlags.getRepresentativeExternalFlags().getDetails()),
+                () -> assertNull(allPartyFlags.getRepresentative1Flags()),
+                () -> assertNull(allPartyFlags.getRepresentative1ExternalFlags())
+        );
+    }
+
+    @Test
+    void setupCaseFlags_shouldHandleStagedNoEmailRepresentativeNameChangeAcrossFourRespondents() {
+        caseData.setRespondentCollection(respondentCollection(4));
+        List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
+        RepresentedTypeRItem representative1 = representativeItemForRespondent(
+                "1", "Representative 1", null, respondents.get(0), "[SOLICITORA]");
+        RepresentedTypeRItem representative2Respondent2 = representativeItemForRespondent(
+                "2", "Representative 2", null, respondents.get(1), "[SOLICITORB]");
+        RepresentedTypeRItem representative2Respondent3 = representativeItemForRespondent(
+                "3", "Representative 2", null, respondents.get(2), "[SOLICITORC]");
+        RepresentedTypeRItem representative3 = representativeItemForRespondent(
+                "4", "Representative 3", null, respondents.get(3), "[SOLICITORD]");
+        caseData.setRepCollection(List.of(
+                representative1, representative2Respondent2, representative2Respondent3, representative3));
+
+        caseFlagsService.setupCaseFlags(caseData);
+        AllPartyFlags allPartyFlags = allPartyFlags(caseData);
+        allPartyFlags.getRepresentativeFlags().setDetails(
+                ListTypeItem.from(activeFlag("Representative 1 internal flag")));
+        allPartyFlags.getRepresentativeExternalFlags().setDetails(
+                ListTypeItem.from(activeFlag("Representative 1 external flag")));
+        allPartyFlags.getRepresentative1Flags().setDetails(
+                ListTypeItem.from(activeFlag("Representative 2 internal flag")));
+        allPartyFlags.getRepresentative1ExternalFlags().setDetails(
+                ListTypeItem.from(activeFlag("Representative 2 external flag")));
+        allPartyFlags.getRepresentative3Flags().setDetails(
+                ListTypeItem.from(activeFlag("Representative 3 internal flag")));
+        allPartyFlags.getRepresentative3ExternalFlags().setDetails(
+                ListTypeItem.from(activeFlag("Representative 3 external flag")));
+
+        representative2Respondent2.getValue().setNameOfRepresentative("Representative 4");
+        caseFlagsService.setupCaseFlags(caseData);
+
+        assertAll(
+                () -> assertRepresentativeFlags(allPartyFlags.getRepresentativeFlags(),
+                        "Representative 1", REPRESENTATIVE1, ACTIVE, "Representative 1 internal flag"),
+                () -> assertRepresentativeFlags(allPartyFlags.getRepresentativeExternalFlags(),
+                        "Representative 1", REPRESENTATIVE1, ACTIVE, "Representative 1 external flag"),
+                () -> assertEquals("Representative 4", allPartyFlags.getRepresentative1Flags().getPartyName()),
+                () -> assertNull(allPartyFlags.getRepresentative1Flags().getDetails()),
+                () -> assertEquals("Representative 4",
+                        allPartyFlags.getRepresentative1ExternalFlags().getPartyName()),
+                () -> assertNull(allPartyFlags.getRepresentative1ExternalFlags().getDetails()),
+                () -> assertRepresentativeFlags(allPartyFlags.getRepresentative2Flags(),
+                        "Representative 2", REPRESENTATIVE3, ACTIVE, "Representative 2 internal flag"),
+                () -> assertRepresentativeFlags(allPartyFlags.getRepresentative2ExternalFlags(),
+                        "Representative 2", REPRESENTATIVE3, ACTIVE, "Representative 2 external flag"),
+                () -> assertRepresentativeFlags(allPartyFlags.getRepresentative3Flags(),
+                        "Representative 3", REPRESENTATIVE4, ACTIVE, "Representative 3 internal flag"),
+                () -> assertRepresentativeFlags(allPartyFlags.getRepresentative3ExternalFlags(),
+                        "Representative 3", REPRESENTATIVE4, ACTIVE, "Representative 3 external flag")
+        );
+
+        representative2Respondent3.getValue().setNameOfRepresentative("Representative 4");
+        caseFlagsService.clearRespondentRepresentativeFlags(caseData, List.of(2));
+        caseFlagsService.setupCaseFlags(caseData);
+
+        assertAll(
+                () -> assertRepresentativeFlags(allPartyFlags.getRepresentativeFlags(),
+                        "Representative 1", REPRESENTATIVE1, ACTIVE, "Representative 1 internal flag"),
+                () -> assertRepresentativeFlags(allPartyFlags.getRepresentativeExternalFlags(),
+                        "Representative 1", REPRESENTATIVE1, ACTIVE, "Representative 1 external flag"),
+                () -> assertEquals("Representative 4", allPartyFlags.getRepresentative1Flags().getPartyName()),
+                () -> assertNull(allPartyFlags.getRepresentative1Flags().getDetails()),
+                () -> assertEquals("Representative 4",
+                        allPartyFlags.getRepresentative1ExternalFlags().getPartyName()),
+                () -> assertNull(allPartyFlags.getRepresentative1ExternalFlags().getDetails()),
+                () -> assertNull(allPartyFlags.getRepresentative2Flags()),
+                () -> assertNull(allPartyFlags.getRepresentative2ExternalFlags()),
+                () -> assertRepresentativeFlags(allPartyFlags.getRepresentative3Flags(),
+                        "Representative 3", REPRESENTATIVE4, ACTIVE, "Representative 3 internal flag"),
+                () -> assertRepresentativeFlags(allPartyFlags.getRepresentative3ExternalFlags(),
+                        "Representative 3", REPRESENTATIVE4, ACTIVE, "Representative 3 external flag")
+        );
+    }
+
+    @Test
+    void setupCaseFlags_shouldReplaceOnlyChangedSingleRespondentRepresentativeSections() {
+        caseData.setRespondentCollection(respondentCollection(3));
+        List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
+        RepresentedTypeRItem representative1 = representativeItemForRespondent(
+                "1", "Representative 1", "rep1@example.com", respondents.get(0), "[SOLICITORA]");
+        RepresentedTypeRItem representative2 = representativeItemForRespondent(
+                "2", "Representative 2", "rep2@example.com", respondents.get(1), "[SOLICITORB]");
+        RepresentedTypeRItem representative3 = representativeItemForRespondent(
+                "3", "Representative 3", "rep3@example.com", respondents.get(2), "[SOLICITORC]");
+        caseData.setRepCollection(List.of(representative1, representative2, representative3));
+
+        caseFlagsService.setupCaseFlags(caseData);
+        AllPartyFlags allPartyFlags = allPartyFlags(caseData);
+        allPartyFlags.getRepresentativeFlags().setDetails(
+                ListTypeItem.from(activeFlag("Representative 1 internal flag")));
+        allPartyFlags.getRepresentativeExternalFlags().setDetails(
+                ListTypeItem.from(activeFlag("Representative 1 external flag")));
+        allPartyFlags.getRepresentative1Flags().setDetails(
+                ListTypeItem.from(activeFlag("Representative 2 internal flag")));
+        allPartyFlags.getRepresentative1ExternalFlags().setDetails(
+                ListTypeItem.from(activeFlag("Representative 2 external flag")));
+        allPartyFlags.getRepresentative2Flags().setDetails(
+                ListTypeItem.from(activeFlag("Representative 3 internal flag")));
+        allPartyFlags.getRepresentative2ExternalFlags().setDetails(
+                ListTypeItem.from(activeFlag("Representative 3 external flag")));
+
+        representative2.getValue().setNameOfRepresentative("Representative 4");
+        caseFlagsService.clearRespondentRepresentativeFlags(caseData, List.of(1));
+        caseFlagsService.setupCaseFlags(caseData);
+
+        assertAll(
+                () -> assertRepresentativeFlags(allPartyFlags.getRepresentativeFlags(),
+                        "Representative 1", REPRESENTATIVE1, ACTIVE, "Representative 1 internal flag"),
+                () -> assertRepresentativeFlags(allPartyFlags.getRepresentativeExternalFlags(),
+                        "Representative 1", REPRESENTATIVE1, ACTIVE, "Representative 1 external flag"),
+                () -> assertEquals("Representative 4", allPartyFlags.getRepresentative1Flags().getPartyName()),
+                () -> assertEquals(INTERNAL, allPartyFlags.getRepresentative1Flags().getVisibility()),
+                () -> assertNull(allPartyFlags.getRepresentative1Flags().getDetails()),
+                () -> assertEquals("Representative 4",
+                        allPartyFlags.getRepresentative1ExternalFlags().getPartyName()),
+                () -> assertEquals(EXTERNAL, allPartyFlags.getRepresentative1ExternalFlags().getVisibility()),
+                () -> assertNull(allPartyFlags.getRepresentative1ExternalFlags().getDetails()),
+                () -> assertRepresentativeFlags(allPartyFlags.getRepresentative2Flags(),
+                        "Representative 3", REPRESENTATIVE3, ACTIVE, "Representative 3 internal flag"),
+                () -> assertRepresentativeFlags(allPartyFlags.getRepresentative2ExternalFlags(),
+                        "Representative 3", REPRESENTATIVE3, ACTIVE, "Representative 3 external flag")
         );
     }
 

@@ -462,7 +462,7 @@ public class NocRespondentRepresentativeService {
      * <ul>
      *     <li>it is a valid representative, and</li>
      *     <li>no matching representative exists in {@code newRepresentatives} for the same respondent, or</li>
-     *     <li>a matching representative exists but the organisation or email address has changed</li>
+     *     <li>a matching representative exists but the name, organisation or email address has changed</li>
      * </ul>
      * <p>
      * Only valid representatives are considered during the comparison. If
@@ -471,7 +471,7 @@ public class NocRespondentRepresentativeService {
      * @param oldRepresentatives the existing representatives to compare against
      * @param newRepresentatives the updated representatives to compare with
      * @return a list of representatives from {@code oldRepresentatives} that are either
-     *         no longer present or have updated organisation or email details
+     *         no longer present or have updated name, organisation or email details
      */
     public List<RepresentedTypeRItem> findRepresentativesToRemove(
             List<RepresentedTypeRItem> oldRepresentatives, List<RepresentedTypeRItem> newRepresentatives) {
@@ -486,17 +486,19 @@ public class NocRespondentRepresentativeService {
             if (!RespondentRepresentativeUtils.isValidRepresentative(oldRepresentative)) {
                 continue;
             }
-            // to check if representative exists but its organisation or email is changed or not
-            boolean hasRespondentRepresentativeOrganisationChanged = false;
+            // to check if representative exists but its name, organisation or email is changed or not
+            boolean hasRespondentRepresentativeDetailsChanged = false;
             // to check if representative exists or not
             boolean isMatchingValidRepresentative = false;
             boolean hmctsRepresentativeEmailChanged = false;
             for (RepresentedTypeRItem newRepresentative : newRepresentatives) {
                 if (RespondentRepresentativeUtils.isMatchingValidRepresentative(oldRepresentative, newRepresentative)) {
                     isMatchingValidRepresentative = true;
-                    // representative already exists but its organisation or email is changed
-                    hasRespondentRepresentativeOrganisationChanged =
+                    // representative already exists but its name or organisation is changed
+                    hasRespondentRepresentativeDetailsChanged =
                             RespondentRepresentativeUtils.hasRespondentRepresentativeOrganisationChanged(
+                                    oldRepresentative.getValue(), newRepresentative.getValue())
+                            || RespondentRepresentativeUtils.isRepresentativeNameChanged(
                                     oldRepresentative.getValue(), newRepresentative.getValue());
                     // when representative email changed and new representative has account on HMCTS should
                     // remove old representative and assign new representative access with new email address.
@@ -505,7 +507,7 @@ public class NocRespondentRepresentativeService {
                 }
             }
             if (RespondentRepresentativeUtils.canRemoveRepresentative(isMatchingValidRepresentative,
-                    hasRespondentRepresentativeOrganisationChanged,
+                    hasRespondentRepresentativeDetailsChanged,
                     hmctsRepresentativeEmailChanged)) {
                 representativesToRemove.add(oldRepresentative);
             }
@@ -664,22 +666,27 @@ public class NocRespondentRepresentativeService {
         return caseData.getRepCollection().stream()
                 .filter(RespondentRepresentativeUtils::isValidRepresentative)
                 .map(RepresentedTypeRItem::getValue)
-                .filter(currentRepresentative -> sameRepresentativeUser(
+                .filter(currentRepresentative -> sameRepresentativeIdentity(
                         removedRepresentativeValue, currentRepresentative))
                 .map(RepresentedTypeR::getRole)
                 .filter(RoleUtils::isRespondentRepresentativeRole)
                 .collect(Collectors.toSet());
     }
 
-    private static boolean sameRepresentativeUser(
+    private static boolean sameRepresentativeIdentity(
             RepresentedTypeR firstRepresentative, RepresentedTypeR secondRepresentative) {
+        boolean sameUser;
         if (StringUtils.isNotBlank(firstRepresentative.getIdamId())
                 && StringUtils.isNotBlank(secondRepresentative.getIdamId())) {
-            return Strings.CS.equals(firstRepresentative.getIdamId(), secondRepresentative.getIdamId());
+            sameUser = Strings.CS.equals(firstRepresentative.getIdamId(), secondRepresentative.getIdamId());
+        } else {
+            sameUser = StringUtils.isNotBlank(firstRepresentative.getRepresentativeEmailAddress())
+                    && Strings.CI.equals(firstRepresentative.getRepresentativeEmailAddress(),
+                    secondRepresentative.getRepresentativeEmailAddress());
         }
-        return StringUtils.isNotBlank(firstRepresentative.getRepresentativeEmailAddress())
-                && Strings.CI.equals(firstRepresentative.getRepresentativeEmailAddress(),
-                secondRepresentative.getRepresentativeEmailAddress());
+        return sameUser && Strings.CI.equals(
+                StringUtils.trimToEmpty(firstRepresentative.getNameOfRepresentative()),
+                StringUtils.trimToEmpty(secondRepresentative.getNameOfRepresentative()));
     }
 
     /**

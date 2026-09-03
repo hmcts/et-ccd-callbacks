@@ -1483,6 +1483,20 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "etICAnyOtherDirectionsLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-api",
+          "caseworker-employment-scotland",
+          "caseworker-employment-etjudge-scotland"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "etICHearingNotListedAnyOtherDirections",
     "UserRole": "caseworker-employment-etjudge",
     "CRUD": "R"

@@ -43,6 +43,36 @@ public final class ClaimantUtils {
         return StringUtils.isBlank(claimantEmailAddress) ? StringUtils.EMPTY : claimantEmailAddress;
     }
 
+    /**
+     * Resolves the claimant email address from the given case data.
+     * <p>
+     * The representative claimant email address is returned first when it is present
+     * and not blank. If no valid representative email address is available, the
+     * claimant email address is returned instead when present and not blank.
+     * </p>
+     *
+     * @param caseData the case data containing claimant and representative claimant details
+     * @return the resolved claimant email address, or {@code null} if no valid email address is found
+     */
+    public static String resolveClaimantEmailAddress(CaseData caseData) {
+        if (ObjectUtils.isNotEmpty(caseData.getRepresentativeClaimantType())
+                && StringUtils.isNotBlank(caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress())) {
+            return caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress();
+        }
+        if (ObjectUtils.isNotEmpty(caseData.getClaimantType())
+                && StringUtils.isNotBlank(caseData.getClaimantType().getClaimantEmailAddress())) {
+            return caseData.getClaimantType().getClaimantEmailAddress();
+        }
+        return null;
+    }
+
+    /**
+     * Returns the claimant associated with the supplied case data.
+     *
+     * @param caseData the case data containing the claimant
+     * @return the claimant, or an empty string if the case data is {@code null}
+     *         or the claimant is blank
+     */
     public static String getClaimant(CaseData caseData) {
         if (ObjectUtils.isEmpty(caseData)
                 || StringUtils.isBlank(caseData.getClaimant())) {

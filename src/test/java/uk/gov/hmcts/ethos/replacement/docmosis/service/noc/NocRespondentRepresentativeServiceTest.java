@@ -81,6 +81,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {CaseConverter.class, NoticeOfChangeFieldPopulator.class, ObjectMapper.class})
@@ -1188,6 +1189,7 @@ class NocRespondentRepresentativeServiceTest {
                         .respondentOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_ONE).build())
                         .build()).id(REPRESENTATIVE_ID_ONE).build();
         tmpCaseData.setRepCollection(List.of(respondentRepresentative));
+        tmpCaseData.setNocRemoveOption(NOC_REMOVE_OPTION_ORGANISATION);
         tmpCaseData.setClaimantRepresentedQuestion(NO);
         assertThat(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails))
                 .isEqualTo(tmpCaseData);

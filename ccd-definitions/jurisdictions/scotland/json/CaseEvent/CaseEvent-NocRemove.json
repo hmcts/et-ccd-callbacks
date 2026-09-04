@@ -1,0 +1,14 @@
+[
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "nocRemoveRepClaimant",
+    "Name": "Remove representation",
+    "Description": "Remove representation",
+    "PreConditionState(s)": "Submitted;Vetted;Accepted;Rejected;",
+    "PostConditionState": "*",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/nocRemoveRepresentation/claimant/aboutToSubmit",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N"
+  }
+]

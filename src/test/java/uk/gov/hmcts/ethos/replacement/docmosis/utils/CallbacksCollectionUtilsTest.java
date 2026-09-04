@@ -5,6 +5,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -83,5 +84,35 @@ final class CallbacksCollectionUtilsTest {
                 .containsExactlyInAnyOrder(ROLE_SOLICITOR_E, ROLE_SOLICITOR_A, ROLE_SOLICITOR_B, ROLE_SOLICITOR_C,
                         ROLE_SOLICITOR_D, ROLE_SOLICITOR_F, ROLE_SOLICITOR_G, ROLE_SOLICITOR_H, ROLE_SOLICITOR_I,
                         ROLE_SOLICITOR_J);
+    }
+
+    @Test
+    void shouldFindDifferentObjectsFromFirstListComparedToSecondList() {
+        assertThat(CallbacksCollectionUtils.findDifferentObjects(null, List.of("A", "B")))
+                .isEmpty();
+
+        assertThat(CallbacksCollectionUtils.findDifferentObjects(Collections.emptyList(), List.of("A", "B")))
+                .isEmpty();
+
+        assertThat(CallbacksCollectionUtils.findDifferentObjects(List.of("A", "B"), null))
+                .containsExactly("A", "B");
+
+        assertThat(CallbacksCollectionUtils.findDifferentObjects(List.of("A", "B"), Collections.emptyList()))
+                .containsExactly("A", "B");
+
+        assertThat(CallbacksCollectionUtils.findDifferentObjects(
+                List.of("A", "B", "C"),
+                List.of("B", "D")
+        )).containsExactly("A", "C");
+
+        assertThat(CallbacksCollectionUtils.findDifferentObjects(
+                List.of("A", "B"),
+                List.of("A", "B", "C")
+        )).isEmpty();
+
+        assertThat(CallbacksCollectionUtils.findDifferentObjects(
+                List.of("A", "A", "B", "C"),
+                List.of("B")
+        )).containsExactly("A", "A", "C");
     }
 }

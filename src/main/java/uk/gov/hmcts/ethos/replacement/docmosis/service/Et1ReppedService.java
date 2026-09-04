@@ -281,9 +281,9 @@ public class Et1ReppedService {
      * <ol>
      *   <li>Validates the input {@code caseData} to ensure it's not null and has the required structure.</li>
      *   <li>Retrieves the organisation address associated with the user token via the {@code myHmctsService}.</li>
-     *   <li>Converts the retrieved {@link OrganisationAddress} to a generic address format using
-     *   {@link AddressUtils#mapOrganisationAddressToAddress(OrganisationAddress)}.</li>
-     *   <li>Sets this address as the representative address for the claimant in the {@code caseData}.</li>
+     *   <li>Converts the retrieved {@link OrganisationAddress} to a generic address format and sets the
+     *   shared MyHMCTS Check your answers text via {@link AddressUtils#applyMyHmctsOrganisationAddress}.</li>
+     *   <li>Stores the mapped address on the claimant representative.</li>
      * </ol>
      *
      * @param userToken the authentication token of the currently authenticated user, used to retrieve organisation
@@ -298,8 +298,7 @@ public class Et1ReppedService {
         checkCaseData(caseData);
         OrganisationAddress organisationAddress = myHmctsService.getUserOrganisationAddress(userToken);
         caseData.getRepresentativeClaimantType().setRepresentativeAddress(
-                AddressUtils.mapOrganisationAddressToAddress(organisationAddress));
-        caseData.setMyHmctsAddressText(AddressUtils.getOrganisationAddressAsText(organisationAddress));
+                AddressUtils.applyMyHmctsOrganisationAddress(caseData, organisationAddress));
     }
 
     /**

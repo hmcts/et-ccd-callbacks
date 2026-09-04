@@ -20,6 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
+import uk.gov.hmcts.ethos.replacement.docmosis.wa.ReferralTaskCompletionService;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
@@ -27,6 +28,9 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -45,6 +49,8 @@ class CloseReferralControllerTest {
 
     @MockitoBean
     private VerifyTokenService verifyTokenService;
+    @MockitoBean
+    private ReferralTaskCompletionService referralTaskCompletionService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -171,5 +177,21 @@ class CloseReferralControllerTest {
         referralTypeItem.setValue(referralType);
         referralType.setReferralStatus("referralStatus");
         return referralTypeItem;
+    }
+
+    @Test
+    void aboutToSubmitCloseReferral_completesTasksForTheClosedReferral() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk());
+
+        // The referral number must be read before clearCloseReferralDataFromCaseData nulls the
+        // selection - if that ordering is ever reversed this argument becomes null.
+        verify(referralTaskCompletionService)
+            .completeTasksForClosedReferral(any(), eq("1"), eq(AUTH_TOKEN));
     }
 }

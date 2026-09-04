@@ -6016,10 +6016,30 @@
   },
   {
     "ID": "etICHearingNotListedListForPrelimHearingUpdated",
+    "ListElementCode": "etICIsPreliminaryHearingWithMembersYes",
+    "FieldType": "MultiSelectList",
+    "ElementLabel": "Reason for full Panel",
+    "FieldTypeParameter": "ms_FinalHearingIsEJSitAloneReasonNo",
+    "FieldShowCondition": "etICIsPreliminaryHearingWithMembersV2=\"Yes\"",
+    "HintText": "Select all that apply",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "etICHearingNotListedListForPrelimHearingUpdated",
+    "ListElementCode": "etICIsPreliminaryHearingWithMembersYesOther",
+    "FieldType": "TextArea",
+    "ElementLabel": "Other Reason (EJ Sit Alone: No)",
+    "FieldShowCondition": "etICIsPreliminaryHearingWithMembersV2=\"Yes\" AND etICIsPreliminaryHearingWithMembersYes CONTAINS \"Other\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "etICHearingNotListedListForPrelimHearingUpdated",
     "ListElementCode": "etICIsPreliminaryHearingWithMembersReasonV2",
     "FieldType": "TextArea",
     "ElementLabel": "Give reasons for requiring members",
-    "FieldShowCondition": "etICIsPreliminaryHearingWithMembersV2=\"Yes\"",
+    "FieldShowCondition": "etICIsPreliminaryHearingWithMembersV2=\"dummy\"",
     "RetainHiddenValue": "No",
     "SecurityClassification": "Public",
     "Searchable": "N"
@@ -6052,7 +6072,7 @@
     "FieldTypeParameter": "msl_IcVideoOrders",
     "FieldShowCondition": "etICTypeOfFinalHearingV2 CONTAINS \"Video\"",
     "SecurityClassification": "Public",
-    "Searchable": "No"
+    "Searchable": "N"
   },
   {
     "ID": "etICHearingNotListedListForFinalHearingUpdated",

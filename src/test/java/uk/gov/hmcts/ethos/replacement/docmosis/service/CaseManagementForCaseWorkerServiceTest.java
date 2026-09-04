@@ -136,6 +136,8 @@ class CaseManagementForCaseWorkerServiceTest {
     @MockitoBean
     private FeatureToggleService featureToggleService;
     @MockitoBean
+    private CaseFlagsService caseFlagsService;
+    @MockitoBean
     private AdminUserService adminUserService;
     @MockitoBean
     private CaseManagementLocationService caseManagementLocationService;
@@ -157,10 +159,11 @@ class CaseManagementForCaseWorkerServiceTest {
         when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
-                caseRetrievalForCaseWorkerService, ccdClient, featureToggleService, HMCTS_SERVICE_ID,
+                caseRetrievalForCaseWorkerService, ccdClient, featureToggleService, caseFlagsService, HMCTS_SERVICE_ID,
                 adminUserService, caseManagementLocationService, multipleReferenceService, ccdGatewayBaseUrl,
                 multipleCasesSendingService, answersConverter);
     }
@@ -494,6 +497,21 @@ class CaseManagementForCaseWorkerServiceTest {
         assertThat(caseData.getRespondentCollection().get(1).getValue().getResponseStruckOut()).isEqualTo(NO);
         assertThat(caseData.getRespondentCollection().get(2).getValue().getRespondentName()).isEqualTo("Juan Garcia");
         assertThat(caseData.getRespondentCollection().get(2).getValue().getResponseStruckOut()).isEqualTo(YES);
+        verify(caseFlagsService).inactivateRespondentCaseFlags(caseData, "Juan Garcia");
+        verify(caseFlagsService).inactivateRespondentRepresentativeCaseFlags(
+                caseData,
+                caseData.getRespondentCollection().get(2)
+        );
+    }
+
+    @Test
+    void struckOutRespondentDoesNotInactivateCaseFlagsWhenDisabledForScotland() {
+        when(featureToggleService.isCaseFlagsV2Enabled(SCOTLAND_CASE_TYPE_ID)).thenReturn(false);
+
+        caseManagementForCaseWorkerService.struckOutRespondents(scotlandCcdRequest1);
+
+        verify(caseFlagsService, never()).inactivateRespondentCaseFlags(any(), anyString());
+        verify(caseFlagsService, never()).inactivateRespondentRepresentativeCaseFlags(any(), any());
     }
 
     @Test
@@ -552,6 +570,11 @@ class CaseManagementForCaseWorkerServiceTest {
         assertThat(caseData.getRespondentCollection().get(2).getValue().getRespondentName())
                 .isEqualTo("Roberto Dondini");
         assertThat(caseData.getRespondentCollection().get(2).getValue().getResponseContinue()).isEqualTo(NO);
+        verify(caseFlagsService).inactivateRespondentCaseFlags(caseData, "Roberto Dondini");
+        verify(caseFlagsService).inactivateRespondentRepresentativeCaseFlags(
+                caseData,
+                caseData.getRespondentCollection().get(2)
+        );
     }
 
     @Test
@@ -559,6 +582,35 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = caseManagementForCaseWorkerService.continuingRespondent(scotlandCcdRequest3);
         assertThat(caseData.getRespondentCollection()).hasSize(1);
         assertThat(caseData.getRespondentCollection().getFirst().getValue().getResponseContinue()).isEqualTo(YES);
+    }
+
+    @Test
+    void continuingRespondentDefaultsResponseContinueWhenRepCollectionExists() {
+        CaseData caseData = scotlandCcdRequest3.getCaseDetails().getCaseData();
+        caseData.setRepCollection(createRepCollection());
+        caseData.getRespondentCollection().getFirst().getValue().setResponseContinue(null);
+
+        caseManagementForCaseWorkerService.continuingRespondent(scotlandCcdRequest3);
+
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getResponseContinue()).isEqualTo(YES);
+        verify(caseFlagsService, never()).inactivateRespondentCaseFlags(any(), anyString());
+        verify(caseFlagsService, never()).inactivateRespondentRepresentativeCaseFlags(any(), any());
+    }
+
+    @Test
+    void continuingRespondentInactivatesCaseFlagsWhenRepCollectionExistsAndResponseDoesNotContinue() {
+        CaseData caseData = scotlandCcdRequest3.getCaseDetails().getCaseData();
+        caseData.setRepCollection(createRepCollection());
+        caseData.getRespondentCollection().getFirst().getValue().setResponseContinue(NO);
+
+        caseManagementForCaseWorkerService.continuingRespondent(scotlandCcdRequest3);
+
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getResponseContinue()).isEqualTo(NO);
+        verify(caseFlagsService).inactivateRespondentCaseFlags(caseData, "Antonio Vazquez");
+        verify(caseFlagsService).inactivateRespondentRepresentativeCaseFlags(
+                caseData,
+                caseData.getRespondentCollection().getFirst()
+        );
     }
 
     @Test

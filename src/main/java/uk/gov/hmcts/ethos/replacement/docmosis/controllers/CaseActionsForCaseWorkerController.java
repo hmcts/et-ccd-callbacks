@@ -17,6 +17,7 @@ import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
@@ -165,10 +166,10 @@ public class CaseActionsForCaseWorkerController {
             }
             defaultValuesReaderService.setPositionAndOffice(caseDetails.getCaseTypeId(), caseData);
 
-            boolean caseFlagsToggle = featureToggleService.isCaseFlagsEnabled();
-            log.info("Caseflags feature flag is {}", caseFlagsToggle);
-            if (caseFlagsToggle && caseFlagsService.caseFlagsSetupRequired(caseData)) {
-                caseFlagsService.setupCaseFlags(caseData);
+            boolean caseFlagsToggle = featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())
+                    || featureToggleService.isCaseFlagsEnabled();
+            if (caseFlagsToggle && caseFlagsSetupRequired(caseDetails.getCaseTypeId(), caseData)) {
+                setupCaseFlags(caseDetails.getCaseTypeId(), caseData);
             }
 
             boolean hmcToggle = featureToggleService.isHmcEnabled();
@@ -342,7 +343,8 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setPublicCaseName(caseData);
         }
 
-        caseFlagsService.setupCaseFlags(caseData);
+        setupCaseFlags(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
+
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         removeSpacesFromPartyNames(caseData);
         return getCallbackRespEntityNoErrors(caseData);
@@ -379,7 +381,12 @@ public class CaseActionsForCaseWorkerController {
         eventValidationService.validateMaximumSize(caseData).ifPresent(errors::add);
         if (errors.isEmpty() && isNotEmpty(caseData.getRepCollection())) {
             //Needed to keep the respondent names in the rep collection sync
-            nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData);
+            boolean caseFlagsV2Enabled = featureToggleService.isCaseFlagsV2Enabled(
+                    ccdRequest.getCaseDetails().getCaseTypeId());
+            nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData, caseFlagsV2Enabled);
+            if (caseFlagsV2Enabled) {
+                caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
+            }
         }
 
         if (errors.isEmpty() && isNotEmpty(caseData.getRespondentCollection())) {
@@ -395,10 +402,29 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setPublicCaseName(caseData);
         }
 
-        caseFlagsService.setupCaseFlags(caseData);
+        setupCaseFlags(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
+
         caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
         removeSpacesFromPartyNames(caseData);
         return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    @PostMapping(value = "/amendRespondentDetailsSubmitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Realigns representative access after respondents have been reordered.")
+    public void amendRespondentDetailsSubmitted(
+            @RequestBody CallbackRequest callbackRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
+        if (!featureToggleService.isCaseFlagsV2Enabled(callbackRequest.getCaseDetails().getCaseTypeId())) {
+            return;
+        }
+        try {
+            nocRespondentRepresentativeService.realignRespondentRepresentativeAccess(callbackRequest);
+        } catch (RuntimeException exception) {
+            String caseId = callbackRequest == null || callbackRequest.getCaseDetails() == null
+                    ? StringUtils.EMPTY
+                    : callbackRequest.getCaseDetails().getCaseId();
+            log.error("Unable to realign respondent representative access for case {}", caseId, exception);
+        }
     }
 
     @PostMapping(value = "/updateHearing", consumes = APPLICATION_JSON_VALUE)
@@ -886,6 +912,20 @@ public class CaseActionsForCaseWorkerController {
 
     private DefaultValues getPostDefaultValues(CaseDetails caseDetails) {
         return defaultValuesReaderService.getDefaultValues(caseDetails.getCaseData().getManagingOffice());
+    }
+
+    private boolean caseFlagsSetupRequired(String caseTypeId, CaseData caseData) {
+        return featureToggleService.isCaseFlagsV2Enabled(caseTypeId)
+                ? caseFlagsService.caseFlagsSetupRequired(caseData)
+                : caseFlagsService.legacyCaseFlagsSetupRequired(caseData);
+    }
+
+    private void setupCaseFlags(String caseTypeId, CaseData caseData) {
+        if (featureToggleService.isCaseFlagsV2Enabled(caseTypeId)) {
+            caseFlagsService.setupCaseFlags(caseData);
+        } else {
+            caseFlagsService.setupLegacyCaseFlags(caseData);
+        }
     }
 
     private void generateEthosCaseReference(CaseData caseData, CCDRequest ccdRequest) {

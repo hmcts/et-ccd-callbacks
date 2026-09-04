@@ -19,8 +19,10 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantOtherType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.VettingJurisdictionCodesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
@@ -47,6 +49,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.LONDON_CENTRAL
 import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.MANCHESTER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.TRACK_OPEN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.ADDRESS_NOT_ENTERED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.calculateEffectiveElapsedTime;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -64,6 +67,9 @@ class Et1VettingServiceTest {
 
     @Mock
     private TornadoService tornadoService;
+
+    @Mock
+    private EmploymentRightsActService employmentRightsActService;
 
     private static final String ET1_DOC_TYPE = "ET1";
     private static final String ACAS_DOC_TYPE = "ACAS Certificate";
@@ -188,7 +194,7 @@ class Et1VettingServiceTest {
 
     @BeforeEach
     void setUp() {
-        et1VettingService = new Et1VettingService(tornadoService, jpaVenueService);
+        et1VettingService = new Et1VettingService(tornadoService, jpaVenueService, employmentRightsActService);
         caseDetails = CaseDataBuilder.builder()
             .withClaimantIndType("Doris", "Johnson")
             .withClaimantType("232 Petticoat Square", "3 House", null,
@@ -688,6 +694,61 @@ class Et1VettingServiceTest {
         assertNull(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails6());
         assertNull(caseDetails.getCaseData().getExistingJurisdictionCodes());
         assertNull(caseDetails.getCaseData().getRegionalOffice());
+        assertNull(caseDetails.getCaseData().getEt1VettingEraAssessmentMarkUp());
+    }
+
+    @Test
+    void initialiseEt1Vetting_preEra_setsEt1VettingEraToNotApplicableAndMarkUpToNull() {
+        when(employmentRightsActService.isEraOctober2026(any())).thenReturn(false);
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertThat(caseDetails.getCaseData().getEt1VettingEra()).isEqualTo("Not applicable");
+        assertNull(caseDetails.getCaseData().getEt1VettingEraAssessmentMarkUp());
+    }
+
+    @Test
+    void initialiseEt1Vetting_eraActive_respondentBetween3And6Months_populatesMarkUpAndResetsEraToNull() {
+        when(employmentRightsActService.isEraOctober2026(any())).thenReturn(true);
+        CaseData caseData = caseDetails.getCaseData();
+        caseData.setReceiptDate("2026-07-11");
+        if (caseData.getClaimantOtherType() == null) {
+            caseData.setClaimantOtherType(new ClaimantOtherType());
+        }
+        caseData.getClaimantOtherType().setDateOfLastEvent("2026-03-01");
+        caseData.setRespondentCollection(new ArrayList<>(caseData.getRespondentCollection().subList(0, 1)));
+        RespondentSumType respondent = caseData.getRespondentCollection().getFirst().getValue();
+        respondent.setAcasCertificateReceiptDate("2026-04-01");
+        respondent.setAcasCertificateIssueDate("2026-04-11");
+        caseData.setEt1VettingEra("Not applicable");
+
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+
+        String expectedMarkUp = """
+            ### ERA Assessment
+            
+            The following respondent(s) have an effective elapsed time greater than 3 months and less than or equal to\
+             6 months:
+            
+            • Respondent 1 - 4 months
+            
+            """;
+        assertThat(caseData.getEt1VettingEraAssessmentMarkUp()).isEqualTo(expectedMarkUp);
+        assertNull(caseData.getEt1VettingEra());
+    }
+
+    @Test
+    void initialiseEt1Vetting_eraActive_respondentOutside3And6Months_setsEt1VettingEraToNotApplicableAndMarkUpToNull() {
+        when(employmentRightsActService.isEraOctober2026(any())).thenReturn(true);
+        CaseData caseData = caseDetails.getCaseData();
+        caseData.setReceiptDate("2026-05-01");
+        if (caseData.getClaimantOtherType() == null) {
+            caseData.setClaimantOtherType(new ClaimantOtherType());
+        }
+        caseData.getClaimantOtherType().setDateOfLastEvent("2026-04-01");
+
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+
+        assertNull(caseData.getEt1VettingEraAssessmentMarkUp());
+        assertThat(caseData.getEt1VettingEra()).isEqualTo("Not applicable");
     }
 
     private DocumentTypeItem createDocumentTypeItem(String typeOfDocument, String binaryLink) {
@@ -744,6 +805,96 @@ class Et1VettingServiceTest {
 
         String expected = "123 Main St<br>Leeds";
         assertEquals(expected, result);
+    }
+
+    /**
+     * Verifies effective elapsed time calculation
+     * Date of Last Event = 01/03/2026, Date Received by Acas = 01/04/2026,
+     * Date Acas Certificate Issued = 11/04/2026 (10 days conciliation), ET1 Received = 11/07/2026.
+     * Gross time (4 months 10 days) minus Acas time (10 days) = 4 months.
+     */
+    @Test
+    void calculateEffectiveElapsedTime_returnsFourMonths() {
+        String result = calculateEffectiveElapsedTime(
+                "2026-07-11", "2026-03-01", "2026-04-01", "2026-04-11");
+        assertEquals("4 months", result);
+    }
+
+    /**
+     * Verifies effective elapsed time calculation when the result contains both months and days:
+     * Date of Last Event = 01/03/2026, Date Received by Acas = 01/04/2026,
+     * Date Acas Certificate Issued = 05/04/2026 (4 days conciliation), ET1 Received = 11/07/2026.
+     * Adjusted ET1 Receipt Date (11/07/2026 - 4 days = 07/07/2026).
+     * Period between 01/03/2026 and 07/07/2026 = 4 months 6 days.
+     */
+    @Test
+    void calculateEffectiveElapsedTime_monthsAndDays_returnsMonthsAndDays() {
+        String result = calculateEffectiveElapsedTime(
+                "2026-07-11", "2026-03-01", "2026-04-01", "2026-04-05");
+        assertEquals("4 months 6 days", result);
+    }
+
+    /**
+     * Verifies effective elapsed time calculation when Acas receipt date and issue date are the same day.
+     * Acas conciliation period is treated as 1 day.
+     * Date of Last Event = 01/03/2026, Date Received by Acas = 01/04/2026,
+     * Date Acas Certificate Issued = 01/04/2026 (1 day conciliation), ET1 Received = 11/07/2026.
+     * Adjusted ET1 Receipt Date (11/07/2026 - 1 day = 10/07/2026).
+     * Period between 01/03/2026 and 10/07/2026 = 4 months 9 days.
+     */
+    @Test
+    void calculateEffectiveElapsedTime_sameAcasDates_treatsAsOneDay() {
+        String result = calculateEffectiveElapsedTime(
+                "2026-07-11", "2026-03-01", "2026-04-01", "2026-04-01");
+        assertEquals("4 months 9 days", result);
+    }
+
+    @Test
+    void calculateEffectiveElapsedTime_nullOrEmptyDates_returnsNull() {
+        assertNull(calculateEffectiveElapsedTime(null, "2026-03-01", "2026-04-01", "2026-04-11"));
+        assertNull(calculateEffectiveElapsedTime("2026-07-11", "", "2026-04-01", "2026-04-11"));
+    }
+
+    @Test
+    void calculateEffectiveElapsedTime_noAcasDates_calculatesGrossPeriod() {
+        String result = calculateEffectiveElapsedTime(
+                "2026-07-01", "2026-03-01", null, null);
+        assertEquals("4 months", result);
+    }
+
+    @Test
+    void initialiseEt1Vetting_submittedOnOrAfterOctober2026_populatesEraAcasDetails() {
+        when(employmentRightsActService.isEraOctober2026(any())).thenReturn(true);
+        caseDetails.getCaseData().setReceiptDate("2026-10-01");
+        ClaimantOtherType claimantOtherType = new ClaimantOtherType();
+        claimantOtherType.setDateOfLastEvent("2026-03-01");
+        caseDetails.getCaseData().setClaimantOtherType(claimantOtherType);
+
+        caseDetails.getCaseData().getRespondentCollection().getFirst().getValue()
+                .setAcasCertificateReceiptDate("2026-04-01");
+        caseDetails.getCaseData().getRespondentCollection().getFirst().getValue()
+                .setAcasCertificateIssueDate("2026-04-11");
+
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+
+        String markUp = caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1();
+        assertThat(markUp)
+            .contains("Date of Last Event").contains("01/03/2026")
+            .contains("Date Received by Acas").contains("01/04/2026")
+            .contains("Date Acas Certificate Issued").contains("11/04/2026")
+            .contains("ET1 Received").contains("01/10/2026")
+            .contains("Effective Elapsed Time");
+    }
+
+    @Test
+    void initialiseEt1Vetting_submittedBeforeOctober2026_populatesStandardAcasDetails() {
+        when(employmentRightsActService.isEraOctober2026(any())).thenReturn(false);
+        caseDetails.getCaseData().setReceiptDate("2026-09-30");
+
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+
+        String markUp = caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1();
+        assertThat(markUp).doesNotContain("Effective Elapsed Time");
     }
 
 }

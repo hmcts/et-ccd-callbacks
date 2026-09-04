@@ -40,7 +40,7 @@ class FlagsImageHelperTest {
             buildFlagsImageFileName(caseDetails);
 
             assertEquals("<font color='DeepPink' size='5'> WITH OUTSTATION </font>", caseData.getFlagsImageAltText());
-            assertEquals("EMP-TRIB-010000000000000.jpg", caseData.getFlagsImageFileName());
+            assertEquals("EMP-TRIB-0010000000000000.jpg", caseData.getFlagsImageFileName());
         }
     }
 
@@ -111,7 +111,7 @@ class FlagsImageHelperTest {
         buildFlagsImageFileName(caseDetails);
 
         assertEquals("", caseData.getFlagsImageAltText());
-        assertEquals("EMP-TRIB-000000000000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-0000000000000000.jpg", caseData.getFlagsImageFileName());
     }
 
     @Test
@@ -123,7 +123,7 @@ class FlagsImageHelperTest {
             buildFlagsImageFileName(caseDetails);
             assertEquals("", caseData.getFlagsImageAltText());
 
-            assertEquals("EMP-TRIB-000000000000000.jpg", caseData.getFlagsImageFileName());
+            assertEquals("EMP-TRIB-0000000000000000.jpg", caseData.getFlagsImageFileName());
         });
     }
 
@@ -134,7 +134,7 @@ class FlagsImageHelperTest {
                 .build();
         caseData.getRespondentCollection().getFirst().getValue().setEt3ResponseRespondentSupportNeeded(YES);
         buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
-        assertEquals("EMP-TRIB-000000000010000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-0000000000010000.jpg", caseData.getFlagsImageFileName());
         assertEquals("<font color='DarkSlateBlue' size='5'> REASONABLE ADJUSTMENT </font>",
                 caseData.getFlagsImageAltText());
 
@@ -145,13 +145,13 @@ class FlagsImageHelperTest {
         CaseData caseData = new CaseData();
         caseData.setMigratedFromEcm(YES);
         buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
-        assertEquals("EMP-TRIB-100000000000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-0100000000000000.jpg", caseData.getFlagsImageFileName());
         assertEquals("<font color='#D6292D' size='5'> MIGRATED FROM ECM </font>",
                 caseData.getFlagsImageAltText());
 
         caseData.setMigratedFromEcm(null);
         buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
-        assertEquals("EMP-TRIB-000000000000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-0000000000000000.jpg", caseData.getFlagsImageFileName());
     }
 
     private CaseDetails createCaseDetails(String caseTypeId, CaseData caseData) {
@@ -170,11 +170,11 @@ class FlagsImageHelperTest {
         caseData.setAdditionalCaseInfoType(additionalCaseInfoType);
 
         buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
-        assertEquals("EMP-TRIB-000000000000010.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-0000000000000010.jpg", caseData.getFlagsImageFileName());
         assertTrue(caseData.getFlagsImageAltText().contains("SPEAK TO REJ"));
 
         buildFlagsImageFileName(SCOTLAND_CASE_TYPE_ID, caseData);
-        assertEquals("EMP-TRIB-010000000000100.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-0010000000000100.jpg", caseData.getFlagsImageFileName());
         assertTrue(caseData.getFlagsImageAltText().contains("SPEAK TO VP"));
     }
 
@@ -215,7 +215,7 @@ class FlagsImageHelperTest {
         buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
         
         assertEquals("<font color='Olive' size='5'> ECC </font>", caseData.getFlagsImageAltText());
-        assertEquals("EMP-TRIB-000000001000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-0000000001000000.jpg", caseData.getFlagsImageFileName());
     }
 
     @Test
@@ -231,7 +231,7 @@ class FlagsImageHelperTest {
         buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
         
         assertEquals("", caseData.getFlagsImageAltText());
-        assertEquals("EMP-TRIB-000000000000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-0000000000000000.jpg", caseData.getFlagsImageFileName());
     }
 
     @Test
@@ -247,7 +247,7 @@ class FlagsImageHelperTest {
         buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
         
         assertEquals("", caseData.getFlagsImageAltText());
-        assertEquals("EMP-TRIB-000000000000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-0000000000000000.jpg", caseData.getFlagsImageFileName());
     }
 
     @Test
@@ -258,6 +258,32 @@ class FlagsImageHelperTest {
         buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
         
         assertEquals("<font color='Olive' size='5'> ECC </font>", caseData.getFlagsImageAltText());
-        assertEquals("EMP-TRIB-000000001000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-0000000001000000.jpg", caseData.getFlagsImageFileName());
+    }
+
+    @Test
+    void eraFlagShownWhenEraSetToYes() {
+        AdditionalCaseInfoType additionalCaseInfoType = new AdditionalCaseInfoType();
+        additionalCaseInfoType.setEra(YES);
+        CaseData caseData = new CaseData();
+        caseData.setAdditionalCaseInfoType(additionalCaseInfoType);
+
+        buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
+
+        assertEquals("<font color='#54319F' size='5'> ERA </font>", caseData.getFlagsImageAltText());
+        assertEquals("EMP-TRIB-1000000000000000.jpg", caseData.getFlagsImageFileName());
+    }
+
+    @Test
+    void eraFlagNotShownWhenEraSetToNoOrNull() {
+        AdditionalCaseInfoType additionalCaseInfoType = new AdditionalCaseInfoType();
+        additionalCaseInfoType.setEra(NO);
+        CaseData caseData = new CaseData();
+        caseData.setAdditionalCaseInfoType(additionalCaseInfoType);
+
+        buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
+
+        assertEquals("", caseData.getFlagsImageAltText());
+        assertEquals("EMP-TRIB-0000000000000000.jpg", caseData.getFlagsImageFileName());
     }
 }

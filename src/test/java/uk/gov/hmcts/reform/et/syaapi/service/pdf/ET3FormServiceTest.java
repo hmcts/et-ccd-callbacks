@@ -16,6 +16,7 @@ import org.mockito.quality.Strictness;
 import uk.gov.hmcts.ecm.common.service.pdf.PdfService;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.reform.et.syaapi.model.CaseTestData;
 import uk.gov.hmcts.reform.et.syaapi.service.CaseDocumentService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -51,11 +52,13 @@ class ET3FormServiceTest {
     private CaseDocumentService caseDocumentService;
     @Mock
     private IdamClient idamClient;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     @SneakyThrows
     void beforeEach() {
-        et3FormService = new ET3FormService(pdfService, caseDocumentService, idamClient);
+        et3FormService = new ET3FormService(pdfService, caseDocumentService, idamClient, featureToggleService);
         caseTestData = new CaseTestData();
     }
 

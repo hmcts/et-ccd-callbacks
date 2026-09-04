@@ -28,7 +28,7 @@
     "Channel": "CaseWorker",
     "TabID": "initialConsideration",
     "CaseFieldID": "etICCanProceed",
-    "TabFieldDisplayOrder": 15
+    "TabFieldDisplayOrder": 16
   },
   {
     "CaseTypeID": "ET_EnglandWales",

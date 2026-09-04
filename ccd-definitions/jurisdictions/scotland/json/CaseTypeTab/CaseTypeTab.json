@@ -803,7 +803,7 @@
     "Channel": "CaseWorker",
     "TabID": "initialConsideration",
     "CaseFieldID": "etICCanProceed",
-    "TabFieldDisplayOrder": 4
+    "TabFieldDisplayOrder": 5
   },
   {
     "CaseTypeID": "ET_Scotland",

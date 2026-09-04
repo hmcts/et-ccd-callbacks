@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ecm.common.service.pdf.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.ecm.common.constants.PdfMapperConstants;
 import uk.gov.hmcts.ecm.common.service.pdf.et1.PdfMapperHearingPreferencesUtil;
 import uk.gov.hmcts.ecm.common.service.pdf.et1.PdfMapperServiceUtil;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -90,5 +92,49 @@ class PdfMapperHearingPreferencesUtilTest {
         if (caseData.getClaimantHearingPreference().getHearingPreferences().contains(PHONE)) {
             assertThat(printFields.get(PdfMapperConstants.I_CAN_TAKE_PART_IN_PHONE_HEARINGS)).contains(YES);
         }
+    }
+
+    @Test
+    void putHearingPreferences_mapsPanelPreferencesJudge() {
+        CaseData caseData = new CaseData();
+        ClaimantHearingPreference preference = new ClaimantHearingPreference();
+        preference.setClaimantHearingPanelPreference("Judge");
+        preference.setClaimantHearingPanelPreferenceWhy("Specific legal points");
+        caseData.setClaimantHearingPreference(preference);
+
+        ConcurrentMap<String, Optional<String>> printFields = new ConcurrentHashMap<>();
+        PdfMapperHearingPreferencesUtil.putHearingPreferences(caseData, printFields);
+
+        assertThat(printFields.get(PdfMapperConstants.HEARINGS_1_12_JUDGE)).contains(YES);
+        assertThat(printFields.get(PdfMapperConstants.HEARINGS_1_12_PANEL)).isNull();
+        assertThat(printFields.get(PdfMapperConstants.HEARINGS_1_12_NO_PREFERENCE)).isNull();
+        assertThat(printFields.get(PdfMapperConstants.HEARINGS_1_12_REASONS)).contains("Specific legal points");
+    }
+
+    @Test
+    void putHearingPreferences_mapsPanelPreferencesPanel() {
+        CaseData caseData = new CaseData();
+        ClaimantHearingPreference preference = new ClaimantHearingPreference();
+        preference.setClaimantHearingPanelPreference("Panel");
+        caseData.setClaimantHearingPreference(preference);
+
+        ConcurrentMap<String, Optional<String>> printFields = new ConcurrentHashMap<>();
+        PdfMapperHearingPreferencesUtil.putHearingPreferences(caseData, printFields);
+
+        assertThat(printFields.get(PdfMapperConstants.HEARINGS_1_12_PANEL)).contains(YES);
+        assertThat(printFields.get(PdfMapperConstants.HEARINGS_1_12_JUDGE)).isNull();
+    }
+
+    @Test
+    void putHearingPreferences_mapsPanelPreferencesNoPreference() {
+        CaseData caseData = new CaseData();
+        ClaimantHearingPreference preference = new  ClaimantHearingPreference();
+        preference.setClaimantHearingPanelPreference("No preference");
+        caseData.setClaimantHearingPreference(preference);
+
+        ConcurrentMap<String, Optional<String>> printFields = new ConcurrentHashMap<>();
+        PdfMapperHearingPreferencesUtil.putHearingPreferences(caseData, printFields);
+
+        assertThat(printFields.get(PdfMapperConstants.HEARINGS_1_12_NO_PREFERENCE)).contains(YES);
     }
 }

@@ -1,0 +1,4 @@
+[
+  {"CaseTypeId": "ET_Scotland", "CaseFieldID": "et1SectionThreeDateOfLastEvent", "UserRole": "caseworker-employment-api", "CRUD": "CRUD"},
+  {"CaseTypeId": "ET_Scotland", "CaseFieldID": "et1SectionThreeDateOfLastEvent", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "CRUD"}
+]

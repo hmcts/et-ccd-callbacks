@@ -10,6 +10,7 @@ export default class LoginPage extends BasePage {
   private readonly username: Locator;
   private readonly password: Locator;
   private readonly signInOrContinueOrSubmitButton: Locator;
+  private readonly signInOptionLink: Locator;
   readonly signOutLink: Locator;
 
   constructor(page: Page) {
@@ -19,6 +20,7 @@ export default class LoginPage extends BasePage {
     this.password = page.locator('[data-testid="idam-password-input"], #password, input[name="password"], input[type="password"]');
     this.signInOrContinueOrSubmitButton = page.locator('[data-testid="idam-submit-button"], [name="save"], button[type="submit"], input[type="submit"]')
       .filter({ hasText: /Sign in|Continue/i });
+    this.signInOptionLink = page.locator('a[href="/enter-email"]');
     this.signOutLink = page.locator(`//a[normalize-space()='Sign out']`)
   }
 
@@ -28,12 +30,27 @@ export default class LoginPage extends BasePage {
   }
 
   async processLogin(user: UserCredentials, baseUrl : string = aatUrl) {
-    await this.page.waitForTimeout(1000);
     await this.page.waitForLoadState('load');
-    if (await this.signOutLink.count() > 0 || await this.username.count() === 0) {
+
+    await expect.poll(async () => {
+      const [isSignedIn, hasSignInOption, hasUsername] = await Promise.all([
+        this.signOutLink.isVisible(),
+        this.signInOptionLink.isVisible(),
+        this.username.isVisible(),
+      ]);
+      return isSignedIn || hasSignInOption || hasUsername;
+    }).toBeTruthy();
+
+    if (await this.signOutLink.isVisible()) {
       // Do not overwrite the canonical session file when a context is already authenticated.
       return;
     }
+
+    if (await this.signInOptionLink.isVisible()) {
+      await this.signInOptionLink.click();
+    }
+
+    await expect(this.username).toBeVisible();
     const currentHeading = await this.headingText();
 
     if (currentHeading === 'Sign in or create an account' || currentHeading === 'Sign in') {

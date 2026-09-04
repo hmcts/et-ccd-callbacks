@@ -329,6 +329,13 @@ cron:
   ecmMigrationCaseNoteIds: ${CRON_ECM_MIGRATION_CASE_NOTE_IDS:}
   ecmMigrationCaseNotesDryRun: ${CRON_ECM_MIGRATION_CASE_NOTES_DRY_RUN:true}
 
+retention:
+  disposal:
+    enabled: ${RETENTION_DISPOSAL_ENABLED:true}
+    caseTypeIds: ${RETENTION_DISPOSAL_CASE_TYPE_IDS:ET_Admin,ET_EnglandWales,ET_Scotland}
+    simulationCaseTypeIds: ${RETENTION_DISPOSAL_SIMULATION_CASE_TYPE_IDS:}
+    batchSize: ${RETENTION_DISPOSAL_BATCH_SIZE:100}
+
 pdf:
   english: "ET1_0224.pdf"
   welsh: "CY_ET1_0224.pdf"

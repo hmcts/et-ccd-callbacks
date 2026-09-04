@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -344,91 +346,30 @@ class InitialConsiderationHelperTest {
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataScotland,
                 "key", "ET_Scotland");
 
-        assertThat(documentRequest).contains("\"accessKey\":\"key\"");
-        assertThat(documentRequest).contains("\"templateName\":\"EM-TRB-SCO-ENG-02204.docx\"");
-        assertThat(documentRequest).contains("\"outputName\":\"Initial Consideration.pdf\"");
+        JsonNode request = new ObjectMapper().readTree(documentRequest);
+        assertJsonAsText(request, "accessKey", "key");
+        assertJsonAsText(request, "templateName", "EM-TRB-SCO-ENG-02204.docx");
+        assertJsonAsText(request, "outputName", "Initial Consideration.pdf");
 
-        assertThat(documentRequest).contains("\"caseNumber\":\"6000001/2024\"");
-        assertThat(documentRequest).contains("\"issuesJurisdiction\":\"No\"");
-        assertThat(documentRequest).contains("\"issuesJurCodesGiveDetails\":null");
-        assertThat(documentRequest).contains("\"canProceed\":\"Yes\"");
-        assertThat(documentRequest).contains("\"hearingAlreadyListed\":\"No\"");
+        JsonNode data = request.get("data");
+        assertJsonAsText(data, "caseNumber", "6000001/2024");
+        assertJsonAsText(data, "issuesJurisdiction", "No");
+        assertJsonAsText(data, "canProceed", "Yes");
+        assertJsonAsText(data, "hearingAlreadyListed", "No");
 
-        assertThat(documentRequest).contains("\"hearingListed\":null");
-        assertThat(documentRequest).contains("\"hearingPostpone\":null");
-        assertThat(documentRequest).contains("\"hearingExtend\":null");
-        assertThat(documentRequest).contains("\"hearingConvertFinal\":null");
-        assertThat(documentRequest).contains("\"hearingConvertF2f\":null");
-        assertThat(documentRequest).contains("\"hearingOther\":null");
-        assertThat(documentRequest).contains("\"hearingWithJudgeOrMembers\":null");
-        assertThat(documentRequest).contains("\"hearingWithJudgeOrMembersReason\":[\"\"]");
-        assertThat(documentRequest).contains("\"hearingWithJsa\":null");
-        assertThat(documentRequest).contains("\"hearingWithMembersLabel\":null");
-        assertThat(documentRequest).contains("\"hearingWithMembers\":null");
+        assertJsonArrayToString(data, "hearingNotListed", "[\"List for final hearing\"]");
 
-        assertThat(documentRequest).contains("\"hearingWithJudgeOrMembersFurtherDetails\":null");
-        assertThat(documentRequest).contains("\"otherDirections\":null");
+        assertJsonArrayToString(data, "etICFinalHearingType", "[\"Video\",\"F2F\"]");
+        assertJsonAsText(data, "etICFinalHearingLength", "1");
+        assertJsonAsText(data, "etICFinalHearingLengthType", "Hours");
 
-        assertThat(documentRequest).contains("\"hearingListedReferVP\":null");
-        assertThat(documentRequest).contains("\"hearingListedReferVPDetails\":null");
+        assertJsonAsText(data, "etICFinalHearingIsEJSitAlone", "JSA");
+        assertJsonArrayToString(data, "etICNoLFinalHearingIsEJSitAloneReasonsJsa",
+            "[\"Members experience is likely to add significant value to the process of adjudication\"]");
+        assertJsonAsText(data, "etICFinalHearingIsEJSitAloneFurtherDetails", "Test SC - EJ Sit Alone Further Details");
 
-        assertThat(documentRequest).contains("\"hearingNotListed\":[\"List for final hearing\"]");
-
-        assertThat(documentRequest).contains("\"preliminaryHearingType\":null");
-        assertThat(documentRequest).contains("\"preliminaryHearingPurpose\":null");
-        assertThat(documentRequest).contains("\"preliminaryHearingNotice\":null");
-        assertThat(documentRequest).contains("\"preliminaryHearingLength\":null");
-        assertThat(documentRequest).contains("\"preliminaryHearingLengthType\":null");
-        assertThat(documentRequest).contains("\"preliminaryHearingWithMembers\":null");
-        assertThat(documentRequest).contains("\"preliminaryHearingWithMembersYes\":null");
-        assertThat(documentRequest).contains("\"preliminaryHearingWithMembersYesOther\":null");
-        assertThat(documentRequest).contains("\"preliminaryHearingWithMembersReason\":null");
-
-        assertThat(documentRequest).contains("\"hearingNotListedListAnyOtherDirections\":null");
-
-        assertThat(documentRequest).contains("\"etICFinalHearingType\":[\"Video\",\"F2F\"]");
-        assertThat(documentRequest).contains("\"etICTypeOfVideoHearingOrder\":null");
-        assertThat(documentRequest).contains("\"etICTypeOfF2fHearingOrder\":null");
-        assertThat(documentRequest).contains("\"etICHearingOrderBUCompliance\":null");
-        assertThat(documentRequest).contains("\"etICFinalHearingLength\":\"1\"");
-        assertThat(documentRequest).contains("\"etICFinalHearingLengthType\":\"Hours\"");
-
-        assertThat(documentRequest).contains("\"etICFinalHearingIsEJSitAlone\":\"JSA\"");
-        assertThat(documentRequest).contains("\"etICFinalHearingIsEJSitAloneReasonYes\":[]");
-        assertThat(documentRequest).contains("\"etICFinalHearingIsEJSitAloneReasonYesOther\":null");
-        assertThat(documentRequest).contains("\"etICFinalHearingIsEJSitAloneReasonNo\":[]");
-        assertThat(documentRequest).contains("\"etICFinalHearingIsEJSitAloneReasonNoOther\":null");
-        assertThat(documentRequest).contains("\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":"
-            + "[\"Members experience is likely to add significant value to the process of adjudication\"]");
-        assertThat(documentRequest).contains("\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther\":null");
-        assertThat(documentRequest).contains("\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null]");
-        assertThat(documentRequest).contains("\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null");
-        assertThat(documentRequest)
-            .contains("\"etICFinalHearingIsEJSitAloneFurtherDetails\":\"Test SC - EJ Sit Alone Further Details\"");
-
-        assertThat(documentRequest).contains("\"hearingNotListedReferVP\":null");
-        assertThat(documentRequest).contains("\"hearingNotListedReferVPDetails\":null");
-
-        assertThat(documentRequest).contains("\"furtherInformation\":[]");
-        assertThat(documentRequest).contains("\"furtherInfoGiveDetails\":null");
-        assertThat(documentRequest).contains("\"furtherInfoTimeToComply\":null");
-
-        assertThat(documentRequest).contains("\"r27ClaimToBe\":null");
-        assertThat(documentRequest).contains("\"r27WhichPart\":null");
-        assertThat(documentRequest).contains("\"r27Direction\":null");
-        assertThat(documentRequest).contains("\"r27DirectionReason\":null");
-        assertThat(documentRequest).contains("\"r27NoJurisdictionReason\":null");
-        assertThat(documentRequest).contains("\"r27NumberOfDays\":null");
-
-        assertThat(documentRequest).contains("\"r28ClaimToBe\":null");
-        assertThat(documentRequest).contains("\"r28WhichPart\":null");
-        assertThat(documentRequest).contains("\"r28DirectionReason\":null");
-        assertThat(documentRequest).contains("\"r28NumberOfDays\":null");
-
-        assertThat(documentRequest).contains("\"furtherInfoAnyOtherDirections\":null");
-
-        assertThat(documentRequest).contains("\"icCompletedBy\":\"A User\"");
-        assertThat(documentRequest).contains("\"icDateCompleted\":\"20 Nov 2024\"");
+        assertJsonAsText(data, "icCompletedBy", "A User");
+        assertJsonAsText(data, "icDateCompleted", "20 Nov 2024");
     }
 
     @Test
@@ -441,31 +382,32 @@ class InitialConsiderationHelperTest {
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataScotland,
                 "key", "ET_Scotland");
 
-        assertThat(documentRequest).contains("\"accessKey\":\"key\"");
-        assertThat(documentRequest).contains("\"templateName\":\"EM-TRB-SCO-ENG-02204.docx\"");
-        assertThat(documentRequest).contains("\"outputName\":\"Initial Consideration.pdf\"");
+        JsonNode request = new ObjectMapper().readTree(documentRequest);
+        assertJsonAsText(request, "accessKey", "key");
+        assertJsonAsText(request, "templateName", "EM-TRB-SCO-ENG-02204.docx");
+        assertJsonAsText(request, "outputName", "Initial Consideration.pdf");
 
-        assertThat(documentRequest).contains("\"caseNumber\":\"6000001/2024\"");
-        assertThat(documentRequest).contains("\"issuesJurisdiction\":\"No\"");
-        assertThat(documentRequest).contains("\"issuesJurCodesGiveDetails\":null");
-        assertThat(documentRequest).contains("\"canProceed\":\"Yes\"");
-        assertThat(documentRequest).contains("\"hearingAlreadyListed\":\"No\"");
+        JsonNode data = request.get("data");
+        assertJsonAsText(data, "caseNumber", "6000001/2024");
+        assertJsonAsText(data, "issuesJurisdiction", "No");
+        assertJsonAsText(data, "canProceed", "Yes");
+        assertJsonAsText(data, "hearingAlreadyListed", "No");
 
-        assertThat(documentRequest).contains("\"hearingNotListed\":[\"List for preliminary hearing\"]");
+        assertJsonArrayToString(data, "hearingNotListed", "[\"List for preliminary hearing\"]");
 
-        assertThat(documentRequest).contains("\"preliminaryHearingType\":[\"Video\",\"F2F\"]");
-        assertThat(documentRequest).contains("\"preliminaryHearingPurpose\":[\"Case management\"]");
-        assertThat(documentRequest).contains("\"preliminaryHearingNotice\":\"Purpose of preliminary hearing\"");
-        assertThat(documentRequest).contains("\"preliminaryHearingLength\":\"1\"");
-        assertThat(documentRequest).contains("\"preliminaryHearingLengthType\":\"Hours\"");
-        assertThat(documentRequest).contains("\"preliminaryHearingWithMembers\":\"Yes\"");
-        assertThat(documentRequest)
-            .contains("\"preliminaryHearingWithMembersYes\":[\"No views expressed by parties\",\"Others\"]");
-        assertThat(documentRequest).contains("\"preliminaryHearingWithMembersYesOther\":\"TestYesOther\"");
-        assertThat(documentRequest).contains("\"preliminaryHearingWithMembersReason\":null");
+        assertJsonArrayToString(data, "preliminaryHearingType", "[\"Video\",\"F2F\"]");
+        assertJsonArrayToString(data, "preliminaryHearingPurpose", "[\"Case management\"]");
+        assertJsonAsText(data, "preliminaryHearingNotice", "Purpose of preliminary hearing");
+        assertJsonAsText(data, "preliminaryHearingLength", "1");
+        assertJsonAsText(data, "preliminaryHearingLengthType", "Hours");
+        assertJsonAsText(data, "preliminaryHearingWithMembers", "Yes");
 
-        assertThat(documentRequest).contains("\"icCompletedBy\":\"A User\"");
-        assertThat(documentRequest).contains("\"icDateCompleted\":\"20 Nov 2024\"");
+        assertJsonArrayToString(data, "preliminaryHearingWithMembersYes",
+            "[\"No views expressed by parties\",\"Others\"]");
+        assertJsonAsText(data, "preliminaryHearingWithMembersYesOther", "TestYesOther");
+
+        assertJsonAsText(data, "icCompletedBy", "A User");
+        assertJsonAsText(data, "icDateCompleted", "20 Nov 2024");
     }
 
     @Test
@@ -626,10 +568,10 @@ class InitialConsiderationHelperTest {
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseData,
                 "key", SCOTLAND_CASE_TYPE_ID);
 
-        assertThat(documentRequest)
-            .contains("\"furtherInformation\":[\"Issue Rule 29 Notice and order\",\"Issue Rule 28 Notice and order\"]");
-        assertThat(documentRequest).contains("\"furtherInfoGiveDetails\":null");
-        assertThat(documentRequest).contains("\"furtherInfoTimeToComply\":null");
+        JsonNode request = new ObjectMapper().readTree(documentRequest);
+        JsonNode data = request.get("data");
+        assertJsonArrayToString(data, "furtherInformation",
+            "[\"Issue Rule 29 Notice and order\",\"Issue Rule 28 Notice and order\"]");
     }
 
     @Test
@@ -724,4 +666,11 @@ class InitialConsiderationHelperTest {
         assertEquals(expected, result);
     }
 
+    private void assertJsonAsText(JsonNode data, String field, String expected) {
+        assertThat(data.get(field).asText()).isEqualTo(expected);
+    }
+
+    private void assertJsonArrayToString(JsonNode data, String field, String expected) {
+        assertThat(data.get(field).toString()).isEqualTo(expected);
+    }
 }

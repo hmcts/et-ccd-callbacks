@@ -82,6 +82,7 @@ public final class AddressUtils {
      */
     @NotNull
     public static Address mapOrganisationAddressToAddress(OrganisationAddress organisationAddress) {
+        Objects.requireNonNull(organisationAddress, "organisationAddress must not be null");
         Address address = new Address();
         address.setAddressLine1(organisationAddress.getAddressLine1());
         address.setAddressLine2(organisationAddress.getAddressLine2());
@@ -118,7 +119,7 @@ public final class AddressUtils {
      */
     @NotNull
     public static String getOrganisationAddressAsText(OrganisationAddress organisationAddress) {
-        if (ObjectUtils.isEmpty(organisationAddress)) {
+        if (organisationAddress == null) {
             return StringUtils.EMPTY;
         }
         return Stream.of(
@@ -150,6 +151,8 @@ public final class AddressUtils {
     @NotNull
     public static Address applyMyHmctsOrganisationAddress(CaseData caseData,
                                                           OrganisationAddress organisationAddress) {
+        Objects.requireNonNull(caseData, "caseData must not be null");
+        Objects.requireNonNull(organisationAddress, "organisationAddress must not be null");
         caseData.setMyHmctsAddressText(getOrganisationAddressAsText(organisationAddress));
         return mapOrganisationAddressToAddress(organisationAddress);
     }
@@ -160,6 +163,9 @@ public final class AddressUtils {
      * @param caseData the case data to update
      */
     public static void clearMyHmctsAddressText(CaseData caseData) {
+        if (caseData == null) {
+            return;
+        }
         caseData.setMyHmctsAddressText(null);
     }
 }

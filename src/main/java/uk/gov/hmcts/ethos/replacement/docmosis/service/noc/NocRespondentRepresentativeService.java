@@ -1260,18 +1260,25 @@ public class NocRespondentRepresentativeService {
      */
     public void saveRespondentRepresentativeContactDetails(String userToken, CaseDetails caseDetails)
             throws GenericServiceException {
+        if (caseDetails == null) {
+            return;
+        }
         CaseData caseData = caseDetails.getCaseData();
+        if (caseData == null) {
+            return;
+        }
         if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS.equals(
                 caseData.getRepresentativeContactChangeOption())) {
             populateMyHmctsOrganisationAddress(userToken, caseData);
         }
         List<RepresentedTypeRItem> representatives = findRepresentativesByToken(userToken, caseDetails);
         for (RepresentedTypeRItem item : representatives) {
-            if (ObjectUtils.isEmpty(item) || ObjectUtils.isEmpty(item.getValue())) {
+            if (item == null || item.getValue() == null) {
                 continue;
             }
-            item.getValue().setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
-            item.getValue().setRepresentativeAddress(caseData.getEt3ResponseAddress());
+            RepresentedTypeR representative = item.getValue();
+            representative.setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
+            representative.setRepresentativeAddress(caseData.getEt3ResponseAddress());
         }
         AddressUtils.clearMyHmctsAddressText(caseData);
     }

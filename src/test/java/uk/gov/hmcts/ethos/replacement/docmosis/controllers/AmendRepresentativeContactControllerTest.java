@@ -33,6 +33,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -139,6 +141,24 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath("$.errors.size()", is(LoggerTestUtils.INTEGER_ZERO)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption("DUMMY");
+    }
+
+    @Test
+    @SneakyThrows
+    void theMidEventAmendRepresentativeContact_skipsMyHmctsWhenAmendOptionSelected() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption("Amend contact details");
+        mvc.perform(post(MID_EVENT)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors.size()", is(LoggerTestUtils.INTEGER_ZERO)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(amendRepresentativeContactService, never())
+                .setStagedMyHmctsContactAddress(anyString(), any(CaseData.class));
         ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption("DUMMY");
     }
 

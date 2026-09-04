@@ -1008,7 +1008,13 @@ public final class RespondentRepresentativeUtils {
      */
     public static void updateRepresentativeContactDetails(CaseData caseData,
                                                           List<String> roles) {
+        if (caseData == null) {
+            return;
+        }
         for (RepresentedTypeR representative : findRepresentativesByRoles(caseData, roles)) {
+            if (representative == null) {
+                continue;
+            }
             representative.setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
             representative.setRepresentativeAddress(caseData.getEt3ResponseAddress());
         }
@@ -1031,24 +1037,33 @@ public final class RespondentRepresentativeUtils {
      */
     public static List<RepresentedTypeR> findRepresentativesByRoles(CaseData caseData, List<String> roles) {
         List<RepresentedTypeR> representatives = new ArrayList<>();
-        if (ObjectUtils.isEmpty(caseData)
-                || CollectionUtils.isEmpty(caseData.getRepCollection())
+        if (caseData == null) {
+            return representatives;
+        }
+        if (CollectionUtils.isEmpty(caseData.getRepCollection())
                 || CollectionUtils.isEmpty(roles)
                 || CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
             return representatives;
         }
         for (String role : roles) {
             int roleIndex = RoleUtils.findRoleIndexByRoleLabel(role);
-            if (roleIndex < 0
-                    || roleIndex >= caseData.getRespondentCollection().size()
-                    || StringUtils.isBlank(caseData.getRespondentCollection().get(roleIndex).getId())) {
+            if (roleIndex < 0 || roleIndex >= caseData.getRespondentCollection().size()) {
                 continue;
             }
             RespondentSumTypeItem respondentSumTypeItem = caseData.getRespondentCollection().get(roleIndex);
+            if (respondentSumTypeItem == null || StringUtils.isBlank(respondentSumTypeItem.getId())) {
+                continue;
+            }
             for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
-                if (RespondentRepresentativeUtils.isValidRepresentative(representative)
-                        && respondentSumTypeItem.getId().equals(representative.getValue().getRespondentId())) {
-                    representatives.add(representative.getValue());
+                if (!RespondentRepresentativeUtils.isValidRepresentative(representative)) {
+                    continue;
+                }
+                RepresentedTypeR representativeValue = representative.getValue();
+                if (representativeValue == null) {
+                    continue;
+                }
+                if (respondentSumTypeItem.getId().equals(representativeValue.getRespondentId())) {
+                    representatives.add(representativeValue);
                 }
             }
         }
@@ -1067,7 +1082,13 @@ public final class RespondentRepresentativeUtils {
      * @param roles the list of case role labels used to identify respondents
      */
     public static void loadStagedRepresentativeContactDetails(CaseData caseData, List<String> roles) {
+        if (caseData == null) {
+            return;
+        }
         for (RepresentedTypeR representative : findRepresentativesByRoles(caseData, roles)) {
+            if (representative == null) {
+                continue;
+            }
             caseData.setRespRepPhoneNumber(representative.getRepresentativePhoneNumber());
             caseData.setRespRepAddress(representative.getRepresentativeAddress());
         }
@@ -1083,10 +1104,7 @@ public final class RespondentRepresentativeUtils {
      * @param roles the list of case role labels used to identify respondents
      */
     public static void saveStagedRepresentativeContactDetails(CaseData caseData, List<String> roles) {
-        for (RepresentedTypeR representative : findRepresentativesByRoles(caseData, roles)) {
-            representative.setRepresentativePhoneNumber(caseData.getRespRepPhoneNumber());
-            representative.setRepresentativeAddress(caseData.getRespRepAddress());
-        }
+        persistStagedRepresentativeContact(caseData, roles, true);
     }
 
     /**
@@ -1099,7 +1117,21 @@ public final class RespondentRepresentativeUtils {
      * @param roles the list of case role labels used to identify respondents
      */
     public static void saveStagedRepresentativeAddress(CaseData caseData, List<String> roles) {
+        persistStagedRepresentativeContact(caseData, roles, false);
+    }
+
+    private static void persistStagedRepresentativeContact(CaseData caseData, List<String> roles,
+                                                           boolean includePhoneNumber) {
+        if (caseData == null) {
+            return;
+        }
         for (RepresentedTypeR representative : findRepresentativesByRoles(caseData, roles)) {
+            if (representative == null) {
+                continue;
+            }
+            if (includePhoneNumber) {
+                representative.setRepresentativePhoneNumber(caseData.getRespRepPhoneNumber());
+            }
             representative.setRepresentativeAddress(caseData.getRespRepAddress());
         }
     }
@@ -1113,7 +1145,7 @@ public final class RespondentRepresentativeUtils {
      * @param caseData the case data to clear
      */
     public static void clearStagedRepresentativeContactDetails(CaseData caseData) {
-        if (ObjectUtils.isEmpty(caseData)) {
+        if (caseData == null) {
             return;
         }
         caseData.setRespRepPhoneNumber(null);
@@ -1154,7 +1186,13 @@ public final class RespondentRepresentativeUtils {
      */
     public static void updateET3ResponseContactDetails(CaseData caseData,
                                                        List<String> roles) {
+        if (caseData == null) {
+            return;
+        }
         for (RepresentedTypeR representative : findRepresentativesByRoles(caseData, roles)) {
+            if (representative == null) {
+                continue;
+            }
             caseData.setEt3ResponsePhone(representative.getRepresentativePhoneNumber());
             caseData.setEt3ResponseAddress(representative.getRepresentativeAddress());
         }

@@ -494,11 +494,21 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseEventID": "initialConsideration",
+    "CaseFieldID": "etICAnyOtherDirectionsLabel",
+    "DisplayContext": "READONLY",
+    "PageID": 2,
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 9,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "initialConsideration",
     "CaseFieldID": "etICHearingNotListedAnyOtherDirections",
     "DisplayContext": "OPTIONAL",
     "PageID": 2,
     "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 9,
+    "PageFieldDisplayOrder": 10,
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -508,7 +518,7 @@
     "DisplayContext": "COMPLEX",
     "PageID": 2,
     "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 10,
+    "PageFieldDisplayOrder": 11,
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -518,7 +528,7 @@
     "DisplayContext": "MANDATORY",
     "PageID": 2,
     "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 11,
+    "PageFieldDisplayOrder": 12,
     "ShowSummaryChangeOption": "Y",
     "PageColumnNumber": 1
   },
@@ -529,7 +539,7 @@
     "DisplayContext": "MANDATORY",
     "PageID": 2,
     "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 12,
+    "PageFieldDisplayOrder": 13,
     "FieldShowCondition": "etICHearingNotListedReferVP=\"Yes\"",
     "ShowSummaryChangeOption": "Y",
     "PageColumnNumber": 1
@@ -541,7 +551,7 @@
     "DisplayContext": "MANDATORY",
     "PageID": 2,
     "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 13,
+    "PageFieldDisplayOrder": 14,
     "FieldShowCondition": "etICCanProceed=\"dummy\"",
     "RetainHiddenValue": "Yes",
     "Publish": "Y"

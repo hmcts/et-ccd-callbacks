@@ -225,14 +225,19 @@
     </suppress>
     <!-- Spring Security 6.5.12 contains the fix but is currently a commercial-only release.
          ET does not use Digest authentication, KeyBasedPersistenceTokenService, the affected
-         Password4j encoders, or InMemoryOAuth2AuthorizationService. -->
+         Password4j encoders, InMemoryOAuth2AuthorizationService, AesBytesEncryptor/Encryptors,
+         or WebAuthn. -->
     <suppress until="2026-10-03">
         <notes><![CDATA[
    file name: spring-security-crypto-6.5.11.jar
-   The timing-attack-sensitive components listed by CVE-2026-59276 are not used by this service.
-   Remove when a patched OSS Spring Security version is available through Spring Boot.
+   CVE-2026-59276: timing-attack-sensitive components not used.
+   CVE-2026-47841: WebAuthn not used (CPE match on spring_security).
+   CVE-2026-47842: AesBytesEncryptor / Encryptors APIs not used.
+   Remove when a patched OSS Spring Security 6.5.x (or Boot-managed) version is available.
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-crypto@6\.5\.11$</packageUrl>
         <cve>CVE-2026-59276</cve>
+        <cve>CVE-2026-47841</cve>
+        <cve>CVE-2026-47842</cve>
     </suppress>
 </suppressions>

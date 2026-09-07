@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -37,7 +38,8 @@ class EmploymentRightsActServiceTest {
         employmentRightsActService = new EmploymentRightsActService(featureToggleService,
                 LocalDate.of(2026, 10, 1));
         caseData = new CaseData();
-        when(featureToggleService.isEraOctober2026Enabled()).thenReturn(true);
+        lenient().when(featureToggleService.isEraOctober2026Enabled()).thenReturn(true);
+        lenient().when(featureToggleService.isEraJanuary2027Enabled()).thenReturn(true);
     }
 
     @Test
@@ -133,7 +135,7 @@ class EmploymentRightsActServiceTest {
 
     @Test
     void setUnfairDismissalEraByReceiptDate_EraFeatureDisabled_DoesNotSetIcUnfairDismissal() {
-        when(featureToggleService.isEraOctober2026Enabled()).thenReturn(false);
+        when(featureToggleService.isEraJanuary2027Enabled()).thenReturn(false);
         caseData.setReceiptDate("2026-09-30");
 
         employmentRightsActService.setUnfairDismissalEraByReceiptDate(caseData);
@@ -143,7 +145,7 @@ class EmploymentRightsActServiceTest {
 
     @Test
     void processUnfairDismissalEra_EraFeatureDisabled_DoesNotSetEraOrUdl() {
-        when(featureToggleService.isEraOctober2026Enabled()).thenReturn(false);
+        when(featureToggleService.isEraJanuary2027Enabled()).thenReturn(false);
         caseData.setEtICUnfairDismissalEra(YES);
 
         employmentRightsActService.processUnfairDismissalEra(ENGLANDWALES_CASE_TYPE_ID, caseData);

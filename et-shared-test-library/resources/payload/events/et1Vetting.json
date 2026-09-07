@@ -1,0 +1,52 @@
+{
+  "et1VettingBeforeYouStart": "Open these documents to help you complete this form:",
+  "et1VettingClaimantDetailsMarkUp": "<hr><h3>Claimant</h3><pre>First name &#09&#09&#09&#09&nbsp; Grayson<br><br>Last name &#09&#09&#09&#09&nbsp; Becker<br><br>Contact address &#09&#09 4 Little Meadows<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Bradley<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Wrexham<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 LL11 4AR</pre>",
+  "et1VettingRespondentDetailsMarkUp": "<h3>Respondent </h3><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; Mrs Test Auto<br><br>Contact address &#09&#09 78 East Wonford Hill<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Exeter<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 EX1 3DD</pre><hr>",
+  "et1VettingCanServeClaimYesOrNo": "Yes",
+  "et1VettingCanServeClaimGeneralNote": null,
+  "et1VettingRespondentAcasDetails1": "<hr><h3>Respondent 1</h3><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; Mrs Test Auto<br><br>Contact address &#09&#09 78 East Wonford Hill<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Exeter<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 EX1 3DD</pre><h3>Acas certificate</h3>Certificate number R807115/23/89 has been provided.<br><br><br>",
+  "et1VettingAcasCertIsYesOrNo1": "Yes",
+  "et1VettingRespondentAcasDetails2": null,
+  "et1VettingRespondentAcasDetails3": null,
+  "et1VettingRespondentAcasDetails4": null,
+  "et1VettingRespondentAcasDetails5": null,
+  "et1VettingRespondentAcasDetails6": null,
+  "et1VettingAcasCertGeneralNote": null,
+  "substantiveDefectsList": ["rule121a"],
+  "rule121aTextArea": "possible substantive",
+  "et1SubstantiveDefectsGeneralNotes": "posssible general notes",
+  "existingJurisdictionCodes": null,
+  "areTheseCodesCorrect": "Yes",
+  "vettingJurisdictionCodeCollection": [
+    {
+      "value": {
+        "et1VettingJurCodeList": "DAG"
+      },
+      "id": "048cfd54-e8d7-4cbd-93a8-e4f431d47955"
+    }
+  ],
+  "et1JurisdictionCodeGeneralNotes": null,
+  "trackType": "Open",
+  "trackAllocation": null,
+  "isTrackAllocationCorrect": "No",
+  "suggestAnotherTrack": "Open",
+  "whyChangeTrackAllocation": "new track allocation",
+  "trackAllocationGeneralNotes": "track allocation general notes",
+  "isLocationCorrect": "Yes",
+  "et1LocationGeneralNotes": null,
+  "et1AddressDetails": "<hr><h2>Listing details<hr><h3>Claimant</h3><pre>Contact address &#09&#09 4 Little Meadows<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Bradley<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Wrexham<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 LL11 4AR</pre><br><pre>Work address &#09&#09&#09 The Burnt Oak<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Egerton Gate<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Shenley Brook End<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Milton Keynes<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 MK5 7HH</pre><hr><h3>Respondent</h3><pre>Contact address &#09&#09 78 East Wonford Hill<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Exeter<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 EX1 3DD</pre><hr>",
+  "et1SuggestHearingVenue": "No",
+  "et1TribunalRegion": "Newcastle",
+  "et1HearingVenueGeneralNotes": null,
+  "et1GovOrMajorQuestion": "No",
+  "et1ReasonableAdjustmentsQuestion": "No",
+  "et1VideoHearingQuestion": "Yes",
+  "et1FurtherQuestionsGeneralNotes": null,
+  "referralToJudgeOrLOList": [],
+  "et1JudgeReferralGeneralNotes": null,
+  "referralToREJOrVPList": [],
+  "et1REJOrVPReferralGeneralNotes": null,
+  "otherReferralList": [],
+  "et1OtherReferralGeneralNotes": null,
+  "et1VettingAdditionalInformationTextArea": null
+}

@@ -2971,7 +2971,7 @@
     "CaseEventID": "amendClaimantDetails",
     "CaseFieldID": "claimantType",
     "ListElementCode": "claimant_email_address",
-    "EventElementLabel": "Email address",
+    "EventElementLabel": "Email address (use Update claimant email to change)",
     "FieldDisplayOrder": 10,
     "DisplayContext": "OPTIONAL"
   },

@@ -6685,7 +6685,7 @@
     "ID": "etICHearingListedAnswers",
     "ListElementCode": "etICHearingAnyOtherDirections",
     "FieldType": "TextArea",
-    "ElementLabel": " ",
+    "ElementLabel": "Any other directions",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },

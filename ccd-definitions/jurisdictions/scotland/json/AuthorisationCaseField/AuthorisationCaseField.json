@@ -12674,12 +12674,6 @@
           "caseworker-employment-api"
         ],
         "CRUD": "CRUD"
-      },
-      {
-        "UserRoles": [
-          "[CLAIMANTSOLICITOR]"
-        ],
-        "CRUD": "D"
       }
     ]
   },
@@ -12702,12 +12696,6 @@
           "caseworker-employment-api"
         ],
         "CRUD": "CRUD"
-      },
-      {
-        "UserRoles": [
-          "[CLAIMANTSOLICITOR]"
-        ],
-        "CRUD": "D"
       }
     ]
   },

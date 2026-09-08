@@ -4,7 +4,7 @@
     "CaseEventID": "initialConsideration",
     "CaseFieldID": "etICUnfairDismissalEra",
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "etICUnfairDismissalEra=\"dummy\"",
+    "FieldShowCondition": "etICCanProceed=\"dummy\"",
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 33,

@@ -331,6 +331,7 @@ public class Et1VettingService {
             return String.format(RESPONDENT_ACAS_DETAILS, respondentNumber, respondent.getRespondentName(),
                 toAddressWithTab(respondent.getRespondentAddress()), acasStatus);
         }
+        log.info("ERA October 2026 feature is enabled and case is submitted on or after ERA date.");
 
         String dateOfLastEvent = getDateOfLastEvent(caseData);
         String acasReceiptDate = respondent.getAcasCertificateReceiptDate();

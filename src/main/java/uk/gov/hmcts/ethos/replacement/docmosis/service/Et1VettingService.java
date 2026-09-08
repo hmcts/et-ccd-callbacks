@@ -327,6 +327,7 @@ public class Et1VettingService {
             : String.format("%s", respondent.getRespondentAcas());
 
         if (!employmentRightsActService.isEraOctober2026(caseData)) {
+            log.info("ERA October 2026 feature is not enabled or case is submitted before ERA date.");
             return String.format(RESPONDENT_ACAS_DETAILS, respondentNumber, respondent.getRespondentName(),
                 toAddressWithTab(respondent.getRespondentAddress()), acasStatus);
         }

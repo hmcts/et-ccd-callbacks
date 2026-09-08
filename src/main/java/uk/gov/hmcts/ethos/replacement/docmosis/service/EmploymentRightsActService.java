@@ -45,6 +45,7 @@ public class EmploymentRightsActService {
      */
     public boolean isEraOctober2026(CaseData caseData) {
         if (!featureToggleService.isEraOctober2026Enabled()) {
+            log.info("ERA October 2026 feature is not enabled.");
             return false;
         }
         return getParsedReceiptDate(caseData)

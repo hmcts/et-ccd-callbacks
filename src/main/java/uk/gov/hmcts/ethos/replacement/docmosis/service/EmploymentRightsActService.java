@@ -91,7 +91,7 @@ public class EmploymentRightsActService {
      * @param caseData the case data
      */
     public void setUnfairDismissalEraByReceiptDate(CaseData caseData) {
-        if (!featureToggleService.isEraOctober2026Enabled()) {
+        if (!featureToggleService.isEraJanuary2027Enabled()) {
             return;
         }
 
@@ -113,7 +113,7 @@ public class EmploymentRightsActService {
      * @param caseData the case data
      */
     public void processUnfairDismissalEra(String caseTypeId, CaseData caseData) {
-        if (!featureToggleService.isEraOctober2026Enabled()) {
+        if (!featureToggleService.isEraJanuary2027Enabled()) {
             return;
         }
 

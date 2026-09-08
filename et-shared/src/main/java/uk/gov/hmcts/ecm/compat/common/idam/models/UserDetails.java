@@ -14,6 +14,7 @@ public class UserDetails {
     @JsonAlias({"sub", "email"})
     private String email;
 
+    @JsonAlias("id")
     private String uid;
 
     private List<String> roles;

@@ -6476,6 +6476,7 @@
     "CaseFieldID": "etICHearingListedAnswers",
     "ListElementCode": "otherDirectionsLabel",
     "FieldDisplayOrder": 22,
+    "FieldShowCondition": "etICHearingAnyOtherDirections != \"dummy\"",
     "DisplayContext": "READONLY"
   },
   {

@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.AdditionalCaseInfoType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -70,6 +71,36 @@ class EmploymentRightsActServiceTest {
     }
 
     @Test
+    void setEraFlagByReceiptDate_InvalidReceiptDate_DoesNotSetEra() {
+        caseData.setReceiptDate("not-a-date");
+
+        employmentRightsActService.setEraFlagByReceiptDate(caseData);
+
+        assertNull(caseData.getAdditionalCaseInfoType());
+    }
+
+    @Test
+    void setEraFlagByReceiptDate_ReceiptDateWithWhitespace_SetsEraToNo() {
+        caseData.setReceiptDate(" 2026-09-30 ");
+
+        employmentRightsActService.setEraFlagByReceiptDate(caseData);
+
+        assertEquals(NO, caseData.getAdditionalCaseInfoType().getEra());
+    }
+
+    @Test
+    void setEraFlagByReceiptDate_ExistingAdditionalCaseInfo_SetsEraWithoutReplacingIt() {
+        AdditionalCaseInfoType additionalCaseInfo = new AdditionalCaseInfoType();
+        caseData.setAdditionalCaseInfoType(additionalCaseInfo);
+        caseData.setReceiptDate("2026-09-30");
+
+        employmentRightsActService.setEraFlagByReceiptDate(caseData);
+
+        assertEquals(additionalCaseInfo, caseData.getAdditionalCaseInfoType());
+        assertEquals(NO, additionalCaseInfo.getEra());
+    }
+
+    @Test
     void setUnfairDismissalEraByReceiptDate_BeforeOctoberFirst2026_SetsIcUnfairDismissalToNotApplicable() {
         caseData.setReceiptDate("2026-09-30");
         employmentRightsActService.setUnfairDismissalEraByReceiptDate(caseData);
@@ -80,6 +111,20 @@ class EmploymentRightsActServiceTest {
     void setUnfairDismissalEraByReceiptDate_OnOrAfterOctoberFirst2026_DoesNotSetIcUnfairDismissal() {
         caseData.setReceiptDate("2026-10-01");
         employmentRightsActService.setUnfairDismissalEraByReceiptDate(caseData);
+        assertNull(caseData.getEtICUnfairDismissalEra());
+    }
+
+    @Test
+    void setUnfairDismissalEraByReceiptDate_NullCaseData_HandlesGracefully() {
+        assertDoesNotThrow(() -> employmentRightsActService.setUnfairDismissalEraByReceiptDate(null));
+    }
+
+    @Test
+    void setUnfairDismissalEraByReceiptDate_InvalidReceiptDate_DoesNotSetIcUnfairDismissal() {
+        caseData.setReceiptDate("2026/09/30");
+
+        employmentRightsActService.setUnfairDismissalEraByReceiptDate(caseData);
+
         assertNull(caseData.getEtICUnfairDismissalEra());
     }
 
@@ -95,9 +140,9 @@ class EmploymentRightsActServiceTest {
 
     @Test
     void processUnfairDismissalEra_ResponseYes_UdlExists_DoesNotAddDuplicateUdl() {
-        caseData.setEtICUnfairDismissalEra(YES);
+        caseData.setEtICUnfairDismissalEra("yes");
         JurCodesType jurCodesType = new JurCodesType();
-        jurCodesType.setJuridictionCodesList("UDL");
+        jurCodesType.setJuridictionCodesList("udl");
         JurCodesTypeItem item = new JurCodesTypeItem();
         item.setValue(jurCodesType);
         caseData.setJurCodesCollection(new ArrayList<>(List.of(item)));
@@ -105,6 +150,12 @@ class EmploymentRightsActServiceTest {
         employmentRightsActService.processUnfairDismissalEra("ET_EnglandWales", caseData);
 
         assertEquals(1, caseData.getJurCodesCollection().size());
+    }
+
+    @Test
+    void processUnfairDismissalEra_NullCaseData_HandlesGracefully() {
+        assertDoesNotThrow(() -> employmentRightsActService.processUnfairDismissalEra(
+                ENGLANDWALES_CASE_TYPE_ID, null));
     }
 
     @Test
@@ -186,5 +237,26 @@ class EmploymentRightsActServiceTest {
     void isEraOctober2026_NullOrInvalidReceiptDate_ReturnsFalse() {
         caseData.setReceiptDate(null);
         assertFalse(employmentRightsActService.isEraOctober2026(caseData));
+    }
+
+    @Test
+    void isEraOctober2026_NullCaseData_ReturnsFalse() {
+        assertFalse(employmentRightsActService.isEraOctober2026(null));
+    }
+
+    @Test
+    void isEraOctober2026_InvalidOrBlankReceiptDate_ReturnsFalse() {
+        caseData.setReceiptDate("invalid");
+        assertFalse(employmentRightsActService.isEraOctober2026(caseData));
+
+        caseData.setReceiptDate("   ");
+        assertFalse(employmentRightsActService.isEraOctober2026(caseData));
+    }
+
+    @Test
+    void isEraOctober2026_ReceiptDateWithWhitespace_ReturnsTrue() {
+        caseData.setReceiptDate(" 2026-10-01 ");
+
+        assertTrue(employmentRightsActService.isEraOctober2026(caseData));
     }
 }

@@ -329,6 +329,9 @@ cron:
   reconfigurationLimit: ${CRON_RECONFIGURATION_LIMIT:1000}
   ecmMigrationCaseNoteIds: ${CRON_ECM_MIGRATION_CASE_NOTE_IDS:}
   ecmMigrationCaseNotesDryRun: ${CRON_ECM_MIGRATION_CASE_NOTES_DRY_RUN:true}
+  clearDraftTtlDryRun: ${CRON_CLEAR_DRAFT_TTL_DRY_RUN:true}
+  clearDraftTtlMaxCasesPerSearch: ${CRON_CLEAR_DRAFT_TTL_MAX_CASES_PER_SEARCH:500}
+  clearDraftTtlMaxCasesToProcess: ${CRON_CLEAR_DRAFT_TTL_MAX_CASES_TO_PROCESS:1000}
 
 pdf:
   english: "ET1_0224.pdf"

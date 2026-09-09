@@ -54,6 +54,10 @@ public final class ET3FormConstants {
     public static final String CHECKBOX_PDF_RESPONDENT_FIELD_CONTACT_TYPE_POST = "2.5 Post";
     public static final String CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_TYPE_PHONE = "2.10 phone";
     public static final String CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_TYPE_VIDEO = "2.10";
+    public static final String CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_PANEL_JUDGE = "2.14 a judge";
+    public static final String CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_PANEL_PANEL = "2.14 a panel";
+    public static final String CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_PANEL_NO_PREFERENCE = "2.14 no preference";
+    public static final String TXT_PDF_RESPONDENT_FIELD_HEARING_PANEL_REASONS = "2.14 reasons";
     public static final String CHECKBOX_PDF_RESPONDENT_FIELD_MORE_THAN_ONE_SITE_GREAT_BRITAIN_NO =
             "2.9 more than one site - no";
     public static final String CHECKBOX_PDF_RESPONDENT_FIELD_MORE_THAN_ONE_SITE_GREAT_BRITAIN_YES =

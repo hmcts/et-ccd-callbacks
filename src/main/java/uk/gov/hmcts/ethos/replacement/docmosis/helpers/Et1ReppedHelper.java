@@ -22,8 +22,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -369,6 +369,7 @@ public final class Et1ReppedHelper {
 
     private static ClaimantOtherType claimantOtherType(CaseData caseData) {
         ClaimantOtherType claimantOtherType = new ClaimantOtherType();
+        claimantOtherType.setDateOfLastEvent(caseData.getEt1SectionThreeDateOfLastEvent());
         if (CollectionUtils.isEmpty(caseData.getDidClaimantWorkForOrg())) {
             return claimantOtherType;
         }
@@ -445,16 +446,21 @@ public final class Et1ReppedHelper {
         if (CollectionUtils.isEmpty(caseData.getClaimantStillWorkingNoticePeriod())) {
             return;
         }
-        if (caseData.getClaimantStillWorkingNoticePeriod().getFirst().equals(WEEKS)) {
-            claimantOtherType.setClaimantNoticePeriod(YES);
-            claimantOtherType.setClaimantNoticePeriodUnit(WEEKS);
-            claimantOtherType.setClaimantNoticePeriodDuration(caseData.getClaimantStillWorkingNoticePeriodWeeks());
-        } else if (caseData.getClaimantStillWorkingNoticePeriod().getFirst().equals(MONTHS)) {
-            claimantOtherType.setClaimantNoticePeriod(YES);
-            claimantOtherType.setClaimantNoticePeriodUnit(MONTHS);
-            claimantOtherType.setClaimantNoticePeriodDuration(caseData.getClaimantStillWorkingNoticePeriodMonths());
-        } else if (caseData.getClaimantStillWorkingNoticePeriod().getFirst().equals(NO)) {
-            claimantOtherType.setClaimantNoticePeriod(NO);
+        switch (caseData.getClaimantStillWorkingNoticePeriod().getFirst()) {
+            case WEEKS -> {
+                claimantOtherType.setClaimantNoticePeriod(YES);
+                claimantOtherType.setClaimantNoticePeriodUnit(WEEKS);
+                claimantOtherType.setClaimantNoticePeriodDuration(caseData.getClaimantStillWorkingNoticePeriodWeeks());
+            }
+            case MONTHS -> {
+                claimantOtherType.setClaimantNoticePeriod(YES);
+                claimantOtherType.setClaimantNoticePeriodUnit(MONTHS);
+                claimantOtherType.setClaimantNoticePeriodDuration(caseData.getClaimantStillWorkingNoticePeriodMonths());
+            }
+            case NO -> claimantOtherType.setClaimantNoticePeriod(NO);
+            default -> {
+                // Do nothing for unmatched values
+            }
         }
     }
 
@@ -490,6 +496,10 @@ public final class Et1ReppedHelper {
                 reasonableAdjustmentsMapping(caseData.getClaimantSupportQuestion()));
         claimantHearingPreference.setReasonableAdjustmentsDetail(caseData.getClaimantSupportQuestionReason());
         claimantHearingPreference.setHearingLanguage(getFirstListItem(caseData.getClaimantHearingContactLanguage()));
+        claimantHearingPreference.setClaimantHearingPanelPreference(
+                caseData.getClaimantHearingPanelPreference());
+        claimantHearingPreference.setClaimantHearingPanelPreferenceWhy(
+                caseData.getClaimantHearingPanelPreferenceWhy());
         return claimantHearingPreference;
     }
 
@@ -540,6 +550,8 @@ public final class Et1ReppedHelper {
         caseData.setClaimantAttendHearing(null);
         caseData.setClaimantSupportQuestion(null);
         caseData.setClaimantSupportQuestionReason(null);
+        caseData.setClaimantHearingPanelPreference(null);
+        caseData.setClaimantHearingPanelPreferenceWhy(null);
         caseData.setRepresentativeContactPreference(null);
         caseData.setContactPreferencePostReason(null);
         caseData.setRepresentativeAddress(null);
@@ -603,16 +615,27 @@ public final class Et1ReppedHelper {
     }
 
     /**
-     * Validates the grounds for the ET1 Repped journey.
+     * Validates the grounds and date of last event for the ET1 Repped journey.
      * @param caseData the case data
      * @return a list of error messages
      */
     public static List<String> validateGrounds(CaseData caseData) {
+        List<String> errors = new ArrayList<>();
         if (ObjectUtils.isEmpty(caseData.getEt1SectionThreeDocumentUpload())
             && isNullOrEmpty(caseData.getEt1SectionThreeClaimDetails())) {
-            return Collections.singletonList(CLAIM_DETAILS_MISSING);
+            errors.add(CLAIM_DETAILS_MISSING);
         }
-        return Collections.emptyList();
+        if (StringUtils.isNotBlank(caseData.getEt1SectionThreeDateOfLastEvent())) {
+            try {
+                LocalDate dateOfLastEvent = LocalDate.parse(caseData.getEt1SectionThreeDateOfLastEvent());
+                if (dateOfLastEvent.isAfter(LocalDate.now(ZoneId.systemDefault()))) {
+                    errors.add("The date of the most recent event cannot be in the future");
+                }
+            } catch (Exception ignored) {
+                errors.add("Enter a valid date");
+            }
+        }
+        return errors;
     }
 
     private static String formatPay(String pay) {

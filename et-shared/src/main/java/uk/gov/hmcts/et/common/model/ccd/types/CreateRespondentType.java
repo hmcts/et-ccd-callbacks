@@ -31,4 +31,8 @@ public class CreateRespondentType {
     private String respondentAcas;
     @JsonProperty("respondent_ACAS_no")
     private String respondentAcasNo;
+    @JsonProperty("acasCertificateReceiptDate")
+    private String acasCertificateReceiptDate;
+    @JsonProperty("acasCertificateIssueDate")
+    private String acasCertificateIssueDate;
 }

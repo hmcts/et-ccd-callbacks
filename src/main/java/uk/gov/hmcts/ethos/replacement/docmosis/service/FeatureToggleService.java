@@ -77,4 +77,12 @@ public class FeatureToggleService {
     public boolean isPartySpacingCronEnabled() {
         return this.featureToggleApi.isFeatureEnabled("party-spacing-cron");
     }
+
+    public boolean isEraOctober2026Enabled() {
+        return this.featureToggleApi.isFeatureEnabled("eraOctober2026");
+    }
+
+    public boolean isEraJanuary2027Enabled() {
+        return this.featureToggleApi.isFeatureEnabled("eraJanuary2027");
+    }
 }

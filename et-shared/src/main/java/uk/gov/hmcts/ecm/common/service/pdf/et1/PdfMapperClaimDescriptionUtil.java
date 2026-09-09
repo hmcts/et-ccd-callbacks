@@ -25,6 +25,13 @@ public final class PdfMapperClaimDescriptionUtil {
                     ofNullable(caseData.getClaimantRequests().getClaimDescription())
                 );
             }
+            if (ObjectUtils.isNotEmpty(caseData.getClaimantOtherType())
+                && StringUtils.isNotBlank(caseData.getClaimantOtherType().getDateOfLastEvent())) {
+                printFields.put(
+                    PdfMapperConstants.Q8_DATE_OF_RECENT_EVENT,
+                    ofNullable(PdfMapperServiceUtil.formatDate(caseData.getClaimantOtherType().getDateOfLastEvent()))
+                );
+            }
         } catch (Exception e) {
             GenericServiceUtil.logException("An error occurred while printing claim description to pdf file",
                                             caseData.getEthosCaseReference(),

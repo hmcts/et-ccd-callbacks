@@ -6679,6 +6679,7 @@
     "ListElementCode": "otherDirectionsLabel",
     "ElementLabel": "<h3>Any other directions (Optional)</h3><p>Are there any other issues or instructions to consider, or further orders to give?</p><p>This could include:</p><ul><li>Rule 49</li><li>Interpreters</li><li>Adjustments required for hearings</li><li>Further information required</li><li>Employer’s Contract Claim</li><li>Respondent’s identity</li><li>Time limits: claim or response</li></ul>",
     "FieldType": "Label",
+    "FieldShowCondition": "etICHearingAnyOtherDirections=\"dummy\"",
     "SecurityClassification": "Public"
   },
   {

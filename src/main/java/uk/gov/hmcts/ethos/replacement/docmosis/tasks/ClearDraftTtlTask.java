@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -19,12 +18,9 @@ import java.io.IOException;
 import java.util.List;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
 @Component
 @Slf4j
-@RequiredArgsConstructor
 public class ClearDraftTtlTask implements Runnable {
 
     static final String DRAFT_STATE = "AWAITING_SUBMISSION_TO_HMCTS";
@@ -44,23 +40,31 @@ public class ClearDraftTtlTask implements Runnable {
         LIMIT :pageSize
         """;
 
-    private static final List<String> CASE_TYPES = List.of(
-        ENGLANDWALES_CASE_TYPE_ID,
-        SCOTLAND_CASE_TYPE_ID
-    );
-
     private final AdminUserService adminUserService;
     private final CcdClient ccdClient;
     private final NamedParameterJdbcTemplate jdbcTemplate;
+    private final String caseTypeId;
+    private final boolean dryRun;
+    private final int maxCasesPerSearch;
+    private final int maxCasesToProcess;
 
-    @Value("${cron.clearDraftTtlDryRun:true}")
-    private boolean dryRun;
-
-    @Value("${cron.clearDraftTtlMaxCasesPerSearch:500}")
-    private int maxCasesPerSearch;
-
-    @Value("${cron.clearDraftTtlMaxCasesToProcess:1000}")
-    private int maxCasesToProcess;
+    public ClearDraftTtlTask(
+        AdminUserService adminUserService,
+        CcdClient ccdClient,
+        NamedParameterJdbcTemplate jdbcTemplate,
+        @Value("${cron.caseTypeId}") String caseTypeId,
+        @Value("${cron.clearDraftTtlDryRun:true}") boolean dryRun,
+        @Value("${cron.clearDraftTtlMaxCasesPerSearch:500}") int maxCasesPerSearch,
+        @Value("${cron.clearDraftTtlMaxCasesToProcess:1000}") int maxCasesToProcess
+    ) {
+        this.adminUserService = adminUserService;
+        this.ccdClient = ccdClient;
+        this.jdbcTemplate = jdbcTemplate;
+        this.caseTypeId = caseTypeId;
+        this.dryRun = dryRun;
+        this.maxCasesPerSearch = maxCasesPerSearch;
+        this.maxCasesToProcess = maxCasesToProcess;
+    }
 
     @Override
     public void run() {
@@ -70,9 +74,7 @@ public class ClearDraftTtlTask implements Runnable {
         String adminUserToken = adminUserService.getAdminUserToken();
         MigrationSummary summary = new MigrationSummary();
 
-        for (String caseType : CASE_TYPES) {
-            processCaseType(adminUserToken, caseType, summary);
-        }
+        processCaseType(adminUserToken, caseTypeId, summary);
 
         log.info(
             "Clear draft TTL task completed; found={}, cleared={}, wouldClear={}, skipped={}, failed={}",

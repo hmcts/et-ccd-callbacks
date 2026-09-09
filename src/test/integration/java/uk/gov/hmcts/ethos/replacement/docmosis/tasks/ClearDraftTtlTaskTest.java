@@ -13,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.testcontainers.containers.PostgreSQLContainer;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -78,10 +77,7 @@ class ClearDraftTtlTaskTest {
     @BeforeEach
     void setUp() {
         jdbcTemplate.getJdbcTemplate().execute("TRUNCATE ccd.case_data");
-        task = new ClearDraftTtlTask(adminUserService, ccdClient, jdbcTemplate);
-        ReflectionTestUtils.setField(task, "dryRun", true);
-        ReflectionTestUtils.setField(task, "maxCasesPerSearch", 2);
-        ReflectionTestUtils.setField(task, "maxCasesToProcess", 1000);
+        task = createTask(true);
     }
 
     @Test
@@ -98,7 +94,7 @@ class ClearDraftTtlTaskTest {
                    "{\"TTL\":{}}");
         insertCase("1234567890123460", ENGLANDWALES_CASE_TYPE_ID, "Submitted",
                    "{\"TTL\":{\"SystemTTL\":\"2026-10-01\"}}");
-        insertCase("1234567890123461", SCOTLAND_CASE_TYPE_ID, "Submitted",
+        insertCase("1234567890123461", SCOTLAND_CASE_TYPE_ID, ClearDraftTtlTask.DRAFT_STATE,
                    "{\"TTL\":{\"Suspended\":\"No\"}}");
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
         when(ccdClient.startEventForCase(
@@ -128,7 +124,7 @@ class ClearDraftTtlTaskTest {
     void liveRunClearsTtlThroughRollbackEvent() throws IOException {
         insertCase(CASE_ID, ENGLANDWALES_CASE_TYPE_ID, ClearDraftTtlTask.DRAFT_STATE,
                    "{\"TTL\":{\"SystemTTL\":\"2026-10-01\"}}");
-        ReflectionTestUtils.setField(task, "dryRun", false);
+        task = createTask(false);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
 
         CCDRequest request = requestWithTtl(CASE_ID, ClearDraftTtlTask.DRAFT_STATE);
@@ -171,7 +167,7 @@ class ClearDraftTtlTaskTest {
     void liveRunDoesNotClearTtlAfterDraftHasBeenSubmitted() throws IOException {
         insertCase(CASE_ID, ENGLANDWALES_CASE_TYPE_ID, ClearDraftTtlTask.DRAFT_STATE,
                    "{\"TTL\":{\"SystemTTL\":\"2026-10-01\"}}");
-        ReflectionTestUtils.setField(task, "dryRun", false);
+        task = createTask(false);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
         when(ccdClient.startEventForCase(
             ADMIN_TOKEN,
@@ -215,6 +211,18 @@ class ClearDraftTtlTaskTest {
             INSERT INTO ccd.case_data (reference, case_type_id, state, data)
             VALUES (:reference, :caseType, :state, CAST(:data AS JSONB))
             """, parameters);
+    }
+
+    private ClearDraftTtlTask createTask(boolean dryRun) {
+        return new ClearDraftTtlTask(
+            adminUserService,
+            ccdClient,
+            jdbcTemplate,
+            ENGLANDWALES_CASE_TYPE_ID,
+            dryRun,
+            2,
+            1000
+        );
     }
 
     private static CCDRequest requestWithTtl(String caseId, String state) {

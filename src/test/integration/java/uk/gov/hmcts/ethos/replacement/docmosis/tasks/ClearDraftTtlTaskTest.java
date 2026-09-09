@@ -2,29 +2,36 @@ package uk.gov.hmcts.ethos.replacement.docmosis.tasks;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.testcontainers.containers.PostgreSQLContainer;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.types.TTL;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.EtCosPostgresqlContainer;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,6 +44,9 @@ class ClearDraftTtlTaskTest {
 
     private static final String ADMIN_TOKEN = "admin-token";
     private static final String CASE_ID = "1234567890123456";
+    private static final PostgreSQLContainer<?> POSTGRES = EtCosPostgresqlContainer.getInstance();
+
+    private static NamedParameterJdbcTemplate jdbcTemplate;
 
     @Mock
     private AdminUserService adminUserService;
@@ -45,65 +55,83 @@ class ClearDraftTtlTaskTest {
 
     private ClearDraftTtlTask task;
 
+    @BeforeAll
+    static void setUpDatabase() {
+        POSTGRES.start();
+        DriverManagerDataSource dataSource = new DriverManagerDataSource(
+            POSTGRES.getJdbcUrl(),
+            POSTGRES.getUsername(),
+            POSTGRES.getPassword()
+        );
+        jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+        jdbcTemplate.getJdbcTemplate().execute("CREATE SCHEMA IF NOT EXISTS ccd");
+        jdbcTemplate.getJdbcTemplate().execute("""
+            CREATE TABLE IF NOT EXISTS ccd.case_data (
+                reference BIGINT PRIMARY KEY,
+                case_type_id TEXT NOT NULL,
+                state TEXT NOT NULL,
+                data JSONB NOT NULL
+            )
+            """);
+    }
+
     @BeforeEach
     void setUp() {
-        task = new ClearDraftTtlTask(adminUserService, ccdClient);
+        jdbcTemplate.getJdbcTemplate().execute("TRUNCATE ccd.case_data");
+        task = new ClearDraftTtlTask(adminUserService, ccdClient, jdbcTemplate);
         ReflectionTestUtils.setField(task, "dryRun", true);
-        ReflectionTestUtils.setField(task, "maxCasesPerSearch", 100);
+        ReflectionTestUtils.setField(task, "maxCasesPerSearch", 2);
         ReflectionTestUtils.setField(task, "maxCasesToProcess", 1000);
     }
 
     @Test
-    void dryRunFindsCasesWithoutStartingRollbackEvents() throws IOException {
+    void dryRunFindsOnlyDraftCasesContainingLegacyTtlDataInReferenceOrder() throws IOException {
+        String secondCaseId = "1234567890123457";
+        String thirdCaseId = "1234567890123458";
+        insertCase(thirdCaseId, ENGLANDWALES_CASE_TYPE_ID, ClearDraftTtlTask.DRAFT_STATE,
+                   "{\"TTL\":{\"Suspended\":\"No\"}}");
+        insertCase(CASE_ID, ENGLANDWALES_CASE_TYPE_ID, ClearDraftTtlTask.DRAFT_STATE,
+                   "{\"TTL\":{\"SystemTTL\":\"2026-10-01\"}}");
+        insertCase(secondCaseId, ENGLANDWALES_CASE_TYPE_ID, ClearDraftTtlTask.DRAFT_STATE,
+                   "{\"TTL\":{\"OverrideTTL\":\"2026-10-02\"}}");
+        insertCase("1234567890123459", ENGLANDWALES_CASE_TYPE_ID, ClearDraftTtlTask.DRAFT_STATE,
+                   "{\"TTL\":{}}");
+        insertCase("1234567890123460", ENGLANDWALES_CASE_TYPE_ID, "Submitted",
+                   "{\"TTL\":{\"SystemTTL\":\"2026-10-01\"}}");
+        insertCase("1234567890123461", SCOTLAND_CASE_TYPE_ID, "Submitted",
+                   "{\"TTL\":{\"Suspended\":\"No\"}}");
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
-        SubmitEvent candidate = candidate(CASE_ID);
-        when(ccdClient.buildAndGetElasticSearchRequest(
+        when(ccdClient.startEventForCase(
             eq(ADMIN_TOKEN),
             eq(ENGLANDWALES_CASE_TYPE_ID),
-            anyString()
-        )).thenReturn(List.of(candidate), List.of());
-        when(ccdClient.buildAndGetElasticSearchRequest(
-            eq(ADMIN_TOKEN),
-            eq(SCOTLAND_CASE_TYPE_ID),
-            anyString()
-        )).thenReturn(List.of());
-        when(ccdClient.startEventForCase(
-            ADMIN_TOKEN,
-            ENGLANDWALES_CASE_TYPE_ID,
-            EMPLOYMENT,
-            CASE_ID,
-            ClearDraftTtlTask.ROLLBACK_TTL_EVENT
-        )).thenReturn(requestWithTtl());
+            eq(EMPLOYMENT),
+            anyString(),
+            eq(ClearDraftTtlTask.ROLLBACK_TTL_EVENT)
+        )).thenAnswer(invocation -> requestWithTtl(invocation.getArgument(3), ClearDraftTtlTask.DRAFT_STATE));
 
         task.run();
 
-        verify(ccdClient, never()).submitEventForCase(
-            anyString(),
-            org.mockito.ArgumentMatchers.any(CaseData.class),
-            anyString(),
-            anyString(),
-            org.mockito.ArgumentMatchers.any(CCDRequest.class),
-            anyString()
+        InOrder calls = inOrder(ccdClient);
+        calls.verify(ccdClient).startEventForCase(
+            ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, ClearDraftTtlTask.ROLLBACK_TTL_EVENT
         );
+        calls.verify(ccdClient).startEventForCase(
+            ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, secondCaseId, ClearDraftTtlTask.ROLLBACK_TTL_EVENT
+        );
+        calls.verify(ccdClient).startEventForCase(
+            ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, thirdCaseId, ClearDraftTtlTask.ROLLBACK_TTL_EVENT
+        );
+        calls.verifyNoMoreInteractions();
     }
 
     @Test
     void liveRunClearsTtlThroughRollbackEvent() throws IOException {
+        insertCase(CASE_ID, ENGLANDWALES_CASE_TYPE_ID, ClearDraftTtlTask.DRAFT_STATE,
+                   "{\"TTL\":{\"SystemTTL\":\"2026-10-01\"}}");
         ReflectionTestUtils.setField(task, "dryRun", false);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
-        SubmitEvent candidate = candidate(CASE_ID);
-        when(ccdClient.buildAndGetElasticSearchRequest(
-            eq(ADMIN_TOKEN),
-            eq(ENGLANDWALES_CASE_TYPE_ID),
-            anyString()
-        )).thenReturn(List.of(candidate), List.of());
-        when(ccdClient.buildAndGetElasticSearchRequest(
-            eq(ADMIN_TOKEN),
-            eq(SCOTLAND_CASE_TYPE_ID),
-            anyString()
-        )).thenReturn(List.of());
 
-        CCDRequest request = requestWithTtl();
+        CCDRequest request = requestWithTtl(CASE_ID, ClearDraftTtlTask.DRAFT_STATE);
         when(ccdClient.startEventForCase(
             ADMIN_TOKEN,
             ENGLANDWALES_CASE_TYPE_ID,
@@ -141,28 +169,17 @@ class ClearDraftTtlTaskTest {
 
     @Test
     void liveRunDoesNotClearTtlAfterDraftHasBeenSubmitted() throws IOException {
+        insertCase(CASE_ID, ENGLANDWALES_CASE_TYPE_ID, ClearDraftTtlTask.DRAFT_STATE,
+                   "{\"TTL\":{\"SystemTTL\":\"2026-10-01\"}}");
         ReflectionTestUtils.setField(task, "dryRun", false);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
-        when(ccdClient.buildAndGetElasticSearchRequest(
-            eq(ADMIN_TOKEN),
-            eq(ENGLANDWALES_CASE_TYPE_ID),
-            anyString()
-        )).thenReturn(List.of(candidate(CASE_ID)), List.of());
-        when(ccdClient.buildAndGetElasticSearchRequest(
-            eq(ADMIN_TOKEN),
-            eq(SCOTLAND_CASE_TYPE_ID),
-            anyString()
-        )).thenReturn(List.of());
-
-        CCDRequest request = requestWithTtl();
-        request.getCaseDetails().setState("Submitted");
         when(ccdClient.startEventForCase(
             ADMIN_TOKEN,
             ENGLANDWALES_CASE_TYPE_ID,
             EMPLOYMENT,
             CASE_ID,
             ClearDraftTtlTask.ROLLBACK_TTL_EVENT
-        )).thenReturn(request);
+        )).thenReturn(requestWithTtl(CASE_ID, "Submitted"));
 
         task.run();
 
@@ -177,20 +194,6 @@ class ClearDraftTtlTaskTest {
     }
 
     @Test
-    void querySelectsOnlyDraftsContainingLegacyTtlData() {
-        String query = ClearDraftTtlTask.buildQuery(50, CASE_ID);
-
-        assertThat(query)
-            .contains("\"size\":50")
-            .contains("\"state.keyword\"")
-            .contains(ClearDraftTtlTask.DRAFT_STATE)
-            .contains("data.TTL.SystemTTL")
-            .contains("data.TTL.OverrideTTL")
-            .contains("data.TTL.Suspended")
-            .contains("\"search_after\":[\"" + CASE_ID + "\"]");
-    }
-
-    @Test
     void emptyTtlSerialisesAsTheEstablishedRollbackPayload() {
         CaseData caseData = new CaseData();
         caseData.setTtl(new TTL());
@@ -202,13 +205,19 @@ class ClearDraftTtlTaskTest {
         assertThat(payload).containsEntry("TTL", Map.of());
     }
 
-    private static SubmitEvent candidate(String caseId) {
-        SubmitEvent candidate = new SubmitEvent();
-        candidate.setCaseId(Long.parseLong(caseId));
-        return candidate;
+    private static void insertCase(String reference, String caseType, String state, String data) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource()
+            .addValue("reference", Long.parseLong(reference))
+            .addValue("caseType", caseType)
+            .addValue("state", state)
+            .addValue("data", data);
+        jdbcTemplate.update("""
+            INSERT INTO ccd.case_data (reference, case_type_id, state, data)
+            VALUES (:reference, :caseType, :state, CAST(:data AS JSONB))
+            """, parameters);
     }
 
-    private static CCDRequest requestWithTtl() {
+    private static CCDRequest requestWithTtl(String caseId, String state) {
         TTL ttl = new TTL();
         ttl.setSystemTTL(LocalDate.now().plusDays(30));
         ttl.setOverrideTTL(LocalDate.now().plusDays(60));
@@ -218,10 +227,10 @@ class ClearDraftTtlTaskTest {
         caseData.setTtl(ttl);
 
         CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseId(CASE_ID);
+        caseDetails.setCaseId(caseId);
         caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setJurisdiction(EMPLOYMENT);
-        caseDetails.setState(ClearDraftTtlTask.DRAFT_STATE);
+        caseDetails.setState(state);
         caseDetails.setCaseData(caseData);
 
         CCDRequest request = new CCDRequest();

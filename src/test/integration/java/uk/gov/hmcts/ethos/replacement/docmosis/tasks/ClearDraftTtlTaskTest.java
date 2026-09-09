@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.tasks;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,13 +17,13 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.utility.DockerImageName;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.types.TTL;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.EtCosPostgresqlContainer;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 
 import java.io.IOException;
@@ -45,7 +46,10 @@ class ClearDraftTtlTaskTest {
 
     private static final String ADMIN_TOKEN = "admin-token";
     private static final String CASE_ID = "1234567890123456";
-    private static final PostgreSQLContainer<?> POSTGRES = EtCosPostgresqlContainer.getInstance();
+    private static final DockerImageName POSTGRES_IMAGE = DockerImageName
+        .parse("hmctspublic.azurecr.io/imported/postgres:16-alpine")
+        .asCompatibleSubstituteFor("postgres");
+    private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>(POSTGRES_IMAGE);
 
     private static NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -74,6 +78,11 @@ class ClearDraftTtlTaskTest {
                 data JSONB NOT NULL
             )
             """);
+    }
+
+    @AfterAll
+    static void tearDownDatabase() {
+        POSTGRES.stop();
     }
 
     @BeforeEach

@@ -212,7 +212,7 @@ public class ClearDraftTtlTask implements Runnable {
             && (ttl.getSystemTTL() != null || ttl.getOverrideTTL() != null || ttl.getSuspended() != null);
     }
 
-    private static class MigrationSummary {
+    private static final class MigrationSummary {
         private int found;
         private int cleared;
         private int wouldClear;

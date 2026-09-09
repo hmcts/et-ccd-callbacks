@@ -22,4 +22,6 @@ public class ClaimantOtherType {
     private String claimantDisabled;
     @JsonProperty("claimant_disabled_details")
     private String claimantDisabledDetails;
+    @JsonProperty("dateOfLastEvent")
+    private String dateOfLastEvent;
 }

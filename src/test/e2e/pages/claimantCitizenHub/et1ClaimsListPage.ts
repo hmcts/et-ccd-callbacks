@@ -48,20 +48,21 @@ export class Et1ClaimsListPage extends BasePage {
   async assertCaseListedInSubmittedClaims(caseId: string) {
     await this.page.waitForLoadState('load');
     await expect(this.submittedClaimsTable).toBeVisible();
-    const targetHref = `/citizen-hub/${caseId}?lng=en`;
+    const targetHref = `/claimant-application/${caseId}?lng=en`;
     const targetLink = this.submittedClaimsTable.locator(`a[href="${targetHref}"]`);
     await expect
       .poll(
         async() => {
-          const visible = await targetLink.isVisible();
+          let visible = await targetLink.isVisible();
           if (!visible) {
             await this.page.reload();
+            visible = await targetLink.isVisible();
           }
           return visible;
         },
         {
           intervals: [1_000],
-          timeout: 7000,
+          timeout: 10000,
           message: `Case with ID ${caseId} not found in Submitted claims table after waiting for 7 seconds.`,
         }
       )

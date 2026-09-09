@@ -2,10 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis;
 
 import com.ibm.icu.util.TimeZone;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(SpringExtension.class)
 class DocmosisApplicationTest {
 
     @Test

@@ -40,6 +40,13 @@
     "AccessProfiles": "[DEFENDANT]"
   },
   {
+    "LiveFrom": "08/07/2026",
+    "CaseTypeID": "ET_Scotland",
+    "RoleName": "[CLAIMANTNONLEGALREPRESENTATIVE]",
+    "ReadOnly": "N",
+    "AccessProfiles": "[CLAIMANTNONLEGALREPRESENTATIVE]"
+  },
+  {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "ET_Scotland",
     "RoleName": "idam:et-acas-api",

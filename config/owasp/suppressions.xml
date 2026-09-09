@@ -61,6 +61,17 @@
         <packageUrl regex="true">^pkg:maven/(com\.azure/azure\-identity(\-extensions)?|com\.microsoft\.azure/msal4j)@.*$</packageUrl>
         <cve>CVE-2024-35255</cve>
     </suppress>
+    <!-- CVE-2026-50338 is an Azure Spring Apps (Microsoft cloud service) elevation-of-privilege issue,
+         not a library flaw. It is a false-positive CPE match against the com.azure.spring:spring-cloud-azure-*
+         client jars, which do not run Azure Spring Apps. Suppress the false positive. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-cloud-azure-*-6.4.0.jar
+   False positive: CVE targets the Azure Spring Apps hosting service, not these client libraries.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.azure\.spring/spring\-cloud\-azure\-.*@.*$</packageUrl>
+        <cve>CVE-2026-50338</cve>
+    </suppress>
     <!-- OpenTelemetry semconv is already forced to the latest published version; these match the broad OpenTelemetry CPE. -->
     <suppress>
         <notes><![CDATA[
@@ -89,6 +100,26 @@
         <packageUrl regex="true">^pkg:maven/co\.elastic\.clients/elasticsearch\-(java|rest5\-client)@9\.4\.2$</packageUrl>
         <cve>CVE-2026-56148</cve>
         <cve>CVE-2026-56149</cve>
+        <cve>CVE-2026-63144</cve>
+        <cve>CVE-2026-63263</cve>
+    </suppress>
+    <!-- CVE-2026-53914 affects Kotlin compiler build-cache metadata (fixed in 2.4.20, not yet on Maven Central).
+         kotlin-stdlib here is a runtime transitive dependency from okhttp; this project does not use the Kotlin Gradle plugin. -->
+    <suppress until="2026-10-01">
+        <notes><![CDATA[
+   file name: kotlin-stdlib-2.3.21.jar, kotlin-stdlib-jdk7-2.3.21.jar, kotlin-stdlib-jdk8-2.3.21.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-stdlib(\-jdk[78])?@.*$</packageUrl>
+        <cve>CVE-2026-53914</cve>
+    </suppress>
+    <!-- CVE-2026-54399 and CVE-2026-54428 affect httpcore5 (5.x) only; httpcore 4.4.x is a false positive from CPE mapping. -->
+    <suppress>
+        <notes><![CDATA[
+   file name: httpcore-4.4.16.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.httpcomponents/httpcore@4\..*$</packageUrl>
+        <cve>CVE-2026-54399</cve>
+        <cve>CVE-2026-54428</cve>
     </suppress>
     <!-- All other CVEs below -->
     <!-- CVE-2026-54515 affects jackson-databind 2.22.0 which is the latest available version.
@@ -125,18 +156,6 @@
         <cve>CVE-2026-54514</cve>
         <cve>CVE-2026-54515</cve>
     </suppress>
-    <!-- Netty 4.2.16.Final is the latest available version; no fix released for these CVEs.
-         Suppress until a patched release is available. -->
-    <suppress>
-        <notes><![CDATA[
-   file name: netty-*-4.2.16.Final.jar
-   Latest available version. No fix released for CVE-2026-44891, CVE-2026-55831, CVE-2026-55833 as of 2026-07-23.
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-.*@4\.2\.16\.Final$</packageUrl>
-        <cve>CVE-2026-44891</cve>
-        <cve>CVE-2026-55831</cve>
-        <cve>CVE-2026-55833</cve>
-    </suppress>
     <!-- spring-cloud-azure 6.4.0 is pinned by com.github.hmcts:ccd-servicebus-support:6.29.0 via the
          hmcts.ccd.sdk plugin. No 6.x release of spring-cloud-azure exists on Maven Central, so the
          version cannot be overridden with a resolution strategy. Suppress until ccd-servicebus-support
@@ -161,5 +180,64 @@
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.azure\.spring/spring-cloud-azure-service@.*$</packageUrl>
         <cpe>cpe:/a:service_project:service</cpe>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-59313</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-59314</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-47893</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-47892</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-59283</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-59284</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-59280</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-59270</cve>
+    </suppress>
+    <!-- Spring Framework 6.2.19 is managed by Spring Boot 3.5.16. The fixes are only available
+         in the commercial 6.2.20 release at the time of writing. ET does not use the affected
+         SSE view-fragment, Aalto Jaxb2Decoder, escaped Errors accessor, or self-populating
+         data-binding patterns. Remove when a patched OSS Spring Boot 3.5 release is available. -->
+    <suppress until="2026-10-03">
+        <notes><![CDATA[
+   file name: spring-aop-6.2.19.jar, spring-beans-6.2.19.jar, spring-context-6.2.19.jar,
+   spring-core-6.2.19.jar, spring-expression-6.2.19.jar, spring-jcl-6.2.19.jar,
+   spring-webmvc-6.2.19.jar
+   Spring Framework CPE findings on the Spring Boot 3.5.16 managed version. The vulnerable usage
+   patterns are not present in this service; fixed 6.2.x artifacts are not currently available OSS.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-(aop|beans|context|core|expression|jcl|webmvc)@6\.2\.19$</packageUrl>
+        <cve>CVE-2026-47890</cve>
+        <cve>CVE-2026-47891</cve>
+        <cve>CVE-2026-59281</cve>
+        <cve>CVE-2026-59282</cve>
+    </suppress>
+    <!-- Spring Security 6.5.12 contains the fix but is currently a commercial-only release.
+         ET does not use Digest authentication, KeyBasedPersistenceTokenService, the affected
+         Password4j encoders, InMemoryOAuth2AuthorizationService, AesBytesEncryptor/Encryptors,
+         or WebAuthn. -->
+    <suppress until="2026-10-03">
+        <notes><![CDATA[
+   file name: spring-security-crypto-6.5.11.jar
+   CVE-2026-59276: timing-attack-sensitive components not used.
+   CVE-2026-47841: WebAuthn not used (CPE match on spring_security).
+   CVE-2026-47842: AesBytesEncryptor / Encryptors APIs not used.
+   Remove when a patched OSS Spring Security 6.5.x (or Boot-managed) version is available.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-crypto@6\.5\.11$</packageUrl>
+        <cve>CVE-2026-59276</cve>
+        <cve>CVE-2026-47841</cve>
+        <cve>CVE-2026-47842</cve>
     </suppress>
 </suppressions>

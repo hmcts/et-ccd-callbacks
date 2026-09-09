@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.et.syaapi.helper.CaseDetailsConverter;
 import uk.gov.hmcts.reform.et.syaapi.model.TestData;
 import uk.gov.hmcts.reform.et.syaapi.models.HubLinksStatusesRequest;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -80,7 +82,7 @@ class HubLinkServiceTest {
 
         hubLinkService.updateHubLinkStatuses(hubLinksStatusesRequest,
                                              TEST_SERVICE_AUTH_TOKEN,
-                                             CASE_USER_ROLE_CREATOR);
+                                             List.of(CASE_USER_ROLE_CREATOR));
 
         verify(caseDetailsConverter, times(1)).caseDataContent(
             any(),
@@ -98,15 +100,17 @@ class HubLinkServiceTest {
             null
         )).thenReturn(testData.getCaseDetailsWithData());
         when(featureToggleService.isCaseFlagsEnabled()).thenReturn(false);
-        when(manageCaseRoleService.getUserCaseByCaseUserRole(TEST_SERVICE_AUTH_TOKEN, CASE_ID, CASE_USER_ROLE_CREATOR))
+        when(manageCaseRoleService.getUserCaseByCaseUserRoles(
+            TEST_SERVICE_AUTH_TOKEN, CASE_ID, List.of(CASE_USER_ROLE_CREATOR)))
             .thenReturn(testData.getCaseDetailsWithData());
 
-        hubLinkService.updateHubLinkStatuses(hubLinksStatusesRequest, TEST_SERVICE_AUTH_TOKEN, CASE_USER_ROLE_CREATOR);
+        hubLinkService.updateHubLinkStatuses(hubLinksStatusesRequest, TEST_SERVICE_AUTH_TOKEN,
+                                             List.of(CASE_USER_ROLE_CREATOR));
 
-        verify(manageCaseRoleService, times(1)).getUserCaseByCaseUserRole(
+        verify(manageCaseRoleService, times(1)).getUserCaseByCaseUserRoles(
             TEST_SERVICE_AUTH_TOKEN,
             hubLinksStatusesRequest.getCaseId(),
-            CASE_USER_ROLE_CREATOR
+            List.of(CASE_USER_ROLE_CREATOR)
         );
         verify(caseService, times(1)).triggerEvent(
             TEST_SERVICE_AUTH_TOKEN, hubLinksStatusesRequest.getCaseId(),

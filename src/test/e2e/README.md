@@ -1,5 +1,6 @@
-# et-xui-e2e-tests
-Employment Tribunal XUI E2E Tests
+# Employment Tribunal end-to-end tests
+
+Playwright end-to-end tests for the Employment Tribunal CCD callbacks service.
 
 
 ## Getting Started

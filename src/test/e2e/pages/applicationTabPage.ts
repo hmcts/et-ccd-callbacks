@@ -317,7 +317,7 @@ export class ApplicationTabPage extends BasePage {
     await this.clickCloseAndReturn();
   }
 
-  async caseWorkerRespondToAnApplication(applicationType:string, orderOrRequest: string = 'Case management order') {
+  async caseWorkerRespondToAnApplication(applicationType:string, orderOrRequest: string = 'Case management order', responseRequired: string = 'Yes') {
     await this.page.waitForLoadState('load');
     await this.selectEitherViewOrMakeOrRespondOrRecordADecisionLink('Respond to an application');
     await this.selectApplicationType(applicationType);
@@ -330,8 +330,13 @@ export class ApplicationTabPage extends BasePage {
     await this.page.getByRole('radio', { name: orderOrRequest }).check();
     await this.madeByDropdown.selectOption('1: Legal officer');
     await this.fullNameText.fill('LEGAL OFFICER');
-    await this.responseToTribunalRequiredDropdown.selectOption('1: Yes');
-    await this.partiesToRespondDropdown.selectOption('1: Both parties');
+
+    if( responseRequired === 'Yes') {
+      await this.responseToTribunalRequiredDropdown.selectOption(`1: ${responseRequired}`);
+      await this.partiesToRespondDropdown.selectOption('1: Both parties');
+    } else {
+      await this.responseToTribunalRequiredDropdown.selectOption(`2: ${responseRequired}`);
+    }
 
     // parties to notify
     await this.page.getByRole('radio', { name: 'Both parties' }).check();

@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue;
 
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.reports.claimsbyhearingvenue.ClaimsByHearingVenueCaseData;
 import uk.gov.hmcts.ecm.common.model.reports.claimsbyhearingvenue.ClaimsByHearingVenueSubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -10,7 +8,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantWorkAddressType;
 
 import java.util.List;
 
-@ExtendWith(SpringExtension.class)
 class ClaimsByHearingVenueCaseDataBuilder {
     private final ClaimsByHearingVenueCaseData caseData = new ClaimsByHearingVenueCaseData();
 

@@ -117,6 +117,15 @@
     "SecurityClassification": "Public"
   },
   {
+    "LiveFrom": "08/07/2026",
+    "CaseTypeID": "ET_Scotland",
+    "ID": "[CLAIMANTNONLEGALREPRESENTATIVE]",
+    "Name": "Claimant Non Legal Representative",
+    "Description": "Claimant Non Legal Representative role",
+    "JurisdictionID": "EMPLOYMENT",
+    "SecurityClassification": "Public"
+  },
+  {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "ET_Scotland_Multiple",
     "ID": "[CREATOR]",

@@ -76,3 +76,10 @@ bin/
 
 ### Claude Code ###
 .claude/settings.local.json
+
+### Testing ###
+.env
+/.sessions
+/src/test/.tmp
+src/test/token-cache.json
+/test-results

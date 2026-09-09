@@ -3,11 +3,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
@@ -82,8 +80,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationSer
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService.OPEN_REFERRAL_ERROR_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService.RECEIPT_DATE_LATER_THAN_REJECTED_ERROR_MESSAGE;
 
-@ExtendWith(SpringExtension.class)
 class EventValidationServiceTest {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private static final LocalDate PAST_RECEIPT_DATE = LocalDate.now().minusDays(1);
     private static final LocalDate CURRENT_RECEIPT_DATE = LocalDate.now();
@@ -889,15 +888,13 @@ class EventValidationServiceTest {
     private CaseDetails generateCaseDetails(String jsonFileName) throws URISyntaxException, IOException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
             .getContextClassLoader().getResource(jsonFileName)).toURI())));
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(json, CaseDetails.class);
+        return OBJECT_MAPPER.readValue(json, CaseDetails.class);
     }
 
     private ListingRequest generateListingDetails(String jsonFileName) throws URISyntaxException, IOException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
             .getContextClassLoader().getResource(jsonFileName)).toURI())));
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(json, ListingRequest.class);
+        return OBJECT_MAPPER.readValue(json, ListingRequest.class);
     }
 
     @Test

@@ -20,6 +20,8 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent;
 import uk.gov.hmcts.reform.et.syaapi.model.CaseTestData;
 import uk.gov.hmcts.reform.et.syaapi.models.CaseRequest;
+import uk.gov.hmcts.reform.et.syaapi.models.CaseTransferInfoResponse;
+import uk.gov.hmcts.reform.et.syaapi.models.CaseTransferType;
 import uk.gov.hmcts.reform.et.syaapi.models.ChangeApplicationStatusRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.ClaimantApplicationRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.HubLinksStatusesRequest;
@@ -27,6 +29,7 @@ import uk.gov.hmcts.reform.et.syaapi.models.RespondToApplicationRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.TribunalResponseViewedRequest;
 import uk.gov.hmcts.reform.et.syaapi.service.ApplicationService;
 import uk.gov.hmcts.reform.et.syaapi.service.CaseService;
+import uk.gov.hmcts.reform.et.syaapi.service.CaseTransferInfoService;
 import uk.gov.hmcts.reform.et.syaapi.service.HubLinkService;
 import uk.gov.hmcts.reform.et.syaapi.service.ManageCaseRoleService;
 import uk.gov.hmcts.reform.et.syaapi.service.utils.ResourceLoader;
@@ -39,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -49,6 +53,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SCOTLAND_CASE_TYPE;
+import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CREATOR;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_FIRST_NAME;
@@ -93,6 +98,9 @@ class ManageCaseControllerTest {
     @MockitoBean
     private HubLinkService hubLinkService;
 
+    @MockitoBean
+    private CaseTransferInfoService caseTransferInfoService;
+
     ManageCaseControllerTest() {
         // Default constructor
         expectedDetails = ResourceLoader.fromString(
@@ -114,9 +122,10 @@ class ManageCaseControllerTest {
 
         // given
         when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
-        when(manageCaseRoleService.getUserCaseByCaseUserRole(TEST_SERVICE_AUTH_TOKEN,
-                                                             caseRequest.getCaseId(),
-                                                             CASE_USER_ROLE_CREATOR))
+        when(manageCaseRoleService.getUserCaseByCaseUserRoles(
+                 TEST_SERVICE_AUTH_TOKEN,
+                 caseRequest.getCaseId(),
+                 List.of(CASE_USER_ROLE_CREATOR, CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE)))
             .thenReturn(expectedDetails);
         // when
         mockMvc.perform(post("/cases/user-case", CASE_ID)
@@ -137,8 +146,9 @@ class ManageCaseControllerTest {
     void shouldGetCaseDetailsByUser() {
         when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
         when(idamClient.getUserInfo(TEST_SERVICE_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
-        when(manageCaseRoleService.getUserCasesByCaseUserRole(
-            TEST_SERVICE_AUTH_TOKEN, CASE_USER_ROLE_CREATOR
+        when(manageCaseRoleService.getUserCasesByCaseUserRoles(
+            TEST_SERVICE_AUTH_TOKEN,
+            List.of(CASE_USER_ROLE_CREATOR, CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE)
         )).thenReturn(requestCaseDataList);
 
         // when
@@ -161,8 +171,8 @@ class ManageCaseControllerTest {
     void shouldGetCaseDetailsByDefendantUser() {
         when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
         when(idamClient.getUserInfo(TEST_SERVICE_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
-        when(manageCaseRoleService.getUserCasesByCaseUserRole(
-            TEST_SERVICE_AUTH_TOKEN, CASE_USER_ROLE_DEFENDANT
+        when(manageCaseRoleService.getUserCasesByCaseUserRoles(
+            TEST_SERVICE_AUTH_TOKEN, List.of(CASE_USER_ROLE_DEFENDANT)
         )).thenReturn(requestCaseDataList);
 
         // when
@@ -182,6 +192,27 @@ class ManageCaseControllerTest {
 
     @Test
     @SneakyThrows
+    void shouldExpandCreatorRequestToIncludeClaimantNonLegalRepresentative() {
+        when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
+        when(idamClient.getUserInfo(TEST_SERVICE_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
+        when(manageCaseRoleService.getUserCasesByCaseUserRoles(
+            TEST_SERVICE_AUTH_TOKEN,
+            List.of(CASE_USER_ROLE_CREATOR, CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE)
+        )).thenReturn(requestCaseDataList);
+
+        // when
+        mockMvc.perform(
+                get("/cases/user-cases?case_user_role=CREATOR", SCOTLAND_CASE_TYPE)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header(HttpHeaders.AUTHORIZATION, TEST_SERVICE_AUTH_TOKEN))
+            // then
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("[0].case_type_id").value(requestCaseDataList.get(0).getCaseTypeId()))
+            .andExpect(jsonPath("[1].case_type_id").value(requestCaseDataList.get(1).getCaseTypeId()));
+    }
+
+    @Test
+    @SneakyThrows
     void shouldReturnBadRequestForNonExistingItem() {
         CaseRequest caseRequest = CaseRequest.builder()
             .caseId(CASE_ID).build();
@@ -189,7 +220,7 @@ class ManageCaseControllerTest {
         Request request = Request.create(
             Request.HttpMethod.GET, "/test", Collections.emptyMap(), null, new RequestTemplate());
         when(verifyTokenService.verifyTokenSignature(anyString())).thenReturn(true);
-        when(manageCaseRoleService.getUserCaseByCaseUserRole(anyString(), anyString(), anyString())).thenThrow(
+        when(manageCaseRoleService.getUserCaseByCaseUserRoles(anyString(), anyString(), anyList())).thenThrow(
             new FeignException.BadRequest(
                 "Bad request",
                 request,
@@ -201,7 +232,7 @@ class ManageCaseControllerTest {
                             .header(HttpHeaders.AUTHORIZATION, TEST_SERVICE_AUTH_TOKEN))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.code").value(400))
-            .andExpect(jsonPath("$.message").value("Bad request - incorrect payload"));
+            .andExpect(jsonPath("$.message").value("Bad request"));
     }
 
     @Test
@@ -235,6 +266,9 @@ class ManageCaseControllerTest {
             .andExpect(jsonPath("$.case_data.caseSource").value("Manually Created"))
             .andExpect(jsonPath("$.created_date").exists())
             .andExpect(jsonPath("$.last_modified").exists());
+
+        verify(manageCaseRoleService, times(1))
+            .assignClaimantNonLegalRepresentativeRole(TEST_SERVICE_AUTH_TOKEN, expectedDetails);
     }
 
     @Test
@@ -330,7 +364,9 @@ class ManageCaseControllerTest {
         ));
         when(hubLinkService.updateHubLinkStatuses(hubLinksStatusesRequest,
                                                   TEST_SERVICE_AUTH_TOKEN,
-                                                  CASE_USER_ROLE_CREATOR)).thenReturn(expectedDetails);
+                                                  List.of(CASE_USER_ROLE_CREATOR,
+                                                          CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE)))
+            .thenReturn(expectedDetails);
 
         mockMvc.perform(
             put("/cases/update-hub-links-statuses", CASE_ID)
@@ -341,7 +377,7 @@ class ManageCaseControllerTest {
         verify(hubLinkService, times(1)).updateHubLinkStatuses(
             hubLinksStatusesRequest,
             TEST_SERVICE_AUTH_TOKEN,
-            CASE_USER_ROLE_CREATOR
+            List.of(CASE_USER_ROLE_CREATOR, CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE)
         );
     }
 
@@ -492,5 +528,46 @@ class ManageCaseControllerTest {
             .andExpect(jsonPath("$.state").value(expectedDetails.getState()))
             .andExpect(jsonPath("$.created_date").exists())
             .andExpect(jsonPath("$.last_modified").exists());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldGetCaseTransferInfo() {
+        CaseTransferInfoResponse transferInfo = CaseTransferInfoResponse.builder()
+            .transferred(true)
+            .transferType(CaseTransferType.ECM)
+            .caseState("Transferred")
+            .originalCaseId(CASE_ID)
+            .originalEthosCaseReference("60000001/2022")
+            .newEthosCaseReference("18850001/2020")
+            .newCaseId("1234567890123456")
+            .destinationOffice("ECM")
+            .reasonForCT("Office move")
+            .transferComplete(true)
+            .build();
+
+        when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
+        when(caseTransferInfoService.getCaseTransferInfo(
+            TEST_SERVICE_AUTH_TOKEN,
+            CASE_ID,
+            CASE_USER_ROLE_CREATOR
+        )).thenReturn(transferInfo);
+
+        mockMvc.perform(get("/cases/{caseId}/transfer-info", CASE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_SERVICE_AUTH_TOKEN)
+                            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.transferred").value(true))
+            .andExpect(jsonPath("$.transferType").value("ECM"))
+            .andExpect(jsonPath("$.originalCaseId").value(CASE_ID))
+            .andExpect(jsonPath("$.newEthosCaseReference").value("18850001/2020"))
+            .andExpect(jsonPath("$.newCaseId").value("1234567890123456"))
+            .andExpect(jsonPath("$.transferComplete").value(true));
+
+        verify(caseTransferInfoService, times(1)).getCaseTransferInfo(
+            TEST_SERVICE_AUTH_TOKEN,
+            CASE_ID,
+            CASE_USER_ROLE_CREATOR
+        );
     }
 }

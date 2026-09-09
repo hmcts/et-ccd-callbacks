@@ -256,7 +256,7 @@ public class TornadoService {
     }
 
     private static boolean isCustomDocName(String documentName) {
-        return documentName.matches(".*(ET3|ACAS|ET1 Vetting|Notification).*");
+        return documentName.matches(".*(ET1|ET3|ACAS|ET1 Vetting|Notification).*");
     }
 
     private byte[] getBytesFromInputStream(ByteArrayOutputStream os, InputStream is) throws IOException {

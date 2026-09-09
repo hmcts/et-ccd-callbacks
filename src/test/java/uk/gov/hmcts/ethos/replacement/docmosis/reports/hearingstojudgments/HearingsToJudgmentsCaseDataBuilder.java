@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments;
 
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.reports.hearingstojudgments.HearingsToJudgmentsCaseData;
 import uk.gov.hmcts.ecm.common.model.reports.hearingstojudgments.HearingsToJudgmentsSubmitEvent;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -16,7 +14,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
 import java.util.ArrayList;
 import java.util.List;
 
-@ExtendWith(SpringExtension.class)
 class HearingsToJudgmentsCaseDataBuilder {
 
     private final HearingsToJudgmentsCaseData caseData = new HearingsToJudgmentsCaseData();

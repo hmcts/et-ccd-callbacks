@@ -57,7 +57,7 @@ class GlobalExceptionHandlerTest {
             null
         );
         final ErrorResponse errorResponse = ErrorResponse.builder()
-            .message("Call failed - service is down.")
+            .message("Call failed")
             .code(500)
             .build();
 

@@ -703,9 +703,15 @@
   },
   {
     "ID": "fl_RepresentativeOccupation",
+    "ListElementCode": "Employment advisor",
+    "ListElement": "Employment advisor",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_RepresentativeOccupation",
     "ListElementCode": "Other",
     "ListElement": "Other",
-    "DisplayOrder": 12
+    "DisplayOrder": 13
   },
   {
     "ID": "fl_ContactPreference",

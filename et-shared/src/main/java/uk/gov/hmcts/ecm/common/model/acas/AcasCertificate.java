@@ -17,6 +17,10 @@ public class AcasCertificate {
     private String certificateDocument;
     @JsonProperty("CertificateNumber")
     private String certificateNumber;
+    @JsonProperty("DateOfReceipt")
+    private String dateOfReceipt;
+    @JsonProperty("DateOfIssue")
+    private String dateOfIssue;
 
     @Override
     public boolean equals(Object object) {

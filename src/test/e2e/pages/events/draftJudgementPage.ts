@@ -5,11 +5,13 @@ export default class DraftJudgementPage extends BasePage {
 
     private readonly isThisAJudgement: Locator;
     private readonly directionsText: Locator;
+    private readonly isThisUrgent: Locator;
 
     constructor(page: Page) {
       super(page);
       this.isThisAJudgement = this.page.locator('#draftAndSignJudgement_isJudgement');
       this.directionsText = this.page.locator(`#draftAndSignJudgement_furtherDirections`);
+      this.isThisUrgent = this.page.locator('#draftAndSignJudgement_isUrgent');
     }
 
     async assertDraftJudgementPageIsDisplayed() {
@@ -35,12 +37,20 @@ export default class DraftJudgementPage extends BasePage {
       await this.directionsText.fill(directions);
     }
 
+    async selectIsThisUrgent(option: string) {
+      await expect(this.isThisUrgent).toBeVisible();
+      const optionLocator = this.isThisUrgent.getByText(option);
+      await expect(optionLocator).toBeVisible();
+      await optionLocator.check();
+    }
+
     async submitDraftJudgement() {
         await this.assertDraftJudgementPageIsDisplayed();
         await this.selectIsThisAJudgement('Yes');
         await this.addNewButtonClick();
         await this.uploadDocument(0,'src/test/e2e/resources/test_file/test.txt');
         await this.fillAnyFurtherDirections('Test Draft Judgement');
+        await this.selectIsThisUrgent('Yes');
         await this.clickContinue();
         await this.clickSubmitButton();
     }

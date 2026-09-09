@@ -7,8 +7,8 @@
   "license": "hmcts",
   "private": true,
   "scripts": {
-    "pwinstall": "yarn playwright install --with-deps",
-    "test:smoke": "yarn pwinstall chromium && yarn playwright test -c src/test/e2e/playwright.config.ts  --project=chromium --grep @smoke",
+    "pwinstall": "yarn playwright install",
+    "test:smoke": "yarn pwinstall chromium && yarn playwright test -c src/test/e2e/playwright.config.ts --project=chromium --grep @smoke",
     "test:functional-chromium": "yarn pwinstall chromium && yarn test:functional-ccd-callback",
     "test:full-functional-chromium": "yarn pwinstall chromium && yarn playwright test -c src/test/e2e/playwright.config.ts --project=chromium --grep-invert @accessibility",
     "test:functional-webkit": "yarn pwinstall webkit && yarn playwright test -c src/test/e2e/playwright.config.ts --project=webkit --grep @cx",
@@ -58,7 +58,7 @@
     "tough-cookie": "^6.0.0",
     "ws": "^8.17.1",
     "glob": "11.1.0",
-    "js-yaml": "4.3.0",
+    "js-yaml": "4.3.1",
     "brace-expansion": "^5.0.5",
     "formdata-node": "6.0.3"
   },

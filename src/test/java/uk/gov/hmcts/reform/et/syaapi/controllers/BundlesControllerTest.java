@@ -13,8 +13,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingBundleType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.et.syaapi.models.ClaimantBundlesRequest;
+import uk.gov.hmcts.reform.et.syaapi.models.RespondentBundlesRequest;
 import uk.gov.hmcts.reform.et.syaapi.service.BundlesService;
-import uk.gov.hmcts.reform.et.syaapi.service.FeatureToggleService;
 import uk.gov.hmcts.reform.et.syaapi.service.utils.ResourceLoader;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -44,9 +44,6 @@ class BundlesControllerTest {
     @MockitoBean
     private BundlesService bundlesService;
 
-    @MockitoBean
-    private FeatureToggleService featureToggleService;
-
     BundlesControllerTest() {
         // Default constructor
         expectedDetails = ResourceLoader.fromString(
@@ -66,7 +63,6 @@ class BundlesControllerTest {
             .build();
 
         when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
-        when(featureToggleService.isBundlesEnabled()).thenReturn(true);
 
         when(bundlesService.submitBundles(any(), any())).thenReturn(expectedDetails);
         mockMvc.perform(
@@ -77,6 +73,32 @@ class BundlesControllerTest {
         ).andExpect(status().isOk());
 
         verify(bundlesService, times(1)).submitBundles(
+            TEST_SERVICE_AUTH_TOKEN,
+            bundleRequest
+        );
+    }
+
+    @SneakyThrows
+    @Test
+    void shouldSubmitRespondentBundles() {
+        HearingBundleType bundle = new HearingBundleType();
+        RespondentBundlesRequest bundleRequest = RespondentBundlesRequest.builder()
+            .caseId(CASE_ID)
+            .caseTypeId(CASE_TYPE)
+            .respondentBundles(bundle)
+            .build();
+
+        when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
+
+        when(bundlesService.submitRespondentBundles(any(), any())).thenReturn(expectedDetails);
+        mockMvc.perform(
+            put("/bundles/submit-respondent-bundles", CASE_ID)
+                .header(HttpHeaders.AUTHORIZATION, TEST_SERVICE_AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(ResourceLoader.toJson(bundleRequest))
+        ).andExpect(status().isOk());
+
+        verify(bundlesService, times(1)).submitRespondentBundles(
             TEST_SERVICE_AUTH_TOKEN,
             bundleRequest
         );

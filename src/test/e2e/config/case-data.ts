@@ -209,7 +209,7 @@ export const Events: Record<string, CaseEvent> = {
   },
   caseTransferScotland: {
     listItem: 'Case Transfer (Scotland)',
-    ccdCallback: '',
+    ccdCallback: 'caseTransferDifferentCountry',
   },
   caseTransferToEcm: {
     listItem: 'Case Transfer to ECM',
@@ -229,7 +229,7 @@ export const Events: Record<string, CaseEvent> = {
   },
   amendContactDetails: {
     listItem: 'Amend contact details',
-    ccdCallback: 'amendContactDetails',
+    ccdCallback: 'amendRepresentativeContact',
   },
   amendContactDetailsClaimant: {
     listItem: 'Amend contact details',

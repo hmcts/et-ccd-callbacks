@@ -11,6 +11,9 @@ import LoginPage from '../../pages/loginPage.ts';
 import CaseDetailsPage from '../../pages/caseDetailsPage.ts';
 import { ApplicationTabPage } from '../../pages/applicationTabPage.ts';
 import { CheckYourAnswersPage } from '../../pages/helpers/CheckYourAnswersPage.ts';
+import Et3LoginPage from "../../pages/respondentCitizenHub/et3LoginPage.ts";
+import Et3ResponsesDashboardPage from "../../pages/respondentCitizenHub/et3ResponsesDashboardPage.ts";
+import RespondentCaseOverviewPage from "../../pages/respondentCitizenHub/respondentCaseOverviewPage.ts";
 
 let caseId: string;
 let caseNumber: string;
@@ -56,7 +59,7 @@ test.describe('LR Make an application and view Recorded Decision for respondent'
 
   //RET-5787
   // Test is failing at submission of application or responding to application in citizen UI, DEFECT RET-6573 needs fixing
-  test.fail('Legal representatives make and application - England', async ({
+  test('Legal representatives make and application - England', async ({
     applicationTabPage, caseDetailsPage
   }) => {
 
@@ -74,7 +77,7 @@ test.describe('LR Make an application and view Recorded Decision for respondent'
     await loginPageCW.processLogin(users.etCaseWorker);
     caseNumber = await manageCaseDashboardPageCW.navigateToCaseDetails(caseId, CaseTypeLocation.EnglandAndWales);
     await caseDetailsPageCW.navigateToTab('Applications')
-    await applicationTabPageCW.caseWorkerRespondToAnApplication('Amend response');
+    await applicationTabPageCW.caseWorkerRespondToAnApplication('Amend response', 'Case management order', 'No');
 
     //claimant see response of respond
     await citizenHubLoginPage.processCitizenHubLogin(users.etClaimant);
@@ -147,9 +150,21 @@ test.describe('LR Make an application and view Recorded Decision for respondent'
              caseDetailsPage,
              checkYourAnswersPage,
              et3DetailsPage, et3RespondentDetailsPage,
-             et3EmploymentDetailsPage, et3ResponseDetailsPage}) => {
+             et3EmploymentDetailsPage, et3ResponseDetailsPage, browserUtils
+    }) => {
 
-    //perform all ET3 events as a LR
+    const respondentBrowser = await browserUtils.openNewBrowserContext(users.etRespondent.sessionFile);
+    const et3LoginPage = new Et3LoginPage(respondentBrowser);
+    const et3ResponseDashboardPage = new Et3ResponsesDashboardPage(respondentBrowser);
+    const respondentCaseOverviewPage = new RespondentCaseOverviewPage(respondentBrowser);
+
+    await et3LoginPage.processRespondentLogin(users.etRespondent2);
+    await et3LoginPage.replyToClaimAsNewRespondent(caseId, caseNumber, CaseDetailsValues.respondentName, CaseDetailsValues.claimantFirstName, CaseDetailsValues.claimantLastName);
+    await et3ResponseDashboardPage.assertCaseListedInAwaitingResponse(caseNumber, caseId);
+    await et3LoginPage.navigateToCase(caseNumber, caseId);
+    await respondentCaseOverviewPage.assertYourResponseStatusEt3('Not started yet');
+
+      //perform all ET3 events as a LR
     await caseDetailsPage.selectNextEvent(Events.et3RespondentDetails);
     await et3RespondentDetailsPage.enterEt3RespondentDetails(checkYourAnswersPage);
 
@@ -164,6 +179,12 @@ test.describe('LR Make an application and view Recorded Decision for respondent'
 
     await caseDetailsPage.selectNextEvent(Events.submitEt3Form);
     await et3DetailsPage.submitEt3Form(checkYourAnswersPage);
+
+    await et3LoginPage.processRespondentLogin(users.etRespondent2);
+    await et3ResponseDashboardPage.assertCaseListedInResponseSubmittedTable(caseNumber, caseId);
+    await et3LoginPage.navigateToCase(caseNumber, caseId);
+    await respondentCaseOverviewPage.assertYourResponseStatusEt3('Submitted');
+
   });
 });
 

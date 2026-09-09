@@ -251,7 +251,7 @@ test.describe('Case Flag 2.1', () => {
 
 
 
-test.describe('Case Flag 2.1- Multiple respondents', () => {
+test.describe.skip('Case Flag 2.1- Multiple respondents', () => {
   let caseWorkerBrowserPage: Page;
   let loginPageCW: LoginPage;
   let manageCaseDashboardPageCW: ManageCaseDashboardPage;

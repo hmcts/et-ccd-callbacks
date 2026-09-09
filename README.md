@@ -23,7 +23,7 @@ For detailed information about working with the CCD definitions, see [ccd-defini
 - JSON to Excel conversion tools
 - Environment-specific configuration management
 - Automated build and deployment scripts
-=======
+
 ## Supported Versions
 
 | Component | Version | Status |

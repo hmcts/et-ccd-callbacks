@@ -851,6 +851,7 @@ cftlibTest {
     dependsOn 'generateCftlibCcdDefinitions'
     group = 'verification'
 
+    environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos'
     environment 'RSE_LIB_CLEAN_BOOT', 'true'
     environment 'CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES', 'et_cos'

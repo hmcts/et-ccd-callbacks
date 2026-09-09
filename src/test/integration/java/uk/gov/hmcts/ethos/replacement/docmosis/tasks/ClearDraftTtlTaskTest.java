@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
@@ -116,6 +118,40 @@ class ClearDraftTtlTaskTest {
         );
         calls.verify(ccdClient).startEventForCase(
             ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, thirdCaseId, ClearDraftTtlTask.ROLLBACK_TTL_EVENT
+        );
+        calls.verifyNoMoreInteractions();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ET_EnglandWales,ET_Scotland", " ET_EnglandWales , ET_Scotland "})
+    void dryRunFindsDraftsForEachConfiguredCaseType(String caseTypeIds) throws IOException {
+        String scotlandCaseId = "1234567890123457";
+        insertCase(CASE_ID, ENGLANDWALES_CASE_TYPE_ID, ClearDraftTtlTask.DRAFT_STATE,
+                   "{\"TTL\":{\"SystemTTL\":\"2026-10-01\"}}");
+        insertCase(scotlandCaseId, SCOTLAND_CASE_TYPE_ID, ClearDraftTtlTask.DRAFT_STATE,
+                   "{\"TTL\":{\"SystemTTL\":\"2026-10-01\"}}");
+        task = new ClearDraftTtlTask(adminUserService, ccdClient, jdbcTemplate, caseTypeIds, true, 2, 1000);
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
+        when(ccdClient.startEventForCase(
+            eq(ADMIN_TOKEN),
+            anyString(),
+            eq(EMPLOYMENT),
+            anyString(),
+            eq(ClearDraftTtlTask.ROLLBACK_TTL_EVENT)
+        )).thenAnswer(invocation -> {
+            CCDRequest request = requestWithTtl(invocation.getArgument(3), ClearDraftTtlTask.DRAFT_STATE);
+            request.getCaseDetails().setCaseTypeId(invocation.getArgument(1));
+            return request;
+        });
+
+        task.run();
+
+        InOrder calls = inOrder(ccdClient);
+        calls.verify(ccdClient).startEventForCase(
+            ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, ClearDraftTtlTask.ROLLBACK_TTL_EVENT
+        );
+        calls.verify(ccdClient).startEventForCase(
+            ADMIN_TOKEN, SCOTLAND_CASE_TYPE_ID, EMPLOYMENT, scotlandCaseId, ClearDraftTtlTask.ROLLBACK_TTL_EVENT
         );
         calls.verifyNoMoreInteractions();
     }

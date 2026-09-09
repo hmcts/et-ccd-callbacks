@@ -43,7 +43,7 @@ public class ClearDraftTtlTask implements Runnable {
     private final AdminUserService adminUserService;
     private final CcdClient ccdClient;
     private final NamedParameterJdbcTemplate jdbcTemplate;
-    private final String caseTypeId;
+    private final String caseTypeIds;
     private final boolean dryRun;
     private final int maxCasesPerSearch;
     private final int maxCasesToProcess;
@@ -52,7 +52,7 @@ public class ClearDraftTtlTask implements Runnable {
         AdminUserService adminUserService,
         CcdClient ccdClient,
         NamedParameterJdbcTemplate jdbcTemplate,
-        @Value("${cron.caseTypeId}") String caseTypeId,
+        @Value("${cron.caseTypeId}") String caseTypeIds,
         @Value("${cron.clearDraftTtlDryRun:true}") boolean dryRun,
         @Value("${cron.clearDraftTtlMaxCasesPerSearch:500}") int maxCasesPerSearch,
         @Value("${cron.clearDraftTtlMaxCasesToProcess:1000}") int maxCasesToProcess
@@ -60,7 +60,7 @@ public class ClearDraftTtlTask implements Runnable {
         this.adminUserService = adminUserService;
         this.ccdClient = ccdClient;
         this.jdbcTemplate = jdbcTemplate;
-        this.caseTypeId = caseTypeId;
+        this.caseTypeIds = caseTypeIds;
         this.dryRun = dryRun;
         this.maxCasesPerSearch = maxCasesPerSearch;
         this.maxCasesToProcess = maxCasesToProcess;
@@ -74,7 +74,9 @@ public class ClearDraftTtlTask implements Runnable {
         String adminUserToken = adminUserService.getAdminUserToken();
         MigrationSummary summary = new MigrationSummary();
 
-        processCaseType(adminUserToken, caseTypeId, summary);
+        for (String caseTypeId : caseTypeIds.split(",")) {
+            processCaseType(adminUserToken, caseTypeId.strip(), summary);
+        }
 
         log.info(
             "Clear draft TTL task completed; found={}, cleared={}, wouldClear={}, skipped={}, failed={}",

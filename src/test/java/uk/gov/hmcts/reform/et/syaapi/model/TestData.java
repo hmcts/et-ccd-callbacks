@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.et.syaapi.models.ClaimantApplicationRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.ClaimantBundlesRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.RespondToApplicationRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.RespondentApplicationRequest;
+import uk.gov.hmcts.reform.et.syaapi.models.RespondentBundlesRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.SendNotificationAddResponseRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.SendNotificationStateUpdateRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.TribunalResponseViewedRequest;
@@ -107,6 +108,11 @@ public final class TestData {
     private final ClaimantBundlesRequest claimantBundlesRequest = ResourceLoader.fromString(
         "requests/claimantBundlesRequest.json",
         ClaimantBundlesRequest.class
+    );
+
+    private final RespondentBundlesRequest respondentBundlesRequest = ResourceLoader.fromString(
+        "requests/respondentBundlesRequest.json",
+        RespondentBundlesRequest.class
     );
 
     public static Stream<Arguments> generateCaseDataArgumentsForTheTestFindClaimantLanguage() {

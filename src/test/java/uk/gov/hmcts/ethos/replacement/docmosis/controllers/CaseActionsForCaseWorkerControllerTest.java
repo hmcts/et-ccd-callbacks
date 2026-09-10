@@ -49,6 +49,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -70,11 +71,12 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.isNull;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.nullable;
 import static org.mockito.Mockito.same;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -95,6 +97,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     private static final String PRE_DEFAULT_VALUES_URL = "/preDefaultValues";
     private static final String POST_DEFAULT_VALUES_URL = "/postDefaultValues";
+    private static final String SUPPORT_TASKS_URL = "/supportTasks/aboutToSubmit";
     private static final String AMEND_CASE_DETAILS_URL = "/amendCaseDetails";
     private static final String AMEND_CLAIMANT_DETAILS_URL = "/amendClaimantDetails";
     private static final String UPDATE_CLAIMANT_EMAIL_ABOUT_TO_START_URL =
@@ -185,6 +188,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @MockitoBean
     private CaseFlagsService caseFlagsService;
+
+    @MockitoBean
+    private SupportTaskService supportTaskService;
 
     @MockitoBean
     private FeatureToggleService featureToggleService;
@@ -316,6 +322,119 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"SUBMIT_CASE_DRAFT", "UPDATE_CASE_SUBMITTED"})
+    @SneakyThrows
+    void postDefaultValuesPreparesReviewSupportTasksForCaseFlagsV2Events(String eventId) {
+        ((ObjectNode) requestContent2).put("event_id", eventId);
+        when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
+        when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+
+        mvc.perform(post(POST_DEFAULT_VALUES_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(supportTaskService).prepareReviewSupportTasks(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void postDefaultValuesDoesNotPrepareReviewSupportTasksWhenCaseFlagsV2IsDisabled() {
+        ((ObjectNode) requestContent2).put("event_id", "UPDATE_CASE_SUBMITTED");
+        when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
+        when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mvc.perform(post(POST_DEFAULT_VALUES_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(supportTaskService, never()).prepareReviewSupportTasks(any(CaseData.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"SUBMIT_ET3_FORM", "UPDATE_ET3_FORM"})
+    @SneakyThrows
+    void preparesRespondentReviewSupportTasksForEt3Events(String eventId) {
+        ((ObjectNode) requestContent2).put("event_id", eventId);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+
+        mvc.perform(post(SUPPORT_TASKS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(supportTaskService).prepareRespondentReviewSupportTasks(any(CaseData.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"requestSupport", "createFlag"})
+    @SneakyThrows
+    void preparesReviewSupportTasksForNewCaseFlags(String eventId) {
+        ((ObjectNode) requestContent2).put("event_id", eventId);
+        ((ObjectNode) requestContent2).set("case_details_before",
+                requestContent2.get("case_details").deepCopy());
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+
+        mvc.perform(post(SUPPORT_TASKS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(supportTaskService).prepareNewFlagReviewSupportTasks(
+                any(CaseData.class), any(CaseData.class));
+        if ("createFlag".equals(eventId)) {
+            verify(supportTaskService).prepareArrangeSupportTask(
+                    any(CaseData.class), any(CaseData.class));
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"manageFlags", "manageSupport"})
+    @SneakyThrows
+    void preparesReviewSupportTaskCompletionForManagedCaseFlags(String eventId) {
+        ((ObjectNode) requestContent2).put("event_id", eventId);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+
+        mvc.perform(post(SUPPORT_TASKS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(supportTaskService).prepareManagedReviewSupportTasks(any(CaseData.class));
+        if ("manageFlags".equals(eventId)) {
+            verify(supportTaskService).prepareArrangeSupportTask(any(CaseData.class), isNull());
+        }
+    }
+
+    @Test
+    @SneakyThrows
+    void doesNotPrepareReviewSupportTasksWhenCaseFlagsV2IsDisabled() {
+        ((ObjectNode) requestContent2).put("event_id", "SUBMIT_ET3_FORM");
+
+        mvc.perform(post(SUPPORT_TASKS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(supportTaskService, never()).prepareRespondentReviewSupportTasks(any(CaseData.class));
+        verify(supportTaskService, never()).prepareNewFlagReviewSupportTasks(
+                any(CaseData.class), any(CaseData.class));
+        verify(supportTaskService, never()).prepareManagedReviewSupportTasks(any(CaseData.class));
+        verify(supportTaskService, never()).prepareArrangeSupportTask(
+                any(CaseData.class), nullable(CaseData.class));
     }
 
     @Test

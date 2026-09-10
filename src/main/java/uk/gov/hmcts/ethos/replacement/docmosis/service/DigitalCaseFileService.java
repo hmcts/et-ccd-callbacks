@@ -79,6 +79,7 @@ public class DigitalCaseFileService {
 
     public List<Bundle> createBundleData(CaseData caseData) {
         Bundle bundle = Bundle.builder()
+                .id(UUID.randomUUID().toString())
                 .value(createBundleDetails(caseData))
                 .build();
         return List.of(bundle);
@@ -88,6 +89,7 @@ public class DigitalCaseFileService {
         List<BundleDocumentDetails> caseDocs = getDocsForDcf(caseData);
         List<BundleDocument> bundleDocuments = caseDocs.stream()
                 .map(bundleDocumentDetails -> BundleDocument.builder()
+                        .id(UUID.randomUUID().toString())
                         .value(bundleDocumentDetails)
                         .build())
                 .toList();

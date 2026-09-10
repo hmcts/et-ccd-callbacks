@@ -337,6 +337,7 @@ public class Et1VettingService {
         String acasReceiptDate = respondent.getAcasCertificateReceiptDate();
         String acasIssueDate = respondent.getAcasCertificateIssueDate();
         String receiptDate = caseData.getReceiptDate();
+        String limitationDate = calculateLimitationDate(dateOfLastEvent, acasReceiptDate, acasIssueDate);
 
         String effectiveElapsedTime = calculateEffectiveElapsedTime(receiptDate, dateOfLastEvent,
                 acasReceiptDate, acasIssueDate);
@@ -346,6 +347,7 @@ public class Et1VettingService {
             formatDisplayDate(dateOfLastEvent),
             formatDisplayDate(acasReceiptDate),
             formatDisplayDate(acasIssueDate),
+            formatDisplayDate(limitationDate),
             formatDisplayDate(receiptDate),
             effectiveElapsedTime != null ? effectiveElapsedTime : "Not calculated");
     }
@@ -359,6 +361,10 @@ public class Et1VettingService {
             return caseData.getClaimantOtherType().getDateOfLastEvent();
         }
         return null;
+    }
+
+    private static LocalDate calculateOriginalLimitationDate(LocalDate dateOfLastEvent) {
+        return dateOfLastEvent.plusMonths(6).minusDays(1);
     }
 
     /**
@@ -434,13 +440,39 @@ public class Et1VettingService {
         int totalMonths = period.getYears() * 12 + period.getMonths();
         int totalDays = period.getDays();
         boolean isGreaterThanThreeMonths = totalMonths > 3 || (totalMonths == 3 && totalDays > 0);
-        boolean isLessThanOrEqualToSixMonths = totalMonths < 6 || (totalMonths == 6 && totalDays == 0);
+        boolean isLessThanOrEqualToSixMonths = totalMonths < 6;
         return isGreaterThanThreeMonths && isLessThanOrEqualToSixMonths;
+    }
+
+    private static String calculateLimitationDate(String dateOfLastEventStr, String acasReceiptDateStr,
+                                                   String acasIssueDateStr) {
+        if (isNullOrEmpty(dateOfLastEventStr)) {
+            return null;
+        }
+        try {
+            LocalDate limitationDate = calculateOriginalLimitationDate(LocalDate.parse(dateOfLastEventStr));
+            if (isNullOrEmpty(acasReceiptDateStr) || isNullOrEmpty(acasIssueDateStr)) {
+                return limitationDate.toString();
+            }
+
+            LocalDate acasReceiptDate = LocalDate.parse(acasReceiptDateStr);
+            LocalDate acasIssueDate = LocalDate.parse(acasIssueDateStr);
+            if (!acasReceiptDate.isAfter(limitationDate) && !acasIssueDate.isBefore(acasReceiptDate)) {
+                LocalDate acasExtensionDate = acasIssueDate.plusMonths(1);
+                if (acasExtensionDate.isAfter(limitationDate)) {
+                    limitationDate = acasExtensionDate;
+                }
+            }
+            return limitationDate.toString();
+        } catch (Exception e) {
+            log.error("Error calculating limitation date", e);
+            return null;
+        }
     }
 
     /**
      * Calculates the Effective Elapsed Period between the Date of Last Event and the ET1 Receipt Date,
-     * adjusted for any Acas Early Conciliation period.
+     * adjusted for an in-time Acas Early Conciliation period.
      */
     public static Period calculateEffectiveElapsedPeriod(String receiptDateStr, String dateOfLastEventStr,
                                                          String acasReceiptDateStr, String acasIssueDateStr) {
@@ -455,10 +487,13 @@ public class Et1VettingService {
             if (!isNullOrEmpty(acasReceiptDateStr) && !isNullOrEmpty(acasIssueDateStr)) {
                 LocalDate acasReceiptDate = LocalDate.parse(acasReceiptDateStr);
                 LocalDate acasIssueDate = LocalDate.parse(acasIssueDateStr);
-                if (acasReceiptDate.equals(acasIssueDate)) {
-                    acasDays = 1;
-                } else if (acasIssueDate.isAfter(acasReceiptDate)) {
-                    acasDays = ChronoUnit.DAYS.between(acasReceiptDate, acasIssueDate);
+                LocalDate originalLimitationDate = calculateOriginalLimitationDate(dateOfLastEvent);
+                if (!acasReceiptDate.isAfter(originalLimitationDate)) {
+                    if (acasReceiptDate.equals(acasIssueDate)) {
+                        acasDays = 1;
+                    } else if (acasIssueDate.isAfter(acasReceiptDate)) {
+                        acasDays = ChronoUnit.DAYS.between(acasReceiptDate, acasIssueDate);
+                    }
                 }
             }
 
@@ -467,7 +502,7 @@ public class Et1VettingService {
                 return Period.ZERO;
             }
 
-            return Period.between(dateOfLastEvent, adjustedReceiptDate);
+            return Period.between(dateOfLastEvent, adjustedReceiptDate).plusDays(1);
         } catch (Exception e) {
             log.error("Error calculating effective elapsed period", e);
             return null;
@@ -485,9 +520,10 @@ public class Et1VettingService {
      * </pre>
      *
      * <p>Calendar dates are used for period calculations rather than fixed day-to-month conversions.
-     * If Acas certificate dates are present, the number of days between Acas receipt and certificate issue
-     * is subtracted from the ET1 receipt date prior to computing the period from the Date of Last Event.
-     * If the Acas receipt date and issue date are the same, the Acas conciliation period is treated as 1 day.
+     * The Acas period is deducted only when both certificate dates are present and the Acas receipt date is on or
+     * before the original limitation date, at the end of the six-month period beginning on the Date of Last Event.
+     * If the Acas receipt date and
+     * issue date are the same, the Acas conciliation period is treated as 1 day.
      *
      * @param receiptDateStr the ET1 receipt date (YYYY-MM-DD format)
      * @param dateOfLastEventStr the date of the last event (YYYY-MM-DD format)

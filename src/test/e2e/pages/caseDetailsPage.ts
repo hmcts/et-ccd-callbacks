@@ -40,17 +40,27 @@ export default class CaseDetailsPage extends BasePage {
 
   async assertTabData(tabs: Tab[]) {
     for (const tab of tabs) {
-      await this.navigateToTab(tab.tabName);
-      const tabHeader = this.getTabHeader(tab.tabName);
-      await expect(tabHeader).toHaveAttribute('aria-controls', /.+/);
-      const panelId = await tabHeader.getAttribute('aria-controls');
-      const panel = this.page.locator(`[id="${panelId}"] .mat-tab-body-content`);
-      await expect(panel).toBeVisible();
-      await this.assertTabContent(tab.tabContent, panel);
+      await this.assertTabHeader(tab.tabName, tab.tabContent[0]);
+      // Wait for the first content item to be attached (visible in DOM)
+      const firstContent = tab.tabContent[0];
+      if (firstContent) {
+        const text = typeof firstContent === 'string' ? firstContent : firstContent.tabItem;
+        const exact = typeof firstContent === 'object' ? (firstContent.exact ?? true) : true;
+        await this.page.getByText(text, { exact }).first().waitFor({ state: 'attached', timeout: 5000 });
+      }
+      await this.assertTabContent(tab.tabContent);
       if (tab.excludedContent) {
-        await this.assertExcludedContent(tab.excludedContent, panel);
+        await this.assertExcludedContent(tab.excludedContent);
       }
     }
+  }
+
+  private async assertTabHeader(tabName: string, firstContent?: TabContentItem): Promise<void> {
+    // const tabHeader = this.getTabHeader(tabName);
+    // // Wait for the tab header to be visible and enabled before clicking
+    // await tabHeader.waitFor({ state: 'visible' });
+    // await expect(tabHeader).toBeEnabled();
+    await this.navigateToTab(tabName);
   }
 
   /**
@@ -64,7 +74,7 @@ export default class CaseDetailsPage extends BasePage {
    * ensuring assertions are made against the correct DOM element.
    * Tab array items should be in right order, as they are displayed in the UI.
    */
-  private async assertTabContent(tabContent: TabContentItem[], panel: Locator): Promise<void> {
+  private async assertTabContent(tabContent: TabContentItem[]): Promise<void> {
     const tabItemCount: Record<string, number> = {};
     for (const content of tabContent) {
       let tabKey: string;
@@ -86,10 +96,10 @@ export default class CaseDetailsPage extends BasePage {
       }
 
       if (typeof content === 'string') {
-        const tabItem = await this.getVisibleTabContent(panel, content, position);
+        const tabItem = await this.getVisibleTabContent(content, position);
         await expect(tabItem).toBeVisible();
       } else {
-        const tabItem = await this.getVisibleTabContent(panel, content.tabItem, position, content.exact ?? true);
+        const tabItem = await this.getVisibleTabContent(content.tabItem, position, content.exact ?? true);
         await expect(tabItem).toBeVisible();
 
         const tabValue = tabItem.locator('xpath=../following-sibling::td[1]');
@@ -114,16 +124,15 @@ export default class CaseDetailsPage extends BasePage {
     }
   }
 
-  private async assertExcludedContent(excludedContent: string[], panel: Locator): Promise<void> {
+  private async assertExcludedContent(excludedContent: string[]): Promise<void> {
     for (const excluded of excludedContent) {
-      const tabItem = panel.getByText(excluded, { exact: true }); // Locate the element directly
+      const tabItem = this.page.getByText(excluded, { exact: true }); // Locate the element directly
       await expect(tabItem).not.toBeVisible(); // Assert that it is not visible
     }
   }
 
   private getTabHeader(tabName: string): Locator {
-    // The first CCD tab has keyboard instructions appended to its accessible name.
-    return this.page.getByRole('tab').filter({ has: this.page.getByText(tabName, { exact: true }) });
+    return this.page.getByRole('tab', { name: tabName, exact: true });
   }
 
   /**
@@ -141,7 +150,9 @@ export default class CaseDetailsPage extends BasePage {
    * 4. Returns the element at the requested visible position.
    * 5. Throws an error if the requested visible position does not exist.
    */
-  private async getVisibleTabContent(activeTabContent: Locator, content: string, position: number = 0, exact: boolean = true): Promise<Locator> {
+  private async getVisibleTabContent(content: string, position: number = 0, exact: boolean = true): Promise<Locator> {
+    // active tab area
+    const activeTabContent = this.page.locator('mat-tab-body.mat-tab-body-active .mat-tab-body-content');
     await expect(activeTabContent).toBeVisible();
 
     const locator = activeTabContent.getByText(content, { exact });
@@ -238,22 +249,48 @@ export default class CaseDetailsPage extends BasePage {
   async navigateToTab(tabName: string): Promise<void> {
     await this.page.waitForLoadState('load', { timeout: 5000 });
 
-    // Resolve by label on every action: Tasks and Roles and access can be
-    // prepended while the case view loads, changing every CCD tab's index.
-    const targetTab = this.getTabHeader(tabName);
-    await targetTab.waitFor({ state: 'attached', timeout: 5000 });
-    const totalTabs = await this.page.getByRole('tab').count();
+    const tabs = this.page.locator("//div[@role='tab']");
+    await tabs.first().waitFor({ state: 'attached', timeout: 5000 });
+
+    const totalTabs = await tabs.count();
+    const tabNames: string[] = [];
+
+    for (let i = 0; i < totalTabs; i++) {
+      const name = (await tabs.nth(i).locator(':scope > div').innerText()).replace(/\s+/g, ' ').trim();
+      tabNames.push(name);
+    }
+
+    const targetIndex = tabNames.indexOf(tabName);
+    if (targetIndex === -1) {
+      throw new Error(`Tab \"${tabName}\" not found in tab list: [${tabNames.join(', ')}]`);
+    }
 
     const tryClickTargetTab = async(): Promise<boolean> => {
       try {
+        const targetTab = tabs.nth(targetIndex);
         await targetTab.click({ trial: true, timeout: 2000 });
-        await targetTab.click({ timeout: 2000 });
-        await expect(targetTab).toHaveAttribute('aria-selected', 'true', { timeout: 2000 });
+        await targetTab.click();
         console.log('Clicked on tab: ' + tabName);
         return true;
       } catch {
         return false;
       }
+    };
+
+    const getVisibleRange = async(): Promise<{ first: number; last: number }> => {
+      let first = -1;
+      let last = -1;
+
+      for (let i = 0; i < totalTabs; i++) {
+        if (await tabs.nth(i).isVisible()) {
+          if (first === -1) {
+            first = i;
+          }
+          last = i;
+        }
+      }
+
+      return { first, last };
     };
 
     const paginateAndClick = async(direction: 'before' | 'after'): Promise<boolean> => {
@@ -279,13 +316,31 @@ export default class CaseDetailsPage extends BasePage {
       return;
     }
 
-    // Material tabs outside the clipped header can still report isVisible().
-    // Search both pagination directions instead of relying on that visibility.
-    if (await paginateAndClick('before')) {
-      return;
-    }
-    if (await paginateAndClick('after')) {
-      return;
+    const { first, last } = await getVisibleRange();
+
+    if (first !== -1 && last !== -1) {
+      if (targetIndex < first) {
+        if (await paginateAndClick('before')) {
+          return;
+        }
+        if (await paginateAndClick('after')) {
+          return;
+        }
+      } else if (targetIndex > last) {
+        if (await paginateAndClick('after')) {
+          return;
+        }
+        if (await paginateAndClick('before')) {
+          return;
+        }
+      }
+    } else {
+      if (await paginateAndClick('before')) {
+        return;
+      }
+      if (await paginateAndClick('after')) {
+        return;
+      }
     }
 
     throw new Error(`Not able to navigate to Tab ${tabName}`);

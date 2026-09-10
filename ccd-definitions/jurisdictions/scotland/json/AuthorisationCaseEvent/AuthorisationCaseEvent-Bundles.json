@@ -74,6 +74,20 @@
       {
         "UserRoles": [
           "[CREATOR]",
+          "caseworker-employment-api",
+          "[CLAIMANTNONLEGALREPRESENTATIVE]"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "SUBMIT_RESPONDENT_BUNDLES",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[DEFENDANT]",
           "caseworker-employment-api"
         ],
         "CRUD": "CRUD"

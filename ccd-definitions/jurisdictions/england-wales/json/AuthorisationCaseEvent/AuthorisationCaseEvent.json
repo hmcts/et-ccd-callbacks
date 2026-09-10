@@ -91,6 +91,42 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "UPDATE_CASE_DRAFT",
+    "UserRole": "[CLAIMANTNONLEGALREPRESENTATIVE]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "SUBMIT_CASE_DRAFT",
+    "UserRole": "[CLAIMANTNONLEGALREPRESENTATIVE]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "DELETE_DRAFT_CASE",
+    "UserRole": "[CLAIMANTNONLEGALREPRESENTATIVE]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "REMOVE_OWN_REP_AS_CLAIMANT",
+    "UserRole": "[CLAIMANTNONLEGALREPRESENTATIVE]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "SUBMIT_CLAIMANT_TSE",
+    "UserRole": "[CLAIMANTNONLEGALREPRESENTATIVE]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "CLAIMANT_TSE_RESPOND",
+    "UserRole": "[CLAIMANTNONLEGALREPRESENTATIVE]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "UPDATE_CASE_SUBMITTED",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"

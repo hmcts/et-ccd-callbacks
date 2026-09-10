@@ -78,6 +78,7 @@ import CaseTransferToEcmPage from '../pages/events/CaseTransferToEcmPage.ts';
 import SingleOrMultipleClaimPage from '../pages/claimantCitizenHub/singleOrMultipleClaimPage.ts';
 import RequestSupportPage from '../pages/requestSupportPage.ts';
 import ManageSupportPage from '../pages/manageSupportPage.ts';
+import Et3ResponsesDashboardPage from "../pages/respondentCitizenHub/et3ResponsesDashboardPage.ts";
 
 export type PageFixtures = {
   applicationTabPage: ApplicationTabPage;
@@ -159,6 +160,7 @@ export type PageFixtures = {
   singleOrMultipleClaimPage: SingleOrMultipleClaimPage;
   requestSupportPage: RequestSupportPage;
   manageSupportPage: ManageSupportPage;
+  et3ResponseDashboardPage: Et3ResponsesDashboardPage;
 };
 
 export const pageFixtures = base.extend<PageFixtures>({

@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.et.syaapi.helper.EmployeeObjectMapper;
 import uk.gov.hmcts.reform.et.syaapi.models.HubLinksStatusesRequest;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -30,7 +32,7 @@ public class HubLinkService {
      */
     public CaseDetails updateHubLinkStatuses(HubLinksStatusesRequest request,
                                              String authorization,
-                                             String caseUserRole) {
+                                             List<String> caseUserRoles) {
 
         if (featureToggleService.isCaseFlagsEnabled()) {
             log.info("Case flags enabled - calling UPDATE_HUBLINK_STATUS");
@@ -53,10 +55,11 @@ public class HubLinkService {
             );
         } else {
             log.info("Case flags disabled - calling UPDATE_CASE_SUBMITTED");
-            // Added parameter case user role as creator.
-            CaseDetails caseDetails = manageCaseRoleService.getUserCaseByCaseUserRole(authorization,
+            // Match the case by any of the requested roles (a request for [CREATOR] also matches a
+            // self-representing claimant's [CLAIMANTNONLEGALREPRESENTATIVE] case).
+            CaseDetails caseDetails = manageCaseRoleService.getUserCaseByCaseUserRoles(authorization,
                                                                             request.getCaseId(),
-                                                                            caseUserRole);
+                                                                            caseUserRoles);
             caseDetails.getData().put("hubLinksStatuses", request.getHubLinksStatuses());
 
             return caseService.triggerEvent(

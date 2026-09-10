@@ -2942,6 +2942,12 @@
   {
     "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "documentCollection",
+    "UserRole": "[CLAIMANTNONLEGALREPRESENTATIVE]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "documentCollection",
     "UserRole": "[DEFENDANT]",
     "CRUD": "CRUD"
   },
@@ -23730,6 +23736,12 @@
     "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "acasCertificateRequired",
     "UserRole": "[CREATOR]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "acasCertificateRequired",
+    "UserRole": "[CLAIMANTNONLEGALREPRESENTATIVE]",
     "CRUD": "CRUD"
   },
   {

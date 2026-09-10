@@ -45,6 +45,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentTse;
 import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
+import uk.gov.hmcts.et.common.model.ccd.types.SupportTaskState;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadHearingDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -1590,6 +1591,9 @@ public class CaseData extends Et1CaseData {
 
     @JsonUnwrapped
     private AllPartyFlags allPartyFlags;
+
+    @JsonProperty("supportTaskState")
+    private SupportTaskState supportTaskState;
 
     //et-hearings-api
     @JsonProperty("autoListFlag")

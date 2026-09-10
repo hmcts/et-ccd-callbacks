@@ -330,6 +330,13 @@
     "SecurityClassification": "Public"
   },
   {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "supportTaskState",
+    "Label": "Support task state",
+    "FieldType": "SupportTaskState",
+    "SecurityClassification": "Public"
+  },
+  {
     "LiveFrom": "10/02/2023",
     "CaseTypeID": "ET_Scotland",
     "ID": "caseLinks",

@@ -329,6 +329,13 @@
     "SecurityClassification": "Public"
   },
   {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "supportTaskState",
+    "Label": "Support task state",
+    "FieldType": "SupportTaskState",
+    "SecurityClassification": "Public"
+  },
+  {
     "LiveFrom": "03/11/2022",
     "CaseTypeID": "ET_EnglandWales",
     "ID": "caseLinks",

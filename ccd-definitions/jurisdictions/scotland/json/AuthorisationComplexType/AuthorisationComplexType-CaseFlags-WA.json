@@ -1,0 +1,79 @@
+[
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "adminTaskCreated",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "adminTaskRequired",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "legalOfficerTaskCreated",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "legalOfficerTaskRequired",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "judgeTaskCreated",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "judgeTaskRequired",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "adminTaskRequired",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "legalOfficerTaskRequired",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "judgeTaskRequired",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "arrangeSupportTaskName",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "arrangeSupportTaskName",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "R"
+  }
+]

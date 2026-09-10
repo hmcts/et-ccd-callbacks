@@ -725,10 +725,9 @@ class Et1VettingServiceTest {
         String expectedMarkUp = """
             ### ERA Assessment
             
-            The following respondent(s) have an effective elapsed time greater than 3 months and less than or equal to\
-             6 months:
+            The following respondent(s) have an effective elapsed time greater than 3 months and less than 6 months:
             
-            • Respondent 1 - 4 months
+            • Respondent 1 - 4 months 1 day
             
             """;
         assertThat(caseData.getEt1VettingEraAssessmentMarkUp()).isEqualTo(expectedMarkUp);
@@ -811,13 +810,13 @@ class Et1VettingServiceTest {
      * Verifies effective elapsed time calculation
      * Date of Last Event = 01/03/2026, Date Received by Acas = 01/04/2026,
      * Date Acas Certificate Issued = 11/04/2026 (10 days conciliation), ET1 Received = 11/07/2026.
-     * Gross time (4 months 10 days) minus Acas time (10 days) = 4 months.
+     * Gross time (4 months 11 days) minus Acas time (10 days) = 4 months 1 day.
      */
     @Test
     void calculateEffectiveElapsedTime_returnsFourMonths() {
         String result = calculateEffectiveElapsedTime(
                 "2026-07-11", "2026-03-01", "2026-04-01", "2026-04-11");
-        assertEquals("4 months", result);
+        assertEquals("4 months 1 day", result);
     }
 
     /**
@@ -825,13 +824,13 @@ class Et1VettingServiceTest {
      * Date of Last Event = 01/03/2026, Date Received by Acas = 01/04/2026,
      * Date Acas Certificate Issued = 05/04/2026 (4 days conciliation), ET1 Received = 11/07/2026.
      * Adjusted ET1 Receipt Date (11/07/2026 - 4 days = 07/07/2026).
-     * Period between 01/03/2026 and 07/07/2026 = 4 months 6 days.
+     * Inclusive period between 01/03/2026 and 07/07/2026 = 4 months 7 days.
      */
     @Test
     void calculateEffectiveElapsedTime_monthsAndDays_returnsMonthsAndDays() {
         String result = calculateEffectiveElapsedTime(
                 "2026-07-11", "2026-03-01", "2026-04-01", "2026-04-05");
-        assertEquals("4 months 6 days", result);
+        assertEquals("4 months 7 days", result);
     }
 
     /**
@@ -840,13 +839,13 @@ class Et1VettingServiceTest {
      * Date of Last Event = 01/03/2026, Date Received by Acas = 01/04/2026,
      * Date Acas Certificate Issued = 01/04/2026 (1 day conciliation), ET1 Received = 11/07/2026.
      * Adjusted ET1 Receipt Date (11/07/2026 - 1 day = 10/07/2026).
-     * Period between 01/03/2026 and 10/07/2026 = 4 months 9 days.
+     * Inclusive period between 01/03/2026 and 10/07/2026 = 4 months 10 days.
      */
     @Test
     void calculateEffectiveElapsedTime_sameAcasDates_treatsAsOneDay() {
         String result = calculateEffectiveElapsedTime(
                 "2026-07-11", "2026-03-01", "2026-04-01", "2026-04-01");
-        assertEquals("4 months 9 days", result);
+        assertEquals("4 months 10 days", result);
     }
 
     @Test
@@ -859,7 +858,7 @@ class Et1VettingServiceTest {
     void calculateEffectiveElapsedTime_noAcasDates_calculatesGrossPeriod() {
         String result = calculateEffectiveElapsedTime(
                 "2026-07-01", "2026-03-01", null, null);
-        assertEquals("4 months", result);
+        assertEquals("4 months 1 day", result);
     }
 
     @Test
@@ -882,6 +881,7 @@ class Et1VettingServiceTest {
             .contains("Date of Last Event").contains("01/03/2026")
             .contains("Date Received by Acas").contains("01/04/2026")
             .contains("Date Acas Certificate Issued").contains("11/04/2026")
+            .contains("Limitation Date").contains("31/08/2026")
             .contains("ET1 Received").contains("01/10/2026")
             .contains("Effective Elapsed Time");
     }

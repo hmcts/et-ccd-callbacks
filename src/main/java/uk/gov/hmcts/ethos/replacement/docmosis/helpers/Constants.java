@@ -81,6 +81,7 @@ public final class Constants {
             + "<tr><td width=\"200\">Date of Last Event</td><td>%s</td></tr>"
             + "<tr><td width=\"200\">Date Received by Acas</td><td>%s</td></tr>"
             + "<tr><td width=\"200\">Date Acas Certificate Issued</td><td>%s</td></tr>"
+            + "<tr><td width=\"200\">Limitation Date</td><td>%s</td></tr>"
             + "<tr><td width=\"200\">ET1 Received</td><td>%s</td></tr>"
             + "<tr><td width=\"200\">Effective Elapsed Time</td><td>%s</td></tr>"
             + "</table>";
@@ -120,7 +121,7 @@ public final class Constants {
             "Update respondent representative request is empty";
     public static final String ERA_ASSESSMENT_HEADER = "### ERA Assessment\n\n"
         + "The following respondent(s) have an effective elapsed time greater than 3 months "
-        + "and less than or equal to 6 months:\n\n";
+        + "and less than 6 months:\n\n";
 
     private Constants() {
         // Utility classes should not have a public or default constructor.

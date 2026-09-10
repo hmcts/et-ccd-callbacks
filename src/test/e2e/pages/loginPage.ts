@@ -27,7 +27,7 @@ export default class LoginPage extends BasePage {
     return (await this.page.locator('h1').first().innerText()).trim();
   }
 
-  async processLogin(user: UserCredentials, baseUrl : string = aatUrl) {
+  async processLogin(user: UserCredentials, baseUrl: string = aatUrl, persistSession = false) {
     await this.page.waitForTimeout(1000);
     await this.page.waitForLoadState('load');
     if (await this.signOutLink.count() > 0 || await this.username.count() === 0) {
@@ -50,8 +50,10 @@ export default class LoginPage extends BasePage {
     }
 
     await this.page.waitForURL(new RegExp(baseUrl), { timeout: 10000 });
-    await this.saveSession(user.sessionFile);
-    await CookieUtils.addSessionFreshnessCookie(user.sessionFile, baseUrl, user.email);
+    if (persistSession) {
+      await this.saveSession(user.sessionFile);
+      await CookieUtils.addSessionFreshnessCookie(user.sessionFile, baseUrl, user.email);
+    }
     await this.page.waitForTimeout(2000);
     await this.page.waitForLoadState('load');
   }

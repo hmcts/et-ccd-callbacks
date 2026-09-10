@@ -40,7 +40,7 @@ export default class CitizenHubLoginPage extends LoginPage {
     await expect(this.returntoSubmittedClaimCheckbox).toBeVisible();
   }
 
-  async processCitizenHubLogin(user: UserCredentials){
+  async processCitizenHubLogin(user: UserCredentials, persistSession = false){
     const claimantUri = config.etSyaUiUrl;
     await this.page.goto(claimantUri);
     await this.page.waitForLoadState('load');
@@ -61,7 +61,7 @@ export default class CitizenHubLoginPage extends LoginPage {
       await this.page.waitForLoadState('load');
     }
     if (await this.signOutLink.isVisible({ timeout: 2000 }).catch(() => false)) return;
-    await this.processLogin(user, config.etSyaUiUrl);
+    await this.processLogin(user, config.etSyaUiUrl, persistSession);
     //TODO remove url check to landing page, as UI will be logged as soon as user is created.
     const url = this.page.url();
     if (url.includes('claimant-applications')) {

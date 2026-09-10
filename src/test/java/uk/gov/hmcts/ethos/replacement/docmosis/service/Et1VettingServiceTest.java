@@ -862,6 +862,14 @@ class Et1VettingServiceTest {
     }
 
     @Test
+    void calculateEffectiveElapsedTime_acasReceivedAfterLimitationDate_doesNotDeductAcasPeriod() {
+        String result = calculateEffectiveElapsedTime(
+                "2026-10-01", "2026-03-01", "2026-09-01", "2026-09-11");
+
+        assertEquals("7 months 1 day", result);
+    }
+
+    @Test
     void initialiseEt1Vetting_submittedOnOrAfterOctober2026_populatesEraAcasDetails() {
         when(employmentRightsActService.isEraOctober2026(any())).thenReturn(true);
         caseDetails.getCaseData().setReceiptDate("2026-10-01");
@@ -884,6 +892,24 @@ class Et1VettingServiceTest {
             .contains("Limitation Date").contains("31/08/2026")
             .contains("ET1 Received").contains("01/10/2026")
             .contains("Effective Elapsed Time");
+    }
+
+    @Test
+    void initialiseEt1Vetting_inTimeAcasIssueNearLimitationDate_extendsLimitationDateByOneMonth() {
+        when(employmentRightsActService.isEraOctober2026(any())).thenReturn(true);
+        CaseData caseData = caseDetails.getCaseData();
+        caseData.setReceiptDate("2026-08-25");
+        ClaimantOtherType claimantOtherType = new ClaimantOtherType();
+        claimantOtherType.setDateOfLastEvent("2026-01-01");
+        caseData.setClaimantOtherType(claimantOtherType);
+        RespondentSumType respondent = caseData.getRespondentCollection().getFirst().getValue();
+        respondent.setAcasCertificateReceiptDate("2026-06-30");
+        respondent.setAcasCertificateIssueDate("2026-07-23");
+
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+
+        assertThat(caseData.getEt1VettingRespondentAcasDetails1())
+            .contains("Limitation Date").contains("23/08/2026");
     }
 
     @Test

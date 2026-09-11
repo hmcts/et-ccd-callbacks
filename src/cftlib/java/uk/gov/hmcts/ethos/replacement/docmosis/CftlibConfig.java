@@ -208,6 +208,7 @@ public class CftlibConfig implements CFTLibConfigurer {
         }
         importCcdDefinitions(lib);
         if (!dumpDefinitions) {
+            lib.dumpDefinitionSnapshots();
             startDockerCompose();
         }
     }

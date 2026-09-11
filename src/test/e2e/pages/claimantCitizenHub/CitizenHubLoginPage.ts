@@ -10,7 +10,6 @@ export default class CitizenHubLoginPage extends LoginPage {
   private readonly returnTodraftClaimCheckbox: Locator;
   private readonly returntoSubmittedClaimCheckbox: Locator;
   private readonly employmentTribunalAccountCheckbox: Locator;
-  private readonly signInOptionLink: Locator;
   private readonly returnToDraftOrSubmittedClaimPageTitle: Locator;
 
   constructor(page: Page) {
@@ -23,7 +22,6 @@ export default class CitizenHubLoginPage extends LoginPage {
     this.returnTodraftClaimCheckbox = this.page.locator(`#return_to_existing`);
     this.returntoSubmittedClaimCheckbox = this.page.locator(`#return_to_existing-2`);
     this.employmentTribunalAccountCheckbox = this.page.locator(`#submitted_claim_option`);
-    this.signInOptionLink = page.locator('//a[@href="/enter-email"]');
   }
 
   async assertSyaLandingPage() {
@@ -55,12 +53,6 @@ export default class CitizenHubLoginPage extends LoginPage {
     await this.page.waitForLoadState('load');
     await this.employmentTribunalAccountCheckbox.check();
     await this.clickContinue();
-    const isNewIdam = await this.signInOptionLink.isVisible().catch(() => false);
-    if(isNewIdam) { // Remove if condition when new IDAM is rolled out to all environments
-      await this.signInOptionLink.click();
-      await this.page.waitForLoadState('load');
-    }
-    if (await this.signOutLink.isVisible({ timeout: 2000 }).catch(() => false)) return;
     await this.processLogin(user, config.etSyaUiUrl);
     //TODO remove url check to landing page, as UI will be logged as soon as user is created.
     const url = this.page.url();

@@ -28,10 +28,12 @@ class SupportTaskServiceTest {
     private static SupportTaskConfiguration configuration() {
         SupportTaskConfiguration configuration = new SupportTaskConfiguration();
         configuration.getReview().setAdminFlagCodes(Set.of(
+                "RA0002", "RA0003", "RA0004", "RA0005", "RA0006", "RA0008", "RA0009",
                 "RA0021", "RA0033", "RA0039", "RA0041"));
         configuration.getReview().setLegalOfficerFlagCodes(Set.of("RA0034", "RA0035", "RA0036"));
         configuration.getReview().setJudgeFlagCodes(Set.of("RA0029", "RA0031", "RA0032", "RA0037", "RA0038"));
         configuration.getArrange().setFlagTitles(Map.ofEntries(
+                Map.entry("RA0003", "I need help with forms"),
                 Map.entry("RA0017", "Guidance on how to complete forms"),
                 Map.entry("RA0018", "Support filling in forms"),
                 Map.entry("RA0019", "Step free / wheelchair access"),
@@ -54,7 +56,8 @@ class SupportTaskServiceTest {
 
     static Stream<Arguments> eligibleFlagScenarios() {
         return Stream.of(
-            Stream.of("RA0021", "RA0033", "RA0039", "RA0041")
+            Stream.of("RA0002", "RA0003", "RA0004", "RA0005", "RA0006", "RA0008", "RA0009",
+                    "RA0021", "RA0033", "RA0039", "RA0041")
                 .map(code -> Arguments.of(code, "Admin")),
             Stream.of("RA0034", "RA0035", "RA0036")
                 .map(code -> Arguments.of(code, "LegalOfficer")),

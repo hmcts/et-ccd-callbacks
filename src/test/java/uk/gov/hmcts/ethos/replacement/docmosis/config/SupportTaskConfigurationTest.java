@@ -19,6 +19,7 @@ class SupportTaskConfigurationTest {
     void loadsFlagCodesFromYaml() {
         assertThat(configuration.getReview().getAdminFlagCodes())
                 .containsExactlyInAnyOrder(
+                        "RA0002", "RA0003", "RA0004", "RA0005", "RA0006", "RA0008", "RA0009",
                         "RA0021", "RA0033", "RA0039", "RA0041");
         assertThat(configuration.getReview().getJudgeFlagCodes())
                 .containsExactlyInAnyOrder("RA0029", "RA0031", "RA0032", "RA0037", "RA0038");
@@ -26,6 +27,7 @@ class SupportTaskConfigurationTest {
                 .containsExactlyInAnyOrder("RA0034", "RA0035", "RA0036");
 
         assertThat(configuration.getArrange().getFlagTitles())
+                .containsEntry("RA0003", "I need help with forms")
                 .containsEntry("RA0017", "Guidance on how to complete forms")
                 .containsEntry("RA0018", "Support filling in forms")
                 .containsEntry("RA0019", "Step free / wheelchair access")
@@ -42,6 +44,6 @@ class SupportTaskConfigurationTest {
                 .containsEntry("RA0044", "Infrared receiver (hearing enhancement system)")
                 .containsEntry("RA0045", "Induction loop (hearing enhancement system)")
                 .containsEntry("RA0046", "Visit to court or tribunal before the hearing")
-                .hasSize(16);
+                .hasSize(17);
     }
 }

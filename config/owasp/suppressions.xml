@@ -261,5 +261,4 @@
     <suppress>
         <cve>CVE-2026-47889</cve>
     </suppress>
-    
 </suppressions>

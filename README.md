@@ -7,7 +7,6 @@
 
 This application is responsible for handling all CCD callback requests for Employment Tribunal cases.
 
-
 ## CCD Definitions
 
 This repository now includes consolidated CCD definitions for all Employment Tribunal jurisdictions in the `ccd-definitions/` directory. These definitions were merged from three separate repositories:

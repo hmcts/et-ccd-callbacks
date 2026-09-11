@@ -1,0 +1,236 @@
+[
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "SUBMIT_CASE_DRAFT",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "adminTaskRequired",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "SUBMIT_CASE_DRAFT",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "legalOfficerTaskRequired",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "SUBMIT_CASE_DRAFT",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "judgeTaskRequired",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "UPDATE_CASE_SUBMITTED",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "adminTaskRequired",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "UPDATE_CASE_SUBMITTED",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "legalOfficerTaskRequired",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "UPDATE_CASE_SUBMITTED",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "judgeTaskRequired",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "SUBMIT_ET3_FORM",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "adminTaskRequired",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "SUBMIT_ET3_FORM",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "legalOfficerTaskRequired",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "SUBMIT_ET3_FORM",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "judgeTaskRequired",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "UPDATE_ET3_FORM",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "adminTaskRequired",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "UPDATE_ET3_FORM",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "legalOfficerTaskRequired",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "UPDATE_ET3_FORM",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "judgeTaskRequired",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "requestSupport",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "adminTaskRequired",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "requestSupport",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "legalOfficerTaskRequired",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "requestSupport",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "judgeTaskRequired",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "createFlag",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "adminTaskRequired",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "createFlag",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "legalOfficerTaskRequired",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "createFlag",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "judgeTaskRequired",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "createFlag",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "arrangeSupportTaskName",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "manageFlags",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "adminTaskRequired",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "manageFlags",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "legalOfficerTaskRequired",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "manageFlags",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "judgeTaskRequired",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "manageFlags",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "arrangeSupportTaskName",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "manageSupport",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "adminTaskRequired",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "manageSupport",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "legalOfficerTaskRequired",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "manageSupport",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "judgeTaskRequired",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  }
+]

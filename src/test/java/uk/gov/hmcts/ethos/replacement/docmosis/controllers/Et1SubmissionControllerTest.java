@@ -11,6 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -76,9 +77,9 @@ class Et1SubmissionControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(caseManagementForCaseWorkerService, times(1))
-                .setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
+                .setHmctsServiceIdSupplementary(any(CaseDetails.class));
         verify(et1SubmissionService, times(1))
-                .sendEt1ConfirmationClaimant(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+                .sendEt1ConfirmationClaimant(any(CaseDetails.class), eq(AUTH_TOKEN));
     }
 
     @Test

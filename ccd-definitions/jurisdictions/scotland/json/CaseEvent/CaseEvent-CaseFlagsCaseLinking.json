@@ -11,8 +11,9 @@
     "ShowSummary": "Y",
     "EventEnablingCondition": "",
     "CallBackURLAboutToStartEvent": "",
-    "CallBackURLAboutToSubmitEvent": "",
-    "CallBackURLSubmittedEvent": ""
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/supportTasks/aboutToSubmit",
+    "CallBackURLSubmittedEvent": "",
+    "Publish": "Y"
   },
   {
     "CaseTypeID": "ET_Scotland",
@@ -26,8 +27,41 @@
     "ShowSummary": "Y",
     "EventEnablingCondition": "",
     "CallBackURLAboutToStartEvent": "",
-    "CallBackURLAboutToSubmitEvent": "",
-    "CallBackURLSubmittedEvent": ""
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/supportTasks/aboutToSubmit",
+    "CallBackURLSubmittedEvent": "",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "requestSupport",
+    "Name": "Request Support",
+    "Description": "Request Support",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "Y",
+    "EventEnablingCondition": "",
+    "CallBackURLAboutToStartEvent": "",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/supportTasks/aboutToSubmit",
+    "CallBackURLSubmittedEvent": "",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "manageSupport",
+    "Name": "Manage Support",
+    "Description": "Manage Support",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "Y",
+    "EventEnablingCondition": "",
+    "CallBackURLAboutToStartEvent": "",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/supportTasks/aboutToSubmit",
+    "CallBackURLSubmittedEvent": "",
+    "Publish": "Y"
   },
   {
     "CaseTypeID": "ET_Scotland",

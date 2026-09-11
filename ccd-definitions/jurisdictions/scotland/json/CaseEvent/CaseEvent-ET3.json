@@ -6,6 +6,7 @@
     "Description": "Submit ET3 Form",
     "PreConditionState(s)": "Accepted",
     "PostConditionState": "Accepted",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/supportTasks/aboutToSubmit",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "N",
@@ -18,8 +19,10 @@
     "Description": "Update ET3 Form",
     "PreConditionState(s)": "Accepted",
     "PostConditionState": "Accepted",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/supportTasks/aboutToSubmit",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
-    "ShowSummary": "N"
+    "ShowSummary": "N",
+    "Publish": "Y"
   }
 ]

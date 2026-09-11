@@ -17,6 +17,7 @@ import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
@@ -49,6 +50,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
@@ -62,6 +64,14 @@ import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_CREATE_FLAG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_MANAGE_FLAGS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_MANAGE_SUPPORT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_REQUEST_SUPPORT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_SUBMIT_CASE_DRAFT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_SUBMIT_ET3_FORM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_UPDATE_CASE_SUBMITTED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_UPDATE_ET3_FORM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
@@ -78,11 +88,17 @@ public class CaseActionsForCaseWorkerController {
     private static final String TWO_HUNDRED = "200";
     private static final String FOUR_HUNDRED = "400";
     private static final String FIVE_HUNDRED = "500";
-    private static final String SUBMIT_CASE_DRAFT = "SUBMIT_CASE_DRAFT";
     public static final String ACCESSED_SUCCESSFULLY = "Accessed successfully";
     public static final String BAD_REQUEST = "Bad Request";
     public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
-    private static final List<String> SUBMISSION_EVENTS = List.of(SUBMIT_CASE_DRAFT, "initiateCase", "submitEt1Draft");
+    private static final List<String> SUBMISSION_EVENTS =
+            List.of(EVENT_SUBMIT_CASE_DRAFT, "initiateCase", "submitEt1Draft");
+    private static final List<String> REVIEW_SUPPORT_TASK_EVENTS =
+            List.of(EVENT_SUBMIT_CASE_DRAFT, EVENT_UPDATE_CASE_SUBMITTED);
+    private static final List<String> RESPONDENT_REVIEW_SUPPORT_TASK_EVENTS =
+            List.of(EVENT_SUBMIT_ET3_FORM, EVENT_UPDATE_ET3_FORM);
+    private static final List<String> NEW_FLAG_REVIEW_SUPPORT_TASK_EVENTS =
+            List.of(EVENT_REQUEST_SUPPORT, EVENT_CREATE_FLAG);
     public static final String CREATE_ECM_CASE = "createEcmCase";
 
     private final CaseCloseValidator caseCloseValidator;
@@ -103,6 +119,7 @@ public class CaseActionsForCaseWorkerController {
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
     private final FeatureToggleService featureToggleService;
     private final CaseFlagsService caseFlagsService;
+    private final SupportTaskService supportTaskService;
     private final CaseManagementLocationService caseManagementLocationService;
     private final Et1SubmissionService et1SubmissionService;
     private final NocRespondentHelper nocRespondentHelper;
@@ -167,10 +184,15 @@ public class CaseActionsForCaseWorkerController {
             }
             defaultValuesReaderService.setPositionAndOffice(caseDetails.getCaseTypeId(), caseData);
 
-            boolean caseFlagsToggle = featureToggleService.isCaseFlagsEnabled();
-            log.info("Caseflags feature flag is {}", caseFlagsToggle);
-            if (caseFlagsToggle && caseFlagsService.caseFlagsSetupRequired(caseData)) {
-                caseFlagsService.setupCaseFlags(caseData);
+            boolean caseFlagsToggle = featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())
+                    || featureToggleService.isCaseFlagsEnabled();
+            if (caseFlagsToggle && caseFlagsSetupRequired(caseDetails.getCaseTypeId(), caseData)) {
+                setupCaseFlags(caseDetails.getCaseTypeId(), caseData);
+            }
+
+            if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())
+                    && REVIEW_SUPPORT_TASK_EVENTS.contains(ccdRequest.getEventId())) {
+                supportTaskService.prepareReviewSupportTasks(caseData);
             }
 
             boolean hmcToggle = featureToggleService.isHmcEnabled();
@@ -180,7 +202,8 @@ public class CaseActionsForCaseWorkerController {
                 caseManagementLocationService.setCaseManagementLocationCode(caseData);
             }
 
-            if (featureToggleService.citizenEt1Generation() && SUBMIT_CASE_DRAFT.equals(ccdRequest.getEventId())) {
+            if (featureToggleService.citizenEt1Generation()
+                    && EVENT_SUBMIT_CASE_DRAFT.equals(ccdRequest.getEventId())) {
                 caseDetails.setCaseData(caseData);
                 et1SubmissionService.createAndUploadEt1Docs(caseDetails, userToken);
                 et1SubmissionService.vexationCheck(caseDetails, userToken);
@@ -190,6 +213,37 @@ public class CaseActionsForCaseWorkerController {
         log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),
                 caseData.getEthosCaseReference());
         return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    @PostMapping(value = {"/supportTasks/aboutToSubmit", "/reviewSupportTasks/aboutToSubmit"},
+            consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Prepare Review Support and Arrange Support tasks for eligible Case Flags.")
+    public ResponseEntity<CCDCallbackResponse> prepareSupportTasks(
+            @RequestBody CallbackRequest callbackRequest) {
+        CaseDetails caseDetails = callbackRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
+
+        if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())) {
+            CaseData caseDataBefore = callbackRequest.getCaseDetailsBefore() == null
+                    ? null
+                    : callbackRequest.getCaseDetailsBefore().getCaseData();
+            if (RESPONDENT_REVIEW_SUPPORT_TASK_EVENTS.contains(callbackRequest.getEventId())) {
+                supportTaskService.prepareRespondentReviewSupportTasks(caseData);
+            } else if (NEW_FLAG_REVIEW_SUPPORT_TASK_EVENTS.contains(callbackRequest.getEventId())) {
+                supportTaskService.prepareNewFlagReviewSupportTasks(caseData, caseDataBefore);
+            } else if (EVENT_MANAGE_FLAGS.equals(callbackRequest.getEventId())
+                    || EVENT_MANAGE_SUPPORT.equals(callbackRequest.getEventId())) {
+                supportTaskService.prepareManagedReviewSupportTasks(caseData);
+            }
+
+            if (EVENT_CREATE_FLAG.equals(callbackRequest.getEventId())) {
+                supportTaskService.prepareNewFlagArrangeSupportTask(caseData, caseDataBefore);
+            } else if (EVENT_MANAGE_FLAGS.equals(callbackRequest.getEventId())) {
+                supportTaskService.prepareArrangeSupportTask(caseData, caseDataBefore);
+            }
+        }
+
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
     private List<String> getValidationDate(String eventId, CaseDetails caseDetails) {
@@ -344,7 +398,8 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setPublicCaseName(caseData);
         }
 
-        caseFlagsService.setupCaseFlags(caseData);
+        setupCaseFlags(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
+
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         removeSpacesFromPartyNames(caseData);
         return getCallbackRespEntityNoErrors(caseData);
@@ -409,7 +464,12 @@ public class CaseActionsForCaseWorkerController {
         eventValidationService.validateMaximumSize(caseData).ifPresent(errors::add);
         if (errors.isEmpty() && isNotEmpty(caseData.getRepCollection())) {
             //Needed to keep the respondent names in the rep collection sync
-            nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData);
+            boolean caseFlagsV2Enabled = featureToggleService.isCaseFlagsV2Enabled(
+                    ccdRequest.getCaseDetails().getCaseTypeId());
+            nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData, caseFlagsV2Enabled);
+            if (caseFlagsV2Enabled) {
+                caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
+            }
         }
 
         if (errors.isEmpty() && isNotEmpty(caseData.getRespondentCollection())) {
@@ -425,10 +485,29 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setPublicCaseName(caseData);
         }
 
-        caseFlagsService.setupCaseFlags(caseData);
+        setupCaseFlags(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
+
         caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
         removeSpacesFromPartyNames(caseData);
         return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    @PostMapping(value = "/amendRespondentDetailsSubmitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Realigns representative access after respondents have been reordered.")
+    public void amendRespondentDetailsSubmitted(
+            @RequestBody CallbackRequest callbackRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
+        if (!featureToggleService.isCaseFlagsV2Enabled(callbackRequest.getCaseDetails().getCaseTypeId())) {
+            return;
+        }
+        try {
+            nocRespondentRepresentativeService.realignRespondentRepresentativeAccess(callbackRequest);
+        } catch (RuntimeException exception) {
+            String caseId = callbackRequest == null || callbackRequest.getCaseDetails() == null
+                    ? StringUtils.EMPTY
+                    : callbackRequest.getCaseDetails().getCaseId();
+            log.error("Unable to realign respondent representative access for case {}", caseId, exception);
+        }
     }
 
     @PostMapping(value = "/updateHearing", consumes = APPLICATION_JSON_VALUE)
@@ -916,6 +995,20 @@ public class CaseActionsForCaseWorkerController {
 
     private DefaultValues getPostDefaultValues(CaseDetails caseDetails) {
         return defaultValuesReaderService.getDefaultValues(caseDetails.getCaseData().getManagingOffice());
+    }
+
+    private boolean caseFlagsSetupRequired(String caseTypeId, CaseData caseData) {
+        return featureToggleService.isCaseFlagsV2Enabled(caseTypeId)
+                ? caseFlagsService.caseFlagsSetupRequired(caseData)
+                : caseFlagsService.legacyCaseFlagsSetupRequired(caseData);
+    }
+
+    private void setupCaseFlags(String caseTypeId, CaseData caseData) {
+        if (featureToggleService.isCaseFlagsV2Enabled(caseTypeId)) {
+            caseFlagsService.setupCaseFlags(caseData);
+        } else {
+            caseFlagsService.setupLegacyCaseFlags(caseData);
+        }
     }
 
     private void generateEthosCaseReference(CaseData caseData, CCDRequest ccdRequest) {

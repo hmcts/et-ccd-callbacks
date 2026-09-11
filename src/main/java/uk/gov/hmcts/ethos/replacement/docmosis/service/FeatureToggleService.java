@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.launchdarkly.FeatureToggleApi;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+
 @Service
 public class FeatureToggleService {
 
@@ -24,6 +27,16 @@ public class FeatureToggleService {
 
     public boolean isCaseFlagsEnabled() {
         return this.featureToggleApi.isFeatureEnabled("case-flags-linking-enabled");
+    }
+
+    public boolean isCaseFlagsV2Enabled(String caseTypeId) {
+        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+            return this.featureToggleApi.isFeatureEnabled("case-flags-v2-enabled-england-wales");
+        }
+        if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+            return this.featureToggleApi.isFeatureEnabled("case-flags-v2-enabled-scotland");
+        }
+        return false;
     }
 
     public boolean isHmcEnabled() {

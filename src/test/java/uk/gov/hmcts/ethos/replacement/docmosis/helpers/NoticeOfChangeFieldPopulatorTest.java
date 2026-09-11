@@ -179,4 +179,39 @@ class NoticeOfChangeFieldPopulatorTest {
         assertThat(claimantPolicy.getOrgPolicyCaseAssignedRole()).isEqualTo("[CLAIMANTSOLICITOR]");
         assertThat(claimantPolicy.getOrganisation()).isEqualTo(claimantOrganisation);
     }
+
+    @Test
+    void shouldGenerateRespondentOrganisationPoliciesUsingCurrentRespondentOrder() {
+        caseData.setRespondentCollection(new ArrayList<>());
+        caseData.getRespondentCollection().add(respondent1);
+        caseData.getRespondentCollection().add(respondent3);
+        caseData.getRespondentCollection().add(respondent2);
+
+        when(policyConverter.generate(SolicitorRole.SOLICITORA, Optional.of(respondentRep1))).thenReturn(
+                ORG_POLICY_A);
+        when(policyConverter.generate(SolicitorRole.SOLICITORB, Optional.of(respondentRep3))).thenReturn(
+                ORG_POLICY_B);
+        when(policyConverter.generate(SolicitorRole.SOLICITORC, Optional.of(respondentRep2))).thenReturn(
+                ORG_POLICY_C);
+        when(policyConverter.generate(SolicitorRole.SOLICITORD, Optional.empty())).thenReturn(ORG_POLICY_D);
+        when(policyConverter.generate(SolicitorRole.SOLICITORE, Optional.empty())).thenReturn(ORG_POLICY_E);
+        when(policyConverter.generate(SolicitorRole.SOLICITORF, Optional.empty())).thenReturn(ORG_POLICY_F);
+        when(policyConverter.generate(SolicitorRole.SOLICITORG, Optional.empty())).thenReturn(ORG_POLICY_G);
+        when(policyConverter.generate(SolicitorRole.SOLICITORH, Optional.empty())).thenReturn(ORG_POLICY_H);
+        when(policyConverter.generate(SolicitorRole.SOLICITORI, Optional.empty())).thenReturn(ORG_POLICY_I);
+        when(policyConverter.generate(SolicitorRole.SOLICITORJ, Optional.empty())).thenReturn(ORG_POLICY_J);
+
+        when(answersConverter.generateForSubmission(eq(respondent1), any())).thenReturn(ANSWERS_1);
+        when(answersConverter.generateForSubmission(eq(respondent2), any())).thenReturn(ANSWERS_2);
+        when(answersConverter.generateForSubmission(eq(respondent3), any())).thenReturn(ANSWERS_3);
+
+        final Map<String, Object> data = noticeOfChangeFieldPopulator.generate(caseData);
+
+        assertThat(data.get("noticeOfChangeAnswers0")).isEqualTo(ANSWERS_1);
+        assertThat(data.get("noticeOfChangeAnswers1")).isEqualTo(ANSWERS_3);
+        assertThat(data.get("noticeOfChangeAnswers2")).isEqualTo(ANSWERS_2);
+        assertThat(data.get("respondentOrganisationPolicy0")).isEqualTo(ORG_POLICY_A);
+        assertThat(data.get("respondentOrganisationPolicy1")).isEqualTo(ORG_POLICY_B);
+        assertThat(data.get("respondentOrganisationPolicy2")).isEqualTo(ORG_POLICY_C);
+    }
 }

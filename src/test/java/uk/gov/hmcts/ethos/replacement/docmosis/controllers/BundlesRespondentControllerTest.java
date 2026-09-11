@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesRespondentService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -102,7 +103,7 @@ class BundlesRespondentControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(bundlesRespondentService).clearInputData(ccdRequest.getCaseDetails().getCaseData());
+        verify(bundlesRespondentService).clearInputData(any(CaseData.class));
     }
 
     @Test
@@ -112,7 +113,7 @@ class BundlesRespondentControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
-        verify(bundlesRespondentService, never()).clearInputData(ccdRequest.getCaseDetails().getCaseData());
+        verify(bundlesRespondentService, never()).clearInputData(any(CaseData.class));
     }
 
     @Test

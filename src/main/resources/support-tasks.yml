@@ -1,13 +1,6 @@
 support-tasks:
   review:
     admin-flag-codes:
-      - RA0002
-      - RA0003
-      - RA0004
-      - RA0005
-      - RA0006
-      - RA0008
-      - RA0009
       - RA0021
       - RA0033
       - RA0039
@@ -24,7 +17,6 @@ support-tasks:
       - RA0036
   arrange:
     flag-titles:
-      RA0003: I need help with forms
       RA0017: Guidance on how to complete forms
       RA0018: Support filling in forms
       RA0019: Step free / wheelchair access

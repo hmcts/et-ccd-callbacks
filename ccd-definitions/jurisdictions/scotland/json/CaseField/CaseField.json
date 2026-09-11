@@ -6749,5 +6749,30 @@
     "FieldType": "Email",
     "SecurityClassification": "Public",
     "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "respondentEmailUpdateSelection",
+    "Label": "Select a respondent",
+    "FieldType": "DynamicList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "currentRespondentEmail",
+    "Label": "Current email address",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "newRespondentEmail",
+    "Label": "New email address",
+    "HintText": "Must be different from the current email. The respondent must already have a registered user account. This updates the contact email and grants or reassigns case access.",
+    "FieldType": "Email",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   }
 ]

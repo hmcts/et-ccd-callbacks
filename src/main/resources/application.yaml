@@ -120,7 +120,7 @@ idam:
     jwkUrl: ${IDAM_API_JWK_URL:http://sidam-api:5000/jwks}
     jwksUrl: ${IDAM_JWKS_BASEURL:${IDAM_API_JWK_URL:http://sidam-api:5000/jwks}}
   client:
-    # User search for claimant email update uses the incoming ExUI token, not this et-cos password grant.
+    # User search for party email update uses the incoming ExUI token, not this et-cos password grant.
     scope: ${IDAM_CLIENT_SCOPE:openid profile roles manage-user}
     secret: ${IDAM_CLIENT_SECRET:${ET_SYA_API_IDAM_CLIENT_SECRET:AAAAAAAAAAAAAAAA}}
     id: ${REFORM_SERVICE_NAME:et-cos}

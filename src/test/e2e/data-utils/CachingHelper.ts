@@ -105,7 +105,7 @@ export function getDynamicUser(key: string) {
  * Call this in global teardown to ensure a clean state.
  */
 export async function deleteAllSessionFiles(): Promise<void> {
-  const sessionsDir = path.resolve(__dirname, '../../.sessions');
+  const sessionsDir = path.resolve(__dirname, '../../../../.sessions');
   try {
     if (await fs.pathExists(sessionsDir)) {
       const files = await fs.readdir(sessionsDir);

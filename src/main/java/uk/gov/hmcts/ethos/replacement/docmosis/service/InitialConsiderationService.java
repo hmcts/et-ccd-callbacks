@@ -765,6 +765,16 @@ public class InitialConsiderationService {
 
     }
 
+    /**
+     * Clear value in IC after submit.
+     * @param caseData data about the current case
+     */
+    public void clearValuesAfterSubmit(CaseData caseData) {
+        caseData.setEtIcPartiesHearingFormat(null);
+        caseData.setEtInitialConsiderationRespondent(null);
+        caseData.setEtIcPartiesHearingPanelPreference(null);
+    }
+
     public void mapOldIcHearingNotListedOptionsToNew(CaseData caseData, String caseTypeId) {
         if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
             List<String> etICHearingNotListedList = caseData.getEtICHearingNotListedList();

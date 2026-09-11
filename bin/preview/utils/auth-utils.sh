@@ -111,7 +111,7 @@ get_service_token() {
     local s2s_secret
     case "${microservice}" in
         "ccd_gw")
-            s2s_secret="${API_GATEWAY_S2S_KEY:-}"
+            s2s_secret="${MICROSERVICE_CCD_GW:-}"
             ;;
         "ccd_data")
             s2s_secret="${DATA_STORE_S2S_KEY:-}"

@@ -3,6 +3,7 @@ package uk.gov.hmcts.ecm.common.model.servicebus.datamodel;
 import uk.gov.hmcts.ecm.common.model.servicebus.tasks.CloseDataTask;
 import uk.gov.hmcts.ecm.common.model.servicebus.tasks.CreationDataTask;
 import uk.gov.hmcts.ecm.common.model.servicebus.tasks.CreationSingleDataTask;
+import uk.gov.hmcts.ecm.common.model.servicebus.tasks.CreateMultiplesDataTask;
 import uk.gov.hmcts.ecm.common.model.servicebus.tasks.DataTaskParent;
 import uk.gov.hmcts.ecm.common.model.servicebus.tasks.DetachDataTask;
 import uk.gov.hmcts.ecm.common.model.servicebus.tasks.PreAcceptDataTask;
@@ -34,6 +35,8 @@ public class DataModelFactory {
             return new CreationSingleDataTask(dataModelParent);
         } else if (dataModelParent instanceof SendNotificationDataModel) {
             return new SendNotificationTask(dataModelParent);
+        } else if (dataModelParent instanceof CreateMultiplesDataModel) {
+            return new CreateMultiplesDataTask(dataModelParent);
         } else {
             return new PreAcceptDataTask(dataModelParent);
         }

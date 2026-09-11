@@ -6374,33 +6374,39 @@
   },
   {
     "ID": "fl_sendNotificationSubject",
+    "ListElement": "Group claims",
+    "ListElementCode": "Group claims",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_sendNotificationSubject",
     "ListElement": "Hearing",
     "ListElementCode": "Hearing",
-    "DisplayOrder": 4
+    "DisplayOrder": 5
   },
   {
     "ID": "fl_sendNotificationSubject",
     "ListElement": "Case management orders / requests",
     "ListElementCode": "Case management orders / requests",
-    "DisplayOrder": 5
+    "DisplayOrder": 6
   },
   {
     "ID": "fl_sendNotificationSubject",
     "ListElement": "Judgment",
     "ListElementCode": "Judgment",
-    "DisplayOrder": 6
+    "DisplayOrder": 7
   },
   {
     "ID": "fl_sendNotificationSubject",
     "ListElement": "Employer Contract Claim",
     "ListElementCode": "Employer Contract Claim",
-    "DisplayOrder": 7
+    "DisplayOrder": 8
   },
   {
     "ID": "fl_sendNotificationSubject",
     "ListElement": "Other (General correspondence)",
     "ListElementCode": "Other (General correspondence)",
-    "DisplayOrder": 8
+    "DisplayOrder": 9
   },
   {
     "ID": "sendNotificationNotify",
@@ -6454,6 +6460,18 @@
     "ID": "fl_sendNotificationWhoCaseOrder",
     "ListElement": "Judge",
     "ListElementCode": "Judge",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_sendNotificationGroupClaims",
+    "ListElement": "Considering claims together",
+    "ListElementCode": "Considering claims together",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_sendNotificationGroupClaims",
+    "ListElement": "You're now part of a group claim",
+    "ListElementCode": "You're now part of a group claim",
     "DisplayOrder": 2
   },
   {

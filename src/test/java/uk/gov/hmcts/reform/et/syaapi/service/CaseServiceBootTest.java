@@ -8,7 +8,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -68,6 +71,12 @@ class CaseServiceBootTest {
     private FeatureToggleService featureToggleService;
     @MockitoBean
     private VerifyTokenService verifyTokenService;
+    @MockitoBean
+    private CreateUpdatesBusSender createUpdatesBusSender;
+    @MockitoBean
+    private ExcelReadingService excelReadingService;
+    @MockitoBean
+    private UserIdamService userIdamService;
     private CaseTestData caseTestData;
 
     @BeforeEach

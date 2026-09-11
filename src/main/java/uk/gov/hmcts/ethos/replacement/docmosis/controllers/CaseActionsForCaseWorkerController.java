@@ -236,8 +236,9 @@ public class CaseActionsForCaseWorkerController {
                 supportTaskService.prepareManagedReviewSupportTasks(caseData);
             }
 
-            if (EVENT_CREATE_FLAG.equals(callbackRequest.getEventId())
-                    || EVENT_MANAGE_FLAGS.equals(callbackRequest.getEventId())) {
+            if (EVENT_CREATE_FLAG.equals(callbackRequest.getEventId())) {
+                supportTaskService.prepareNewFlagArrangeSupportTask(caseData, caseDataBefore);
+            } else if (EVENT_MANAGE_FLAGS.equals(callbackRequest.getEventId())) {
                 supportTaskService.prepareArrangeSupportTask(caseData, caseDataBefore);
             }
         }

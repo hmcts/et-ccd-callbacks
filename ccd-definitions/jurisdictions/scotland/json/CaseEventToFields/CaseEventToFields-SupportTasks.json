@@ -1,0 +1,94 @@
+[
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "SUBMIT_CASE_DRAFT",
+    "CaseFieldID": "supportTaskState",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 99,
+    "FieldShowCondition": "horizontalLine=\"dummy\"",
+    "ShowSummaryChangeOption": "N",
+    "RetainHiddenValue": "Yes"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "UPDATE_CASE_SUBMITTED",
+    "CaseFieldID": "supportTaskState",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 99,
+    "FieldShowCondition": "et1OnlineSubmission=\"DUMMY_VALUE_TO_HIDE_FIELD\"",
+    "ShowSummaryChangeOption": "N",
+    "RetainHiddenValue": "Yes"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "SUBMIT_ET3_FORM",
+    "CaseFieldID": "supportTaskState",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 99,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "UPDATE_ET3_FORM",
+    "CaseFieldID": "supportTaskState",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 99,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "requestSupport",
+    "CaseFieldID": "supportTaskState",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 99,
+    "FieldShowCondition": "flagLauncherExternal=\"hidden\"",
+    "ShowSummaryChangeOption": "N",
+    "RetainHiddenValue": "Yes"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "createFlag",
+    "CaseFieldID": "supportTaskState",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 99,
+    "FieldShowCondition": "flagLauncher=\"hidden\"",
+    "ShowSummaryChangeOption": "N",
+    "RetainHiddenValue": "Yes"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "manageFlags",
+    "CaseFieldID": "supportTaskState",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 99,
+    "FieldShowCondition": "flagLauncher=\"hidden\"",
+    "ShowSummaryChangeOption": "N",
+    "RetainHiddenValue": "Yes"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "manageSupport",
+    "CaseFieldID": "supportTaskState",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 99,
+    "FieldShowCondition": "flagLauncherExternal=\"hidden\"",
+    "ShowSummaryChangeOption": "N",
+    "RetainHiddenValue": "Yes"
+  }
+]

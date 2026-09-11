@@ -9,9 +9,11 @@ import uk.gov.hmcts.et.common.model.ccd.types.AllPartyFlags;
 import uk.gov.hmcts.et.common.model.ccd.types.SupportTaskState;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.SupportTaskConfiguration;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -55,6 +57,10 @@ public class SupportTaskService {
                 .filter(isNewFlag)
                 .map(GenericTypeItem::getValue)
                 .toList();
+
+        if (newFlags.isEmpty()) {
+            newFlags = latestCreatedFlag(caseData).map(List::of).orElseGet(List::of);
+        }
 
         prepareTasks(caseData, newFlags);
     }
@@ -147,6 +153,27 @@ public class SupportTaskService {
                 .findFirst()
                 .map(item -> flagTitles.get(item.getValue().getFlagCode()))
                 .ifPresent(taskState::setArrangeSupportTaskName);
+    }
+
+    public void prepareNewFlagArrangeSupportTask(CaseData caseData, CaseData caseDataBefore) {
+        prepareArrangeSupportTask(caseData, caseDataBefore);
+        if (caseData.getSupportTaskState().getArrangeSupportTaskName() != null) {
+            return;
+        }
+
+        Map<String, String> flagTitles = configuration.getArrange().getFlagTitles();
+        latestCreatedFlag(caseData)
+                .filter(flag -> FLAG_STATUS_ACTIVE.equals(flag.getStatus()))
+                .map(FlagDetailType::getFlagCode)
+                .map(flagTitles::get)
+                .ifPresent(caseData.getSupportTaskState()::setArrangeSupportTaskName);
+    }
+
+    private static Optional<FlagDetailType> latestCreatedFlag(CaseData caseData) {
+        return allFlagItems(caseData.getAllPartyFlags())
+                .map(GenericTypeItem::getValue)
+                .filter(flag -> flag.getDateTimeCreated() != null)
+                .max(Comparator.comparing(FlagDetailType::getDateTimeCreated));
     }
 
     private static boolean wasNotPreviouslyActive(GenericTypeItem<FlagDetailType> current,

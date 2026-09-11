@@ -152,6 +152,20 @@ class SupportTaskServiceTest {
     }
 
     @Test
+    void prepares_review_task_when_create_flag_before_data_already_contains_the_new_flag() {
+        CaseFlagsType requestedFlag = caseFlags("new-flag", "RA0038", "Requested", "2026-09-11T10:00:00.000Z");
+        CaseData caseDataBefore = new CaseData();
+        caseDataBefore.setAllPartyFlags(AllPartyFlags.builder().claimantFlags(requestedFlag).build());
+        CaseData caseData = new CaseData();
+        caseData.setAllPartyFlags(AllPartyFlags.builder().claimantFlags(requestedFlag).build());
+
+        service.prepareNewFlagReviewSupportTasks(caseData, caseDataBefore);
+
+        assertEquals(YES, taskState(caseData).getJudgeTaskCreated());
+        assertEquals(YES, taskState(caseData).getJudgeTaskRequired());
+    }
+
+    @Test
     void does_not_treat_an_unchanged_flag_without_an_id_as_new() {
         CaseData caseDataBefore = new CaseData();
         caseDataBefore.setAllPartyFlags(AllPartyFlags.builder()
@@ -369,6 +383,32 @@ class SupportTaskServiceTest {
     }
 
     @Test
+    void prepares_arrange_task_when_create_flag_before_data_already_contains_the_new_active_flag() {
+        CaseFlagsType activeFlag = caseFlags("new-flag", "RA0038", "Active", "2026-09-11T10:00:00.000Z");
+        CaseData caseDataBefore = new CaseData();
+        caseDataBefore.setAllPartyFlags(AllPartyFlags.builder().claimantFlags(activeFlag).build());
+        CaseData caseData = new CaseData();
+        caseData.setAllPartyFlags(AllPartyFlags.builder().claimantFlags(activeFlag).build());
+
+        service.prepareNewFlagArrangeSupportTask(caseData, caseDataBefore);
+
+        assertEquals("Intermediary", taskState(caseData).getArrangeSupportTaskName());
+    }
+
+    @Test
+    void does_not_fall_back_to_an_older_eligible_flag_when_the_newest_flag_is_ineligible() {
+        CaseData caseData = new CaseData();
+        caseData.setAllPartyFlags(AllPartyFlags.builder()
+                .claimantFlags(caseFlags("old-flag", "RA0038", "Active", "2026-09-11T09:00:00.000Z"))
+                .respondentFlags(caseFlags("new-flag", "RA9999", "Active", "2026-09-11T10:00:00.000Z"))
+                .build());
+
+        service.prepareNewFlagArrangeSupportTask(caseData, caseData);
+
+        assertNull(taskState(caseData).getArrangeSupportTaskName());
+    }
+
+    @Test
     void does_not_prepare_arrange_support_task_for_unchanged_active_flag() {
         CaseData caseDataBefore = new CaseData();
         caseDataBefore.setAllPartyFlags(AllPartyFlags.builder()
@@ -417,9 +457,14 @@ class SupportTaskServiceTest {
     }
 
     private static CaseFlagsType caseFlags(String id, String flagCode, String status) {
+        return caseFlags(id, flagCode, status, null);
+    }
+
+    private static CaseFlagsType caseFlags(String id, String flagCode, String status, String dateTimeCreated) {
         FlagDetailType detail = FlagDetailType.builder()
                 .flagCode(flagCode)
                 .status(status)
+                .dateTimeCreated(dateTimeCreated)
                 .build();
         ListTypeItem<FlagDetailType> details = ListTypeItem.from(GenericTypeItem.from(id, detail));
         return CaseFlagsType.builder().details(details).build();

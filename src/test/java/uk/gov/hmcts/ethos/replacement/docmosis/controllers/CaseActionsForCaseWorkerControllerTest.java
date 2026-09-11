@@ -394,7 +394,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         verify(supportTaskService).prepareNewFlagReviewSupportTasks(
                 any(CaseData.class), any(CaseData.class));
         if ("createFlag".equals(eventId)) {
-            verify(supportTaskService).prepareArrangeSupportTask(
+            verify(supportTaskService).prepareNewFlagArrangeSupportTask(
                     any(CaseData.class), any(CaseData.class));
         }
     }
@@ -434,6 +434,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 any(CaseData.class), any(CaseData.class));
         verify(supportTaskService, never()).prepareManagedReviewSupportTasks(any(CaseData.class));
         verify(supportTaskService, never()).prepareArrangeSupportTask(
+                any(CaseData.class), nullable(CaseData.class));
+        verify(supportTaskService, never()).prepareNewFlagArrangeSupportTask(
                 any(CaseData.class), nullable(CaseData.class));
     }
 

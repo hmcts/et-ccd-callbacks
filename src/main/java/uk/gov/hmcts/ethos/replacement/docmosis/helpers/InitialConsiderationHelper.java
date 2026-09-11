@@ -109,6 +109,9 @@ public final class InitialConsiderationHelper {
                         .map(EtICHearingListedAnswers::getEtICOtherGiveDetails).orElse(null))
                 .otherDirections(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICHearingAnyOtherDirections).orElse(null))
+                // refer VP - hearing listed
+                .hearingListedReferVP(defaultIfEmpty(caseData.getEtICHearingListedReferVP(), null))
+                .hearingListedReferVPDetails(defaultIfEmpty(caseData.getEtICHearingListedReferVPFurtherDetails(), null))
 
                 .hearingNotListed(Optional.ofNullable(caseData.getEtICHearingNotListedListUpdated())
                         .orElse(null))
@@ -145,10 +148,16 @@ public final class InitialConsiderationHelper {
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearingUpdated())
                                 .map(EtICListForPreliminaryHearingUpdated::getEtICIsPreliminaryHearingWithMembers)
                                 .orElse(null))
-                .preliminaryHearingWithMembersReason(
-                        Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearingUpdated())
-                                .map(EtICListForPreliminaryHearingUpdated::getEtICIsPreliminaryHearingWithMembersReason)
-                                .orElse(null))
+                .preliminaryHearingWithMembersYes(
+                    Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearingUpdated())
+                        .map(reasons -> getSortedEJSitAloneReasons(
+                            caseData.getEtICHearingNotListedListForPrelimHearingUpdated()
+                                .getEtICIsPreliminaryHearingWithMembersYes()))
+                        .orElse(null))
+                .preliminaryHearingWithMembersYesOther(
+                    Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearingUpdated())
+                        .map(EtICListForPreliminaryHearingUpdated::getEtICIsPreliminaryHearingWithMembersYesOther)
+                        .orElse(null))
 
                 //final
                 .etICFinalHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
@@ -220,6 +229,10 @@ public final class InitialConsiderationHelper {
                 // hearingNotListedDoNotListAnyOtherDirections
                 .hearingNotListedListAnyOtherDirections(defaultIfEmpty(
                         caseData.getEtICHearingNotListedAnyOtherDirections(), null))
+                // refer VP - hearing not listed
+                .hearingNotListedReferVP(defaultIfEmpty(caseData.getEtICHearingNotListedReferVP(), null))
+                .hearingNotListedReferVPDetails(
+                    defaultIfEmpty(caseData.getEtICHearingNotListedReferVPFurtherDetails(), null))
 
                 //udl
                 .udlSitAlone(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
@@ -281,6 +294,7 @@ public final class InitialConsiderationHelper {
 
                 .furtherInfoAnyOtherDirections(
                         defaultIfEmpty(caseData.getEtICFurtherInformationHearingAnyOtherDirections(), null))
+
                 // Common
                 .icDateCompleted(defaultIfEmpty(caseData.getIcDateCompleted(), formattedNow))
                 .icCompletedBy(defaultIfEmpty(caseData.getIcCompletedBy(), null))

@@ -816,6 +816,10 @@ public class CaseData extends Et1CaseData {
     private EtIcudlHearing etICHearingNotListedUDLHearing;
     @JsonProperty("etICHearingNotListedAnyOtherDirections")
     private String etICHearingNotListedAnyOtherDirections;
+    @JsonProperty("etICHearingNotListedReferVP")
+    private String etICHearingNotListedReferVP;
+    @JsonProperty("etICHearingNotListedReferVPFurtherDetails")
+    private String etICHearingNotListedReferVPFurtherDetails;
 
     //New fields to replace the hidden "hearing not listed" related fields
     @JsonProperty("etICHearingNotListedListUpdated")
@@ -834,6 +838,10 @@ public class CaseData extends Et1CaseData {
     private EtICHearingListedAnswers etICHearingListedAnswers;
     @JsonProperty("etICHearingListed")
     private List<String> etICHearingListed;
+    @JsonProperty("etICHearingListedReferVP")
+    private String etICHearingListedReferVP;
+    @JsonProperty("etICHearingListedReferVPFurtherDetails")
+    private String etICHearingListedReferVPFurtherDetails;
     @JsonProperty("etICExtendDurationGiveDetails")
     private String etICExtendDurationGiveDetails;
     @JsonProperty("etICOtherGiveDetails")

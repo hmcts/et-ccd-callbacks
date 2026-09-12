@@ -9,14 +9,18 @@ import org.mockito.MockedStatic;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -289,6 +293,23 @@ final class OrganisationUtilsTest {
     }
 
     @Test
+    void theHasOrganisationIdentifier() {
+        organisationUtils.close();
+        // when user response is empty should return false
+        assertThat(OrganisationUtils.hasOrganisationIdentifier(null)).isFalse();
+        // when user response not has body should return false
+        ResponseEntity<OrganisationsResponse> organisationsResponse = new ResponseEntity<>(null, HttpStatus.OK);
+        assertThat(OrganisationUtils.hasOrganisationIdentifier(organisationsResponse)).isFalse();
+        // when user response not has user identifier should return false
+        organisationsResponse = new ResponseEntity<>(OrganisationsResponse.builder().build(), HttpStatus.OK);
+        assertThat(OrganisationUtils.hasOrganisationIdentifier(organisationsResponse)).isFalse();
+        // when user response has user identifier should return true
+        organisationsResponse = new ResponseEntity<>(OrganisationsResponse.builder()
+                .organisationIdentifier(TEST_ORGANISATION_ID_1).build(), HttpStatus.OK);
+        assertThat(OrganisationUtils.hasOrganisationIdentifier(organisationsResponse)).isTrue();
+    }
+
+    @Test
     void theHasMatchingOrganisationId() {
         organisationUtils.close();
         // when organisation is empty should return true
@@ -308,5 +329,24 @@ final class OrganisationUtilsTest {
         // when organisation id and organisation response identification are same should return true
         organisationsResponse.setOrganisationIdentifier(TEST_ORGANISATION_ID_1);
         assertThat(OrganisationUtils.hasMatchingOrganisationId(organisation, organisationsResponse)).isTrue();
+    }
+
+    @Test
+    void theHasRemainingRespondentReps() {
+        organisationUtils.close();
+        // when case data representative collection is empty should return false
+        CaseData caseData = new CaseData();
+        assertThat(OrganisationUtils.hasRemainingRespondentReps(caseData, TEST_ORGANISATION_ID_1)).isFalse();
+        // when case data representative collection is not empty but organisation id is empty should return false
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().id(TEST_REPRESENTATIVE_ID)
+                .value(RepresentedTypeR.builder()
+                        .respondentOrganisation(Organisation.builder().organisationID(TEST_ORGANISATION_ID_1).build())
+                        .build()).build();
+        caseData.setRepCollection(List.of(representative));
+        assertThat(OrganisationUtils.hasRemainingRespondentReps(caseData, StringUtils.EMPTY)).isFalse();
+        // when representative's organisation id is different from parameter organisation id should return false
+        assertThat(OrganisationUtils.hasRemainingRespondentReps(caseData, TEST_ORGANISATION_ID_2)).isFalse();
+        // when representative's organisation id is same with parameter organisation id should return true
+        assertThat(OrganisationUtils.hasRemainingRespondentReps(caseData, TEST_ORGANISATION_ID_1)).isTrue();
     }
 }

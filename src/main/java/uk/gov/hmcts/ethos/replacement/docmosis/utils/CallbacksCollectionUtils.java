@@ -70,4 +70,43 @@ public final class CallbacksCollectionUtils {
         }
         return new ArrayList<>(mergedSet);
     }
+
+    /**
+     * Finds the objects that exist in the first list but do not exist in the second list.
+     *
+     * <p>This method performs a one-way comparison. It returns only the items from
+     * {@code firstList} that are not contained in {@code secondList}. It does not return
+     * items that exist in {@code secondList} but not in {@code firstList}.</p>
+     *
+     * <p>If {@code firstList} is {@code null} or empty, an empty list is returned.
+     * If {@code secondList} is {@code null} or empty, a copy of {@code firstList} is
+     * returned.</p>
+     *
+     * <p>Assumptions:</p>
+     * <ul>
+     *     <li>Objects of type {@code T} have a meaningful {@link Object#equals(Object)}
+     *         implementation, as {@link List#contains(Object)} is used for comparison.</li>
+     *     <li>No duplicate filtering is performed; duplicate values in {@code firstList}
+     *         may also appear in the returned list.</li>
+     * </ul>
+     *
+     * @param <T> the type of objects contained in the lists
+     * @param firstList the list containing the objects to check
+     * @param secondList the list to compare against
+     * @return a list of objects that are present in {@code firstList} but not in
+     *         {@code secondList}, or an empty list if no differences are found
+     */
+    public static <T> List<T> findDifferentObjects(List<T> firstList, List<T> secondList) {
+        if (firstList == null || firstList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        if (secondList == null || secondList.isEmpty()) {
+            return new ArrayList<>(firstList);
+        }
+
+        return firstList.stream()
+                .filter(item -> !secondList.contains(item))
+                .toList();
+    }
 }

@@ -418,6 +418,34 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         }
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"manageFlags", "manageSupport"})
+    @SneakyThrows
+    void preservesCaseFlagUpdateCommentWhenSupportRequestIsRejected(String eventId) {
+        ((ObjectNode) requestContent2).put("event_id", eventId);
+        ObjectNode caseData = (ObjectNode) requestContent2.at("/case_details/case_data");
+        ObjectNode flag = caseData.putObject("claimantExternalFlags")
+                .putArray("details")
+                .addObject()
+                .put("id", "flag-id")
+                .putObject("value");
+        flag.put("flagCode", "RA0038");
+        flag.put("status", "Rejected");
+        flag.put("flagComment", "Original request comment");
+        flag.put("flagUpdateComment", "Rejection comment");
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+
+        mvc.perform(post(SUPPORT_TASKS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.claimantExternalFlags.details[0].value.flagComment",
+                        is("Original request comment")))
+                .andExpect(jsonPath("$.data.claimantExternalFlags.details[0].value.flagUpdateComment",
+                        is("Rejection comment")));
+    }
+
     @Test
     @SneakyThrows
     void doesNotPrepareReviewSupportTasksWhenCaseFlagsV2IsDisabled() {

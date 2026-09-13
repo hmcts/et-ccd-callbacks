@@ -22,6 +22,7 @@ public class FlagDetailType {
     private String otherDescription_cy;
     private String flagComment;
     private String flagComment_cy;
+    private String flagUpdateComment;
     private String dateTimeModified;
     private String dateTimeCreated;
     private ListTypeItem<String> path;

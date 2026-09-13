@@ -215,8 +215,7 @@ public class CaseActionsForCaseWorkerController {
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
-    @PostMapping(value = {"/supportTasks/aboutToSubmit", "/reviewSupportTasks/aboutToSubmit"},
-            consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/supportTasks/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Prepare Review Support and Arrange Support tasks for eligible Case Flags.")
     public ResponseEntity<CCDCallbackResponse> prepareSupportTasks(
             @RequestBody CallbackRequest callbackRequest) {

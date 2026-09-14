@@ -11,8 +11,14 @@ import java.util.List;
 public class EtICHearingListedAnswers {
     @JsonProperty("etICHearingListed")
     private List<String> etICHearingListed;
+    @JsonProperty("etICPostponeGiveDetails")
+    private String etICPostponeGiveDetails;
     @JsonProperty("etICExtendDurationGiveDetails")
     private String etICExtendDurationGiveDetails;
+    @JsonProperty("etICConvertPreliminaryGiveDetails")
+    private String etICConvertPreliminaryGiveDetails;
+    @JsonProperty("etICConvertF2fGiveDetails")
+    private String etICConvertF2fGiveDetails;
     @JsonProperty("etICOtherGiveDetails")
     private String etICOtherGiveDetails;
 

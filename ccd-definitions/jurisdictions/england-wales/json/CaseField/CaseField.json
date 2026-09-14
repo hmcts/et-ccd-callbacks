@@ -6534,6 +6534,23 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
+    "ID": "respRepPhoneNumber",
+    "Label": "What is your contact phone number?",
+    "HintText": "Where we can contact you during the day. For international numbers include the country code.",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "respRepAddress",
+    "Label": "Contact address if different from registered address",
+    "FieldType": "AddressUK",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
     "ID": "nextHearingDetails",
     "Label": "Next Hearing Details",
     "FieldType": "nextHearingDetails",

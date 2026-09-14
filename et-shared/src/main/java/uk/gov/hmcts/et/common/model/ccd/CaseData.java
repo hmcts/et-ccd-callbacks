@@ -1958,7 +1958,11 @@ public class CaseData extends Et1CaseData {
     private String uploadHearingDocumentsDateSubmitted;
     @JsonProperty("myHmctsAddressText")
     private String myHmctsAddressText;
-  
+    @JsonProperty("respRepPhoneNumber")
+    private String respRepPhoneNumber;
+    @JsonProperty("respRepAddress")
+    private Address respRepAddress;
+
     @JsonProperty("caseNotesCollection")
     private List<GenericTypeItem<CaseNote>> caseNotesCollection;
     @JsonProperty("addCaseNote")

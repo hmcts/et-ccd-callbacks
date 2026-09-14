@@ -327,8 +327,10 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     @ParameterizedTest
     @ValueSource(strings = {"SUBMIT_CASE_DRAFT", "UPDATE_CASE_SUBMITTED"})
     @SneakyThrows
-    void postDefaultValuesPreparesReviewSupportTasksForCaseFlagsV2Events(String eventId) {
+    void postDefaultValuesPreparesSupportTasksForCaseFlagsV2Events(String eventId) {
         ((ObjectNode) requestContent2).put("event_id", eventId);
+        ((ObjectNode) requestContent2).set("case_details_before",
+                requestContent2.get("case_details").deepCopy());
         when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
         when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -341,6 +343,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isOk());
 
         verify(supportTaskService).prepareReviewSupportTasks(any(CaseData.class));
+        verify(supportTaskService).prepareArrangeSupportTask(
+                any(CaseData.class), any(CaseData.class));
     }
 
     @Test
@@ -358,6 +362,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isOk());
 
         verify(supportTaskService, never()).prepareReviewSupportTasks(any(CaseData.class));
+        verify(supportTaskService, never()).prepareArrangeSupportTask(
+                any(CaseData.class), nullable(CaseData.class));
     }
 
     @ParameterizedTest
@@ -374,6 +380,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isOk());
 
         verify(supportTaskService).prepareRespondentReviewSupportTasks(any(CaseData.class));
+        verify(supportTaskService).prepareNewFlagArrangeSupportTask(
+                any(CaseData.class), nullable(CaseData.class));
     }
 
     @ParameterizedTest
@@ -393,10 +401,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
         verify(supportTaskService).prepareNewFlagReviewSupportTasks(
                 any(CaseData.class), any(CaseData.class));
-        if ("createFlag".equals(eventId)) {
-            verify(supportTaskService).prepareNewFlagArrangeSupportTask(
-                    any(CaseData.class), any(CaseData.class));
-        }
+        verify(supportTaskService).prepareNewFlagArrangeSupportTask(
+                any(CaseData.class), any(CaseData.class));
     }
 
     @ParameterizedTest

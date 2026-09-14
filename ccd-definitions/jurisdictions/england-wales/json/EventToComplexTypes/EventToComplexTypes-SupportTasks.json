@@ -28,6 +28,15 @@
   },
   {
     "ID": "SupportTaskState",
+    "CaseEventID": "SUBMIT_CASE_DRAFT",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "arrangeSupportTaskName",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
     "CaseEventID": "UPDATE_CASE_SUBMITTED",
     "CaseFieldID": "supportTaskState",
     "ListElementCode": "adminTaskRequired",
@@ -50,6 +59,15 @@
     "CaseFieldID": "supportTaskState",
     "ListElementCode": "judgeTaskRequired",
     "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "UPDATE_CASE_SUBMITTED",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "arrangeSupportTaskName",
+    "FieldDisplayOrder": 4,
     "DisplayContext": "OPTIONAL",
     "Publish": "Y"
   },
@@ -82,6 +100,15 @@
   },
   {
     "ID": "SupportTaskState",
+    "CaseEventID": "SUBMIT_ET3_FORM",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "arrangeSupportTaskName",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
     "CaseEventID": "UPDATE_ET3_FORM",
     "CaseFieldID": "supportTaskState",
     "ListElementCode": "adminTaskRequired",
@@ -109,6 +136,15 @@
   },
   {
     "ID": "SupportTaskState",
+    "CaseEventID": "UPDATE_ET3_FORM",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "arrangeSupportTaskName",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
     "CaseEventID": "requestSupport",
     "CaseFieldID": "supportTaskState",
     "ListElementCode": "adminTaskRequired",
@@ -131,6 +167,15 @@
     "CaseFieldID": "supportTaskState",
     "ListElementCode": "judgeTaskRequired",
     "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "requestSupport",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "arrangeSupportTaskName",
+    "FieldDisplayOrder": 4,
     "DisplayContext": "OPTIONAL",
     "Publish": "Y"
   },

@@ -193,6 +193,10 @@ public class CaseActionsForCaseWorkerController {
             if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())
                     && REVIEW_SUPPORT_TASK_EVENTS.contains(ccdRequest.getEventId())) {
                 supportTaskService.prepareReviewSupportTasks(caseData);
+                CaseData caseDataBefore = ccdRequest.getCaseDetailsBefore() == null
+                        ? null
+                        : ccdRequest.getCaseDetailsBefore().getCaseData();
+                supportTaskService.prepareArrangeSupportTask(caseData, caseDataBefore);
             }
 
             boolean hmcToggle = featureToggleService.isHmcEnabled();
@@ -228,6 +232,7 @@ public class CaseActionsForCaseWorkerController {
                     : callbackRequest.getCaseDetailsBefore().getCaseData();
             if (RESPONDENT_REVIEW_SUPPORT_TASK_EVENTS.contains(callbackRequest.getEventId())) {
                 supportTaskService.prepareRespondentReviewSupportTasks(caseData);
+                supportTaskService.prepareNewFlagArrangeSupportTask(caseData, caseDataBefore);
             } else if (NEW_FLAG_REVIEW_SUPPORT_TASK_EVENTS.contains(callbackRequest.getEventId())) {
                 supportTaskService.prepareNewFlagReviewSupportTasks(caseData, caseDataBefore);
             } else if (EVENT_MANAGE_FLAGS.equals(callbackRequest.getEventId())
@@ -235,7 +240,8 @@ public class CaseActionsForCaseWorkerController {
                 supportTaskService.prepareManagedReviewSupportTasks(caseData);
             }
 
-            if (EVENT_CREATE_FLAG.equals(callbackRequest.getEventId())) {
+            if (EVENT_CREATE_FLAG.equals(callbackRequest.getEventId())
+                    || EVENT_REQUEST_SUPPORT.equals(callbackRequest.getEventId())) {
                 supportTaskService.prepareNewFlagArrangeSupportTask(caseData, caseDataBefore);
             } else if (EVENT_MANAGE_FLAGS.equals(callbackRequest.getEventId())) {
                 supportTaskService.prepareArrangeSupportTask(caseData, caseDataBefore);

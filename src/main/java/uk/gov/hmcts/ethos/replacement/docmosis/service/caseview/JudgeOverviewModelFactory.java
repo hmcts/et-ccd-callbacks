@@ -40,6 +40,7 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 public class JudgeOverviewModelFactory {
 
     private static final String CLOSED = "Closed";
+    private static final String AWAITING_INSTRUCTIONS = "Awaiting instructions";
     private static final String YES = "Yes";
     private static final String TAG_GREY = "govuk-tag govuk-tag--grey";
     private static final String TAG_ORANGE = "govuk-tag govuk-tag--orange";
@@ -100,7 +101,7 @@ public class JudgeOverviewModelFactory {
         emptyIfNull(caseData.getReferralCollection()).stream()
             .filter(item -> item != null && item.getValue() != null)
             .map(ReferralTypeItem::getValue)
-            .filter(referral -> !CLOSED.equalsIgnoreCase(referral.getReferralStatus()))
+            .filter(referral -> AWAITING_INSTRUCTIONS.equalsIgnoreCase(referral.getReferralStatus()))
             .map(referral -> referralAttentionItem(referral, caseReference))
             .forEach(items::add);
 
@@ -326,7 +327,7 @@ public class JudgeOverviewModelFactory {
         return emptyIfNull(caseData.getReferralCollection()).stream()
             .filter(item -> item != null && item.getValue() != null)
             .map(ReferralTypeItem::getValue)
-            .anyMatch(referral -> !CLOSED.equalsIgnoreCase(referral.getReferralStatus()));
+            .anyMatch(referral -> AWAITING_INSTRUCTIONS.equalsIgnoreCase(referral.getReferralStatus()));
     }
 
     private Optional<LocalDate> parseDate(String value) {

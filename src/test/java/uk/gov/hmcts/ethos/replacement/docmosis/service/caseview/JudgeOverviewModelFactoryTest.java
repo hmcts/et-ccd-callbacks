@@ -66,7 +66,10 @@ class JudgeOverviewModelFactoryTest {
         CaseData caseData = baseCase();
         caseData.setGenericTseApplicationCollection(List.of(application("1", "Amend details", "Closed",
             "2026-09-08", "2026-09-13")));
-        caseData.setReferralCollection(List.of(referral("1", "Orders", "Closed", "No", "2026-09-09")));
+        caseData.setReferralCollection(List.of(
+            referral("1", "Orders", "Closed", "No", "2026-09-09"),
+            referral("2", "ET3/ECC", "Instructions issued", "Yes", "2025-09-16")
+        ));
         caseData.setBfActions(List.of(bfAction("2026-09-01", "Yes")));
 
         JudgeOverviewModel model = factory.create(caseData, CASE_REFERENCE, CaseState.Closed);

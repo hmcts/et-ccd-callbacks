@@ -1,0 +1,17 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "judgeOverviewMarkdown",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "judgeOverviewLabel",
+    "Label": "${judgeOverviewMarkdown}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  }
+]

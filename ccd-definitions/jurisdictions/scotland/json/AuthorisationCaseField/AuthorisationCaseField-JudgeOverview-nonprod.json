@@ -1,0 +1,26 @@
+[
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "judgeOverviewMarkdown",
+    "UserRole": "caseworker-employment-etjudge",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "judgeOverviewLabel",
+    "UserRole": "caseworker-employment-etjudge",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "judgeOverviewMarkdown",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "judgeOverviewLabel",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  }
+]

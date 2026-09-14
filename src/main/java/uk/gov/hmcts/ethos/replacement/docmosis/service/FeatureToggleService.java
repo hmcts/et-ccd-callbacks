@@ -22,10 +22,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("global_search_enabled");
     }
 
-    public boolean isCaseFlagsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("case-flags-linking-enabled");
-    }
-
     public boolean isHmcEnabled() {
         return this.featureToggleApi.isFeatureEnabled("hmc");
     }

@@ -69,7 +69,7 @@
     "ID": "et3HearingPanelPreferenceReason",
     "Label": "Give reason",
     "FieldType": "TextArea",
-    "Max": 500,
+    "Max": 700,
     "SecurityClassification": "Public",
     "Searchable": "N"
   }

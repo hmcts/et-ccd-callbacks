@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.CaseState;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.caseview.JudgeOverviewModel.Action;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.caseview.JudgeOverviewModel.Activity;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.caseview.JudgeOverviewModel.AttentionItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.caseview.JudgeOverviewModel.Fact;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.caseview.JudgeOverviewModel.Hearing;
@@ -46,6 +47,8 @@ public class JudgeOverviewModelFactory {
     private static final String TAG_ORANGE = "govuk-tag govuk-tag--orange";
     private static final String TAG_RED = "govuk-tag govuk-tag--red";
     private static final DateTimeFormatter DISPLAY_DATE = DateTimeFormatter.ofPattern("d MMM uuuu", Locale.UK);
+    private static final DateTimeFormatter DISPLAY_DATE_TIME =
+        DateTimeFormatter.ofPattern("d MMM uuuu, h:mm a", Locale.UK);
     private static final List<DateTimeFormatter> CASE_DATE_FORMATS = List.of(
         DateTimeFormatter.ISO_LOCAL_DATE,
         DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.ENGLISH),
@@ -64,6 +67,11 @@ public class JudgeOverviewModelFactory {
     }
 
     public JudgeOverviewModel create(CaseData caseData, long caseReference, CaseState state) {
+        return create(caseData, caseReference, state, List.of());
+    }
+
+    public JudgeOverviewModel create(CaseData caseData, long caseReference, CaseState state,
+                                     List<CaseTimelineEvent> timeline) {
         LocalDate today = LocalDate.now(clock);
         List<AttentionItem> attentionItems = createAttentionItems(caseData, caseReference, today);
         List<BFActionType> overdueBfActions = findOverdueBfActions(caseData, today);
@@ -85,8 +93,21 @@ public class JudgeOverviewModelFactory {
             createBfSummary(overdueBfActions),
             nextHearing.map(this::toHearing).orElseGet(this::emptyHearing),
             createKeyFacts(caseData, caseReference),
+            createRecentActivity(timeline),
+            !timeline.isEmpty(),
             createQuickActions(caseData, caseReference, state)
         );
+    }
+
+    private List<Activity> createRecentActivity(List<CaseTimelineEvent> timeline) {
+        return timeline.stream()
+            .map(event -> new Activity(
+                DISPLAY_DATE_TIME.format(event.created()),
+                firstNonBlank(event.eventName(), event.eventId(), "Case updated"),
+                defaultText(joinNonBlank(" ", event.userFirstName(), event.userLastName()), "System"),
+                defaultText(event.stateName(), "Not recorded")
+            ))
+            .toList();
     }
 
     private List<AttentionItem> createAttentionItems(CaseData caseData, long caseReference, LocalDate today) {

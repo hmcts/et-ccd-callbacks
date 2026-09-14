@@ -1,13 +1,17 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CaseView;
 import uk.gov.hmcts.ccd.sdk.CaseViewRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.CaseState;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.caseview.CaseTimelineEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.caseview.CaseTimelineRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.caseview.JudgeOverviewRenderer;
 
+import java.util.List;
 import java.util.Set;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -15,9 +19,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ETCaseView implements CaseView<CaseData, CaseState> {
 
     private final JudgeOverviewRenderer judgeOverviewRenderer;
+    private final CaseTimelineRepository caseTimelineRepository;
 
     @Override
     public Set<String> caseTypeIds() {
@@ -27,10 +33,20 @@ public class ETCaseView implements CaseView<CaseData, CaseState> {
     @Override
     public CaseData getCase(CaseViewRequest<CaseState> request, CaseData blobCase) {
         if (request.state() != CaseState.AWAITING_SUBMISSION_TO_HMCTS) {
+            List<CaseTimelineEvent> timeline = loadTimeline(request.caseRef());
             blobCase.setJudgeOverviewMarkdown(
-                judgeOverviewRenderer.render(blobCase, request.caseRef(), request.state())
+                judgeOverviewRenderer.render(blobCase, request.caseRef(), request.state(), timeline)
             );
         }
         return blobCase;
+    }
+
+    private List<CaseTimelineEvent> loadTimeline(long caseReference) {
+        try {
+            return caseTimelineRepository.findRecent(caseReference);
+        } catch (RuntimeException exception) {
+            log.warn("Unable to load judge overview timeline for case {}", caseReference, exception);
+            return List.of();
+        }
     }
 }

@@ -17,6 +17,8 @@ public class JudgeOverviewModel {
     String overdueBfActions;
     Hearing nextHearing;
     List<Fact> keyFacts;
+    List<Activity> recentActivity;
+    boolean hasRecentActivity;
     List<Action> quickActions;
 
     @Value
@@ -49,6 +51,14 @@ public class JudgeOverviewModel {
     public static class Fact {
         String label;
         String value;
+    }
+
+    @Value
+    public static class Activity {
+        String date;
+        String event;
+        String user;
+        String state;
     }
 
     @Value

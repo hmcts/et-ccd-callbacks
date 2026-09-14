@@ -17,6 +17,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.CaseState;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
@@ -94,6 +95,31 @@ class JudgeOverviewModelFactoryTest {
         JudgeOverviewModel model = factory.create(caseData, CASE_REFERENCE, CaseState.Accepted);
 
         assertThat(model.getNextHearing().getVenue()).isEqualTo("Edinburgh Tribunal Centre");
+    }
+
+    @Test
+    void createsRecentActivityFromCaseEvents() {
+        JudgeOverviewModel model = factory.create(
+            baseCase(),
+            CASE_REFERENCE,
+            CaseState.Accepted,
+            List.of(new CaseTimelineEvent(
+                LocalDateTime.of(2026, 9, 12, 14, 30),
+                "acceptCase",
+                "Accept case",
+                "Accepted",
+                "Alex",
+                "Judge"
+            ))
+        );
+
+        assertThat(model.isHasRecentActivity()).isTrue();
+        assertThat(model.getRecentActivity()).singleElement().satisfies(activity -> {
+            assertThat(activity.getDate()).isEqualTo("12 Sept 2026, 2:30 pm");
+            assertThat(activity.getEvent()).isEqualTo("Accept case");
+            assertThat(activity.getUser()).isEqualTo("Alex Judge");
+            assertThat(activity.getState()).isEqualTo("Accepted");
+        });
     }
 
     private CaseData baseCase() {

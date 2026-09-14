@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -48,7 +49,8 @@ class JudgeOverviewRendererTest {
     void returnsWarningWhenModelCreationFails() {
         JudgeOverviewModelFactory failingFactory = new JudgeOverviewModelFactory(CLOCK) {
             @Override
-            public JudgeOverviewModel create(CaseData caseData, long caseReference, CaseState state) {
+            public JudgeOverviewModel create(CaseData caseData, long caseReference, CaseState state,
+                                             List<CaseTimelineEvent> timeline) {
                 throw new IllegalStateException("boom");
             }
         };

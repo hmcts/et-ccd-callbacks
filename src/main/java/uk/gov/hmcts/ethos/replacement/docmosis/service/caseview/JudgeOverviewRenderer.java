@@ -11,6 +11,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.CaseState;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -36,8 +37,13 @@ public class JudgeOverviewRenderer {
     }
 
     public String render(CaseData caseData, long caseReference, CaseState state) {
+        return render(caseData, caseReference, state, List.of());
+    }
+
+    public String render(CaseData caseData, long caseReference, CaseState state,
+                         List<CaseTimelineEvent> timeline) {
         try {
-            return template.execute(modelFactory.create(caseData, caseReference, state));
+            return template.execute(modelFactory.create(caseData, caseReference, state, timeline));
         } catch (RuntimeException exception) {
             log.warn("Unable to render judge overview for case {}", caseReference, exception);
             return FAILURE_MARKUP;

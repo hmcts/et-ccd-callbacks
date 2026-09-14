@@ -82,6 +82,29 @@
         </dl>
       </div>
     </div>
+    {{#hasRecentActivity}}
+    <h3 class="govuk-heading-m">Recent activity</h3>
+    <table class="govuk-table govuk-!-margin-bottom-7">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Date</th>
+          <th scope="col" class="govuk-table__header">Event</th>
+          <th scope="col" class="govuk-table__header">By</th>
+          <th scope="col" class="govuk-table__header">Result</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {{#recentActivity}}
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">{{date}}</td>
+          <td class="govuk-table__cell">{{event}}</td>
+          <td class="govuk-table__cell">{{user}}</td>
+          <td class="govuk-table__cell">{{state}}</td>
+        </tr>
+        {{/recentActivity}}
+      </tbody>
+    </table>
+    {{/hasRecentActivity}}
     <h3 class="govuk-heading-m">Do something</h3>
     <ul class="govuk-list">
       {{#quickActions}}

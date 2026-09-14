@@ -32,9 +32,9 @@ class JudgeOverviewModelFactoryTest {
     void createsBusyOverviewFromCaseData() {
         CaseData caseData = baseCase();
         caseData.setGenericTseApplicationCollection(List.of(application("3", "Postpone a hearing", "Open",
-            "2026-09-08", "2026-09-13")));
+            "8 September 2026", "13 September 2026")));
         caseData.setReferralCollection(List.of(referral("4", "Postpone a hearing", "Awaiting instructions",
-            "Yes", "2026-09-09")));
+            "Yes", "9 Sep 2026")));
         caseData.setBfActions(List.of(bfAction("2026-09-01", "No")));
         caseData.setHearingCollection(List.of(hearing("Final Hearing", "Leeds", "EJ Okafor",
             "2026-09-21T10:00:00.000", "Listed")));
@@ -46,7 +46,10 @@ class JudgeOverviewModelFactoryTest {
         assertThat(model.isWarning()).isTrue();
         assertThat(model.getAttentionItems()).hasSize(2);
         assertThat(model.getAttentionItems().getFirst().getStatus()).isEqualTo("Overdue");
+        assertThat(model.getAttentionItems().getFirst().getRaised()).isEqualTo("8 Sept 2026");
+        assertThat(model.getAttentionItems().getFirst().getDue()).isEqualTo("13 Sept 2026");
         assertThat(model.getAttentionItems().getLast().getStatus()).isEqualTo("Urgent");
+        assertThat(model.getAttentionItems().getLast().getRaised()).isEqualTo("9 Sept 2026");
         assertThat(model.getOverdueBfActions()).isEqualTo("1 overdue BF action, oldest due 1 Sept 2026");
         assertThat(model.getNextHearing().getVenue()).isEqualTo("Leeds");
         assertThat(model.getQuickActions()).extracting(JudgeOverviewModel.Action::getLabel)

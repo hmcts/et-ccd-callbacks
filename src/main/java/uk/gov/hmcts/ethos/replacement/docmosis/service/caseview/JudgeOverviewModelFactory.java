@@ -45,6 +45,11 @@ public class JudgeOverviewModelFactory {
     private static final String TAG_ORANGE = "govuk-tag govuk-tag--orange";
     private static final String TAG_RED = "govuk-tag govuk-tag--red";
     private static final DateTimeFormatter DISPLAY_DATE = DateTimeFormatter.ofPattern("d MMM uuuu", Locale.UK);
+    private static final List<DateTimeFormatter> CASE_DATE_FORMATS = List.of(
+        DateTimeFormatter.ISO_LOCAL_DATE,
+        DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.ENGLISH),
+        DateTimeFormatter.ofPattern("d MMM uuuu", Locale.ENGLISH)
+    );
     private static final int URGENT_DAYS = 7;
 
     private final Clock clock;
@@ -328,14 +333,17 @@ public class JudgeOverviewModelFactory {
         if (StringUtils.isBlank(value)) {
             return Optional.empty();
         }
-        try {
-            return Optional.of(LocalDate.parse(value, DateTimeFormatter.ISO_LOCAL_DATE));
-        } catch (DateTimeParseException ignored) {
+        for (DateTimeFormatter formatter : CASE_DATE_FORMATS) {
             try {
-                return Optional.of(LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toLocalDate());
-            } catch (DateTimeParseException invalidDate) {
-                return Optional.empty();
+                return Optional.of(LocalDate.parse(value, formatter));
+            } catch (DateTimeParseException ignored) {
+                // Try the next date format used by ET case data.
             }
+        }
+        try {
+            return Optional.of(LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toLocalDate());
+        } catch (DateTimeParseException invalidDate) {
+            return Optional.empty();
         }
     }
 

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.et.syaapi.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -12,16 +11,11 @@ import uk.gov.hmcts.reform.et.syaapi.helper.EmployeeObjectMapper;
 import uk.gov.hmcts.reform.et.syaapi.models.HubLinksStatusesRequest;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import java.util.List;
-
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class HubLinkService {
     private final CaseService caseService;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final FeatureToggleService featureToggleService;
-    private final ManageCaseRoleService manageCaseRoleService;
 
     /**
      * Updates case data with hub link statuses {@link CaseDetails}.
@@ -31,44 +25,23 @@ public class HubLinkService {
      * @return the associated {@link CaseDetails} if the case is created
      */
     public CaseDetails updateHubLinkStatuses(HubLinksStatusesRequest request,
-                                             String authorization,
-                                             List<String> caseUserRoles) {
+                                             String authorization) {
+        StartEventResponse startEventResponse = caseService.startUpdate(
+            authorization,
+            request.getCaseId(),
+            request.getCaseTypeId(),
+            CaseEvent.UPDATE_HUBLINK_STATUS
+        );
 
-        if (featureToggleService.isCaseFlagsEnabled()) {
-            log.info("Case flags enabled - calling UPDATE_HUBLINK_STATUS");
-            StartEventResponse startEventResponse = caseService.startUpdate(
-                authorization,
-                request.getCaseId(),
-                request.getCaseTypeId(),
-                CaseEvent.UPDATE_HUBLINK_STATUS
-            );
+        CaseData caseData = EmployeeObjectMapper
+            .convertCaseDataMapToCaseDataObject(startEventResponse.getCaseDetails().getData());
+        caseData.setHubLinksStatuses(request.getHubLinksStatuses());
 
-            CaseData caseData = EmployeeObjectMapper
-                .convertCaseDataMapToCaseDataObject(startEventResponse.getCaseDetails().getData());
-            caseData.setHubLinksStatuses(request.getHubLinksStatuses());
-
-            return caseService.submitUpdate(
-                authorization,
-                request.getCaseId(),
-                caseDetailsConverter.caseDataContent(startEventResponse, caseData),
-                request.getCaseTypeId()
-            );
-        } else {
-            log.info("Case flags disabled - calling UPDATE_CASE_SUBMITTED");
-            // Match the case by any of the requested roles (a request for [CREATOR] also matches a
-            // self-representing claimant's [CLAIMANTNONLEGALREPRESENTATIVE] case).
-            CaseDetails caseDetails = manageCaseRoleService.getUserCaseByCaseUserRoles(authorization,
-                                                                            request.getCaseId(),
-                                                                            caseUserRoles);
-            caseDetails.getData().put("hubLinksStatuses", request.getHubLinksStatuses());
-
-            return caseService.triggerEvent(
-                authorization,
-                request.getCaseId(),
-                CaseEvent.UPDATE_CASE_SUBMITTED,
-                request.getCaseTypeId(),
-                caseDetails.getData()
-            );
-        }
+        return caseService.submitUpdate(
+            authorization,
+            request.getCaseId(),
+            caseDetailsConverter.caseDataContent(startEventResponse, caseData),
+            request.getCaseTypeId()
+        );
     }
 }

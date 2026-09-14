@@ -725,7 +725,7 @@ class Et1VettingServiceTest {
         String expectedMarkUp = """
             ### ERA Assessment
             
-            The following respondent(s) have an effective elapsed time greater than 3 months and less than 6 months:
+            The following respondent(s) have an effective elapsed time greater than 3 months:
             
             • Respondent 1 - 4 months 1 day
             
@@ -743,6 +743,25 @@ class Et1VettingServiceTest {
             caseData.setClaimantOtherType(new ClaimantOtherType());
         }
         caseData.getClaimantOtherType().setDateOfLastEvent("2026-04-01");
+
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+
+        assertNull(caseData.getEt1VettingEraAssessmentMarkUp());
+        assertThat(caseData.getEt1VettingEra()).isEqualTo("Not applicable");
+    }
+    @Test
+    void initialiseEt1Vetting_eraActive_claimWithinPreEraAcasExtension_doesNotPopulateMarkUp() {
+        when(employmentRightsActService.isEraOctober2026(any())).thenReturn(true);
+        CaseData caseData = caseDetails.getCaseData();
+        caseData.setReceiptDate("2026-07-29");
+        if (caseData.getClaimantOtherType() == null) {
+            caseData.setClaimantOtherType(new ClaimantOtherType());
+        }
+        caseData.getClaimantOtherType().setDateOfLastEvent("2026-01-01");
+        caseData.setRespondentCollection(new ArrayList<>(caseData.getRespondentCollection().subList(0, 1)));
+        RespondentSumType respondent = caseData.getRespondentCollection().getFirst().getValue();
+        respondent.setAcasCertificateReceiptDate("2026-03-30");
+        respondent.setAcasCertificateIssueDate("2026-06-30");
 
         et1VettingService.initialiseEt1Vetting(caseDetails);
 

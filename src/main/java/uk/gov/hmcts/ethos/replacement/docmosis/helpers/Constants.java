@@ -120,8 +120,7 @@ public final class Constants {
     public static final String EXCEPTION_UPDATE_RESPONDENT_REPRESENTATIVE_REQUEST_EMPTY =
             "Update respondent representative request is empty";
     public static final String ERA_ASSESSMENT_HEADER = "### ERA Assessment\n\n"
-        + "The following respondent(s) have an effective elapsed time greater than 3 months "
-        + "and less than 6 months:\n\n";
+        + "The following respondent(s) have an effective elapsed time greater than 3 months:\n\n";
 
     private Constants() {
         // Utility classes should not have a public or default constructor.

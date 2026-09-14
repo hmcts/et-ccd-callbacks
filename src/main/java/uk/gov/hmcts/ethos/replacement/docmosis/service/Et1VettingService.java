@@ -374,8 +374,10 @@ public class Et1VettingService {
      * {@code et1VettingEra} is set to "Not applicable" and the ERA assessment markdown is set to {@code null}.
      *
      * <p>If the ERA feature is active, each respondent's Effective Elapsed Time is evaluated.
-     * If at least one respondent has an Effective Elapsed Time greater than 3 months and less than or equal to
-     * 6 months, the markdown panel is populated listing the triggering respondent(s) and their effective elapsed time.
+     * A respondent is listed only when their ET1 is outside the pre-ERA three-month limitation period, including a
+     * valid Acas extension, and their effective elapsed time exceeds three months. If at least one respondent meets
+     * these conditions, the markdown panel is populated listing the triggering respondent(s) and their effective
+     * elapsed time.
      * In this case, {@code et1VettingEra} is reset to {@code null} if unselected or previously "Not applicable",
      * requiring mandatory selection by the caseworker.
      *
@@ -417,7 +419,9 @@ public class Et1VettingService {
 
             Period period = calculateEffectiveElapsedPeriod(receiptDate, dateOfLastEvent,
                 acasReceiptDate, acasIssueDate);
-            if (period != null && isBetweenThreeAndSixMonths(period)) {
+            if (period != null && isMoreThan3Months(period)
+                    && !isWithinPreEraLimitationPeriod(receiptDate, dateOfLastEvent,
+                    acasReceiptDate, acasIssueDate)) {
                 String elapsedTimeStr = formatPeriod(period.getYears() * 12 + period.getMonths(), period.getDays());
                 triggeringRespondents.append(String.format("• Respondent %d - %s%n%n", respondentNumber,
                     elapsedTimeStr));
@@ -436,12 +440,32 @@ public class Et1VettingService {
         }
     }
 
-    private static boolean isBetweenThreeAndSixMonths(Period period) {
+    private static boolean isMoreThan3Months(Period period) {
         int totalMonths = period.getYears() * 12 + period.getMonths();
         int totalDays = period.getDays();
-        boolean isGreaterThanThreeMonths = totalMonths > 3 || (totalMonths == 3 && totalDays > 0);
-        boolean isLessThanOrEqualToSixMonths = totalMonths < 6;
-        return isGreaterThanThreeMonths && isLessThanOrEqualToSixMonths;
+        return totalMonths > 3 || (totalMonths == 3 && totalDays > 0);
+    }
+
+    private static boolean isWithinPreEraLimitationPeriod(String receiptDateStr, String dateOfLastEventStr,
+                                                           String acasReceiptDateStr, String acasIssueDateStr) {
+        try {
+            LocalDate receiptDate = LocalDate.parse(receiptDateStr);
+            LocalDate dateOfLastEvent = LocalDate.parse(dateOfLastEventStr);
+            LocalDate limitationDate = dateOfLastEvent.plusMonths(3).minusDays(1);
+
+            if (!isNullOrEmpty(acasReceiptDateStr) && !isNullOrEmpty(acasIssueDateStr)) {
+                LocalDate acasReceiptDate = LocalDate.parse(acasReceiptDateStr);
+                LocalDate acasIssueDate = LocalDate.parse(acasIssueDateStr);
+                if (!acasReceiptDate.isAfter(limitationDate) && !acasIssueDate.isBefore(acasReceiptDate)) {
+                    limitationDate = limitationDate.isAfter(acasIssueDate.plusMonths(1))
+                            ? limitationDate : acasIssueDate.plusMonths(1);
+                }
+            }
+            return !receiptDate.isAfter(limitationDate);
+        } catch (Exception e) {
+            log.error("Error calculating pre-ERA limitation date", e);
+            return false;
+        }
     }
 
     private static String calculateLimitationDate(String dateOfLastEventStr, String acasReceiptDateStr,

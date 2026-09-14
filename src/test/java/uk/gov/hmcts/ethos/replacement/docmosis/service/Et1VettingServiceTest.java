@@ -749,6 +749,7 @@ class Et1VettingServiceTest {
         assertNull(caseData.getEt1VettingEraAssessmentMarkUp());
         assertThat(caseData.getEt1VettingEra()).isEqualTo("Not applicable");
     }
+
     @Test
     void initialiseEt1Vetting_eraActive_claimWithinPreEraAcasExtension_doesNotPopulateMarkUp() {
         when(employmentRightsActService.isEraOctober2026(any())).thenReturn(true);

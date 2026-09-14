@@ -66,18 +66,7 @@ class UpdateHubLinkStatusEventTest {
     }
 
     @Test
-    void insertsThenUpdatesStatus() {
-        saveStatus("notStarted");
-        flushAndClear();
-        assertStoredStatus("notStarted");
-
-        saveStatus("completed");
-        flushAndClear();
-        assertStoredStatus("completed");
-    }
-
-    @Test
-    void eventWritesStatus() {
+    void eventInsertsThenUpdatesStatus() {
         UpdateHubLinkStatusEvent eventConfig = new UpdateHubLinkStatusEvent(repository);
         ResolvedCCDConfig<CaseData, CaseState, PlaceholderRole> resolvedConfig = new ResolvedCCDConfig<>(
             CaseData.class,
@@ -88,33 +77,37 @@ class UpdateHubLinkStatusEventTest {
         );
         ConfigBuilderImpl<CaseData, CaseState, PlaceholderRole> builder = new ConfigBuilderImpl<>(resolvedConfig);
         eventConfig.configure(builder);
-
-        CaseData caseData = new CaseData();
-        caseData.setHubLinksStatuses(statuses("completed"));
-
-        var response = builder.build()
+        var callback = builder.build()
             .getEvents()
             .get(UpdateHubLinkStatusEvent.EVENT_ID)
-            .getAboutToSubmitCallback()
-            .handle(CaseDetails.<CaseData, CaseState>builder()
-                        .id(CASE_REFERENCE)
-                        .data(caseData)
-                        .build(),
-                    null);
+            .getAboutToSubmitCallback();
+
+        CaseData caseData = new CaseData();
+        caseData.setHubLinksStatuses(statuses("notStarted"));
+        var response = callback.handle(caseDetails(caseData), null);
 
         assertThat(eventConfig.caseTypeIds()).containsExactlyInAnyOrder("ET_EnglandWales", "ET_Scotland");
         assertThat(response.getData()).isSameAs(caseData);
+        flushAndClear();
+        assertStoredStatus("notStarted");
+
+        caseData.setHubLinksStatuses(statuses("completed"));
+        callback.handle(caseDetails(caseData), null);
+        flushAndClear();
         assertStoredStatus("completed");
+    }
+
+    private CaseDetails<CaseData, CaseState> caseDetails(CaseData caseData) {
+        return CaseDetails.<CaseData, CaseState>builder()
+            .id(CASE_REFERENCE)
+            .data(caseData)
+            .build();
     }
 
     private HubLinksStatuses statuses(String personalDetails) {
         HubLinksStatuses statuses = new HubLinksStatuses();
         statuses.setPersonalDetails(personalDetails);
         return statuses;
-    }
-
-    private void saveStatus(String personalDetails) {
-        repository.saveAndFlush(HubLinkStatus.create(CASE_REFERENCE, statuses(personalDetails)));
     }
 
     private void assertStoredStatus(String personalDetails) {

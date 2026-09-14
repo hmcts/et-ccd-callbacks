@@ -47,7 +47,7 @@ public class UpdateHubLinkStatusEvent implements CCDConfig<CaseData, CaseState, 
         if (data.getHubLinksStatuses() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Hub-link statuses are required");
         }
-        hubLinkStatusRepository.saveAndFlush(
+        hubLinkStatusRepository.save(
             HubLinkStatus.create(details.getId(), data.getHubLinksStatuses())
         );
 

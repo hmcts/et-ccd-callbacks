@@ -21,7 +21,7 @@ environment variable is set to `true`.
   └── wa-task-monitor (port 9194) — initiates/reconfigures/terminates tasks
 ```
 
-ET uses the *decentralised data store* pattern (`decentralised = true` in `build.gradle`).
+ET uses the *decentralised data store* pattern through the `decentralised-runtime` dependency in `build.gradle`.
 CCD stores ET case data in the `et_cos` database (not `datastore`), so all WA-related tables
 live in `et_cos` too.
 

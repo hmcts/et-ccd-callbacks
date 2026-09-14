@@ -44,6 +44,7 @@ public class SupportTaskService {
     }
 
     public void prepareNewFlagReviewSupportTasks(CaseData caseData, CaseData caseDataBefore) {
+        retainCreatedTaskState(caseData, caseDataBefore);
         List<GenericTypeItem<FlagDetailType>> previousFlags = allFlagItems(
                 caseDataBefore == null ? null : caseDataBefore.getAllPartyFlags()).toList();
         Set<String> previousFlagIds = previousFlags.stream()
@@ -63,6 +64,24 @@ public class SupportTaskService {
         }
 
         prepareTasks(caseData, newFlags);
+    }
+
+    private static void retainCreatedTaskState(CaseData caseData, CaseData caseDataBefore) {
+        if (caseDataBefore == null || caseDataBefore.getSupportTaskState() == null) {
+            return;
+        }
+
+        SupportTaskState currentState = taskState(caseData);
+        SupportTaskState previousState = caseDataBefore.getSupportTaskState();
+        if (currentState.getAdminTaskCreated() == null) {
+            currentState.setAdminTaskCreated(previousState.getAdminTaskCreated());
+        }
+        if (currentState.getLegalOfficerTaskCreated() == null) {
+            currentState.setLegalOfficerTaskCreated(previousState.getLegalOfficerTaskCreated());
+        }
+        if (currentState.getJudgeTaskCreated() == null) {
+            currentState.setJudgeTaskCreated(previousState.getJudgeTaskCreated());
+        }
     }
 
     public void prepareManagedReviewSupportTasks(CaseData caseData) {

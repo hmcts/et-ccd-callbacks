@@ -152,6 +152,21 @@ class SupportTaskServiceTest {
     }
 
     @Test
+    void does_not_prepare_duplicate_judge_task_for_requested_flag_on_another_party() {
+        CaseData caseDataBefore = caseDataWithClaimantFlag("RA0038", "Requested", false);
+        caseDataBefore.setSupportTaskState(SupportTaskState.builder().judgeTaskCreated(YES).build());
+
+        CaseData caseData = caseDataWithClaimantFlag("RA0038", "Requested", false);
+        caseData.getAllPartyFlags().setRespondent1Flags(
+                caseFlags("respondent-flag", "RA0038", "Requested"));
+
+        service.prepareNewFlagReviewSupportTasks(caseData, caseDataBefore);
+
+        assertEquals(YES, taskState(caseData).getJudgeTaskCreated());
+        assertNull(taskState(caseData).getJudgeTaskRequired());
+    }
+
+    @Test
     void prepares_review_task_when_create_flag_before_data_already_contains_the_new_flag() {
         CaseFlagsType requestedFlag = caseFlags("new-flag", "RA0038", "Requested", "2026-09-11T10:00:00.000Z");
         CaseData caseDataBefore = new CaseData();

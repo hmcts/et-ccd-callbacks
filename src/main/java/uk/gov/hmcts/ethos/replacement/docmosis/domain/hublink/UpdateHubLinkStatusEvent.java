@@ -36,12 +36,11 @@ public class UpdateHubLinkStatusEvent implements CCDConfig<CaseData, CaseState, 
     public void configure(ConfigBuilder<CaseData, CaseState, PlaceholderRole> builder) {
         builder.event(EVENT_ID)
             .forAllStates()
-            .aboutToSubmitCallback(this::submit);
+            .aboutToSubmitCallback((details, detailsBefore) -> submit(details));
     }
 
     private AboutToStartOrSubmitResponse<CaseData, CaseState> submit(
-        CaseDetails<CaseData, CaseState> details,
-        CaseDetails<CaseData, CaseState> detailsBefore
+        CaseDetails<CaseData, CaseState> details
     ) {
         CaseData data = details.getData();
         if (data.getHubLinksStatuses() == null) {

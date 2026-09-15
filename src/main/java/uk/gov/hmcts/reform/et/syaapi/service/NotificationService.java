@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.et.syaapi.exception.NotificationException;
 import uk.gov.hmcts.reform.et.syaapi.helper.NotificationsHelper;
 import uk.gov.hmcts.reform.et.syaapi.models.CaseRequest;
 import uk.gov.hmcts.reform.et.syaapi.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.et.syaapi.service.utils.ClaimantUtil;
 import uk.gov.hmcts.reform.et.syaapi.service.utils.GenericServiceUtil;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.service.notify.NotificationClient;
@@ -1059,6 +1060,57 @@ public class NotificationService {
             caseId,
             emailParameters,
             notificationsProperties.getBundlesClaimantSubmittedNotificationTemplateId()
+        );
+    }
+
+    /**
+     * Sends email to the claimant plus the tribunal when the respondent submits a bundle.
+     *
+     * @param caseData  existing case data
+     * @param caseId    id of case
+     * @param hearingId id of hearing
+     */
+    public void sendRespondentBundlesEmails(CaseData caseData,
+                                            String caseId,
+                                            String hearingId) {
+
+        Map<String, Object> emailParameters = new ConcurrentHashMap<>();
+        NotificationsHelper.addCommonParameters(emailParameters, caseData, caseId);
+
+        String hearingDate = NotificationsHelper.getEarliestDateForHearing(
+            caseData.getHearingCollection(),
+            hearingId
+        );
+        emailParameters.put(
+            SEND_EMAIL_PARAMS_HEARING_DATE_KEY,
+            hearingDate
+        );
+
+        if (!ClaimantUtil.isClaimantNonSystemUser(caseData)) {
+            Map<String, Object> claimantParameters = new ConcurrentHashMap<>(emailParameters);
+            boolean isClaimantRepresented = isRepresentedClaimantWithMyHmctsCase(caseData);
+            String caseLink = isClaimantRepresented
+                ? notificationsProperties.getExuiCaseDetailsLink() + caseId
+                : notificationsProperties.getCitizenPortalLink() + caseId;
+            claimantParameters.put(SEND_EMAIL_PARAMS_LINK_TO_CITIZEN_HUB, caseLink);
+            sendEmailToClaimant(
+                caseData,
+                caseId,
+                notificationsProperties.getBundlesRespondentSubmittedForClaimantTemplateId(),
+                claimantParameters
+            );
+        }
+
+        Map<String, Object> tribunalParameters = new ConcurrentHashMap<>(emailParameters);
+        tribunalParameters.put(
+            SEND_EMAIL_PARAMS_EXUI_HEARING_DOCUMENTS_LINK,
+            notificationsProperties.getExuiCaseDetailsLink() + caseId + HEARING_DOCUMENTS_PATH
+        );
+        sendTribunalEmail(
+            caseData,
+            caseId,
+            tribunalParameters,
+            notificationsProperties.getBundlesRespondentSubmittedForTribunalTemplateId()
         );
     }
 

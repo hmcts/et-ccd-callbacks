@@ -139,7 +139,7 @@ allprojects {
     // CVE-2026-41851 - override the Spring Framework version managed by the Spring Boot BOM.
     // CVE-2026-54512, CVE-2026-54513, CVE-2026-54514, CVE-2026-54515, CVE-2026-54516,
     // CVE-2026-54517, CVE-2026-54518 - jackson-databind upgraded to 2.22.0
-    ext['spring-framework.version'] = '6.2.20'
+    ext['spring-framework.version'] = '6.2.19'
 
     configurations.configureEach {
         resolutionStrategy.eachDependency { details ->

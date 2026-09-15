@@ -1,0 +1,31 @@
+<div id="multiple-cases-{{caseReference}}">
+  {{^hasCases}}
+  <p class="govuk-body">No single cases are linked to this multiple.</p>
+  {{/hasCases}}
+  {{#hasCases}}
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Case reference</th>
+          <th scope="col" class="govuk-table__header">Claimant</th>
+          <th scope="col" class="govuk-table__header">Respondent</th>
+          <th scope="col" class="govuk-table__header">Sub-multiple</th>
+          <th scope="col" class="govuk-table__header">State</th>
+          <th scope="col" class="govuk-table__header">Lead Claimant</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {{#cases}}
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell"><a class="govuk-link" href="/cases/case-details/{{reference}}">{{displayReference}}</a></td>
+          <td class="govuk-table__cell">{{claimant}}</td>
+          <td class="govuk-table__cell">{{respondent}}</td>
+          <td class="govuk-table__cell">{{displaySubMultiple}}</td>
+          <td class="govuk-table__cell">{{state}}</td>
+          <td class="govuk-table__cell">{{leadClaimant}}</td>
+        </tr>
+        {{/cases}}
+      </tbody>
+    </table>
+  {{/hasCases}}
+</div>

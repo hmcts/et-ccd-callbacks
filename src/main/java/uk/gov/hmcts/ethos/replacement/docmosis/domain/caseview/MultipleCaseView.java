@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CaseView;
 import uk.gov.hmcts.ccd.sdk.CaseViewRequest;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.MultipleCaseState;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.caseview.MultipleCasesRenderer;
 
 import java.util.Set;
 
@@ -12,7 +14,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_C
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 
 @Component
+@RequiredArgsConstructor
 public class MultipleCaseView implements CaseView<MultipleData, MultipleCaseState> {
+    private final MultipleCasesRenderer multipleCasesRenderer;
 
     @Override
     public Set<String> caseTypeIds() {
@@ -21,6 +25,9 @@ public class MultipleCaseView implements CaseView<MultipleData, MultipleCaseStat
 
     @Override
     public MultipleData getCase(CaseViewRequest<MultipleCaseState> request, MultipleData blobCase) {
+        blobCase.setMultipleCasesMarkdown(
+            multipleCasesRenderer.render(request.caseRef(), blobCase.getMultipleReference())
+        );
         return blobCase;
     }
 }

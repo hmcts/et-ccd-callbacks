@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -23,6 +25,16 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 class SupportTaskServiceTest {
+    private static final String TASK_TYPE_ADMIN = "Admin";
+    private static final String TASK_TYPE_LEGAL_OFFICER = "LegalOfficer";
+    private static final String TASK_TYPE_JUDGE = "Judge";
+    private static final String STATUS_REQUESTED = "Requested";
+    private static final String STATUS_ACTIVE = "Active";
+    private static final String STATUS_NOT_APPROVED = "Not Approved";
+    private static final String STATUS_INACTIVE = "Inactive";
+    private static final String CCD_TRUE = "true";
+    private static final String CCD_FALSE = "false";
+
     private final SupportTaskService service = new SupportTaskService(configuration());
 
     private static SupportTaskConfiguration configuration() {
@@ -58,26 +70,26 @@ class SupportTaskServiceTest {
         return Stream.of(
             Stream.of("RA0002", "RA0003", "RA0004", "RA0005", "RA0006", "RA0008", "RA0009",
                     "RA0021", "RA0033", "RA0039", "RA0041")
-                .map(code -> Arguments.of(code, "Admin")),
+                .map(code -> Arguments.of(code, TASK_TYPE_ADMIN)),
             Stream.of("RA0034", "RA0035", "RA0036")
-                .map(code -> Arguments.of(code, "LegalOfficer")),
+                .map(code -> Arguments.of(code, TASK_TYPE_LEGAL_OFFICER)),
             Stream.of("RA0029", "RA0031", "RA0032", "RA0037", "RA0038")
-                .map(code -> Arguments.of(code, "Judge"))
+                .map(code -> Arguments.of(code, TASK_TYPE_JUDGE))
         ).flatMap(stream -> stream);
     }
 
     @ParameterizedTest
     @MethodSource("eligibleFlagScenarios")
     void prepares_each_eligible_task_type_once_per_case(String flagCode, String taskType) {
-        CaseData caseData = caseDataWithClaimantFlag(flagCode, "Requested", false);
+        CaseData caseData = caseDataWithClaimantFlag(flagCode, STATUS_REQUESTED, false);
 
         service.prepareReviewSupportTasks(caseData);
 
-        assertEquals("Admin".equals(taskType) ? YES : null,
+        assertEquals(TASK_TYPE_ADMIN.equals(taskType) ? YES : null,
                 taskState(caseData).getAdminTaskRequired());
-        assertEquals("LegalOfficer".equals(taskType) ? YES : null,
+        assertEquals(TASK_TYPE_LEGAL_OFFICER.equals(taskType) ? YES : null,
                 taskState(caseData).getLegalOfficerTaskRequired());
-        assertEquals("Judge".equals(taskType) ? YES : null,
+        assertEquals(TASK_TYPE_JUDGE.equals(taskType) ? YES : null,
                 taskState(caseData).getJudgeTaskRequired());
 
         service.prepareReviewSupportTasks(caseData);
@@ -89,7 +101,7 @@ class SupportTaskServiceTest {
 
     @Test
     void prepares_task_for_requested_external_claimant_flag() {
-        CaseData caseData = caseDataWithClaimantFlag("RA0029", "Requested", true);
+        CaseData caseData = caseDataWithClaimantFlag("RA0029", STATUS_REQUESTED, true);
 
         service.prepareReviewSupportTasks(caseData);
 
@@ -101,7 +113,7 @@ class SupportTaskServiceTest {
     void prepares_task_for_requested_flag_from_any_respondent() {
         CaseData caseData = new CaseData();
         caseData.setAllPartyFlags(AllPartyFlags.builder()
-                .respondent3ExternalFlags(caseFlags("respondent-3-flag", "RA0034", "Requested"))
+                .respondent3ExternalFlags(caseFlags("respondent-3-flag", "RA0034", STATUS_REQUESTED))
                 .build());
 
         service.prepareRespondentReviewSupportTasks(caseData);
@@ -112,7 +124,7 @@ class SupportTaskServiceTest {
 
     @Test
     void respondent_event_does_not_use_a_claimant_flag() {
-        CaseData caseData = caseDataWithClaimantFlag("RA0033", "Requested", false);
+        CaseData caseData = caseDataWithClaimantFlag("RA0033", STATUS_REQUESTED, false);
 
         service.prepareRespondentReviewSupportTasks(caseData);
 
@@ -123,12 +135,12 @@ class SupportTaskServiceTest {
     void prepares_task_only_for_a_newly_created_flag() {
         CaseData caseDataBefore = new CaseData();
         caseDataBefore.setAllPartyFlags(AllPartyFlags.builder()
-                .claimantFlags(caseFlags("existing-flag", "RA0033", "Requested"))
+                .claimantFlags(caseFlags("existing-flag", "RA0033", STATUS_REQUESTED))
                 .build());
         CaseData caseData = new CaseData();
         caseData.setAllPartyFlags(AllPartyFlags.builder()
-                .claimantFlags(caseFlags("existing-flag", "RA0033", "Requested"))
-                .respondent2Flags(caseFlags("new-flag", "RA0029", "Requested"))
+                .claimantFlags(caseFlags("existing-flag", "RA0033", STATUS_REQUESTED))
+                .respondent2Flags(caseFlags("new-flag", "RA0029", STATUS_REQUESTED))
                 .build());
 
         service.prepareNewFlagReviewSupportTasks(caseData, caseDataBefore);
@@ -142,7 +154,7 @@ class SupportTaskServiceTest {
     void prepares_task_for_a_new_requested_flag() {
         CaseData caseData = new CaseData();
         caseData.setAllPartyFlags(AllPartyFlags.builder()
-                .representative2ExternalFlags(caseFlags("new-flag", "RA0033", "Requested"))
+                .representative2ExternalFlags(caseFlags("new-flag", "RA0033", STATUS_REQUESTED))
                 .build());
 
         service.prepareNewFlagReviewSupportTasks(caseData, new CaseData());
@@ -153,12 +165,12 @@ class SupportTaskServiceTest {
 
     @Test
     void does_not_prepare_duplicate_judge_task_for_requested_flag_on_another_party() {
-        CaseData caseDataBefore = caseDataWithClaimantFlag("RA0038", "Requested", false);
+        CaseData caseDataBefore = caseDataWithClaimantFlag("RA0038", STATUS_REQUESTED, false);
         caseDataBefore.setSupportTaskState(SupportTaskState.builder().judgeTaskCreated(YES).build());
 
-        CaseData caseData = caseDataWithClaimantFlag("RA0038", "Requested", false);
+        CaseData caseData = caseDataWithClaimantFlag("RA0038", STATUS_REQUESTED, false);
         caseData.getAllPartyFlags().setRespondent1Flags(
-                caseFlags("respondent-flag", "RA0038", "Requested"));
+                caseFlags("respondent-flag", "RA0038", STATUS_REQUESTED));
 
         service.prepareNewFlagReviewSupportTasks(caseData, caseDataBefore);
 
@@ -168,7 +180,7 @@ class SupportTaskServiceTest {
 
     @Test
     void prepares_review_task_when_create_flag_before_data_already_contains_the_new_flag() {
-        CaseFlagsType requestedFlag = caseFlags("new-flag", "RA0038", "Requested", "2026-09-11T10:00:00.000Z");
+        CaseFlagsType requestedFlag = caseFlags("new-flag", "RA0038", STATUS_REQUESTED, "2026-09-11T10:00:00.000Z");
         CaseData caseDataBefore = new CaseData();
         caseDataBefore.setAllPartyFlags(AllPartyFlags.builder().claimantFlags(requestedFlag).build());
         CaseData caseData = new CaseData();
@@ -184,11 +196,11 @@ class SupportTaskServiceTest {
     void does_not_treat_an_unchanged_flag_without_an_id_as_new() {
         CaseData caseDataBefore = new CaseData();
         caseDataBefore.setAllPartyFlags(AllPartyFlags.builder()
-                .claimantFlags(caseFlags(null, "RA0033", "Requested"))
+                .claimantFlags(caseFlags(null, "RA0033", STATUS_REQUESTED))
                 .build());
         CaseData caseData = new CaseData();
         caseData.setAllPartyFlags(AllPartyFlags.builder()
-                .claimantFlags(caseFlags(null, "RA0033", "Requested"))
+                .claimantFlags(caseFlags(null, "RA0033", STATUS_REQUESTED))
                 .build());
 
         service.prepareNewFlagReviewSupportTasks(caseData, caseDataBefore);
@@ -201,11 +213,11 @@ class SupportTaskServiceTest {
     void does_not_treat_an_updated_existing_flag_as_new() {
         CaseData caseDataBefore = new CaseData();
         caseDataBefore.setAllPartyFlags(AllPartyFlags.builder()
-                .claimantFlags(caseFlags("existing-flag", "RA0033", "Active"))
+                .claimantFlags(caseFlags("existing-flag", "RA0033", STATUS_ACTIVE))
                 .build());
         CaseData caseData = new CaseData();
         caseData.setAllPartyFlags(AllPartyFlags.builder()
-                .claimantFlags(caseFlags("existing-flag", "RA0033", "Requested"))
+                .claimantFlags(caseFlags("existing-flag", "RA0033", STATUS_REQUESTED))
                 .build());
 
         service.prepareNewFlagReviewSupportTasks(caseData, caseDataBefore);
@@ -218,7 +230,7 @@ class SupportTaskServiceTest {
     void does_not_prepare_task_for_a_new_case_level_flag() {
         CaseData caseData = new CaseData();
         caseData.setAllPartyFlags(AllPartyFlags.builder()
-                .caseFlags(caseFlags("new-case-flag", "RA0033", "Requested"))
+                .caseFlags(caseFlags("new-case-flag", "RA0033", STATUS_REQUESTED))
                 .build());
 
         service.prepareNewFlagReviewSupportTasks(caseData, new CaseData());
@@ -230,9 +242,9 @@ class SupportTaskServiceTest {
     void prepares_tasks_for_new_claimant_and_representative_flags() {
         CaseData caseData = new CaseData();
         caseData.setAllPartyFlags(AllPartyFlags.builder()
-                .claimantExternalFlags(caseFlags("claimant-flag", "RA0033", "Requested"))
-                .claimantRepresentativeFlags(caseFlags("claimant-rep-flag", "RA0034", "Requested"))
-                .representative4ExternalFlags(caseFlags("respondent-rep-flag", "RA0029", "Requested"))
+                .claimantExternalFlags(caseFlags("claimant-flag", "RA0033", STATUS_REQUESTED))
+                .claimantRepresentativeFlags(caseFlags("claimant-rep-flag", "RA0034", STATUS_REQUESTED))
+                .representative4ExternalFlags(caseFlags("respondent-rep-flag", "RA0029", STATUS_REQUESTED))
                 .build());
 
         service.prepareNewFlagReviewSupportTasks(caseData, new CaseData());
@@ -246,8 +258,8 @@ class SupportTaskServiceTest {
     void completes_only_task_type_without_an_eligible_requested_flag() {
         CaseData caseData = new CaseData();
         caseData.setAllPartyFlags(AllPartyFlags.builder()
-                .claimantFlags(caseFlags("admin-flag", "RA0033", "Active"))
-                .respondent2Flags(caseFlags("judge-flag", "RA0029", "Requested"))
+                .claimantFlags(caseFlags("admin-flag", "RA0033", STATUS_ACTIVE))
+                .respondent2Flags(caseFlags("judge-flag", "RA0029", STATUS_REQUESTED))
                 .build());
         caseData.setSupportTaskState(SupportTaskState.builder()
                 .adminTaskCreated(YES)
@@ -267,8 +279,8 @@ class SupportTaskServiceTest {
     void keeps_task_active_when_another_party_has_an_eligible_requested_flag() {
         CaseData caseData = new CaseData();
         caseData.setAllPartyFlags(AllPartyFlags.builder()
-                .claimantFlags(caseFlags("managed-flag", "RA0033", "Active"))
-                .representative2ExternalFlags(caseFlags("requested-flag", "RA0033", "Requested"))
+                .claimantFlags(caseFlags("managed-flag", "RA0033", STATUS_ACTIVE))
+                .representative2ExternalFlags(caseFlags("requested-flag", "RA0033", STATUS_REQUESTED))
                 .build());
         caseData.setSupportTaskState(SupportTaskState.builder().adminTaskCreated(YES).build());
 
@@ -278,9 +290,141 @@ class SupportTaskServiceTest {
         assertNull(taskState(caseData).getAdminTaskRequired());
     }
 
+    static Stream<Arguments> reviewTaskCategoryScenarios() {
+        return Stream.of(
+            Arguments.of(TASK_TYPE_ADMIN, "RA0041", "RA0039"),
+            Arguments.of(TASK_TYPE_LEGAL_OFFICER, "RA0034", "RA0035"),
+            Arguments.of(TASK_TYPE_JUDGE, "RA0038", "RA0029")
+        );
+    }
+
+    static Stream<Arguments> nonRequestedReviewTaskScenarios() {
+        return Stream.of(STATUS_NOT_APPROVED, STATUS_INACTIVE)
+                .flatMap(status -> Stream.of(
+                    Arguments.of(TASK_TYPE_ADMIN, "RA0041", status),
+                    Arguments.of(TASK_TYPE_LEGAL_OFFICER, "RA0034", status),
+                    Arguments.of(TASK_TYPE_JUDGE, "RA0038", status)
+                ));
+    }
+
+    @ParameterizedTest
+    @MethodSource("reviewTaskCategoryScenarios")
+    void completes_each_task_category_only_after_its_last_requested_flag_is_activated(
+            String taskType, String activeFlagCode, String requestedFlagCode) {
+        CaseData caseData = caseDataWithFlags(activeFlagCode, STATUS_ACTIVE, requestedFlagCode, STATUS_REQUESTED);
+        setTaskCreated(taskState(caseData), taskType, CCD_TRUE);
+
+        service.prepareManagedReviewSupportTasks(caseData, null);
+
+        assertEquals(CCD_TRUE, getTaskCreated(taskState(caseData), taskType));
+        assertNull(getTaskRequired(taskState(caseData), taskType));
+
+        activateRespondentFlag(caseData);
+        service.prepareManagedReviewSupportTasks(caseData, null);
+
+        assertNull(getTaskCreated(taskState(caseData), taskType));
+        assertEquals(NO, getTaskRequired(taskState(caseData), taskType));
+    }
+
+    @ParameterizedTest
+    @MethodSource("reviewTaskCategoryScenarios")
+    void boolean_created_state_prevents_duplicate_tasks_for_each_category(
+            String taskType, String existingFlagCode, String newFlagCode) {
+        CaseData caseDataBefore = caseDataWithClaimantFlag(existingFlagCode, STATUS_REQUESTED, false);
+        caseDataBefore.setSupportTaskState(new SupportTaskState());
+        setTaskCreated(taskState(caseDataBefore), taskType, CCD_TRUE);
+        CaseData caseData = caseDataWithFlags(existingFlagCode, STATUS_REQUESTED, newFlagCode, STATUS_REQUESTED);
+
+        service.prepareNewFlagReviewSupportTasks(caseData, caseDataBefore);
+
+        assertEquals(CCD_TRUE, getTaskCreated(taskState(caseData), taskType));
+        assertNull(getTaskRequired(taskState(caseData), taskType));
+    }
+
+    @ParameterizedTest
+    @MethodSource("reviewTaskCategoryScenarios")
+    void restores_boolean_created_state_from_before_data_and_completes_each_category(
+            String taskType, String flagCode, String secondFlagCode) {
+        CaseData caseDataBefore = caseDataWithClaimantFlag(flagCode, STATUS_REQUESTED, false);
+        caseDataBefore.setSupportTaskState(new SupportTaskState());
+        setTaskCreated(taskState(caseDataBefore), taskType, CCD_TRUE);
+        CaseData caseData = caseDataWithFlags(flagCode, STATUS_ACTIVE, secondFlagCode, STATUS_ACTIVE);
+
+        service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
+
+        assertNull(getTaskCreated(taskState(caseData), taskType));
+        assertEquals(NO, getTaskRequired(taskState(caseData), taskType));
+    }
+
+    @ParameterizedTest
+    @MethodSource("reviewTaskCategoryScenarios")
+    void false_created_state_allows_a_new_task_for_each_category(
+            String taskType, String flagCode, String secondFlagCode) {
+        CaseData caseData = caseDataWithFlags(flagCode, STATUS_REQUESTED, secondFlagCode, STATUS_ACTIVE);
+        setTaskCreated(taskState(caseData), taskType, CCD_FALSE);
+
+        service.prepareReviewSupportTasks(caseData);
+
+        assertEquals(YES, getTaskCreated(taskState(caseData), taskType));
+        assertEquals(YES, getTaskRequired(taskState(caseData), taskType));
+    }
+
+    @ParameterizedTest
+    @MethodSource("nonRequestedReviewTaskScenarios")
+    void completes_each_task_category_for_every_non_requested_status(
+            String taskType, String flagCode, String status) {
+        CaseData caseData = caseDataWithClaimantFlag(flagCode, status, false);
+        caseData.setSupportTaskState(new SupportTaskState());
+        setTaskCreated(taskState(caseData), taskType, CCD_TRUE);
+
+        service.prepareManagedReviewSupportTasks(caseData, null);
+
+        assertNull(getTaskCreated(taskState(caseData), taskType));
+        assertEquals(NO, getTaskRequired(taskState(caseData), taskType));
+    }
+
+    @Test
+    void completes_only_categories_without_requested_flags_when_boolean_state_is_used() {
+        CaseData caseData = new CaseData();
+        caseData.setAllPartyFlags(AllPartyFlags.builder()
+                .claimantFlags(caseFlags("admin-flag", "RA0041", STATUS_ACTIVE))
+                .respondentFlags(caseFlags("legal-flag", "RA0034", STATUS_REQUESTED))
+                .respondent1Flags(caseFlags("judge-flag", "RA0038", STATUS_REQUESTED))
+                .build());
+        caseData.setSupportTaskState(SupportTaskState.builder()
+                .adminTaskCreated(CCD_TRUE)
+                .legalOfficerTaskCreated(CCD_TRUE)
+                .judgeTaskCreated(CCD_TRUE)
+                .build());
+
+        service.prepareManagedReviewSupportTasks(caseData, null);
+
+        assertNull(taskState(caseData).getAdminTaskCreated());
+        assertEquals(NO, taskState(caseData).getAdminTaskRequired());
+        assertEquals(CCD_TRUE, taskState(caseData).getLegalOfficerTaskCreated());
+        assertNull(taskState(caseData).getLegalOfficerTaskRequired());
+        assertEquals(CCD_TRUE, taskState(caseData).getJudgeTaskCreated());
+        assertNull(taskState(caseData).getJudgeTaskRequired());
+    }
+
+    @Test
+    void ccd_boolean_task_state_is_deserialized_to_boolean_strings() throws JsonProcessingException {
+        SupportTaskState state = new ObjectMapper().readValue("""
+                {
+                  "adminTaskCreated": true,
+                  "legalOfficerTaskCreated": false,
+                  "judgeTaskCreated": true
+                }
+                """, SupportTaskState.class);
+
+        assertEquals(CCD_TRUE, state.getAdminTaskCreated());
+        assertEquals(CCD_FALSE, state.getLegalOfficerTaskCreated());
+        assertEquals(CCD_TRUE, state.getJudgeTaskCreated());
+    }
+
     @Test
     void keeps_task_active_when_an_eligible_requested_flag_remains() {
-        CaseData caseData = caseDataWithClaimantFlag("RA0033", "Requested", false);
+        CaseData caseData = caseDataWithClaimantFlag("RA0033", STATUS_REQUESTED, false);
         caseData.setSupportTaskState(SupportTaskState.builder().adminTaskCreated(YES).build());
 
         service.prepareManagedReviewSupportTasks(caseData, null);
@@ -310,9 +454,9 @@ class SupportTaskServiceTest {
 
     @Test
     void completes_judge_task_when_last_requested_flag_is_managed_and_current_state_is_missing() {
-        CaseData caseDataBefore = caseDataWithClaimantFlag("RA0038", "Requested", false);
+        CaseData caseDataBefore = caseDataWithClaimantFlag("RA0038", STATUS_REQUESTED, false);
         caseDataBefore.setSupportTaskState(SupportTaskState.builder().judgeTaskCreated(YES).build());
-        CaseData caseData = caseDataWithClaimantFlag("RA0038", "Active", false);
+        CaseData caseData = caseDataWithClaimantFlag("RA0038", STATUS_ACTIVE, false);
 
         service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
 
@@ -322,13 +466,13 @@ class SupportTaskServiceTest {
 
     @Test
     void creates_a_new_task_after_the_previous_task_was_completed() {
-        CaseData caseDataBefore = caseDataWithClaimantFlag("RA0033", "Active", false);
+        CaseData caseDataBefore = caseDataWithClaimantFlag("RA0033", STATUS_ACTIVE, false);
         caseDataBefore.setSupportTaskState(SupportTaskState.builder().adminTaskCreated(YES).build());
         service.prepareManagedReviewSupportTasks(caseDataBefore, null);
 
-        CaseData caseData = caseDataWithClaimantFlag("RA0033", "Active", false);
+        CaseData caseData = caseDataWithClaimantFlag("RA0033", STATUS_ACTIVE, false);
         caseData.getAllPartyFlags().setRespondent1Flags(
-                caseFlags("new-requested-flag", "RA0033", "Requested"));
+                caseFlags("new-requested-flag", "RA0033", STATUS_REQUESTED));
 
         service.prepareNewFlagReviewSupportTasks(caseData, caseDataBefore);
 
@@ -338,9 +482,9 @@ class SupportTaskServiceTest {
 
     static Stream<Arguments> ineligibleFlagScenarios() {
         return Stream.of(
-            Arguments.of("RA0033", "Active"),
+            Arguments.of("RA0033", STATUS_ACTIVE),
             Arguments.of("RA0033", null),
-            Arguments.of("RA9999", "Requested")
+            Arguments.of("RA9999", STATUS_REQUESTED)
         );
     }
 
@@ -366,7 +510,7 @@ class SupportTaskServiceTest {
     void prepares_arrange_support_task_for_each_new_active_flag(String flagCode, String taskName) {
         CaseData caseData = new CaseData();
         caseData.setAllPartyFlags(AllPartyFlags.builder()
-                .representative4ExternalFlags(caseFlags("new-flag", flagCode, "Active"))
+                .representative4ExternalFlags(caseFlags("new-flag", flagCode, STATUS_ACTIVE))
                 .build());
 
         service.prepareArrangeSupportTask(caseData, new CaseData());
@@ -378,14 +522,14 @@ class SupportTaskServiceTest {
     void prepares_separate_arrange_support_tasks_for_the_same_code_on_separate_events() {
         CaseData firstEvent = new CaseData();
         firstEvent.setAllPartyFlags(AllPartyFlags.builder()
-                .claimantFlags(caseFlags("claimant-flag", "RA0017", "Active"))
+                .claimantFlags(caseFlags("claimant-flag", "RA0017", STATUS_ACTIVE))
                 .build());
         service.prepareArrangeSupportTask(firstEvent, new CaseData());
 
         CaseData secondEvent = new CaseData();
         secondEvent.setAllPartyFlags(AllPartyFlags.builder()
-                .claimantFlags(caseFlags("claimant-flag", "RA0017", "Active"))
-                .respondent2Flags(caseFlags("respondent-flag", "RA0017", "Active"))
+                .claimantFlags(caseFlags("claimant-flag", "RA0017", STATUS_ACTIVE))
+                .respondent2Flags(caseFlags("respondent-flag", "RA0017", STATUS_ACTIVE))
                 .build());
         service.prepareArrangeSupportTask(secondEvent, firstEvent);
 
@@ -397,11 +541,11 @@ class SupportTaskServiceTest {
     void prepares_arrange_support_task_when_existing_flag_becomes_active() {
         CaseData caseDataBefore = new CaseData();
         caseDataBefore.setAllPartyFlags(AllPartyFlags.builder()
-                .claimantRepresentativeFlags(caseFlags("managed-flag", "RA0042", "Requested"))
+                .claimantRepresentativeFlags(caseFlags("managed-flag", "RA0042", STATUS_REQUESTED))
                 .build());
         CaseData caseData = new CaseData();
         caseData.setAllPartyFlags(AllPartyFlags.builder()
-                .claimantRepresentativeFlags(caseFlags("managed-flag", "RA0042", "Active"))
+                .claimantRepresentativeFlags(caseFlags("managed-flag", "RA0042", STATUS_ACTIVE))
                 .build());
 
         service.prepareArrangeSupportTask(caseData, caseDataBefore);
@@ -411,7 +555,7 @@ class SupportTaskServiceTest {
 
     @Test
     void prepares_arrange_task_when_create_flag_before_data_already_contains_the_new_active_flag() {
-        CaseFlagsType activeFlag = caseFlags("new-flag", "RA0038", "Active", "2026-09-11T10:00:00.000Z");
+        CaseFlagsType activeFlag = caseFlags("new-flag", "RA0038", STATUS_ACTIVE, "2026-09-11T10:00:00.000Z");
         CaseData caseDataBefore = new CaseData();
         caseDataBefore.setAllPartyFlags(AllPartyFlags.builder().claimantFlags(activeFlag).build());
         CaseData caseData = new CaseData();
@@ -426,8 +570,8 @@ class SupportTaskServiceTest {
     void does_not_fall_back_to_an_older_eligible_flag_when_the_newest_flag_is_ineligible() {
         CaseData caseData = new CaseData();
         caseData.setAllPartyFlags(AllPartyFlags.builder()
-                .claimantFlags(caseFlags("old-flag", "RA0038", "Active", "2026-09-11T09:00:00.000Z"))
-                .respondentFlags(caseFlags("new-flag", "RA9999", "Active", "2026-09-11T10:00:00.000Z"))
+                .claimantFlags(caseFlags("old-flag", "RA0038", STATUS_ACTIVE, "2026-09-11T09:00:00.000Z"))
+                .respondentFlags(caseFlags("new-flag", "RA9999", STATUS_ACTIVE, "2026-09-11T10:00:00.000Z"))
                 .build());
 
         service.prepareNewFlagArrangeSupportTask(caseData, caseData);
@@ -439,11 +583,11 @@ class SupportTaskServiceTest {
     void does_not_prepare_arrange_support_task_for_unchanged_active_flag() {
         CaseData caseDataBefore = new CaseData();
         caseDataBefore.setAllPartyFlags(AllPartyFlags.builder()
-                .claimantFlags(caseFlags("unchanged-flag", "RA0017", "Active"))
+                .claimantFlags(caseFlags("unchanged-flag", "RA0017", STATUS_ACTIVE))
                 .build());
         CaseData caseData = new CaseData();
         caseData.setAllPartyFlags(AllPartyFlags.builder()
-                .claimantFlags(caseFlags("unchanged-flag", "RA0017", "Active"))
+                .claimantFlags(caseFlags("unchanged-flag", "RA0017", STATUS_ACTIVE))
                 .build());
 
         service.prepareArrangeSupportTask(caseData, caseDataBefore);
@@ -455,8 +599,8 @@ class SupportTaskServiceTest {
     void does_not_prepare_arrange_support_task_for_ineligible_or_non_active_flag() {
         CaseData caseData = new CaseData();
         caseData.setAllPartyFlags(AllPartyFlags.builder()
-                .claimantFlags(caseFlags("requested-flag", "RA0017", "Requested"))
-                .respondentFlags(caseFlags("ineligible-flag", "RA9999", "Active"))
+                .claimantFlags(caseFlags("requested-flag", "RA0017", STATUS_REQUESTED))
+                .respondentFlags(caseFlags("ineligible-flag", "RA9999", STATUS_ACTIVE))
                 .build());
         caseData.setSupportTaskState(SupportTaskState.builder()
                 .arrangeSupportTaskName("Previous task")
@@ -481,6 +625,55 @@ class SupportTaskServiceTest {
         CaseData caseData = new CaseData();
         caseData.setAllPartyFlags(allPartyFlags);
         return caseData;
+    }
+
+    private static CaseData caseDataWithFlags(String claimantFlagCode,
+                                              String claimantFlagStatus,
+                                              String respondentFlagCode,
+                                              String respondentFlagStatus) {
+        CaseData caseData = new CaseData();
+        caseData.setAllPartyFlags(AllPartyFlags.builder()
+                .claimantFlags(caseFlags("claimant-flag", claimantFlagCode, claimantFlagStatus))
+                .respondentFlags(caseFlags("respondent-flag", respondentFlagCode, respondentFlagStatus))
+                .build());
+        caseData.setSupportTaskState(new SupportTaskState());
+        return caseData;
+    }
+
+    private static void activateRespondentFlag(CaseData caseData) {
+        caseData.getAllPartyFlags()
+                .getRespondentFlags()
+                .getDetails()
+                .getFirst()
+                .getValue()
+                .setStatus(STATUS_ACTIVE);
+    }
+
+    private static void setTaskCreated(SupportTaskState state, String taskType, String value) {
+        switch (taskType) {
+            case TASK_TYPE_ADMIN -> state.setAdminTaskCreated(value);
+            case TASK_TYPE_LEGAL_OFFICER -> state.setLegalOfficerTaskCreated(value);
+            case TASK_TYPE_JUDGE -> state.setJudgeTaskCreated(value);
+            default -> throw new IllegalArgumentException("Unknown task type: " + taskType);
+        }
+    }
+
+    private static String getTaskCreated(SupportTaskState state, String taskType) {
+        return switch (taskType) {
+            case TASK_TYPE_ADMIN -> state.getAdminTaskCreated();
+            case TASK_TYPE_LEGAL_OFFICER -> state.getLegalOfficerTaskCreated();
+            case TASK_TYPE_JUDGE -> state.getJudgeTaskCreated();
+            default -> throw new IllegalArgumentException("Unknown task type: " + taskType);
+        };
+    }
+
+    private static String getTaskRequired(SupportTaskState state, String taskType) {
+        return switch (taskType) {
+            case TASK_TYPE_ADMIN -> state.getAdminTaskRequired();
+            case TASK_TYPE_LEGAL_OFFICER -> state.getLegalOfficerTaskRequired();
+            case TASK_TYPE_JUDGE -> state.getJudgeTaskRequired();
+            default -> throw new IllegalArgumentException("Unknown task type: " + taskType);
+        };
     }
 
     private static CaseFlagsType caseFlags(String id, String flagCode, String status) {

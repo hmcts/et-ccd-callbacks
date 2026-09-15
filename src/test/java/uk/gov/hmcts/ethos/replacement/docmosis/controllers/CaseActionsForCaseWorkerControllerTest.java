@@ -433,7 +433,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     @ParameterizedTest
     @ValueSource(strings = {"manageFlags", "manageSupport"})
     @SneakyThrows
-    void preservesCaseFlagUpdateCommentWhenSupportRequestIsRejected(String eventId) {
+    void preservesCaseFlagUpdateCommentWhenSupportRequestIsNotApproved(String eventId) {
         ((ObjectNode) requestContent2).put("event_id", eventId);
         ObjectNode caseData = (ObjectNode) requestContent2.at("/case_details/case_data");
         ObjectNode flag = caseData.putObject("claimantExternalFlags")
@@ -442,7 +442,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .put("id", "flag-id")
                 .putObject("value");
         flag.put("flagCode", "RA0038");
-        flag.put("status", "Rejected");
+        flag.put("status", "Not Approved");
         flag.put("flagComment", "Original request comment");
         flag.put("flagUpdateComment", "Rejection comment");
         when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);

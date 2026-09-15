@@ -111,17 +111,17 @@ public class SupportTaskService {
         taskState.setLegalOfficerTaskRequired(null);
         taskState.setJudgeTaskRequired(null);
 
-        if (!YES.equals(taskState.getAdminTaskCreated())
+        if (!isTaskCreated(taskState.getAdminTaskCreated())
                 && hasRequestedFlag(flags, configuration.getReview().getAdminFlagCodes())) {
             taskState.setAdminTaskCreated(YES);
             taskState.setAdminTaskRequired(YES);
         }
-        if (!YES.equals(taskState.getLegalOfficerTaskCreated())
+        if (!isTaskCreated(taskState.getLegalOfficerTaskCreated())
                 && hasRequestedFlag(flags, configuration.getReview().getLegalOfficerFlagCodes())) {
             taskState.setLegalOfficerTaskCreated(YES);
             taskState.setLegalOfficerTaskRequired(YES);
         }
-        if (!YES.equals(taskState.getJudgeTaskCreated())
+        if (!isTaskCreated(taskState.getJudgeTaskCreated())
                 && hasRequestedFlag(flags, configuration.getReview().getJudgeFlagCodes())) {
             taskState.setJudgeTaskCreated(YES);
             taskState.setJudgeTaskRequired(YES);
@@ -145,10 +145,14 @@ public class SupportTaskService {
                                         Consumer<String> taskCreatedSetter,
                                         Consumer<String> taskRequiredSetter) {
         taskRequiredSetter.accept(null);
-        if (YES.equals(taskCreated) && !hasRequestedFlag(flags, eligibleFlagCodes)) {
+        if (isTaskCreated(taskCreated) && !hasRequestedFlag(flags, eligibleFlagCodes)) {
             taskCreatedSetter.accept(null);
             taskRequiredSetter.accept(NO);
         }
+    }
+
+    private static boolean isTaskCreated(String taskCreated) {
+        return YES.equalsIgnoreCase(taskCreated) || Boolean.parseBoolean(taskCreated);
     }
 
     private static boolean isRequested(FlagDetailType flag) {

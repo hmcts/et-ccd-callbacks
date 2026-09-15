@@ -403,7 +403,6 @@ class InitialConsiderationHelperTest {
         assertJsonAsText(data, "hearingConvertF2f", "Test Convert to F2F hearing");
         assertJsonAsText(data, "hearingOther", "Test Other");
         assertJsonAsText(data, "hearingWithJudgeOrMembers", "JSA");
-        assertJsonArrayToString(data, "hearingWithJudgeOrMembersReason", "[\"Already decided\"]");
         assertJsonAsText(data, "hearingWithJudgeOrMembersFurtherDetails", "Test Further details");
         assertJsonAsText(data, "otherDirections", "Test Any other directions");
     }

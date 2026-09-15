@@ -139,6 +139,9 @@
         <cpe>cpe:/a:service_project:service</cpe>
     </suppress>
     <suppress>
+        <cve>CVE-2026-59313</cve>
+    </suppress>
+    <suppress>
         <cve>CVE-2026-59314</cve>
     </suppress>
     <suppress>

@@ -244,9 +244,6 @@
         <cve>CVE-2026-47883</cve>
     </suppress>
     <suppress>
-        <cve>CVE-2026-47884</cve>
-    </suppress>
-    <suppress>
         <cve>CVE-2026-47885</cve>
     </suppress>
     <suppress>

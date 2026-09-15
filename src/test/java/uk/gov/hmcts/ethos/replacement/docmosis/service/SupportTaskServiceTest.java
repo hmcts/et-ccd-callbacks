@@ -254,7 +254,7 @@ class SupportTaskServiceTest {
                 .judgeTaskCreated(YES)
                 .build());
 
-        service.prepareManagedReviewSupportTasks(caseData);
+        service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertNull(taskState(caseData).getAdminTaskCreated());
         assertEquals(NO, taskState(caseData).getAdminTaskRequired());
@@ -272,7 +272,7 @@ class SupportTaskServiceTest {
                 .build());
         caseData.setSupportTaskState(SupportTaskState.builder().adminTaskCreated(YES).build());
 
-        service.prepareManagedReviewSupportTasks(caseData);
+        service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(YES, taskState(caseData).getAdminTaskCreated());
         assertNull(taskState(caseData).getAdminTaskRequired());
@@ -283,7 +283,7 @@ class SupportTaskServiceTest {
         CaseData caseData = caseDataWithClaimantFlag("RA0033", "Requested", false);
         caseData.setSupportTaskState(SupportTaskState.builder().adminTaskCreated(YES).build());
 
-        service.prepareManagedReviewSupportTasks(caseData);
+        service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(YES, taskState(caseData).getAdminTaskCreated());
         assertNull(taskState(caseData).getAdminTaskRequired());
@@ -298,7 +298,7 @@ class SupportTaskServiceTest {
                 .judgeTaskCreated(YES)
                 .build());
 
-        service.prepareManagedReviewSupportTasks(caseData);
+        service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertNull(taskState(caseData).getAdminTaskCreated());
         assertNull(taskState(caseData).getLegalOfficerTaskCreated());
@@ -309,10 +309,22 @@ class SupportTaskServiceTest {
     }
 
     @Test
+    void completes_judge_task_when_last_requested_flag_is_managed_and_current_state_is_missing() {
+        CaseData caseDataBefore = caseDataWithClaimantFlag("RA0038", "Requested", false);
+        caseDataBefore.setSupportTaskState(SupportTaskState.builder().judgeTaskCreated(YES).build());
+        CaseData caseData = caseDataWithClaimantFlag("RA0038", "Active", false);
+
+        service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
+
+        assertNull(taskState(caseData).getJudgeTaskCreated());
+        assertEquals(NO, taskState(caseData).getJudgeTaskRequired());
+    }
+
+    @Test
     void creates_a_new_task_after_the_previous_task_was_completed() {
         CaseData caseDataBefore = caseDataWithClaimantFlag("RA0033", "Active", false);
         caseDataBefore.setSupportTaskState(SupportTaskState.builder().adminTaskCreated(YES).build());
-        service.prepareManagedReviewSupportTasks(caseDataBefore);
+        service.prepareManagedReviewSupportTasks(caseDataBefore, null);
 
         CaseData caseData = caseDataWithClaimantFlag("RA0033", "Active", false);
         caseData.getAllPartyFlags().setRespondent1Flags(

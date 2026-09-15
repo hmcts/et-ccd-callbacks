@@ -74,7 +74,6 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.nullable;
 import static org.mockito.Mockito.same;
@@ -410,6 +409,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     @SneakyThrows
     void preparesReviewSupportTaskCompletionForManagedCaseFlags(String eventId) {
         ((ObjectNode) requestContent2).put("event_id", eventId);
+        ((ObjectNode) requestContent2).set("case_details_before",
+                requestContent2.get("case_details").deepCopy());
         when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
 
         mvc.perform(post(SUPPORT_TASKS_URL)
@@ -418,9 +419,11 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(supportTaskService).prepareManagedReviewSupportTasks(any(CaseData.class));
+        verify(supportTaskService).prepareManagedReviewSupportTasks(
+                any(CaseData.class), any(CaseData.class));
         if ("manageFlags".equals(eventId)) {
-            verify(supportTaskService).prepareArrangeSupportTask(any(CaseData.class), isNull());
+            verify(supportTaskService).prepareArrangeSupportTask(
+                    any(CaseData.class), any(CaseData.class));
         }
     }
 
@@ -466,7 +469,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         verify(supportTaskService, never()).prepareRespondentReviewSupportTasks(any(CaseData.class));
         verify(supportTaskService, never()).prepareNewFlagReviewSupportTasks(
                 any(CaseData.class), any(CaseData.class));
-        verify(supportTaskService, never()).prepareManagedReviewSupportTasks(any(CaseData.class));
+        verify(supportTaskService, never()).prepareManagedReviewSupportTasks(
+                any(CaseData.class), nullable(CaseData.class));
         verify(supportTaskService, never()).prepareArrangeSupportTask(
                 any(CaseData.class), nullable(CaseData.class));
         verify(supportTaskService, never()).prepareNewFlagArrangeSupportTask(

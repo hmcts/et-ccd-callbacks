@@ -84,7 +84,8 @@ public class SupportTaskService {
         }
     }
 
-    public void prepareManagedReviewSupportTasks(CaseData caseData) {
+    public void prepareManagedReviewSupportTasks(CaseData caseData, CaseData caseDataBefore) {
+        retainCreatedTaskState(caseData, caseDataBefore);
         SupportTaskState taskState = taskState(caseData);
         List<FlagDetailType> flags = allFlagItems(caseData.getAllPartyFlags())
                 .map(GenericTypeItem::getValue)

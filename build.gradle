@@ -215,7 +215,9 @@ allprojects {
             'org.postgresql:postgresql:42.7.13',
             'org.springframework.security:spring-security-crypto:6.5.11',
             // CVE-2026-29181, CVE-2026-24051, CVE-2026-39883, CVE-2026-39882
-            'io.opentelemetry.semconv:opentelemetry-semconv:1.43.0'
+            'io.opentelemetry.semconv:opentelemetry-semconv:1.43.0',
+            // Ensure azure-identity-extensions is a patched version to address CVE-2023-36414
+            'com.azure:azure-identity-extensions:1.2.9'
         )
     }
 }

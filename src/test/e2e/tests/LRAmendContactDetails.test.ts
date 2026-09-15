@@ -72,7 +72,13 @@ test.describe( 'Legal Rep updates update contact to colleagues in his org', () =
     await manageCaseDashboardPageCW.visit();
     await loginPageCW.processLogin(users.etCaseWorker);
     await manageCaseDashboardPageCW.navigateToCaseDetails(caseId, CaseTypeLocation.EnglandAndWales);
-    await caseDetailsPageCW.assertTabData(tabData);
+    await caseDetailsPageCW.assertTabData([
+      ...tabData,
+      {
+        tabName: 'History',
+        tabContent: ['Amend contact details']
+      }
+    ]);
 
 // LR updates contact details by 'Use MyHMCTS details'
     await caseDetailsPage.selectNextEvent(Events.amendContactDetailsClaimant);

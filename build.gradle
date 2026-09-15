@@ -519,9 +519,9 @@ ext {
     
     // CVE-2026-54512, CVE-2026-54513, CVE-2026-54514, CVE-2026-54515
     serenity = '5.3.11'
-    tomcatEmbedVersion = '10.1.59'
-    jacksonVersion = '2.22.2'
-    jacksonAnnotationsVersion = '2.22.2'
+    tomcatEmbedVersion = '10.1.57'
+    jacksonVersion = '2.22.1'
+    jacksonAnnotationsVersion = '2.22'
     jacksonV3Version = '3.2.0'
     // CVE-2026-54399, CVE-2026-54428
     httpcore5Version = '5.4.3'
@@ -549,7 +549,7 @@ dependencyManagement {
         dependency 'com.azure:azure-core-amqp:2.12.1'
         dependency 'com.azure:azure-identity:1.18.6'
 
-        dependencySet(group: 'com.google.guava', version: '33.7.1-jre') {
+        dependencySet(group: 'com.google.guava', version: '33.6.0-jre') {
             entry 'guava'
         }
         dependencySet(group: 'io.netty', version: '4.2.16.Final') {

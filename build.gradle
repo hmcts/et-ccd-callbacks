@@ -15,6 +15,15 @@ plugins {
     id 'com.github.hmcts.rse-cft-lib' version '0.19.2274'
 }
 
+// Import Spring Framework BOM to align Spring Framework modules to 7.0.9
+// This forces Spring Framework artifacts to the requested version.
+dependencyManagement {
+    imports {
+        mavenBom 'org.springframework:spring-framework-bom:7.0.9'
+    }
+}
+
+
 group = 'uk.gov.hmcts.et'
 version = '0.0.1'
 

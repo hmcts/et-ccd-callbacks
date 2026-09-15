@@ -23,10 +23,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled(feature);
     }
 
-    public boolean isCaseFlagsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("case-flags-linking-enabled");
-    }
-
     public boolean isCaseFlagsV2Enabled(String caseTypeId) {
         if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
             return this.featureToggleApi.isFeatureEnabled("case-flags-v2-enabled-england-wales");

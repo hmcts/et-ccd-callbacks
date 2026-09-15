@@ -47,14 +47,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenLegacyCaseFlagsLinkingIsEnabled(Boolean toggleStat) {
-        givenToggle("case-flags-linking-enabled", toggleStat);
-
-        assertThat(featureToggleService.isCaseFlagsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenEnglandWalesCaseFlagsLinkingIsEnabled(Boolean toggleStat) {
         givenToggle("case-flags-v2-enabled-england-wales", toggleStat);
 

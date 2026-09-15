@@ -525,7 +525,7 @@ ext {
     jacksonV3Version = '3.2.0'
     // CVE-2026-54399, CVE-2026-54428
     httpcore5Version = '5.4.3'
-    kotlinVersion = '2.3.21'
+    kotlinVersion = '2.4.20'
     cucumberCoreVersion = '7.34.4'
 }
 

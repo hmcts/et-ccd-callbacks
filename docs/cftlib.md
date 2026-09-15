@@ -54,7 +54,10 @@ The latest version of the RSE CFT lib can be found [here](https://github.com/hmc
 | CFTLIB_IMPORT_CCD_DEFS_ON_BOOT | Optional<br/>Set to `false` to prevent CCD definitions from being imported at startup  |
 | ET_LAUNCH_DARKLY_SDK_KEY       | ET Launch Darkly SDK Key - this can be retrieved from the et-aat Key Vault             |
 | ET_WORK_ALLOCATION             | Optional<br/>Set to `true` to enable Work Allocation containers, services, and stubs (see [Work Allocation CFTLib](work-allocation-cftlib.md)) |
+| ET_CUI_RA                      | Optional<br/>Set to `true` to enable CUI RA and RD Common Data API containers (see [CUI RA with CFTLib](cui-ra-cftlib.md)) |
+| CUI_RA_SESSION_SECURE          | Optional<br/>Defaults to `false` for local HTTP CUI RA sessions. |
 | WA_LAUNCH_DARKLY_SDK_KEY       | Optional<br/>Work Allocation LaunchDarkly SDK key for `wa-workflow-api` and `wa-case-event-handler` (defaults to `sdk-key`) |
+| RD_COMMONDATA_LD_SDK_KEY       | Optional<br/>LaunchDarkly SDK key for local `rd-commondata-api` case flag endpoints. Without this, the service may boot but return `403` for case flags. |
 
 These can be set with the ./bin/set_env.sh script. Edit the script to add your own path to config-repos and any missing variables.
 Run the script with source, so that the environment variables are set in your current shell that you invoke the gradle command from.
@@ -164,4 +167,20 @@ Or using the environment variable:
 
 ```bash
 ET_WORK_ALLOCATION=true ./gradlew bootWithCCD
+```
+
+## CUI RA
+
+CUI RA support is integrated into CFTLib and can be enabled on demand. For full documentation on architecture, setup steps, environment variables, and testing, see [CUI RA with CFTLib](cui-ra-cftlib.md).
+
+To start CFTLib with CUI RA and RD Common Data API enabled:
+
+```bash
+./gradlew bootWithCcdAndCuiRa
+```
+
+Or using the environment variable:
+
+```bash
+ET_CUI_RA=true ./gradlew bootWithCCD
 ```

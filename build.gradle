@@ -746,9 +746,48 @@ wrapper {
 
 assemble.dependsOn(dumpCCDDefinitions)
 
-// True when ET_WORK_ALLOCATION=true is set explicitly, or when the bootWithCcdAndWa task is invoked.
+def requestedTask = { taskName ->
+    gradle.startParameter.taskNames.any { it == taskName || it.endsWith(":${taskName}") }
+}
+
+// True when ET_WORK_ALLOCATION=true is set explicitly, or when a Work Allocation boot task is invoked.
 def waEnabled = System.getenv('ET_WORK_ALLOCATION') == 'true'
-        || gradle.startParameter.taskNames.any { it == 'bootWithCcdAndWa' }
+        || requestedTask('bootWithCcdAndWa')
+        || requestedTask('bootWithCcdAndWaAndCuiRa')
+
+// True when ET_CUI_RA=true is set explicitly, or when a CUI RA boot task is invoked.
+def cuiRaEnabled = System.getenv('ET_CUI_RA') == 'true'
+        || requestedTask('bootWithCcdAndCuiRa')
+        || requestedTask('bootWithCcdAndWaAndCuiRa')
+
+def cftlibExtraComposeFiles = []
+if (waEnabled) {
+    cftlibExtraComposeFiles << 'wa-docker-compose.yml'
+}
+if (cuiRaEnabled) {
+    cftlibExtraComposeFiles << 'cui-ra-docker-compose.yml'
+}
+
+def cftlibAdditionalDatabases = [
+        'et_cos',
+        'et_msg_handler',
+        'evidence',
+        'ethos',
+        'camunda',
+        'role_assignment',
+        'wa_workflow_api',
+        'cft_task_db',
+        'wa_case_event_messages_db',
+        'ccd_data',
+        'emstitch',
+        'cft_task_db_replica'
+]
+if (cuiRaEnabled) {
+    cftlibAdditionalDatabases << 'dbcommondata'
+}
+def cftlibDumpAdditionalDatabases = cftlibAdditionalDatabases.findAll {
+    it != 'cft_task_db_replica'
+}
 
 bootWithCCD {
     // Simulates idam and s2s locally.
@@ -759,7 +798,7 @@ bootWithCCD {
         jvmArgs '-Dspring.devtools.restart.enabled=false'
     }
 
-    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,ethos,camunda,role_assignment,wa_workflow_api,cft_task_db,wa_case_event_messages_db,ccd_data,emstitch,cft_task_db_replica'
+    environment 'RSE_LIB_ADDITIONAL_DATABASES', cftlibAdditionalDatabases.join(',')
     environment 'CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES', 'aac_manage_case_assignment,et_cos,et_sya_api,et_msg_handler'
     // ccd-data-store-api
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ethos_repl_service,ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,ccd_case_document_am_api,am_role_assignment_service,ethos_repl_docmosis_service,ecm_consumer,et_cos,et_msg_handler,et_sya_api,wa_workflow_api,wa_task_management_api,wa_task_monitor,wa_case_event_handler,em_ccd_orchestrator,em_stitching_api,wa_task_configuration_api'
@@ -824,10 +863,10 @@ bootWithCCD {
     environment 'CFTLIB_IMPORT_CCD_DEFS_ON_BOOT', System.getenv('CFTLIB_IMPORT_CCD_DEFS_ON_BOOT') ?: 'true'
     // et-ccd-callbacks
     //environment 'SERVICEBUS_FAKE', 'true'*
-    // Load WA compose services only when ET_WORK_ALLOCATION=true is set, or when running bootWithCcdAndWa.
-    // This starts camunda, wa-workflow-api, wa-case-event-handler, and wa-task-monitor.
-    environment 'CFTLIB_EXTRA_COMPOSE_FILES', waEnabled ? 'wa-docker-compose.yml' : ''
+    // Load optional local service compose files only when their feature flag/task is enabled.
+    environment 'CFTLIB_EXTRA_COMPOSE_FILES', cftlibExtraComposeFiles.join(',')
     environment 'ET_WORK_ALLOCATION', waEnabled ? 'true' : 'false'
+    environment 'ET_CUI_RA', cuiRaEnabled ? 'true' : 'false'
     environment 'SPRING_APPLICATION_JSON', groovy.json.JsonOutput.toJson([
         ccd: [
             decentralised: [
@@ -852,10 +891,22 @@ tasks.register('bootWithCcdAndWa') {
     dependsOn 'bootWithCCD'
 }
 
+tasks.register('bootWithCcdAndCuiRa') {
+    group = 'Application'
+    description = 'Starts bootWithCCD with CUI RA and rd-commondata-api enabled (equivalent to ET_CUI_RA=true ./gradlew bootWithCCD)'
+    dependsOn 'bootWithCCD'
+}
+
+tasks.register('bootWithCcdAndWaAndCuiRa') {
+    group = 'Application'
+    description = 'Starts bootWithCCD with Work Allocation, CUI RA, and rd-commondata-api enabled'
+    dependsOn 'bootWithCCD'
+}
+
 tasks.named('dumpCCDDefinitions') {
     dependsOn 'generateCftlibCcdDefinitions'
     authMode = uk.gov.hmcts.rse.AuthMode.Local
-    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,ethos,camunda,role_assignment,wa_workflow_api,cft_task_db,wa_case_event_messages_db,ccd_data,emstitch'
+    environment 'RSE_LIB_ADDITIONAL_DATABASES', cftlibDumpAdditionalDatabases.join(',')
     environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
     environment 'SPRING_MAIN_LAZY_INITIALIZATION', 'true'
     environment 'CFTLIB_IMPORT_CCD_DEFS_ON_BOOT', System.getenv('CFTLIB_IMPORT_CCD_DEFS_ON_BOOT') ?: 'true'

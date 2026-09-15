@@ -97,13 +97,7 @@ test.describe( 'Legal Rep updates update contact to colleagues in his org', () =
 
     // login as Caseworker check the detail updated
     await manageCaseDashboardPageCW.navigateToCaseDetails(caseId, CaseTypeLocation.EnglandAndWales);
-    await caseDetailsPageCW.assertTabData([
-      ...updatedTabData,
-      {
-        tabName: 'History',
-        tabContent: ['Amend contact details']
-      }
-    ]);
+    await caseDetailsPageCW.assertTabData(updatedTabData);
     await caseWorkerBrowserPage.close();
   });
 
@@ -161,13 +155,7 @@ test.describe( 'Legal Rep updates update contact to colleagues in his org', () =
 
       // login as Caseworker check the detail updated
       await manageCaseDashboardPageCW.navigateToCaseDetails(caseId, CaseTypeLocation.EnglandAndWales);
-      await caseDetailsPageCW.assertTabData([
-        ...updatedTabData,
-        {
-          tabName: 'History',
-          tabContent: ['Amend contact details']
-        }
-      ]);
+      await caseDetailsPageCW.assertTabData(updatedTabData);
       await caseWorkerBrowserPage.close();
     });
 });

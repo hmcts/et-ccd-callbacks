@@ -1,0 +1,14 @@
+[
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "initialConsideration",
+    "CaseFieldID": "etICUnfairDismissalEra",
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "etICCanProceed=\"dummy\"",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 33,
+    "ShowSummaryChangeOption": "Y",
+    "PageColumnNumber": 1
+  }
+]

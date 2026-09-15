@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -20,6 +21,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_FIELD_CONTACT_TYPE_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_FIELD_CONTACT_TYPE_POST;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_PANEL_JUDGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_PANEL_NO_PREFERENCE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_PANEL_PANEL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_TYPE_PHONE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_TYPE_VIDEO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_FIELD_MORE_THAN_ONE_SITE_GREAT_BRITAIN_NO;
@@ -36,6 +40,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_RESPONDENT_FIELD_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_RESPONDENT_FIELD_EMPLOYEE_NUMBER_CLAIMANT_WORK_PLACE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_RESPONDENT_FIELD_EMPLOYEE_NUMBER_GREAT_BRITAIN;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_RESPONDENT_FIELD_HEARING_PANEL_REASONS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_RESPONDENT_FIELD_MOBILE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_RESPONDENT_FIELD_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_RESPONDENT_FIELD_NUMBER;
@@ -141,7 +146,7 @@ class ET3FormRespondentMapperTest {
         RespondentSumType respondentSumType = caseData.getRespondentCollection().stream()
                 .filter(r -> caseData.getSubmitEt3Respondent()
                         .getSelectedLabel().equals(r.getValue().getRespondentName()))
-                .toList().get(0).getValue();
+                .toList().getFirst().getValue();
         RespondentSumType respondentSumTypeTitleMr = cloneObject(respondentSumType, RespondentSumType.class);
         respondentSumTypeTitleMr
                 .setEt3ResponseRespondentPreferredTitle(CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MR);
@@ -159,6 +164,24 @@ class ET3FormRespondentMapperTest {
                 .setEt3ResponseRespondentPreferredTitle(CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_OTHER);
         return Stream.of(respondentSumType, respondentSumTypeTitleMr, respondentSumTypeTitleMrs,
                 respondentSumTypeTitleMs, respondentSumTypeTitleMiss, respondentSumTypeTitleOther);
+    }
+
+    @Test
+    void testMapRespondentHearingPanelPreferences() {
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentHearingPanelPreference("Panel");
+        respondentSumType.setRespondentHearingPanelPreferenceReason("Technical complexity");
+
+        mapRespondent(respondentSumType, pdfFields);
+
+        assertThat(pdfFields.get(CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_PANEL_PANEL))
+                .contains(YES_CAPITALISED);
+        assertThat(pdfFields.get(CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_PANEL_JUDGE))
+                .contains(STRING_EMPTY);
+        assertThat(pdfFields.get(CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_PANEL_NO_PREFERENCE))
+                .contains(STRING_EMPTY);
+        assertThat(pdfFields.get(TXT_PDF_RESPONDENT_FIELD_HEARING_PANEL_REASONS))
+                .contains("Technical complexity");
     }
 
 }

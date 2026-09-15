@@ -563,6 +563,26 @@
   },
   {
     "ID": "Respondent",
+    "ListElementCode": "acasCertificateReceiptDate",
+    "FieldType": "Date",
+    "ElementLabel": "Date of Receipt by Acas",
+    "FieldShowCondition": "respondent_ACAS_question=\"Yes\"",
+    "RetainHiddenValue": "No",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Respondent",
+    "ListElementCode": "acasCertificateIssueDate",
+    "FieldType": "Date",
+    "ElementLabel": "Date of Issue by Acas",
+    "FieldShowCondition": "respondent_ACAS_question=\"Yes\"",
+    "RetainHiddenValue": "No",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Respondent",
     "ListElementCode": "respondent_ACAS_no",
     "FieldType": "FixedRadioList",
     "ElementLabel": "What are the reasons for not having an ACAS Certificate number?",

@@ -125,7 +125,13 @@ test.describe( 'Legal Rep updates update contact to colleagues in his org', () =
       await manageCaseDashboardPageCW.visit();
       await loginPageCW.processLogin(users.etCaseWorker);
       await manageCaseDashboardPageCW.navigateToCaseDetails(caseId, CaseTypeLocation.EnglandAndWales);
-      await caseDetailsPageCW.assertTabData(tabData);
+      await caseDetailsPageCW.assertTabData([
+        ...tabData,
+        {
+          tabName: 'History',
+          tabContent: ['Amend contact details']
+        }
+      ]);
 
       await caseDetailsPage.selectNextEvent(Events.amendContactDetails);
       ({ addressDetails,  phNumber} = await amendContactDetailsLrPage.amendLegalRepContactDetails('Use MyHMCTS details', checkYourAnswersPage));
@@ -143,7 +149,13 @@ test.describe( 'Legal Rep updates update contact to colleagues in his org', () =
 
       // login as Caseworker check the detail updated
       await manageCaseDashboardPageCW.navigateToCaseDetails(caseId, CaseTypeLocation.EnglandAndWales);
-      await caseDetailsPageCW.assertTabData(updatedTabData);
+      await caseDetailsPageCW.assertTabData([
+        ...updatedTabData,
+        {
+          tabName: 'History',
+          tabContent: ['Amend contact details']
+        }
+      ]);
       await caseWorkerBrowserPage.close();
     });
 });

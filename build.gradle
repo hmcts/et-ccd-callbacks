@@ -550,6 +550,12 @@ dependencyManagement {
         // CVE-2026-42198, CVE-2026-54291 - override above the Spring Boot BOM
         dependency 'org.postgresql:postgresql:42.7.13'
         dependency 'org.springframework.security:spring-security-crypto:6.5.11'
+        // Force updated Azure SDK components to resolve CVE-2026-33117
+        dependency 'com.azure:azure-core:1.59.1'
+        dependency 'com.azure:azure-core-http-netty:1.16.7'
+        dependency 'com.azure:azure-core-amqp:2.12.1'
+        dependency 'com.azure:azure-identity:1.18.6'
+
         dependencySet(group: 'com.google.guava', version: '33.6.0-jre') {
             entry 'guava'
         }

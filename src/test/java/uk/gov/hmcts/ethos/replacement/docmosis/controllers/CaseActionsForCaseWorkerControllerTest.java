@@ -298,6 +298,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
         when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(caseFlagsService.caseFlagsSetupRequired(any(CaseData.class))).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
             .thenReturn(ccdRequest.getCaseDetails().getCaseData());
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
@@ -308,6 +309,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(caseFlagsService).setupCaseFlags(any(CaseData.class));
     }
 
     @Test

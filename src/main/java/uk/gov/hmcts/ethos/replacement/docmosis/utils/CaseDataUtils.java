@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -151,5 +152,30 @@ public final class CaseDataUtils {
                     new Exception(exceptionMessage), exceptionMessage,
                     exceptionMessage, CLASS_NAME, methodName);
         }
+    }
+
+    /**
+     * Creates a cloned copy of the provided {@link CaseDetails} object.
+     *
+     * <p>If the cloning process fails due to a JSON processing error, a
+     * {@link GenericRuntimeException} is thrown with details of the case ID,
+     * class name, and method name to support troubleshooting.</p>
+     *
+     * @param caseDetails the {@link CaseDetails} object to clone
+     * @return a cloned {@link CaseDetails} instance
+     * @throws GenericRuntimeException if the case details cannot be cloned
+     */
+    public static CaseDetails cloneCaseDetails(CaseDetails caseDetails) {
+        final String methodName = "cloneCaseDetails";
+        CaseDetails clonedCaseDetails;
+        try {
+            clonedCaseDetails = CallbackObjectUtils.cloneObject(caseDetails, CaseDetails.class);
+        } catch (JsonProcessingException e) {
+            String errorMessage = String.format("Failed to clone case details for case ID: %s, Exception: %s",
+                    caseDetails.getCaseId(), e.getMessage());
+            throw new GenericRuntimeException(new GenericServiceException(errorMessage, e, errorMessage,
+                    caseDetails.getCaseId(), CLASS_NAME, methodName));
+        }
+        return clonedCaseDetails;
     }
 }

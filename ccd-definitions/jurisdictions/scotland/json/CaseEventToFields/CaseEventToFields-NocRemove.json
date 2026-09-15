@@ -1,0 +1,84 @@
+[
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepLandingPageLabel",
+    "DisplayContext": "READONLY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepOption",
+    "DisplayContext": "MANDATORY",
+    "PageID": 2,
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepRemoveLabelSelf",
+    "DisplayContext": "READONLY",
+    "PageID": 3,
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "PageShowCondition": "nocRemoveRepOption=\"yourself\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepRemoveSelfConfirm",
+    "DisplayContext": "MANDATORY",
+    "PageID": 3,
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 2,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepRemoveLabelOrg",
+    "DisplayContext": "READONLY",
+    "PageID": 4,
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 1,
+    "PageShowCondition": "nocRemoveRepOption=\"your organisation\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepRemoveOrgLabelClaimant",
+    "DisplayContext": "READONLY",
+    "PageID": 4,
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 2,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepRemoveOrgConfirm1",
+    "DisplayContext": "MANDATORY",
+    "PageID": 4,
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 3,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepRemoveOrgConfirm2",
+    "DisplayContext": "MANDATORY",
+    "PageID": 4,
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 4,
+    "ShowSummaryChangeOption": "N"
+  }
+]

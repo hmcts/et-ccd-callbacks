@@ -848,6 +848,7 @@ final class RespondentRepresentativeUtilsTest {
                 .id(REPRESENTATIVE_ID_1)
                 .value(RepresentedTypeR.builder().respondentId(RESPONDENT_ID_1).build())
                 .build()));
+        // an unrecognised role resolves to index -1 and must be skipped, not cause an index error
         assertThat(RespondentRepresentativeUtils.findRepresentativesByRoles(caseData, List.of(ROLE_INVALID)))
                 .isEmpty();
         assertThat(RespondentRepresentativeUtils.findRepresentativesByRoles(null, List.of(ROLE_SOLICITOR_A)))
@@ -886,12 +887,15 @@ final class RespondentRepresentativeUtilsTest {
         caseData.setRespondentCollection(List.of(respondent));
         List<String> roles = List.of(ROLE_SOLICITOR_A);
 
+        // load copies the current representative contact into the dedicated staging fields
         RespondentRepresentativeUtils.loadStagedRepresentativeContactDetails(caseData, roles);
         assertThat(caseData.getRespRepPhoneNumber()).isEqualTo(REPRESENTATIVE_1_PHONE);
         assertThat(caseData.getRespRepAddress()).isEqualTo(address);
+        // the live ET3 response fields are not used as staging
         assertThat(caseData.getEt3ResponsePhone()).isNull();
         assertThat(caseData.getEt3ResponseAddress()).isNull();
 
+        // save writes the staged values back onto the representative
         Address newAddress = new Address();
         newAddress.setAddressLine1("1 New Street");
         caseData.setRespRepPhoneNumber("07999999999");
@@ -944,6 +948,7 @@ final class RespondentRepresentativeUtilsTest {
         assertThat(caseData.getRespRepAddress()).isNull();
         assertThat(caseData.getRepresentativeContactChangeOption()).isNull();
         assertThat(caseData.getMyHmctsAddressText()).isNull();
+        // clearing staged fields must never wipe the live ET3 response fields
         assertThat(caseData.getEt3ResponsePhone()).isEqualTo(REPRESENTATIVE_1_PHONE);
         assertThat(caseData.getEt3ResponseAddress()).isEqualTo(et3Address);
         assertDoesNotThrow(() -> RespondentRepresentativeUtils.clearStagedRepresentativeContactDetails(null));

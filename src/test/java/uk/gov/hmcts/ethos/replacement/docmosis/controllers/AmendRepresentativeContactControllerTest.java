@@ -209,6 +209,7 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                // the live ET3 response fields must be left untouched by this event
                 .andExpect(jsonPath("$.data.et3ResponseAddress.AddressLine1", is("10 Downing Street")))
                 .andExpect(jsonPath("$.data.et3ResponsePhone", is("01234567890")))
                 .andExpect(jsonPath("$.errors.size()", is(LoggerTestUtils.INTEGER_ZERO)))

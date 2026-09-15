@@ -180,6 +180,7 @@ class AmendRepresentativeContactServiceTest {
 
         assertThat(caseData.getRespRepPhoneNumber()).isEqualTo(REPRESENTATIVE_PHONE_NUMBER);
         assertThat(caseData.getRespRepAddress()).isEqualTo(address);
+        // the live ET3 response fields must not be used as staging by this event
         assertThat(caseData.getEt3ResponsePhone()).isNull();
         assertThat(caseData.getEt3ResponseAddress()).isNull();
     }
@@ -212,10 +213,12 @@ class AmendRepresentativeContactServiceTest {
 
         assertThat(representativeValue.getRepresentativePhoneNumber()).isEqualTo(REPRESENTATIVE_PHONE_NUMBER);
         assertThat(representativeValue.getRepresentativeAddress()).isEqualTo(stagedAddress);
+        // staged and Check your answers fields are cleared once persisted
         assertThat(caseData.getRespRepPhoneNumber()).isNull();
         assertThat(caseData.getRespRepAddress()).isNull();
         assertThat(caseData.getRepresentativeContactChangeOption()).isNull();
         assertThat(caseData.getMyHmctsAddressText()).isNull();
+        // the live ET3 response fields are left exactly as they were
         assertThat(caseData.getEt3ResponsePhone()).isEqualTo("01234567890");
         assertThat(caseData.getEt3ResponseAddress()).isEqualTo(et3Address);
     }
@@ -225,6 +228,7 @@ class AmendRepresentativeContactServiceTest {
     void theSaveStagedContactDetails_withMyHmctsOption_usesOrganisationAddress() {
         CaseData caseData = new CaseData();
         caseData.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS);
+        // CCD clears the hidden phone staging field for the MyHMCTS option
         caseData.setRespRepPhoneNumber(null);
         when(myHmctsService.getUserOrganisationAddress(VALID_USER_TOKEN)).thenReturn(OrganisationAddress.builder()
                 .addressLine1(ADDRESS_LINE_1).addressLine2(ADDRESS_LINE_2).addressLine3(ADDRESS_LINE_3)
@@ -246,6 +250,7 @@ class AmendRepresentativeContactServiceTest {
         amendRepresentativeContactService.saveStagedContactDetails(VALID_USER_TOKEN, caseData, SUBMISSION_REFERENCE);
 
         assertThat(representativeValue.getRepresentativeAddress()).isEqualTo(createAddress());
+        // existing phone must not be wiped when the staging phone field is hidden/null
         assertThat(representativeValue.getRepresentativePhoneNumber()).isEqualTo(REPRESENTATIVE_PHONE_NUMBER);
         assertThat(caseData.getEt3ResponseAddress()).isNull();
         assertThat(caseData.getRespRepAddress()).isNull();

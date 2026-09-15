@@ -140,6 +140,10 @@ public final class AddressUtils {
      * Sets the shared MyHMCTS address text used on Check your answers, and returns the mapped
      * {@link Address} for party-specific persistence.
      *
+     * <p>Claimant legal-rep events store the returned address on
+     * {@code representativeClaimantType.representativeAddress}. Respondent legal-rep events store it on
+     * {@code et3ResponseAddress} before copying into {@code repCollection}.
+     *
      * @param caseData the case data whose {@code myHmctsAddressText} field will be updated
      * @param organisationAddress the organisation address retrieved from MyHMCTS
      * @return the mapped {@link Address}, never {@code null}

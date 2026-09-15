@@ -1,0 +1,115 @@
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    {{#caption}}<span class="govuk-caption-m">{{caption}}</span>{{/caption}}
+    <h2 class="govuk-heading-l govuk-!-margin-bottom-2">{{heading}}</h2>
+    <p class="govuk-body govuk-!-margin-bottom-6">
+      {{#tags}}<strong class="{{cssClass}}">{{text}}</strong> {{/tags}}
+    </p>
+    {{#warning}}
+    <div class="govuk-warning-text govuk-!-margin-bottom-6">
+      <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+      <strong class="govuk-warning-text__text">
+        <span class="govuk-warning-text__assistive">Warning</span>
+        {{todayMessage}}
+      </strong>
+    </div>
+    {{/warning}}
+    {{^warning}}
+    <div class="govuk-inset-text govuk-!-margin-bottom-6">{{todayMessage}}</div>
+    {{/warning}}
+    {{#hasAttentionItems}}
+    <h3 class="govuk-heading-m">Needs your attention</h3>
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Item</th>
+          <th scope="col" class="govuk-table__header">Raised</th>
+          <th scope="col" class="govuk-table__header">Due</th>
+          <th scope="col" class="govuk-table__header">Action</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {{#attentionItems}}
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell"><strong class="{{cssClass}}">{{status}}</strong><br>{{item}}</td>
+          <td class="govuk-table__cell">{{raised}}</td>
+          <td class="govuk-table__cell">{{due}}</td>
+          <td class="govuk-table__cell"><a class="govuk-link" href="{{actionUrl}}">{{actionLabel}}</a></td>
+        </tr>
+        {{/attentionItems}}
+      </tbody>
+    </table>
+    {{/hasAttentionItems}}
+    {{#hasOverdueBfActions}}
+    <p class="govuk-body-s govuk-!-margin-bottom-7"><strong>{{overdueBfActions}}</strong></p>
+    {{/hasOverdueBfActions}}
+    <div class="govuk-grid-row govuk-!-margin-bottom-4">
+      <div class="govuk-grid-column-one-half">
+        <h3 class="govuk-heading-m">Next hearing</h3>
+        {{#nextHearing.present}}
+        <dl class="govuk-summary-list govuk-summary-list--no-border">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Hearing</dt>
+            <dd class="govuk-summary-list__value">{{nextHearing.type}}</dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Date</dt>
+            <dd class="govuk-summary-list__value">{{nextHearing.date}}</dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Venue</dt>
+            <dd class="govuk-summary-list__value">{{nextHearing.venue}}</dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Judge</dt>
+            <dd class="govuk-summary-list__value">{{nextHearing.judge}}</dd>
+          </div>
+        </dl>
+        {{/nextHearing.present}}
+        {{^nextHearing.present}}
+        <p class="govuk-body">No future hearing is listed.</p>
+        {{/nextHearing.present}}
+      </div>
+      <div class="govuk-grid-column-one-half">
+        <h3 class="govuk-heading-m">Key facts</h3>
+        <dl class="govuk-summary-list govuk-summary-list--no-border">
+          {{#keyFacts}}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{label}}</dt>
+            <dd class="govuk-summary-list__value">{{value}}</dd>
+          </div>
+          {{/keyFacts}}
+        </dl>
+      </div>
+    </div>
+    {{#hasRecentActivity}}
+    <h3 class="govuk-heading-m">Recent activity</h3>
+    <table class="govuk-table govuk-!-margin-bottom-7">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Date</th>
+          <th scope="col" class="govuk-table__header">Event</th>
+          <th scope="col" class="govuk-table__header">By</th>
+          <th scope="col" class="govuk-table__header">Result</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {{#recentActivity}}
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">{{date}}</td>
+          <td class="govuk-table__cell">{{event}}</td>
+          <td class="govuk-table__cell">{{user}}</td>
+          <td class="govuk-table__cell">{{state}}</td>
+        </tr>
+        {{/recentActivity}}
+      </tbody>
+    </table>
+    {{/hasRecentActivity}}
+    <h3 class="govuk-heading-m">Do something</h3>
+    <ul class="govuk-list">
+      {{#quickActions}}
+      <li><a class="govuk-link" href="{{url}}">{{label}}</a></li>
+      {{/quickActions}}
+    </ul>
+  </div>
+</div>

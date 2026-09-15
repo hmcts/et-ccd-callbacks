@@ -1,0 +1,17 @@
+[
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "judgeOverviewMarkdown",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "judgeOverviewLabel",
+    "Label": "${judgeOverviewMarkdown}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  }
+]

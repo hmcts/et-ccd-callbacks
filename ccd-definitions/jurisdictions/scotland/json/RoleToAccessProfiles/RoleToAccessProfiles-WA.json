@@ -3,7 +3,7 @@
     "RoleName": "specific-access-judiciary",
     "Authorisation": "",
     "CaseTypeID": "ET_Scotland",
-    "AccessProfiles": "GS_profile,caseworker-employment-etjudge-scotland",
+    "AccessProfiles": "GS_profile,caseworker-employment-etjudge-scotland,caseworker-employment-etjudge",
     "ReadOnly": "Y",
     "Disabled": "F",
     "CaseAccessCategories": ""
@@ -12,7 +12,7 @@
     "RoleName": "challenged-access-judiciary",
     "Authorisation": "",
     "CaseTypeID": "ET_Scotland",
-    "AccessProfiles": "GS_profile,caseworker-employment-etjudge-scotland",
+    "AccessProfiles": "GS_profile,caseworker-employment-etjudge-scotland,caseworker-employment-etjudge",
     "ReadOnly": "N",
     "Disabled": "F",
     "CaseAccessCategories": ""
@@ -21,7 +21,7 @@
     "RoleName": "leadership-judge",
     "Authorisation": "",
     "CaseTypeID": "ET_Scotland",
-    "AccessProfiles": "GS_profile,caseworker-employment-etjudge-scotland",
+    "AccessProfiles": "GS_profile,caseworker-employment-etjudge-scotland,caseworker-employment-etjudge",
     "ReadOnly": "N",
     "Disabled": "F",
     "CaseAccessCategories": ""
@@ -30,7 +30,7 @@
     "RoleName": "judge",
     "Authorisation": "",
     "CaseTypeID": "ET_Scotland",
-    "AccessProfiles": "GS_profile,caseworker-employment-etjudge-scotland",
+    "AccessProfiles": "GS_profile,caseworker-employment-etjudge-scotland,caseworker-employment-etjudge",
     "ReadOnly": "N",
     "Disabled": "F",
     "CaseAccessCategories": ""
@@ -39,7 +39,7 @@
     "RoleName": "fee-paid-judge",
     "Authorisation": "",
     "CaseTypeID": "ET_Scotland",
-    "AccessProfiles": "GS_profile,caseworker-employment-etjudge-scotland",
+    "AccessProfiles": "GS_profile,caseworker-employment-etjudge-scotland,caseworker-employment-etjudge",
     "ReadOnly": "N",
     "Disabled": "F",
     "CaseAccessCategories": ""
@@ -48,7 +48,7 @@
     "RoleName": "tribunal-member",
     "Authorisation": "",
     "CaseTypeID": "ET_Scotland",
-    "AccessProfiles": "GS_profile,caseworker-employment-etjudge-scotland",
+    "AccessProfiles": "GS_profile,caseworker-employment-etjudge-scotland,caseworker-employment-etjudge",
     "ReadOnly": "N",
     "Disabled": "F",
     "CaseAccessCategories": ""

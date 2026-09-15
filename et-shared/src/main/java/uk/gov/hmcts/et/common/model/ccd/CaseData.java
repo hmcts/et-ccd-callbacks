@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Tolerate;
+import uk.gov.hmcts.ccd.sdk.External;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.items.AddressLabelTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
@@ -81,6 +82,9 @@ public class CaseData extends Et1CaseData {
     private String tribunalCorrespondenceEmail;
     @JsonProperty("ethosCaseReference")
     private String ethosCaseReference;
+    @External
+    @JsonProperty("judgeOverviewMarkdown")
+    private String judgeOverviewMarkdown;
     @JsonProperty("multipleName")
     private String multipleName;
     @JsonProperty("multipleReference")

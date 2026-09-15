@@ -89,10 +89,6 @@ dependencies:
     version: ~0.3.13
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: rd-judicial-data-load.enabled
-  - name: et-migration
-    version: ~0.0.2
-    repository: 'oci://hmctsprod.azurecr.io/helm'
-    condition: et-migration.enabled
   - name: em-ccdorc
     version: 2.1.4
     repository: 'oci://hmctsprod.azurecr.io/helm'

@@ -95,7 +95,6 @@ test.describe( 'Legal Rep updates update contact to colleagues in his org', () =
     await caseWorkerBrowserPage.close();
   });
 
-  //RET-6237 to be released before testing this for Respondent LR
   test('Respondent Legal Rep updates contact to colleagues in his org',
     async ({
              nocPage, manageCaseDashboardPage, caseDetailsPage, amendContactDetailsLrPage, checkYourAnswersPage

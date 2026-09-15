@@ -6349,23 +6349,6 @@
     "FieldDisplayOrder": 6,
     "DisplayContext": "MANDATORY"
   },
-
-  {
-    "ID": "InitialConsideration",
-    "CaseEventID": "initialConsideration",
-    "CaseFieldID": "etICHearingListedAnswers",
-    "ListElementCode": "etICExtendDurationGiveDetails",
-    "FieldDisplayOrder": 7,
-    "DisplayContext": "MANDATORY"
-  },
-  {
-    "ID": "InitialConsideration",
-    "CaseEventID": "initialConsideration",
-    "CaseFieldID": "etICHearingListedAnswers",
-    "ListElementCode": "etICOtherGiveDetails",
-    "FieldDisplayOrder": 8,
-    "DisplayContext": "MANDATORY"
-  },
   {
     "ID": "InitialConsideration",
     "CaseEventID": "initialConsideration",

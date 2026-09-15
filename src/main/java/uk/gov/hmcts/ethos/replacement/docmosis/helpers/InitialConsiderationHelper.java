@@ -82,9 +82,6 @@ public final class InitialConsiderationHelper {
 
         InitialConsiderationData data = InitialConsiderationData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
-                .hearingPostpone(defaultIfEmpty(caseData.getEtICPostponeGiveDetails(), null))
-                .hearingConvertF2f(defaultIfEmpty(caseData.getEtICConvertF2fGiveDetails(), null))
-                .hearingConvertFinal(defaultIfEmpty(caseData.getEtICConvertPreliminaryGiveDetails(), null))
 
                 // New values
                 .issuesJurisdiction(defaultIfEmpty(caseData.getEtICJuridictionCodesInvalid(), null))
@@ -107,6 +104,12 @@ public final class InitialConsiderationHelper {
                         .map(EtICHearingListedAnswers::getEtICExtendDurationGiveDetails).orElse(null))
                 .hearingOther(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICOtherGiveDetails).orElse(null))
+                .hearingPostpone(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICPostponeGiveDetails).orElse(null))
+                .hearingConvertFinal(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICConvertPreliminaryGiveDetails).orElse(null))
+                .hearingConvertF2f(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICConvertF2fGiveDetails).orElse(null))
                 .otherDirections(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICHearingAnyOtherDirections).orElse(null))
                 // refer VP - hearing listed

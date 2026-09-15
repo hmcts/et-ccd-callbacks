@@ -29,6 +29,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsSelectionType;
 import uk.gov.hmcts.et.common.model.ccd.types.AllPartyFlags;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
+import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseNote;
 import uk.gov.hmcts.et.common.model.ccd.types.CasePreAcceptType;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
@@ -1594,6 +1595,9 @@ public class CaseData extends Et1CaseData {
 
     @JsonProperty("supportTaskState")
     private SupportTaskState supportTaskState;
+
+    @JsonProperty("reviewSupportRequestFlags")
+    private ListTypeItem<CaseFlagsType> reviewSupportRequestFlags;
 
     //et-hearings-api
     @JsonProperty("autoListFlag")

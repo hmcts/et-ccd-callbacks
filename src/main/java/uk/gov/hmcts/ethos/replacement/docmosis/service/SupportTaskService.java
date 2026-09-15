@@ -5,11 +5,14 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.FlagDetailType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AllPartyFlags;
+import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
 import uk.gov.hmcts.et.common.model.ccd.types.SupportTaskState;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.SupportTaskConfiguration;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -18,12 +21,17 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_REVIEW_ADMIN_SUPPORT_REQUEST;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_REVIEW_JUDGE_SUPPORT_REQUEST;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_REVIEW_LEGAL_OFFICER_SUPPORT_REQUEST;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.FLAG_STATUS_ACTIVE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.FLAG_STATUS_REQUESTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.PartyCaseFlagUtils.allFlagItems;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.PartyCaseFlagUtils.allPartyFlagSections;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.PartyCaseFlagUtils.flagDetails;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.PartyCaseFlagUtils.respondentFlagDetails;
 
@@ -92,17 +100,78 @@ public class SupportTaskService {
                 .toList();
 
         updateTaskState(flags, configuration.getReview().getAdminFlagCodes(),
-                taskState.getAdminTaskCreated(),
                 taskState::setAdminTaskCreated,
                 taskState::setAdminTaskRequired);
         updateTaskState(flags, configuration.getReview().getLegalOfficerFlagCodes(),
-                taskState.getLegalOfficerTaskCreated(),
                 taskState::setLegalOfficerTaskCreated,
                 taskState::setLegalOfficerTaskRequired);
         updateTaskState(flags, configuration.getReview().getJudgeFlagCodes(),
-                taskState.getJudgeTaskCreated(),
                 taskState::setJudgeTaskCreated,
                 taskState::setJudgeTaskRequired);
+    }
+
+    public void prepareReviewSupportRequest(CaseData caseData, String eventId) {
+        Set<String> eligibleCodes = reviewFlagCodes(eventId);
+        ListTypeItem<CaseFlagsType> selectedFlags = allPartyFlagSections(caseData.getAllPartyFlags())
+                .map(flags -> requestedFlags(flags, eligibleCodes))
+                .filter(flags -> !flags.getDetails().isEmpty())
+                .map(GenericTypeItem::from)
+                .collect(Collectors.toCollection(ListTypeItem::new));
+        caseData.setReviewSupportRequestFlags(selectedFlags);
+    }
+
+    public boolean applyReviewSupportRequest(CaseData caseData) {
+        if (caseData.getReviewSupportRequestFlags() == null) {
+            return false;
+        }
+
+        Map<String, GenericTypeItem<FlagDetailType>> originalFlags = new HashMap<>();
+        allFlagItems(caseData.getAllPartyFlags())
+                .filter(item -> item.getId() != null)
+                .forEach(item -> originalFlags.put(item.getId(), item));
+
+        List<GenericTypeItem<FlagDetailType>> updatedFlags = caseData.getReviewSupportRequestFlags().stream()
+                .filter(Objects::nonNull)
+                .map(GenericTypeItem::getValue)
+                .filter(Objects::nonNull)
+                .flatMap(flags -> flags.getDetails() == null ? Stream.empty() : flags.getDetails().stream())
+                .filter(item -> item != null && item.getId() != null && item.getValue() != null)
+                .filter(item -> !isRequested(item.getValue()))
+                .filter(item -> originalFlags.containsKey(item.getId()))
+                .toList();
+        updatedFlags.forEach(item -> originalFlags.get(item.getId()).setValue(item.getValue()));
+
+        if (!updatedFlags.isEmpty()) {
+            caseData.setReviewSupportRequestFlags(null);
+        }
+        return !updatedFlags.isEmpty();
+    }
+
+    private Set<String> reviewFlagCodes(String eventId) {
+        return switch (eventId) {
+            case EVENT_REVIEW_ADMIN_SUPPORT_REQUEST -> configuration.getReview().getAdminFlagCodes();
+            case EVENT_REVIEW_LEGAL_OFFICER_SUPPORT_REQUEST ->
+                    configuration.getReview().getLegalOfficerFlagCodes();
+            case EVENT_REVIEW_JUDGE_SUPPORT_REQUEST -> configuration.getReview().getJudgeFlagCodes();
+            default -> Set.of();
+        };
+    }
+
+    private static CaseFlagsType requestedFlags(CaseFlagsType flags, Set<String> eligibleCodes) {
+        ListTypeItem<FlagDetailType> details = flags.getDetails() == null
+                ? new ListTypeItem<>()
+                : flags.getDetails().stream()
+                        .filter(item -> item != null && item.getValue() != null)
+                        .filter(item -> isRequested(item.getValue()))
+                        .filter(item -> eligibleCodes.contains(item.getValue().getFlagCode()))
+                        .collect(Collectors.toCollection(ListTypeItem::new));
+        return CaseFlagsType.builder()
+                .partyName(flags.getPartyName())
+                .roleOnCase(flags.getRoleOnCase())
+                .groupId(flags.getGroupId())
+                .visibility(flags.getVisibility())
+                .details(details)
+                .build();
     }
 
     private void prepareTasks(CaseData caseData, List<FlagDetailType> flags) {
@@ -111,17 +180,17 @@ public class SupportTaskService {
         taskState.setLegalOfficerTaskRequired(null);
         taskState.setJudgeTaskRequired(null);
 
-        if (!isTaskCreated(taskState.getAdminTaskCreated())
+        if (isTaskNotCreated(taskState.getAdminTaskCreated())
                 && hasRequestedFlag(flags, configuration.getReview().getAdminFlagCodes())) {
             taskState.setAdminTaskCreated(YES);
             taskState.setAdminTaskRequired(YES);
         }
-        if (!isTaskCreated(taskState.getLegalOfficerTaskCreated())
+        if (isTaskNotCreated(taskState.getLegalOfficerTaskCreated())
                 && hasRequestedFlag(flags, configuration.getReview().getLegalOfficerFlagCodes())) {
             taskState.setLegalOfficerTaskCreated(YES);
             taskState.setLegalOfficerTaskRequired(YES);
         }
-        if (!isTaskCreated(taskState.getJudgeTaskCreated())
+        if (isTaskNotCreated(taskState.getJudgeTaskCreated())
                 && hasRequestedFlag(flags, configuration.getReview().getJudgeFlagCodes())) {
             taskState.setJudgeTaskCreated(YES);
             taskState.setJudgeTaskRequired(YES);
@@ -141,18 +210,18 @@ public class SupportTaskService {
 
     private static void updateTaskState(List<FlagDetailType> flags,
                                         Set<String> eligibleFlagCodes,
-                                        String taskCreated,
                                         Consumer<String> taskCreatedSetter,
                                         Consumer<String> taskRequiredSetter) {
         taskRequiredSetter.accept(null);
-        if (isTaskCreated(taskCreated) && !hasRequestedFlag(flags, eligibleFlagCodes)) {
-            taskCreatedSetter.accept(null);
+        if (!hasRequestedFlag(flags, eligibleFlagCodes)) {
+            taskCreatedSetter.accept(NO);
             taskRequiredSetter.accept(NO);
         }
     }
 
-    private static boolean isTaskCreated(String taskCreated) {
-        return YES.equalsIgnoreCase(taskCreated) || Boolean.parseBoolean(taskCreated);
+    private static boolean isTaskNotCreated(String taskCreated) {
+        return !YES.equalsIgnoreCase(taskCreated)
+                && !Boolean.parseBoolean(taskCreated);
     }
 
     private static boolean isRequested(FlagDetailType flag) {

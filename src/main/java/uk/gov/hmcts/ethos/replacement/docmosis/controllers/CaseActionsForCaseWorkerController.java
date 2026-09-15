@@ -190,6 +190,7 @@ public class CaseActionsForCaseWorkerController {
 
             if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())
                     && REVIEW_SUPPORT_TASK_EVENTS.contains(ccdRequest.getEventId())) {
+                caseManagementForCaseWorkerService.setNextListedDate(caseData);
                 supportTaskService.prepareReviewSupportTasks(caseData);
                 CaseData caseDataBefore = ccdRequest.getCaseDetailsBefore() == null
                         ? null
@@ -225,6 +226,7 @@ public class CaseActionsForCaseWorkerController {
         CaseData caseData = caseDetails.getCaseData();
 
         if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())) {
+            caseManagementForCaseWorkerService.setNextListedDate(caseData);
             CaseData caseDataBefore = callbackRequest.getCaseDetailsBefore() == null
                     ? null
                     : callbackRequest.getCaseDetailsBefore().getCaseData();
@@ -247,6 +249,40 @@ public class CaseActionsForCaseWorkerController {
         }
 
         return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    @PostMapping(value = "/reviewSupportRequest/aboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Prepare the requested Case Flags for review.")
+    public ResponseEntity<CCDCallbackResponse> prepareReviewSupportRequest(
+            @RequestBody CallbackRequest callbackRequest) {
+        CaseDetails caseDetails = callbackRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
+        if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())) {
+            supportTaskService.prepareReviewSupportRequest(caseData, callbackRequest.getEventId());
+        }
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    @PostMapping(value = "/reviewSupportRequest/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Apply reviewed Case Flags and prepare the related support tasks.")
+    public ResponseEntity<CCDCallbackResponse> applyReviewSupportRequest(
+            @RequestBody CallbackRequest callbackRequest) {
+        CaseDetails caseDetails = callbackRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
+        List<String> errors = new ArrayList<>();
+        if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())) {
+            if (!supportTaskService.applyReviewSupportRequest(caseData)) {
+                errors.add("Please select status other than Requested");
+            } else {
+                caseManagementForCaseWorkerService.setNextListedDate(caseData);
+                CaseData caseDataBefore = callbackRequest.getCaseDetailsBefore() == null
+                        ? null
+                        : callbackRequest.getCaseDetailsBefore().getCaseData();
+                supportTaskService.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
+                supportTaskService.prepareArrangeSupportTask(caseData, caseDataBefore);
+            }
+        }
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     private List<String> getValidationDate(String eventId, CaseDetails caseDetails) {

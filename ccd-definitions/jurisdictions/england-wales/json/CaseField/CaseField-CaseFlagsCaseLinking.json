@@ -330,6 +330,15 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
+    "ID": "reviewSupportRequestFlags",
+    "Label": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Flags",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
     "ID": "supportTaskState",
     "Label": "Support task state",
     "FieldType": "SupportTaskState",

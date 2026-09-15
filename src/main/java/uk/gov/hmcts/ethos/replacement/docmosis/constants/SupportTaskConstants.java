@@ -10,6 +10,9 @@ public final class SupportTaskConstants {
     public static final String EVENT_UPDATE_ET3_FORM = "UPDATE_ET3_FORM";
     public static final String EVENT_REQUEST_SUPPORT = "requestSupport";
     public static final String EVENT_MANAGE_SUPPORT = "manageSupport";
+    public static final String EVENT_REVIEW_ADMIN_SUPPORT_REQUEST = "reviewAdminSupportRequest";
+    public static final String EVENT_REVIEW_LEGAL_OFFICER_SUPPORT_REQUEST = "reviewLOSupportRequest";
+    public static final String EVENT_REVIEW_JUDGE_SUPPORT_REQUEST = "reviewJudgeSupportRequest";
     public static final String FLAG_STATUS_ACTIVE = "Active";
     public static final String FLAG_STATUS_REQUESTED = "Requested";
 

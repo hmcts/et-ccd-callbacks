@@ -15,14 +15,20 @@ import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
 import uk.gov.hmcts.et.common.model.ccd.types.SupportTaskState;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.SupportTaskConfiguration;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_REVIEW_ADMIN_SUPPORT_REQUEST;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_REVIEW_JUDGE_SUPPORT_REQUEST;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_REVIEW_LEGAL_OFFICER_SUPPORT_REQUEST;
 
 class SupportTaskServiceTest {
     private static final String TASK_TYPE_ADMIN = "Admin";
@@ -268,11 +274,12 @@ class SupportTaskServiceTest {
 
         service.prepareManagedReviewSupportTasks(caseData, null);
 
-        assertNull(taskState(caseData).getAdminTaskCreated());
+        assertEquals(NO, taskState(caseData).getAdminTaskCreated());
         assertEquals(NO, taskState(caseData).getAdminTaskRequired());
         assertEquals(YES, taskState(caseData).getJudgeTaskCreated());
         assertNull(taskState(caseData).getJudgeTaskRequired());
-        assertNull(taskState(caseData).getLegalOfficerTaskRequired());
+        assertEquals(NO, taskState(caseData).getLegalOfficerTaskCreated());
+        assertEquals(NO, taskState(caseData).getLegalOfficerTaskRequired());
     }
 
     @Test
@@ -296,6 +303,83 @@ class SupportTaskServiceTest {
             Arguments.of(TASK_TYPE_LEGAL_OFFICER, "RA0034", "RA0035"),
             Arguments.of(TASK_TYPE_JUDGE, "RA0038", "RA0029")
         );
+    }
+
+    static Stream<Arguments> reviewSupportRequestScenarios() {
+        return Stream.of(
+            Arguments.of(EVENT_REVIEW_ADMIN_SUPPORT_REQUEST, "RA0041", "RA0038"),
+            Arguments.of(EVENT_REVIEW_LEGAL_OFFICER_SUPPORT_REQUEST, "RA0034", "RA0041"),
+            Arguments.of(EVENT_REVIEW_JUDGE_SUPPORT_REQUEST, "RA0038", "RA0034")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("reviewSupportRequestScenarios")
+    void review_event_contains_only_requested_flags_for_its_task_category(
+            String eventId, String flagCode, String differentCategoryFlagCode) {
+        CaseData caseData = new CaseData();
+        caseData.setAllPartyFlags(AllPartyFlags.builder()
+                .claimantFlags(caseFlags("matching-requested", flagCode, STATUS_REQUESTED))
+                .respondentFlags(caseFlags("matching-active", flagCode, STATUS_ACTIVE))
+                .representativeFlags(caseFlags("different-category", differentCategoryFlagCode, STATUS_REQUESTED))
+                .build());
+
+        service.prepareReviewSupportRequest(caseData, eventId);
+
+        assertEquals(1, caseData.getReviewSupportRequestFlags().size());
+        CaseFlagsType selectedSection = caseData.getReviewSupportRequestFlags().getFirst().getValue();
+        assertEquals(1, selectedSection.getDetails().size());
+        assertEquals("matching-requested", selectedSection.getDetails().getFirst().getId());
+    }
+
+    @Test
+    void review_event_includes_matching_flags_for_every_party_type() {
+        CaseData caseData = new CaseData();
+        caseData.setAllPartyFlags(AllPartyFlags.builder()
+                .claimantFlags(caseFlags("claimant", "RA0041", STATUS_REQUESTED))
+                .respondent1ExternalFlags(caseFlags("respondent", "RA0041", STATUS_REQUESTED))
+                .claimantRepresentativeFlags(caseFlags("claimant-representative", "RA0041", STATUS_REQUESTED))
+                .representative2ExternalFlags(caseFlags("respondent-representative", "RA0041", STATUS_REQUESTED))
+                .build());
+
+        service.prepareReviewSupportRequest(caseData, EVENT_REVIEW_ADMIN_SUPPORT_REQUEST);
+
+        List<String> selectedFlagIds = caseData.getReviewSupportRequestFlags().stream()
+                .map(GenericTypeItem::getValue)
+                .flatMap(flags -> flags.getDetails().stream())
+                .map(GenericTypeItem::getId)
+                .toList();
+        assertEquals(List.of("claimant", "respondent", "claimant-representative", "respondent-representative"),
+                selectedFlagIds);
+    }
+
+    @Test
+    void reviewed_flag_is_updated_in_its_original_party_section() {
+        CaseData caseData = caseDataWithClaimantFlag("RA0041", STATUS_REQUESTED, false);
+        GenericTypeItem<FlagDetailType> originalFlag = caseData.getAllPartyFlags()
+                .getClaimantFlags().getDetails().getFirst();
+        originalFlag.setId("reviewed-flag");
+        CaseFlagsType selectedFlags = caseFlags("reviewed-flag", "RA0041", STATUS_ACTIVE);
+        caseData.setReviewSupportRequestFlags(ListTypeItem.from(selectedFlags));
+
+        boolean updated = service.applyReviewSupportRequest(caseData);
+
+        assertTrue(updated);
+        assertEquals(STATUS_ACTIVE, originalFlag.getValue().getStatus());
+        assertNull(caseData.getReviewSupportRequestFlags());
+    }
+
+    @Test
+    void review_event_rejects_a_flag_that_is_still_requested() {
+        CaseData caseData = caseDataWithClaimantFlag("RA0041", STATUS_REQUESTED, false);
+        CaseFlagsType selectedFlags = caseFlags("selected-flag", "RA0041", STATUS_REQUESTED);
+        caseData.setReviewSupportRequestFlags(ListTypeItem.from(selectedFlags));
+
+        boolean updated = service.applyReviewSupportRequest(caseData);
+
+        assertFalse(updated);
+        assertEquals(STATUS_REQUESTED, caseData.getAllPartyFlags()
+                .getClaimantFlags().getDetails().getFirst().getValue().getStatus());
     }
 
     static Stream<Arguments> nonRequestedReviewTaskScenarios() {
@@ -322,7 +406,7 @@ class SupportTaskServiceTest {
         activateRespondentFlag(caseData);
         service.prepareManagedReviewSupportTasks(caseData, null);
 
-        assertNull(getTaskCreated(taskState(caseData), taskType));
+        assertEquals(NO, getTaskCreated(taskState(caseData), taskType));
         assertEquals(NO, getTaskRequired(taskState(caseData), taskType));
     }
 
@@ -352,7 +436,7 @@ class SupportTaskServiceTest {
 
         service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
 
-        assertNull(getTaskCreated(taskState(caseData), taskType));
+        assertEquals(NO, getTaskCreated(taskState(caseData), taskType));
         assertEquals(NO, getTaskRequired(taskState(caseData), taskType));
     }
 
@@ -379,7 +463,7 @@ class SupportTaskServiceTest {
 
         service.prepareManagedReviewSupportTasks(caseData, null);
 
-        assertNull(getTaskCreated(taskState(caseData), taskType));
+        assertEquals(NO, getTaskCreated(taskState(caseData), taskType));
         assertEquals(NO, getTaskRequired(taskState(caseData), taskType));
     }
 
@@ -399,7 +483,7 @@ class SupportTaskServiceTest {
 
         service.prepareManagedReviewSupportTasks(caseData, null);
 
-        assertNull(taskState(caseData).getAdminTaskCreated());
+        assertEquals(NO, taskState(caseData).getAdminTaskCreated());
         assertEquals(NO, taskState(caseData).getAdminTaskRequired());
         assertEquals(CCD_TRUE, taskState(caseData).getLegalOfficerTaskCreated());
         assertNull(taskState(caseData).getLegalOfficerTaskRequired());
@@ -444,9 +528,9 @@ class SupportTaskServiceTest {
 
         service.prepareManagedReviewSupportTasks(caseData, null);
 
-        assertNull(taskState(caseData).getAdminTaskCreated());
-        assertNull(taskState(caseData).getLegalOfficerTaskCreated());
-        assertNull(taskState(caseData).getJudgeTaskCreated());
+        assertEquals(NO, taskState(caseData).getAdminTaskCreated());
+        assertEquals(NO, taskState(caseData).getLegalOfficerTaskCreated());
+        assertEquals(NO, taskState(caseData).getJudgeTaskCreated());
         assertEquals(NO, taskState(caseData).getAdminTaskRequired());
         assertEquals(NO, taskState(caseData).getLegalOfficerTaskRequired());
         assertEquals(NO, taskState(caseData).getJudgeTaskRequired());
@@ -460,8 +544,18 @@ class SupportTaskServiceTest {
 
         service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
 
-        assertNull(taskState(caseData).getJudgeTaskCreated());
+        assertEquals(NO, taskState(caseData).getJudgeTaskCreated());
         assertEquals(NO, taskState(caseData).getJudgeTaskRequired());
+    }
+
+    @Test
+    void completes_admin_task_when_created_marker_is_missing() {
+        CaseData caseData = caseDataWithClaimantFlag("RA0041", STATUS_ACTIVE, false);
+
+        service.prepareManagedReviewSupportTasks(caseData, null);
+
+        assertEquals(NO, taskState(caseData).getAdminTaskCreated());
+        assertEquals(NO, taskState(caseData).getAdminTaskRequired());
     }
 
     @Test

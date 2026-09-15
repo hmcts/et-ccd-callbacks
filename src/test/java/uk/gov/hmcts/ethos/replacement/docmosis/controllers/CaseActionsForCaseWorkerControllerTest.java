@@ -97,6 +97,10 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private static final String PRE_DEFAULT_VALUES_URL = "/preDefaultValues";
     private static final String POST_DEFAULT_VALUES_URL = "/postDefaultValues";
     private static final String SUPPORT_TASKS_URL = "/supportTasks/aboutToSubmit";
+    private static final String REVIEW_SUPPORT_REQUEST_ABOUT_TO_START_URL =
+            "/reviewSupportRequest/aboutToStart";
+    private static final String REVIEW_SUPPORT_REQUEST_ABOUT_TO_SUBMIT_URL =
+            "/reviewSupportRequest/aboutToSubmit";
     private static final String AMEND_CASE_DETAILS_URL = "/amendCaseDetails";
     private static final String AMEND_CLAIMANT_DETAILS_URL = "/amendClaimantDetails";
     private static final String UPDATE_CLAIMANT_EMAIL_ABOUT_TO_START_URL =
@@ -347,6 +351,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         verify(supportTaskService).prepareReviewSupportTasks(any(CaseData.class));
         verify(supportTaskService).prepareArrangeSupportTask(
                 any(CaseData.class), any(CaseData.class));
+        verify(caseManagementForCaseWorkerService).setNextListedDate(any(CaseData.class));
     }
 
     @Test
@@ -366,6 +371,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         verify(supportTaskService, never()).prepareReviewSupportTasks(any(CaseData.class));
         verify(supportTaskService, never()).prepareArrangeSupportTask(
                 any(CaseData.class), nullable(CaseData.class));
+        verify(caseManagementForCaseWorkerService, never()).setNextListedDate(any(CaseData.class));
     }
 
     @ParameterizedTest
@@ -384,6 +390,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         verify(supportTaskService).prepareRespondentReviewSupportTasks(any(CaseData.class));
         verify(supportTaskService).prepareNewFlagArrangeSupportTask(
                 any(CaseData.class), nullable(CaseData.class));
+        verify(caseManagementForCaseWorkerService).setNextListedDate(any(CaseData.class));
     }
 
     @ParameterizedTest
@@ -405,6 +412,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 any(CaseData.class), any(CaseData.class));
         verify(supportTaskService).prepareNewFlagArrangeSupportTask(
                 any(CaseData.class), any(CaseData.class));
+        verify(caseManagementForCaseWorkerService).setNextListedDate(any(CaseData.class));
     }
 
     @ParameterizedTest
@@ -428,6 +436,69 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
             verify(supportTaskService).prepareArrangeSupportTask(
                     any(CaseData.class), any(CaseData.class));
         }
+        verify(caseManagementForCaseWorkerService).setNextListedDate(any(CaseData.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "reviewAdminSupportRequest",
+        "reviewLOSupportRequest",
+        "reviewJudgeSupportRequest"
+    })
+    @SneakyThrows
+    void preparesRequestedFlagsForTheReviewTaskCategory(String eventId) {
+        ((ObjectNode) requestContent2).put("event_id", eventId);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+
+        mvc.perform(post(REVIEW_SUPPORT_REQUEST_ABOUT_TO_START_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(supportTaskService).prepareReviewSupportRequest(any(CaseData.class), eq(eventId));
+    }
+
+    @Test
+    @SneakyThrows
+    void appliesReviewedFlagAndPreparesCompletionAndArrangeTasks() {
+        ((ObjectNode) requestContent2).put("event_id", "reviewAdminSupportRequest");
+        ((ObjectNode) requestContent2).set("case_details_before",
+                requestContent2.get("case_details").deepCopy());
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+        when(supportTaskService.applyReviewSupportRequest(any(CaseData.class))).thenReturn(true);
+
+        mvc.perform(post(REVIEW_SUPPORT_REQUEST_ABOUT_TO_SUBMIT_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)));
+
+        verify(supportTaskService).prepareManagedReviewSupportTasks(
+                any(CaseData.class), any(CaseData.class));
+        verify(supportTaskService).prepareArrangeSupportTask(
+                any(CaseData.class), any(CaseData.class));
+        verify(caseManagementForCaseWorkerService).setNextListedDate(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void rejectsReviewSupportRequestWhenNoFlagWasActioned() {
+        ((ObjectNode) requestContent2).put("event_id", "reviewAdminSupportRequest");
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+
+        mvc.perform(post(REVIEW_SUPPORT_REQUEST_ABOUT_TO_SUBMIT_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.ERRORS + "[0]",
+                        is("Please select status other than Requested")));
+
+        verify(supportTaskService, never()).prepareManagedReviewSupportTasks(
+                any(CaseData.class), nullable(CaseData.class));
+        verify(caseManagementForCaseWorkerService, never()).setNextListedDate(any(CaseData.class));
     }
 
     @ParameterizedTest
@@ -478,6 +549,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 any(CaseData.class), nullable(CaseData.class));
         verify(supportTaskService, never()).prepareNewFlagArrangeSupportTask(
                 any(CaseData.class), nullable(CaseData.class));
+        verify(caseManagementForCaseWorkerService, never()).setNextListedDate(any(CaseData.class));
     }
 
     @Test

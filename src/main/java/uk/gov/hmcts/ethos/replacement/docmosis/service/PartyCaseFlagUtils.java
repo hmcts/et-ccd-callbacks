@@ -37,6 +37,36 @@ final class PartyCaseFlagUtils {
                 Stream.concat(respondentFlagItems(flags), representativeFlagItems(flags)));
     }
 
+    static Stream<CaseFlagsType> allPartyFlagSections(AllPartyFlags flags) {
+        if (flags == null) {
+            return Stream.empty();
+        }
+        return Stream.of(
+                flags.getClaimantFlags(), flags.getClaimantExternalFlags(),
+                flags.getRespondentFlags(), flags.getRespondentExternalFlags(),
+                flags.getRespondent1Flags(), flags.getRespondent1ExternalFlags(),
+                flags.getRespondent2Flags(), flags.getRespondent2ExternalFlags(),
+                flags.getRespondent3Flags(), flags.getRespondent3ExternalFlags(),
+                flags.getRespondent4Flags(), flags.getRespondent4ExternalFlags(),
+                flags.getRespondent5Flags(), flags.getRespondent5ExternalFlags(),
+                flags.getRespondent6Flags(), flags.getRespondent6ExternalFlags(),
+                flags.getRespondent7Flags(), flags.getRespondent7ExternalFlags(),
+                flags.getRespondent8Flags(), flags.getRespondent8ExternalFlags(),
+                flags.getRespondent9Flags(), flags.getRespondent9ExternalFlags(),
+                flags.getClaimantRepresentativeFlags(), flags.getClaimantRepresentativeExternalFlags(),
+                flags.getRepresentativeFlags(), flags.getRepresentativeExternalFlags(),
+                flags.getRepresentative1Flags(), flags.getRepresentative1ExternalFlags(),
+                flags.getRepresentative2Flags(), flags.getRepresentative2ExternalFlags(),
+                flags.getRepresentative3Flags(), flags.getRepresentative3ExternalFlags(),
+                flags.getRepresentative4Flags(), flags.getRepresentative4ExternalFlags(),
+                flags.getRepresentative5Flags(), flags.getRepresentative5ExternalFlags(),
+                flags.getRepresentative6Flags(), flags.getRepresentative6ExternalFlags(),
+                flags.getRepresentative7Flags(), flags.getRepresentative7ExternalFlags(),
+                flags.getRepresentative8Flags(), flags.getRepresentative8ExternalFlags(),
+                flags.getRepresentative9Flags(), flags.getRepresentative9ExternalFlags())
+                .filter(java.util.Objects::nonNull);
+    }
+
     static Stream<FlagDetailType> flagDetails(CaseFlagsType... flags) {
         return flagItems(flags).map(GenericTypeItem::getValue);
     }

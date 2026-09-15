@@ -331,6 +331,15 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
+    "ID": "reviewSupportRequestFlags",
+    "Label": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Flags",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
     "ID": "supportTaskState",
     "Label": "Support task state",
     "FieldType": "SupportTaskState",

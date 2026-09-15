@@ -1000,5 +1000,17 @@
     "CaseFieldID": "supportTaskState",
     "UserRole": "caseworker-wa-task-configuration",
     "CRUD": "R"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "reviewSupportRequestFlags",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "reviewSupportRequestFlags",
+    "UserRole": "caseworker-employment-scotland",
+    "CRUD": "CRUD"
   }
 ]

@@ -1006,5 +1006,17 @@
     "CaseFieldID": "supportTaskState",
     "UserRole": "caseworker-wa-task-configuration",
     "CRUD": "R"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "reviewSupportRequestFlags",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "reviewSupportRequestFlags",
+    "UserRole": "caseworker-employment-englandwales",
+    "CRUD": "CRUD"
   }
 ]

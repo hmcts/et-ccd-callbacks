@@ -63,7 +63,6 @@ import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_ALLOCATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.CASE_DETAILS_OR_CASE_DATA_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES;
@@ -1247,39 +1246,4 @@ public class NocRespondentRepresentativeService {
         caseData.setEt3ResponseAddress(applyMyHmctsOrganisationAddress(caseData, organisationAddress));
     }
 
-    /**
-     * Saves the amended contact details (phone and address) back to all respondent representatives
-     * associated with the authenticated user.
-     *
-     * <p>If the user selected "Use MyHMCTS details", the organisation address is first fetched and
-     * applied to the case data before being persisted to the representative collection.
-     *
-     * @param userToken   the IDAM authentication token of the logged-in legal rep
-     * @param caseDetails the case details containing the representative collection and form values
-     * @throws GenericServiceException if the MyHMCTS organisation address cannot be retrieved
-     */
-    public void saveRespondentRepresentativeContactDetails(String userToken, CaseDetails caseDetails)
-            throws GenericServiceException {
-        if (caseDetails == null) {
-            return;
-        }
-        CaseData caseData = caseDetails.getCaseData();
-        if (caseData == null) {
-            return;
-        }
-        if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS.equals(
-                caseData.getRepresentativeContactChangeOption())) {
-            populateMyHmctsOrganisationAddress(userToken, caseData);
-        }
-        List<RepresentedTypeRItem> representatives = findRepresentativesByToken(userToken, caseDetails);
-        for (RepresentedTypeRItem item : representatives) {
-            if (item == null || item.getValue() == null) {
-                continue;
-            }
-            RepresentedTypeR representative = item.getValue();
-            representative.setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
-            representative.setRepresentativeAddress(caseData.getEt3ResponseAddress());
-        }
-        AddressUtils.clearMyHmctsAddressText(caseData);
-    }
 }

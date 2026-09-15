@@ -10,6 +10,11 @@ public final class NOCConstants {
     public static final String NOC_TYPE_REMOVAL = "Removal";
     public static final String NOC_TYPE_ADDITION = "Addition";
 
+    public static final String REMOVE_ORGANISATION = "your organisation";
+
+    public static final String EMAIL_TYPE_TO_ORG_ADMIN_REMOVED = "orgAdminRemoved";
+    public static final String EMAIL_TYPE_TO_ORG_ADMIN_NO_REP_LEFT = "orgAdminNoRepLeft";
+
     public static final String EXCEPTION_RESPONDENT_NOT_FOUND = "Respondent not found for case ID %s.";
     public static final String EXCEPTION_RESPONDENT_ID_NOT_FOUND =
             "Respondent ID not found for case ID %s.";
@@ -18,7 +23,7 @@ public final class NOCConstants {
     public static final String EXCEPTION_RESPONDENT_NAME_NOT_EXISTS =
             "Respondent name could not be found for respondent ID %s in case %s.";
     public static final String EXCEPTION_REPRESENTATIVE_NOT_FOUND =
-            "Representative not found for case ID %s.";
+            "No representative found for case ID %s.";
     public static final String EXCEPTION_REPRESENTATIVE_ID_NOT_FOUND =
             "Representative ID not found for case ID %s.";
     public static final String EXCEPTION_REPRESENTATIVE_DETAILS_NOT_EXIST =
@@ -59,6 +64,8 @@ public final class NOCConstants {
             "User's organisation and selected organisation does not match, for case %s.";
     public static final String EXCEPTION_CLAIMANT_REPRESENTATIVE_NOT_FOUND =
             "Claimant representative not found.";
+    public static final String EXCEPTION_INVALID_PARAMETERS_TO_REVOKE_REPRESENTATIVE =
+            "Invalid parameters to revoke representative of case with id: %s";
 
     public static final String ERROR_RESPONDENT_HAS_MULTIPLE_REPRESENTATIVES =
             "Respondent with name %s has more than one representative";
@@ -108,6 +115,8 @@ public final class NOCConstants {
             "Unable to assign access to this case via MyHMCTS. Representative email not defined for organisation";
     public static final String ERROR_UNABLE_TO_CHECK_REPRESENTATIVE_ACCOUNT_BY_EMAIL =
             "Failed to check representative account by email. Exception is {}";
+    public static final String WARNING_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID =
+            "Failed to find organisation by user id. Exception is {}";
     public static final String WARNING_MISSING_RESPONDENT_EMAIL_ADDRESS =
             "Missing respondent email address while sending Notice of Change (NoC) respondent representative removal "
                     + NOTIFICATION_FOR_CASE;
@@ -156,6 +165,11 @@ public final class NOCConstants {
             "Failed to send email to claimant for removal of representative, case id: {}, error: {}";
     public static final String WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS =
             "Failed to retrieve case assignments for case id: {}, error: {}";
+
+    public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_REMOVED_REPRESENTATIVE =
+        "Failed to send email to removed legal representative, case id: {}, error: {}";
+    public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_UNREPRESENTED_PARTY =
+        "Failed to send email to unrepresented party, case id: {}, error: {}";
 
     public static final int MAX_NOC_ANSWERS = 10;
 

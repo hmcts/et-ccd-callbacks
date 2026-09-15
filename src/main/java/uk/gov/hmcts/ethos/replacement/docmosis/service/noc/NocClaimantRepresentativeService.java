@@ -234,13 +234,15 @@ public class NocClaimantRepresentativeService {
         CaseData caseData = caseDetails.getCaseData();
         ChangeOrganisationRequest changeRequest = identifyRepresentationChanges(caseData,
                 caseDataBefore);
+        if (changeRequest == null) {
+            return;
+        }
         try {
             nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest, true);
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
         }
-        if (changeRequest != null
-                && changeRequest.getOrganisationToRemove() != null) {
+        if (changeRequest.getOrganisationToRemove() != null) {
             try {
                 nocService.removeOrganisationRepresentativeAccess(caseDetails.getCaseId(), changeRequest);
             } catch (IOException e) {

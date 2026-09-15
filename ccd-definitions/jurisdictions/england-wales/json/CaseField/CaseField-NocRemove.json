@@ -1,0 +1,78 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRemoveRepLandingPageLabel",
+    "Label": "This will remove you and/or your organisation from the case. You will no longer represent the client.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRemoveRepOption",
+    "Label": "Who do you wish to remove from this case?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "frl_NocRemove_ChooseYourselfOrYourOrg",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRemoveRepRemoveLabelSelf",
+    "Label": "When you submit this page, you will be removed from this case and it will no longer appear on your case list.<br><br>A notification will be sent to all parties on this case.<br><br>This is a new online process - you don't need to file any further documents in relation to this notice of change with the court.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRemoveRepRemoveSelfConfirm",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "msl_NocRemove_ConfirmSelf",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRemoveRepRemoveLabelOrg",
+    "Label": "When you submit this page, your organisation will no longer be representing this client and it will not appear in your organisation's case list.<br><br>A notification will be sent to all parties on this case.<br><br>This is a new online process - you don't need to file any further documents in relation to this notice of change with the court.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRemoveRepRemoveOrgLabelClaimant",
+    "Label": "You should check the boxes to 'sign' when<br>- Your organisation will no longer be representing the claimant.<br>- You have served notice of this change to your former client.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRemoveRepRemoveOrgLabelRespondent",
+    "Label": "You should check the boxes to 'sign' when<br>- Your organisation will no longer be representing the respondent.<br>- You have served notice of this change to your former client.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRemoveRepRemoveOrgConfirm1",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "msl_NocRemove_NoLonger",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRemoveRepRemoveOrgConfirm2",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "msl_NocRemove_Notice",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

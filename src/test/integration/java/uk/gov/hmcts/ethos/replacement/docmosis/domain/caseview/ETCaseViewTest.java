@@ -13,7 +13,6 @@ import uk.gov.hmcts.ccd.sdk.CaseViewRequest;
 import uk.gov.hmcts.ccd.sdk.config.DecentralisedDataConfiguration;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.HubLinksStatuses;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.CaseState;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ccd.HubLinkStatus;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.EtCosPostgresqlContainer;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.HubLinkStatusRepository;

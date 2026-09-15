@@ -6732,5 +6732,22 @@
     "FieldType": "Collection",
     "FieldTypeParameter": "DynamicListCollection",
     "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "currentClaimantEmail",
+    "Label": "Current email address",
+    "FieldType": "Email",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "newClaimantEmail",
+    "Label": "New email address",
+    "HintText": "Must be different from the current email and already registered as a citizen portal account. This updates the contact email and grants or reassigns case access.",
+    "FieldType": "Email",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   }
 ]

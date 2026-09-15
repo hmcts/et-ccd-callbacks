@@ -184,8 +184,7 @@ public class CaseActionsForCaseWorkerController {
             }
             defaultValuesReaderService.setPositionAndOffice(caseDetails.getCaseTypeId(), caseData);
 
-            boolean caseFlagsToggle = featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId());
-            if (caseFlagsToggle && caseFlagsSetupRequired(caseDetails.getCaseTypeId(), caseData)) {
+            if (caseFlagsSetupRequired(caseDetails.getCaseTypeId(), caseData)) {
                 setupCaseFlags(caseDetails.getCaseTypeId(), caseData);
             }
 

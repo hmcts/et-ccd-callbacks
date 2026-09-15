@@ -311,6 +311,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
         when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
         when(caseFlagsService.caseFlagsSetupRequired(any(CaseData.class))).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
             .thenReturn(ccdRequest.getCaseDetails().getCaseData());
@@ -487,7 +488,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
         when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
         when(caseFlagsService.legacyCaseFlagsSetupRequired(any(CaseData.class))).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
                 .thenReturn(prepopulatedCaseData);

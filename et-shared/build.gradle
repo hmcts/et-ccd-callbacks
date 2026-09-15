@@ -144,6 +144,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: jacksonVersion
     implementation group: 'org.springframework', name: 'spring-core'
+    implementation group: 'com.github.hmcts', name: 'ccd-config-generator', version: '7.2.0'
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.46'

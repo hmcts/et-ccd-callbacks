@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import uk.gov.hmcts.ccd.sdk.External;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AdditionalCaseInfoType;
@@ -80,6 +81,7 @@ public class Et1CaseData extends BaseCaseData {
     @JsonProperty("et1OnlineSubmission")
     private String et1OnlineSubmission;
     // Citizen hub
+    @External
     @JsonProperty("hubLinksStatuses")
     private HubLinksStatuses hubLinksStatuses;
     @JsonProperty("TTL")

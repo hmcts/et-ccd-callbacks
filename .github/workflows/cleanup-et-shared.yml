@@ -1,0 +1,88 @@
+name: Clean old et-shared Maven packages
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/cleanup-et-shared.yml"
+  schedule:
+    - cron: "0 2 * * 0" # Every Sunday, 02:00 UTC
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "List versions only; do not delete"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    if: >-
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    env:
+      ORGANIZATION: hmcts
+      PROJECT: Artifacts
+      FEED: hmcts-lib
+      GROUP: com.github.hmcts
+      ARTIFACT: et-shared
+      PACKAGE_NAME: com.github.hmcts:et-shared
+      DRY_RUN: ${{ github.event_name == 'pull_request' || inputs.dry_run || 'false' }}
+      AZURE_DEVOPS_ARTIFACT_TOKEN: ${{ secrets.AZURE_DEVOPS_ARTIFACT_TOKEN }}
+
+    steps:
+      - name: Delete package versions published over 90 days ago
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cutoff="$(date -u -d '90 days ago' +%Y-%m-%dT%H:%M:%SZ)"
+
+          list_url="https://feeds.dev.azure.com/${ORGANIZATION}/${PROJECT}/_apis/packaging/feeds/${FEED}/packages?protocolType=maven&packageNameQuery=${ARTIFACT}&includeAllVersions=true&api-version=7.1"
+
+          payload="$(
+            curl --fail-with-body --silent --show-error \
+              --user ":${AZURE_DEVOPS_ARTIFACT_TOKEN}" \
+              "${list_url}" |
+            jq -c \
+              --arg artifact "${ARTIFACT}" \
+              --arg package "${PACKAGE_NAME}" \
+              --arg cutoff "${cutoff}" '
+                {
+                  operation: "delete",
+                  packages: [
+                    .value[]
+                    | select(.name == $package)
+                    | .versions[]
+                    | select(.publishDate < $cutoff)
+                    | select(.isLatest | not)
+                    | select(any(.views[]?; .type == "release") | not)
+                    | {
+                        group: "com.github.hmcts",
+                        artifact: $artifact,
+                        version: .version
+                      }
+                  ]
+                }
+              '
+          )"
+
+          count="$(jq '.packages | length' <<< "${payload}")"
+          echo "Versions selected for deletion: ${count}"
+          jq '.packages' <<< "${payload}"
+
+          if [[ "${count}" -eq 0 || "${DRY_RUN}" == "true" ]]; then
+            exit 0
+          fi
+
+          delete_url="https://pkgs.dev.azure.com/${ORGANIZATION}/${PROJECT}/_apis/packaging/feeds/${FEED}/maven/packagesbatch?api-version=7.1-preview.1"
+
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            --user ":${AZURE_DEVOPS_ARTIFACT_TOKEN}" \
+            --header "Content-Type: application/json" \
+            --data "${payload}" \
+            "${delete_url}"

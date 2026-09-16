@@ -34,6 +34,8 @@ public class UpdateHubLinkStatusEvent implements CCDConfig<CaseData, CaseState, 
 
     @Override
     public void configureDecentralised(DecentralisedConfigBuilder<CaseData, CaseState, PlaceholderRole> builder) {
+        // Decentralised events do not touch the legacy case_data.data json blob.
+        // We persist to our table without touching the blob, avoiding conflicts.
         builder.decentralisedEvent(EVENT_ID, this::submit)
             .forAllStates();
     }

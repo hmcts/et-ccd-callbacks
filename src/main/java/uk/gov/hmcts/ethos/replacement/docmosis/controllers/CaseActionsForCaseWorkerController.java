@@ -50,6 +50,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskEventService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
@@ -120,6 +121,7 @@ public class CaseActionsForCaseWorkerController {
     private final FeatureToggleService featureToggleService;
     private final CaseFlagsService caseFlagsService;
     private final SupportTaskService supportTaskService;
+    private final SupportTaskEventService supportTaskEventService;
     private final CaseManagementLocationService caseManagementLocationService;
     private final Et1SubmissionService et1SubmissionService;
     private final NocRespondentHelper nocRespondentHelper;
@@ -249,6 +251,18 @@ public class CaseActionsForCaseWorkerController {
         }
 
         return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    @PostMapping(value = "/supportTasks/submitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Trigger closure of Review Support tasks after Case Flags are updated.")
+    public ResponseEntity<CCDCallbackResponse> closeReviewSupportTasks(
+            @RequestBody CallbackRequest callbackRequest) {
+        CaseDetails caseDetails = callbackRequest.getCaseDetails();
+        if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())
+                && supportTaskService.hasReviewSupportTaskToClose(caseDetails.getCaseData())) {
+            supportTaskEventService.triggerCloseReviewSupportTasks(caseDetails);
+        }
+        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 
     @PostMapping(value = "/reviewSupportRequest/aboutToStart", consumes = APPLICATION_JSON_VALUE)

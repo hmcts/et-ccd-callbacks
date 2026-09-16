@@ -195,5 +195,15 @@
     "FieldShowCondition": "flagLauncher=\"hidden\"",
     "ShowSummaryChangeOption": "N",
     "RetainHiddenValue": "Yes"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "closeReviewSupportTasks",
+    "CaseFieldID": "supportTaskState",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
   }
 ]

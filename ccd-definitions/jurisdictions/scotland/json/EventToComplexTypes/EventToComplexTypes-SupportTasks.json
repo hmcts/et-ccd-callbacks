@@ -331,5 +331,32 @@
     "FieldDisplayOrder": 4,
     "DisplayContext": "OPTIONAL",
     "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "closeReviewSupportTasks",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "adminTaskRequired",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "closeReviewSupportTasks",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "legalOfficerTaskRequired",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "closeReviewSupportTasks",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "judgeTaskRequired",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
   }
 ]

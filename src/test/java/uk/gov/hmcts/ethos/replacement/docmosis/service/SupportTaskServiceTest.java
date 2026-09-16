@@ -43,6 +43,37 @@ class SupportTaskServiceTest {
 
     private final SupportTaskService service = new SupportTaskService(configuration());
 
+    @Test
+    void identifiesReviewSupportTaskThatNeedsClosing() {
+        CaseData caseData = new CaseData();
+        SupportTaskState state = new SupportTaskState();
+        state.setJudgeTaskRequired(NO);
+        caseData.setSupportTaskState(state);
+
+        assertTrue(service.hasReviewSupportTaskToClose(caseData));
+    }
+
+    @Test
+    void identifiesBooleanReviewSupportTaskThatNeedsClosing() {
+        CaseData caseData = new CaseData();
+        SupportTaskState state = new SupportTaskState();
+        state.setAdminTaskRequired(CCD_FALSE);
+        caseData.setSupportTaskState(state);
+
+        assertTrue(service.hasReviewSupportTaskToClose(caseData));
+    }
+
+    @Test
+    void doesNotIdentifyReviewSupportTaskWhenNoCategoryNeedsClosing() {
+        CaseData caseData = new CaseData();
+        SupportTaskState state = new SupportTaskState();
+        state.setAdminTaskRequired(YES);
+        state.setJudgeTaskRequired(CCD_TRUE);
+        caseData.setSupportTaskState(state);
+
+        assertFalse(service.hasReviewSupportTaskToClose(caseData));
+    }
+
     private static SupportTaskConfiguration configuration() {
         SupportTaskConfiguration configuration = new SupportTaskConfiguration();
         configuration.getReview().setAdminFlagCodes(Set.of(

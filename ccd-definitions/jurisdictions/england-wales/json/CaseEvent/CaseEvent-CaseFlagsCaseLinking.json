@@ -11,7 +11,8 @@
     "ShowSummary": "N",
     "Publish": "Y",
     "CallBackURLAboutToStartEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToStart",
-    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToSubmit"
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToSubmit",
+    "CallBackURLSubmittedEvent": "${ET_COS_URL}/supportTasks/submitted"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
@@ -25,7 +26,8 @@
     "ShowSummary": "N",
     "Publish": "Y",
     "CallBackURLAboutToStartEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToStart",
-    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToSubmit"
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToSubmit",
+    "CallBackURLSubmittedEvent": "${ET_COS_URL}/supportTasks/submitted"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
@@ -39,7 +41,8 @@
     "ShowSummary": "N",
     "Publish": "Y",
     "CallBackURLAboutToStartEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToStart",
-    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToSubmit"
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToSubmit",
+    "CallBackURLSubmittedEvent": "${ET_COS_URL}/supportTasks/submitted"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
@@ -70,7 +73,7 @@
     "EventEnablingCondition": "",
     "CallBackURLAboutToStartEvent": "",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/supportTasks/aboutToSubmit",
-    "CallBackURLSubmittedEvent": "",
+    "CallBackURLSubmittedEvent": "${ET_COS_URL}/supportTasks/submitted",
     "Publish": "Y"
   },
   {
@@ -102,7 +105,7 @@
     "EventEnablingCondition": "",
     "CallBackURLAboutToStartEvent": "",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/supportTasks/aboutToSubmit",
-    "CallBackURLSubmittedEvent": "",
+    "CallBackURLSubmittedEvent": "${ET_COS_URL}/supportTasks/submitted",
     "Publish": "Y"
   },
   {
@@ -177,5 +180,18 @@
     "CallBackURLAboutToStartEvent": "",
     "CallBackURLAboutToSubmitEvent": "",
     "CallBackURLSubmittedEvent": ""
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "closeReviewSupportTasks",
+    "Name": "Close review support tasks",
+    "Description": "Close review support tasks",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "EventEnablingCondition": "caseType=\"dummy\"",
+    "Publish": "Y"
   }
 ]

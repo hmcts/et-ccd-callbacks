@@ -224,6 +224,20 @@ public class SupportTaskService {
                 && !Boolean.parseBoolean(taskCreated);
     }
 
+    public boolean hasReviewSupportTaskToClose(CaseData caseData) {
+        SupportTaskState state = caseData.getSupportTaskState();
+        return state != null && Stream.of(
+                        state.getAdminTaskRequired(),
+                        state.getLegalOfficerTaskRequired(),
+                        state.getJudgeTaskRequired())
+                .anyMatch(SupportTaskService::isTaskNotRequired);
+    }
+
+    private static boolean isTaskNotRequired(String taskRequired) {
+        return NO.equalsIgnoreCase(taskRequired)
+                || "false".equalsIgnoreCase(taskRequired);
+    }
+
     private static boolean isRequested(FlagDetailType flag) {
         return FLAG_STATUS_REQUESTED.equals(flag.getStatus());
     }

@@ -22,7 +22,7 @@ class MultipleCaseViewTest {
         MultipleCasesRenderer multipleCasesRenderer = mock(MultipleCasesRenderer.class);
         MultipleCaseView caseView = new MultipleCaseView(multipleCasesRenderer);
         MultipleData multipleData = new MultipleData();
-        long caseReference = 1234567890123456L;
+        long caseReference = 1_234_567_890_123_456L;
 
         when(multipleCasesRenderer.render(caseReference, null)).thenReturn("Rendered cases");
 

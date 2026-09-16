@@ -853,6 +853,7 @@ tasks.register('bootWithCcdAndWa') {
 }
 
 cftlibTest {
+    dependsOn 'generateCftlibCcdDefinitions'
     jacoco.excludes = ['org/drools/**', 'uk/gov/hmcts/et/common/model/ccd/CaseData']
 }
 

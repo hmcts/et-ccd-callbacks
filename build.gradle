@@ -1,3 +1,6 @@
+import uk.gov.hmcts.rse.AuthMode
+import uk.gov.hmcts.rse.CftlibExec
+
 plugins {
     id 'application'
     id 'java'
@@ -740,17 +743,28 @@ wrapper {
 // True when ET_WORK_ALLOCATION=true is set explicitly, or when the bootWithCcdAndWa task is invoked.
 def waEnabled = System.getenv('ET_WORK_ALLOCATION') == 'true'
         || gradle.startParameter.taskNames.any { it == 'bootWithCcdAndWa' }
+def cftlibDatabases = 'et_cos,et_msg_handler,evidence,ethos,camunda,role_assignment,wa_workflow_api,cft_task_db,' +
+    'wa_case_event_messages_db,ccd_data,emstitch'
+
+tasks.withType(CftlibExec).configureEach {
+    authMode = AuthMode.Local
+    environment 'RSE_LIB_ADDITIONAL_DATABASES', cftlibDatabases
+    environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
+    environment 'CFTLIB_IMPORT_CCD_DEFS_ON_BOOT', System.getenv('CFTLIB_IMPORT_CCD_DEFS_ON_BOOT') ?: 'true'
+    environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
+    environment 'ET_COS_URL', System.getenv('ET_COS_URL') ?: 'http://localhost:8081'
+    environment 'ET_COS_SYSTEM_USER', System.getenv('ET_COS_SYSTEM_USER') ?: 'admin@hmcts.net'
+    environment 'ET_COS_SYSTEM_USER_PASSWORD', System.getenv('ET_COS_SYSTEM_USER_PASSWORD') ?: 'Password'
+}
 
 bootWithCCD {
     // Simulates idam and s2s locally.
     // See rse-cft-lib/LibRunnerTask
-    authMode = uk.gov.hmcts.rse.AuthMode.Local
-
     if (waEnabled) {
         jvmArgs '-Dspring.devtools.restart.enabled=false'
     }
 
-    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,ethos,camunda,role_assignment,wa_workflow_api,cft_task_db,wa_case_event_messages_db,ccd_data,emstitch,cft_task_db_replica'
+    environment 'RSE_LIB_ADDITIONAL_DATABASES', "$cftlibDatabases,cft_task_db_replica"
     environment 'CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES', 'aac_manage_case_assignment,et_cos,et_sya_api,et_msg_handler'
     // ccd-data-store-api
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ethos_repl_service,ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,ccd_case_document_am_api,am_role_assignment_service,ethos_repl_docmosis_service,ecm_consumer,et_cos,et_msg_handler,et_sya_api,wa_workflow_api,wa_task_management_api,wa_task_monitor,wa_case_event_handler,em_ccd_orchestrator,em_stitching_api,wa_task_configuration_api'
@@ -808,11 +822,6 @@ bootWithCCD {
     environment 'PRD_HOST', 'http://localhost:8765'
     environment 'XUI_MANAGE_ORGANISATIONS_CASETYPES', 'ET_EnglandWales,ET_Scotland'
 
-    environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
-    environment 'ET_COS_URL', System.getenv('ET_COS_URL') ?: 'http://localhost:8081'
-    environment 'ET_COS_SYSTEM_USER', System.getenv('ET_COS_SYSTEM_USER') ?: 'admin@hmcts.net'
-    environment 'ET_COS_SYSTEM_USER_PASSWORD', System.getenv('ET_COS_SYSTEM_USER_PASSWORD') ?: 'Password'
-    environment 'CFTLIB_IMPORT_CCD_DEFS_ON_BOOT', System.getenv('CFTLIB_IMPORT_CCD_DEFS_ON_BOOT') ?: 'true'
     // et-ccd-callbacks
     //environment 'SERVICEBUS_FAKE', 'true'*
     // Load WA compose services only when ET_WORK_ALLOCATION=true is set, or when running bootWithCcdAndWa.
@@ -844,29 +853,13 @@ tasks.register('bootWithCcdAndWa') {
 }
 
 cftlibTest {
-    authMode = uk.gov.hmcts.rse.AuthMode.Local
     jacoco.excludes = ['org/drools/**', 'uk/gov/hmcts/et/common/model/ccd/CaseData']
-    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,ethos,camunda,role_assignment,wa_workflow_api,cft_task_db,wa_case_event_messages_db,ccd_data,emstitch'
-    environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
-    environment 'CFTLIB_IMPORT_CCD_DEFS_ON_BOOT', 'true'
-    environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
-    environment 'ET_COS_URL', 'http://localhost:8081'
-    environment 'ET_COS_SYSTEM_USER', 'admin@hmcts.net'
-    environment 'ET_COS_SYSTEM_USER_PASSWORD', 'Password'
 }
 
 tasks.named('dumpCCDDefinitions') {
     dependsOn 'generateCftlibCcdDefinitions'
-    authMode = uk.gov.hmcts.rse.AuthMode.Local
-    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,ethos,camunda,role_assignment,wa_workflow_api,cft_task_db,wa_case_event_messages_db,ccd_data,emstitch'
-    environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
     environment 'SPRING_MAIN_LAZY_INITIALIZATION', 'true'
-    environment 'CFTLIB_IMPORT_CCD_DEFS_ON_BOOT', System.getenv('CFTLIB_IMPORT_CCD_DEFS_ON_BOOT') ?: 'true'
     environment 'ET_COS_CFTLIB_DB_PASSWORD', System.getenv('ET_COS_CFTLIB_DB_PASSWORD') ?: 'postgres'
-    environment 'ET_COS_URL', System.getenv('ET_COS_URL') ?: 'http://localhost:8081'
-    environment 'ET_COS_SYSTEM_USER', System.getenv('ET_COS_SYSTEM_USER') ?: 'admin@hmcts.net'
-    environment 'ET_COS_SYSTEM_USER_PASSWORD', System.getenv('ET_COS_SYSTEM_USER_PASSWORD') ?: 'Password'
-    environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
 }
 
 tasks.register('highLevelDataSetup', JavaExec) {

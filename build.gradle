@@ -521,6 +521,8 @@ ext["rest-assured.version"] = '5.1.0'
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        // Boot 4 compatible Spring Cloud Azure
+        mavenBom 'com.azure.spring:spring-cloud-azure-dependencies:7.4.0'
         mavenBom 'com.azure:azure-sdk-bom:1.3.8'
         mavenBom "com.fasterxml.jackson:jackson-bom:${jacksonVersion}"
     }
@@ -603,8 +605,8 @@ dependencies {
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '4.0.4'
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.11'
-    implementation 'org.flywaydb:flyway-database-postgresql:11.20.3'
-    implementation 'org.flywaydb:flyway-core:11.20.3'
+    implementation 'org.springframework.boot:spring-boot-starter-flyway'
+    implementation 'org.flywaydb:flyway-database-postgresql'
     // CVE-2026-42198, CVE-2026-54291
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.13'
     implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.17'

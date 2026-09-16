@@ -24,7 +24,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -129,6 +131,14 @@ class DigitalCaseFileServiceTest {
         assertDoesNotThrow(() -> digitalCaseFileService.createUploadRemoveDcf("authToken", caseDetails));
         assertEquals("DCF Updating: " + LocalDateTime.now(ZoneId.of("Europe/London")).format(NEW_DATE_TIME_PATTERN),
                 caseData.getDigitalCaseFile().getStatus());
+        assertThat(caseData.getCaseBundles()).hasSize(1);
+        var bundle = caseData.getCaseBundles().getFirst();
+        assertDoesNotThrow(() -> UUID.fromString(bundle.id()));
+        assertThat(bundle.id()).isNotEqualTo(bundle.value().getId());
+        assertThat(bundle.value().getDocuments()).hasSize(1).allSatisfy(document -> {
+            assertDoesNotThrow(() -> UUID.fromString(document.id()));
+            assertThat(document.id()).isNotEqualTo(bundle.id());
+        });
     }
 
     @Test

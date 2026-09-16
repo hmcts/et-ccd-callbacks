@@ -10,9 +10,6 @@
 !build/
 !build/libs/
 !build/libs/et-cos.jar
-!build/cftlib/
-!build/cftlib/definition-snapshots/
-!build/cftlib/definition-snapshots/**
 
 !ccd-definitions/
 !ccd-definitions/jurisdictions/

@@ -724,10 +724,6 @@ bootJar {
         'et-cos.jar'
     })
 
-    from("$buildDir/cftlib/definition-snapshots") {
-        into 'BOOT-INF/classes/definition-snapshots'
-    }
-
     manifest {
         attributes('Implementation-Version': project.version.toString())
     }

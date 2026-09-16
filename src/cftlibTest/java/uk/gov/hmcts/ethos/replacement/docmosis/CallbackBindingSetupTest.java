@@ -6,14 +6,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.context.SpringBootTest;
+import uk.gov.hmcts.rse.ccd.lib.Database;
 import uk.gov.hmcts.rse.ccd.lib.test.CftlibTest;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -32,11 +32,8 @@ class CallbackBindingSetupTest extends CftlibTest {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-    private static final List<Path> DEFINITION_SNAPSHOTS_LOCATIONS = List.of(
-        Path.of("build", "cftlib", "definition-snapshots"),
-        Path.of("build", "resources", "test", "definition-snapshots")
-    );
-    private static final String DEFINITION_SNAPSHOTS_CLASSPATH = "definition-snapshots";
+    private static final Path DEFINITION_SNAPSHOTS_ROOT =
+        Path.of("build", "cftlib", "definition-snapshots");
     private static final Path CONTROLLERS_SOURCE_ROOT = Path.of(
         "src", "main", "java", "uk", "gov", "hmcts", "ethos", "replacement", "docmosis", "controllers"
     );
@@ -57,9 +54,17 @@ class CallbackBindingSetupTest extends CftlibTest {
 
     @Test
     void callbackBindingsFromCcdDefinitionsResolveAgainstEtControllers()
-        throws IOException {
+        throws IOException, SQLException {
+        Set<String> expectedCaseTypeIds = loadCaseTypeIds();
+        clearDefinitionSnapshots();
         cftlib().dumpDefinitionSnapshots();
         Map<String, JsonNode> definitions = loadCaseTypeDefinitions();
+
+        assertThat(definitions.keySet())
+            .as("CFT Lib must dump one JSON snapshot for every imported CCD case type")
+            .containsExactlyInAnyOrderElementsOf(expectedCaseTypeIds);
+
+        definitions.remove(PRE_HEARING_DEPOSIT);
         Set<String> controllerCallbackPaths = discoverControllerCallbackPaths();
         Set<String> definitionCallbackPaths = extractDefinitionCallbackPaths(definitions);
 
@@ -80,7 +85,7 @@ class CallbackBindingSetupTest extends CftlibTest {
     private static Map<String, JsonNode> loadCaseTypeDefinitions() throws IOException {
         Map<String, JsonNode> definitions = new LinkedHashMap<>();
 
-        try (Stream<Path> paths = Files.walk(resolveDefinitionSnapshotsRoot())) {
+        try (Stream<Path> paths = Files.walk(DEFINITION_SNAPSHOTS_ROOT)) {
             for (Path path : paths
                 .filter(Files::isRegularFile)
                 .filter(snapshot -> snapshot.getFileName().toString().endsWith(".json"))
@@ -98,24 +103,28 @@ class CallbackBindingSetupTest extends CftlibTest {
         return definitions;
     }
 
-    private static Path resolveDefinitionSnapshotsRoot() {
-        for (Path candidate : DEFINITION_SNAPSHOTS_LOCATIONS) {
-            if (Files.isDirectory(candidate)) {
-                return candidate;
+    private Set<String> loadCaseTypeIds() throws SQLException {
+        Set<String> caseTypeIds = new LinkedHashSet<>();
+        try (var connection = cftlib().getConnection(Database.Definitionstore);
+             var statement = connection.createStatement();
+             var resultSet = statement.executeQuery("select distinct reference from case_type order by reference")) {
+            while (resultSet.next()) {
+                caseTypeIds.add(resultSet.getString("reference"));
             }
         }
+        return caseTypeIds;
+    }
 
-        URL resource = CallbackBindingSetupTest.class.getClassLoader().getResource(DEFINITION_SNAPSHOTS_CLASSPATH);
-        if (resource != null && "file".equals(resource.getProtocol())) {
-            try {
-                return Path.of(resource.toURI());
-            } catch (URISyntaxException e) {
-                throw new IllegalStateException("Invalid definition-snapshots classpath location", e);
+    private static void clearDefinitionSnapshots() throws IOException {
+        Files.createDirectories(DEFINITION_SNAPSHOTS_ROOT);
+        try (Stream<Path> paths = Files.list(DEFINITION_SNAPSHOTS_ROOT)) {
+            for (Path path : paths
+                .filter(Files::isRegularFile)
+                .filter(snapshot -> snapshot.getFileName().toString().endsWith(".json"))
+                .toList()) {
+                Files.delete(path);
             }
         }
-
-        throw new IllegalStateException(
-            "CCD definition snapshots not found. Run ./gradlew dumpCCDDefinitions to generate them.");
     }
 
     private static Set<String> extractDefinitionCallbackPaths(Map<String, JsonNode> definitions) {

@@ -43,61 +43,6 @@ class SupportTaskServiceTest {
 
     private final SupportTaskService service = new SupportTaskService(configuration());
 
-    @Test
-    void identifiesReviewSupportTaskThatNeedsClosing() {
-        CaseData caseData = new CaseData();
-        SupportTaskState state = new SupportTaskState();
-        state.setJudgeTaskCreated(NO);
-        state.setJudgeTaskRequired(YES);
-        caseData.setSupportTaskState(state);
-
-        assertTrue(service.hasReviewSupportTaskToClose(caseData));
-    }
-
-    @Test
-    void identifiesBooleanReviewSupportTaskThatNeedsClosing() {
-        CaseData caseData = new CaseData();
-        SupportTaskState state = new SupportTaskState();
-        state.setAdminTaskCreated(CCD_FALSE);
-        state.setAdminTaskRequired(CCD_TRUE);
-        caseData.setSupportTaskState(state);
-
-        assertTrue(service.hasReviewSupportTaskToClose(caseData));
-    }
-
-    @Test
-    void doesNotIdentifyReviewSupportTaskWhenNoCategoryNeedsClosing() {
-        CaseData caseData = new CaseData();
-        SupportTaskState state = new SupportTaskState();
-        state.setAdminTaskCreated(YES);
-        state.setJudgeTaskCreated(CCD_TRUE);
-        caseData.setSupportTaskState(state);
-
-        assertFalse(service.hasReviewSupportTaskToClose(caseData));
-    }
-
-    @Test
-    void doesNotCloseReviewSupportTaskAgainWhenItWasAlreadyNotRequired() {
-        CaseData caseData = new CaseData();
-        caseData.setSupportTaskState(SupportTaskState.builder()
-                .adminTaskCreated(NO)
-                .adminTaskRequired(NO)
-                .build());
-
-        assertFalse(service.hasReviewSupportTaskToClose(caseData));
-    }
-
-    @Test
-    void closesReviewSupportTaskFromCurrentPendingState() {
-        CaseData caseData = new CaseData();
-        caseData.setSupportTaskState(SupportTaskState.builder()
-                .legalOfficerTaskCreated(NO)
-                .legalOfficerTaskRequired(YES)
-                .build());
-
-        assertTrue(service.hasReviewSupportTaskToClose(caseData));
-    }
-
     private static SupportTaskConfiguration configuration() {
         SupportTaskConfiguration configuration = new SupportTaskConfiguration();
         configuration.getReview().setAdminFlagCodes(Set.of(
@@ -152,6 +97,9 @@ class SupportTaskServiceTest {
                 taskState(caseData).getLegalOfficerTaskRequired());
         assertEquals(TASK_TYPE_JUDGE.equals(taskType) ? YES : null,
                 taskState(caseData).getJudgeTaskRequired());
+        assertNull(taskState(caseData).getAdminTaskCompletionRequired());
+        assertNull(taskState(caseData).getLegalOfficerTaskCompletionRequired());
+        assertNull(taskState(caseData).getJudgeTaskCompletionRequired());
 
         service.prepareReviewSupportTasks(caseData);
 
@@ -330,11 +278,11 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, taskState(caseData).getAdminTaskCreated());
-        assertEquals(NO, taskState(caseData).getAdminTaskRequired());
+        assertEquals(YES, taskState(caseData).getAdminTaskCompletionRequired());
         assertEquals(YES, taskState(caseData).getJudgeTaskCreated());
-        assertNull(taskState(caseData).getJudgeTaskRequired());
+        assertNull(taskState(caseData).getJudgeTaskCompletionRequired());
         assertEquals(NO, taskState(caseData).getLegalOfficerTaskCreated());
-        assertEquals(NO, taskState(caseData).getLegalOfficerTaskRequired());
+        assertEquals(YES, taskState(caseData).getLegalOfficerTaskCompletionRequired());
     }
 
     @Test
@@ -344,12 +292,17 @@ class SupportTaskServiceTest {
                 .claimantFlags(caseFlags("managed-flag", "RA0033", STATUS_ACTIVE))
                 .representative2ExternalFlags(caseFlags("requested-flag", "RA0033", STATUS_REQUESTED))
                 .build());
-        caseData.setSupportTaskState(SupportTaskState.builder().adminTaskCreated(YES).build());
+        caseData.setSupportTaskState(SupportTaskState.builder()
+                .adminTaskCreated(YES)
+                .adminTaskRequired(YES)
+                .adminTaskCompletionRequired(YES)
+                .build());
 
         service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(YES, taskState(caseData).getAdminTaskCreated());
         assertNull(taskState(caseData).getAdminTaskRequired());
+        assertNull(taskState(caseData).getAdminTaskCompletionRequired());
     }
 
     static Stream<Arguments> reviewTaskCategoryScenarios() {
@@ -456,13 +409,14 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(CCD_TRUE, getTaskCreated(taskState(caseData), taskType));
-        assertNull(getTaskRequired(taskState(caseData), taskType));
+        assertNull(getTaskCompletionRequired(taskState(caseData), taskType));
 
         activateRespondentFlag(caseData);
         service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, getTaskCreated(taskState(caseData), taskType));
-        assertEquals(NO, getTaskRequired(taskState(caseData), taskType));
+        assertNull(getTaskRequired(taskState(caseData), taskType));
+        assertEquals(YES, getTaskCompletionRequired(taskState(caseData), taskType));
     }
 
     @ParameterizedTest
@@ -492,7 +446,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
 
         assertEquals(NO, getTaskCreated(taskState(caseData), taskType));
-        assertEquals(NO, getTaskRequired(taskState(caseData), taskType));
+        assertEquals(YES, getTaskCompletionRequired(taskState(caseData), taskType));
     }
 
     @ParameterizedTest
@@ -519,7 +473,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, getTaskCreated(taskState(caseData), taskType));
-        assertEquals(NO, getTaskRequired(taskState(caseData), taskType));
+        assertEquals(YES, getTaskCompletionRequired(taskState(caseData), taskType));
     }
 
     @Test
@@ -539,11 +493,11 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, taskState(caseData).getAdminTaskCreated());
-        assertEquals(NO, taskState(caseData).getAdminTaskRequired());
+        assertEquals(YES, taskState(caseData).getAdminTaskCompletionRequired());
         assertEquals(CCD_TRUE, taskState(caseData).getLegalOfficerTaskCreated());
-        assertNull(taskState(caseData).getLegalOfficerTaskRequired());
+        assertNull(taskState(caseData).getLegalOfficerTaskCompletionRequired());
         assertEquals(CCD_TRUE, taskState(caseData).getJudgeTaskCreated());
-        assertNull(taskState(caseData).getJudgeTaskRequired());
+        assertNull(taskState(caseData).getJudgeTaskCompletionRequired());
     }
 
     @Test
@@ -569,7 +523,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(YES, taskState(caseData).getAdminTaskCreated());
-        assertNull(taskState(caseData).getAdminTaskRequired());
+        assertNull(taskState(caseData).getAdminTaskCompletionRequired());
     }
 
     @Test
@@ -586,9 +540,9 @@ class SupportTaskServiceTest {
         assertEquals(NO, taskState(caseData).getAdminTaskCreated());
         assertEquals(NO, taskState(caseData).getLegalOfficerTaskCreated());
         assertEquals(NO, taskState(caseData).getJudgeTaskCreated());
-        assertEquals(NO, taskState(caseData).getAdminTaskRequired());
-        assertEquals(NO, taskState(caseData).getLegalOfficerTaskRequired());
-        assertEquals(NO, taskState(caseData).getJudgeTaskRequired());
+        assertEquals(YES, taskState(caseData).getAdminTaskCompletionRequired());
+        assertEquals(YES, taskState(caseData).getLegalOfficerTaskCompletionRequired());
+        assertEquals(YES, taskState(caseData).getJudgeTaskCompletionRequired());
     }
 
     @Test
@@ -600,7 +554,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
 
         assertEquals(NO, taskState(caseData).getJudgeTaskCreated());
-        assertEquals(NO, taskState(caseData).getJudgeTaskRequired());
+        assertEquals(YES, taskState(caseData).getJudgeTaskCompletionRequired());
     }
 
     static Stream<Arguments> reviewAndArrangeTaskScenarios() {
@@ -623,7 +577,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
         service.prepareArrangeSupportTask(caseData, caseDataBefore);
 
-        assertEquals(NO, getTaskRequired(taskState(caseData), taskType));
+        assertEquals(YES, getTaskCompletionRequired(taskState(caseData), taskType));
         assertEquals(arrangeTaskName, taskState(caseData).getArrangeSupportTaskName());
     }
 
@@ -634,7 +588,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, taskState(caseData).getAdminTaskCreated());
-        assertEquals(NO, taskState(caseData).getAdminTaskRequired());
+        assertEquals(YES, taskState(caseData).getAdminTaskCompletionRequired());
     }
 
     @Test
@@ -845,6 +799,15 @@ class SupportTaskServiceTest {
             case TASK_TYPE_ADMIN -> state.getAdminTaskRequired();
             case TASK_TYPE_LEGAL_OFFICER -> state.getLegalOfficerTaskRequired();
             case TASK_TYPE_JUDGE -> state.getJudgeTaskRequired();
+            default -> throw new IllegalArgumentException("Unknown task type: " + taskType);
+        };
+    }
+
+    private static String getTaskCompletionRequired(SupportTaskState state, String taskType) {
+        return switch (taskType) {
+            case TASK_TYPE_ADMIN -> state.getAdminTaskCompletionRequired();
+            case TASK_TYPE_LEGAL_OFFICER -> state.getLegalOfficerTaskCompletionRequired();
+            case TASK_TYPE_JUDGE -> state.getJudgeTaskCompletionRequired();
             default -> throw new IllegalArgumentException("Unknown task type: " + taskType);
         };
     }

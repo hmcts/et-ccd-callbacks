@@ -16,6 +16,13 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseFieldID": "supportTaskState",
+    "ListElementCode": "adminTaskCompletionRequired",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "supportTaskState",
     "ListElementCode": "legalOfficerTaskCreated",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
@@ -30,6 +37,13 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseFieldID": "supportTaskState",
+    "ListElementCode": "legalOfficerTaskCompletionRequired",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "supportTaskState",
     "ListElementCode": "judgeTaskCreated",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
@@ -38,6 +52,13 @@
     "CaseTypeID": "ET_Scotland",
     "CaseFieldID": "supportTaskState",
     "ListElementCode": "judgeTaskRequired",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "judgeTaskCompletionRequired",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
   },
@@ -59,6 +80,27 @@
     "CaseTypeID": "ET_Scotland",
     "CaseFieldID": "supportTaskState",
     "ListElementCode": "judgeTaskRequired",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "adminTaskCompletionRequired",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "legalOfficerTaskCompletionRequired",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "judgeTaskCompletionRequired",
     "UserRole": "caseworker-wa-task-configuration",
     "CRUD": "R"
   },

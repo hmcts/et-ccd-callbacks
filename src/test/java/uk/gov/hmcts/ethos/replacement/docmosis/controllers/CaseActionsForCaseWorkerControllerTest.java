@@ -49,7 +49,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskEventService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
@@ -98,7 +97,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private static final String PRE_DEFAULT_VALUES_URL = "/preDefaultValues";
     private static final String POST_DEFAULT_VALUES_URL = "/postDefaultValues";
     private static final String SUPPORT_TASKS_URL = "/supportTasks/aboutToSubmit";
-    private static final String SUPPORT_TASKS_SUBMITTED_URL = "/supportTasks/submitted";
     private static final String REVIEW_SUPPORT_REQUEST_ABOUT_TO_START_URL =
             "/reviewSupportRequest/aboutToStart";
     private static final String REVIEW_SUPPORT_REQUEST_ABOUT_TO_SUBMIT_URL =
@@ -196,9 +194,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @MockitoBean
     private SupportTaskService supportTaskService;
-
-    @MockitoBean
-    private SupportTaskEventService supportTaskEventService;
 
     @MockitoBean
     private FeatureToggleService featureToggleService;
@@ -442,38 +437,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                     any(CaseData.class), any(CaseData.class));
         }
         verify(caseManagementForCaseWorkerService).setNextListedDate(any(CaseData.class));
-    }
-
-    @Test
-    @SneakyThrows
-    void triggersDedicatedReviewSupportTaskClosureEventAfterCaseUpdate() {
-        ((ObjectNode) requestContent2).set("case_details_before",
-                requestContent2.get("case_details").deepCopy());
-        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
-        when(supportTaskService.hasReviewSupportTaskToClose(any(CaseData.class))).thenReturn(true);
-
-        mvc.perform(post(SUPPORT_TASKS_SUBMITTED_URL)
-                        .content(requestContent2.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        verify(supportTaskEventService).triggerCloseReviewSupportTasks(any(CaseDetails.class));
-        verify(supportTaskService).hasReviewSupportTaskToClose(any(CaseData.class));
-    }
-
-    @Test
-    @SneakyThrows
-    void doesNotTriggerReviewSupportTaskClosureEventWhenNoTaskNeedsClosing() {
-        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
-
-        mvc.perform(post(SUPPORT_TASKS_SUBMITTED_URL)
-                        .content(requestContent2.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        verify(supportTaskEventService, never()).triggerCloseReviewSupportTasks(any(CaseDetails.class));
     }
 
     @ParameterizedTest

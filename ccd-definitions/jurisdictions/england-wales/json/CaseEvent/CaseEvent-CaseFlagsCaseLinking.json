@@ -180,18 +180,5 @@
     "CallBackURLAboutToStartEvent": "",
     "CallBackURLAboutToSubmitEvent": "",
     "CallBackURLSubmittedEvent": ""
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "closeReviewSupportTasks",
-    "Name": "Close review support tasks",
-    "Description": "Close review support tasks",
-    "PreConditionState(s)": "*",
-    "PostConditionState": "*",
-    "SecurityClassification": "Public",
-    "ShowEventNotes": "N",
-    "ShowSummary": "N",
-    "EventEnablingCondition": "caseType=\"dummy\"",
-    "Publish": "Y"
   }
 ]

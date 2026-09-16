@@ -215,17 +215,5 @@
     "CaseEventID": "reviewJudgeSupportRequest",
     "UserRole": "caseworker-wa-task-configuration",
     "CRUD": "R"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "closeReviewSupportTasks",
-    "UserRole": "caseworker-employment-api",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "closeReviewSupportTasks",
-    "UserRole": "caseworker-wa-task-configuration",
-    "CRUD": "CRU"
   }
 ]

@@ -40,17 +40,5 @@
     "CaseEventID": "reviewJudgeSupportRequest",
     "UserRole": "caseworker-wa-task-configuration",
     "CRUD": "R"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseEventID": "closeReviewSupportTasks",
-    "UserRole": "caseworker-employment-api",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseEventID": "closeReviewSupportTasks",
-    "UserRole": "caseworker-wa-task-configuration",
-    "CRUD": "CRU"
   }
 ]

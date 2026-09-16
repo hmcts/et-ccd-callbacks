@@ -95,20 +95,26 @@ public class SupportTaskService {
     public void prepareManagedReviewSupportTasks(CaseData caseData, CaseData caseDataBefore) {
         retainCreatedTaskState(caseData, caseDataBefore);
         SupportTaskState taskState = taskState(caseData);
+        taskState.setAdminTaskRequired(null);
+        taskState.setLegalOfficerTaskRequired(null);
+        taskState.setJudgeTaskRequired(null);
+        taskState.setAdminTaskCompletionRequired(null);
+        taskState.setLegalOfficerTaskCompletionRequired(null);
+        taskState.setJudgeTaskCompletionRequired(null);
         List<FlagDetailType> flags = allFlagItems(caseData.getAllPartyFlags())
                 .map(GenericTypeItem::getValue)
                 .toList();
 
         updateTaskState(flags, configuration.getReview().getAdminFlagCodes(), taskState.getAdminTaskCreated(),
                 taskState::setAdminTaskCreated,
-                taskState::setAdminTaskRequired);
+                taskState::setAdminTaskCompletionRequired);
         updateTaskState(flags, configuration.getReview().getLegalOfficerFlagCodes(),
                 taskState.getLegalOfficerTaskCreated(),
                 taskState::setLegalOfficerTaskCreated,
-                taskState::setLegalOfficerTaskRequired);
+                taskState::setLegalOfficerTaskCompletionRequired);
         updateTaskState(flags, configuration.getReview().getJudgeFlagCodes(), taskState.getJudgeTaskCreated(),
                 taskState::setJudgeTaskCreated,
-                taskState::setJudgeTaskRequired);
+                taskState::setJudgeTaskCompletionRequired);
     }
 
     public void prepareReviewSupportRequest(CaseData caseData, String eventId) {
@@ -180,6 +186,9 @@ public class SupportTaskService {
         taskState.setAdminTaskRequired(null);
         taskState.setLegalOfficerTaskRequired(null);
         taskState.setJudgeTaskRequired(null);
+        taskState.setAdminTaskCompletionRequired(null);
+        taskState.setLegalOfficerTaskCompletionRequired(null);
+        taskState.setJudgeTaskCompletionRequired(null);
 
         if (isTaskNotCreated(taskState.getAdminTaskCreated())
                 && hasRequestedFlag(flags, configuration.getReview().getAdminFlagCodes())) {
@@ -213,33 +222,16 @@ public class SupportTaskService {
                                         Set<String> eligibleFlagCodes,
                                         String taskCreated,
                                         Consumer<String> taskCreatedSetter,
-                                        Consumer<String> taskRequiredSetter) {
+                                        Consumer<String> taskCompletionRequiredSetter) {
         if (!hasRequestedFlag(flags, eligibleFlagCodes) && !isTaskNotCreatedMarker(taskCreated)) {
             taskCreatedSetter.accept(NO);
-            taskRequiredSetter.accept(NO);
+            taskCompletionRequiredSetter.accept(YES);
         }
     }
 
     private static boolean isTaskNotCreated(String taskCreated) {
         return !YES.equalsIgnoreCase(taskCreated)
                 && !Boolean.parseBoolean(taskCreated);
-    }
-
-    public boolean hasReviewSupportTaskToClose(CaseData caseData) {
-        SupportTaskState currentState = caseData.getSupportTaskState();
-        if (currentState == null) {
-            return false;
-        }
-
-        return isTaskClosurePending(currentState.getAdminTaskCreated(), currentState.getAdminTaskRequired())
-                || isTaskClosurePending(currentState.getLegalOfficerTaskCreated(),
-                        currentState.getLegalOfficerTaskRequired())
-                || isTaskClosurePending(currentState.getJudgeTaskCreated(), currentState.getJudgeTaskRequired());
-    }
-
-    private static boolean isTaskClosurePending(String taskCreated, String taskRequired) {
-        return isTaskNotCreatedMarker(taskCreated)
-                && (YES.equalsIgnoreCase(taskRequired) || Boolean.parseBoolean(taskRequired));
     }
 
     private static boolean isTaskNotCreatedMarker(String taskCreated) {

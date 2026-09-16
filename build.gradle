@@ -3,8 +3,8 @@ plugins {
     id 'java'
     id 'checkstyle'
     id 'jacoco'
-    id 'io.spring.dependency-management' version '1.1.5'
-    id 'org.springframework.boot' version '3.5.16'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.springframework.boot' version '4.0.8'
     id 'org.owasp.dependencycheck' version '11.1.1'
     id 'com.github.ben-manes.versions' version '0.51.0'
     id 'au.com.dius.pact' version '4.3.15'
@@ -57,14 +57,14 @@ def sonarExclusions =
          'et-shared/src/main/java/**/helpers/**',
          'et-shared/src/main/java/**/launchdarkly/**',
          'et-shared/src/main/java/**/servicebus/**',
-		 'et-shared/src/main/java/uk/gov/hmcts/ecm/compat/common/client/CcdClient.java',
+         'et-shared/src/main/java/uk/gov/hmcts/ecm/compat/common/client/CcdClient.java',
          '**/uk/gov/hmcts/ethos/replacement/docmosis/domain/caseview/state/**'
-]
+        ]
 
 def duplicateCodeExclusionList = [
-	'**/uk/gov/hmcts/ethos/replacement/docmosis/domain/messagequeue/CreateUpdatesQueueMessage.java',
-	'**/uk/gov/hmcts/ethos/replacement/docmosis/domain/messagequeue/UpdateCaseQueueMessage.java',
-    'et-shared/src/main/java/**'
+        '**/uk/gov/hmcts/ethos/replacement/docmosis/domain/messagequeue/CreateUpdatesQueueMessage.java',
+        '**/uk/gov/hmcts/ethos/replacement/docmosis/domain/messagequeue/UpdateCaseQueueMessage.java',
+        'et-shared/src/main/java/**'
 ]
 
 sonarqube {
@@ -135,12 +135,6 @@ sourceSets {
 }
 
 allprojects {
-    // CVE-2026-41840, CVE-2026-41841, CVE-2026-41842, CVE-2026-41843, CVE-2026-41850,
-    // CVE-2026-41851 - override the Spring Framework version managed by the Spring Boot BOM.
-    // CVE-2026-54512, CVE-2026-54513, CVE-2026-54514, CVE-2026-54515, CVE-2026-54516,
-    // CVE-2026-54517, CVE-2026-54518 - jackson-databind upgraded to 2.22.0
-    ext['spring-framework.version'] = '6.2.19'
-
     configurations.configureEach {
         resolutionStrategy.eachDependency { details ->
             if (details.requested.group.startsWith("com.fasterxml.jackson")) {
@@ -155,69 +149,64 @@ allprojects {
                 // CVE-2026-54516, CVE-2026-54517, CVE-2026-54518 - upgrade Jackson 3.x
                 details.useVersion("$jacksonV3Version")
             }
-            if (details.requested.group == "org.apache.tomcat.embed"
-                && ["tomcat-embed-core", "tomcat-embed-el", "tomcat-embed-websocket"].contains(details.requested.name)) {
-                details.useVersion(tomcatEmbedVersion)
-            }
             if (details.requested.group == "io.cucumber" && details.requested.name == "cucumber-core") {
                 details.useVersion(cucumberCoreVersion)
             }
             // CVE-2026-53914 - latest stable stdlib; runtime transitive dep only (see OWASP suppression)
             // CVE-2020-29582, CVE-2026-53914 - Force Kotlin to 2.2.0+
             if (details.requested.group == "org.jetbrains.kotlin"
-                && details.requested.name.startsWith("kotlin-stdlib")) {
+                    && details.requested.name.startsWith("kotlin-stdlib")) {
                 details.useVersion(kotlinVersion)
             }
             // CVE-2026-54399, CVE-2026-54428
             if (details.requested.group == "org.apache.httpcomponents.core5"
-                && details.requested.name.startsWith("httpcore5")) {
+                    && details.requested.name.startsWith("httpcore5")) {
                 details.useVersion(httpcore5Version)
             }
         }
         resolutionStrategy.force(
-            'commons-fileupload:commons-fileupload:1.6.0',
-            'org.apache.httpcomponents:httpclient:4.5.14',
-            'org.apache.httpcomponents.core5:httpcore5:5.4.3',
-            'org.apache.httpcomponents.core5:httpcore5-h2:5.4.3',
-            'org.apache.logging.log4j:log4j-core:2.26.1',
-            'com.nimbusds:nimbus-jose-jwt:10.9.1',
-            'net.minidev:json-smart:2.5.2',
-            'com.squareup.okhttp3:logging-interceptor:4.12.0',
-            'com.squareup.okhttp3:okhttp:4.12.0',
-            'com.squareup.okhttp3:okhttp-urlconnection:4.12.0',
-            'com.squareup.okio:okio:3.18.0',
-            'io.cucumber:cucumber-core:7.34.4',
-            // CVE-2026-53914 - latest stable stdlib; runtime transitive dep only (see OWASP suppression)
-            'org.jetbrains.kotlin:kotlin-stdlib:2.4.20',
-            'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.4.20',
-            'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.20',
-            'org.bouncycastle:bcprov-jdk15on:1.70',
-            'io.netty:netty-buffer:4.2.16.Final',
-            'io.netty:netty-codec:4.2.16.Final',
-            'io.netty:netty-codec-dns:4.2.16.Final',
-            'io.netty:netty-codec-http:4.2.16.Final',
-            'io.netty:netty-codec-http2:4.2.16.Final',
-            'io.netty:netty-codec-socks:4.2.16.Final',
-            'io.netty:netty-common:4.2.16.Final',
-            'io.netty:netty-handler:4.2.16.Final',
-            'io.netty:netty-handler-proxy:4.2.16.Final',
-            'io.netty:netty-resolver:4.2.16.Final',
-            'io.netty:netty-resolver-dns:4.2.16.Final',
-            'io.netty:netty-resolver-dns-classes-macos:4.2.16.Final',
-            'io.netty:netty-resolver-dns-native-macos:4.2.16.Final',
-            'io.netty:netty-transport:4.2.16.Final',
-            'io.netty:netty-transport-native-epoll:4.2.16.Final',
-            'io.netty:netty-transport-native-kqueue:4.2.16.Final',
-            'io.netty:netty-transport-native-unix-common:4.2.16.Final',
-            'io.netty:netty-transport-classes-epoll:4.2.16.Final',
-            'io.netty:netty-transport-classes-kqueue:4.2.16.Final',
-            // CVE-2026-42198, CVE-2026-54291
-            'org.postgresql:postgresql:42.7.13',
-            'org.springframework.security:spring-security-crypto:6.5.11',
-            // CVE-2026-29181, CVE-2026-24051, CVE-2026-39883, CVE-2026-39882
-            'io.opentelemetry.semconv:opentelemetry-semconv:1.43.0',
-            // Ensure azure-identity-extensions is a patched version to address CVE-2023-36414
-            'com.azure:azure-identity-extensions:1.2.9'
+                'commons-fileupload:commons-fileupload:1.6.0',
+                'org.apache.httpcomponents:httpclient:4.5.14',
+                'org.apache.httpcomponents.core5:httpcore5:5.4.3',
+                'org.apache.httpcomponents.core5:httpcore5-h2:5.4.3',
+                'org.apache.logging.log4j:log4j-core:2.26.1',
+                'com.nimbusds:nimbus-jose-jwt:10.9.1',
+                'net.minidev:json-smart:2.5.2',
+                'com.squareup.okhttp3:logging-interceptor:4.12.0',
+                'com.squareup.okhttp3:okhttp:4.12.0',
+                'com.squareup.okhttp3:okhttp-urlconnection:4.12.0',
+                'com.squareup.okio:okio:3.18.0',
+                'io.cucumber:cucumber-core:7.34.4',
+                // CVE-2026-53914 - latest stable stdlib; runtime transitive dep only (see OWASP suppression)
+                'org.jetbrains.kotlin:kotlin-stdlib:2.4.20',
+                'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.4.20',
+                'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.20',
+                'org.bouncycastle:bcprov-jdk15on:1.70',
+                'io.netty:netty-buffer:4.2.16.Final',
+                'io.netty:netty-codec:4.2.16.Final',
+                'io.netty:netty-codec-dns:4.2.16.Final',
+                'io.netty:netty-codec-http:4.2.16.Final',
+                'io.netty:netty-codec-http2:4.2.16.Final',
+                'io.netty:netty-codec-socks:4.2.16.Final',
+                'io.netty:netty-common:4.2.16.Final',
+                'io.netty:netty-handler:4.2.16.Final',
+                'io.netty:netty-handler-proxy:4.2.16.Final',
+                'io.netty:netty-resolver:4.2.16.Final',
+                'io.netty:netty-resolver-dns:4.2.16.Final',
+                'io.netty:netty-resolver-dns-classes-macos:4.2.16.Final',
+                'io.netty:netty-resolver-dns-native-macos:4.2.16.Final',
+                'io.netty:netty-transport:4.2.16.Final',
+                'io.netty:netty-transport-native-epoll:4.2.16.Final',
+                'io.netty:netty-transport-native-kqueue:4.2.16.Final',
+                'io.netty:netty-transport-native-unix-common:4.2.16.Final',
+                'io.netty:netty-transport-classes-epoll:4.2.16.Final',
+                'io.netty:netty-transport-classes-kqueue:4.2.16.Final',
+                // CVE-2026-42198, CVE-2026-54291
+                'org.postgresql:postgresql:42.7.13',
+                // CVE-2026-29181, CVE-2026-24051, CVE-2026-39883, CVE-2026-39882
+                'io.opentelemetry.semconv:opentelemetry-semconv:1.43.0',
+                // Ensure azure-identity-extensions is a patched version to address CVE-2023-36414
+                'com.azure:azure-identity-extensions:1.2.9'
         )
     }
 }
@@ -248,14 +237,14 @@ test {
 // any missing outputs normally.
 def requestedTaskNames = gradle.startParameter.taskNames.collect { it.tokenize(':').last() }
 def rerunOnlyDeploymentTests = !requestedTaskNames.isEmpty()
-    && requestedTaskNames.every { it in ['smoke', 'functional'] }
+        && requestedTaskNames.every { it in ['smoke', 'functional'] }
 def deploymentCompilationMarker = layout.buildDirectory
-    .file('jenkins/deployment-test-compilation.ready')
-    .get().asFile
+        .file('jenkins/deployment-test-compilation.ready')
+        .get().asFile
 def reuseTransferredCompilation = gradle.startParameter.rerunTasks
-    && rerunOnlyDeploymentTests
-    && System.getenv('JENKINS_URL')
-    && deploymentCompilationMarker.exists()
+        && rerunOnlyDeploymentTests
+        && System.getenv('JENKINS_URL')
+        && deploymentCompilationMarker.exists()
 
 tasks.named('check') {
     doLast {
@@ -511,15 +500,12 @@ integration.shouldRunAfter(checkstyleIntegrationTest)
 integration.shouldRunAfter(test)
 
 ext {
-    junitJupiterVersion = '5.13.4'
-    junitPlatformVersion = '1.13.4'
     log4JVersion = '2.26.1'
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
-    
+
     // CVE-2026-54512, CVE-2026-54513, CVE-2026-54514, CVE-2026-54515
     serenity = '5.3.11'
-    tomcatEmbedVersion = '10.1.57'
     jacksonVersion = '2.22.1'
     jacksonAnnotationsVersion = '2.22'
     jacksonV3Version = '3.2.0'
@@ -527,12 +513,14 @@ ext {
     httpcore5Version = '5.4.3'
     kotlinVersion = '2.4.20'
     cucumberCoreVersion = '7.34.4'
+    springCloudVersion = '2025.1.3'
 }
 
 ext["rest-assured.version"] = '5.1.0'
 
 dependencyManagement {
     imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         mavenBom 'com.azure:azure-sdk-bom:1.3.8'
         mavenBom "com.fasterxml.jackson:jackson-bom:${jacksonVersion}"
     }
@@ -542,7 +530,6 @@ dependencyManagement {
         dependency 'com.microsoft.azure:msal4j:1.25.1'
         // CVE-2026-42198, CVE-2026-54291 - override above the Spring Boot BOM
         dependency 'org.postgresql:postgresql:42.7.13'
-        dependency 'org.springframework.security:spring-security-crypto:6.5.11'
         // Force updated Azure SDK components to resolve CVE-2026-33117
         dependency 'com.azure:azure-core:1.59.1'
         dependency 'com.azure:azure-core-http-netty:1.16.7'
@@ -577,10 +564,10 @@ dependencyManagement {
 }
 
 dependencies {
-    smokeImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.1.0'
-    smokeImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.12.2'
-    smokeRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.12.2'
-    smokeRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.12.2'
+    smokeImplementation "io.rest-assured:rest-assured:5.1.0"
+    smokeImplementation "org.junit.jupiter:junit-jupiter-api"
+    smokeRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
+    smokeRuntimeOnly "org.junit.platform:junit-platform-launcher"
 
 
     implementation project(':et-shared')
@@ -614,9 +601,6 @@ dependencies {
     implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: log4JVersion
     implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.8'
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '4.0.4'
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.5.11'
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.11'
     implementation 'org.flywaydb:flyway-database-postgresql:11.20.3'
@@ -624,15 +608,13 @@ dependencies {
     // CVE-2026-42198, CVE-2026-54291
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.13'
     implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.17'
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.5.0'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '3.0.0'
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'jakarta.servlet:jakarta.servlet-api:6.1.0'
-    implementation 'javax.servlet:javax.servlet-api:4.0.1'
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.3.3'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.13'
     // CVE-2022-25857
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.5'
@@ -666,6 +648,10 @@ dependencies {
     // CVE-2025-7962
     implementation group: 'org.eclipse.angus', name: 'angus-mail', version: '2.0.5'
 
+    // For using jackson version 2
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.module:jackson-module-parameter-names:${jacksonVersion}"
+
     runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.18.0'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -673,6 +659,9 @@ dependencies {
     testImplementation 'com.github.hmcts:fortify-client:1.4.10:all', {
         exclude module: 'commons-io'
     }
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     testImplementation group: 'com.auth0', name: 'java-jwt', version: '4.6.0'
     testImplementation group: 'com.warrenstrange', name: 'googleauth', version: '1.5.0'
@@ -685,14 +674,6 @@ dependencies {
     testImplementation (group: 'org.docx4j', name: 'docx4j', version: '6.1.2') {
         exclude module: 'slf4j-log4j12'
     }
-    testImplementation(platform('org.junit:junit-bom:5.13.4'))
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitJupiterVersion
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitJupiterVersion
-    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion
-    testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: junitPlatformVersion
-    testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: junitPlatformVersion
-    testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: junitPlatformVersion
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.21.4'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.7'
     testImplementation group: 'nl.jqno.equalsverifier', name: 'equalsverifier', version: '3.17.5'
@@ -710,23 +691,11 @@ dependencies {
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.43'
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
-    contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitJupiterVersion
-    contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitJupiterVersion
-    contractTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion
-    contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: junitPlatformVersion
-    contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: junitPlatformVersion
-    contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: junitPlatformVersion
-    contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.3.3'
+    contractTestImplementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
 
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.22.0'
-    integrationTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitJupiterVersion
-    integrationTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitJupiterVersion
-    integrationTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion
-    integrationTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: junitPlatformVersion
-    integrationTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: junitPlatformVersion
-    integrationTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: junitPlatformVersion
     integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.19.0'
@@ -789,7 +758,7 @@ bootWithCCD {
     environment 'XUI_DOCUMENTS_API_V2', 'http://host.docker.internal:4455'
     environment 'XUI_LD_ID', System.getenv('XUI_LD_ID')
     environment 'APPINSIGHTS_CONNECTION_STRING', System.getenv('APPINSIGHTS_CONNECTION_STRING')
-        ?: 'InstrumentationKey=00000000-0000-0000-0000-000000000000;IngestionEndpoint=http://localhost'
+            ?: 'InstrumentationKey=00000000-0000-0000-0000-000000000000;IngestionEndpoint=http://localhost'
     environment 'SERVICES_PRD_COMMONDATA_API', 'http://wiremock:8080'
 
     // Work Allocation
@@ -837,19 +806,19 @@ bootWithCCD {
     environment 'CFTLIB_EXTRA_COMPOSE_FILES', waEnabled ? 'wa-docker-compose.yml' : ''
     environment 'ET_WORK_ALLOCATION', waEnabled ? 'true' : 'false'
     environment 'SPRING_APPLICATION_JSON', groovy.json.JsonOutput.toJson([
-        ccd: [
-            decentralised: [
-                'case-type-service-urls': [
-                    ET_EnglandWales: 'http://localhost:8081',
-                    ET_Scotland: 'http://localhost:8081',
-                    ET_EnglandWales_Listings: 'http://localhost:8081',
-                    ET_Scotland_Listings: 'http://localhost:8081',
-                    ET_EnglandWales_Multiple: 'http://localhost:8081',
-                    ET_Scotland_Multiple: 'http://localhost:8081',
-                    ET_Admin: 'http://localhost:8081'
-                ]
+            ccd: [
+                    decentralised: [
+                            'case-type-service-urls': [
+                                    ET_EnglandWales: 'http://localhost:8081',
+                                    ET_Scotland: 'http://localhost:8081',
+                                    ET_EnglandWales_Listings: 'http://localhost:8081',
+                                    ET_Scotland_Listings: 'http://localhost:8081',
+                                    ET_EnglandWales_Multiple: 'http://localhost:8081',
+                                    ET_Scotland_Multiple: 'http://localhost:8081',
+                                    ET_Admin: 'http://localhost:8081'
+                            ]
+                    ]
             ]
-        ]
     ])
 
 }

@@ -258,8 +258,11 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> closeReviewSupportTasks(
             @RequestBody CallbackRequest callbackRequest) {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
+        CaseData caseDataBefore = callbackRequest.getCaseDetailsBefore() == null
+                ? null
+                : callbackRequest.getCaseDetailsBefore().getCaseData();
         if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())
-                && supportTaskService.hasReviewSupportTaskToClose(caseDetails.getCaseData())) {
+                && supportTaskService.hasReviewSupportTaskToClose(caseDetails.getCaseData(), caseDataBefore)) {
             supportTaskEventService.triggerCloseReviewSupportTasks(caseDetails);
         }
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());

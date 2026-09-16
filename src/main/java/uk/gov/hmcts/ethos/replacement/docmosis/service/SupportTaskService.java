@@ -224,13 +224,23 @@ public class SupportTaskService {
                 && !Boolean.parseBoolean(taskCreated);
     }
 
-    public boolean hasReviewSupportTaskToClose(CaseData caseData) {
-        SupportTaskState state = caseData.getSupportTaskState();
-        return state != null && Stream.of(
-                        state.getAdminTaskRequired(),
-                        state.getLegalOfficerTaskRequired(),
-                        state.getJudgeTaskRequired())
-                .anyMatch(SupportTaskService::isTaskNotRequired);
+    public boolean hasReviewSupportTaskToClose(CaseData caseData, CaseData caseDataBefore) {
+        SupportTaskState currentState = caseData.getSupportTaskState();
+        if (currentState == null) {
+            return false;
+        }
+
+        SupportTaskState previousState = caseDataBefore == null ? null : caseDataBefore.getSupportTaskState();
+        return becameNotRequired(currentState.getAdminTaskRequired(),
+                        previousState == null ? null : previousState.getAdminTaskRequired())
+                || becameNotRequired(currentState.getLegalOfficerTaskRequired(),
+                        previousState == null ? null : previousState.getLegalOfficerTaskRequired())
+                || becameNotRequired(currentState.getJudgeTaskRequired(),
+                        previousState == null ? null : previousState.getJudgeTaskRequired());
+    }
+
+    private static boolean becameNotRequired(String currentValue, String previousValue) {
+        return isTaskNotRequired(currentValue) && !isTaskNotRequired(previousValue);
     }
 
     private static boolean isTaskNotRequired(String taskRequired) {

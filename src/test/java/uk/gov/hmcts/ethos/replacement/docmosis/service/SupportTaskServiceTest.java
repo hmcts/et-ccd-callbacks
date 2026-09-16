@@ -50,7 +50,7 @@ class SupportTaskServiceTest {
         state.setJudgeTaskRequired(NO);
         caseData.setSupportTaskState(state);
 
-        assertTrue(service.hasReviewSupportTaskToClose(caseData));
+        assertTrue(service.hasReviewSupportTaskToClose(caseData, new CaseData()));
     }
 
     @Test
@@ -60,7 +60,7 @@ class SupportTaskServiceTest {
         state.setAdminTaskRequired(CCD_FALSE);
         caseData.setSupportTaskState(state);
 
-        assertTrue(service.hasReviewSupportTaskToClose(caseData));
+        assertTrue(service.hasReviewSupportTaskToClose(caseData, new CaseData()));
     }
 
     @Test
@@ -71,7 +71,25 @@ class SupportTaskServiceTest {
         state.setJudgeTaskRequired(CCD_TRUE);
         caseData.setSupportTaskState(state);
 
-        assertFalse(service.hasReviewSupportTaskToClose(caseData));
+        assertFalse(service.hasReviewSupportTaskToClose(caseData, new CaseData()));
+    }
+
+    @Test
+    void doesNotCloseReviewSupportTaskAgainWhenItWasAlreadyNotRequired() {
+        CaseData caseDataBefore = new CaseData();
+        caseDataBefore.setSupportTaskState(SupportTaskState.builder().adminTaskRequired(NO).build());
+        CaseData caseData = new CaseData();
+        caseData.setSupportTaskState(SupportTaskState.builder().adminTaskRequired(NO).build());
+
+        assertFalse(service.hasReviewSupportTaskToClose(caseData, caseDataBefore));
+    }
+
+    @Test
+    void closesReviewSupportTaskWhenPreviousCaseDataIsUnavailable() {
+        CaseData caseData = new CaseData();
+        caseData.setSupportTaskState(SupportTaskState.builder().legalOfficerTaskRequired(NO).build());
+
+        assertTrue(service.hasReviewSupportTaskToClose(caseData, null));
     }
 
     private static SupportTaskConfiguration configuration() {
@@ -577,6 +595,30 @@ class SupportTaskServiceTest {
 
         assertEquals(NO, taskState(caseData).getJudgeTaskCreated());
         assertEquals(NO, taskState(caseData).getJudgeTaskRequired());
+    }
+
+    static Stream<Arguments> reviewAndArrangeTaskScenarios() {
+        return Stream.of(
+            Arguments.of("RA0041", TASK_TYPE_ADMIN, "Lip speaker"),
+            Arguments.of("RA0038", TASK_TYPE_JUDGE, "Intermediary")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("reviewAndArrangeTaskScenarios")
+    void preservesReviewCompletionAndArrangeCreationInTheSameUpdate(String flagCode,
+                                                                     String taskType,
+                                                                     String arrangeTaskName) {
+        CaseData caseDataBefore = caseDataWithClaimantFlag(flagCode, STATUS_REQUESTED, false);
+        CaseData caseData = caseDataWithClaimantFlag(flagCode, STATUS_ACTIVE, false);
+        caseData.setSupportTaskState(new SupportTaskState());
+        setTaskCreated(taskState(caseData), taskType, YES);
+
+        service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
+        service.prepareArrangeSupportTask(caseData, caseDataBefore);
+
+        assertEquals(NO, getTaskRequired(taskState(caseData), taskType));
+        assertEquals(arrangeTaskName, taskState(caseData).getArrangeSupportTaskName());
     }
 
     @Test

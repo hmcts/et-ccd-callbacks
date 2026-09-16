@@ -215,7 +215,8 @@ public class SupportTaskService {
         taskRequiredSetter.accept(null);
         if (!hasRequestedFlag(flags, eligibleFlagCodes)) {
             taskCreatedSetter.accept(NO);
-            taskRequiredSetter.accept(NO);
+            // The submitted callback changes this to No in the dedicated close event.
+            taskRequiredSetter.accept(YES);
         }
     }
 
@@ -231,21 +232,21 @@ public class SupportTaskService {
         }
 
         SupportTaskState previousState = caseDataBefore == null ? null : caseDataBefore.getSupportTaskState();
-        return becameNotRequired(currentState.getAdminTaskRequired(),
-                        previousState == null ? null : previousState.getAdminTaskRequired())
-                || becameNotRequired(currentState.getLegalOfficerTaskRequired(),
-                        previousState == null ? null : previousState.getLegalOfficerTaskRequired())
-                || becameNotRequired(currentState.getJudgeTaskRequired(),
-                        previousState == null ? null : previousState.getJudgeTaskRequired());
+        return becameNotCreated(currentState.getAdminTaskCreated(),
+                        previousState == null ? null : previousState.getAdminTaskCreated())
+                || becameNotCreated(currentState.getLegalOfficerTaskCreated(),
+                        previousState == null ? null : previousState.getLegalOfficerTaskCreated())
+                || becameNotCreated(currentState.getJudgeTaskCreated(),
+                        previousState == null ? null : previousState.getJudgeTaskCreated());
     }
 
-    private static boolean becameNotRequired(String currentValue, String previousValue) {
-        return isTaskNotRequired(currentValue) && !isTaskNotRequired(previousValue);
+    private static boolean becameNotCreated(String currentValue, String previousValue) {
+        return isTaskNotCreatedMarker(currentValue) && !isTaskNotCreatedMarker(previousValue);
     }
 
-    private static boolean isTaskNotRequired(String taskRequired) {
-        return NO.equalsIgnoreCase(taskRequired)
-                || "false".equalsIgnoreCase(taskRequired);
+    private static boolean isTaskNotCreatedMarker(String taskCreated) {
+        return NO.equalsIgnoreCase(taskCreated)
+                || "false".equalsIgnoreCase(taskCreated);
     }
 
     private static boolean isRequested(FlagDetailType flag) {

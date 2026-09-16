@@ -261,8 +261,12 @@ public class CaseActionsForCaseWorkerController {
         CaseData caseDataBefore = callbackRequest.getCaseDetailsBefore() == null
                 ? null
                 : callbackRequest.getCaseDetailsBefore().getCaseData();
-        if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())
-                && supportTaskService.hasReviewSupportTaskToClose(caseDetails.getCaseData(), caseDataBefore)) {
+        boolean caseFlagsV2Enabled = featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId());
+        boolean reviewSupportTaskToClose = caseFlagsV2Enabled
+                && supportTaskService.hasReviewSupportTaskToClose(caseDetails.getCaseData(), caseDataBefore);
+        log.info("Review Support task closure evaluated for case {}: enabled={}, closeRequired={}",
+                caseDetails.getCaseId(), caseFlagsV2Enabled, reviewSupportTaskToClose);
+        if (reviewSupportTaskToClose) {
             supportTaskEventService.triggerCloseReviewSupportTasks(caseDetails);
         }
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());

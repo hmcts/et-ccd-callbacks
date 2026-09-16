@@ -47,7 +47,7 @@ class SupportTaskServiceTest {
     void identifiesReviewSupportTaskThatNeedsClosing() {
         CaseData caseData = new CaseData();
         SupportTaskState state = new SupportTaskState();
-        state.setJudgeTaskRequired(NO);
+        state.setJudgeTaskCreated(NO);
         caseData.setSupportTaskState(state);
 
         assertTrue(service.hasReviewSupportTaskToClose(caseData, new CaseData()));
@@ -57,7 +57,7 @@ class SupportTaskServiceTest {
     void identifiesBooleanReviewSupportTaskThatNeedsClosing() {
         CaseData caseData = new CaseData();
         SupportTaskState state = new SupportTaskState();
-        state.setAdminTaskRequired(CCD_FALSE);
+        state.setAdminTaskCreated(CCD_FALSE);
         caseData.setSupportTaskState(state);
 
         assertTrue(service.hasReviewSupportTaskToClose(caseData, new CaseData()));
@@ -67,8 +67,8 @@ class SupportTaskServiceTest {
     void doesNotIdentifyReviewSupportTaskWhenNoCategoryNeedsClosing() {
         CaseData caseData = new CaseData();
         SupportTaskState state = new SupportTaskState();
-        state.setAdminTaskRequired(YES);
-        state.setJudgeTaskRequired(CCD_TRUE);
+        state.setAdminTaskCreated(YES);
+        state.setJudgeTaskCreated(CCD_TRUE);
         caseData.setSupportTaskState(state);
 
         assertFalse(service.hasReviewSupportTaskToClose(caseData, new CaseData()));
@@ -77,9 +77,9 @@ class SupportTaskServiceTest {
     @Test
     void doesNotCloseReviewSupportTaskAgainWhenItWasAlreadyNotRequired() {
         CaseData caseDataBefore = new CaseData();
-        caseDataBefore.setSupportTaskState(SupportTaskState.builder().adminTaskRequired(NO).build());
+        caseDataBefore.setSupportTaskState(SupportTaskState.builder().adminTaskCreated(NO).build());
         CaseData caseData = new CaseData();
-        caseData.setSupportTaskState(SupportTaskState.builder().adminTaskRequired(NO).build());
+        caseData.setSupportTaskState(SupportTaskState.builder().adminTaskCreated(NO).build());
 
         assertFalse(service.hasReviewSupportTaskToClose(caseData, caseDataBefore));
     }
@@ -87,7 +87,7 @@ class SupportTaskServiceTest {
     @Test
     void closesReviewSupportTaskWhenPreviousCaseDataIsUnavailable() {
         CaseData caseData = new CaseData();
-        caseData.setSupportTaskState(SupportTaskState.builder().legalOfficerTaskRequired(NO).build());
+        caseData.setSupportTaskState(SupportTaskState.builder().legalOfficerTaskCreated(NO).build());
 
         assertTrue(service.hasReviewSupportTaskToClose(caseData, null));
     }
@@ -324,11 +324,11 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, taskState(caseData).getAdminTaskCreated());
-        assertEquals(NO, taskState(caseData).getAdminTaskRequired());
+        assertEquals(YES, taskState(caseData).getAdminTaskRequired());
         assertEquals(YES, taskState(caseData).getJudgeTaskCreated());
         assertNull(taskState(caseData).getJudgeTaskRequired());
         assertEquals(NO, taskState(caseData).getLegalOfficerTaskCreated());
-        assertEquals(NO, taskState(caseData).getLegalOfficerTaskRequired());
+        assertEquals(YES, taskState(caseData).getLegalOfficerTaskRequired());
     }
 
     @Test
@@ -456,7 +456,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, getTaskCreated(taskState(caseData), taskType));
-        assertEquals(NO, getTaskRequired(taskState(caseData), taskType));
+        assertEquals(YES, getTaskRequired(taskState(caseData), taskType));
     }
 
     @ParameterizedTest
@@ -486,7 +486,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
 
         assertEquals(NO, getTaskCreated(taskState(caseData), taskType));
-        assertEquals(NO, getTaskRequired(taskState(caseData), taskType));
+        assertEquals(YES, getTaskRequired(taskState(caseData), taskType));
     }
 
     @ParameterizedTest
@@ -513,7 +513,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, getTaskCreated(taskState(caseData), taskType));
-        assertEquals(NO, getTaskRequired(taskState(caseData), taskType));
+        assertEquals(YES, getTaskRequired(taskState(caseData), taskType));
     }
 
     @Test
@@ -533,7 +533,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, taskState(caseData).getAdminTaskCreated());
-        assertEquals(NO, taskState(caseData).getAdminTaskRequired());
+        assertEquals(YES, taskState(caseData).getAdminTaskRequired());
         assertEquals(CCD_TRUE, taskState(caseData).getLegalOfficerTaskCreated());
         assertNull(taskState(caseData).getLegalOfficerTaskRequired());
         assertEquals(CCD_TRUE, taskState(caseData).getJudgeTaskCreated());
@@ -580,9 +580,9 @@ class SupportTaskServiceTest {
         assertEquals(NO, taskState(caseData).getAdminTaskCreated());
         assertEquals(NO, taskState(caseData).getLegalOfficerTaskCreated());
         assertEquals(NO, taskState(caseData).getJudgeTaskCreated());
-        assertEquals(NO, taskState(caseData).getAdminTaskRequired());
-        assertEquals(NO, taskState(caseData).getLegalOfficerTaskRequired());
-        assertEquals(NO, taskState(caseData).getJudgeTaskRequired());
+        assertEquals(YES, taskState(caseData).getAdminTaskRequired());
+        assertEquals(YES, taskState(caseData).getLegalOfficerTaskRequired());
+        assertEquals(YES, taskState(caseData).getJudgeTaskRequired());
     }
 
     @Test
@@ -594,7 +594,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
 
         assertEquals(NO, taskState(caseData).getJudgeTaskCreated());
-        assertEquals(NO, taskState(caseData).getJudgeTaskRequired());
+        assertEquals(YES, taskState(caseData).getJudgeTaskRequired());
     }
 
     static Stream<Arguments> reviewAndArrangeTaskScenarios() {
@@ -617,7 +617,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
         service.prepareArrangeSupportTask(caseData, caseDataBefore);
 
-        assertEquals(NO, getTaskRequired(taskState(caseData), taskType));
+        assertEquals(YES, getTaskRequired(taskState(caseData), taskType));
         assertEquals(arrangeTaskName, taskState(caseData).getArrangeSupportTaskName());
     }
 
@@ -628,7 +628,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, taskState(caseData).getAdminTaskCreated());
-        assertEquals(NO, taskState(caseData).getAdminTaskRequired());
+        assertEquals(YES, taskState(caseData).getAdminTaskRequired());
     }
 
     @Test

@@ -30,10 +30,37 @@ jobs:
       GROUP: com.github.hmcts
       ARTIFACT: et-shared
       PACKAGE_NAME: com.github.hmcts:et-shared
+      DELETE_BATCH_SIZE: 100
       DRY_RUN: ${{ github.event_name == 'pull_request' || inputs.dry_run || 'false' }}
       AZURE_DEVOPS_ARTIFACT_TOKEN: ${{ secrets.AZURE_DEVOPS_ARTIFACT_TOKEN }}
 
     steps:
+      - name: Check out master release tags
+        uses: actions/checkout@v5
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Identify stable versions to retain
+        id: master_releases
+        shell: bash
+        run: |
+          stable_versions="$(
+            git tag --merged origin/master --list |
+              awk '/^[0-9]+\.[0-9]+\.[0-9]+$/' |
+              sort -V |
+              jq -Rsc 'split("\n") | map(select(length > 0))'
+          )"
+          retained_versions="$(
+            git tag --merged origin/master --list |
+              awk '/^[0-9]+\.[0-9]+\.[0-9]+$/' |
+              sort -V |
+              tail -n 50 |
+              jq -Rsc 'split("\n") | map(select(length > 0))'
+          )"
+          echo "stable_versions=${stable_versions}" >> "${GITHUB_OUTPUT}"
+          echo "retained_versions=${retained_versions}" >> "${GITHUB_OUTPUT}"
+          echo "Retaining $(jq length <<< "${retained_versions}") stable master releases"
       - name: Delete package versions published over 90 days ago
         shell: bash
         run: |
@@ -49,23 +76,37 @@ jobs:
               "${list_url}" |
             jq -c \
               --arg artifact "${ARTIFACT}" \
+              --arg group "${GROUP}" \
               --arg package "${PACKAGE_NAME}" \
+              --argjson batch_size "${DELETE_BATCH_SIZE}" \
+              --argjson stable_versions '${{ steps.master_releases.outputs.stable_versions }}' \
+              --argjson retained_versions '${{ steps.master_releases.outputs.retained_versions }}' \
               --arg cutoff "${cutoff}" '
                 {
                   operation: "delete",
-                  packages: [
-                    .value[]
-                    | select(.name == $package)
-                    | .versions[]
-                    | select(.publishDate < $cutoff)
-                    | select(.isLatest | not)
-                    | select(any(.views[]?; .type == "release") | not)
-                    | {
-                        group: "com.github.hmcts",
+                  packages: (
+                    [
+                      .value[]
+                      | select(.name == $package)
+                      | .versions[]
+                      | . as $version
+                      | if ($version.version | test("^[0-9]+\\.[0-9]+\\.[0-9]+$")) then
+                          select($stable_versions | index($version.version))
+                          | select(($retained_versions | index($version.version)) | not)
+                        else
+                          select($version.publishDate < $cutoff)
+                          | select($version.isLatest | not)
+                          | select(any(.views[]?; .type == "release") | not)
+                        end
+                    ]
+                    | sort_by(.publishDate)
+                    | .[:$batch_size]
+                    | map({
+                        group: $group,
                         artifact: $artifact,
                         version: .version
-                      }
-                  ]
+                      })
+                  )
                 }
               '
           )"

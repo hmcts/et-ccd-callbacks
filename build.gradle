@@ -324,46 +324,12 @@ tasks.register('validateCcdDefinitionsLockfile', Exec) {
 tasks.register('setupCcdDefinitionsWorkspace', Exec) {
     workingDir 'ccd-definitions'
     commandLine 'yarn', 'install'
-
-    inputs.files(
-        'ccd-definitions/package.json',
-        'ccd-definitions/yarn.lock',
-        'ccd-definitions/.yarnrc.yml',
-        fileTree('ccd-definitions') {
-            include 'jurisdictions/*/package.json'
-            include 'tools/*/package.json'
-        }
-    ).withPathSensitivity(PathSensitivity.RELATIVE)
-    outputs.file 'ccd-definitions/.yarn/install-state.gz'
-    outputs.upToDateWhen { file('ccd-definitions/node_modules').exists() }
 }
 
 tasks.register('generateCftlibCcdDefinitions', Exec) {
     dependsOn 'setupCcdDefinitionsWorkspace'
     workingDir 'ccd-definitions'
     commandLine 'yarn', 'generate-excel:cftlib'
-
-    inputs.property('environment', 'cftlib')
-    inputs.files(
-        'ccd-definitions/package.json',
-        'ccd-definitions/yarn.lock',
-        fileTree('ccd-definitions') {
-            include 'configs/build.config.js'
-            include 'jurisdictions/*/json/**/*.json'
-            include 'jurisdictions/*/data/ccd-template.xlsx'
-            include 'tools/build-*.js'
-            include 'tools/ccd-definition-processor/bin/**/*.js'
-            include 'tools/ccd-definition-processor/src/**/*.js'
-            include 'tools/ccd-definition-processor/package.json'
-        }
-    ).withPathSensitivity(PathSensitivity.RELATIVE)
-    outputs.files(
-        'ccd-definitions/jurisdictions/admin/xlsx/et-admin-ccd-config-cftlib.xlsx',
-        'ccd-definitions/jurisdictions/england-wales/xlsx/et-englandwales-ccd-config-cftlib.xlsx',
-        'ccd-definitions/jurisdictions/scotland/xlsx/et-scotland-ccd-config-cftlib.xlsx'
-    )
-    outputs.dir 'ccd-definitions/dist/cftlib'
-    outputs.cacheIf { true }
 }
 
 tasks.register('yarnAudit', Exec) {
@@ -776,8 +742,6 @@ def waEnabled = System.getenv('ET_WORK_ALLOCATION') == 'true'
         || gradle.startParameter.taskNames.any { it == 'bootWithCcdAndWa' }
 
 bootWithCCD {
-    dependsOn 'generateCftlibCcdDefinitions'
-
     // Simulates idam and s2s locally.
     // See rse-cft-lib/LibRunnerTask
     authMode = uk.gov.hmcts.rse.AuthMode.Local

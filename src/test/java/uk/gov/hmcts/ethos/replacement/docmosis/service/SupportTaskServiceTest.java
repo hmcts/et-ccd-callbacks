@@ -48,9 +48,10 @@ class SupportTaskServiceTest {
         CaseData caseData = new CaseData();
         SupportTaskState state = new SupportTaskState();
         state.setJudgeTaskCreated(NO);
+        state.setJudgeTaskRequired(YES);
         caseData.setSupportTaskState(state);
 
-        assertTrue(service.hasReviewSupportTaskToClose(caseData, new CaseData()));
+        assertTrue(service.hasReviewSupportTaskToClose(caseData));
     }
 
     @Test
@@ -58,9 +59,10 @@ class SupportTaskServiceTest {
         CaseData caseData = new CaseData();
         SupportTaskState state = new SupportTaskState();
         state.setAdminTaskCreated(CCD_FALSE);
+        state.setAdminTaskRequired(CCD_TRUE);
         caseData.setSupportTaskState(state);
 
-        assertTrue(service.hasReviewSupportTaskToClose(caseData, new CaseData()));
+        assertTrue(service.hasReviewSupportTaskToClose(caseData));
     }
 
     @Test
@@ -71,25 +73,29 @@ class SupportTaskServiceTest {
         state.setJudgeTaskCreated(CCD_TRUE);
         caseData.setSupportTaskState(state);
 
-        assertFalse(service.hasReviewSupportTaskToClose(caseData, new CaseData()));
+        assertFalse(service.hasReviewSupportTaskToClose(caseData));
     }
 
     @Test
     void doesNotCloseReviewSupportTaskAgainWhenItWasAlreadyNotRequired() {
-        CaseData caseDataBefore = new CaseData();
-        caseDataBefore.setSupportTaskState(SupportTaskState.builder().adminTaskCreated(NO).build());
         CaseData caseData = new CaseData();
-        caseData.setSupportTaskState(SupportTaskState.builder().adminTaskCreated(NO).build());
+        caseData.setSupportTaskState(SupportTaskState.builder()
+                .adminTaskCreated(NO)
+                .adminTaskRequired(NO)
+                .build());
 
-        assertFalse(service.hasReviewSupportTaskToClose(caseData, caseDataBefore));
+        assertFalse(service.hasReviewSupportTaskToClose(caseData));
     }
 
     @Test
-    void closesReviewSupportTaskWhenPreviousCaseDataIsUnavailable() {
+    void closesReviewSupportTaskFromCurrentPendingState() {
         CaseData caseData = new CaseData();
-        caseData.setSupportTaskState(SupportTaskState.builder().legalOfficerTaskCreated(NO).build());
+        caseData.setSupportTaskState(SupportTaskState.builder()
+                .legalOfficerTaskCreated(NO)
+                .legalOfficerTaskRequired(YES)
+                .build());
 
-        assertTrue(service.hasReviewSupportTaskToClose(caseData, null));
+        assertTrue(service.hasReviewSupportTaskToClose(caseData));
     }
 
     private static SupportTaskConfiguration configuration() {

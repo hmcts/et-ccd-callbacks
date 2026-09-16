@@ -450,8 +450,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         ((ObjectNode) requestContent2).set("case_details_before",
                 requestContent2.get("case_details").deepCopy());
         when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
-        when(supportTaskService.hasReviewSupportTaskToClose(
-                any(CaseData.class), any(CaseData.class))).thenReturn(true);
+        when(supportTaskService.hasReviewSupportTaskToClose(any(CaseData.class))).thenReturn(true);
 
         mvc.perform(post(SUPPORT_TASKS_SUBMITTED_URL)
                         .content(requestContent2.toString())
@@ -460,8 +459,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isOk());
 
         verify(supportTaskEventService).triggerCloseReviewSupportTasks(any(CaseDetails.class));
-        verify(supportTaskService).hasReviewSupportTaskToClose(
-                any(CaseData.class), any(CaseData.class));
+        verify(supportTaskService).hasReviewSupportTaskToClose(any(CaseData.class));
     }
 
     @Test

@@ -99,13 +99,14 @@ public class SupportTaskService {
                 .map(GenericTypeItem::getValue)
                 .toList();
 
-        updateTaskState(flags, configuration.getReview().getAdminFlagCodes(),
+        updateTaskState(flags, configuration.getReview().getAdminFlagCodes(), taskState.getAdminTaskCreated(),
                 taskState::setAdminTaskCreated,
                 taskState::setAdminTaskRequired);
         updateTaskState(flags, configuration.getReview().getLegalOfficerFlagCodes(),
+                taskState.getLegalOfficerTaskCreated(),
                 taskState::setLegalOfficerTaskCreated,
                 taskState::setLegalOfficerTaskRequired);
-        updateTaskState(flags, configuration.getReview().getJudgeFlagCodes(),
+        updateTaskState(flags, configuration.getReview().getJudgeFlagCodes(), taskState.getJudgeTaskCreated(),
                 taskState::setJudgeTaskCreated,
                 taskState::setJudgeTaskRequired);
     }
@@ -210,10 +211,10 @@ public class SupportTaskService {
 
     private static void updateTaskState(List<FlagDetailType> flags,
                                         Set<String> eligibleFlagCodes,
+                                        String taskCreated,
                                         Consumer<String> taskCreatedSetter,
                                         Consumer<String> taskRequiredSetter) {
-        taskRequiredSetter.accept(null);
-        if (!hasRequestedFlag(flags, eligibleFlagCodes)) {
+        if (!hasRequestedFlag(flags, eligibleFlagCodes) && !isTaskNotCreatedMarker(taskCreated)) {
             taskCreatedSetter.accept(NO);
             // The submitted callback changes this to No in the dedicated close event.
             taskRequiredSetter.accept(YES);
@@ -225,23 +226,21 @@ public class SupportTaskService {
                 && !Boolean.parseBoolean(taskCreated);
     }
 
-    public boolean hasReviewSupportTaskToClose(CaseData caseData, CaseData caseDataBefore) {
+    public boolean hasReviewSupportTaskToClose(CaseData caseData) {
         SupportTaskState currentState = caseData.getSupportTaskState();
         if (currentState == null) {
             return false;
         }
 
-        SupportTaskState previousState = caseDataBefore == null ? null : caseDataBefore.getSupportTaskState();
-        return becameNotCreated(currentState.getAdminTaskCreated(),
-                        previousState == null ? null : previousState.getAdminTaskCreated())
-                || becameNotCreated(currentState.getLegalOfficerTaskCreated(),
-                        previousState == null ? null : previousState.getLegalOfficerTaskCreated())
-                || becameNotCreated(currentState.getJudgeTaskCreated(),
-                        previousState == null ? null : previousState.getJudgeTaskCreated());
+        return isTaskClosurePending(currentState.getAdminTaskCreated(), currentState.getAdminTaskRequired())
+                || isTaskClosurePending(currentState.getLegalOfficerTaskCreated(),
+                        currentState.getLegalOfficerTaskRequired())
+                || isTaskClosurePending(currentState.getJudgeTaskCreated(), currentState.getJudgeTaskRequired());
     }
 
-    private static boolean becameNotCreated(String currentValue, String previousValue) {
-        return isTaskNotCreatedMarker(currentValue) && !isTaskNotCreatedMarker(previousValue);
+    private static boolean isTaskClosurePending(String taskCreated, String taskRequired) {
+        return isTaskNotCreatedMarker(taskCreated)
+                && (YES.equalsIgnoreCase(taskRequired) || Boolean.parseBoolean(taskRequired));
     }
 
     private static boolean isTaskNotCreatedMarker(String taskCreated) {

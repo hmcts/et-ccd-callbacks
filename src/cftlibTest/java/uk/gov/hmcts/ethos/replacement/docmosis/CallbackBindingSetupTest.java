@@ -92,9 +92,6 @@ class CallbackBindingSetupTest extends CftlibTest {
                 .sorted(Comparator.naturalOrder())
                 .toList()) {
                 String caseTypeId = path.getFileName().toString().replaceFirst("\\.json$", "");
-                if (PRE_HEARING_DEPOSIT.equals(caseTypeId)) {
-                    continue;
-                }
                 JsonNode caseTypeDefinition = OBJECT_MAPPER.readTree(path.toFile());
                 definitions.put(caseTypeId, caseTypeDefinition);
             }

@@ -229,10 +229,11 @@ configurations {
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
     apiTestImplementation.extendsFrom testImplementation
     apiTestRuntimeOnly.extendsFrom testRuntimeOnly
+    cftlibTestImplementation.extendsFrom testImplementation
+    cftlibTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 test {
-    dependsOn dumpCCDDefinitions
     exclude '**/*ComponentTest*'
     useJUnitPlatform()
     testLogging {
@@ -272,13 +273,6 @@ allprojects {
                 enabled = false
             }
         }
-    }
-}
-
-processTestResources {
-    dependsOn dumpCCDDefinitions
-    from("$buildDir/cftlib/definition-snapshots") {
-        into 'definition-snapshots'
     }
 }
 
@@ -330,12 +324,46 @@ tasks.register('validateCcdDefinitionsLockfile', Exec) {
 tasks.register('setupCcdDefinitionsWorkspace', Exec) {
     workingDir 'ccd-definitions'
     commandLine 'yarn', 'install'
+
+    inputs.files(
+        'ccd-definitions/package.json',
+        'ccd-definitions/yarn.lock',
+        'ccd-definitions/.yarnrc.yml',
+        fileTree('ccd-definitions') {
+            include 'jurisdictions/*/package.json'
+            include 'tools/*/package.json'
+        }
+    ).withPathSensitivity(PathSensitivity.RELATIVE)
+    outputs.file 'ccd-definitions/.yarn/install-state.gz'
+    outputs.upToDateWhen { file('ccd-definitions/node_modules').exists() }
 }
 
 tasks.register('generateCftlibCcdDefinitions', Exec) {
     dependsOn 'setupCcdDefinitionsWorkspace'
     workingDir 'ccd-definitions'
     commandLine 'yarn', 'generate-excel:cftlib'
+
+    inputs.property('environment', 'cftlib')
+    inputs.files(
+        'ccd-definitions/package.json',
+        'ccd-definitions/yarn.lock',
+        fileTree('ccd-definitions') {
+            include 'configs/build.config.js'
+            include 'jurisdictions/*/json/**/*.json'
+            include 'jurisdictions/*/data/ccd-template.xlsx'
+            include 'tools/build-*.js'
+            include 'tools/ccd-definition-processor/bin/**/*.js'
+            include 'tools/ccd-definition-processor/src/**/*.js'
+            include 'tools/ccd-definition-processor/package.json'
+        }
+    ).withPathSensitivity(PathSensitivity.RELATIVE)
+    outputs.files(
+        'ccd-definitions/jurisdictions/admin/xlsx/et-admin-ccd-config-cftlib.xlsx',
+        'ccd-definitions/jurisdictions/england-wales/xlsx/et-englandwales-ccd-config-cftlib.xlsx',
+        'ccd-definitions/jurisdictions/scotland/xlsx/et-scotland-ccd-config-cftlib.xlsx'
+    )
+    outputs.dir 'ccd-definitions/dist/cftlib'
+    outputs.cacheIf { true }
 }
 
 tasks.register('yarnAudit', Exec) {
@@ -730,7 +758,6 @@ bootJar {
         'et-cos.jar'
     })
 
-    dependsOn dumpCCDDefinitions
     from("$buildDir/cftlib/definition-snapshots") {
         into 'BOOT-INF/classes/definition-snapshots'
     }
@@ -744,13 +771,13 @@ wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
 
-assemble.dependsOn(dumpCCDDefinitions)
-
 // True when ET_WORK_ALLOCATION=true is set explicitly, or when the bootWithCcdAndWa task is invoked.
 def waEnabled = System.getenv('ET_WORK_ALLOCATION') == 'true'
         || gradle.startParameter.taskNames.any { it == 'bootWithCcdAndWa' }
 
 bootWithCCD {
+    dependsOn 'generateCftlibCcdDefinitions'
+
     // Simulates idam and s2s locally.
     // See rse-cft-lib/LibRunnerTask
     authMode = uk.gov.hmcts.rse.AuthMode.Local
@@ -850,6 +877,18 @@ tasks.register('bootWithCcdAndWa') {
     group = 'Application'
     description = 'Starts bootWithCCD with Work Allocation enabled (equivalent to ET_WORK_ALLOCATION=true ./gradlew bootWithCCD)'
     dependsOn 'bootWithCCD'
+}
+
+cftlibTest {
+    authMode = uk.gov.hmcts.rse.AuthMode.Local
+    jacoco.excludes = ['org/drools/**', 'uk/gov/hmcts/et/common/model/ccd/CaseData']
+    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,ethos,camunda,role_assignment,wa_workflow_api,cft_task_db,wa_case_event_messages_db,ccd_data,emstitch'
+    environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
+    environment 'CFTLIB_IMPORT_CCD_DEFS_ON_BOOT', 'true'
+    environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
+    environment 'ET_COS_URL', 'http://localhost:8081'
+    environment 'ET_COS_SYSTEM_USER', 'admin@hmcts.net'
+    environment 'ET_COS_SYSTEM_USER_PASSWORD', 'Password'
 }
 
 tasks.named('dumpCCDDefinitions') {

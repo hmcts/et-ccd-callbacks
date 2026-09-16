@@ -213,4 +213,12 @@ export default class RespondentCaseOverviewPage extends BasePage {
     await this.clickSubmitButton();
   }
 
+  async assertYourResponseStatusEt3(status: string) {
+    await this.page.waitForLoadState('load');
+    const yourResponseStatus = this.page.locator(`//a[normalize-space()='Your response form (ET3)']/ancestor::li//strong`);
+    await expect(yourResponseStatus).toBeVisible();
+    await expect(yourResponseStatus).toContainText(status);
+  }
+
+
 }

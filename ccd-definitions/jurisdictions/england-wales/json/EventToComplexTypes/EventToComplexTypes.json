@@ -1713,6 +1713,42 @@
     "DisplayContext": "OPTIONAL"
   },
   {
+    "ID": "CreateDraftCase",
+    "CaseEventID": "INITIATE_CASE_DRAFT",
+    "CaseFieldID": "claimantTaskListChecks",
+    "ListElementCode": "representativeDetailsCheck",
+    "EventElementLabel": "Have you completed this section?",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "CreateDraftCase",
+    "CaseEventID": "INITIATE_CASE_DRAFT",
+    "CaseFieldID": "claimantTaskListChecks",
+    "ListElementCode": "representedClaimantDetailsCheck",
+    "EventElementLabel": "Have you completed this section?",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "CreateDraftCase",
+    "CaseEventID": "INITIATE_CASE_DRAFT",
+    "CaseFieldID": "claimantTaskListChecks",
+    "ListElementCode": "representedClaimantNameProvided",
+    "EventElementLabel": "Has the representative provided the claimant's name?",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "CreateDraftCase",
+    "CaseEventID": "INITIATE_CASE_DRAFT",
+    "CaseFieldID": "claimantTaskListChecks",
+    "ListElementCode": "representedClaimantEmailProvided",
+    "EventElementLabel": "Has the representative provided the claimant's email address?",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
     "ID": "UpdateCase",
     "CaseEventID": "UPDATE_CASE_DRAFT",
     "CaseFieldID": "claimantIndType",
@@ -2727,6 +2763,42 @@
     "DisplayContext": "OPTIONAL"
   },
   {
+    "ID": "UpdateCase",
+    "CaseEventID": "UPDATE_CASE_DRAFT",
+    "CaseFieldID": "claimantTaskListChecks",
+    "ListElementCode": "representativeDetailsCheck",
+    "EventElementLabel": "Have you completed this section?",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "UpdateCase",
+    "CaseEventID": "UPDATE_CASE_DRAFT",
+    "CaseFieldID": "claimantTaskListChecks",
+    "ListElementCode": "representedClaimantDetailsCheck",
+    "EventElementLabel": "Have you completed this section?",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "UpdateCase",
+    "CaseEventID": "UPDATE_CASE_DRAFT",
+    "CaseFieldID": "claimantTaskListChecks",
+    "ListElementCode": "representedClaimantNameProvided",
+    "EventElementLabel": "Has the representative provided the claimant's name?",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "UpdateCase",
+    "CaseEventID": "UPDATE_CASE_DRAFT",
+    "CaseFieldID": "claimantTaskListChecks",
+    "ListElementCode": "representedClaimantEmailProvided",
+    "EventElementLabel": "Has the representative provided the claimant's email address?",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
     "ID": "AmendCase",
     "CaseEventID": "amendCaseDetails",
     "CaseFieldID": "preAcceptCase",
@@ -2944,7 +3016,7 @@
     "CaseEventID": "amendClaimantDetails",
     "CaseFieldID": "claimantType",
     "ListElementCode": "claimant_email_address",
-    "EventElementLabel": "Email address",
+    "EventElementLabel": "Email address (use Update claimant email to change)",
     "FieldDisplayOrder": 10,
     "DisplayContext": "OPTIONAL"
   },

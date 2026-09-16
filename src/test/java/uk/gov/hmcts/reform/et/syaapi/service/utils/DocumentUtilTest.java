@@ -11,6 +11,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_CREATOR;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT;
 
@@ -19,7 +20,8 @@ class DocumentUtilTest {
     private static final String DOCUMENT_COLLECTION = "documentCollection";
 
     @ParameterizedTest
-    @ValueSource(strings = {CASE_USER_ROLE_CREATOR, CASE_USER_ROLE_DEFENDANT})
+    @ValueSource(strings = {CASE_USER_ROLE_CREATOR, CASE_USER_ROLE_DEFENDANT,
+        CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE})
     @SuppressWarnings("unchecked")
     void theFilterClaimantDocuments(String caseRole) {
         CaseDetails caseDetailsFull = new TestData().getCaseDetailsWithData();

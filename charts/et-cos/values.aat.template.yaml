@@ -25,13 +25,13 @@ am-org-role-mapping-service:
   enabled: false
 em-ccdorc:
   enabled: false
-et-migration:
-  enabled: false
 rd-judicial-data-load:
   enabled: false
 rd-judicial-api:
   enabled: false
 rd-professional-api:
+  enabled: false
+rd-commondata-api:
   enabled: false
 rd-user-profile-api:
   enabled: false

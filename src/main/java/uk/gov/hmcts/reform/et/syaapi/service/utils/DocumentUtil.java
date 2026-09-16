@@ -148,7 +148,10 @@ public final class DocumentUtil {
     }
 
     private static List<String> getMergedListByCaseUserRole(String caseUserRole) {
-        if (ManageCaseRoleConstants.CASE_USER_ROLE_CREATOR.equals(caseUserRole)) {
+        // A claimant's non-legal representative acts on the claimant's behalf, so the same documents are
+        // hidden from them as from the claimant ([CREATOR]).
+        if (ManageCaseRoleConstants.CASE_USER_ROLE_CREATOR.equals(caseUserRole)
+            || ManageCaseRoleConstants.CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE.equals(caseUserRole)) {
             return Stream.of(
                     HIDDEN_DOCUMENT_TYPES_FOR_CLAIMANT,
                     RESPONDENT_APPLICATION_DOC_TYPE

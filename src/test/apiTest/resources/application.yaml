@@ -31,7 +31,7 @@ idam:
     totp_secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAC}
     microservice: et_cos
   client:
-    scope: openid profile roles manage-user
+    scope: ${IDAM_CLIENT_SCOPE:openid profile roles manage-user}
     secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAA}
     id: et-cos
 
@@ -195,6 +195,7 @@ assign_case_access_api_url: ${AAC_URL:http://localhost:4454}
 apply_noc_access_api_assignments_path: /noc/apply-decision
 
 rd_professional-api-url: ${RD_PROFESSIONAL_API_URL:http://localhost:4507}
+rd_commondata-api-url: ${RD_COMMONDATA_API_URL:http://localhost:4507}
 
 case-details-url:
   citizen: ${CITIZEN_CASE_DETAILS_URL:http://localhost:3001/citizen-hub/}

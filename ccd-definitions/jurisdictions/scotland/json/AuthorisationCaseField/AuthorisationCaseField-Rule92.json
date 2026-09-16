@@ -19,6 +19,12 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "tseApplicationStoredCollection",
+    "UserRole": "[CLAIMANTNONLEGALREPRESENTATIVE]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "tseRespondentStoredCollection",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"

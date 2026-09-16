@@ -57,6 +57,7 @@ public final class ManageCaseRoleConstants {
     public static final String CASE_USER_ROLE_CREATOR = "[CREATOR]";
     public static final String CASE_USER_ROLE_DEFENDANT = "[DEFENDANT]";
     public static final String CASE_USER_ROLE_CLAIMANT_SOLICITOR = "[CLAIMANTSOLICITOR]";
+    public static final String CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE = "[CLAIMANTNONLEGALREPRESENTATIVE]";
     public static final String STRING_AMPERSAND = "&";
     public static final String STRING_EQUAL = "=";
     public static final String STRING_QUESTION_MARK = "?";
@@ -66,6 +67,7 @@ public final class ManageCaseRoleConstants {
     public static final String STRING_LEFT_SQUARE_BRACKET = "[";
     public static final String STRING_RIGHT_SQUARE_BRACKET = "]";
     public static final String CASE_USER_ROLE_API_PARAMETER_NAME = "case_user_role";
+    public static final String CASE_USER_ROLE_DATA_KEY = "caseUserRole";
     public static final String CASE_USER_ROLE_CCD_API_POST_METHOD_NAME = "/case-users/search";
     public static final String CASE_USERS_RETRIEVE_API = "%s/case-users?case_ids=%s";
     public static final String LINK_STATUS_NOT_STARTED_YET = "notStartedYet";

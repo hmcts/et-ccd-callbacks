@@ -69,26 +69,12 @@ ccd:
   decentralised-runtime:
     cdam-attach:
       enabled: ${CCD_DECENTRALISED_RUNTIME_CDAM_ATTACH_ENABLED:true}
-  data-migration:
-    enabled: ${ET_CCD_DATA_MIGRATION_ENABLED:false}
-    task-name: ${ET_CCD_DATA_MIGRATION_TASK_NAME:et-ccd-data-migration}
-    mode: ${ET_CCD_DATA_MIGRATION_MODE:PRELOAD_EVENTS}
-    case-type-ids: ${ET_CCD_DATA_MIGRATION_CASE_TYPE_IDS:ET_EnglandWales,ET_Scotland,ET_Admin,ET_EnglandWales_Multiple,ET_Scotland_Multiple,ET_EnglandWales_Listings,ET_Scotland_Listings}
-    event-batch-size: ${ET_CCD_DATA_MIGRATION_EVENT_BATCH_SIZE:10000}
-    max-batches-per-run: ${ET_CCD_DATA_MIGRATION_MAX_BATCHES_PER_RUN:100}
-    max-run-time: ${ET_CCD_DATA_MIGRATION_MAX_RUN_TIME:2h}
-    case-revision-offset: ${ET_CCD_DATA_MIGRATION_CASE_REVISION_OFFSET:1000000000}
   servicebus:
     destination: ${CCD_SERVICEBUS_DESTINATION:${AZURE_SERVICE_BUS_TOPIC_NAME:ccd-case-events-aat}}
     scheduler-enabled: ${ET_SERVICEBUS_SCHEDULER_ENABLED:false}
     batch-size: ${ET_SERVICEBUS_BATCH_SIZE:1000}
     published-retention-days: ${ET_SERVICEBUS_PUBLISHED_RETENTION_DAYS:7}
     schedule: ${ET_SERVICEBUS_SCHEDULE:*/30 * * * * *}
-
-migration:
-  ccd-data:
-    enabled: ${ET_CCD_DATA_MIGRATION_ENABLED:false}
-    cron: ${ET_CCD_DATA_MIGRATION_CRON:0 0 15,17 * * *}
 
 core_case_data:
   api:
@@ -120,7 +106,8 @@ idam:
     jwkUrl: ${IDAM_API_JWK_URL:http://sidam-api:5000/jwks}
     jwksUrl: ${IDAM_JWKS_BASEURL:${IDAM_API_JWK_URL:http://sidam-api:5000/jwks}}
   client:
-    scope: openid profile roles manage-user
+    # User search for claimant email update uses the incoming ExUI token, not this et-cos password grant.
+    scope: ${IDAM_CLIENT_SCOPE:openid profile roles manage-user}
     secret: ${IDAM_CLIENT_SECRET:${ET_SYA_API_IDAM_CLIENT_SECRET:AAAAAAAAAAAAAAAA}}
     id: ${REFORM_SERVICE_NAME:et-cos}
 
@@ -131,6 +118,7 @@ case_document_am:
   max_retries: ${CASE_DOCUMENT_AM_MAX_RETRIES:3}
 
 rd_professional-api-url: ${RD_PROFESSIONAL_API_URL:http://localhost:4507}
+rd_commondata-api-url: ${RD_COMMONDATA_API_URL:http://localhost:4507}
 
 feature:
   secure-doc-store:
@@ -398,4 +386,6 @@ notifications:
     respondentResponse: ${RESPONDENT_RESPONSE:9ea43b1d-7029-48ea-a0bd-b9fc4c3c8b66}
   bundles:
     claimantSubmitted: ${BUNDLES_SUBMITTED_TEMPLATE_ID:5c829358-0b54-4335-9d60-1c8296c4a516}
-  dataQualityReportTemplateId: ${DATA_QUALITY_REPORT_TEMPLATE_ID:57a8cba5-9885-4772-876b-09a3fe0abe94
+    respondentSubmittedForClaimant: ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_CLAIMANT_TEMPLATE_ID:cdb6288d-8247-435a-875f-4ea48ca23c9e}
+    respondentSubmittedForTribunal: ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID:12d604ce-df82-4c64-8544-ebbef66eb8c4}
+  dataQualityReportTemplateId: ${DATA_QUALITY_REPORT_TEMPLATE_ID:57a8cba5-9885-4772-876b-09a3fe0abe94}

@@ -138,6 +138,9 @@ withPipeline(type, product, component) {
     sh '''
       env AZURE_CONFIG_DIR=/opt/jenkins/.azure-nonprod az acr login --name hmctsprod
     '''
+  }
+
+  before('dockerbuild') {
     sh './gradlew dumpCCDDefinitions'
   }
 

@@ -45,6 +45,9 @@ public class UpdateHubLinkStatusEvent implements CCDConfig<CaseData, CaseState, 
         if (data.getHubLinksStatuses() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Hub-link statuses are required");
         }
+        // Intentionally last write wins mirroring the SYA frontend client.
+        // Do not copy this pattern for data requiring concurrency protection;
+        // use versioning and optimistic locking by default.
         hubLinkStatusRepository.save(
             HubLinkStatus.create(eventPayload.caseReference(), data.getHubLinksStatuses())
         );

@@ -216,8 +216,7 @@ public class SupportTaskService {
                                         Consumer<String> taskRequiredSetter) {
         if (!hasRequestedFlag(flags, eligibleFlagCodes) && !isTaskNotCreatedMarker(taskCreated)) {
             taskCreatedSetter.accept(NO);
-            // The submitted callback changes this to No in the dedicated close event.
-            taskRequiredSetter.accept(YES);
+            taskRequiredSetter.accept(NO);
         }
     }
 

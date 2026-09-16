@@ -330,11 +330,11 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, taskState(caseData).getAdminTaskCreated());
-        assertEquals(YES, taskState(caseData).getAdminTaskRequired());
+        assertEquals(NO, taskState(caseData).getAdminTaskRequired());
         assertEquals(YES, taskState(caseData).getJudgeTaskCreated());
         assertNull(taskState(caseData).getJudgeTaskRequired());
         assertEquals(NO, taskState(caseData).getLegalOfficerTaskCreated());
-        assertEquals(YES, taskState(caseData).getLegalOfficerTaskRequired());
+        assertEquals(NO, taskState(caseData).getLegalOfficerTaskRequired());
     }
 
     @Test
@@ -462,7 +462,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, getTaskCreated(taskState(caseData), taskType));
-        assertEquals(YES, getTaskRequired(taskState(caseData), taskType));
+        assertEquals(NO, getTaskRequired(taskState(caseData), taskType));
     }
 
     @ParameterizedTest
@@ -492,7 +492,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
 
         assertEquals(NO, getTaskCreated(taskState(caseData), taskType));
-        assertEquals(YES, getTaskRequired(taskState(caseData), taskType));
+        assertEquals(NO, getTaskRequired(taskState(caseData), taskType));
     }
 
     @ParameterizedTest
@@ -519,7 +519,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, getTaskCreated(taskState(caseData), taskType));
-        assertEquals(YES, getTaskRequired(taskState(caseData), taskType));
+        assertEquals(NO, getTaskRequired(taskState(caseData), taskType));
     }
 
     @Test
@@ -539,7 +539,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, taskState(caseData).getAdminTaskCreated());
-        assertEquals(YES, taskState(caseData).getAdminTaskRequired());
+        assertEquals(NO, taskState(caseData).getAdminTaskRequired());
         assertEquals(CCD_TRUE, taskState(caseData).getLegalOfficerTaskCreated());
         assertNull(taskState(caseData).getLegalOfficerTaskRequired());
         assertEquals(CCD_TRUE, taskState(caseData).getJudgeTaskCreated());
@@ -586,9 +586,9 @@ class SupportTaskServiceTest {
         assertEquals(NO, taskState(caseData).getAdminTaskCreated());
         assertEquals(NO, taskState(caseData).getLegalOfficerTaskCreated());
         assertEquals(NO, taskState(caseData).getJudgeTaskCreated());
-        assertEquals(YES, taskState(caseData).getAdminTaskRequired());
-        assertEquals(YES, taskState(caseData).getLegalOfficerTaskRequired());
-        assertEquals(YES, taskState(caseData).getJudgeTaskRequired());
+        assertEquals(NO, taskState(caseData).getAdminTaskRequired());
+        assertEquals(NO, taskState(caseData).getLegalOfficerTaskRequired());
+        assertEquals(NO, taskState(caseData).getJudgeTaskRequired());
     }
 
     @Test
@@ -600,7 +600,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
 
         assertEquals(NO, taskState(caseData).getJudgeTaskCreated());
-        assertEquals(YES, taskState(caseData).getJudgeTaskRequired());
+        assertEquals(NO, taskState(caseData).getJudgeTaskRequired());
     }
 
     static Stream<Arguments> reviewAndArrangeTaskScenarios() {
@@ -623,7 +623,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
         service.prepareArrangeSupportTask(caseData, caseDataBefore);
 
-        assertEquals(YES, getTaskRequired(taskState(caseData), taskType));
+        assertEquals(NO, getTaskRequired(taskState(caseData), taskType));
         assertEquals(arrangeTaskName, taskState(caseData).getArrangeSupportTaskName());
     }
 
@@ -634,7 +634,7 @@ class SupportTaskServiceTest {
         service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, taskState(caseData).getAdminTaskCreated());
-        assertEquals(YES, taskState(caseData).getAdminTaskRequired());
+        assertEquals(NO, taskState(caseData).getAdminTaskRequired());
     }
 
     @Test

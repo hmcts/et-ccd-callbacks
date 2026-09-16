@@ -12,7 +12,7 @@
     "Publish": "Y",
     "CallBackURLAboutToStartEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToStart",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToSubmit",
-    "CallBackURLSubmittedEvent": "${ET_COS_URL}/supportTasks/submitted"
+    "CallBackURLSubmittedEvent": ""
   },
   {
     "CaseTypeID": "ET_Scotland",
@@ -27,7 +27,7 @@
     "Publish": "Y",
     "CallBackURLAboutToStartEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToStart",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToSubmit",
-    "CallBackURLSubmittedEvent": "${ET_COS_URL}/supportTasks/submitted"
+    "CallBackURLSubmittedEvent": ""
   },
   {
     "CaseTypeID": "ET_Scotland",
@@ -42,7 +42,7 @@
     "Publish": "Y",
     "CallBackURLAboutToStartEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToStart",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToSubmit",
-    "CallBackURLSubmittedEvent": "${ET_COS_URL}/supportTasks/submitted"
+    "CallBackURLSubmittedEvent": ""
   },
   {
     "CaseTypeID": "ET_Scotland",
@@ -73,7 +73,7 @@
     "EventEnablingCondition": "",
     "CallBackURLAboutToStartEvent": "",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/supportTasks/aboutToSubmit",
-    "CallBackURLSubmittedEvent": "${ET_COS_URL}/supportTasks/submitted",
+    "CallBackURLSubmittedEvent": "",
     "Publish": "Y"
   },
   {
@@ -105,7 +105,7 @@
     "EventEnablingCondition": "",
     "CallBackURLAboutToStartEvent": "",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/supportTasks/aboutToSubmit",
-    "CallBackURLSubmittedEvent": "${ET_COS_URL}/supportTasks/submitted",
+    "CallBackURLSubmittedEvent": "",
     "Publish": "Y"
   },
   {

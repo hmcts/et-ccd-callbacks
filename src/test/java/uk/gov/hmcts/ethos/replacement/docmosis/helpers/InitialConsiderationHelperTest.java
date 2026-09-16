@@ -361,6 +361,53 @@ class InitialConsiderationHelperTest {
     }
 
     @Test
+    void getDocumentRequestSC_HearingListed_withGiveDetails() throws JsonProcessingException {
+        caseData = CaseDataBuilder.builder().build();
+        setCaseDataValues(caseData);
+        caseData.setEtICHearingListedAnswers(EtICHearingListedAnswers.builder()
+            .etICHearingListed(List.of(
+                "extendHearingDuration",
+                "other",
+                "proceedToHearing",
+                "postponeHearing",
+                "convertFinalToPreliminaryHearing",
+                "convertToF2FHearing"
+            ))
+            .etICExtendDurationGiveDetails("Test Extend duration of hearing")
+            .etICOtherGiveDetails("Test Other")
+            .etICPostponeGiveDetails("Test Postpone hearing")
+            .etICConvertPreliminaryGiveDetails("Test Convert final hearing to preliminary hearing")
+            .etICConvertF2fGiveDetails("Test Convert to F2F hearing")
+            .etICIsHearingWithJudgeOrMembers("JSA")
+            .etICIsFinalHearingWithJudgeOrMembersJsaReason(List.of("Already decided"))
+            .etICIsHearingWithJudgeOrMembersFurtherDetails("Test Further details")
+            .etICHearingAnyOtherDirections("Test Any other directions")
+            .build()
+        );
+
+        String documentRequest = InitialConsiderationHelper
+            .getDocumentRequest(caseData, "key", "ET_Scotland");
+
+        JsonNode request = new ObjectMapper().readTree(documentRequest);
+        JsonNode data = request.get("data");
+        assertJsonArrayToString(data, "hearingListed",
+            "[\"extendHearingDuration\","
+                + "\"other\","
+                + "\"proceedToHearing\","
+                + "\"postponeHearing\","
+                + "\"convertFinalToPreliminaryHearing\","
+                + "\"convertToF2FHearing\"]");
+        assertJsonAsText(data, "hearingPostpone", "Test Postpone hearing");
+        assertJsonAsText(data, "hearingExtend", "Test Extend duration of hearing");
+        assertJsonAsText(data, "hearingConvertFinal", "Test Convert final hearing to preliminary hearing");
+        assertJsonAsText(data, "hearingConvertF2f", "Test Convert to F2F hearing");
+        assertJsonAsText(data, "hearingOther", "Test Other");
+        assertJsonAsText(data, "hearingWithJudgeOrMembers", "JSA");
+        assertJsonAsText(data, "hearingWithJudgeOrMembersFurtherDetails", "Test Further details");
+        assertJsonAsText(data, "otherDirections", "Test Any other directions");
+    }
+
+    @Test
     void getDocumentRequestSC_withNullCaseData_returnsEmptyJson() throws JsonProcessingException {
         CaseData caseDataSC = new CaseData();
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataSC, "key",

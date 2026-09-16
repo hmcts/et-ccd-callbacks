@@ -676,6 +676,8 @@ dependencies {
     testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: serenity
     testImplementation (group: 'org.docx4j', name: 'docx4j', version: '6.1.2') {
         exclude module: 'slf4j-log4j12'
+        exclude group: 'log4j', module: 'log4j'
+        exclude group: 'xalan', module: 'xalan'
     }
     testImplementation(platform('org.junit:junit-bom:5.13.4'))
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitJupiterVersion

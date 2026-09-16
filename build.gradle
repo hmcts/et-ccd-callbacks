@@ -813,6 +813,7 @@ bootWithCCD {
     environment 'IDAM_SECURITY_ALLOWED_ISSUER_2', 'http://localhost:5062/o'
     // xui-manage-org
     environment 'RD_PROFESSIONAL_API_URL', 'http://localhost:8765'
+    environment 'RD_COMMONDATA_API_URL', 'http://localhost:8765'
     environment 'RD_PROFESSIONAL_API_SERVICE', 'http://localhost:8765'
     environment 'PRD_HOST', 'http://localhost:8765'
     environment 'XUI_MANAGE_ORGANISATIONS_CASETYPES', 'ET_EnglandWales,ET_Scotland'

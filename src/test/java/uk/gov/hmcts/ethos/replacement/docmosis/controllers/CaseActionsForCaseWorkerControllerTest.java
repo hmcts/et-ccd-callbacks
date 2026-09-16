@@ -53,6 +53,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
+import uk.gov.hmcts.ethos.replacement.docmosis.wa.ReviewSupportTaskCompletionService;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,6 +62,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -79,6 +81,7 @@ import static org.mockito.Mockito.nullable;
 import static org.mockito.Mockito.same;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -194,6 +197,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @MockitoBean
     private SupportTaskService supportTaskService;
+
+    @MockitoBean
+    private ReviewSupportTaskCompletionService reviewSupportTaskCompletionService;
 
     @MockitoBean
     private FeatureToggleService featureToggleService;
@@ -423,6 +429,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         ((ObjectNode) requestContent2).set("case_details_before",
                 requestContent2.get("case_details").deepCopy());
         when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+        when(supportTaskService.prepareManagedReviewSupportTasks(any(CaseData.class), any(CaseData.class)))
+                .thenReturn(Set.of("ReviewSupportRequestAdmin"));
 
         mvc.perform(post(SUPPORT_TASKS_URL)
                         .content(requestContent2.toString())
@@ -432,6 +440,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
         verify(supportTaskService).prepareManagedReviewSupportTasks(
                 any(CaseData.class), any(CaseData.class));
+        verify(reviewSupportTaskCompletionService).completeTasks(
+                anyString(), eq(AUTH_TOKEN), eq(Set.of("ReviewSupportRequestAdmin")));
         if ("manageFlags".equals(eventId)) {
             verify(supportTaskService).prepareArrangeSupportTask(
                     any(CaseData.class), any(CaseData.class));
@@ -467,6 +477,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 requestContent2.get("case_details").deepCopy());
         when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
         when(supportTaskService.applyReviewSupportRequest(any(CaseData.class))).thenReturn(true);
+        when(supportTaskService.prepareManagedReviewSupportTasks(any(CaseData.class), any(CaseData.class)))
+                .thenReturn(Set.of("ReviewSupportRequestAdmin"));
 
         mvc.perform(post(REVIEW_SUPPORT_REQUEST_ABOUT_TO_SUBMIT_URL)
                         .content(requestContent2.toString())
@@ -477,6 +489,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
         verify(supportTaskService).prepareManagedReviewSupportTasks(
                 any(CaseData.class), any(CaseData.class));
+        verify(reviewSupportTaskCompletionService).completeTasks(
+                anyString(), eq(AUTH_TOKEN), eq(Set.of("ReviewSupportRequestAdmin")));
         verify(supportTaskService).prepareArrangeSupportTask(
                 any(CaseData.class), any(CaseData.class));
         verify(caseManagementForCaseWorkerService).setNextListedDate(any(CaseData.class));
@@ -498,6 +512,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
         verify(supportTaskService, never()).prepareManagedReviewSupportTasks(
                 any(CaseData.class), nullable(CaseData.class));
+        verifyNoInteractions(reviewSupportTaskCompletionService);
         verify(caseManagementForCaseWorkerService, never()).setNextListedDate(any(CaseData.class));
     }
 

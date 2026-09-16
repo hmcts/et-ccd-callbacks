@@ -16,12 +16,9 @@ import lombok.extern.jackson.Jacksonized;
 public class SupportTaskState {
     private String adminTaskCreated;
     private String adminTaskRequired;
-    private String adminTaskCompletionRequired;
     private String legalOfficerTaskCreated;
     private String legalOfficerTaskRequired;
-    private String legalOfficerTaskCompletionRequired;
     private String judgeTaskCreated;
     private String judgeTaskRequired;
-    private String judgeTaskCompletionRequired;
     private String arrangeSupportTaskName;
 }

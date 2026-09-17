@@ -41,17 +41,20 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DigitalCaseFileHel
 public class DigitalCaseFileService {
     private final AuthTokenGenerator authTokenGenerator;
     private final BundleApiClient bundleApiClient;
+    private final DigitalCaseFilePersistenceService persistenceService;
     private static final String CREATE = "Create";
     private static final String UPLOAD = "Upload";
     private static final String REMOVE = "Remove";
 
     public void createUploadRemoveDcf(String userToken, CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
+        long caseReference = Long.parseLong(caseDetails.getCaseId());
         switch (caseData.getUploadOrRemoveDcf()) {
             case CREATE -> {
                 caseData.setCaseBundles(createBundleData(caseData));
-                stitchCaseFileAsync(userToken, caseDetails);
                 setUpdatingStatus(caseData);
+                persistenceService.start(caseReference, caseData);
+                stitchCaseFileAsync(userToken, caseDetails);
             }
             case UPLOAD -> {
                 DigitalCaseFileType digitalCaseFile = caseData.getDigitalCaseFile();
@@ -62,12 +65,22 @@ public class DigitalCaseFileService {
 
                     // Deprecating old field
                     digitalCaseFile.setDateGenerated(null);
+                    persistenceService.save(caseReference, digitalCaseFile);
                 }
             }
-            case REMOVE -> caseData.setDigitalCaseFile(null);
+            case REMOVE -> {
+                persistenceService.save(caseReference, null);
+                caseData.setDigitalCaseFile(null);
+            }
             default -> log.error("Invalid uploadOrRemoveDcf value: {}", caseData.getUploadOrRemoveDcf());
         }
         caseData.setUploadOrRemoveDcf(null);
+    }
+
+    public void completeDcf(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        persistenceService.complete(Long.parseLong(caseDetails.getCaseId()), caseData);
+        caseData.setCaseBundles(null);
     }
 
     private BundleCreateRequest bundleRequestMapper(CaseDetails caseDetails) {

@@ -30,6 +30,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -44,6 +47,8 @@ class DigitalCaseFileServiceTest {
     private BundleApiClient bundleApiClient;
     @Mock
     private AuthTokenGenerator authTokenGenerator;
+    @Mock
+    private DigitalCaseFilePersistenceService persistenceService;
     @MockitoBean
     private DigitalCaseFileService digitalCaseFileService;
     private CaseData caseData;
@@ -51,7 +56,7 @@ class DigitalCaseFileServiceTest {
 
     @BeforeEach
     void setUp() throws URISyntaxException, IOException {
-        digitalCaseFileService = new DigitalCaseFileService(authTokenGenerator, bundleApiClient);
+        digitalCaseFileService = new DigitalCaseFileService(authTokenGenerator, bundleApiClient, persistenceService);
         caseData = CaseDataBuilder.builder()
                 .withEthosCaseReference("123456/2021")
                 .withDocumentCollection(ET1)
@@ -132,6 +137,11 @@ class DigitalCaseFileServiceTest {
         assertEquals("DCF Updating: " + LocalDateTime.now(ZoneId.of("Europe/London")).format(NEW_DATE_TIME_PATTERN),
                 caseData.getDigitalCaseFile().getStatus());
         assertThat(caseData.getCaseBundles()).hasSize(1);
+
+        verify(persistenceService).start(
+            eq(1234123412341234L),
+            same(caseData)
+        );
         var bundle = caseData.getCaseBundles().getFirst();
         assertDoesNotThrow(() -> UUID.fromString(bundle.id()));
         assertThat(bundle.id()).isNotEqualTo(bundle.value().getId());
@@ -139,6 +149,16 @@ class DigitalCaseFileServiceTest {
             assertDoesNotThrow(() -> UUID.fromString(document.id()));
             assertThat(document.id()).isNotEqualTo(bundle.id());
         });
+    }
+
+    @Test
+    void completeDcf() {
+        caseData.setCaseBundles(digitalCaseFileService.createBundleData(caseData));
+
+        digitalCaseFileService.completeDcf(caseDetails);
+
+        verify(persistenceService).complete(1234123412341234L, caseData);
+        assertThat(caseData.getCaseBundles()).isNull();
     }
 
     @Test

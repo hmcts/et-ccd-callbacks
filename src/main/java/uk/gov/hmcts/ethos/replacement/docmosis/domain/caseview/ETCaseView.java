@@ -7,6 +7,7 @@ import uk.gov.hmcts.ccd.sdk.CaseViewRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.CaseState;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ccd.HubLinkStatus;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.DigitalCaseFileRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.HubLinkStatusRepository;
 
 import java.util.Set;
@@ -19,6 +20,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 public class ETCaseView implements CaseView<CaseData, CaseState> {
 
     private final HubLinkStatusRepository hubLinkStatusRepository;
+    private final DigitalCaseFileRepository digitalCaseFileRepository;
 
     @Override
     public Set<String> caseTypeIds() {
@@ -31,6 +33,14 @@ public class ETCaseView implements CaseView<CaseData, CaseState> {
         hubLinkStatusRepository.findById(request.caseRef())
             .map(HubLinkStatus::getData)
             .ifPresent(blobCase::setHubLinksStatuses);
+
+        digitalCaseFileRepository.findById(request.caseRef())
+            .ifPresent(digitalCaseFile -> {
+                blobCase.setDigitalCaseFile(digitalCaseFile.getData());
+                if (digitalCaseFile.getActiveBundleId() == null) {
+                    blobCase.setCaseBundles(null);
+                }
+            });
 
         return blobCase;
     }

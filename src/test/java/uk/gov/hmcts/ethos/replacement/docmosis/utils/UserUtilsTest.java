@@ -71,7 +71,7 @@ final class UserUtilsTest {
         assertThat(UserUtils.isLeadClaimantRepresentative(userDetails, claimantRepresentative)).isFalse();
 
         // When userDetails and claimant representative emails match, should return true.
-        claimantRepresentative.setRepresentativeEmailAddress(DUMMY_EMAIL_2);
+        claimantRepresentative.setRepresentativeEmailAddress(DUMMY_EMAIL_1);
         assertThat(UserUtils.isLeadClaimantRepresentative(userDetails, claimantRepresentative)).isTrue();
     }
 }

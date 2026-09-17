@@ -8,8 +8,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
 import java.io.IOException;
@@ -18,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -27,6 +31,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_YOURSELF;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_TYPE_TO_ORG_ADMIN_NO_REP_LEFT;
 
 @ExtendWith(SpringExtension.class)
@@ -40,6 +46,8 @@ class NocRemoveRepresentationServiceTest {
     private NocRemoveRepresentationEmailService nocRemoveRepresentationEmailService;
     @Mock
     private AdminUserService adminUserService;
+    @Mock
+    private UserIdamService userIdamService;
 
     @InjectMocks
     private NocRemoveRepresentationService nocRemoveRepresentationService;
@@ -51,6 +59,11 @@ class NocRemoveRepresentationServiceTest {
     private static final String REP_CLAIMANT_NAME = "Legal Rep C";
     private static final String REP_CLAIMANT_EMAIL = "rep.c@test.com";
     private static final String CLAIMANT_NAME = "Chris Claimant";
+    private static final String DUMMY_USER_TOKEN = "dummyUserToken";
+
+    private static final String EXPECTED_EXCEPTION_INVALID_CASE_DETAILS = "Case details are required";
+    private static final String CLAIMANT_REPRESENTATIVE_EMAIL_VALID = "rep.c@test.com";
+    private static final String CLAIMANT_REPRESENTATIVE_EMAIL_INVALID = "rep.r@test.com";
 
     private CaseDetails caseDetails;
 
@@ -65,6 +78,27 @@ class NocRemoveRepresentationServiceTest {
                 .getContextClassLoader().getResource("nocRemoveRepTest.json")).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
+    }
+
+    @Test
+    @SneakyThrows
+    void theSetNocRemoveOption() {
+        // when case details are not valid should throw generic service exception
+        GenericServiceException gse = assertThrows(GenericServiceException.class,
+                () -> nocRemoveRepresentationService.setNocRemoveOption(DUMMY_USER_TOKEN, null));
+        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_INVALID_CASE_DETAILS);
+        // when representative is lead representative, should set nocRemoveOption to organisation
+        UserDetails userDetails = new UserDetails();
+        userDetails.setEmail(CLAIMANT_REPRESENTATIVE_EMAIL_VALID);
+        userDetails.setUid(UUID.randomUUID().toString());
+        when(userIdamService.getUserDetails(DUMMY_USER_TOKEN)).thenReturn(userDetails);
+        nocRemoveRepresentationService.setNocRemoveOption(DUMMY_USER_TOKEN, caseDetails);
+        assertThat(caseDetails.getCaseData().getNocRemoveOption()).isEqualTo(NOC_REMOVE_OPTION_ORGANISATION);
+        // when representative is not lead representative, should set nocRemoveOption to yourself
+        userDetails.setEmail(CLAIMANT_REPRESENTATIVE_EMAIL_INVALID);
+        when(userIdamService.getUserDetails(DUMMY_USER_TOKEN)).thenReturn(userDetails);
+        nocRemoveRepresentationService.setNocRemoveOption(DUMMY_USER_TOKEN, caseDetails);
+        assertThat(caseDetails.getCaseData().getNocRemoveOption()).isEqualTo(NOC_REMOVE_OPTION_YOURSELF);
     }
 
     @Test

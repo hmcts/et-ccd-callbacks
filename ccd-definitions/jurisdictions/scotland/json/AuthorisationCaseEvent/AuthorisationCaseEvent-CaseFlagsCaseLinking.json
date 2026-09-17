@@ -91,12 +91,6 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "reviewLOSupportRequest",
-    "UserRole": "caseworker-employment-etjudge-scotland",
-    "CRUD": "CRU"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
     "CaseEventID": "reviewJudgeSupportRequest",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"

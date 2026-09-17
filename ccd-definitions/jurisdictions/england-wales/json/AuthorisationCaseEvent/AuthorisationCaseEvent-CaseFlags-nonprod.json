@@ -49,12 +49,6 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseEventID": "reviewLOSupportRequest",
-    "UserRole": "caseworker-employment-etjudge-englandwales",
-    "CRUD": "CRU"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "reviewJudgeSupportRequest",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"

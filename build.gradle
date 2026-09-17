@@ -235,6 +235,11 @@ configurations {
 
 test {
     dependsOn dumpCCDDefinitions
+    // Bound classpath scanning and retained Spring contexts on high-core CI agents.
+    maxHeapSize = '1G'
+    maxParallelForks = 1
+    jvmArgs '-XX:ActiveProcessorCount=2'
+    systemProperty 'spring.test.context.cache.maxSize', '8'
     exclude '**/*ComponentTest*'
     useJUnitPlatform()
     testLogging {

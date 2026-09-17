@@ -1,8 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
@@ -13,30 +17,47 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.FlagDetailType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.AllPartyFlags;
+import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
 import uk.gov.hmcts.et.common.model.ccd.types.SupportTaskState;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.SupportTaskConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
+import uk.gov.hmcts.ethos.replacement.docmosis.wa.SupportTaskClientContextService;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_CLOSE_ADMIN_REVIEW_SUPPORT_TASK;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_CLOSE_JUDGE_REVIEW_SUPPORT_TASK;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_CLOSE_LEGAL_OFFICER_REVIEW_SUPPORT_TASK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_CREATE_ARRANGE_SUPPORT_TASK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.TASK_TYPE_REVIEW_SUPPORT_ADMIN;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.TASK_TYPE_REVIEW_SUPPORT_JUDGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.TASK_TYPE_REVIEW_SUPPORT_LEGAL_OFFICER;
 
 @ExtendWith(SpringExtension.class)
 class SupportTaskEventServiceTest {
@@ -44,6 +65,11 @@ class SupportTaskEventServiceTest {
     private static final String CASE_ID = "1234567890123456";
     private static final String CASE_TYPE = "ET_Scotland";
     private static final String JURISDICTION = "EMPLOYMENT";
+    private static final String REQUESTED = "Requested";
+    private static final String ACTIVE = "Active";
+    private static final String NOT_APPROVED = "Not Approved";
+    private static final String INACTIVE = "Inactive";
+    private static final String COMPLETE_TASK_PATH = "/client_context/user_task/complete_task";
 
     @Mock
     private CcdClient ccdClient;
@@ -80,21 +106,146 @@ class SupportTaskEventServiceTest {
         ccdRequest.setCaseDetails(latestCaseDetails);
     }
 
-    @Test
-    void triggersTheCategorySpecificClosureEventAndResetsOnlyItsMarker() throws IOException {
+    static Stream<Arguments> closureCategories() {
+        return Stream.of(
+                Arguments.of(TASK_TYPE_REVIEW_SUPPORT_ADMIN, EVENT_CLOSE_ADMIN_REVIEW_SUPPORT_TASK),
+                Arguments.of(TASK_TYPE_REVIEW_SUPPORT_JUDGE, EVENT_CLOSE_JUDGE_REVIEW_SUPPORT_TASK),
+                Arguments.of(TASK_TYPE_REVIEW_SUPPORT_LEGAL_OFFICER, EVENT_CLOSE_LEGAL_OFFICER_REVIEW_SUPPORT_TASK));
+    }
+
+    @ParameterizedTest
+    @MethodSource("closureCategories")
+    void triggersTheCategorySpecificClosureEventAndResetsOnlyItsMarker(String taskType, String eventId)
+            throws IOException {
         when(adminUserService.getAdminUserToken()).thenReturn(TOKEN);
         when(ccdClient.startEventForCase(TOKEN, CASE_TYPE, JURISDICTION, CASE_ID,
-                EVENT_CLOSE_ADMIN_REVIEW_SUPPORT_TASK)).thenReturn(ccdRequest);
+                eventId)).thenReturn(ccdRequest);
         ArgumentCaptor<CaseData> caseDataCaptor = ArgumentCaptor.forClass(CaseData.class);
 
-        service.triggerReviewTaskClosureEvents(caseDetails, Set.of(TASK_TYPE_REVIEW_SUPPORT_ADMIN));
+        service.triggerReviewTaskClosureEvents(caseDetails, Set.of(taskType));
 
+        verify(ccdClient).startEventForCase(TOKEN, CASE_TYPE, JURISDICTION, CASE_ID, eventId);
         verify(ccdClient).submitEventForCase(eq(TOKEN), caseDataCaptor.capture(), eq(CASE_TYPE),
                 eq(JURISDICTION), eq(ccdRequest), eq(CASE_ID));
         SupportTaskState state = caseDataCaptor.getValue().getSupportTaskState();
-        assertEquals(NO, state.getAdminTaskCreated());
-        assertEquals(YES, state.getLegalOfficerTaskCreated());
-        assertEquals(YES, state.getJudgeTaskCreated());
+        assertEquals(TASK_TYPE_REVIEW_SUPPORT_ADMIN.equals(taskType) ? NO : YES, state.getAdminTaskCreated());
+        assertEquals(TASK_TYPE_REVIEW_SUPPORT_LEGAL_OFFICER.equals(taskType) ? NO : YES,
+                state.getLegalOfficerTaskCreated());
+        assertEquals(TASK_TYPE_REVIEW_SUPPORT_JUDGE.equals(taskType) ? NO : YES, state.getJudgeTaskCreated());
+        verifyNoMoreInteractions(ccdClient);
+    }
+
+    static Stream<Arguments> reviewLifecycles() {
+        return closureCategories().flatMap(category -> Stream.of(false, true)
+                .flatMap(fromTask -> Stream.of(ACTIVE, NOT_APPROVED, INACTIVE)
+                        .map(status -> Arguments.of(category.get()[0], category.get()[1], fromTask, status))));
+    }
+
+    @ParameterizedTest(name = "{0}, task link={2}, final status={3}")
+    @MethodSource("reviewLifecycles")
+    void completesReviewLifecycleAndAllowsANewRequest(String taskType, String closureEvent,
+                                                     boolean fromTask, String finalStatus) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        final SupportTaskClientContextService contextService = new SupportTaskClientContextService(mapper);
+        SupportTaskConfiguration configuration = new SupportTaskConfiguration();
+        configuration.getReview().setAdminFlagCodes(Set.of("RA0039", "RA0041"));
+        configuration.getReview().setJudgeFlagCodes(Set.of("RA0037", "RA0038"));
+        configuration.getReview().setLegalOfficerFlagCodes(Set.of("RA0034", "RA0035"));
+        SupportTaskService taskService = new SupportTaskService(configuration);
+        List<String> codes = switch (taskType) {
+            case TASK_TYPE_REVIEW_SUPPORT_ADMIN -> List.of("RA0039", "RA0041");
+            case TASK_TYPE_REVIEW_SUPPORT_JUDGE -> List.of("RA0037", "RA0038");
+            case TASK_TYPE_REVIEW_SUPPORT_LEGAL_OFFICER -> List.of("RA0034", "RA0035");
+            default -> throw new IllegalArgumentException(taskType);
+        };
+        final String context = fromTask ? Base64.getEncoder().encodeToString(mapper.writeValueAsBytes(
+                Map.of("client_context", Map.of("user_task", Map.of(
+                        "task_data", Map.of("id", "review-task-id", "type", taskType),
+                        "complete_task", true))))) : null;
+        CaseData data = new CaseData();
+        data.setAllPartyFlags(AllPartyFlags.builder()
+                .claimantFlags(requestedFlag("claimant-request", codes.getFirst())).build());
+        taskService.prepareNewFlagReviewSupportTasks(data, new CaseData());
+        assertCategoryState(data, taskType, YES, YES);
+
+        CaseData before = mapper.readValue(mapper.writeValueAsBytes(data), CaseData.class);
+        data.getAllPartyFlags().setRespondentExternalFlags(requestedFlag("respondent-request", codes.getLast()));
+        taskService.prepareNewFlagReviewSupportTasks(data, before);
+        assertCategoryState(data, taskType, YES, null);
+
+        before = mapper.readValue(mapper.writeValueAsBytes(data), CaseData.class);
+        data.getAllPartyFlags().getClaimantFlags().getDetails().getFirst().getValue().setStatus(ACTIVE);
+        Set<String> closures = taskService.prepareManagedReviewSupportTasks(data, before);
+        assertTrue(closures.isEmpty());
+        assertCategoryState(data, taskType, YES, null);
+        assertCompletionContext(mapper, contextService.updateTaskCompletion(context, closures), fromTask, false);
+        service.triggerReviewTaskClosureEvents(caseDetails, taskService.reviewTaskTypesToClose(data));
+        verifyNoInteractions(ccdClient);
+
+        before = mapper.readValue(mapper.writeValueAsBytes(data), CaseData.class);
+        data.getAllPartyFlags().getRespondentExternalFlags().getDetails().getFirst().getValue().setStatus(finalStatus);
+        closures = taskService.prepareManagedReviewSupportTasks(data, before);
+        assertEquals(Set.of(taskType), closures);
+        assertCategoryState(data, taskType, NO, null);
+        assertCompletionContext(mapper, contextService.updateTaskCompletion(context, closures), fromTask, true);
+        if (!fromTask) {
+            taskService.retainReviewTasksForSubmittedCallback(data, closures);
+            assertCategoryState(data, taskType, YES, null);
+            ccdRequest.getCaseDetails().setCaseData(data);
+            when(adminUserService.getAdminUserToken()).thenReturn(TOKEN);
+            when(ccdClient.startEventForCase(TOKEN, CASE_TYPE, JURISDICTION, CASE_ID, closureEvent))
+                    .thenReturn(ccdRequest);
+            assertEquals(Set.of(taskType), taskService.reviewTaskTypesToClose(data));
+            service.triggerReviewTaskClosureEvents(caseDetails, taskService.reviewTaskTypesToClose(data));
+            verify(ccdClient).startEventForCase(TOKEN, CASE_TYPE, JURISDICTION, CASE_ID, closureEvent);
+            verify(ccdClient).submitEventForCase(TOKEN, data, CASE_TYPE, JURISDICTION, ccdRequest, CASE_ID);
+        } else {
+            service.triggerReviewTaskClosureEvents(caseDetails, taskService.reviewTaskTypesToClose(data));
+        }
+        assertCategoryState(data, taskType, NO, null);
+        assertTrue(taskService.reviewTaskTypesToClose(data).isEmpty());
+        verifyNoMoreInteractions(ccdClient);
+
+        before = mapper.readValue(mapper.writeValueAsBytes(data), CaseData.class);
+        data.getAllPartyFlags().setClaimantRepresentativeExternalFlags(requestedFlag("new-request", codes.getFirst()));
+        taskService.prepareNewFlagReviewSupportTasks(data, before);
+        assertCategoryState(data, taskType, YES, YES);
+        taskService.prepareNewFlagReviewSupportTasks(data, before);
+        assertCategoryState(data, taskType, YES, null);
+    }
+
+    private static CaseFlagsType requestedFlag(String id, String code) {
+        return CaseFlagsType.builder().details(ListTypeItem.from(GenericTypeItem.from(id,
+                FlagDetailType.builder().flagCode(code).status(REQUESTED).build()))).build();
+    }
+
+    private static void assertCategoryState(CaseData data, String taskType, String created, String required) {
+        SupportTaskState state = data.getSupportTaskState();
+        switch (taskType) {
+            case TASK_TYPE_REVIEW_SUPPORT_ADMIN -> {
+                assertEquals(created, state.getAdminTaskCreated());
+                assertEquals(required, state.getAdminTaskRequired());
+            }
+            case TASK_TYPE_REVIEW_SUPPORT_JUDGE -> {
+                assertEquals(created, state.getJudgeTaskCreated());
+                assertEquals(required, state.getJudgeTaskRequired());
+            }
+            case TASK_TYPE_REVIEW_SUPPORT_LEGAL_OFFICER -> {
+                assertEquals(created, state.getLegalOfficerTaskCreated());
+                assertEquals(required, state.getLegalOfficerTaskRequired());
+            }
+            default -> throw new IllegalArgumentException(taskType);
+        }
+    }
+
+    private static void assertCompletionContext(ObjectMapper mapper, String context, boolean fromTask,
+                                                boolean expected) throws IOException {
+        if (fromTask) {
+            assertEquals(expected, mapper.readTree(Base64.getDecoder().decode(context))
+                    .at(COMPLETE_TASK_PATH).booleanValue());
+        } else {
+            assertNull(context);
+        }
     }
 
     @Test

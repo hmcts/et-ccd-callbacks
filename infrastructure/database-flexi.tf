@@ -20,7 +20,7 @@ module "postgres" {
   pgsql_version                  = "15"
   pgsql_storage_mb               = var.env == "prod" ? 524288 : 65536
   admin_user_object_id           = var.jenkins_AAD_objectId
-  force_user_permissions_trigger = "2"
+  force_user_permissions_trigger = "3"
   enable_db_report_privileges    = true
   pgsql_server_configuration = [
     {

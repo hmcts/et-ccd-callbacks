@@ -139,7 +139,7 @@ class DigitalCaseFileServiceTest {
         assertThat(caseData.getCaseBundles()).hasSize(1);
 
         verify(persistenceService).start(
-            eq(1234123412341234L),
+            eq(1_234_123_412_341_234L),
             same(caseData)
         );
         var bundle = caseData.getCaseBundles().getFirst();
@@ -157,7 +157,7 @@ class DigitalCaseFileServiceTest {
 
         digitalCaseFileService.completeDcf(caseDetails);
 
-        verify(persistenceService).complete(1234123412341234L, caseData);
+        verify(persistenceService).complete(1_234_123_412_341_234L, caseData);
         assertThat(caseData.getCaseBundles()).isNull();
     }
 

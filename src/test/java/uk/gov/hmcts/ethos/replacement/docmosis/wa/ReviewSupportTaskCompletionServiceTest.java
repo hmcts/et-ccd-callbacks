@@ -13,7 +13,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.client.WaTaskApiClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.wa.model.TaskSearchParameter;
 import uk.gov.hmcts.ethos.replacement.docmosis.wa.model.TaskSearchRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.wa.model.TaskSearchResponse;
-import uk.gov.hmcts.ethos.replacement.docmosis.wa.model.TerminateTaskRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.wa.model.WaTask;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -69,7 +68,7 @@ class ReviewSupportTaskCompletionServiceTest {
     }
 
     @Test
-    void terminatesEveryReturnedTaskWithCompletedReason() {
+    void completesEveryReturnedTask() {
         stubSearch(TaskSearchResponse.builder().tasks(List.of(
                 WaTask.builder().id("admin-id").type(ADMIN_TASK).build(),
                 WaTask.builder().id("judge-id").type(JUDGE_TASK).build())).build());
@@ -77,25 +76,22 @@ class ReviewSupportTaskCompletionServiceTest {
         service.completeTasks(CASE_ID, USER_TOKEN, Set.of(ADMIN_TASK, JUDGE_TASK));
 
         ArgumentCaptor<String> taskIds = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<TerminateTaskRequest> requests = ArgumentCaptor.forClass(TerminateTaskRequest.class);
-        verify(waTaskApiClient, times(2)).terminateTask(eq(SERVICE_TOKEN), taskIds.capture(), requests.capture());
+        verify(waTaskApiClient, times(2))
+                .completeTask(eq(USER_TOKEN), eq(SERVICE_TOKEN), taskIds.capture());
         assertThat(taskIds.getAllValues()).containsExactlyInAnyOrder("admin-id", "judge-id");
-        assertThat(requests.getAllValues())
-                .extracting(request -> request.getTerminateInfo().getTerminateReason())
-                .containsOnly("completed");
     }
 
     @Test
-    void continuesWhenOneTerminationFails() {
+    void continuesWhenOneCompletionFails() {
         stubSearch(TaskSearchResponse.builder().tasks(List.of(
                 WaTask.builder().id("fails").type(ADMIN_TASK).build(),
                 WaTask.builder().id("succeeds").type(JUDGE_TASK).build())).build());
         doThrow(new IllegalStateException("unavailable"))
-                .when(waTaskApiClient).terminateTask(eq(SERVICE_TOKEN), eq("fails"), any());
+                .when(waTaskApiClient).completeTask(eq(USER_TOKEN), eq(SERVICE_TOKEN), eq("fails"));
 
         service.completeTasks(CASE_ID, USER_TOKEN, Set.of(ADMIN_TASK, JUDGE_TASK));
 
-        verify(waTaskApiClient).terminateTask(eq(SERVICE_TOKEN), eq("succeeds"), any());
+        verify(waTaskApiClient).completeTask(eq(USER_TOKEN), eq(SERVICE_TOKEN), eq("succeeds"));
     }
 
     @Test
@@ -106,19 +102,19 @@ class ReviewSupportTaskCompletionServiceTest {
 
         service.completeTasks(CASE_ID, USER_TOKEN, Set.of(ADMIN_TASK));
 
-        verify(waTaskApiClient, never()).terminateTask(anyString(), anyString(), any());
+        verify(waTaskApiClient, never()).completeTask(anyString(), anyString(), anyString());
     }
 
     @Test
     void toleratesMissingSearchResponseOrTaskList() {
         stubSearch(null);
         service.completeTasks(CASE_ID, USER_TOKEN, Set.of(ADMIN_TASK));
-        verify(waTaskApiClient, never()).terminateTask(anyString(), anyString(), any());
+        verify(waTaskApiClient, never()).completeTask(anyString(), anyString(), anyString());
 
         when(waTaskApiClient.searchTasks(anyString(), anyString(), any()))
                 .thenReturn(TaskSearchResponse.builder().build());
         service.completeTasks(CASE_ID, USER_TOKEN, Set.of(ADMIN_TASK));
-        verify(waTaskApiClient, never()).terminateTask(anyString(), anyString(), any());
+        verify(waTaskApiClient, never()).completeTask(anyString(), anyString(), anyString());
     }
 
     @ParameterizedTest

@@ -1,18 +1,25 @@
 [
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "nocRemoveRepLandingPageLabel",
-    "Label": "This will remove you and/or your organisation from the case. You will no longer represent the client.",
+    "ID": "nocRemoveRepLandingPageLeadLabel",
+    "Label": "This will remove you and your organisation from the case. You will no longer represent the client.",
     "FieldType": "Label",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "nocRemoveRepOption",
+    "ID": "nocRemoveRepLandingPageSharedLabel",
+    "Label": "This will remove you from the case. You will no longer represent the client.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRemoveOption",
     "Label": "Who do you wish to remove from this case?",
-    "FieldType": "FixedRadioList",
-    "FieldTypeParameter": "frl_NocRemove_ChooseYourselfOrYourOrg",
+    "FieldType": "Text",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },

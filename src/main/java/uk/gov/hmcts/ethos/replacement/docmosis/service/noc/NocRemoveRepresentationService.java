@@ -4,17 +4,24 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.UserUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 
 import java.util.List;
 
+import static uk.gov.hmcts.et.common.model.hmc.ValidationError.INVALID_CASE_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_OLD_CASE_DETAILS_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_YOURSELF;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_TYPE_TO_ORG_ADMIN_NO_REP_LEFT;
 
 @Slf4j
@@ -26,6 +33,25 @@ public class NocRemoveRepresentationService {
     private final NocNotificationService nocNotificationService;
     private final NocRemoveRepresentationEmailService nocRemoveRepresentationEmailService;
     private final AdminUserService adminUserService;
+    private final UserIdamService userIdamService;
+
+    public void setNocRemoveOption(String userToken, CaseDetails caseDetails) throws GenericServiceException {
+        final String methodName = "setNocRemoveOption";
+        if (!CaseDataUtils.areCaseDetailsValid(caseDetails)) {
+            throw new GenericServiceException(INVALID_CASE_DETAILS,
+                    new Exception(INVALID_CASE_DETAILS),
+                    INVALID_CASE_DETAILS,
+                    INVALID_CASE_DETAILS,
+                    NocRemoveRepresentationService.class.getSimpleName(),
+                    methodName);
+        }
+        UserDetails userDetails = userIdamService.getUserDetails(userToken);
+        caseDetails.getCaseData().setNocRemoveOption(
+                UserUtils.isLeadClaimantRepresentative(userDetails,
+                        caseDetails.getCaseData().getRepresentativeClaimantType())
+                        ? NOC_REMOVE_OPTION_ORGANISATION
+                        : NOC_REMOVE_OPTION_YOURSELF);
+    }
 
     /**
      * Revokes the claimant's legal representative from the case and sends notification emails to all relevant parties.

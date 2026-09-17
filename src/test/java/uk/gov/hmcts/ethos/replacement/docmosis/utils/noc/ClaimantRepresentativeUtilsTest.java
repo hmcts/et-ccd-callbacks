@@ -357,4 +357,22 @@ final class ClaimantRepresentativeUtilsTest {
         assertThat(caseData.getEt3ResponseAddress()).isEqualTo(address);
         assertThat(caseData.getEt3ResponsePhone()).isEqualTo(REPRESENTATIVE_PHONE);
     }
+
+    @Test
+    void theHasRequiredClaimantRepresentativeDetails() {
+        // when claimant representative is empty should return false
+        assertThat(ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(null)).isFalse();
+        // when claimant representative's id is empty should return false
+        RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder().build();
+        assertThat(ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(claimantRepresentative))
+                .isFalse();
+        // when claimant representative's email address is not empty should return true
+        claimantRepresentative.setRepresentativeId(CLAIMANT_REPRESENTATIVE_ID);
+        assertThat(ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(claimantRepresentative))
+                .isFalse();
+        // when claimant representative's email address is not empty should return true
+        claimantRepresentative.setRepresentativeEmailAddress(CLAIMANT_REPRESENTATIVE_EMAIL_ADDRESS);
+        assertThat(ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(claimantRepresentative))
+                .isTrue();
+    }
 }

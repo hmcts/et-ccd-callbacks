@@ -116,6 +116,8 @@ public class InitialConsiderationController {
         setDocumentNumbers(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
 
+        initialConsiderationService.clearMarkupAndOldValueAfterSubmit(caseData);
+
         return getCallbackRespEntityNoErrors(caseData);
     }
 

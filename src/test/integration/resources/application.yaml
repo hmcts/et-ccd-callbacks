@@ -45,11 +45,6 @@ case_document_am:
 rd_professional-api-url: http://localhost:4507
 rd_commondata-api-url: http://localhost:4507
 
-wa:
-  task-management:
-    api:
-      url: http://localhost:8087
-
 feature:
   secure-doc-store:
     enabled: 'false'

@@ -100,5 +100,29 @@
     "CaseEventID": "reviewJudgeSupportRequest",
     "UserRole": "caseworker-employment-etjudge-scotland",
     "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "closeAdminReviewSupportTask",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "closeLOReviewSupportTask",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "closeJudgeReviewSupportTask",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "createArrangeSupportTask",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRU"
   }
 ]

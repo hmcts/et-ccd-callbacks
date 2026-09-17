@@ -14,6 +14,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.config.SupportTaskConfiguration.A
 import uk.gov.hmcts.ethos.replacement.docmosis.config.SupportTaskConfiguration.PathFlag;
 
 import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -123,6 +124,48 @@ public class SupportTaskService {
             taskTypesToComplete.add(TASK_TYPE_REVIEW_SUPPORT_JUDGE);
         }
         return taskTypesToComplete;
+    }
+
+    public void retainReviewTasksForSubmittedCallback(CaseData caseData, Set<String> taskTypes) {
+        SupportTaskState state = taskState(caseData);
+        if (taskTypes.contains(TASK_TYPE_REVIEW_SUPPORT_ADMIN)) {
+            state.setAdminTaskCreated(YES);
+        }
+        if (taskTypes.contains(TASK_TYPE_REVIEW_SUPPORT_LEGAL_OFFICER)) {
+            state.setLegalOfficerTaskCreated(YES);
+        }
+        if (taskTypes.contains(TASK_TYPE_REVIEW_SUPPORT_JUDGE)) {
+            state.setJudgeTaskCreated(YES);
+        }
+    }
+
+    public Set<String> reviewTaskTypesToClose(CaseData caseData) {
+        SupportTaskState state = caseData.getSupportTaskState();
+        if (state == null) {
+            return Set.of();
+        }
+
+        List<FlagDetailType> flags = allFlagItems(caseData.getAllPartyFlags())
+                .map(GenericTypeItem::getValue)
+                .toList();
+        Set<String> taskTypes = new LinkedHashSet<>();
+        addTaskTypeToClose(flags, adminReviewFlag(), state.getAdminTaskCreated(),
+                TASK_TYPE_REVIEW_SUPPORT_ADMIN, taskTypes);
+        addTaskTypeToClose(flags, legalOfficerReviewFlag(), state.getLegalOfficerTaskCreated(),
+                TASK_TYPE_REVIEW_SUPPORT_LEGAL_OFFICER, taskTypes);
+        addTaskTypeToClose(flags, judgeReviewFlag(), state.getJudgeTaskCreated(),
+                TASK_TYPE_REVIEW_SUPPORT_JUDGE, taskTypes);
+        return taskTypes;
+    }
+
+    private static void addTaskTypeToClose(List<FlagDetailType> flags,
+                                           Predicate<FlagDetailType> eligibleFlag,
+                                           String taskCreated,
+                                           String taskType,
+                                           Set<String> taskTypes) {
+        if (isTaskCreated(taskCreated) && !hasRequestedFlag(flags, eligibleFlag)) {
+            taskTypes.add(taskType);
+        }
     }
 
     public void prepareReviewSupportRequest(CaseData caseData, String eventId) {
@@ -251,22 +294,37 @@ public class SupportTaskService {
     public void prepareArrangeSupportTask(CaseData caseData, CaseData caseDataBefore) {
         SupportTaskState taskState = taskState(caseData);
         taskState.setArrangeSupportTaskName(null);
+        arrangeSupportTasks(caseData, caseDataBefore).stream()
+                .findFirst()
+                .map(ArrangeSupportTask::taskName)
+                .ifPresent(taskState::setArrangeSupportTaskName);
+    }
 
+    public List<ArrangeSupportTask> additionalArrangeSupportTasks(CaseData caseData, CaseData caseDataBefore) {
+        return arrangeSupportTasks(caseData, caseDataBefore).stream().skip(1).toList();
+    }
+
+    private List<ArrangeSupportTask> arrangeSupportTasks(CaseData caseData, CaseData caseDataBefore) {
         Map<String, String> flagTitles = configuration.getArrange().getFlagTitles();
         if (flagTitles.isEmpty() && configuration.getArrange().getPathFlags().isEmpty()) {
-            return;
+            return List.of();
         }
 
         List<GenericTypeItem<FlagDetailType>> previousFlags = allFlagItems(
                 caseDataBefore == null ? null : caseDataBefore.getAllPartyFlags()).toList();
-        allFlagItems(caseData.getAllPartyFlags())
-                .filter(item -> FLAG_STATUS_ACTIVE.equals(item.getValue().getStatus()))
-                .filter(item -> wasNotPreviouslyActive(item, previousFlags))
-                .map(GenericTypeItem::getValue)
-                .map(this::arrangeTaskName)
-                .flatMap(Optional::stream)
-                .findFirst()
-                .ifPresent(taskState::setArrangeSupportTaskName);
+        List<GenericTypeItem<FlagDetailType>> currentFlags = allFlagItems(caseData.getAllPartyFlags()).toList();
+        List<ArrangeSupportTask> tasks = new ArrayList<>();
+        for (int index = 0; index < currentFlags.size(); index++) {
+            GenericTypeItem<FlagDetailType> item = currentFlags.get(index);
+            if (!FLAG_STATUS_ACTIVE.equals(item.getValue().getStatus())
+                    || !wasNotPreviouslyActive(item, previousFlags)) {
+                continue;
+            }
+            int flagIndex = index;
+            arrangeTaskName(item.getValue()).ifPresent(taskName -> tasks.add(new ArrangeSupportTask(
+                    item.getId() == null ? "flag-" + flagIndex : item.getId(), taskName)));
+        }
+        return tasks;
     }
 
     public void prepareNewFlagArrangeSupportTask(CaseData caseData, CaseData caseDataBefore) {
@@ -284,6 +342,9 @@ public class SupportTaskService {
     private Predicate<FlagDetailType> adminReviewFlag() {
         return eligibleFlag(configuration.getReview().getAdminFlagCodes(),
                 configuration.getReview().getAdminPathFlags());
+    }
+
+    public record ArrangeSupportTask(String flagId, String taskName) {
     }
 
     private Predicate<FlagDetailType> legalOfficerReviewFlag() {

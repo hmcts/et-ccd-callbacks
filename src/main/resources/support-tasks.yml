@@ -1,4 +1,9 @@
 support-tasks:
+  closure-retry:
+    max-attempts: 3
+    initial-backoff-ms: 200
+    multiplier: 2
+    max-backoff-ms: 1000
   review:
     admin-flag-codes:
       - RA0021

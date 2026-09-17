@@ -14,11 +14,15 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskEventService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -42,6 +46,12 @@ class Et1SubmissionControllerTest extends BaseControllerTest {
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     @MockitoBean
     private Et1SubmissionService et1SubmissionService;
+    @MockitoBean
+    private FeatureToggleService featureToggleService;
+    @MockitoBean
+    private SupportTaskService supportTaskService;
+    @MockitoBean
+    private SupportTaskEventService supportTaskEventService;
     @Autowired
     private MockMvc mvc;
     @Autowired
@@ -80,6 +90,25 @@ class Et1SubmissionControllerTest extends BaseControllerTest {
                 .setHmctsServiceIdSupplementary(any(CaseDetails.class));
         verify(et1SubmissionService, times(1))
                 .sendEt1ConfirmationClaimant(any(CaseDetails.class), eq(AUTH_TOKEN));
+    }
+
+    @Test
+    void createsAdditionalArrangeSupportTasksForCaseFlagsV2() throws Exception {
+        List<SupportTaskService.ArrangeSupportTask> tasks = List.of(
+                new SupportTaskService.ArrangeSupportTask("flag-2", "Support filling in forms"));
+        org.mockito.Mockito.when(featureToggleService.isCaseFlagsV2Enabled(ENGLANDWALES_CASE_TYPE_ID))
+                .thenReturn(true);
+        org.mockito.Mockito.when(supportTaskService.additionalArrangeSupportTasks(
+                        any(), org.mockito.ArgumentMatchers.nullable(CaseData.class)))
+                .thenReturn(tasks);
+
+        mvc.perform(post(SUBMITTED_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk());
+
+        verify(supportTaskEventService).triggerArrangeSupportTaskEvents(any(CaseDetails.class), eq(tasks));
     }
 
     @Test

@@ -58,5 +58,29 @@
     "CaseEventID": "reviewJudgeSupportRequest",
     "UserRole": "caseworker-employment-etjudge-englandwales",
     "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "closeAdminReviewSupportTask",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "closeLOReviewSupportTask",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "closeJudgeReviewSupportTask",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "createArrangeSupportTask",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRU"
   }
 ]

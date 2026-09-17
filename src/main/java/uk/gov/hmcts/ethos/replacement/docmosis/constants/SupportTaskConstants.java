@@ -13,6 +13,10 @@ public final class SupportTaskConstants {
     public static final String EVENT_REVIEW_ADMIN_SUPPORT_REQUEST = "reviewAdminSupportRequest";
     public static final String EVENT_REVIEW_LEGAL_OFFICER_SUPPORT_REQUEST = "reviewLOSupportRequest";
     public static final String EVENT_REVIEW_JUDGE_SUPPORT_REQUEST = "reviewJudgeSupportRequest";
+    public static final String EVENT_CLOSE_ADMIN_REVIEW_SUPPORT_TASK = "closeAdminReviewSupportTask";
+    public static final String EVENT_CLOSE_LEGAL_OFFICER_REVIEW_SUPPORT_TASK = "closeLOReviewSupportTask";
+    public static final String EVENT_CLOSE_JUDGE_REVIEW_SUPPORT_TASK = "closeJudgeReviewSupportTask";
+    public static final String EVENT_CREATE_ARRANGE_SUPPORT_TASK = "createArrangeSupportTask";
     public static final String FLAG_STATUS_ACTIVE = "Active";
     public static final String FLAG_STATUS_REQUESTED = "Requested";
     public static final String TASK_TYPE_REVIEW_SUPPORT_ADMIN = "ReviewSupportRequestAdmin";

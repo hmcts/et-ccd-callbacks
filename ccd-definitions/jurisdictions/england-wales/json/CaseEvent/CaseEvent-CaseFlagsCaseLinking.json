@@ -12,7 +12,7 @@
     "Publish": "Y",
     "CallBackURLAboutToStartEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToStart",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToSubmit",
-    "CallBackURLSubmittedEvent": ""
+    "CallBackURLSubmittedEvent": "${ET_COS_URL}/supportTasks/submitted"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
@@ -27,7 +27,7 @@
     "Publish": "Y",
     "CallBackURLAboutToStartEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToStart",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToSubmit",
-    "CallBackURLSubmittedEvent": ""
+    "CallBackURLSubmittedEvent": "${ET_COS_URL}/supportTasks/submitted"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
@@ -42,7 +42,7 @@
     "Publish": "Y",
     "CallBackURLAboutToStartEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToStart",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToSubmit",
-    "CallBackURLSubmittedEvent": ""
+    "CallBackURLSubmittedEvent": "${ET_COS_URL}/supportTasks/submitted"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
@@ -73,7 +73,7 @@
     "EventEnablingCondition": "",
     "CallBackURLAboutToStartEvent": "",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/supportTasks/aboutToSubmit",
-    "CallBackURLSubmittedEvent": "",
+    "CallBackURLSubmittedEvent": "${ET_COS_URL}/supportTasks/submitted",
     "Publish": "Y"
   },
   {
@@ -105,7 +105,55 @@
     "EventEnablingCondition": "",
     "CallBackURLAboutToStartEvent": "",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/supportTasks/aboutToSubmit",
-    "CallBackURLSubmittedEvent": "",
+    "CallBackURLSubmittedEvent": "${ET_COS_URL}/supportTasks/submitted",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "closeAdminReviewSupportTask",
+    "Name": "Close Admin review task",
+    "Description": "Close Admin review support task",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "closeLOReviewSupportTask",
+    "Name": "Close LO review task",
+    "Description": "Close Legal Officer review support task",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "closeJudgeReviewSupportTask",
+    "Name": "Close Judge review task",
+    "Description": "Close Judge review support task",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "createArrangeSupportTask",
+    "Name": "Create Arrange Support Task",
+    "Description": "Create Arrange Support Task",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
     "Publish": "Y"
   },
   {

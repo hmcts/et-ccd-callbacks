@@ -18,6 +18,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConst
 public class SupportTaskConfiguration {
     private Review review = new Review();
     private Arrange arrange = new Arrange();
+    private ClosureRetry closureRetry = new ClosureRetry();
 
     @Data
     public static class Review {
@@ -33,6 +34,14 @@ public class SupportTaskConfiguration {
     public static class Arrange {
         private Map<String, String> flagTitles = Map.of();
         private List<ArrangePathFlag> pathFlags = List.of();
+    }
+
+    @Data
+    public static class ClosureRetry {
+        private int maxAttempts = 3;
+        private long initialBackoffMs = 200;
+        private double multiplier = 2;
+        private long maxBackoffMs = 1000;
     }
 
     @Data

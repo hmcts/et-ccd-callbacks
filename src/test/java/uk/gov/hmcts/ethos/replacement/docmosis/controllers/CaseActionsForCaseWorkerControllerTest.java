@@ -49,11 +49,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskEventService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
-import uk.gov.hmcts.ethos.replacement.docmosis.wa.ReviewSupportTaskCompletionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.wa.SupportTaskClientContextService;
 
 import java.io.File;
 import java.io.IOException;
@@ -84,6 +85,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
@@ -100,6 +102,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private static final String PRE_DEFAULT_VALUES_URL = "/preDefaultValues";
     private static final String POST_DEFAULT_VALUES_URL = "/postDefaultValues";
     private static final String SUPPORT_TASKS_URL = "/supportTasks/aboutToSubmit";
+    private static final String SUPPORT_TASKS_SUBMITTED_URL = "/supportTasks/submitted";
     private static final String REVIEW_SUPPORT_REQUEST_ABOUT_TO_START_URL =
             "/reviewSupportRequest/aboutToStart";
     private static final String REVIEW_SUPPORT_REQUEST_ABOUT_TO_SUBMIT_URL =
@@ -140,6 +143,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     private static final String ADD_SERVICE_ID_URL = "/addServiceId";
     private static final String AUTHORIZATION = "Authorization";
+    private static final String CLIENT_CONTEXT = "client-context";
+    private static final String ENCODED_CLIENT_CONTEXT = "encoded-client-context";
+    private static final String UPDATED_CLIENT_CONTEXT = "updated-client-context";
     @Autowired
     private JsonMapper jsonMapper;
     @Autowired
@@ -199,7 +205,10 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private SupportTaskService supportTaskService;
 
     @MockitoBean
-    private ReviewSupportTaskCompletionService reviewSupportTaskCompletionService;
+    private SupportTaskEventService supportTaskEventService;
+
+    @MockitoBean
+    private SupportTaskClientContextService supportTaskClientContextService;
 
     @MockitoBean
     private FeatureToggleService featureToggleService;
@@ -431,22 +440,83 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
         when(supportTaskService.prepareManagedReviewSupportTasks(any(CaseData.class), any(CaseData.class)))
                 .thenReturn(Set.of("ReviewSupportRequestAdmin"));
+        when(supportTaskClientContextService.updateTaskCompletion(
+                ENCODED_CLIENT_CONTEXT, Set.of("ReviewSupportRequestAdmin")))
+                .thenReturn(UPDATED_CLIENT_CONTEXT);
 
         mvc.perform(post(SUPPORT_TASKS_URL)
                         .content(requestContent2.toString())
                         .header(AUTHORIZATION, AUTH_TOKEN)
+                        .header(CLIENT_CONTEXT, ENCODED_CLIENT_CONTEXT)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(header().string(CLIENT_CONTEXT, UPDATED_CLIENT_CONTEXT));
 
         verify(supportTaskService).prepareManagedReviewSupportTasks(
                 any(CaseData.class), any(CaseData.class));
-        verify(reviewSupportTaskCompletionService).completeTasks(
-                anyString(), eq(AUTH_TOKEN), eq(Set.of("ReviewSupportRequestAdmin")));
+        verify(supportTaskClientContextService).updateTaskCompletion(
+                ENCODED_CLIENT_CONTEXT, Set.of("ReviewSupportRequestAdmin"));
         if ("manageFlags".equals(eventId)) {
             verify(supportTaskService).prepareArrangeSupportTask(
                     any(CaseData.class), any(CaseData.class));
         }
         verify(caseManagementForCaseWorkerService).setNextListedDate(any(CaseData.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"manageFlags", "manageSupport"})
+    @SneakyThrows
+    void retainsReviewTaskForSubmittedCallbackWhenClientContextIsMissing(String eventId) {
+        ((ObjectNode) requestContent2).put("event_id", eventId);
+        ((ObjectNode) requestContent2).set("case_details_before",
+                requestContent2.get("case_details").deepCopy());
+        Set<String> taskTypes = Set.of("ReviewSupportRequestAdmin");
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+        when(supportTaskService.prepareManagedReviewSupportTasks(any(CaseData.class), any(CaseData.class)))
+                .thenReturn(taskTypes);
+
+        mvc.perform(post(SUPPORT_TASKS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(header().doesNotExist(CLIENT_CONTEXT));
+
+        verify(supportTaskClientContextService).updateTaskCompletion(null, taskTypes);
+        verify(supportTaskService).retainReviewTasksForSubmittedCallback(any(CaseData.class), eq(taskTypes));
+    }
+
+    @Test
+    @SneakyThrows
+    void triggersCategorySpecificReviewTaskClosureEventsAfterSubmission() {
+        Set<String> taskTypes = Set.of("ReviewSupportRequestAdmin", "ReviewSupportRequestJudge");
+        List<SupportTaskService.ArrangeSupportTask> arrangeTasks = List.of(
+                new SupportTaskService.ArrangeSupportTask("flag-2", "Sign language interpreter"));
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+        when(supportTaskService.reviewTaskTypesToClose(any(CaseData.class))).thenReturn(taskTypes);
+        when(supportTaskService.additionalArrangeSupportTasks(any(CaseData.class), nullable(CaseData.class)))
+                .thenReturn(arrangeTasks);
+
+        mvc.perform(post(SUPPORT_TASKS_SUBMITTED_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(supportTaskEventService).triggerArrangeSupportTaskEvents(any(CaseDetails.class), eq(arrangeTasks));
+        verify(supportTaskEventService).triggerReviewTaskClosureEvents(any(CaseDetails.class), eq(taskTypes));
+    }
+
+    @Test
+    @SneakyThrows
+    void doesNotTriggerReviewTaskClosureEventsWhenCaseFlagsV2IsDisabled() {
+        mvc.perform(post(SUPPORT_TASKS_SUBMITTED_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verifyNoInteractions(supportTaskEventService);
     }
 
     @ParameterizedTest
@@ -479,18 +549,23 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(supportTaskService.applyReviewSupportRequest(any(CaseData.class))).thenReturn(true);
         when(supportTaskService.prepareManagedReviewSupportTasks(any(CaseData.class), any(CaseData.class)))
                 .thenReturn(Set.of("ReviewSupportRequestAdmin"));
+        when(supportTaskClientContextService.updateTaskCompletion(
+                ENCODED_CLIENT_CONTEXT, Set.of("ReviewSupportRequestAdmin")))
+                .thenReturn(UPDATED_CLIENT_CONTEXT);
 
         mvc.perform(post(REVIEW_SUPPORT_REQUEST_ABOUT_TO_SUBMIT_URL)
                         .content(requestContent2.toString())
                         .header(AUTHORIZATION, AUTH_TOKEN)
+                        .header(CLIENT_CONTEXT, ENCODED_CLIENT_CONTEXT)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(header().string(CLIENT_CONTEXT, UPDATED_CLIENT_CONTEXT))
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)));
 
         verify(supportTaskService).prepareManagedReviewSupportTasks(
                 any(CaseData.class), any(CaseData.class));
-        verify(reviewSupportTaskCompletionService).completeTasks(
-                anyString(), eq(AUTH_TOKEN), eq(Set.of("ReviewSupportRequestAdmin")));
+        verify(supportTaskClientContextService).updateTaskCompletion(
+                ENCODED_CLIENT_CONTEXT, Set.of("ReviewSupportRequestAdmin"));
         verify(supportTaskService).prepareArrangeSupportTask(
                 any(CaseData.class), any(CaseData.class));
         verify(caseManagementForCaseWorkerService).setNextListedDate(any(CaseData.class));
@@ -512,7 +587,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
         verify(supportTaskService, never()).prepareManagedReviewSupportTasks(
                 any(CaseData.class), nullable(CaseData.class));
-        verifyNoInteractions(reviewSupportTaskCompletionService);
+        verifyNoInteractions(supportTaskClientContextService);
         verify(caseManagementForCaseWorkerService, never()).setNextListedDate(any(CaseData.class));
     }
 

@@ -21,4 +21,5 @@ public class SupportTaskState {
     private String judgeTaskCreated;
     private String judgeTaskRequired;
     private String arrangeSupportTaskName;
+    private String arrangeSupportTaskFlagId;
 }

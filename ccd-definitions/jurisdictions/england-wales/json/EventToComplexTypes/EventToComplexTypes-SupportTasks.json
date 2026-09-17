@@ -226,15 +226,6 @@
   },
   {
     "ID": "SupportTaskState",
-    "CaseEventID": "manageSupport",
-    "CaseFieldID": "supportTaskState",
-    "ListElementCode": "arrangeSupportTaskName",
-    "FieldDisplayOrder": 4,
-    "DisplayContext": "OPTIONAL",
-    "Publish": "Y"
-  },
-  {
-    "ID": "SupportTaskState",
     "CaseEventID": "reviewAdminSupportRequest",
     "CaseFieldID": "supportTaskState",
     "ListElementCode": "arrangeSupportTaskName",
@@ -257,6 +248,51 @@
     "CaseFieldID": "supportTaskState",
     "ListElementCode": "arrangeSupportTaskName",
     "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "closeAdminReviewSupportTask",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "adminTaskCreated",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "closeLOReviewSupportTask",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "legalOfficerTaskCreated",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "closeJudgeReviewSupportTask",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "judgeTaskCreated",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "createArrangeSupportTask",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "arrangeSupportTaskName",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "SupportTaskState",
+    "CaseEventID": "createArrangeSupportTask",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "arrangeSupportTaskFlagId",
+    "FieldDisplayOrder": 2,
     "DisplayContext": "OPTIONAL",
     "Publish": "Y"
   }

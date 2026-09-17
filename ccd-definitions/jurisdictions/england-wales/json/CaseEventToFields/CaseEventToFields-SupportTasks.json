@@ -195,5 +195,45 @@
     "FieldShowCondition": "flagLauncher=\"hidden\"",
     "ShowSummaryChangeOption": "N",
     "RetainHiddenValue": "Yes"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "closeAdminReviewSupportTask",
+    "CaseFieldID": "supportTaskState",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 99,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "closeLOReviewSupportTask",
+    "CaseFieldID": "supportTaskState",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 99,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "closeJudgeReviewSupportTask",
+    "CaseFieldID": "supportTaskState",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 99,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "createArrangeSupportTask",
+    "CaseFieldID": "supportTaskState",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 99,
+    "ShowSummaryChangeOption": "N"
   }
 ]

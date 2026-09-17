@@ -47,5 +47,12 @@
     "FieldType": "Text",
     "ElementLabel": "Arrange support task name",
     "SecurityClassification": "Public"
+  },
+  {
+    "ID": "SupportTaskState",
+    "ListElementCode": "arrangeSupportTaskFlagId",
+    "FieldType": "Text",
+    "ElementLabel": "Arrange support task flag ID",
+    "SecurityClassification": "Public"
   }
 ]

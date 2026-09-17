@@ -75,5 +75,12 @@
     "ListElementCode": "arrangeSupportTaskName",
     "UserRole": "caseworker-wa-task-configuration",
     "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "supportTaskState",
+    "ListElementCode": "arrangeSupportTaskFlagId",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
   }
 ]

@@ -578,6 +578,47 @@ class SupportTaskServiceTest {
     }
 
     @Test
+    void retains_only_review_tasks_that_need_the_submitted_callback() {
+        CaseData caseData = new CaseData();
+        caseData.setSupportTaskState(SupportTaskState.builder()
+                .adminTaskCreated(NO)
+                .legalOfficerTaskCreated(NO)
+                .judgeTaskCreated(NO)
+                .build());
+
+        service.retainReviewTasksForSubmittedCallback(caseData,
+                Set.of(TASK_TYPE_REVIEW_SUPPORT_ADMIN, TASK_TYPE_REVIEW_SUPPORT_JUDGE));
+
+        assertEquals(YES, taskState(caseData).getAdminTaskCreated());
+        assertEquals(NO, taskState(caseData).getLegalOfficerTaskCreated());
+        assertEquals(YES, taskState(caseData).getJudgeTaskCreated());
+    }
+
+    @Test
+    void finds_only_created_review_tasks_without_requested_flags() {
+        CaseData caseData = new CaseData();
+        caseData.setAllPartyFlags(AllPartyFlags.builder()
+                .claimantFlags(caseFlags("admin-flag", "RA0041", STATUS_ACTIVE))
+                .respondentFlags(caseFlags("legal-flag", "RA0034", STATUS_REQUESTED))
+                .respondent1Flags(caseFlags("judge-flag", "RA0038", STATUS_ACTIVE))
+                .build());
+        caseData.setSupportTaskState(SupportTaskState.builder()
+                .adminTaskCreated(YES)
+                .legalOfficerTaskCreated(YES)
+                .judgeTaskCreated(NO)
+                .build());
+
+        Set<String> taskTypesToClose = service.reviewTaskTypesToClose(caseData);
+
+        assertEquals(Set.of(TASK_TYPE_REVIEW_SUPPORT_ADMIN), taskTypesToClose);
+    }
+
+    @Test
+    void finds_no_review_tasks_to_close_when_task_state_is_missing() {
+        assertTrue(service.reviewTaskTypesToClose(new CaseData()).isEmpty());
+    }
+
+    @Test
     void ccd_boolean_task_state_is_deserialized_to_boolean_strings() throws JsonProcessingException {
         SupportTaskState state = new ObjectMapper().readValue("""
                 {
@@ -758,6 +799,27 @@ class SupportTaskServiceTest {
 
         assertEquals("Guidance on how to complete forms", taskState(firstEvent).getArrangeSupportTaskName());
         assertEquals("Guidance on how to complete forms", taskState(secondEvent).getArrangeSupportTaskName());
+    }
+
+    @Test
+    void prepares_an_arrange_support_task_for_every_new_active_flag_in_one_event() {
+        CaseData caseData = new CaseData();
+        caseData.setAllPartyFlags(AllPartyFlags.builder()
+                .claimantFlags(caseFlags("claimant-flag", "RA0017", STATUS_ACTIVE))
+                .respondentFlags(caseFlags("respondent-flag", "RA0017", STATUS_ACTIVE))
+                .representative1ExternalFlags(caseFlags("representative-flag", "RA0042", STATUS_ACTIVE))
+                .build());
+
+        service.prepareArrangeSupportTask(caseData, new CaseData());
+        List<SupportTaskService.ArrangeSupportTask> additionalTasks =
+                service.additionalArrangeSupportTasks(caseData, new CaseData());
+
+        assertEquals("Guidance on how to complete forms", taskState(caseData).getArrangeSupportTaskName());
+        assertEquals(List.of(
+                new SupportTaskService.ArrangeSupportTask(
+                        "respondent-flag", "Guidance on how to complete forms"),
+                new SupportTaskService.ArrangeSupportTask("representative-flag", "Sign language interpreter")
+        ), additionalTasks);
     }
 
     @Test

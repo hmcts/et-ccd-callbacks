@@ -50,16 +50,18 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskEventService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
-import uk.gov.hmcts.ethos.replacement.docmosis.wa.ReviewSupportTaskCompletionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.wa.SupportTaskClientContextService;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
@@ -89,6 +91,7 @@ public class CaseActionsForCaseWorkerController {
     private static final String TWO_HUNDRED = "200";
     private static final String FOUR_HUNDRED = "400";
     private static final String FIVE_HUNDRED = "500";
+    private static final String CLIENT_CONTEXT = "client-context";
     public static final String ACCESSED_SUCCESSFULLY = "Accessed successfully";
     public static final String BAD_REQUEST = "Bad Request";
     public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
@@ -121,7 +124,8 @@ public class CaseActionsForCaseWorkerController {
     private final FeatureToggleService featureToggleService;
     private final CaseFlagsService caseFlagsService;
     private final SupportTaskService supportTaskService;
-    private final ReviewSupportTaskCompletionService reviewSupportTaskCompletionService;
+    private final SupportTaskEventService supportTaskEventService;
+    private final SupportTaskClientContextService supportTaskClientContextService;
     private final CaseManagementLocationService caseManagementLocationService;
     private final Et1SubmissionService et1SubmissionService;
     private final NocRespondentHelper nocRespondentHelper;
@@ -224,9 +228,11 @@ public class CaseActionsForCaseWorkerController {
     @Operation(summary = "Prepare Review Support and Arrange Support tasks for eligible Case Flags.")
     public ResponseEntity<CCDCallbackResponse> prepareSupportTasks(
             @RequestBody CallbackRequest callbackRequest,
-            @RequestHeader(AUTHORIZATION) String userToken) {
+            @RequestHeader(AUTHORIZATION) String userToken,
+            @RequestHeader(value = CLIENT_CONTEXT, required = false) String clientContext) {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
+        Set<String> taskTypesToComplete = null;
 
         if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())) {
             caseManagementForCaseWorkerService.setNextListedDate(caseData);
@@ -240,10 +246,7 @@ public class CaseActionsForCaseWorkerController {
                 supportTaskService.prepareNewFlagReviewSupportTasks(caseData, caseDataBefore);
             } else if (EVENT_MANAGE_FLAGS.equals(callbackRequest.getEventId())
                     || EVENT_MANAGE_SUPPORT.equals(callbackRequest.getEventId())) {
-                reviewSupportTaskCompletionService.completeTasks(
-                        caseDetails.getCaseId(),
-                        userToken,
-                        supportTaskService.prepareManagedReviewSupportTasks(caseData, caseDataBefore));
+                taskTypesToComplete = supportTaskService.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
             }
 
             if (EVENT_CREATE_FLAG.equals(callbackRequest.getEventId())
@@ -254,7 +257,8 @@ public class CaseActionsForCaseWorkerController {
             }
         }
 
-        return getCallbackRespEntityNoErrors(caseData);
+        return addTaskCompletionHeader(
+                getCallbackRespEntityNoErrors(caseData), clientContext, taskTypesToComplete);
     }
 
     @PostMapping(value = "/reviewSupportRequest/aboutToStart", consumes = APPLICATION_JSON_VALUE)
@@ -273,10 +277,12 @@ public class CaseActionsForCaseWorkerController {
     @Operation(summary = "Apply reviewed Case Flags and prepare the related support tasks.")
     public ResponseEntity<CCDCallbackResponse> applyReviewSupportRequest(
             @RequestBody CallbackRequest callbackRequest,
-            @RequestHeader(AUTHORIZATION) String userToken) {
+            @RequestHeader(AUTHORIZATION) String userToken,
+            @RequestHeader(value = CLIENT_CONTEXT, required = false) String clientContext) {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
         List<String> errors = new ArrayList<>();
+        Set<String> taskTypesToComplete = null;
         if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())) {
             if (!supportTaskService.applyReviewSupportRequest(caseData)) {
                 errors.add("Please select status other than Requested");
@@ -285,14 +291,49 @@ public class CaseActionsForCaseWorkerController {
                 CaseData caseDataBefore = callbackRequest.getCaseDetailsBefore() == null
                         ? null
                         : callbackRequest.getCaseDetailsBefore().getCaseData();
-                reviewSupportTaskCompletionService.completeTasks(
-                        caseDetails.getCaseId(),
-                        userToken,
-                        supportTaskService.prepareManagedReviewSupportTasks(caseData, caseDataBefore));
+                taskTypesToComplete = supportTaskService.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
                 supportTaskService.prepareArrangeSupportTask(caseData, caseDataBefore);
             }
         }
-        return getCallbackRespEntityErrors(errors, caseData);
+        return addTaskCompletionHeader(
+                getCallbackRespEntityErrors(errors, caseData), clientContext, taskTypesToComplete);
+    }
+
+    @PostMapping(value = "/supportTasks/submitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Trigger category-specific Review Support task cancellation events.")
+    public ResponseEntity<CCDCallbackResponse> closeReviewSupportTasks(
+            @RequestBody CallbackRequest callbackRequest) {
+        CaseDetails caseDetails = callbackRequest.getCaseDetails();
+        if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())) {
+            CaseData caseDataBefore = callbackRequest.getCaseDetailsBefore() == null
+                    ? null
+                    : callbackRequest.getCaseDetailsBefore().getCaseData();
+            supportTaskEventService.triggerArrangeSupportTaskEvents(caseDetails,
+                    supportTaskService.additionalArrangeSupportTasks(caseDetails.getCaseData(), caseDataBefore));
+            Set<String> taskTypesToClose = supportTaskService.reviewTaskTypesToClose(caseDetails.getCaseData());
+            supportTaskEventService.triggerReviewTaskClosureEvents(caseDetails, taskTypesToClose);
+        }
+        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
+    }
+
+    private ResponseEntity<CCDCallbackResponse> addTaskCompletionHeader(
+            ResponseEntity<CCDCallbackResponse> response,
+            String clientContext,
+            Set<String> taskTypesToComplete) {
+        if (taskTypesToComplete == null) {
+            return response;
+        }
+        String updatedClientContext = supportTaskClientContextService.updateTaskCompletion(
+                clientContext, taskTypesToComplete);
+        if (updatedClientContext == null) {
+            supportTaskService.retainReviewTasksForSubmittedCallback(
+                    response.getBody().getData(), taskTypesToComplete);
+            return response;
+        }
+        return ResponseEntity.status(response.getStatusCode())
+                .headers(response.getHeaders())
+                .header(CLIENT_CONTEXT, updatedClientContext)
+                .body(response.getBody());
     }
 
     private List<String> getValidationDate(String eventId, CaseDetails caseDetails) {

@@ -195,5 +195,45 @@
     "FieldShowCondition": "flagLauncher=\"hidden\"",
     "ShowSummaryChangeOption": "N",
     "RetainHiddenValue": "Yes"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "closeAdminReviewSupportTask",
+    "CaseFieldID": "supportTaskState",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 99,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "closeLOReviewSupportTask",
+    "CaseFieldID": "supportTaskState",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 99,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "closeJudgeReviewSupportTask",
+    "CaseFieldID": "supportTaskState",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 99,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "createArrangeSupportTask",
+    "CaseFieldID": "supportTaskState",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 99,
+    "ShowSummaryChangeOption": "N"
   }
 ]

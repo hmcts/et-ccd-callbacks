@@ -13,8 +13,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.config.SupportTaskConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.SupportTaskConfiguration.ArrangePathFlag;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.SupportTaskConfiguration.PathFlag;
 
-import java.util.Comparator;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;

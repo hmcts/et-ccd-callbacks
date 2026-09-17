@@ -38,10 +38,10 @@ public class SupportTaskConfiguration {
 
     @Data
     public static class ClosureRetry {
-        private int maxAttempts = 3;
-        private long initialBackoffMs = 200;
-        private double multiplier = 2;
-        private long maxBackoffMs = 1000;
+        private int maxAttempts;
+        private long initialBackoffMs;
+        private double multiplier;
+        private long maxBackoffMs;
     }
 
     @Data

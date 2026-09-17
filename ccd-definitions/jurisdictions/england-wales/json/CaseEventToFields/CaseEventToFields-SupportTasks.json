@@ -81,18 +81,6 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "manageSupport",
-    "CaseFieldID": "supportTaskState",
-    "DisplayContext": "COMPLEX",
-    "PageID": 1,
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 99,
-    "FieldShowCondition": "flagLauncherExternal=\"hidden\"",
-    "ShowSummaryChangeOption": "N",
-    "RetainHiddenValue": "Yes"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "reviewAdminSupportRequest",
     "CaseFieldID": "flagLauncher",
     "DisplayContext": "OPTIONAL",

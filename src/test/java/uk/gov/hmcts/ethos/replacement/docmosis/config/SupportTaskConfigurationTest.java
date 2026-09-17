@@ -16,6 +16,14 @@ class SupportTaskConfigurationTest {
     private SupportTaskConfiguration configuration;
 
     @Test
+    void loadsRetrySettingsFromYaml() {
+        assertThat(configuration.getClosureRetry().getMaxAttempts()).isEqualTo(3);
+        assertThat(configuration.getClosureRetry().getInitialBackoffMs()).isEqualTo(200);
+        assertThat(configuration.getClosureRetry().getMultiplier()).isEqualTo(2);
+        assertThat(configuration.getClosureRetry().getMaxBackoffMs()).isEqualTo(1000);
+    }
+
+    @Test
     void loadsFlagCodesFromYaml() {
         assertThat(configuration.getReview().getAdminFlagCodes())
                 .containsExactlyInAnyOrder("RA0021", "RA0033", "RA0039", "RA0041");

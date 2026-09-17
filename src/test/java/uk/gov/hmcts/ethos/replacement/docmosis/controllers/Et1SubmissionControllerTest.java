@@ -95,7 +95,8 @@ class Et1SubmissionControllerTest extends BaseControllerTest {
     @Test
     void createsAdditionalArrangeSupportTasksForCaseFlagsV2() throws Exception {
         List<SupportTaskService.ArrangeSupportTask> tasks = List.of(
-                new SupportTaskService.ArrangeSupportTask("flag-2", "Support filling in forms"));
+                new SupportTaskService.ArrangeSupportTask("flag-2", "Support filling in forms"),
+                new SupportTaskService.ArrangeSupportTask("flag-3", "Support filling in forms"));
         org.mockito.Mockito.when(featureToggleService.isCaseFlagsV2Enabled(ENGLANDWALES_CASE_TYPE_ID))
                 .thenReturn(true);
         org.mockito.Mockito.when(supportTaskService.additionalArrangeSupportTasks(

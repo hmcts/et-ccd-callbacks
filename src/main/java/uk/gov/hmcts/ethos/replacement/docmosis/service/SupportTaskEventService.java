@@ -18,7 +18,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeExceptio
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -69,14 +68,18 @@ public class SupportTaskEventService {
 
     public void triggerArrangeSupportTaskEvents(
             CaseDetails caseDetails, List<SupportTaskService.ArrangeSupportTask> tasks) {
-        tasks.forEach(task -> triggerArrangeSupportTaskEvent(caseDetails, task));
+        List<String> flagIds = tasks.stream().map(SupportTaskService.ArrangeSupportTask::flagId).toList();
+        for (int index = 0; index < tasks.size(); index++) {
+            triggerArrangeSupportTaskEvent(caseDetails, tasks.get(index), flagIds.subList(index, flagIds.size()));
+        }
     }
 
     private void triggerArrangeSupportTaskEvent(
-            CaseDetails caseDetails, SupportTaskService.ArrangeSupportTask task) {
+            CaseDetails caseDetails, SupportTaskService.ArrangeSupportTask task, List<String> remainingFlagIds) {
         String caseId = caseDetails.getCaseId();
         try {
-            boolean submitted = retryTemplate.execute(context -> submitArrangeSupportTaskEvent(caseDetails, task));
+            boolean submitted = retryTemplate.execute(context ->
+                    submitArrangeSupportTaskEvent(caseDetails, task, remainingFlagIds));
             if (submitted) {
                 log.info("Triggered {} for flag {} on case {}", EVENT_CREATE_ARRANGE_SUPPORT_TASK,
                         task.flagId(), caseId);
@@ -89,14 +92,17 @@ public class SupportTaskEventService {
     }
 
     private boolean submitArrangeSupportTaskEvent(
-            CaseDetails caseDetails, SupportTaskService.ArrangeSupportTask task) throws IOException {
+            CaseDetails caseDetails, SupportTaskService.ArrangeSupportTask task,
+            List<String> remainingFlagIds) throws IOException {
         String token = adminUserService.getAdminUserToken();
         String caseId = caseDetails.getCaseId();
         CCDRequest request = ccdClient.startEventForCase(token, caseDetails.getCaseTypeId(),
                 caseDetails.getJurisdiction(), caseId, EVENT_CREATE_ARRANGE_SUPPORT_TASK);
         CaseData latestCaseData = request.getCaseDetails().getCaseData();
         SupportTaskState state = latestCaseData.getSupportTaskState();
-        if (state != null && Objects.equals(task.flagId(), state.getArrangeSupportTaskFlagId())) {
+        // A later checkpoint in this ordered batch also confirms that earlier flags were submitted.
+        if (state != null && state.getArrangeSupportTaskFlagId() != null
+                && remainingFlagIds.contains(state.getArrangeSupportTaskFlagId())) {
             return false;
         }
         if (state == null) {

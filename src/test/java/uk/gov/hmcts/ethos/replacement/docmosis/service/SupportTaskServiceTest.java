@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.FlagDetailType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
@@ -820,6 +821,127 @@ class SupportTaskServiceTest {
                         "respondent-flag", "Guidance on how to complete forms"),
                 new SupportTaskService.ArrangeSupportTask("representative-flag", "Sign language interpreter")
         ), additionalTasks);
+    }
+
+    @ParameterizedTest(name = "submit and update respondent flags: {0}")
+    @ValueSource(booleans = {false, true})
+    void submit_then_update_creates_only_new_arrange_tasks_and_no_duplicate_reviews(boolean respondent)
+            throws JsonProcessingException {
+        CaseData submitted = bulkSupportCase(respondent);
+        prepareSubmissionTasks(submitted, new CaseData(), respondent);
+        assertReviewCategories(submitted, YES);
+        assertEquals("Intermediary", taskState(submitted).getArrangeSupportTaskName());
+        assertEquals(List.of(
+                new SupportTaskService.ArrangeSupportTask("active-2", "Intermediary"),
+                new SupportTaskService.ArrangeSupportTask("active-3", "Lip speaker")),
+                service.additionalArrangeSupportTasks(submitted, new CaseData()));
+
+        // Use a separate persisted snapshot so updating flags cannot mutate the before data.
+        ObjectMapper mapper = new ObjectMapper();
+        CaseData updated = mapper.readValue(mapper.writeValueAsString(submitted), CaseData.class);
+        CaseFlagsType section = respondent ? updated.getAllPartyFlags().getRespondentFlags()
+                : updated.getAllPartyFlags().getClaimantFlags();
+        section.getDetails().addAll(caseFlags("new-active-1", "RA0038", STATUS_ACTIVE).getDetails());
+        section.getDetails().addAll(caseFlags("new-active-2", "RA0041", STATUS_ACTIVE).getDetails());
+        section.getDetails().addAll(caseFlags("new-active-3", "RA0042", STATUS_ACTIVE).getDetails());
+        section.getDetails().addAll(caseFlags("new-admin", "RA0033", STATUS_REQUESTED).getDetails());
+        section.getDetails().addAll(caseFlags("new-judge", "RA0031", STATUS_REQUESTED).getDetails());
+        section.getDetails().addAll(caseFlags("new-lo", "RA0035", STATUS_REQUESTED).getDetails());
+
+        prepareSubmissionTasks(updated, submitted, respondent);
+
+        assertReviewCategories(updated, null);
+        assertEquals("Intermediary", taskState(updated).getArrangeSupportTaskName());
+        assertEquals(List.of(
+                new SupportTaskService.ArrangeSupportTask("new-active-2", "Lip speaker"),
+                new SupportTaskService.ArrangeSupportTask("new-active-3", "Sign language interpreter")),
+                service.additionalArrangeSupportTasks(updated, submitted));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void review_tasks_are_shared_between_claimant_and_respondent_submissions(boolean respondentFirst)
+            throws JsonProcessingException {
+        CaseData submitted = bulkSupportCase(respondentFirst);
+        prepareSubmissionTasks(submitted, new CaseData(), respondentFirst);
+        assertReviewCategories(submitted, YES);
+
+        ObjectMapper mapper = new ObjectMapper();
+        CaseData updated = mapper.readValue(mapper.writeValueAsString(submitted), CaseData.class);
+        CaseData secondSubmission = bulkSupportCase(!respondentFirst);
+        CaseFlagsType newFlags = respondentFirst ? secondSubmission.getAllPartyFlags().getClaimantFlags()
+                : secondSubmission.getAllPartyFlags().getRespondentFlags();
+        newFlags.getDetails().forEach(item -> item.setId("second-" + item.getId()));
+        if (respondentFirst) {
+            updated.getAllPartyFlags().setClaimantFlags(newFlags);
+        } else {
+            updated.getAllPartyFlags().setRespondentFlags(newFlags);
+        }
+
+        prepareSubmissionTasks(updated, submitted, !respondentFirst);
+
+        assertReviewCategories(updated, null);
+    }
+
+    @Test
+    void multiple_respondents_share_reviews_but_have_separate_arrange_tasks() {
+        CaseData caseData = new CaseData();
+        CaseFlagsType first = caseFlags("respondent-1-active", "RA0038", STATUS_ACTIVE);
+        first.getDetails().addAll(caseFlags("respondent-1-request", "RA0038", STATUS_REQUESTED).getDetails());
+        CaseFlagsType second = caseFlags("respondent-2-active", "RA0038", STATUS_ACTIVE);
+        second.getDetails().addAll(caseFlags("respondent-2-request", "RA0037", STATUS_REQUESTED).getDetails());
+        caseData.setAllPartyFlags(AllPartyFlags.builder().respondentFlags(first)
+                .respondent2ExternalFlags(second)
+                .respondent3Flags(caseFlags("respondent-3-active", "RA0038", STATUS_ACTIVE)).build());
+
+        prepareSubmissionTasks(caseData, new CaseData(), true);
+
+        assertEquals(YES, taskState(caseData).getJudgeTaskRequired());
+        assertEquals(YES, taskState(caseData).getJudgeTaskCreated());
+        assertNull(taskState(caseData).getAdminTaskRequired());
+        assertNull(taskState(caseData).getLegalOfficerTaskRequired());
+        assertEquals("Intermediary", taskState(caseData).getArrangeSupportTaskName());
+        assertEquals(List.of(
+                new SupportTaskService.ArrangeSupportTask("respondent-2-active", "Intermediary"),
+                new SupportTaskService.ArrangeSupportTask("respondent-3-active", "Intermediary")),
+                service.additionalArrangeSupportTasks(caseData, new CaseData()));
+
+        service.prepareRespondentReviewSupportTasks(caseData);
+        assertNull(taskState(caseData).getJudgeTaskRequired());
+        assertEquals(YES, taskState(caseData).getJudgeTaskCreated());
+    }
+
+    private void prepareSubmissionTasks(CaseData current, CaseData before, boolean respondent) {
+        if (respondent) {
+            service.prepareRespondentReviewSupportTasks(current);
+            service.prepareNewFlagArrangeSupportTask(current, before);
+        } else {
+            service.prepareReviewSupportTasks(current);
+            service.prepareArrangeSupportTask(current, before);
+        }
+    }
+
+    private static CaseData bulkSupportCase(boolean respondent) {
+        CaseFlagsType flags = caseFlags("active-1", "RA0038", STATUS_ACTIVE);
+        flags.getDetails().addAll(caseFlags("active-2", "RA0038", STATUS_ACTIVE).getDetails());
+        flags.getDetails().addAll(caseFlags("active-3", "RA0041", STATUS_ACTIVE).getDetails());
+        for (String code : List.of("RA0039", "RA0041", "RA0038", "RA0037", "RA0034", "RA0036")) {
+            flags.getDetails().addAll(caseFlags("requested-" + code, code, STATUS_REQUESTED).getDetails());
+        }
+        flags.getDetails().addAll(caseFlags("inactive", "RA0038", STATUS_INACTIVE).getDetails());
+        flags.getDetails().addAll(caseFlags("not-approved", "RA0041", STATUS_NOT_APPROVED).getDetails());
+        flags.getDetails().addAll(caseFlags("unmapped", "UNKNOWN", STATUS_ACTIVE).getDetails());
+        CaseData caseData = new CaseData();
+        caseData.setAllPartyFlags(respondent ? AllPartyFlags.builder().respondentFlags(flags).build()
+                : AllPartyFlags.builder().claimantFlags(flags).build());
+        return caseData;
+    }
+
+    private static void assertReviewCategories(CaseData caseData, String required) {
+        for (String category : List.of(TASK_TYPE_ADMIN, TASK_TYPE_JUDGE, TASK_TYPE_LEGAL_OFFICER)) {
+            assertEquals(required, getTaskRequired(taskState(caseData), category), category);
+            assertEquals(YES, getTaskCreated(taskState(caseData), category), category);
+        }
     }
 
     @Test

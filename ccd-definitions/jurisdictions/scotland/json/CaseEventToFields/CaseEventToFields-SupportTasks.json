@@ -81,18 +81,6 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "CaseEventID": "manageSupport",
-    "CaseFieldID": "supportTaskState",
-    "DisplayContext": "COMPLEX",
-    "PageID": 1,
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 99,
-    "FieldShowCondition": "flagLauncherExternal=\"hidden\"",
-    "ShowSummaryChangeOption": "N",
-    "RetainHiddenValue": "Yes"
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
     "CaseEventID": "reviewAdminSupportRequest",
     "CaseFieldID": "flagLauncher",
     "DisplayContext": "OPTIONAL",

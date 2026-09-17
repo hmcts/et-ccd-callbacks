@@ -18,13 +18,16 @@ import uk.gov.hmcts.ethos.replacement.docmosis.config.SupportTaskConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -54,7 +57,9 @@ class SupportTaskEventServiceTest {
     @BeforeEach
     void setUp() {
         SupportTaskConfiguration configuration = new SupportTaskConfiguration();
+        configuration.getClosureRetry().setMaxAttempts(3);
         configuration.getClosureRetry().setInitialBackoffMs(1);
+        configuration.getClosureRetry().setMultiplier(2);
         configuration.getClosureRetry().setMaxBackoffMs(2);
         service = new SupportTaskEventService(ccdClient, adminUserService, configuration);
 
@@ -105,17 +110,26 @@ class SupportTaskEventServiceTest {
         when(adminUserService.getAdminUserToken()).thenReturn(TOKEN);
         when(ccdClient.startEventForCase(TOKEN, CASE_TYPE, JURISDICTION, CASE_ID,
                 EVENT_CREATE_ARRANGE_SUPPORT_TASK)).thenReturn(ccdRequest);
-        ArgumentCaptor<CaseData> caseDataCaptor = ArgumentCaptor.forClass(CaseData.class);
+        List<SupportTaskService.ArrangeSupportTask> submitted = new ArrayList<>();
+        when(ccdClient.submitEventForCase(eq(TOKEN), any(CaseData.class), eq(CASE_TYPE),
+                eq(JURISDICTION), eq(ccdRequest), eq(CASE_ID))).thenAnswer(invocation -> {
+                    SupportTaskState state = invocation.<CaseData>getArgument(1).getSupportTaskState();
+                    submitted.add(new SupportTaskService.ArrangeSupportTask(
+                            state.getArrangeSupportTaskFlagId(), state.getArrangeSupportTaskName()));
+                    assertEquals(YES, state.getAdminTaskCreated());
+                    assertEquals(YES, state.getJudgeTaskCreated());
+                    assertEquals(YES, state.getLegalOfficerTaskCreated());
+                    return null;
+                });
 
-        service.triggerArrangeSupportTaskEvents(caseDetails, List.of(
+        List<SupportTaskService.ArrangeSupportTask> tasks = List.of(
                 new SupportTaskService.ArrangeSupportTask("flag-2", "Support filling in forms"),
-                new SupportTaskService.ArrangeSupportTask("flag-3", "Sign language interpreter")));
+                new SupportTaskService.ArrangeSupportTask("flag-3", "Sign language interpreter"));
+        service.triggerArrangeSupportTaskEvents(caseDetails, tasks);
 
-        verify(ccdClient, times(2)).submitEventForCase(eq(TOKEN), caseDataCaptor.capture(), eq(CASE_TYPE),
+        verify(ccdClient, times(2)).submitEventForCase(eq(TOKEN), any(CaseData.class), eq(CASE_TYPE),
                 eq(JURISDICTION), eq(ccdRequest), eq(CASE_ID));
-        SupportTaskState finalState = caseDataCaptor.getAllValues().getLast().getSupportTaskState();
-        assertEquals("Sign language interpreter", finalState.getArrangeSupportTaskName());
-        assertEquals("flag-3", finalState.getArrangeSupportTaskFlagId());
+        assertEquals(tasks, submitted);
     }
 
     @Test
@@ -134,6 +148,56 @@ class SupportTaskEventServiceTest {
                 EVENT_CREATE_ARRANGE_SUPPORT_TASK);
         verify(ccdClient).submitEventForCase(eq(TOKEN), any(CaseData.class), eq(CASE_TYPE),
                 eq(JURISDICTION), eq(ccdRequest), eq(CASE_ID));
+    }
+
+    @Test
+    void retriesFailedBatchRemainderWithoutDuplicatingTheCommittedFlag() throws IOException {
+        AtomicReference<String> persistedFlagId = new AtomicReference<>();
+        List<SupportTaskService.ArrangeSupportTask> committed = new ArrayList<>();
+        when(adminUserService.getAdminUserToken()).thenReturn(TOKEN);
+        when(ccdClient.startEventForCase(TOKEN, CASE_TYPE, JURISDICTION, CASE_ID,
+                EVENT_CREATE_ARRANGE_SUPPORT_TASK)).thenAnswer(invocation -> {
+                    CCDRequest freshRequest = requestWithAdminTaskCreated(YES);
+                    freshRequest.getCaseDetails().getCaseData().getSupportTaskState()
+                            .setArrangeSupportTaskFlagId(persistedFlagId.get());
+                    return freshRequest;
+                });
+        when(ccdClient.submitEventForCase(eq(TOKEN), any(CaseData.class), eq(CASE_TYPE),
+                eq(JURISDICTION), any(CCDRequest.class), eq(CASE_ID))).thenAnswer(invocation -> {
+                    SupportTaskState state = invocation.<CaseData>getArgument(1).getSupportTaskState();
+                    if ("flag-4".equals(state.getArrangeSupportTaskFlagId())) {
+                        throw new HttpServerErrorException(HttpStatus.SERVICE_UNAVAILABLE);
+                    }
+                    persistedFlagId.set(state.getArrangeSupportTaskFlagId());
+                    committed.add(new SupportTaskService.ArrangeSupportTask(
+                            state.getArrangeSupportTaskFlagId(), state.getArrangeSupportTaskName()));
+                    return null;
+                });
+        List<SupportTaskService.ArrangeSupportTask> tasks = List.of(
+                new SupportTaskService.ArrangeSupportTask("flag-2", "Intermediary"),
+                new SupportTaskService.ArrangeSupportTask("flag-3", "Intermediary"),
+                new SupportTaskService.ArrangeSupportTask("flag-4", "Lip speaker"));
+
+        assertThrows(GenericRuntimeException.class,
+                () -> service.triggerArrangeSupportTaskEvents(caseDetails, tasks));
+        assertEquals(tasks.subList(0, 2), committed);
+
+        doAnswer(invocation -> {
+            SupportTaskState state = invocation.<CaseData>getArgument(1).getSupportTaskState();
+            persistedFlagId.set(state.getArrangeSupportTaskFlagId());
+            committed.add(new SupportTaskService.ArrangeSupportTask(
+                    state.getArrangeSupportTaskFlagId(), state.getArrangeSupportTaskName()));
+            return null;
+        }).when(ccdClient).submitEventForCase(eq(TOKEN), any(CaseData.class), eq(CASE_TYPE),
+                eq(JURISDICTION), any(CCDRequest.class), eq(CASE_ID));
+
+        service.triggerArrangeSupportTaskEvents(caseDetails, tasks);
+
+        assertEquals(tasks, committed);
+        service.triggerArrangeSupportTaskEvents(caseDetails, tasks);
+        assertEquals(tasks, committed, "Replaying a completed batch must not create duplicate tasks");
+        verify(ccdClient, times(6)).submitEventForCase(eq(TOKEN), any(CaseData.class), eq(CASE_TYPE),
+                eq(JURISDICTION), any(CCDRequest.class), eq(CASE_ID));
     }
 
     @Test

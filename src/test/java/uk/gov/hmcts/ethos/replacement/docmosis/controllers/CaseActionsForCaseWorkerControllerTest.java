@@ -486,12 +486,15 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         verify(supportTaskService).retainReviewTasksForSubmittedCallback(any(CaseData.class), eq(taskTypes));
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"UPDATE_CASE_SUBMITTED", "SUBMIT_ET3_FORM", "UPDATE_ET3_FORM"})
     @SneakyThrows
-    void triggersCategorySpecificReviewTaskClosureEventsAfterSubmission() {
+    void triggersCategorySpecificReviewTaskClosureEventsAfterSubmission(String eventId) {
+        ((ObjectNode) requestContent2).put("event_id", eventId);
         Set<String> taskTypes = Set.of("ReviewSupportRequestAdmin", "ReviewSupportRequestJudge");
         List<SupportTaskService.ArrangeSupportTask> arrangeTasks = List.of(
-                new SupportTaskService.ArrangeSupportTask("flag-2", "Sign language interpreter"));
+                new SupportTaskService.ArrangeSupportTask("flag-2", "Sign language interpreter"),
+                new SupportTaskService.ArrangeSupportTask("flag-3", "Sign language interpreter"));
         when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
         when(supportTaskService.reviewTaskTypesToClose(any(CaseData.class))).thenReturn(taskTypes);
         when(supportTaskService.additionalArrangeSupportTasks(any(CaseData.class), nullable(CaseData.class)))

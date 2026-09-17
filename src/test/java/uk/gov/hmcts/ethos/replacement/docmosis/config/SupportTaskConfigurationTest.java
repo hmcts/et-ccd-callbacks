@@ -18,16 +18,26 @@ class SupportTaskConfigurationTest {
     @Test
     void loadsFlagCodesFromYaml() {
         assertThat(configuration.getReview().getAdminFlagCodes())
-                .containsExactlyInAnyOrder(
-                        "RA0002", "RA0003", "RA0004", "RA0005", "RA0006", "RA0008", "RA0009",
-                        "RA0021", "RA0033", "RA0039", "RA0041");
+                .containsExactlyInAnyOrder("RA0021", "RA0033", "RA0039", "RA0041");
         assertThat(configuration.getReview().getJudgeFlagCodes())
                 .containsExactlyInAnyOrder("RA0029", "RA0031", "RA0032", "RA0037", "RA0038");
         assertThat(configuration.getReview().getLegalOfficerFlagCodes())
                 .containsExactlyInAnyOrder("RA0034", "RA0035", "RA0036");
+        assertThat(configuration.getReview().getAdminPathFlags())
+                .hasSize(7)
+                .allSatisfy(pathFlag -> assertThat(pathFlag.getFlagCode()).isEqualTo("OT0001"));
+        assertThat(configuration.getReview().getAdminPathFlags())
+                .extracting(pathFlag -> pathFlag.getPath().getLast())
+                .containsExactlyInAnyOrder(
+                        "Induction Loop, Infrared Receiver)",
+                        "I need documents in an alternative format",
+                        "I need help with forms",
+                        "I need adjustments to get to, into and around our buildings",
+                        "I need to bring support with me to a hearing",
+                        "I need something to feel comfortable during my hearing",
+                        "I need help communicating and understanding");
 
         assertThat(configuration.getArrange().getFlagTitles())
-                .containsEntry("RA0003", "I need help with forms")
                 .containsEntry("RA0017", "Guidance on how to complete forms")
                 .containsEntry("RA0018", "Support filling in forms")
                 .containsEntry("RA0019", "Step free / wheelchair access")
@@ -44,6 +54,12 @@ class SupportTaskConfigurationTest {
                 .containsEntry("RA0044", "Infrared receiver (hearing enhancement system)")
                 .containsEntry("RA0045", "Induction loop (hearing enhancement system)")
                 .containsEntry("RA0046", "Visit to court or tribunal before the hearing")
-                .hasSize(17);
+                .hasSize(16);
+        assertThat(configuration.getArrange().getPathFlags()).singleElement().satisfies(pathFlag -> {
+            assertThat(pathFlag.getFlagCode()).isEqualTo("OT0001");
+            assertThat(pathFlag.getPath()).containsExactly(
+                    "Party", "Reasonable adjustment", "I need help with forms");
+            assertThat(pathFlag.getTaskTitle()).isEqualTo("I need help with forms");
+        });
     }
 }

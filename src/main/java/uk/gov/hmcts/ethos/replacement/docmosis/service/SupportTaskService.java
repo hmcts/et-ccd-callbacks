@@ -10,6 +10,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.AllPartyFlags;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
 import uk.gov.hmcts.et.common.model.ccd.types.SupportTaskState;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.SupportTaskConfiguration;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.SupportTaskConfiguration.ArrangePathFlag;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.SupportTaskConfiguration.PathFlag;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -107,16 +109,16 @@ public class SupportTaskService {
                 .toList();
         Set<String> taskTypesToComplete = new LinkedHashSet<>();
 
-        if (updateTaskState(flags, configuration.getReview().getAdminFlagCodes(), taskState.getAdminTaskCreated(),
+        if (updateTaskState(flags, adminReviewFlag(), taskState.getAdminTaskCreated(),
                 taskState::setAdminTaskCreated)) {
             taskTypesToComplete.add(TASK_TYPE_REVIEW_SUPPORT_ADMIN);
         }
-        if (updateTaskState(flags, configuration.getReview().getLegalOfficerFlagCodes(),
+        if (updateTaskState(flags, legalOfficerReviewFlag(),
                 taskState.getLegalOfficerTaskCreated(),
                 taskState::setLegalOfficerTaskCreated)) {
             taskTypesToComplete.add(TASK_TYPE_REVIEW_SUPPORT_LEGAL_OFFICER);
         }
-        if (updateTaskState(flags, configuration.getReview().getJudgeFlagCodes(), taskState.getJudgeTaskCreated(),
+        if (updateTaskState(flags, judgeReviewFlag(), taskState.getJudgeTaskCreated(),
                 taskState::setJudgeTaskCreated)) {
             taskTypesToComplete.add(TASK_TYPE_REVIEW_SUPPORT_JUDGE);
         }
@@ -124,9 +126,9 @@ public class SupportTaskService {
     }
 
     public void prepareReviewSupportRequest(CaseData caseData, String eventId) {
-        Set<String> eligibleCodes = reviewFlagCodes(eventId);
+        Predicate<FlagDetailType> eligibleFlag = reviewFlag(eventId);
         ListTypeItem<CaseFlagsType> selectedFlags = allPartyFlagSections(caseData.getAllPartyFlags())
-                .map(flags -> requestedFlags(flags, eligibleCodes))
+                .map(flags -> requestedFlags(flags, eligibleFlag))
                 .filter(flags -> !flags.getDetails().isEmpty())
                 .map(GenericTypeItem::from)
                 .collect(Collectors.toCollection(ListTypeItem::new));
@@ -160,23 +162,22 @@ public class SupportTaskService {
         return !updatedFlags.isEmpty();
     }
 
-    private Set<String> reviewFlagCodes(String eventId) {
+    private Predicate<FlagDetailType> reviewFlag(String eventId) {
         return switch (eventId) {
-            case EVENT_REVIEW_ADMIN_SUPPORT_REQUEST -> configuration.getReview().getAdminFlagCodes();
-            case EVENT_REVIEW_LEGAL_OFFICER_SUPPORT_REQUEST ->
-                    configuration.getReview().getLegalOfficerFlagCodes();
-            case EVENT_REVIEW_JUDGE_SUPPORT_REQUEST -> configuration.getReview().getJudgeFlagCodes();
-            default -> Set.of();
+            case EVENT_REVIEW_ADMIN_SUPPORT_REQUEST -> adminReviewFlag();
+            case EVENT_REVIEW_LEGAL_OFFICER_SUPPORT_REQUEST -> legalOfficerReviewFlag();
+            case EVENT_REVIEW_JUDGE_SUPPORT_REQUEST -> judgeReviewFlag();
+            default -> flag -> false;
         };
     }
 
-    private static CaseFlagsType requestedFlags(CaseFlagsType flags, Set<String> eligibleCodes) {
+    private static CaseFlagsType requestedFlags(CaseFlagsType flags, Predicate<FlagDetailType> eligibleFlag) {
         ListTypeItem<FlagDetailType> details = flags.getDetails() == null
                 ? new ListTypeItem<>()
                 : flags.getDetails().stream()
                         .filter(item -> item != null && item.getValue() != null)
                         .filter(item -> isRequested(item.getValue()))
-                        .filter(item -> eligibleCodes.contains(item.getValue().getFlagCode()))
+                        .filter(item -> eligibleFlag.test(item.getValue()))
                         .collect(Collectors.toCollection(ListTypeItem::new));
         return CaseFlagsType.builder()
                 .partyName(flags.getPartyName())
@@ -194,17 +195,17 @@ public class SupportTaskService {
         taskState.setJudgeTaskRequired(null);
 
         if (isTaskNotCreated(taskState.getAdminTaskCreated())
-                && hasRequestedFlag(flags, configuration.getReview().getAdminFlagCodes())) {
+                && hasRequestedFlag(flags, adminReviewFlag())) {
             taskState.setAdminTaskCreated(YES);
             taskState.setAdminTaskRequired(YES);
         }
         if (isTaskNotCreated(taskState.getLegalOfficerTaskCreated())
-                && hasRequestedFlag(flags, configuration.getReview().getLegalOfficerFlagCodes())) {
+                && hasRequestedFlag(flags, legalOfficerReviewFlag())) {
             taskState.setLegalOfficerTaskCreated(YES);
             taskState.setLegalOfficerTaskRequired(YES);
         }
         if (isTaskNotCreated(taskState.getJudgeTaskCreated())
-                && hasRequestedFlag(flags, configuration.getReview().getJudgeFlagCodes())) {
+                && hasRequestedFlag(flags, judgeReviewFlag())) {
             taskState.setJudgeTaskCreated(YES);
             taskState.setJudgeTaskRequired(YES);
         }
@@ -217,18 +218,16 @@ public class SupportTaskService {
         return caseData.getSupportTaskState();
     }
 
-    private static boolean hasRequestedFlag(List<FlagDetailType> flags, Set<String> eligibleFlagCodes) {
-        return flags.stream().anyMatch(flag -> isRequested(flag) && eligibleFlagCodes.contains(flag.getFlagCode()));
+    private static boolean hasRequestedFlag(List<FlagDetailType> flags, Predicate<FlagDetailType> eligibleFlag) {
+        return flags.stream().anyMatch(flag -> isRequested(flag) && eligibleFlag.test(flag));
     }
 
     private static boolean updateTaskState(List<FlagDetailType> flags,
-                                           Set<String> eligibleFlagCodes,
+                                           Predicate<FlagDetailType> eligibleFlag,
                                            String taskCreated,
                                            Consumer<String> taskCreatedSetter) {
-        boolean categoryHasFlags = flags.stream()
-                .map(FlagDetailType::getFlagCode)
-                .anyMatch(eligibleFlagCodes::contains);
-        if (!hasRequestedFlag(flags, eligibleFlagCodes)
+        boolean categoryHasFlags = flags.stream().anyMatch(eligibleFlag);
+        if (!hasRequestedFlag(flags, eligibleFlag)
                 && (isTaskCreated(taskCreated) || categoryHasFlags)) {
             taskCreatedSetter.accept(NO);
             return true;
@@ -254,7 +253,7 @@ public class SupportTaskService {
         taskState.setArrangeSupportTaskName(null);
 
         Map<String, String> flagTitles = configuration.getArrange().getFlagTitles();
-        if (flagTitles.isEmpty()) {
+        if (flagTitles.isEmpty() && configuration.getArrange().getPathFlags().isEmpty()) {
             return;
         }
 
@@ -262,10 +261,11 @@ public class SupportTaskService {
                 caseDataBefore == null ? null : caseDataBefore.getAllPartyFlags()).toList();
         allFlagItems(caseData.getAllPartyFlags())
                 .filter(item -> FLAG_STATUS_ACTIVE.equals(item.getValue().getStatus()))
-                .filter(item -> flagTitles.containsKey(item.getValue().getFlagCode()))
                 .filter(item -> wasNotPreviouslyActive(item, previousFlags))
+                .map(GenericTypeItem::getValue)
+                .map(this::arrangeTaskName)
+                .flatMap(Optional::stream)
                 .findFirst()
-                .map(item -> flagTitles.get(item.getValue().getFlagCode()))
                 .ifPresent(taskState::setArrangeSupportTaskName);
     }
 
@@ -275,12 +275,61 @@ public class SupportTaskService {
             return;
         }
 
-        Map<String, String> flagTitles = configuration.getArrange().getFlagTitles();
         latestCreatedFlag(caseData)
                 .filter(flag -> FLAG_STATUS_ACTIVE.equals(flag.getStatus()))
-                .map(FlagDetailType::getFlagCode)
-                .map(flagTitles::get)
+                .flatMap(this::arrangeTaskName)
                 .ifPresent(caseData.getSupportTaskState()::setArrangeSupportTaskName);
+    }
+
+    private Predicate<FlagDetailType> adminReviewFlag() {
+        return eligibleFlag(configuration.getReview().getAdminFlagCodes(),
+                configuration.getReview().getAdminPathFlags());
+    }
+
+    private Predicate<FlagDetailType> legalOfficerReviewFlag() {
+        return eligibleFlag(configuration.getReview().getLegalOfficerFlagCodes(),
+                configuration.getReview().getLegalOfficerPathFlags());
+    }
+
+    private Predicate<FlagDetailType> judgeReviewFlag() {
+        return eligibleFlag(configuration.getReview().getJudgeFlagCodes(),
+                configuration.getReview().getJudgePathFlags());
+    }
+
+    private static Predicate<FlagDetailType> eligibleFlag(Set<String> flagCodes, List<PathFlag> pathFlags) {
+        return flag -> flagCodes.contains(flag.getFlagCode())
+                || pathFlags.stream().anyMatch(pathFlag -> matchesPath(flag, pathFlag));
+    }
+
+    private Optional<String> arrangeTaskName(FlagDetailType flag) {
+        String title = configuration.getArrange().getFlagTitles().get(flag.getFlagCode());
+        if (title != null) {
+            return Optional.of(title);
+        }
+        return configuration.getArrange().getPathFlags().stream()
+                .filter(pathFlag -> matchesPath(flag, pathFlag))
+                .map(ArrangePathFlag::getTaskTitle)
+                .findFirst();
+    }
+
+    private static boolean matchesPath(FlagDetailType flag, PathFlag pathFlag) {
+        return Objects.equals(flag.getFlagCode(), pathFlag.getFlagCode())
+                && hasPath(flag, pathFlag.getPath());
+    }
+
+    private static boolean matchesPath(FlagDetailType flag, ArrangePathFlag pathFlag) {
+        return Objects.equals(flag.getFlagCode(), pathFlag.getFlagCode())
+                && hasPath(flag, pathFlag.getPath());
+    }
+
+    private static boolean hasPath(FlagDetailType flag, List<String> expectedPath) {
+        if (flag.getPath() == null) {
+            return false;
+        }
+        List<String> actualPath = flag.getPath().stream()
+                .map(item -> item == null ? null : item.getValue())
+                .toList();
+        return expectedPath.equals(actualPath);
     }
 
     private static Optional<FlagDetailType> latestCreatedFlag(CaseData caseData) {

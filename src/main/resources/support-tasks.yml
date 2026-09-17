@@ -1,17 +1,48 @@
 support-tasks:
   review:
     admin-flag-codes:
-      - RA0002
-      - RA0003
-      - RA0004
-      - RA0005
-      - RA0006
-      - RA0008
-      - RA0009
       - RA0021
       - RA0033
       - RA0039
       - RA0041
+    admin-path-flags:
+      - flag-code: OT0001
+        path:
+          - Party
+          - Reasonable adjustment
+          - I need help communicating and understanding
+          - Hearing Enhancement System (Hearing
+          - Induction Loop, Infrared Receiver)
+      - flag-code: OT0001
+        path:
+          - Party
+          - Reasonable adjustment
+          - I need documents in an alternative format
+      - flag-code: OT0001
+        path:
+          - Party
+          - Reasonable adjustment
+          - I need help with forms
+      - flag-code: OT0001
+        path:
+          - Party
+          - Reasonable adjustment
+          - I need adjustments to get to, into and around our buildings
+      - flag-code: OT0001
+        path:
+          - Party
+          - Reasonable adjustment
+          - I need to bring support with me to a hearing
+      - flag-code: OT0001
+        path:
+          - Party
+          - Reasonable adjustment
+          - I need something to feel comfortable during my hearing
+      - flag-code: OT0001
+        path:
+          - Party
+          - Reasonable adjustment
+          - I need help communicating and understanding
     judge-flag-codes:
       - RA0029
       - RA0031
@@ -24,7 +55,6 @@ support-tasks:
       - RA0036
   arrange:
     flag-titles:
-      RA0003: I need help with forms
       RA0017: Guidance on how to complete forms
       RA0018: Support filling in forms
       RA0019: Step free / wheelchair access
@@ -41,3 +71,10 @@ support-tasks:
       RA0044: Infrared receiver (hearing enhancement system)
       RA0045: Induction loop (hearing enhancement system)
       RA0046: Visit to court or tribunal before the hearing
+    path-flags:
+      - flag-code: OT0001
+        path:
+          - Party
+          - Reasonable adjustment
+          - I need help with forms
+        task-title: I need help with forms

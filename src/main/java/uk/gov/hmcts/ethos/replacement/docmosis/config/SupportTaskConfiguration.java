@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,10 +24,27 @@ public class SupportTaskConfiguration {
         private Set<String> adminFlagCodes = Set.of();
         private Set<String> legalOfficerFlagCodes = Set.of();
         private Set<String> judgeFlagCodes = Set.of();
+        private List<PathFlag> adminPathFlags = List.of();
+        private List<PathFlag> legalOfficerPathFlags = List.of();
+        private List<PathFlag> judgePathFlags = List.of();
     }
 
     @Data
     public static class Arrange {
         private Map<String, String> flagTitles = Map.of();
+        private List<ArrangePathFlag> pathFlags = List.of();
+    }
+
+    @Data
+    public static class PathFlag {
+        private String flagCode;
+        private List<String> path = List.of();
+    }
+
+    @Data
+    public static class ArrangePathFlag {
+        private String flagCode;
+        private List<String> path = List.of();
+        private String taskTitle;
     }
 }

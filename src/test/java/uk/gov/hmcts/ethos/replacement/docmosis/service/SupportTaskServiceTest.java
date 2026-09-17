@@ -14,6 +14,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.AllPartyFlags;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
 import uk.gov.hmcts.et.common.model.ccd.types.SupportTaskState;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.SupportTaskConfiguration;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.SupportTaskConfiguration.ArrangePathFlag;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.SupportTaskConfiguration.PathFlag;
 
 import java.util.List;
 import java.util.Map;
@@ -43,18 +45,31 @@ class SupportTaskServiceTest {
     private static final String STATUS_INACTIVE = "Inactive";
     private static final String CCD_TRUE = "true";
     private static final String CCD_FALSE = "false";
+    private static final String OTHER_FLAG_CODE = "OT0001";
+    private static final List<String> HELP_WITH_FORMS_PATH = List.of(
+            "Party", "Reasonable adjustment", "I need help with forms");
+    private static final List<List<String>> OTHER_REVIEW_PATHS = List.of(
+            List.of("Party", "Reasonable adjustment", "I need help communicating and understanding",
+                    "Hearing Enhancement System (Hearing", "Induction Loop, Infrared Receiver)"),
+            List.of("Party", "Reasonable adjustment", "I need documents in an alternative format"),
+            HELP_WITH_FORMS_PATH,
+            List.of("Party", "Reasonable adjustment",
+                    "I need adjustments to get to, into and around our buildings"),
+            List.of("Party", "Reasonable adjustment", "I need to bring support with me to a hearing"),
+            List.of("Party", "Reasonable adjustment", "I need something to feel comfortable during my hearing"),
+            List.of("Party", "Reasonable adjustment", "I need help communicating and understanding"));
 
     private final SupportTaskService service = new SupportTaskService(configuration());
 
     private static SupportTaskConfiguration configuration() {
         SupportTaskConfiguration configuration = new SupportTaskConfiguration();
-        configuration.getReview().setAdminFlagCodes(Set.of(
-                "RA0002", "RA0003", "RA0004", "RA0005", "RA0006", "RA0008", "RA0009",
-                "RA0021", "RA0033", "RA0039", "RA0041"));
+        configuration.getReview().setAdminFlagCodes(Set.of("RA0021", "RA0033", "RA0039", "RA0041"));
         configuration.getReview().setLegalOfficerFlagCodes(Set.of("RA0034", "RA0035", "RA0036"));
         configuration.getReview().setJudgeFlagCodes(Set.of("RA0029", "RA0031", "RA0032", "RA0037", "RA0038"));
+        configuration.getReview().setAdminPathFlags(OTHER_REVIEW_PATHS.stream()
+                .map(path -> pathFlag(OTHER_FLAG_CODE, path))
+                .toList());
         configuration.getArrange().setFlagTitles(Map.ofEntries(
-                Map.entry("RA0003", "I need help with forms"),
                 Map.entry("RA0017", "Guidance on how to complete forms"),
                 Map.entry("RA0018", "Support filling in forms"),
                 Map.entry("RA0019", "Step free / wheelchair access"),
@@ -72,13 +87,24 @@ class SupportTaskServiceTest {
                 Map.entry("RA0045", "Induction loop (hearing enhancement system)"),
                 Map.entry("RA0046", "Visit to court or tribunal before the hearing")
         ));
+        ArrangePathFlag arrangePathFlag = new ArrangePathFlag();
+        arrangePathFlag.setFlagCode(OTHER_FLAG_CODE);
+        arrangePathFlag.setPath(HELP_WITH_FORMS_PATH);
+        arrangePathFlag.setTaskTitle("I need help with forms");
+        configuration.getArrange().setPathFlags(List.of(arrangePathFlag));
         return configuration;
+    }
+
+    private static PathFlag pathFlag(String flagCode, List<String> path) {
+        PathFlag pathFlag = new PathFlag();
+        pathFlag.setFlagCode(flagCode);
+        pathFlag.setPath(path);
+        return pathFlag;
     }
 
     static Stream<Arguments> eligibleFlagScenarios() {
         return Stream.of(
-            Stream.of("RA0002", "RA0003", "RA0004", "RA0005", "RA0006", "RA0008", "RA0009",
-                    "RA0021", "RA0033", "RA0039", "RA0041")
+            Stream.of("RA0021", "RA0033", "RA0039", "RA0041")
                 .map(code -> Arguments.of(code, TASK_TYPE_ADMIN)),
             Stream.of("RA0034", "RA0035", "RA0036")
                 .map(code -> Arguments.of(code, TASK_TYPE_LEGAL_OFFICER)),
@@ -115,6 +141,63 @@ class SupportTaskServiceTest {
 
         assertEquals(YES, taskState(caseData).getJudgeTaskCreated());
         assertEquals(YES, taskState(caseData).getJudgeTaskRequired());
+    }
+
+    static Stream<Arguments> otherReviewPathScenarios() {
+        return OTHER_REVIEW_PATHS.stream().map(Arguments::of);
+    }
+
+    @ParameterizedTest
+    @MethodSource("otherReviewPathScenarios")
+    void prepares_admin_review_task_for_each_configured_other_flag_path(List<String> path) {
+        CaseData caseData = caseDataWithClaimantFlag(OTHER_FLAG_CODE, STATUS_REQUESTED, false, path);
+
+        service.prepareReviewSupportTasks(caseData);
+
+        assertEquals(YES, taskState(caseData).getAdminTaskCreated());
+        assertEquals(YES, taskState(caseData).getAdminTaskRequired());
+    }
+
+    @Test
+    void does_not_prepare_review_task_for_other_flag_with_an_unconfigured_or_missing_path() {
+        CaseData unconfiguredPath = caseDataWithClaimantFlag(OTHER_FLAG_CODE, STATUS_REQUESTED, false,
+                List.of("Party", "Other"));
+        CaseData missingPath = caseDataWithClaimantFlag(OTHER_FLAG_CODE, STATUS_REQUESTED, false);
+
+        service.prepareReviewSupportTasks(unconfiguredPath);
+        service.prepareReviewSupportTasks(missingPath);
+
+        assertNull(taskState(unconfiguredPath).getAdminTaskCreated());
+        assertNull(taskState(missingPath).getAdminTaskCreated());
+    }
+
+    @Test
+    void keeps_admin_task_active_while_requested_other_flag_has_a_configured_path() {
+        CaseData caseData = caseDataWithClaimantFlag(
+                OTHER_FLAG_CODE, STATUS_REQUESTED, false, HELP_WITH_FORMS_PATH);
+        caseData.setSupportTaskState(SupportTaskState.builder().adminTaskCreated(YES).build());
+
+        Set<String> taskTypesToComplete = service.prepareManagedReviewSupportTasks(caseData, null);
+
+        assertEquals(YES, taskState(caseData).getAdminTaskCreated());
+        assertTrue(taskTypesToComplete.isEmpty());
+    }
+
+    @Test
+    void admin_review_event_contains_requested_other_flag_only_for_a_configured_path() {
+        CaseData caseData = new CaseData();
+        caseData.setAllPartyFlags(AllPartyFlags.builder()
+                .claimantFlags(caseFlags("matching", OTHER_FLAG_CODE, STATUS_REQUESTED, null,
+                        HELP_WITH_FORMS_PATH))
+                .respondentFlags(caseFlags("not-matching", OTHER_FLAG_CODE, STATUS_REQUESTED, null,
+                        List.of("Party", "Other")))
+                .build());
+
+        service.prepareReviewSupportRequest(caseData, EVENT_REVIEW_ADMIN_SUPPORT_REQUEST);
+
+        assertEquals(1, caseData.getReviewSupportRequestFlags().size());
+        assertEquals("matching", caseData.getReviewSupportRequestFlags().getFirst().getValue()
+                .getDetails().getFirst().getId());
     }
 
     @Test
@@ -639,6 +722,26 @@ class SupportTaskServiceTest {
     }
 
     @Test
+    void prepares_arrange_support_task_for_active_other_flag_with_help_with_forms_path() {
+        CaseData caseData = caseDataWithClaimantFlag(
+                OTHER_FLAG_CODE, STATUS_ACTIVE, false, HELP_WITH_FORMS_PATH);
+
+        service.prepareArrangeSupportTask(caseData, new CaseData());
+
+        assertEquals("I need help with forms", taskState(caseData).getArrangeSupportTaskName());
+    }
+
+    @Test
+    void does_not_prepare_arrange_support_task_for_other_flag_with_a_different_path() {
+        CaseData caseData = caseDataWithClaimantFlag(
+                OTHER_FLAG_CODE, STATUS_ACTIVE, false, OTHER_REVIEW_PATHS.get(1));
+
+        service.prepareArrangeSupportTask(caseData, new CaseData());
+
+        assertNull(taskState(caseData).getArrangeSupportTaskName());
+    }
+
+    @Test
     void prepares_separate_arrange_support_tasks_for_the_same_code_on_separate_events() {
         CaseData firstEvent = new CaseData();
         firstEvent.setAllPartyFlags(AllPartyFlags.builder()
@@ -734,9 +837,17 @@ class SupportTaskServiceTest {
     private static CaseData caseDataWithClaimantFlag(String flagCode,
                                                       String status,
                                                       boolean external) {
+        return caseDataWithClaimantFlag(flagCode, status, external, null);
+    }
+
+    private static CaseData caseDataWithClaimantFlag(String flagCode,
+                                                      String status,
+                                                      boolean external,
+                                                      List<String> path) {
         FlagDetailType detail = FlagDetailType.builder()
                 .flagCode(flagCode)
                 .status(status)
+                .path(pathItems(path))
                 .build();
         CaseFlagsType flags = CaseFlagsType.builder().details(ListTypeItem.from(detail)).build();
         AllPartyFlags allPartyFlags = external
@@ -810,13 +921,31 @@ class SupportTaskServiceTest {
     }
 
     private static CaseFlagsType caseFlags(String id, String flagCode, String status, String dateTimeCreated) {
+        return caseFlags(id, flagCode, status, dateTimeCreated, null);
+    }
+
+    private static CaseFlagsType caseFlags(String id,
+                                           String flagCode,
+                                           String status,
+                                           String dateTimeCreated,
+                                           List<String> path) {
         FlagDetailType detail = FlagDetailType.builder()
                 .flagCode(flagCode)
                 .status(status)
                 .dateTimeCreated(dateTimeCreated)
+                .path(pathItems(path))
                 .build();
         ListTypeItem<FlagDetailType> details = ListTypeItem.from(GenericTypeItem.from(id, detail));
         return CaseFlagsType.builder().details(details).build();
+    }
+
+    private static ListTypeItem<String> pathItems(List<String> path) {
+        if (path == null) {
+            return null;
+        }
+        ListTypeItem<String> pathItems = new ListTypeItem<>();
+        path.forEach(pathItems::addAsItem);
+        return pathItems;
     }
 
     private static SupportTaskState taskState(CaseData caseData) {

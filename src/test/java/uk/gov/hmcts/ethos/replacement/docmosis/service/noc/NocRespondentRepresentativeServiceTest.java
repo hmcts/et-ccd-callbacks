@@ -1435,12 +1435,12 @@ class NocRespondentRepresentativeServiceTest {
                 .thenReturn(null);
         assertThat(nocRespondentRepresentativeService.isHmctsOrganisationUser(REPRESENTATIVE_EMAIL_1)).isFalse();
         // when response entity does not have status code should return false
-        ResponseEntity<AccountIdByEmailResponse> responseEntity = new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        ResponseEntity<AccountIdByEmailResponse> responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, S2S_TOKEN, REPRESENTATIVE_EMAIL_1))
                 .thenReturn(responseEntity);
         assertThat(nocRespondentRepresentativeService.isHmctsOrganisationUser(REPRESENTATIVE_EMAIL_1)).isFalse();
         // when response entity body is empty should return false
-        responseEntity = new ResponseEntity<>(null, HttpStatus.OK);
+        responseEntity = new ResponseEntity<>(HttpStatus.OK);
         when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, S2S_TOKEN, REPRESENTATIVE_EMAIL_1))
                 .thenReturn(responseEntity);
         assertThat(nocRespondentRepresentativeService.isHmctsOrganisationUser(REPRESENTATIVE_EMAIL_1)).isFalse();

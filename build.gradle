@@ -267,13 +267,6 @@ allprojects {
     }
 }
 
-processTestResources {
-    dependsOn dumpCCDDefinitions
-    from("$buildDir/cftlib/definition-snapshots") {
-        into 'definition-snapshots'
-    }
-}
-
 tasks.register('smoke', Test) {
     testClassesDirs = sourceSets.smoke.output.classesDirs
     classpath = sourceSets.smoke.runtimeClasspath

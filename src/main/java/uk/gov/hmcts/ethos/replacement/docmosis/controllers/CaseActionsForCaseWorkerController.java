@@ -54,6 +54,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.wa.ReviewSupportTaskCompletionService;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -120,6 +121,7 @@ public class CaseActionsForCaseWorkerController {
     private final FeatureToggleService featureToggleService;
     private final CaseFlagsService caseFlagsService;
     private final SupportTaskService supportTaskService;
+    private final ReviewSupportTaskCompletionService reviewSupportTaskCompletionService;
     private final CaseManagementLocationService caseManagementLocationService;
     private final Et1SubmissionService et1SubmissionService;
     private final NocRespondentHelper nocRespondentHelper;
@@ -221,7 +223,8 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/supportTasks/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Prepare Review Support and Arrange Support tasks for eligible Case Flags.")
     public ResponseEntity<CCDCallbackResponse> prepareSupportTasks(
-            @RequestBody CallbackRequest callbackRequest) {
+            @RequestBody CallbackRequest callbackRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
 
@@ -237,7 +240,10 @@ public class CaseActionsForCaseWorkerController {
                 supportTaskService.prepareNewFlagReviewSupportTasks(caseData, caseDataBefore);
             } else if (EVENT_MANAGE_FLAGS.equals(callbackRequest.getEventId())
                     || EVENT_MANAGE_SUPPORT.equals(callbackRequest.getEventId())) {
-                supportTaskService.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
+                reviewSupportTaskCompletionService.completeTasks(
+                        caseDetails.getCaseId(),
+                        userToken,
+                        supportTaskService.prepareManagedReviewSupportTasks(caseData, caseDataBefore));
             }
 
             if (EVENT_CREATE_FLAG.equals(callbackRequest.getEventId())
@@ -266,7 +272,8 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/reviewSupportRequest/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Apply reviewed Case Flags and prepare the related support tasks.")
     public ResponseEntity<CCDCallbackResponse> applyReviewSupportRequest(
-            @RequestBody CallbackRequest callbackRequest) {
+            @RequestBody CallbackRequest callbackRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
         List<String> errors = new ArrayList<>();
@@ -278,7 +285,10 @@ public class CaseActionsForCaseWorkerController {
                 CaseData caseDataBefore = callbackRequest.getCaseDetailsBefore() == null
                         ? null
                         : callbackRequest.getCaseDetailsBefore().getCaseData();
-                supportTaskService.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
+                reviewSupportTaskCompletionService.completeTasks(
+                        caseDetails.getCaseId(),
+                        userToken,
+                        supportTaskService.prepareManagedReviewSupportTasks(caseData, caseDataBefore));
                 supportTaskService.prepareArrangeSupportTask(caseData, caseDataBefore);
             }
         }

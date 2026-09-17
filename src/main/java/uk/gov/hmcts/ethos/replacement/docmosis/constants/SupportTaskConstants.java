@@ -15,6 +15,9 @@ public final class SupportTaskConstants {
     public static final String EVENT_REVIEW_JUDGE_SUPPORT_REQUEST = "reviewJudgeSupportRequest";
     public static final String FLAG_STATUS_ACTIVE = "Active";
     public static final String FLAG_STATUS_REQUESTED = "Requested";
+    public static final String TASK_TYPE_REVIEW_SUPPORT_ADMIN = "ReviewSupportRequestAdmin";
+    public static final String TASK_TYPE_REVIEW_SUPPORT_LEGAL_OFFICER = "ReviewSupportRequestLegalOfficer";
+    public static final String TASK_TYPE_REVIEW_SUPPORT_JUDGE = "ReviewSupportRequestJudge";
 
     private SupportTaskConstants() {
     }

@@ -16,13 +16,6 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "supportTaskState",
-    "ListElementCode": "adminTaskCompletionRequired",
-    "UserRole": "caseworker-employment-api",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "supportTaskState",
     "ListElementCode": "legalOfficerTaskCreated",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
@@ -37,13 +30,6 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "supportTaskState",
-    "ListElementCode": "legalOfficerTaskCompletionRequired",
-    "UserRole": "caseworker-employment-api",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "supportTaskState",
     "ListElementCode": "judgeTaskCreated",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
@@ -52,13 +38,6 @@
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "supportTaskState",
     "ListElementCode": "judgeTaskRequired",
-    "UserRole": "caseworker-employment-api",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "supportTaskState",
-    "ListElementCode": "judgeTaskCompletionRequired",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
   },
@@ -80,27 +59,6 @@
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "supportTaskState",
     "ListElementCode": "judgeTaskRequired",
-    "UserRole": "caseworker-wa-task-configuration",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "supportTaskState",
-    "ListElementCode": "adminTaskCompletionRequired",
-    "UserRole": "caseworker-wa-task-configuration",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "supportTaskState",
-    "ListElementCode": "legalOfficerTaskCompletionRequired",
-    "UserRole": "caseworker-wa-task-configuration",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "supportTaskState",
-    "ListElementCode": "judgeTaskCompletionRequired",
     "UserRole": "caseworker-wa-task-configuration",
     "CRUD": "R"
   },

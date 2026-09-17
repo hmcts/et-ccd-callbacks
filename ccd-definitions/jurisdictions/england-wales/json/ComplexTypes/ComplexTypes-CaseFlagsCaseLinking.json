@@ -15,13 +15,6 @@
   },
   {
     "ID": "SupportTaskState",
-    "ListElementCode": "adminTaskCompletionRequired",
-    "FieldType": "YesOrNo",
-    "ElementLabel": "Admin task completion required",
-    "SecurityClassification": "Public"
-  },
-  {
-    "ID": "SupportTaskState",
     "ListElementCode": "legalOfficerTaskCreated",
     "FieldType": "YesOrNo",
     "ElementLabel": "Legal Officer task created",
@@ -36,13 +29,6 @@
   },
   {
     "ID": "SupportTaskState",
-    "ListElementCode": "legalOfficerTaskCompletionRequired",
-    "FieldType": "YesOrNo",
-    "ElementLabel": "Legal Officer task completion required",
-    "SecurityClassification": "Public"
-  },
-  {
-    "ID": "SupportTaskState",
     "ListElementCode": "judgeTaskCreated",
     "FieldType": "YesOrNo",
     "ElementLabel": "Judge task created",
@@ -53,13 +39,6 @@
     "ListElementCode": "judgeTaskRequired",
     "FieldType": "YesOrNo",
     "ElementLabel": "Judge task required",
-    "SecurityClassification": "Public"
-  },
-  {
-    "ID": "SupportTaskState",
-    "ListElementCode": "judgeTaskCompletionRequired",
-    "FieldType": "YesOrNo",
-    "ElementLabel": "Judge task completion required",
     "SecurityClassification": "Public"
   },
   {

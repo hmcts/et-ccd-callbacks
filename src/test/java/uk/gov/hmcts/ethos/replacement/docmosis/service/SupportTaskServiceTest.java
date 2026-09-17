@@ -29,6 +29,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_REVIEW_ADMIN_SUPPORT_REQUEST;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_REVIEW_JUDGE_SUPPORT_REQUEST;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_REVIEW_LEGAL_OFFICER_SUPPORT_REQUEST;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.TASK_TYPE_REVIEW_SUPPORT_ADMIN;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.TASK_TYPE_REVIEW_SUPPORT_JUDGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.TASK_TYPE_REVIEW_SUPPORT_LEGAL_OFFICER;
 
 class SupportTaskServiceTest {
     private static final String TASK_TYPE_ADMIN = "Admin";
@@ -97,10 +100,6 @@ class SupportTaskServiceTest {
                 taskState(caseData).getLegalOfficerTaskRequired());
         assertEquals(TASK_TYPE_JUDGE.equals(taskType) ? YES : null,
                 taskState(caseData).getJudgeTaskRequired());
-        assertNull(taskState(caseData).getAdminTaskCompletionRequired());
-        assertNull(taskState(caseData).getLegalOfficerTaskCompletionRequired());
-        assertNull(taskState(caseData).getJudgeTaskCompletionRequired());
-
         service.prepareReviewSupportTasks(caseData);
 
         assertNull(taskState(caseData).getAdminTaskRequired());
@@ -275,14 +274,12 @@ class SupportTaskServiceTest {
                 .judgeTaskCreated(YES)
                 .build());
 
-        service.prepareManagedReviewSupportTasks(caseData, null);
+        final Set<String> taskTypesToComplete = service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, taskState(caseData).getAdminTaskCreated());
-        assertEquals(YES, taskState(caseData).getAdminTaskCompletionRequired());
         assertEquals(YES, taskState(caseData).getJudgeTaskCreated());
-        assertNull(taskState(caseData).getJudgeTaskCompletionRequired());
-        assertEquals(NO, taskState(caseData).getLegalOfficerTaskCreated());
-        assertEquals(YES, taskState(caseData).getLegalOfficerTaskCompletionRequired());
+        assertNull(taskState(caseData).getLegalOfficerTaskCreated());
+        assertEquals(Set.of(TASK_TYPE_REVIEW_SUPPORT_ADMIN), taskTypesToComplete);
     }
 
     @Test
@@ -295,14 +292,13 @@ class SupportTaskServiceTest {
         caseData.setSupportTaskState(SupportTaskState.builder()
                 .adminTaskCreated(YES)
                 .adminTaskRequired(YES)
-                .adminTaskCompletionRequired(YES)
                 .build());
 
-        service.prepareManagedReviewSupportTasks(caseData, null);
+        final Set<String> taskTypesToComplete = service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(YES, taskState(caseData).getAdminTaskCreated());
         assertNull(taskState(caseData).getAdminTaskRequired());
-        assertNull(taskState(caseData).getAdminTaskCompletionRequired());
+        assertTrue(taskTypesToComplete.isEmpty());
     }
 
     static Stream<Arguments> reviewTaskCategoryScenarios() {
@@ -406,17 +402,17 @@ class SupportTaskServiceTest {
         CaseData caseData = caseDataWithFlags(activeFlagCode, STATUS_ACTIVE, requestedFlagCode, STATUS_REQUESTED);
         setTaskCreated(taskState(caseData), taskType, CCD_TRUE);
 
-        service.prepareManagedReviewSupportTasks(caseData, null);
+        Set<String> firstCompletion = service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(CCD_TRUE, getTaskCreated(taskState(caseData), taskType));
-        assertNull(getTaskCompletionRequired(taskState(caseData), taskType));
+        assertTrue(firstCompletion.isEmpty());
 
         activateRespondentFlag(caseData);
-        service.prepareManagedReviewSupportTasks(caseData, null);
+        Set<String> secondCompletion = service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, getTaskCreated(taskState(caseData), taskType));
         assertNull(getTaskRequired(taskState(caseData), taskType));
-        assertEquals(YES, getTaskCompletionRequired(taskState(caseData), taskType));
+        assertEquals(Set.of(reviewTaskType(taskType)), secondCompletion);
     }
 
     @ParameterizedTest
@@ -443,10 +439,10 @@ class SupportTaskServiceTest {
         setTaskCreated(taskState(caseDataBefore), taskType, CCD_TRUE);
         CaseData caseData = caseDataWithFlags(flagCode, STATUS_ACTIVE, secondFlagCode, STATUS_ACTIVE);
 
-        service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
+        Set<String> taskTypesToComplete = service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
 
         assertEquals(NO, getTaskCreated(taskState(caseData), taskType));
-        assertEquals(YES, getTaskCompletionRequired(taskState(caseData), taskType));
+        assertEquals(Set.of(reviewTaskType(taskType)), taskTypesToComplete);
     }
 
     @ParameterizedTest
@@ -470,10 +466,10 @@ class SupportTaskServiceTest {
         caseData.setSupportTaskState(new SupportTaskState());
         setTaskCreated(taskState(caseData), taskType, CCD_TRUE);
 
-        service.prepareManagedReviewSupportTasks(caseData, null);
+        final Set<String> taskTypesToComplete = service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, getTaskCreated(taskState(caseData), taskType));
-        assertEquals(YES, getTaskCompletionRequired(taskState(caseData), taskType));
+        assertEquals(Set.of(reviewTaskType(taskType)), taskTypesToComplete);
     }
 
     @Test
@@ -490,14 +486,12 @@ class SupportTaskServiceTest {
                 .judgeTaskCreated(CCD_TRUE)
                 .build());
 
-        service.prepareManagedReviewSupportTasks(caseData, null);
+        final Set<String> taskTypesToComplete = service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, taskState(caseData).getAdminTaskCreated());
-        assertEquals(YES, taskState(caseData).getAdminTaskCompletionRequired());
         assertEquals(CCD_TRUE, taskState(caseData).getLegalOfficerTaskCreated());
-        assertNull(taskState(caseData).getLegalOfficerTaskCompletionRequired());
         assertEquals(CCD_TRUE, taskState(caseData).getJudgeTaskCreated());
-        assertNull(taskState(caseData).getJudgeTaskCompletionRequired());
+        assertEquals(Set.of(TASK_TYPE_REVIEW_SUPPORT_ADMIN), taskTypesToComplete);
     }
 
     @Test
@@ -520,10 +514,10 @@ class SupportTaskServiceTest {
         CaseData caseData = caseDataWithClaimantFlag("RA0033", STATUS_REQUESTED, false);
         caseData.setSupportTaskState(SupportTaskState.builder().adminTaskCreated(YES).build());
 
-        service.prepareManagedReviewSupportTasks(caseData, null);
+        Set<String> taskTypesToComplete = service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(YES, taskState(caseData).getAdminTaskCreated());
-        assertNull(taskState(caseData).getAdminTaskCompletionRequired());
+        assertTrue(taskTypesToComplete.isEmpty());
     }
 
     @Test
@@ -535,14 +529,13 @@ class SupportTaskServiceTest {
                 .judgeTaskCreated(YES)
                 .build());
 
-        service.prepareManagedReviewSupportTasks(caseData, null);
+        final Set<String> taskTypesToComplete = service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, taskState(caseData).getAdminTaskCreated());
         assertEquals(NO, taskState(caseData).getLegalOfficerTaskCreated());
         assertEquals(NO, taskState(caseData).getJudgeTaskCreated());
-        assertEquals(YES, taskState(caseData).getAdminTaskCompletionRequired());
-        assertEquals(YES, taskState(caseData).getLegalOfficerTaskCompletionRequired());
-        assertEquals(YES, taskState(caseData).getJudgeTaskCompletionRequired());
+        assertEquals(Set.of(TASK_TYPE_REVIEW_SUPPORT_ADMIN, TASK_TYPE_REVIEW_SUPPORT_LEGAL_OFFICER,
+                TASK_TYPE_REVIEW_SUPPORT_JUDGE), taskTypesToComplete);
     }
 
     @Test
@@ -551,10 +544,10 @@ class SupportTaskServiceTest {
         caseDataBefore.setSupportTaskState(SupportTaskState.builder().judgeTaskCreated(YES).build());
         CaseData caseData = caseDataWithClaimantFlag("RA0038", STATUS_ACTIVE, false);
 
-        service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
+        Set<String> taskTypesToComplete = service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
 
         assertEquals(NO, taskState(caseData).getJudgeTaskCreated());
-        assertEquals(YES, taskState(caseData).getJudgeTaskCompletionRequired());
+        assertEquals(Set.of(TASK_TYPE_REVIEW_SUPPORT_JUDGE), taskTypesToComplete);
     }
 
     static Stream<Arguments> reviewAndArrangeTaskScenarios() {
@@ -574,10 +567,10 @@ class SupportTaskServiceTest {
         caseData.setSupportTaskState(new SupportTaskState());
         setTaskCreated(taskState(caseData), taskType, YES);
 
-        service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
+        Set<String> taskTypesToComplete = service.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
         service.prepareArrangeSupportTask(caseData, caseDataBefore);
 
-        assertEquals(YES, getTaskCompletionRequired(taskState(caseData), taskType));
+        assertEquals(Set.of(reviewTaskType(taskType)), taskTypesToComplete);
         assertEquals(arrangeTaskName, taskState(caseData).getArrangeSupportTaskName());
     }
 
@@ -585,10 +578,10 @@ class SupportTaskServiceTest {
     void completes_admin_task_when_created_marker_is_missing() {
         CaseData caseData = caseDataWithClaimantFlag("RA0041", STATUS_ACTIVE, false);
 
-        service.prepareManagedReviewSupportTasks(caseData, null);
+        Set<String> taskTypesToComplete = service.prepareManagedReviewSupportTasks(caseData, null);
 
         assertEquals(NO, taskState(caseData).getAdminTaskCreated());
-        assertEquals(YES, taskState(caseData).getAdminTaskCompletionRequired());
+        assertEquals(Set.of(TASK_TYPE_REVIEW_SUPPORT_ADMIN), taskTypesToComplete);
     }
 
     @Test
@@ -803,11 +796,11 @@ class SupportTaskServiceTest {
         };
     }
 
-    private static String getTaskCompletionRequired(SupportTaskState state, String taskType) {
+    private static String reviewTaskType(String taskType) {
         return switch (taskType) {
-            case TASK_TYPE_ADMIN -> state.getAdminTaskCompletionRequired();
-            case TASK_TYPE_LEGAL_OFFICER -> state.getLegalOfficerTaskCompletionRequired();
-            case TASK_TYPE_JUDGE -> state.getJudgeTaskCompletionRequired();
+            case TASK_TYPE_ADMIN -> TASK_TYPE_REVIEW_SUPPORT_ADMIN;
+            case TASK_TYPE_LEGAL_OFFICER -> TASK_TYPE_REVIEW_SUPPORT_LEGAL_OFFICER;
+            case TASK_TYPE_JUDGE -> TASK_TYPE_REVIEW_SUPPORT_JUDGE;
             default -> throw new IllegalArgumentException("Unknown task type: " + taskType);
         };
     }

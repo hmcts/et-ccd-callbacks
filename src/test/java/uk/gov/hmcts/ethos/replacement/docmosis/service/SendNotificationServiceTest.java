@@ -6,8 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -66,20 +67,21 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationSe
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.NOTIFICATION_SUMMARY_PDF;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.CASE_USER_ROLE_DEFENDANT;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class SendNotificationServiceTest {
 
     @Mock
     private HearingSelectionService hearingSelectionService;
-    @MockitoBean
+    @Mock
     private FeatureToggleService featureToggleService;
-    @MockitoBean
+    @Mock
     private CaseAccessService caseAccessService;
-    @MockitoBean
+    @Mock
     private AdminUserService adminUserService;
     @Mock
     private TornadoService tornadoService;
-    @MockitoBean
+    @Mock
     private EmailNotificationService emailNotificationService;
     private CaseData caseData;
     private CaseDetails caseDetails;

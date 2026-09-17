@@ -4,8 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -56,7 +57,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class RespondNotificationServiceTest {
     private static final String CLAIMANT_EMAIL = "claimant@test.com";
     private static final String RESPONDENT_EMAIL = "repondent@test.com";
@@ -68,13 +70,13 @@ class RespondNotificationServiceTest {
 
     @Mock
     private HearingSelectionService hearingSelectionService;
-    @MockitoBean
+    @Mock
     private FeatureToggleService featureToggleService;
     @Mock
     private TornadoService tornadoService;
-    @MockitoBean
+    @Mock
     private CaseAccessService caseAccessService;
-    @MockitoBean
+    @Mock
     EmailNotificationService emailNotificationService;
 
     private EmailService emailService;

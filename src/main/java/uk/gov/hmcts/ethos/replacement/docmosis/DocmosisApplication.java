@@ -6,8 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScheduledTaskRunner;
 
@@ -38,6 +41,11 @@ public class DocmosisApplication implements CommandLineRunner {
 
     @Autowired(required = false)
     ScheduledTaskRunner taskRunner;
+
+    @Bean
+    CacheManager cacheManager() {
+        return new ConcurrentMapCacheManager("adminUserToken");
+    }
 
     @SuppressWarnings("PMD.CloseResource") // Context is intentionally closed only when TASK_NAME env var is set
     public static void main(String[] args) {

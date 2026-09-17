@@ -991,6 +991,12 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "respondentExternalFlags",
+    "UserRole": "[DEFENDANT]",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "supportTaskState",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"

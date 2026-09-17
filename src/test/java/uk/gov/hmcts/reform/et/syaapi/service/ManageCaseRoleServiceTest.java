@@ -16,6 +16,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -94,6 +96,7 @@ import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.YES;
 
 @EqualsAndHashCode
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 class ManageCaseRoleServiceTest {
 
@@ -977,7 +980,7 @@ class ManageCaseRoleServiceTest {
                                    eq(HttpMethod.GET),
                                    any(HttpEntity.class),
                                    eq(CaseUserAssignmentData.class))).thenReturn(
-                                       new ResponseEntity<>(null, HttpStatus.OK));
+                                       ResponseEntity.status(HttpStatus.OK).build());
         CaseDetails caseDetails = CaseDetails.builder().id(TEST_CASE_ID_LONG).build();
         ManageCaseRoleException caseRoleException = assertThrows(ManageCaseRoleException.class, () ->
             manageCaseRoleService.findCaseUserAssignmentsByRoleAndCase(

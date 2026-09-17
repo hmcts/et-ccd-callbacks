@@ -121,7 +121,7 @@ final class NotificationUtilsTest {
         orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse, HttpStatus.BAD_REQUEST);
         assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
         // when organisation response not has body should return false
-        orgResponse = new ResponseEntity<>(null, HttpStatus.OK);
+        orgResponse = ResponseEntity.status(HttpStatus.OK).build();
         assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
         // when organisation response body not has superuser should return false
         orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse, HttpStatus.OK);
@@ -150,7 +150,7 @@ final class NotificationUtilsTest {
         orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse, HttpStatus.BAD_REQUEST);
         assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
         // when organisation response not has body should return false
-        orgResponse = new ResponseEntity<>(null, HttpStatus.OK);
+        orgResponse = ResponseEntity.status(HttpStatus.OK).build();
         assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
         // when organisation response body not has superuser should return false
         orgResponse = new ResponseEntity<>(RetrieveOrgByIdResponse.builder().build(), HttpStatus.OK);

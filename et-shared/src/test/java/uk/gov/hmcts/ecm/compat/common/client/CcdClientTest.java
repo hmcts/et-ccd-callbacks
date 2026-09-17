@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.ecm.compat.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.bulk.BulkCaseSearchResult;
 import uk.gov.hmcts.ecm.common.model.bulk.BulkData;
 import uk.gov.hmcts.ecm.common.model.bulk.BulkDetails;
@@ -26,13 +25,13 @@ import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseSearchResult;
 import uk.gov.hmcts.ecm.common.model.ccd.PaginatedSearchMetadata;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
-import static uk.gov.hmcts.ecm.compat.common.model.helper.Constants.*;
-import uk.gov.hmcts.ecm.compat.common.model.labels.LabelCaseSearchResult;
-import uk.gov.hmcts.ecm.compat.common.model.labels.LabelPayloadEvent;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleCaseSearchResult;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ecm.common.model.multiples.SubmitMultipleEvent;
+import uk.gov.hmcts.ecm.compat.common.idam.models.UserDetails;
+import uk.gov.hmcts.ecm.compat.common.model.labels.LabelCaseSearchResult;
+import uk.gov.hmcts.ecm.compat.common.model.labels.LabelPayloadEvent;
 import uk.gov.hmcts.ecm.compat.common.model.reports.casesawaitingjudgment.CasesAwaitingJudgmentSearchResult;
 import uk.gov.hmcts.ecm.compat.common.model.reports.casesawaitingjudgment.CasesAwaitingJudgmentSubmitEvent;
 import uk.gov.hmcts.ecm.compat.common.model.reports.claimsbyhearingvenue.ClaimsByHearingVenueCaseData;
@@ -67,6 +66,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.compat.common.helpers.ESHelper.LISTING_VENUE_FIELD_NAME;
+import static uk.gov.hmcts.ecm.compat.common.model.helper.Constants.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CcdClientTest {
@@ -127,7 +127,7 @@ public class CcdClientTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "authToken");
         headers.add("ServiceAuthorization", null);
-        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE);
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         return headers;
     }
 
@@ -722,7 +722,7 @@ public class CcdClientTest {
         when(authTokenGenerator.generate()).thenReturn("authString");
         HttpHeaders httpHeaders = ccdClient.buildHeaders("authString");
         assertEquals("[Authorization:\"authString\", ServiceAuthorization:\"authString\", " +
-                "Content-Type:\"application/json;charset=UTF-8\"]", httpHeaders.toString());
+                "Content-Type:\"application/json\"]", httpHeaders.toString());
     }
 
     @Test

@@ -10,10 +10,12 @@ import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -59,20 +61,21 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.SUBMIT_ET3;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class Et3ResponseServiceTest {
     private Et3ResponseService et3ResponseService;
-    @MockitoBean
+    @Mock
     private DocumentManagementService documentManagementService;
-    @MockitoBean
+    @Mock
     private PdfBoxService pdfBoxService;
-    @MockitoBean
+    @Mock
     private UserIdamService userIdamService;
-    @MockitoBean
+    @Mock
     private CcdCaseAssignment ccdCaseAssignment;
-    @MockitoBean
+    @Mock
     private AuthTokenGenerator authTokenGenerator;
-    @MockitoBean
+    @Mock
     private MyHmctsService myHmctsService;
 
     private static final String VALID_USER_TOKEN = "validUserToken";

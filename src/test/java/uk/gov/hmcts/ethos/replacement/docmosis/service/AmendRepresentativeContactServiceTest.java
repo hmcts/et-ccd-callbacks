@@ -6,8 +6,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
@@ -26,18 +28,19 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class AmendRepresentativeContactServiceTest {
 
-    @MockitoBean
+    @Mock
     private UserIdamService  userIdamService;
-    @MockitoBean
+    @Mock
     private MyHmctsService myHmctsService;
-    @MockitoBean
+    @Mock
     private CcdCaseAssignment ccdCaseAssignment;
-    @MockitoBean
+    @Mock
     private AuthTokenGenerator authTokenGenerator;
-    @MockitoBean
+    @Mock
     private NocRepresentativeService nocRepresentativeService;
 
     @InjectMocks

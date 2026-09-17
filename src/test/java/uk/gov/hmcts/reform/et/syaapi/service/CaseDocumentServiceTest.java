@@ -6,11 +6,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.client.ExpectedCount;
@@ -56,6 +59,7 @@ import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.RESOURCE_NO
 @SuppressWarnings({"PMD"})
 @Slf4j
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class CaseDocumentServiceTest {
     private static final String SERVICE_AUTH = "Bearer MOCK";
     private static final String DOCUMENT_SERVICE_API_URL = "http://localhost:4455";
@@ -139,6 +143,9 @@ class CaseDocumentServiceTest {
     @BeforeEach
     void setup() {
         RestTemplate restTemplate = new RestTemplate();
+        restTemplate.getMessageConverters().removeIf(converter ->
+            converter.getClass().getSimpleName().equals("JacksonJsonHttpMessageConverter"));
+        restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
         AuthTokenGenerator authTokenGenerator = () -> SERVICE_AUTH;
         caseDocumentService = new CaseDocumentService(restTemplate,
                                                       authTokenGenerator,

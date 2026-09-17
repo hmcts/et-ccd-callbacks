@@ -7,12 +7,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
@@ -58,7 +60,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepr
 import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.getCaseDataAfter;
 import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.mockCaseAssignmentData;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class NocClaimantRepresentativeServiceTest {
     private static final String USER_EMAIL = "test@hmcts.net";
     private static final String USER_FIRST_NAME = "John";
@@ -78,21 +81,21 @@ class NocClaimantRepresentativeServiceTest {
             "Representative Name 1 does not have a valid account with the organisation Dummy Organisation. Please "
                 + "check the selected organisation";
 
-    @MockitoBean
+    @Mock
     private AuthTokenGenerator authTokenGenerator;
-    @MockitoBean
+    @Mock
     private OrganisationClient organisationClient;
-    @MockitoBean
+    @Mock
     private AdminUserService adminUserService;
-    @MockitoBean
+    @Mock
     private NocCcdService nocCcdService;
-    @MockitoBean
+    @Mock
     private NocNotificationService nocNotificationService;
-    @MockitoBean
+    @Mock
     private CcdCaseAssignment ccdCaseAssignment;
-    @MockitoBean
+    @Mock
     private NocService nocService;
-    @MockitoBean
+    @Mock
     private OrganisationService organisationService;
 
     private CaseData caseData;

@@ -232,8 +232,6 @@ configurations {
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
     apiTestImplementation.extendsFrom testImplementation
     apiTestRuntimeOnly.extendsFrom testRuntimeOnly
-    cftlibTestImplementation.extendsFrom testImplementation
-    cftlibTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 test {
@@ -850,11 +848,6 @@ tasks.register('bootWithCcdAndWa') {
     group = 'Application'
     description = 'Starts bootWithCCD with Work Allocation enabled (equivalent to ET_WORK_ALLOCATION=true ./gradlew bootWithCCD)'
     dependsOn 'bootWithCCD'
-}
-
-cftlibTest {
-    dependsOn 'generateCftlibCcdDefinitions'
-    jacoco.excludes = ['org/drools/**', 'uk/gov/hmcts/et/common/model/ccd/CaseData']
 }
 
 tasks.named('dumpCCDDefinitions') {

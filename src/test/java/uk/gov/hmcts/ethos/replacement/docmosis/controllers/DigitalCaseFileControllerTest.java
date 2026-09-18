@@ -35,7 +35,8 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -97,7 +98,10 @@ class DigitalCaseFileControllerTest extends BaseControllerTest {
                 .build());
         ccdRequest.getCaseDetails().getCaseData().setDigitalCaseFile(digitalCaseFileType);
         ccdRequest.getCaseDetails().getCaseData().setUploadOrRemoveDcf("Remove");
-        doCallRealMethod().when(digitalCaseFileService).createUploadRemoveDcf(anyString(), any());
+        doAnswer(invocation -> {
+            invocation.getArgument(1, CaseDetails.class).getCaseData().setDigitalCaseFile(null);
+            return null;
+        }).when(digitalCaseFileService).createUploadRemoveDcf(anyString(), any());
         mockMvc.perform(post(ASYNC_ABOUT_TO_SUBMIT_URL)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
@@ -117,7 +121,12 @@ class DigitalCaseFileControllerTest extends BaseControllerTest {
                         .build());
         ccdRequest.getCaseDetails().getCaseData().setDigitalCaseFile(digitalCaseFileType);
         ccdRequest.getCaseDetails().getCaseData().setUploadOrRemoveDcf("Upload");
-        doCallRealMethod().when(digitalCaseFileService).createUploadRemoveDcf(anyString(), any());
+        doAnswer(invocation -> {
+            DigitalCaseFileType dcf = invocation.getArgument(1, CaseDetails.class).getCaseData().getDigitalCaseFile();
+            dcf.setStatus("DCF Uploaded: "
+                + LocalDateTime.now(ZoneId.of("Europe/London")).format(NEW_DATE_TIME_PATTERN));
+            return null;
+        }).when(digitalCaseFileService).createUploadRemoveDcf(anyString(), any());
         mockMvc.perform(post(ASYNC_ABOUT_TO_SUBMIT_URL)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
@@ -153,6 +162,7 @@ class DigitalCaseFileControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(digitalCaseFileService).completeDcf(any(CaseDetails.class));
     }
 
     @Test

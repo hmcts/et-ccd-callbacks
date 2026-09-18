@@ -109,7 +109,24 @@ public final class ET3FormRespondentMapper {
         putPdfTextField(pdfFields,
                 ET3FormConstants.TXT_PDF_RESPONDENT_FIELD_EMPLOYEE_NUMBER_CLAIMANT_WORK_PLACE,
                 respondentSumType.getEt3ResponseSiteEmploymentCount());
-
+        putPdfCheckboxFieldWhenExpectedValueEqualsActualValue(pdfFields,
+                ET3FormConstants.CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_PANEL_JUDGE,
+                ET3FormConstants.YES_CAPITALISED,
+                "Judge",
+                respondentSumType.getRespondentHearingPanelPreference());
+        putPdfCheckboxFieldWhenExpectedValueEqualsActualValue(pdfFields,
+                ET3FormConstants.CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_PANEL_PANEL,
+                ET3FormConstants.YES_CAPITALISED,
+                "Panel",
+                respondentSumType.getRespondentHearingPanelPreference());
+        putPdfCheckboxFieldWhenExpectedValueEqualsActualValue(pdfFields,
+                ET3FormConstants.CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_PANEL_NO_PREFERENCE,
+                ET3FormConstants.YES_CAPITALISED,
+                "No preference",
+                respondentSumType.getRespondentHearingPanelPreference());
+        putPdfTextField(pdfFields,
+                ET3FormConstants.TXT_PDF_RESPONDENT_FIELD_HEARING_PANEL_REASONS,
+                respondentSumType.getRespondentHearingPanelPreferenceReason());
     }
 
     private static void putOtherTitle(String selectedTitle,

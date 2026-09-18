@@ -234,6 +234,11 @@ configurations {
 }
 
 test {
+    // Bound classpath scanning and retained Spring contexts on high-core CI agents.
+    maxHeapSize = '1G'
+    maxParallelForks = 1
+    jvmArgs '-XX:ActiveProcessorCount=2'
+    systemProperty 'spring.test.context.cache.maxSize', '8'
     exclude '**/*ComponentTest*'
     useJUnitPlatform()
     testLogging {
@@ -812,6 +817,7 @@ bootWithCCD {
     environment 'IDAM_SECURITY_ALLOWED_ISSUER_2', 'http://localhost:5062/o'
     // xui-manage-org
     environment 'RD_PROFESSIONAL_API_URL', 'http://localhost:8765'
+    environment 'RD_COMMONDATA_API_URL', 'http://localhost:8765'
     environment 'RD_PROFESSIONAL_API_SERVICE', 'http://localhost:8765'
     environment 'PRD_HOST', 'http://localhost:8765'
     environment 'XUI_MANAGE_ORGANISATIONS_CASETYPES', 'ET_EnglandWales,ET_Scotland'

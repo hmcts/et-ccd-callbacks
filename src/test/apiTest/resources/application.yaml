@@ -195,6 +195,7 @@ assign_case_access_api_url: ${AAC_URL:http://localhost:4454}
 apply_noc_access_api_assignments_path: /noc/apply-decision
 
 rd_professional-api-url: ${RD_PROFESSIONAL_API_URL:http://localhost:4507}
+rd_commondata-api-url: ${RD_COMMONDATA_API_URL:http://localhost:4507}
 
 case-details-url:
   citizen: ${CITIZEN_CASE_DETAILS_URL:http://localhost:3001/citizen-hub/}

@@ -43,6 +43,7 @@ case_document_am:
   url: http://localhost:4455
 
 rd_professional-api-url: http://localhost:4507
+rd_commondata-api-url: http://localhost:4507
 
 feature:
   secure-doc-store:

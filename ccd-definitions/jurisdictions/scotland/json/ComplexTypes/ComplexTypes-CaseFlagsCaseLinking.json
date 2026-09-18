@@ -1,0 +1,51 @@
+[
+  {
+    "ID": "SupportTaskState",
+    "ListElementCode": "adminTaskCreated",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Admin task created",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "SupportTaskState",
+    "ListElementCode": "adminTaskRequired",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Admin task required",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "SupportTaskState",
+    "ListElementCode": "legalOfficerTaskCreated",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Legal Officer task created",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "SupportTaskState",
+    "ListElementCode": "legalOfficerTaskRequired",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Legal Officer task required",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "SupportTaskState",
+    "ListElementCode": "judgeTaskCreated",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Judge task created",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "SupportTaskState",
+    "ListElementCode": "judgeTaskRequired",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Judge task required",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "SupportTaskState",
+    "ListElementCode": "arrangeSupportTaskName",
+    "FieldType": "Text",
+    "ElementLabel": "Arrange support task name",
+    "SecurityClassification": "Public"
+  }
+]

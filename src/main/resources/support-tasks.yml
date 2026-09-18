@@ -1,0 +1,43 @@
+support-tasks:
+  review:
+    admin-flag-codes:
+      - RA0002
+      - RA0003
+      - RA0004
+      - RA0005
+      - RA0006
+      - RA0008
+      - RA0009
+      - RA0021
+      - RA0033
+      - RA0039
+      - RA0041
+    judge-flag-codes:
+      - RA0029
+      - RA0031
+      - RA0032
+      - RA0037
+      - RA0038
+    legal-officer-flag-codes:
+      - RA0034
+      - RA0035
+      - RA0036
+  arrange:
+    flag-titles:
+      RA0003: I need help with forms
+      RA0017: Guidance on how to complete forms
+      RA0018: Support filling in forms
+      RA0019: Step free / wheelchair access
+      RA0020: Use of venue wheelchair
+      RA0021: Parking space close to the venue
+      RA0022: Accessible toilet
+      RA0024: A different type of chair
+      RA0030: Appropriate lighting
+      RA0038: Intermediary
+      RA0039: Speech to text reporter (palantypist)
+      RA0041: Lip speaker
+      RA0042: Sign language interpreter
+      RA0043: Hearing loop (hearing enhancement system)
+      RA0044: Infrared receiver (hearing enhancement system)
+      RA0045: Induction loop (hearing enhancement system)
+      RA0046: Visit to court or tribunal before the hearing

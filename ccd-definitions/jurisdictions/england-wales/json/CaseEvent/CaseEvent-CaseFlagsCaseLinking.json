@@ -1,6 +1,51 @@
 [
   {
     "CaseTypeID": "ET_EnglandWales",
+    "ID": "reviewAdminSupportRequest",
+    "Name": "Review Admin RA Request",
+    "Description": "Review Admin RA Request",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "Publish": "Y",
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToSubmit",
+    "CallBackURLSubmittedEvent": ""
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "reviewLOSupportRequest",
+    "Name": "Review LO RA Request",
+    "Description": "Review Legal Officer RA Request",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "Publish": "Y",
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToSubmit",
+    "CallBackURLSubmittedEvent": ""
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "reviewJudgeSupportRequest",
+    "Name": "Review Judge RA Request",
+    "Description": "Review Judge RA Request",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "Publish": "Y",
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/reviewSupportRequest/aboutToSubmit",
+    "CallBackURLSubmittedEvent": ""
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
     "ID": "createFlag",
     "Name": "Create a case flag",
     "Description": "Create Flag",
@@ -11,8 +56,9 @@
     "ShowSummary": "Y",
     "EventEnablingCondition": "",
     "CallBackURLAboutToStartEvent": "",
-    "CallBackURLAboutToSubmitEvent": "",
-    "CallBackURLSubmittedEvent": ""
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/supportTasks/aboutToSubmit",
+    "CallBackURLSubmittedEvent": "",
+    "Publish": "Y"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
@@ -26,8 +72,41 @@
     "ShowSummary": "Y",
     "EventEnablingCondition": "",
     "CallBackURLAboutToStartEvent": "",
-    "CallBackURLAboutToSubmitEvent": "",
-    "CallBackURLSubmittedEvent": ""
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/supportTasks/aboutToSubmit",
+    "CallBackURLSubmittedEvent": "",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "requestSupport",
+    "Name": "Request Support",
+    "Description": "Request Support",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "Y",
+    "EventEnablingCondition": "",
+    "CallBackURLAboutToStartEvent": "",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/supportTasks/aboutToSubmit",
+    "CallBackURLSubmittedEvent": "",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "manageSupport",
+    "Name": "Manage Support",
+    "Description": "Manage Support",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "Y",
+    "EventEnablingCondition": "",
+    "CallBackURLAboutToStartEvent": "",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/supportTasks/aboutToSubmit",
+    "CallBackURLSubmittedEvent": "",
+    "Publish": "Y"
   },
   {
     "CaseTypeID": "ET_EnglandWales",

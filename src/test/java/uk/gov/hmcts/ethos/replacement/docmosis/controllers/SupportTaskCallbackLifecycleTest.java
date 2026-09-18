@@ -10,17 +10,28 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.BeanUtils;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.env.MockEnvironment;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import uk.gov.hmcts.ccd.sdk.impl.json.JsonCallbackBridge;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -48,6 +59,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -100,6 +112,7 @@ class SupportTaskCallbackLifecycleTest {
     private static final String LIP_SPEAKER = "Lip speaker";
     private static final String TASK_LINK = "taskLink";
     private static final String MANUAL_REVIEW = "manualReview";
+    private static final String LOCAL_CALLBACK = "${ET_COS_URL}";
 
     @Mock
     private FeatureToggleService featureToggleService;
@@ -151,6 +164,86 @@ class SupportTaskCallbackLifecycleTest {
                 .flatMap(category -> Stream.of(TASK_LINK, MANUAL_REVIEW, EVENT_MANAGE_FLAGS, EVENT_MANAGE_SUPPORT)
                         .flatMap(route -> Stream.of(ENGLAND_WALES, SCOTLAND)
                                 .map(type -> Arguments.of(category, route, type))));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {ABOUT_TO_SUBMIT, REVIEW_SUBMIT})
+    void callbackSignatureIsAcceptedByDeployedCcdSdk(String callbackUrl) throws Exception {
+        JsonCallbackBridge bridge = sdkBridge();
+
+        assertDoesNotThrow(() -> bridge.validate(LOCAL_CALLBACK + callbackUrl));
+
+        caseType = SCOTLAND;
+        callback(callbackUrl, EVENT_CREATE_FLAG, new CaseData(), new CaseData(), null);
+    }
+
+    private JsonCallbackBridge sdkBridge() throws NoSuchMethodException {
+        ApplicationContext context = mvc.getDispatcherServlet().getWebApplicationContext();
+        return BeanUtils.instantiateClass(JsonCallbackBridge.class.getDeclaredConstructor(
+                ApplicationContext.class, ObjectMapper.class, RequestMappingHandlerMapping.class, Environment.class),
+                context, mapper, context.getBean(RequestMappingHandlerMapping.class),
+                new MockEnvironment().withProperty("decentralisation.local-callback-placeholder", "ET_COS_URL"));
+    }
+
+    static Stream<Arguments> sdkInvocations() {
+        return Stream.of(ABOUT_TO_SUBMIT, REVIEW_SUBMIT)
+                .flatMap(url -> Stream.of(false, true).flatMap(requestedRemains -> Stream.of(false, true)
+                        .map(withContext -> Arguments.of(url, requestedRemains, withContext))));
+    }
+
+    @ParameterizedTest
+    @MethodSource("sdkInvocations")
+    void sdkInvocationPreservesCompletionHeaderAndManualClosureFallback(
+            String url, boolean requestedRemains, boolean withContext) throws Exception {
+        caseType = SCOTLAND;
+        CaseData before = new CaseData();
+        before.setAllPartyFlags(AllPartyFlags.builder()
+                .claimantFlags(flags("claimant-request", ADMIN_CODE, FLAG_STATUS_REQUESTED)).build());
+        before.setSupportTaskState(SupportTaskState.builder().adminTaskCreated(YES).build());
+        if (requestedRemains) {
+            before.getAllPartyFlags().setRespondentExternalFlags(
+                    flags("remaining-request", ADMIN_CODE, FLAG_STATUS_REQUESTED));
+        }
+        CaseData data = copy(before);
+        if (REVIEW_SUBMIT.equals(url)) {
+            data.setReviewSupportRequestFlags(ListTypeItem.from(GenericTypeItem.from("reviewed-section",
+                    flags("claimant-request", ADMIN_CODE, FLAG_STATUS_ACTIVE))));
+        } else {
+            data.getAllPartyFlags().getClaimantFlags().getDetails().getFirst().getValue().setStatus(FLAG_STATUS_ACTIVE);
+        }
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader("Authorization", TOKEN);
+        if (withContext) {
+            request.addHeader(CLIENT_CONTEXT, taskContext(TASK_TYPE_REVIEW_SUPPORT_ADMIN));
+        }
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        JsonCallbackBridge bridge = sdkBridge();
+        Map<String, Object> payload = Map.of("case_details", details(data), "case_details_before", details(before),
+                "event_id", REVIEW_SUBMIT.equals(url) ? EVENT_REVIEW_ADMIN_SUPPORT_REQUEST : EVENT_MANAGE_FLAGS);
+
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request, response));
+        try {
+            bridge.validate(LOCAL_CALLBACK + url);
+            Object body = ReflectionTestUtils.invokeMethod(bridge, "invoke", LOCAL_CALLBACK + url, payload);
+            JsonNode result = mapper.valueToTree(body);
+            assertEquals(withContext && !requestedRemains ? NO : YES,
+                    result.at("/data/supportTaskState/adminTaskCreated").textValue());
+            assertEquals(FLAG_STATUS_ACTIVE,
+                    result.at("/data/claimantFlags/details/0/value/status").textValue());
+            if (withContext) {
+                JsonNode returnedContext = mapper.readTree(
+                        Base64.getDecoder().decode(response.getHeader(CLIENT_CONTEXT)));
+                assertTrue(returnedContext.at("/client_context/user_task/complete_task").isBoolean());
+                assertEquals(!requestedRemains,
+                        returnedContext.at("/client_context/user_task/complete_task").booleanValue());
+                assertEquals("review-task-id",
+                        returnedContext.at("/client_context/user_task/task_data/id").textValue());
+            } else {
+                assertNull(response.getHeader(CLIENT_CONTEXT));
+            }
+        } finally {
+            RequestContextHolder.resetRequestAttributes();
+        }
     }
 
     @ParameterizedTest(name = "{0}, {1}, {2}")

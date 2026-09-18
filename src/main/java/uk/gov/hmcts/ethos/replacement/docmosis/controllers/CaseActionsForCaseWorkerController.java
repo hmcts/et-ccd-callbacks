@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
@@ -228,8 +231,7 @@ public class CaseActionsForCaseWorkerController {
     @Operation(summary = "Prepare Review Support and Arrange Support tasks for eligible Case Flags.")
     public ResponseEntity<CCDCallbackResponse> prepareSupportTasks(
             @RequestBody CallbackRequest callbackRequest,
-            @RequestHeader(AUTHORIZATION) String userToken,
-            @RequestHeader(value = CLIENT_CONTEXT, required = false) String clientContext) {
+            @RequestHeader(AUTHORIZATION) String userToken) {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
         Set<String> taskTypesToComplete = null;
@@ -258,7 +260,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         return addTaskCompletionHeader(
-                getCallbackRespEntityNoErrors(caseData), clientContext, taskTypesToComplete);
+                getCallbackRespEntityNoErrors(caseData), taskTypesToComplete);
     }
 
     @PostMapping(value = "/reviewSupportRequest/aboutToStart", consumes = APPLICATION_JSON_VALUE)
@@ -277,8 +279,7 @@ public class CaseActionsForCaseWorkerController {
     @Operation(summary = "Apply reviewed Case Flags and prepare the related support tasks.")
     public ResponseEntity<CCDCallbackResponse> applyReviewSupportRequest(
             @RequestBody CallbackRequest callbackRequest,
-            @RequestHeader(AUTHORIZATION) String userToken,
-            @RequestHeader(value = CLIENT_CONTEXT, required = false) String clientContext) {
+            @RequestHeader(AUTHORIZATION) String userToken) {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
         List<String> errors = new ArrayList<>();
@@ -296,7 +297,7 @@ public class CaseActionsForCaseWorkerController {
             }
         }
         return addTaskCompletionHeader(
-                getCallbackRespEntityErrors(errors, caseData), clientContext, taskTypesToComplete);
+                getCallbackRespEntityErrors(errors, caseData), taskTypesToComplete);
     }
 
     @PostMapping(value = "/supportTasks/submitted", consumes = APPLICATION_JSON_VALUE)
@@ -318,17 +319,26 @@ public class CaseActionsForCaseWorkerController {
 
     private ResponseEntity<CCDCallbackResponse> addTaskCompletionHeader(
             ResponseEntity<CCDCallbackResponse> response,
-            String clientContext,
             Set<String> taskTypesToComplete) {
         if (taskTypesToComplete == null) {
             return response;
         }
+        // The SDK callback bridge only accepts Authorization/ServiceAuthorization header parameters.
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        ServletRequestAttributes servletAttributes = requestAttributes instanceof ServletRequestAttributes attributes
+                ? attributes : null;
+        String clientContext = servletAttributes == null ? null
+                : servletAttributes.getRequest().getHeader(CLIENT_CONTEXT);
         String updatedClientContext = supportTaskClientContextService.updateTaskCompletion(
                 clientContext, taskTypesToComplete);
         if (updatedClientContext == null) {
             supportTaskService.retainReviewTasksForSubmittedCallback(
                     response.getBody().getData(), taskTypesToComplete);
             return response;
+        }
+        // SDK invocation unwraps ResponseEntity, so also preserve the header on the enclosing HTTP response.
+        if (servletAttributes != null && servletAttributes.getResponse() != null) {
+            servletAttributes.getResponse().setHeader(CLIENT_CONTEXT, updatedClientContext);
         }
         return ResponseEntity.status(response.getStatusCode())
                 .headers(response.getHeaders())

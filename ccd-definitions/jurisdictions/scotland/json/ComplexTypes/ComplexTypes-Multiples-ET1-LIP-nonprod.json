@@ -1,0 +1,44 @@
+[
+  {
+    "ID": "AdditionalClaimant",
+    "ListElementCode": "title",
+    "FieldType": "Text",
+    "ElementLabel": "Title",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "AdditionalClaimant",
+    "ListElementCode": "firstName",
+    "FieldType": "Text",
+    "ElementLabel": "First name",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "AdditionalClaimant",
+    "ListElementCode": "lastName",
+    "FieldType": "Text",
+    "ElementLabel": "Last name",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "AdditionalClaimant",
+    "ListElementCode": "email",
+    "FieldType": "Text",
+    "ElementLabel": "Email",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "AdditionalClaimant",
+    "ListElementCode": "dob",
+    "FieldType": "Date",
+    "ElementLabel": "Date of birth",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "AdditionalClaimant",
+    "ListElementCode": "address",
+    "FieldType": "AddressUK",
+    "ElementLabel": "Address",
+    "SecurityClassification": "Public"
+  }
+]

@@ -24,7 +24,7 @@ test.describe.serial("set up user context", () => {
         }
         console.log(`Logging new session for ${role} (${user.email})`);
         await manageCaseDashboardPage.visit();
-        await loginPage.processLogin(user);
+        await loginPage.processLogin(user, undefined, true);
       }
     );
   }
@@ -36,7 +36,7 @@ test.describe.serial("set up user context", () => {
       if(CookieUtils.isSessionValid(user.sessionFile, cookieName, user.email || undefined)) {
         console.log(`Valid session already exists for ${user.email}, skipping login.`);
         return;}
-      await citizenHubLoginPage.processCitizenHubLogin(user);
+      await citizenHubLoginPage.processCitizenHubLogin(user, true);
     });
 
   test(
@@ -46,7 +46,7 @@ test.describe.serial("set up user context", () => {
       if(CookieUtils.isSessionValid(user.sessionFile, cookieName, user.email || undefined)) {
         console.log(`Valid session already exists for ${user.email}, skipping login.`);
         return;}
-      await citizenHubLoginPage.processCitizenHubLogin(user);
+      await citizenHubLoginPage.processCitizenHubLogin(user, true);
     });
 
   const respondentUsers = [
@@ -62,7 +62,7 @@ test.describe.serial("set up user context", () => {
           console.log(`Valid session already exists for ${role} ${user.email}, skipping login.`);
           return;
         }
-        await et3LoginPage.processRespondentLogin(user);
+        await et3LoginPage.processRespondentLogin(user, true);
       });
   }
 

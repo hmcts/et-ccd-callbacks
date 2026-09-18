@@ -750,6 +750,95 @@ class SupportTaskServiceTest {
                 .map(entry -> Arguments.of(entry.getKey(), entry.getValue()));
     }
 
+    static Stream<String> arrangeOnlyFlagCodes() {
+        SupportTaskConfiguration config = configuration();
+        return config.getArrange().getFlagTitles().keySet().stream()
+                .filter(code -> !config.getReview().getAdminFlagCodes().contains(code)
+                        && !config.getReview().getJudgeFlagCodes().contains(code)
+                        && !config.getReview().getLegalOfficerFlagCodes().contains(code));
+    }
+
+    @ParameterizedTest
+    @MethodSource("arrangeOnlyFlagCodes")
+    void arrange_only_requested_flags_create_one_admin_review_and_appear_in_review_list(String code) {
+        CaseData data = caseDataWithClaimantFlag(code, STATUS_REQUESTED, true);
+
+        service.prepareReviewSupportTasks(data);
+        service.prepareReviewSupportRequest(data, EVENT_REVIEW_ADMIN_SUPPORT_REQUEST);
+
+        assertEquals(YES, taskState(data).getAdminTaskRequired());
+        assertEquals(YES, taskState(data).getAdminTaskCreated());
+        assertNull(taskState(data).getJudgeTaskRequired());
+        assertNull(taskState(data).getLegalOfficerTaskRequired());
+        assertEquals(1, data.getReviewSupportRequestFlags().size());
+        assertEquals(code, data.getReviewSupportRequestFlags().getFirst().getValue()
+                .getDetails().getFirst().getValue().getFlagCode());
+
+        service.prepareReviewSupportTasks(data);
+
+        assertNull(taskState(data).getAdminTaskRequired());
+        assertTrue(service.reviewTaskTypesToClose(data).isEmpty());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {STATUS_ACTIVE, STATUS_INACTIVE, STATUS_NOT_APPROVED})
+    void arrange_fallback_review_closes_only_after_last_requested_flag_changes_status(String status) {
+        CaseData data = caseDataWithFlags("RA0033", STATUS_ACTIVE, "RA0017", STATUS_REQUESTED);
+        taskState(data).setAdminTaskCreated(YES);
+
+        assertTrue(service.prepareManagedReviewSupportTasks(data, null).isEmpty());
+        assertEquals(YES, taskState(data).getAdminTaskCreated());
+        assertTrue(service.reviewTaskTypesToClose(data).isEmpty());
+
+        data.getAllPartyFlags().getRespondentFlags().getDetails().getFirst().getValue().setStatus(status);
+        assertEquals(Set.of(TASK_TYPE_REVIEW_SUPPORT_ADMIN), service.reviewTaskTypesToClose(data));
+        assertEquals(Set.of(TASK_TYPE_REVIEW_SUPPORT_ADMIN), service.prepareManagedReviewSupportTasks(data, null));
+        assertEquals(NO, taskState(data).getAdminTaskCreated());
+
+        CaseData fresh = caseDataWithClaimantFlag("RA0017", status, false);
+        service.prepareReviewSupportTasks(fresh);
+        assertNull(taskState(fresh).getAdminTaskRequired());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {TASK_TYPE_JUDGE, TASK_TYPE_LEGAL_OFFICER})
+    void explicit_review_mapping_takes_precedence_over_arrange_fallback(String category) {
+        SupportTaskConfiguration config = configuration();
+        if (TASK_TYPE_JUDGE.equals(category)) {
+            config.getReview().setJudgeFlagCodes(Set.of("RA0017"));
+        } else {
+            config.getReview().setLegalOfficerFlagCodes(Set.of("RA0017"));
+        }
+        SupportTaskService configuredService = new SupportTaskService(config);
+        CaseData data = caseDataWithClaimantFlag("RA0017", STATUS_REQUESTED, false);
+
+        configuredService.prepareReviewSupportTasks(data);
+        configuredService.prepareReviewSupportRequest(data, EVENT_REVIEW_ADMIN_SUPPORT_REQUEST);
+
+        assertNull(taskState(data).getAdminTaskRequired());
+        assertEquals(TASK_TYPE_JUDGE.equals(category) ? YES : null, taskState(data).getJudgeTaskRequired());
+        assertEquals(TASK_TYPE_LEGAL_OFFICER.equals(category) ? YES : null,
+                taskState(data).getLegalOfficerTaskRequired());
+        assertTrue(data.getReviewSupportRequestFlags().isEmpty());
+    }
+
+    @Test
+    void arrange_path_fallback_respects_explicit_review_path_mapping() {
+        SupportTaskConfiguration config = configuration();
+        config.getReview().setAdminPathFlags(List.of());
+        SupportTaskService configuredService = new SupportTaskService(config);
+        CaseData data = caseDataWithClaimantFlag(OTHER_FLAG_CODE, STATUS_REQUESTED, false, HELP_WITH_FORMS_PATH);
+
+        configuredService.prepareReviewSupportTasks(data);
+        assertEquals(YES, taskState(data).getAdminTaskRequired());
+
+        config.getReview().setJudgePathFlags(List.of(pathFlag(OTHER_FLAG_CODE, HELP_WITH_FORMS_PATH)));
+        CaseData mapped = caseDataWithClaimantFlag(OTHER_FLAG_CODE, STATUS_REQUESTED, false, HELP_WITH_FORMS_PATH);
+        configuredService.prepareReviewSupportTasks(mapped);
+        assertNull(taskState(mapped).getAdminTaskRequired());
+        assertEquals(YES, taskState(mapped).getJudgeTaskRequired());
+    }
+
     @ParameterizedTest
     @MethodSource("arrangeSupportFlagScenarios")
     void prepares_arrange_support_task_for_each_new_active_flag(String flagCode, String taskName) {

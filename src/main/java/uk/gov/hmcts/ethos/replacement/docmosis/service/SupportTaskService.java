@@ -341,7 +341,10 @@ public class SupportTaskService {
 
     private Predicate<FlagDetailType> adminReviewFlag() {
         return eligibleFlag(configuration.getReview().getAdminFlagCodes(),
-                configuration.getReview().getAdminPathFlags());
+                configuration.getReview().getAdminPathFlags())
+                .or(flag -> arrangeTaskName(flag).isPresent()
+                        && !judgeReviewFlag().test(flag)
+                        && !legalOfficerReviewFlag().test(flag));
     }
 
     public record ArrangeSupportTask(String flagId, String taskName) {

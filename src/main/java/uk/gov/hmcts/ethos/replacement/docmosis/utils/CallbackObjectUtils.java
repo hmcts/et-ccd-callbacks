@@ -2,6 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +34,9 @@ public final class CallbackObjectUtils {
         if (object == null || clazz == null) {
             return null;
         }
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper()
+                .registerModule(new Jdk8Module())
+                .registerModule(new JavaTimeModule());
         return objectMapper
                 .readValue(objectMapper.writeValueAsString(object), clazz);
     }

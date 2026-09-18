@@ -2413,6 +2413,13 @@
           "caseworker-employment-api"
         ],
         "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment",
+          "caseworker-employment-englandwales"
+        ],
+        "CRUD": "R"
       }
     ]
   },

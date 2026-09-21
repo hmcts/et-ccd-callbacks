@@ -140,7 +140,7 @@ withPipeline(type, product, component) {
     '''
   }
 
-  after('build') {
+  afterSuccess('build') {
     sh './gradlew --no-daemon --init-script init.gradle dumpCCDDefinitions'
   }
 

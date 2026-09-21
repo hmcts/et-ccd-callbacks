@@ -129,7 +129,6 @@ class DigitalCaseFileServiceIntegrationTest {
                 "http://documents.example/documents/generated/binary", "generated.pdf");
         assertThat(storedDcf.getData()).isEqualTo(caseData.getDigitalCaseFile());
         assertThat(storedDcf.getActiveBundleId()).isNull();
-        assertThat(storedDcf.getCompletedBundleId()).hasToString(pendingBundle.value().getId());
         assertThat(caseData.getCaseBundles()).isNull();
     }
 
@@ -163,7 +162,6 @@ class DigitalCaseFileServiceIntegrationTest {
         assertThat(storedDcf.getData().getError()).isEqualTo("Failed to generate");
         assertThat(storedDcf.getData().getUploadedDocument()).isEqualTo(uploadedDocument());
         assertThat(storedDcf.getData()).isEqualTo(caseData.getDigitalCaseFile());
-        assertThat(storedDcf.getCompletedBundleId()).hasToString(completed.value().getId());
         assertThat(storedDcf.getActiveBundleId()).isNull();
         assertThat(caseData.getCaseBundles()).isNull();
     }
@@ -186,7 +184,6 @@ class DigitalCaseFileServiceIntegrationTest {
         assertThat(retryData.getDigitalCaseFile().getStatus()).startsWith("DCF Generated:");
         assertThat(retryData.getDigitalCaseFile().getUploadedDocument().getDocumentFilename())
             .isEqualTo("generated.pdf");
-        assertThat(storedDcf.getCompletedBundleId()).hasToString(completed.value().getId());
         assertThat(storedDcf.getActiveBundleId()).isNull();
         assertThat(retryData.getCaseBundles()).isNull();
     }
@@ -205,7 +202,6 @@ class DigitalCaseFileServiceIntegrationTest {
         var storedDcf = repository.findById(CASE_REFERENCE).orElseThrow();
         assertThat(storedDcf.getData().getStatus()).startsWith("DCF Updating:");
         assertThat(storedDcf.getActiveBundleId()).hasToString(activeBundle.value().getId());
-        assertThat(storedDcf.getCompletedBundleId()).isNull();
     }
 
     @Test
@@ -226,7 +222,6 @@ class DigitalCaseFileServiceIntegrationTest {
         assertThat(storedDcf.getData().getDateGenerated()).isNull();
         assertThat(storedDcf.getData()).isEqualTo(caseData.getDigitalCaseFile());
         assertThat(storedDcf.getActiveBundleId()).isNull();
-        assertThat(storedDcf.getCompletedBundleId()).isNull();
         assertThat(caseData.getUploadOrRemoveDcf()).isNull();
     }
 
@@ -241,7 +236,6 @@ class DigitalCaseFileServiceIntegrationTest {
         var storedDcf = repository.findById(CASE_REFERENCE).orElseThrow();
         assertThat(storedDcf.getData()).isNull();
         assertThat(storedDcf.getActiveBundleId()).isNull();
-        assertThat(storedDcf.getCompletedBundleId()).isNull();
         assertThat(caseData.getDigitalCaseFile()).isNull();
         assertThat(caseData.getUploadOrRemoveDcf()).isNull();
     }

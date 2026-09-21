@@ -32,13 +32,9 @@ public class DigitalCaseFile {
     @Column(name = "active_bundle_id")
     private UUID activeBundleId;
 
-    @Column(name = "completed_bundle_id")
-    private UUID completedBundleId;
-
     public static DigitalCaseFile create(long caseReference,
                                          DigitalCaseFileType data,
-                                         UUID activeBundleId,
-                                         UUID completedBundleId) {
-        return new DigitalCaseFile(caseReference, data, activeBundleId, completedBundleId);
+                                         UUID activeBundleId) {
+        return new DigitalCaseFile(caseReference, data, activeBundleId);
     }
 }

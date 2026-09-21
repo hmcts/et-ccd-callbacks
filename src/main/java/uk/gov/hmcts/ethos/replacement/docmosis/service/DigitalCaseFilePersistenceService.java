@@ -22,13 +22,12 @@ public class DigitalCaseFilePersistenceService {
         digitalCaseFileRepository.save(DigitalCaseFile.create(
             caseReference,
             caseData.getDigitalCaseFile(),
-            UUID.fromString(bundle.value().getId()),
-            null
+            UUID.fromString(bundle.value().getId())
         ));
     }
 
     public void save(long caseReference, DigitalCaseFileType digitalCaseFile) {
-        digitalCaseFileRepository.save(DigitalCaseFile.create(caseReference, digitalCaseFile, null, null));
+        digitalCaseFileRepository.save(DigitalCaseFile.create(caseReference, digitalCaseFile, null));
     }
 
     public void complete(long caseReference, CaseData caseData) {
@@ -36,10 +35,9 @@ public class DigitalCaseFilePersistenceService {
         if (completedBundle == null) {
             return;
         }
-        UUID completedBundleId = UUID.fromString(completedBundle.value().getId());
         DigitalCaseFileHelper.addDcfToDocumentCollection(caseData, completedBundle);
         digitalCaseFileRepository.save(
-            DigitalCaseFile.create(caseReference, caseData.getDigitalCaseFile(), null, completedBundleId)
+            DigitalCaseFile.create(caseReference, caseData.getDigitalCaseFile(), null)
         );
     }
 }

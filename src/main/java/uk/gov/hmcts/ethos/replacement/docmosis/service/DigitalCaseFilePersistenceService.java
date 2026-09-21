@@ -1,10 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.et.common.model.bundle.Bundle;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.DigitalCaseFileType;
@@ -41,20 +39,6 @@ public class DigitalCaseFilePersistenceService {
             return;
         }
         UUID completedBundleId = UUID.fromString(completedBundle.value().getId());
-        DigitalCaseFile storedDcf = digitalCaseFileRepository.findById(caseReference).orElse(null);
-
-        if (storedDcf != null) {
-            if (completedBundleId.equals(storedDcf.getCompletedBundleId())) {
-                return;
-            }
-            if (!completedBundleId.equals(storedDcf.getActiveBundleId())) {
-                throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "The completed Digital Case File bundle is no longer active"
-                );
-            }
-        }
-
         DigitalCaseFileHelper.addDcfToDocumentCollection(caseData, completedBundle);
         digitalCaseFileRepository.save(
             DigitalCaseFile.create(caseReference, caseData.getDigitalCaseFile(), null, completedBundleId)

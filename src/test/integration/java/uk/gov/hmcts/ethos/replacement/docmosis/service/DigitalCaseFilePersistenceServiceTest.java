@@ -7,14 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.web.server.ResponseStatusException;
 import org.testcontainers.containers.PostgreSQLContainer;
 import uk.gov.hmcts.ccd.sdk.config.DecentralisedDataConfiguration;
 import uk.gov.hmcts.et.common.model.bundle.Bundle;
@@ -95,7 +93,7 @@ class DigitalCaseFilePersistenceServiceTest {
     }
 
     @Test
-    void storesCompletionAndDeletesTheTemporaryBundle() {
+    void storesCompletionAndClearsTheActiveBundleId() {
         Bundle pendingBundle = bundle();
         Bundle completedBundle = completedBundle(pendingBundle);
         start(digitalCaseFile("DCF Updating"), pendingBundle);
@@ -112,27 +110,27 @@ class DigitalCaseFilePersistenceServiceTest {
     }
 
     @Test
-    void rejectsAStaleCompletionWithoutChangingTheCurrentBundle() {
-        Bundle staleBundle = bundle();
-        Bundle activeBundle = bundle();
-        start(digitalCaseFile("DCF Updating A"), staleBundle);
-        start(digitalCaseFile("DCF Updating B"), activeBundle);
+    void completesAReplacementStartedByAnOlderInstanceDespiteTheStaleTableBundle() {
+        Bundle previousBundle = bundle();
+        start(digitalCaseFile("DCF Updating previous job"), previousBundle);
+        flushAndClear();
 
+        Bundle replacementBundle = bundle();
         CaseData caseData = new CaseData();
-        caseData.setCaseBundles(List.of(completedBundle(staleBundle)));
+        caseData.setCaseBundles(List.of(completedBundle(replacementBundle)));
 
-        assertThatThrownBy(() -> service.complete(CASE_REFERENCE, caseData))
-            .isInstanceOfSatisfying(ResponseStatusException.class,
-                exception -> assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.CONFLICT));
+        service.complete(CASE_REFERENCE, caseData);
         flushAndClear();
 
         var storedDcf = digitalCaseFileRepository.findById(CASE_REFERENCE).orElseThrow();
-        assertThat(storedDcf.getActiveBundleId()).hasToString(activeBundle.value().getId());
-        assertThat(storedDcf.getData().getStatus()).isEqualTo("DCF Updating B");
+        assertThat(storedDcf.getActiveBundleId()).isNull();
+        assertThat(storedDcf.getCompletedBundleId()).hasToString(replacementBundle.value().getId());
+        assertThat(storedDcf.getData()).isEqualTo(caseData.getDigitalCaseFile());
+        assertThat(caseData.getDigitalCaseFile().getStatus()).startsWith("DCF Failed to generate:");
     }
 
     @Test
-    void acceptsAnExactDuplicateCompletion() {
+    void completionRetryStillPopulatesTheBlobResponse() {
         Bundle pendingBundle = bundle();
         Bundle completedBundle = completedBundle(pendingBundle);
         start(digitalCaseFile("DCF Updating"), pendingBundle);
@@ -141,9 +139,13 @@ class DigitalCaseFilePersistenceServiceTest {
         service.complete(CASE_REFERENCE, caseData);
         flushAndClear();
 
-        service.complete(CASE_REFERENCE, caseData);
+        CaseData retryData = new CaseData();
+        retryData.setDigitalCaseFile(digitalCaseFile("DCF Updating"));
+        retryData.setCaseBundles(List.of(completedBundle));
+        service.complete(CASE_REFERENCE, retryData);
         flushAndClear();
 
+        assertThat(retryData.getDigitalCaseFile().getStatus()).startsWith("DCF Failed to generate:");
         var storedDcf = digitalCaseFileRepository.findById(CASE_REFERENCE).orElseThrow();
         assertThat(storedDcf.getActiveBundleId()).isNull();
         assertThat(storedDcf.getCompletedBundleId()).hasToString(pendingBundle.value().getId());
@@ -181,7 +183,7 @@ class DigitalCaseFilePersistenceServiceTest {
     }
 
     @Test
-    void uploadInvalidatesAnActiveBundle() {
+    void uploadReplacesTheTableDataAndClearsBundleIds() {
         Bundle activeBundle = bundle();
         start(digitalCaseFile("DCF Updating"), activeBundle);
         service.save(CASE_REFERENCE, digitalCaseFile("DCF Uploaded"));
@@ -191,16 +193,10 @@ class DigitalCaseFilePersistenceServiceTest {
         assertThat(storedDcf.getData().getStatus()).isEqualTo("DCF Uploaded");
         assertThat(storedDcf.getActiveBundleId()).isNull();
         assertThat(storedDcf.getCompletedBundleId()).isNull();
-        assertThatThrownBy(() -> {
-            CaseData caseData = new CaseData();
-            caseData.setCaseBundles(List.of(completedBundle(activeBundle)));
-            service.complete(CASE_REFERENCE, caseData);
-        }).isInstanceOfSatisfying(ResponseStatusException.class,
-            exception -> assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.CONFLICT));
     }
 
     @Test
-    void removeLeavesATombstoneThatFencesAnActiveBundle() {
+    void removeStoresATombstoneAndClearsBundleIds() {
         Bundle activeBundle = bundle();
         start(digitalCaseFile("DCF Updating"), activeBundle);
 
@@ -211,12 +207,23 @@ class DigitalCaseFilePersistenceServiceTest {
         assertThat(storedDcf.getData()).isNull();
         assertThat(storedDcf.getActiveBundleId()).isNull();
         assertThat(storedDcf.getCompletedBundleId()).isNull();
-        assertThatThrownBy(() -> {
-            CaseData caseData = new CaseData();
-            caseData.setCaseBundles(List.of(completedBundle(activeBundle)));
-            service.complete(CASE_REFERENCE, caseData);
-        }).isInstanceOfSatisfying(ResponseStatusException.class,
-            exception -> assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.CONFLICT));
+    }
+
+    @Test
+    void completesAJobStartedByAnOlderInstanceAfterATableRemoval() {
+        service.save(CASE_REFERENCE, null);
+        flushAndClear();
+        Bundle completedBundle = completedBundle(bundle());
+        CaseData caseData = new CaseData();
+        caseData.setCaseBundles(List.of(completedBundle));
+
+        service.complete(CASE_REFERENCE, caseData);
+        flushAndClear();
+
+        var storedDcf = digitalCaseFileRepository.findById(CASE_REFERENCE).orElseThrow();
+        assertThat(storedDcf.getCompletedBundleId()).hasToString(completedBundle.value().getId());
+        assertThat(storedDcf.getData()).isEqualTo(caseData.getDigitalCaseFile());
+        assertThat(caseData.getDigitalCaseFile().getStatus()).startsWith("DCF Failed to generate:");
     }
 
     @Test

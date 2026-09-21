@@ -127,7 +127,7 @@ public class CcdClientTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "authToken");
         headers.add("ServiceAuthorization", null);
-        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE);
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         return headers;
     }
 
@@ -722,7 +722,7 @@ public class CcdClientTest {
         when(authTokenGenerator.generate()).thenReturn("authString");
         HttpHeaders httpHeaders = ccdClient.buildHeaders("authString");
         assertEquals("[Authorization:\"authString\", ServiceAuthorization:\"authString\", " +
-                "Content-Type:\"application/json;charset=UTF-8\"]", httpHeaders.toString());
+                "Content-Type:\"application/json\"]", httpHeaders.toString());
     }
 
     @Test

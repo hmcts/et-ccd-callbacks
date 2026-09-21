@@ -6,8 +6,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesDto;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -44,28 +46,29 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_ALL;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class MultipleNotificationServiceTest {
 
     private static final String EMAIL = "email@email.com";
 
-    @MockitoBean
+    @Mock
     CreateUpdatesBusSender createUpdatesBusSender;
 
-    @MockitoBean
+    @Mock
     UserIdamService userIdamService;
 
-    @MockitoBean
+    @Mock
     ExcelReadingService excelReadingService;
 
-    @MockitoBean
+    @Mock
     CaseLookupService caseLookupService;
 
-    @MockitoBean
+    @Mock
     MultipleDynamicListFlagsService multipleDynamicListFlagsService;
-    @MockitoBean
+    @Mock
     FileLocationSelectionService fileLocationSelectionService;
-    @MockitoBean
+    @Mock
     ScotlandFileLocationSelectionService scotlandFileLocationSelectionService;
 
     private HearingSelectionService hearingSelectionService;

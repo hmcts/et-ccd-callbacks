@@ -3,8 +3,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -27,7 +29,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class CaseLinksEmailServiceTest {
     private static final String RESPONDENT_NAME = "Respondent";
     private static final String REP_EMAIL = "rep1@test.com";
@@ -35,9 +38,9 @@ class CaseLinksEmailServiceTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
 
     private CaseLinksEmailService caseLinksEmailService;
-    @MockitoBean
+    @Mock
     private EmailService emailService;
-    @MockitoBean
+    @Mock
     private CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private CCDRequest ccdRequest;
     private SubmitEvent submitEvent;

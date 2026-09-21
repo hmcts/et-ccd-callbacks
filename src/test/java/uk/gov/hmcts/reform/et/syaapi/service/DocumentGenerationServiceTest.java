@@ -13,6 +13,8 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.HttpClientConfiguration;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.JacksonConfiguration;
 import uk.gov.hmcts.reform.et.syaapi.models.ClaimCaseDocument;
 
 import java.net.UnknownHostException;
@@ -43,7 +45,8 @@ class DocumentGenerationServiceTest {
 
     @BeforeEach
     void setup() {
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = HttpClientConfiguration.createJackson2RestTemplate(
+            new JacksonConfiguration().objectMapper());
         ObjectMapper objectMapper = new ObjectMapper();
         documentGenerationService = new DocumentGenerationService(restTemplate, objectMapper,
             TORNADO_API_URL, SOME_KEY);
@@ -70,7 +73,8 @@ class DocumentGenerationServiceTest {
     @Test
     void genDocumentWithDataFailingToConvertToJsonThrowsDocumentGenerationException()
         throws JsonProcessingException {
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = HttpClientConfiguration.createJackson2RestTemplate(
+            new JacksonConfiguration().objectMapper());
         ObjectMapper objectMapper = mock(ObjectMapper.class);
         given(objectMapper.writeValueAsString(any()))
             .willThrow(new JsonParseException(null, "wellthatworkednot"));

@@ -3,8 +3,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.types.NotificationsExtract;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
@@ -32,16 +34,17 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_C
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_ALL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelDocManagementService.APPLICATION_EXCEL_VALUE;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class NotificationsExcelReportServiceTest {
     public static final String DOC_URL = "http://dm-store/documents/64668823-d355-4663-8d38-1ce3c61108df";
-    @MockitoBean
+    @Mock
     private ExcelReadingService excelReadingService;
-    @MockitoBean
+    @Mock
     private NotificationScheduleService notificationScheduleService;
-    @MockitoBean
+    @Mock
     private DocumentManagementService documentManagementService;
-    @MockitoBean
+    @Mock
     private CcdClient ccdClient;
 
     private NotificationsExcelReportService notificationsExcelReportService;

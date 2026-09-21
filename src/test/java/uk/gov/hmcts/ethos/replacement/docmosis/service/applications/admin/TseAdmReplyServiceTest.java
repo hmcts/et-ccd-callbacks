@@ -7,10 +7,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -74,24 +76,25 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class TseAdmReplyServiceTest {
     private TseAdmReplyService tseAdmReplyService;
     private EmailService emailService;
 
-    @MockitoBean
+    @Mock
     public TseAdminHelper tseAdminHelper;
-    @MockitoBean
+    @Mock
     private DocumentManagementService documentManagementService;
-    @MockitoBean
+    @Mock
     private TornadoService tornadoService;
-    @MockitoBean
+    @Mock
     private TseService tseService;
-    @MockitoBean
+    @Mock
     private FeatureToggleService featureToggleService;
-    @MockitoBean
+    @Mock
     private EmailNotificationService emailNotificationService;
-    @MockitoBean
+    @Mock
     CaseAccessService caseAccessService;
 
     private CaseData caseData;

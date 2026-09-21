@@ -20,6 +20,8 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.HttpClientConfiguration;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.JacksonConfiguration;
 import uk.gov.hmcts.reform.et.syaapi.model.CaseTestData;
 import uk.gov.hmcts.reform.et.syaapi.models.AcasCertificate;
 import uk.gov.hmcts.reform.et.syaapi.service.utils.GenericServiceUtil;
@@ -77,7 +79,8 @@ class AcasServiceTest {
     @BeforeEach
     void setup() {
         caseTestData = new CaseTestData();
-        restTemplate = new RestTemplate();
+        restTemplate = HttpClientConfiguration.createJackson2RestTemplate(
+            new JacksonConfiguration().objectMapper());
         acasService = new AcasService(restTemplate, ACAS_DEV_API_URL, ACAS_API_KEY);
     }
 

@@ -23,6 +23,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.HttpClientConfiguration;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.JacksonConfiguration;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.et.syaapi.config.interceptors.ResourceNotFoundException;
 import uk.gov.hmcts.reform.et.syaapi.model.CaseTestData;
@@ -138,7 +140,8 @@ class CaseDocumentServiceTest {
 
     @BeforeEach
     void setup() {
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = HttpClientConfiguration.createJackson2RestTemplate(
+            new JacksonConfiguration().objectMapper());
         AuthTokenGenerator authTokenGenerator = () -> SERVICE_AUTH;
         caseDocumentService = new CaseDocumentService(restTemplate,
                                                       authTokenGenerator,

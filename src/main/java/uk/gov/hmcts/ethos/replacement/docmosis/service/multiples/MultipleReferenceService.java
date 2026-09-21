@@ -170,7 +170,7 @@ public class MultipleReferenceService {
                 throw new CaseCreationException(errorMessage);
             }
 
-            log.info("Http status received from CCD addUserToMultiple API; {}", response.getStatusCodeValue());
+            log.info("Http status received from CCD addUserToMultiple API; {}", response.getStatusCode().value());
         } catch (RestClientResponseException | IOException e) {
             throw (CaseCreationException)
                     new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage())).initCause(e);

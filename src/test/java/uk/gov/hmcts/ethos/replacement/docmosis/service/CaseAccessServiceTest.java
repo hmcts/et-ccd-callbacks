@@ -7,11 +7,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
@@ -42,22 +43,23 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService.CREATOR_ROLE;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class CaseAccessServiceTest {
 
     private List<String> errors;
     private CaseData caseData;
     private CaseDetails caseDetails;
     private CaseAccessService caseAccessService;
-    @MockitoBean
+    @Mock
     private CcdCaseAssignment caseAssignment;
     @Mock
     private RestTemplate restTemplate;
-    @MockitoBean
+    @Mock
     private AdminUserService adminUserService;
-    @MockitoBean
+    @Mock
     private AuthTokenGenerator authTokenGenerator;
-    @MockitoBean
+    @Mock
     private OrganisationClient organisationClient;
 
     @BeforeEach

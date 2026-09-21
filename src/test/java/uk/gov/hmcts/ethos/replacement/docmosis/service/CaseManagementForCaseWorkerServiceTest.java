@@ -12,13 +12,15 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
@@ -98,7 +100,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_DOC_
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.LISTED_DATE_ON_WEEKEND_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.ORGANISATION;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class CaseManagementForCaseWorkerServiceTest {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -127,23 +130,23 @@ class CaseManagementForCaseWorkerServiceTest {
     private CCDRequest manchesterCcdRequest;
     private SubmitEvent submitEvent;
 
-    @MockitoBean
+    @Mock
     private CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
-    @MockitoBean
+    @Mock
     private CcdClient ccdClient;
-    @MockitoBean
+    @Mock
     private ClerkService clerkService;
-    @MockitoBean
+    @Mock
     private FeatureToggleService featureToggleService;
-    @MockitoBean
+    @Mock
     private AdminUserService adminUserService;
-    @MockitoBean
+    @Mock
     private CaseManagementLocationService caseManagementLocationService;
-    @MockitoBean
+    @Mock
     private MultipleReferenceService multipleReferenceService;
-    @MockitoBean
+    @Mock
     private MultipleCasesSendingService multipleCasesSendingService;
-    @MockitoBean
+    @Mock
     private NoticeOfChangeAnswersConverter answersConverter;
 
     @BeforeEach

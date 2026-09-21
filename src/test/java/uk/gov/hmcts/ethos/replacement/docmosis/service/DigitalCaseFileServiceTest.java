@@ -1,180 +1,74 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DigitalCaseFileType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.client.BundleApiClient;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
-import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_TIME_PATTERN;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CASE_FILE;
 
-@ExtendWith(SpringExtension.class)
 class DigitalCaseFileServiceTest {
 
-    @MockitoBean
-    private BundleApiClient bundleApiClient;
-    @Mock
-    private AuthTokenGenerator authTokenGenerator;
-    @Mock
-    private DigitalCaseFilePersistenceService persistenceService;
-    @MockitoBean
-    private DigitalCaseFileService digitalCaseFileService;
-    private CaseData caseData;
-    private CaseDetails caseDetails;
+    private static final String EXPECTED_LINK = "<a target=\"_blank\" href=\"/documents/file/binary\">"
+        + "Digital case file (opens in new tab)</a><br>";
+    private final DigitalCaseFileService service = new DigitalCaseFileService(null, null, null);
 
-    @BeforeEach
-    void setUp() throws URISyntaxException, IOException {
-        digitalCaseFileService = new DigitalCaseFileService(authTokenGenerator, bundleApiClient, persistenceService);
-        caseData = CaseDataBuilder.builder()
-                .withEthosCaseReference("123456/2021")
-                .withDocumentCollection(ET1)
-                .withDocumentCollection(ET1_ATTACHMENT)
-                .build();
-        caseData.getDocumentCollection().get(0).getValue().setDateOfCorrespondence("2000-01-01");
-        caseData.getDocumentCollection().get(1).getValue().setExcludeFromDcf(List.of(YES));
-        caseDetails = new CaseDetails();
-        caseDetails.setCaseData(caseData);
-        caseDetails.setCaseId("1234123412341234");
-        when(bundleApiClient.asyncStitchBundle(any(), any(), any())).thenReturn(ResourceLoader.stitchBundleRequest());
-        when(authTokenGenerator.generate()).thenReturn("authToken");
+    @Test
+    void returnsDigitalCaseFileLink() {
+        CaseData caseData = new CaseData();
+        DigitalCaseFileType dcf = new DigitalCaseFileType();
+        dcf.setUploadedDocument(uploadedDocument());
+        caseData.setDigitalCaseFile(dcf);
+
+        assertThat(service.getReplyToReferralDCFLink(caseData)).isEqualTo(EXPECTED_LINK);
     }
 
     @Test
-    void getReplyToReferralDCFLink_shouldReturnDigitalCaseFile() {
-        DigitalCaseFileType digitalCaseFileType = new DigitalCaseFileType();
-        digitalCaseFileType.setUploadedDocument(new UploadedDocumentType());
-        digitalCaseFileType.getUploadedDocument()
-            .setDocumentBinaryUrl("http://dm-store:8080/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary");
-        caseData.setDigitalCaseFile(digitalCaseFileType);
-
-        String actual = digitalCaseFileService.getReplyToReferralDCFLink(caseData);
-
-        String expected = "<a target=\"_blank\" href=\"/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary\">"
-            + "Digital case file (opens in new tab)</a><br>";
-        assertEquals(expected, actual);
+    void fallsBackToLegacyTribunalCaseFile() {
+        assertThat(service.getReplyToReferralDCFLink(legacyCaseData())).isEqualTo(EXPECTED_LINK);
     }
 
     @Test
-    void getReplyToReferralDCFLink_shouldReturnTribunalCaseFile() {
-        List<DocumentTypeItem> documentTypeItemList = getTribunalCaseFile();
-        caseData.setDocumentCollection(documentTypeItemList);
+    void returnsEmptyWithoutARelevantDocument() {
+        assertThat(service.getReplyToReferralDCFLink(new CaseData())).isEmpty();
 
-        String actual = digitalCaseFileService.getReplyToReferralDCFLink(caseData);
-
-        String expected = "<a target=\"_blank\" href=\"/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary\">"
-            + "Digital case file (opens in new tab)</a><br>";
-        assertEquals(expected, actual);
-    }
-
-    @NotNull
-    private static List<DocumentTypeItem> getTribunalCaseFile() {
-        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
-        uploadedDocumentType.setDocumentBinaryUrl("http://dm-store:8080/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary");
-
-        DocumentType documentType = new DocumentType();
-        documentType.setUploadedDocument(uploadedDocumentType);
-        documentType.setTypeOfDocument(TRIBUNAL_CASE_FILE);
-        documentType.setMiscDocuments(TRIBUNAL_CASE_FILE);
-
-        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
-        documentTypeItem.setValue(documentType);
-
-        List<DocumentTypeItem> documentTypeItemList = new ArrayList<>();
-        documentTypeItemList.add(documentTypeItem);
-        return documentTypeItemList;
+        CaseData caseData = legacyCaseData();
+        caseData.getDocumentCollection().getFirst().getValue().setTypeOfDocument("Other");
+        caseData.getDocumentCollection().getFirst().getValue().setMiscDocuments("Other");
+        assertThat(service.getReplyToReferralDCFLink(caseData)).isEmpty();
     }
 
     @Test
-    void getReplyToReferralDCFLink_shouldReturnEmpty() {
-        String actual = digitalCaseFileService.getReplyToReferralDCFLink(caseData);
-        String expected = "";
-        assertEquals(expected, actual);
+    void returnsEmptyWithoutAnUploadedDocumentOrBinaryUrl() {
+        CaseData caseData = legacyCaseData();
+        caseData.getDocumentCollection().getFirst().getValue().setUploadedDocument(null);
+        assertThat(service.getReplyToReferralDCFLink(caseData)).isEmpty();
+
+        caseData = legacyCaseData();
+        caseData.getDocumentCollection().getFirst().getValue().getUploadedDocument().setDocumentBinaryUrl(null);
+        assertThat(service.getReplyToReferralDCFLink(caseData)).isEmpty();
     }
 
-    @Test
-    void shouldNotThrowNullPointerIfNoFileOrDocs() {
-        caseData.setDigitalCaseFile(null);
-        caseData.setDocumentCollection(null);
-        assertDoesNotThrow(() -> digitalCaseFileService.getReplyToReferralDCFLink(caseData));
+    private CaseData legacyCaseData() {
+        CaseData caseData = new CaseData();
+        DocumentTypeItem document = new DocumentTypeItem();
+        document.setValue(DocumentType.builder()
+            .uploadedDocument(uploadedDocument())
+            .typeOfDocument(TRIBUNAL_CASE_FILE)
+            .miscDocuments(TRIBUNAL_CASE_FILE)
+            .build());
+        caseData.setDocumentCollection(List.of(document));
+        return caseData;
     }
 
-    @Test
-    void createDcf() {
-        caseData.setUploadOrRemoveDcf("Create");
-        assertDoesNotThrow(() -> digitalCaseFileService.createUploadRemoveDcf("authToken", caseDetails));
-        assertEquals("DCF Updating: " + LocalDateTime.now(ZoneId.of("Europe/London")).format(NEW_DATE_TIME_PATTERN),
-                caseData.getDigitalCaseFile().getStatus());
-        assertThat(caseData.getCaseBundles()).hasSize(1);
-
-        verify(persistenceService).start(
-            eq(1_234_123_412_341_234L),
-            same(caseData)
-        );
-        var bundle = caseData.getCaseBundles().getFirst();
-        assertDoesNotThrow(() -> UUID.fromString(bundle.id()));
-        assertThat(bundle.id()).isNotEqualTo(bundle.value().getId());
-        assertThat(bundle.value().getDocuments()).hasSize(1).allSatisfy(document -> {
-            assertDoesNotThrow(() -> UUID.fromString(document.id()));
-            assertThat(document.id()).isNotEqualTo(bundle.id());
-        });
+    private UploadedDocumentType uploadedDocument() {
+        return UploadedDocumentType.builder()
+            .documentBinaryUrl("http://dm-store:8080/documents/file/binary")
+            .build();
     }
-
-    @Test
-    void completeDcf() {
-        caseData.setCaseBundles(digitalCaseFileService.createBundleData(caseData));
-
-        digitalCaseFileService.completeDcf(caseDetails);
-
-        verify(persistenceService).complete(1_234_123_412_341_234L, caseData);
-        assertThat(caseData.getCaseBundles()).isNull();
-    }
-
-    @Test
-    void emptyDcfDocumentType_shouldReturnEmpty() {
-        List<DocumentTypeItem> documentTypeItems = getTribunalCaseFile();
-        documentTypeItems.get(0).getValue().setUploadedDocument(null);
-        caseData.setDocumentCollection(documentTypeItems);
-        assertEquals("", digitalCaseFileService.getReplyToReferralDCFLink(caseData));
-    }
-
-    @Test
-    void emptyBinaryUrl_shouldReturnEmpty() {
-        List<DocumentTypeItem> documentTypeItems = getTribunalCaseFile();
-        documentTypeItems.get(0).getValue().getUploadedDocument().setDocumentBinaryUrl(null);
-        caseData.setDocumentCollection(documentTypeItems);
-        assertEquals("", digitalCaseFileService.getReplyToReferralDCFLink(caseData));
-    }
-
 }

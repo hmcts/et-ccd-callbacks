@@ -3,5 +3,5 @@ CREATE TABLE public.digital_case_file (
         REFERENCES ccd.case_data(reference) ON DELETE CASCADE,
     data JSONB
         CHECK (data IS NULL OR jsonb_typeof(data) = 'object'),
-    active_bundle_id UUID
+    pending_bundle_id UUID
 );

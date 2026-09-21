@@ -29,12 +29,12 @@ public class DigitalCaseFile {
     @Column(columnDefinition = "jsonb")
     private DigitalCaseFileType data;
 
-    @Column(name = "active_bundle_id")
-    private UUID activeBundleId;
+    @Column(name = "pending_bundle_id")
+    private UUID pendingBundleId;
 
     public static DigitalCaseFile create(long caseReference,
                                          DigitalCaseFileType data,
-                                         UUID activeBundleId) {
-        return new DigitalCaseFile(caseReference, data, activeBundleId);
+                                         UUID pendingBundleId) {
+        return new DigitalCaseFile(caseReference, data, pendingBundleId);
     }
 }

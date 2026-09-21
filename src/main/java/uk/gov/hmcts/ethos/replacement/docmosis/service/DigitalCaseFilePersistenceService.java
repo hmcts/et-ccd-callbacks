@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.et.common.model.bundle.Bundle;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.DigitalCaseFileType;
@@ -32,7 +31,6 @@ public class DigitalCaseFilePersistenceService {
         digitalCaseFileRepository.save(DigitalCaseFile.create(caseReference, digitalCaseFile, null, null));
     }
 
-    @Transactional
     public void complete(long caseReference, CaseData caseData) {
         Bundle completedBundle = DigitalCaseFileHelper.findStitchedBundle(caseData).orElse(null);
         if (completedBundle == null) {

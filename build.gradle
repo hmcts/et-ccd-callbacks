@@ -11,7 +11,7 @@ plugins {
     id 'io.freefair.lombok' version '8.14.4'
     id 'org.sonarqube' version '6.3.1.5724'
     id 'pmd'
-    id 'hmcts.ccd.sdk' version '7.2.0'
+    id 'hmcts.ccd.sdk' version '7.3.0'
     id 'com.github.hmcts.rse-cft-lib' version '0.19.2274'
 }
 
@@ -234,7 +234,6 @@ configurations {
 }
 
 test {
-    dependsOn dumpCCDDefinitions
     exclude '**/*ComponentTest*'
     useJUnitPlatform()
     testLogging {
@@ -274,13 +273,6 @@ allprojects {
                 enabled = false
             }
         }
-    }
-}
-
-processTestResources {
-    dependsOn dumpCCDDefinitions
-    from("$buildDir/cftlib/definition-snapshots") {
-        into 'definition-snapshots'
     }
 }
 
@@ -740,7 +732,6 @@ bootJar {
         'et-cos.jar'
     })
 
-    dependsOn dumpCCDDefinitions
     from("$buildDir/cftlib/definition-snapshots") {
         into 'BOOT-INF/classes/definition-snapshots'
     }
@@ -753,8 +744,6 @@ bootJar {
 wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
-
-assemble.dependsOn(dumpCCDDefinitions)
 
 // True when ET_WORK_ALLOCATION=true is set explicitly, or when the bootWithCcdAndWa task is invoked.
 def waEnabled = System.getenv('ET_WORK_ALLOCATION') == 'true'

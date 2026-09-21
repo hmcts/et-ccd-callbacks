@@ -140,6 +140,10 @@ withPipeline(type, product, component) {
     '''
   }
 
+  before('dockerbuild') {
+    sh './gradlew dumpCCDDefinitions'
+  }
+
   // Performance stages are temporarily disabled while their runtime and variability are investigated.
   // enablePerformanceTestStages(timeout: 10, perfTestEnvironments: ['preview','aat','perftest'])
   // enableGatlingLoadTests([

@@ -1,7 +1,7 @@
 apiVersion: v2
 name: et-cos
 home: https://github.com/hmcts/et-ccd-callbacks
-version: 0.0.76
+version: 0.0.77
 description: HMCTS Employment Tribunals CCD Callbacks service
 maintainers:
   - name: HMCTS Employment Tribunals Team
@@ -50,7 +50,7 @@ dependencies:
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: wa.enabled
   - name: servicebus
-    version: ~1.2.1
+    version: ~1.3.0
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: servicebus.enabled
   - name: ccd-message-publisher

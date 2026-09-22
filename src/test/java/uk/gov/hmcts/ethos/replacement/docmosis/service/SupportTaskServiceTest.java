@@ -64,12 +64,10 @@ class SupportTaskServiceTest {
 
     private static SupportTaskConfiguration configuration() {
         SupportTaskConfiguration configuration = new SupportTaskConfiguration();
-        configuration.getReview().setAdminFlagCodes(Set.of("RA0021", "RA0033", "RA0039", "RA0041"));
         configuration.getReview().setLegalOfficerFlagCodes(Set.of("RA0034", "RA0035", "RA0036"));
         configuration.getReview().setJudgeFlagCodes(Set.of("RA0029", "RA0031", "RA0032", "RA0037", "RA0038"));
-        configuration.getReview().setAdminPathFlags(OTHER_REVIEW_PATHS.stream()
-                .map(path -> pathFlag(OTHER_FLAG_CODE, path))
-                .toList());
+        configuration.getReview().setAdminPathFlags(List.of(
+                pathFlag(OTHER_FLAG_CODE, List.of("Party", "Reasonable adjustment"))));
         configuration.getArrange().setFlagTitles(Map.ofEntries(
                 Map.entry("RA0017", "Guidance on how to complete forms"),
                 Map.entry("RA0018", "Support filling in forms"),
@@ -729,7 +727,7 @@ class SupportTaskServiceTest {
         return Stream.of(
             Arguments.of("RA0033", STATUS_ACTIVE),
             Arguments.of("RA0033", null),
-            Arguments.of("RA9999", STATUS_REQUESTED)
+            Arguments.of("XX9999", STATUS_REQUESTED)
         );
     }
 
@@ -750,11 +748,46 @@ class SupportTaskServiceTest {
                 .map(entry -> Arguments.of(entry.getKey(), entry.getValue()));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"RA0003", "RA9999"})
+    void unconfigured_ra_codes_require_admin_review_but_not_arrange(String code) {
+        CaseData data = caseDataWithClaimantFlag(code, STATUS_REQUESTED, false);
+        service.prepareReviewSupportTasks(data);
+        assertEquals(YES, taskState(data).getAdminTaskRequired());
+        assertNull(taskState(data).getJudgeTaskRequired());
+        assertNull(taskState(data).getLegalOfficerTaskRequired());
+        service.prepareReviewSupportRequest(data, EVENT_REVIEW_ADMIN_SUPPORT_REQUEST);
+        assertEquals(1, data.getReviewSupportRequestFlags().size());
+
+        data.getAllPartyFlags().getClaimantFlags().getDetails().getFirst().getValue().setStatus(STATUS_ACTIVE);
+        assertEquals(Set.of(TASK_TYPE_REVIEW_SUPPORT_ADMIN), service.prepareManagedReviewSupportTasks(data, null));
+        service.prepareArrangeSupportTask(data, null);
+        assertNull(taskState(data).getArrangeSupportTaskName());
+    }
+
+    static Stream<Arguments> adminPathPrefixScenarios() {
+        return Stream.of(
+                Arguments.of(List.of("Party", "Reasonable adjustment"), true),
+                Arguments.of(List.of("Party", "Reasonable adjustment", "New category", "Other"), true),
+                Arguments.of(List.of("Party"), false),
+                Arguments.of(List.of("Party", "Other", "Reasonable adjustment"), false),
+                Arguments.of(List.of("Case", "Reasonable adjustment"), false));
+    }
+
+    @ParameterizedTest
+    @MethodSource("adminPathPrefixScenarios")
+    void other_flags_use_reasonable_adjustment_parent_prefix(List<String> path, boolean eligible) {
+        CaseData data = caseDataWithClaimantFlag(OTHER_FLAG_CODE, STATUS_REQUESTED, true, path);
+        service.prepareReviewSupportTasks(data);
+        assertEquals(eligible ? YES : null, taskState(data).getAdminTaskRequired());
+        service.prepareReviewSupportRequest(data, EVENT_REVIEW_ADMIN_SUPPORT_REQUEST);
+        assertEquals(eligible ? 1 : 0, data.getReviewSupportRequestFlags().size());
+    }
+
     static Stream<String> arrangeOnlyFlagCodes() {
         SupportTaskConfiguration config = configuration();
         return config.getArrange().getFlagTitles().keySet().stream()
-                .filter(code -> !config.getReview().getAdminFlagCodes().contains(code)
-                        && !config.getReview().getJudgeFlagCodes().contains(code)
+                .filter(code -> !config.getReview().getJudgeFlagCodes().contains(code)
                         && !config.getReview().getLegalOfficerFlagCodes().contains(code));
     }
 
@@ -825,7 +858,6 @@ class SupportTaskServiceTest {
     @Test
     void arrange_path_fallback_respects_explicit_review_path_mapping() {
         SupportTaskConfiguration config = configuration();
-        config.getReview().setAdminPathFlags(List.of());
         SupportTaskService configuredService = new SupportTaskService(config);
         CaseData data = caseDataWithClaimantFlag(OTHER_FLAG_CODE, STATUS_REQUESTED, false, HELP_WITH_FORMS_PATH);
 

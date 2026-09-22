@@ -340,11 +340,20 @@ public class SupportTaskService {
     }
 
     private Predicate<FlagDetailType> adminReviewFlag() {
-        return eligibleFlag(configuration.getReview().getAdminFlagCodes(),
-                configuration.getReview().getAdminPathFlags())
-                .or(flag -> arrangeTaskName(flag).isPresent()
-                        && !judgeReviewFlag().test(flag)
-                        && !legalOfficerReviewFlag().test(flag));
+        return flag -> !judgeReviewFlag().test(flag) && !legalOfficerReviewFlag().test(flag)
+                && ((flag.getFlagCode() != null && flag.getFlagCode().startsWith("RA"))
+                    || configuration.getReview().getAdminPathFlags().stream()
+                        .anyMatch(pathFlag -> Objects.equals(flag.getFlagCode(), pathFlag.getFlagCode())
+                                && hasPathPrefix(flag, pathFlag.getPath())));
+    }
+
+    private static boolean hasPathPrefix(FlagDetailType flag, List<String> expectedPath) {
+        if (expectedPath.isEmpty() || flag.getPath() == null || flag.getPath().size() < expectedPath.size()) {
+            return false;
+        }
+        List<String> actualPrefix = flag.getPath().stream().limit(expectedPath.size())
+                .map(item -> item == null ? null : item.getValue()).toList();
+        return expectedPath.equals(actualPrefix);
     }
 
     public record ArrangeSupportTask(String flagId, String taskName) {

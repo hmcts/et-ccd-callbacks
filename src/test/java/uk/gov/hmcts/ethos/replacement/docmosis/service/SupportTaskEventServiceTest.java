@@ -148,7 +148,6 @@ class SupportTaskEventServiceTest {
         ObjectMapper mapper = new ObjectMapper();
         final SupportTaskClientContextService contextService = new SupportTaskClientContextService(mapper);
         SupportTaskConfiguration configuration = new SupportTaskConfiguration();
-        configuration.getReview().setAdminFlagCodes(Set.of("RA0039", "RA0041"));
         configuration.getReview().setJudgeFlagCodes(Set.of("RA0037", "RA0038"));
         configuration.getReview().setLegalOfficerFlagCodes(Set.of("RA0034", "RA0035"));
         SupportTaskService taskService = new SupportTaskService(configuration);

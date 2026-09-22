@@ -25,25 +25,14 @@ class SupportTaskConfigurationTest {
 
     @Test
     void loadsFlagCodesFromYaml() {
-        assertThat(configuration.getReview().getAdminFlagCodes())
-                .containsExactlyInAnyOrder("RA0021", "RA0033", "RA0039", "RA0041");
         assertThat(configuration.getReview().getJudgeFlagCodes())
                 .containsExactlyInAnyOrder("RA0029", "RA0031", "RA0032", "RA0037", "RA0038");
         assertThat(configuration.getReview().getLegalOfficerFlagCodes())
                 .containsExactlyInAnyOrder("RA0034", "RA0035", "RA0036");
-        assertThat(configuration.getReview().getAdminPathFlags())
-                .hasSize(7)
-                .allSatisfy(pathFlag -> assertThat(pathFlag.getFlagCode()).isEqualTo("OT0001"));
-        assertThat(configuration.getReview().getAdminPathFlags())
-                .extracting(pathFlag -> pathFlag.getPath().getLast())
-                .containsExactlyInAnyOrder(
-                        "Induction Loop, Infrared Receiver)",
-                        "I need documents in an alternative format",
-                        "I need help with forms",
-                        "I need adjustments to get to, into and around our buildings",
-                        "I need to bring support with me to a hearing",
-                        "I need something to feel comfortable during my hearing",
-                        "I need help communicating and understanding");
+        assertThat(configuration.getReview().getAdminPathFlags()).singleElement().satisfies(pathFlag -> {
+            assertThat(pathFlag.getFlagCode()).isEqualTo("OT0001");
+            assertThat(pathFlag.getPath()).containsExactly("Party", "Reasonable adjustment");
+        });
 
         assertThat(configuration.getArrange().getFlagTitles())
                 .containsEntry("RA0017", "Guidance on how to complete forms")

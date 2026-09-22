@@ -5,49 +5,11 @@ support-tasks:
     multiplier: 2
     max-backoff-ms: 1000
   review:
-    admin-flag-codes:
-      - RA0021
-      - RA0033
-      - RA0039
-      - RA0041
     admin-path-flags:
       - flag-code: OT0001
         path:
           - Party
           - Reasonable adjustment
-          - I need help communicating and understanding
-          - Hearing Enhancement System (Hearing
-          - Induction Loop, Infrared Receiver)
-      - flag-code: OT0001
-        path:
-          - Party
-          - Reasonable adjustment
-          - I need documents in an alternative format
-      - flag-code: OT0001
-        path:
-          - Party
-          - Reasonable adjustment
-          - I need help with forms
-      - flag-code: OT0001
-        path:
-          - Party
-          - Reasonable adjustment
-          - I need adjustments to get to, into and around our buildings
-      - flag-code: OT0001
-        path:
-          - Party
-          - Reasonable adjustment
-          - I need to bring support with me to a hearing
-      - flag-code: OT0001
-        path:
-          - Party
-          - Reasonable adjustment
-          - I need something to feel comfortable during my hearing
-      - flag-code: OT0001
-        path:
-          - Party
-          - Reasonable adjustment
-          - I need help communicating and understanding
     judge-flag-codes:
       - RA0029
       - RA0031

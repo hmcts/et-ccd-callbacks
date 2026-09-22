@@ -22,7 +22,6 @@ public class SupportTaskConfiguration {
 
     @Data
     public static class Review {
-        private Set<String> adminFlagCodes = Set.of();
         private Set<String> legalOfficerFlagCodes = Set.of();
         private Set<String> judgeFlagCodes = Set.of();
         private List<PathFlag> adminPathFlags = List.of();

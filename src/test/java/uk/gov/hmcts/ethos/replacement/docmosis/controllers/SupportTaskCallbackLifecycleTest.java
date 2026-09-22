@@ -136,7 +136,6 @@ class SupportTaskCallbackLifecycleTest {
     @BeforeEach
     void setUp() {
         SupportTaskConfiguration configuration = new SupportTaskConfiguration();
-        configuration.getReview().setAdminFlagCodes(Set.of(ADMIN_CODE));
         configuration.getReview().setJudgeFlagCodes(Set.of(JUDGE_CODE));
         configuration.getReview().setLegalOfficerFlagCodes(Set.of(LO_CODE));
         configuration.getArrange().setFlagTitles(Map.of(ADMIN_CODE, LIP_SPEAKER, JUDGE_CODE, "Intermediary"));

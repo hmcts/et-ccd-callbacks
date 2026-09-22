@@ -269,6 +269,7 @@ template:
     claimantRepresentative:
       selfRemoval:
         orgAdmin: ${CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID:6d53b5ec-9247-4abe-b48a-c796ee66fe92}
+        representative: ${CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_REP_TEMPLATE_ID:fe52b39f-852c-43ca-a42a-b9a27c43b130}
 
 etcos:
   system:

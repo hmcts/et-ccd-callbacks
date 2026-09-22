@@ -132,6 +132,8 @@ public final class NOCConstants {
             "Invalid parameters(orgId, caseId, nocType). Unable to resolve organisation's superuser email Case id: {}";
     public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION =
             "Failed to send NOC notification email to organisation admin, case id: {}, error: {}";
+    public static final String WARNING_ORGANISATION_ADMIN_EMAIL_NOT_FOUND =
+            "Organisation admin email not found";
     public static final String WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_TRIBUNAL_FOR_RESPONDENT_REP_UPDATE =
             "Invalid case details. Unable to notify tribunal for respondent representative update. Case id: {}, "
                     + NOC_TYPE;

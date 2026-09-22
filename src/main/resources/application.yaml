@@ -264,6 +264,12 @@ template:
     et1ProfessionalSubmission: ${ET1_PROFESSIONAL_SUBMISSION_TEMPLATE_ID:ec815e00-39b0-4711-8b24-614ea1f2de89}
     submitCaseEmailTemplateId: ${SUBMIT_CASE_EMAIL_TEMPLATE_ID:7b1f33eb-31c5-4a00-b1a4-c1bca84bc441}
     cySubmitCaseEmailTemplateId: ${CY_SUBMIT_CASE_EMAIL_TEMPLATE_ID:7b1f33eb-31c5-4a00-b1a4-c1bca84bc441}
+
+  removeRepresentationNotifications:
+    claimantRepresentative:
+      selfRemoval:
+        orgAdmin: ${CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID:6d53b5ec-9247-4abe-b48a-c796ee66fe92}
+
 etcos:
   system:
     username: ${ET_COS_SYSTEM_USER}

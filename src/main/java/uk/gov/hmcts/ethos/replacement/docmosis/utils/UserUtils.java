@@ -46,10 +46,44 @@ public final class UserUtils {
                 && !StringUtils.isBlank(userDetails.getEmail());
     }
 
+    /**
+     * Determines whether the given user is the lead claimant representative.
+     * <p>
+     * The user is considered the lead claimant representative when both the user details
+     * and claimant representative details contain the required information, and the user's
+     * email address matches the claimant representative's email address, ignoring case.
+     * </p>
+     *
+     * @param userDetails the user details to validate and compare
+     * @param claimantRepresentative the claimant representative details to validate and compare
+     * @return {@code true} if the user is the lead claimant representative; otherwise {@code false}
+     */
     public static boolean isLeadClaimantRepresentative(UserDetails userDetails,
                                                        RepresentedTypeC claimantRepresentative) {
         return hasRequiredUserDetails(userDetails)
                 && ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(claimantRepresentative)
                 && Strings.CI.equals(userDetails.getEmail(), claimantRepresentative.getRepresentativeEmailAddress());
+    }
+
+    /**
+     * Resolves a display name for the given user details.
+     * <p>
+     * If {@link UserDetails#getName()} contains a non-blank value, it is returned.
+     * Otherwise, the display name is constructed from the user's first and last names,
+     * ignoring any blank values.
+     * </p>
+     *
+     * @param userDetails the user details used to resolve the display name
+     * @return the resolved display name, or an empty string if no name information is available
+     */
+    public static String resolveUserDisplayName(UserDetails userDetails) {
+        if (StringUtils.isNotBlank(userDetails.getName())) {
+            return userDetails.getName();
+        }
+
+        String firstName = StringUtils.trimToEmpty(userDetails.getFirstName());
+        String lastName = StringUtils.trimToEmpty(userDetails.getLastName());
+
+        return StringUtils.joinWith(StringUtils.SPACE, firstName, lastName).trim();
     }
 }

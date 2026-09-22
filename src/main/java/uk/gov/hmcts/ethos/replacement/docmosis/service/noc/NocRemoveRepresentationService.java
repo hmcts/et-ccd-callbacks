@@ -9,7 +9,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UserUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
@@ -26,9 +25,25 @@ public class NocRemoveRepresentationService {
 
     private final NocCcdService nocCcdService;
     private final AdminUserService adminUserService;
-    private final UserIdamService userIdamService;
 
-    public void setNocRemoveOption(String userToken, CaseDetails caseDetails) throws GenericServiceException {
+    /**
+     * Sets the notice of change removal option based on the user's relationship
+     * to the claimant representative organisation.
+     * <p>
+     * If the user is the lead claimant representative, the removal option is set
+     * to remove the organisation. Otherwise, the option is set to remove only the
+     * current representative.
+     * </p>
+     * <p>
+     * The case details are validated before updating the case data. If the case
+     * details are invalid, a {@link GenericServiceException} is thrown.
+     * </p>
+     *
+     * @param userDetails the authenticated user's details used to determine the removal option
+     * @param caseDetails the case details containing the claimant representative information
+     * @throws GenericServiceException if the supplied case details are invalid
+     */
+    public void setNocRemoveOption(UserDetails userDetails, CaseDetails caseDetails) throws GenericServiceException {
         final String methodName = "setNocRemoveOption";
         if (!CaseDataUtils.areCaseDetailsValid(caseDetails)) {
             throw new GenericServiceException(INVALID_CASE_DETAILS,
@@ -38,7 +53,6 @@ public class NocRemoveRepresentationService {
                     NocRemoveRepresentationService.class.getSimpleName(),
                     methodName);
         }
-        UserDetails userDetails = userIdamService.getUserDetails(userToken);
         caseDetails.getCaseData().setNocRemoveOption(
                 UserUtils.isLeadClaimantRepresentative(userDetails,
                         caseDetails.getCaseData().getRepresentativeClaimantType())

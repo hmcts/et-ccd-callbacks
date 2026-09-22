@@ -52,12 +52,17 @@ public final class DigitalCaseFileHelper {
      * @param caseData data
      */
     public static void addDcfToDocumentCollection(BaseCaseData caseData) {
-        Optional<Bundle> stitchedFile = emptyIfNull(caseData.getCaseBundles())
-                .stream()
-                .filter(bundle -> List.of(DONE, FAILED).contains(bundle.value().getStitchStatus()))
-                .findFirst();
-        stitchedFile.ifPresent(bundle -> caseData.setDigitalCaseFile(
-                createTribunalCaseFile(caseData, bundle.value())));
+        findStitchedBundle(caseData).ifPresent(bundle -> addDcfToDocumentCollection(caseData, bundle));
+    }
+
+    public static void addDcfToDocumentCollection(BaseCaseData caseData, Bundle bundle) {
+        caseData.setDigitalCaseFile(createTribunalCaseFile(caseData, bundle.value()));
+    }
+
+    public static Optional<Bundle> findStitchedBundle(BaseCaseData caseData) {
+        return emptyIfNull(caseData.getCaseBundles()).stream()
+            .filter(bundle -> List.of(DONE, FAILED).contains(bundle.value().getStitchStatus()))
+            .findFirst();
     }
 
     private static DigitalCaseFileType createTribunalCaseFile(BaseCaseData caseData,

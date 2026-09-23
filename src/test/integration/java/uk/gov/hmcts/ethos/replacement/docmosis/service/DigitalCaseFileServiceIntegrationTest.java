@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConfiguration;
@@ -22,6 +23,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
+import uk.gov.hmcts.ccd.sdk.CaseViewRequest;
 import uk.gov.hmcts.ccd.sdk.config.DecentralisedDataConfiguration;
 import uk.gov.hmcts.et.common.model.bundle.Bundle;
 import uk.gov.hmcts.et.common.model.bundle.BundleDetails;
@@ -32,6 +34,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DigitalCaseFileType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.ETCaseView;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.EtCosPostgresqlContainer;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.DigitalCaseFileRepository;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -48,7 +51,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
 @Import({DecentralisedDataConfiguration.class, DigitalCaseFileService.class,
-    DigitalCaseFilePersistenceService.class, DigitalCaseFileServiceIntegrationTest.TestConfig.class})
+    DigitalCaseFilePersistenceService.class, ETCaseView.class,
+    DigitalCaseFileServiceIntegrationTest.TestConfig.class})
 @ImportAutoConfiguration({FeignAutoConfiguration.class, HttpMessageConvertersAutoConfiguration.class})
 class DigitalCaseFileServiceIntegrationTest {
 
@@ -62,6 +66,9 @@ class DigitalCaseFileServiceIntegrationTest {
 
     @Autowired
     private DigitalCaseFileService service;
+
+    @Autowired
+    private ETCaseView caseView;
 
     @Autowired
     private DigitalCaseFileRepository repository;
@@ -130,6 +137,35 @@ class DigitalCaseFileServiceIntegrationTest {
         assertThat(storedDcf.getData()).isEqualTo(caseData.getDigitalCaseFile());
         assertThat(storedDcf.getPendingBundleId()).isNull();
         assertThat(caseData.getCaseBundles()).isNull();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"DONE", "FAILED"})
+    void completesUsingOnlyTheProjectedPendingBundle(String status) throws InterruptedException {
+        CaseData started = start();
+        String pendingId = started.getCaseBundles().getFirst().value().getId();
+        flushAndClear();
+
+        // EM starts asyncStitchingComplete using a projected case, matches value.id,
+        // then adds the status and document from the stitching result.
+        CaseData projected = caseView.getCase(new CaseViewRequest<>(CASE_REFERENCE, null), new CaseData());
+        Bundle pending = projected.getCaseBundles().getFirst();
+        assertThat(pending.value().getId()).isEqualTo(pendingId);
+        assertThat(pending.value().getDocuments()).isNull();
+        projected.setCaseBundles(List.of(completedBundle(pending, status)));
+
+        service.completeDcf(caseDetails(projected));
+        flushAndClear();
+
+        var stored = repository.findById(CASE_REFERENCE).orElseThrow();
+        assertThat(stored.getData()).isEqualTo(projected.getDigitalCaseFile());
+        assertThat(stored.getPendingBundleId()).isNull();
+        assertThat(projected.getDigitalCaseFile().getStatus())
+            .startsWith("DONE".equals(status) ? "DCF Generated:" : "DCF Failed to generate:");
+        assertThat(projected.getCaseBundles()).isNull();
+        CaseData refreshed = caseView.getCase(new CaseViewRequest<>(CASE_REFERENCE, null), started);
+        assertThat(refreshed.getCaseBundles()).isNull();
+        assertThat(refreshed.getDigitalCaseFile()).isEqualTo(stored.getData());
     }
 
     @ParameterizedTest

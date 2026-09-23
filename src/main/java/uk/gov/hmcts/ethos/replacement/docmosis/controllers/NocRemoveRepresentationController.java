@@ -19,7 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveRepNotificationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveClaimantRepNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveRepresentationService;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class NocRemoveRepresentationController {
 
     private final UserService userService;
     private final NocRemoveRepresentationService nocRemoveRepresentationService;
-    private final NocRemoveRepNotificationService nocRemoveRepNotificationService;
+    private final NocRemoveClaimantRepNotificationService nocRemoveClaimantRepNotificationService;
 
     @PostMapping(value = "/claimant/aboutToStart", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "nocRemoveRep claimant about to submit page")
@@ -81,7 +81,8 @@ public class NocRemoveRepresentationController {
             UserDetails userDetails = userService.getValidatedUserDetails(userToken, caseDetails.getCaseId());
             nocRemoveRepresentationService.setNocRemoveOption(userDetails, caseDetails);
             nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails);
-            nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails, caseDetails);
+            nocRemoveClaimantRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails,
+                    caseDetails);
             caseDetails.getCaseData().setNocRemoveOption(null);
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());

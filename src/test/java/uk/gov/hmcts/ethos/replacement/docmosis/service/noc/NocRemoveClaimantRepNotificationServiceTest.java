@@ -33,14 +33,14 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_YOURSELF;
 
 @ExtendWith(SpringExtension.class)
-class NocRemoveRepNotificationServiceTest {
+class NocRemoveClaimantRepNotificationServiceTest {
     @Mock
     private EmailService emailService;
     @Mock
     private NocNotificationService nocNotificationService;
 
     @InjectMocks
-    private NocRemoveRepNotificationService nocRemoveRepNotificationService;
+    private NocRemoveClaimantRepNotificationService nocRemoveClaimantRepNotificationService;
 
     private CaseDetails caseDetails;
 
@@ -51,19 +51,27 @@ class NocRemoveRepNotificationServiceTest {
     private static final String USER_ID = "6281d99e-1a94-4369-870e-9f527801d913";
     private static final String USER_EMAIL = "user@example.com";
     private static final String USER_NAME = "John Smith";
-    private static final String CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID =
-            "6d53b5ec-9247-4abe-b48a-c796ee66fe92";
+    private static final String DUMMY_NOC_REMOVE_OPTION = "dummyNocRemoveOption";
+
     private static final String CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID_FIELD =
             "claimantRepresentativeSelfRemovalOrgAdminTemplateId";
-    private static final String CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_REPRESENTATIVE_TEMPLATE_ID =
+    private static final String CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID =
+            "6d53b5ec-9247-4abe-b48a-c796ee66fe92";
+    private static final String CLAIMANT_REPRESENTATIVE_ORGANISATION_REMOVAL_ORG_ADMIN_TEMPLATE_ID_FIELD =
+            "claimantRepresentativeOrganisationRemovalOrgAdminTemplateId";
+    private static final String CLAIMANT_REPRESENTATIVE_ORGANISATION_REMOVAL_ORG_ADMIN_TEMPLATE_ID =
+            "039c5bc5-f2a7-4ba0-b217-ef493c582d2e";
+    private static final String CLAIMANT_REPRESENTATIVE_REMOVAL_REPRESENTATIVE_TEMPLATE_ID_FIELD =
+            "claimantRepresentativeRemovalRepTemplateId";
+    private static final String CLAIMANT_REPRESENTATIVE_REMOVAL_REPRESENTATIVE_TEMPLATE_ID =
             "fe52b39f-852c-43ca-a42a-b9a27c43b130";
-    private static final String CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_REPRESENTATIVE_TEMPLATE_ID_FIELD =
-            "claimantRepresentativeSelfRemovalRepTemplateId";
 
     private static final String EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION =
             "Failed to send NOC notification email to organisation admin, case id: 1775651960650043, error: ";
     private static final String EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_REPRESENTATIVE =
             "Failed to send NOC notification email to representative, case id: 1775651960650043, error: ";
+    private static final String EXPECTED_WARNING_INVALID_REMOVE_OPTION =
+            "Invalid remove option, case id: 1775651960650043, remove option: " + DUMMY_NOC_REMOVE_OPTION;
 
     private static final String ERROR_ORGANISATION_ADMIN_EMAIL_NOT_FOUND = "Organisation admin email not found";
     private static final String ERROR_SYSTEM = "System error";
@@ -71,14 +79,18 @@ class NocRemoveRepNotificationServiceTest {
     @BeforeEach
     @SneakyThrows
     void setUp() {
-        ReflectionTestUtils.setField(nocRemoveRepNotificationService,
+        ReflectionTestUtils.setField(nocRemoveClaimantRepNotificationService,
                 CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID_FIELD,
                 CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID);
-        ReflectionTestUtils.setField(nocRemoveRepNotificationService,
-                CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_REPRESENTATIVE_TEMPLATE_ID_FIELD,
-                CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_REPRESENTATIVE_TEMPLATE_ID);
+        ReflectionTestUtils.setField(nocRemoveClaimantRepNotificationService,
+                CLAIMANT_REPRESENTATIVE_ORGANISATION_REMOVAL_ORG_ADMIN_TEMPLATE_ID_FIELD,
+                CLAIMANT_REPRESENTATIVE_ORGANISATION_REMOVAL_ORG_ADMIN_TEMPLATE_ID);
+        ReflectionTestUtils.setField(nocRemoveClaimantRepNotificationService,
+                CLAIMANT_REPRESENTATIVE_REMOVAL_REPRESENTATIVE_TEMPLATE_ID_FIELD,
+                CLAIMANT_REPRESENTATIVE_REMOVAL_REPRESENTATIVE_TEMPLATE_ID);
+
         caseDetails = generateCaseDetails();
-        LoggerTestUtils.initializeLogger(NocRemoveRepNotificationService.class);
+        LoggerTestUtils.initializeLogger(NocRemoveClaimantRepNotificationService.class);
     }
 
     private CaseDetails generateCaseDetails() throws URISyntaxException, IOException {
@@ -96,44 +108,52 @@ class NocRemoveRepNotificationServiceTest {
         userDetails.setName(USER_NAME);
         when(nocNotificationService.findClaimantRepOrgSuperUserEmail(caseDetails.getCaseData()
                 .getRepresentativeClaimantType())).thenReturn(ORG_ADMIN_EMAIL);
+        // when noc remove option is not valid should log warning and return without sending any notification
+        caseDetails.getCaseData().setNocRemoveOption(DUMMY_NOC_REMOVE_OPTION);
+        nocRemoveClaimantRepNotificationService
+                .sendClaimantRepresentativeRemovalNotifications(userDetails, caseDetails);
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE, EXPECTED_WARNING_INVALID_REMOVE_OPTION);
         // when noc remove option is yourself should send claimant representative self removal org admin notification
         caseDetails.getCaseData().setNocRemoveOption(NOC_REMOVE_OPTION_YOURSELF);
         doNothing().when(emailService).sendEmail(eq(CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID),
                 eq(ORG_ADMIN_EMAIL), anyMap());
-        nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails, caseDetails);
+        nocRemoveClaimantRepNotificationService
+                .sendClaimantRepresentativeRemovalNotifications(userDetails, caseDetails);
         verify(emailService, times(LoggerTestUtils.INTEGER_ONE)).sendEmail(
                 eq(CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID), eq(ORG_ADMIN_EMAIL), anyMap());
         verify(emailService, times(LoggerTestUtils.INTEGER_ONE)).sendEmail(
-                eq(CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_REPRESENTATIVE_TEMPLATE_ID), eq(USER_EMAIL), anyMap());
-        // when noc remove option is organisation should not send claimant representative self removal org admin
-        // notification
-        caseDetails.getCaseData().setNocRemoveOption(NOC_REMOVE_OPTION_ORGANISATION);
-        nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails, caseDetails);
-        verify(emailService, times(LoggerTestUtils.INTEGER_ONE)).sendEmail(
-                eq(CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID), eq(ORG_ADMIN_EMAIL), anyMap());
-        verify(emailService, times(LoggerTestUtils.INTEGER_ONE)).sendEmail(
-                eq(CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_REPRESENTATIVE_TEMPLATE_ID), eq(USER_EMAIL), anyMap());
+                eq(CLAIMANT_REPRESENTATIVE_REMOVAL_REPRESENTATIVE_TEMPLATE_ID), eq(USER_EMAIL), anyMap());
     }
 
     @Test
     void theSendClaimantRepresentativeSelfRemovalOrgAdminNotification() {
-        // when organisation admin email is blank, should log a warning and not send email
-        nocRemoveRepNotificationService.sendClaimantRepresentativeSelfRemovalOrgAdminNotification(caseDetails,
+        // when organisation admin email is blank, should log organisation admin email not found warning
+        nocRemoveClaimantRepNotificationService.sendClaimantRepresentativeRemovalOrgAdminNotification(caseDetails,
                 StringUtils.EMPTY, REPRESENTATIVE_NAME);
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
                 EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION
                         + ERROR_ORGANISATION_ADMIN_EMAIL_NOT_FOUND);
-        // when email is successfully sent, should invoke sendEmail at least once
-        nocRemoveRepNotificationService.sendClaimantRepresentativeSelfRemovalOrgAdminNotification(caseDetails,
+        // when org admin email is valid and noc removal type is yourself, should invoke sendEmail with claimant
+        // representative self removal org admin template id
+        caseDetails.getCaseData().setNocRemoveOption(NOC_REMOVE_OPTION_YOURSELF);
+        nocRemoveClaimantRepNotificationService.sendClaimantRepresentativeRemovalOrgAdminNotification(caseDetails,
                 ORG_ADMIN_EMAIL, REPRESENTATIVE_NAME);
         verify(emailService, times(LoggerTestUtils.INTEGER_ONE))
                 .sendEmail(eq(CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID), eq(ORG_ADMIN_EMAIL),
                         anyMap());
-        // when email sending fails, should log a warning
+        // when org admin email is valid and noc removal type is organisation, should invoke sendEmail with claimant
+        // representative organisation removal org admin template id
+        caseDetails.getCaseData().setNocRemoveOption(NOC_REMOVE_OPTION_ORGANISATION);
+        nocRemoveClaimantRepNotificationService.sendClaimantRepresentativeRemovalOrgAdminNotification(caseDetails,
+                ORG_ADMIN_EMAIL, REPRESENTATIVE_NAME);
+        verify(emailService, times(LoggerTestUtils.INTEGER_ONE))
+                .sendEmail(eq(CLAIMANT_REPRESENTATIVE_ORGANISATION_REMOVAL_ORG_ADMIN_TEMPLATE_ID), eq(ORG_ADMIN_EMAIL),
+                        anyMap());
+        // when email sending fails, should log failed to send noc notification email, organisation warning
         doThrow(new RuntimeException(ERROR_SYSTEM))
-                .when(emailService).sendEmail(eq(CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID),
+                .when(emailService).sendEmail(eq(CLAIMANT_REPRESENTATIVE_ORGANISATION_REMOVAL_ORG_ADMIN_TEMPLATE_ID),
                         eq(ORG_ADMIN_EMAIL), anyMap());
-        nocRemoveRepNotificationService.sendClaimantRepresentativeSelfRemovalOrgAdminNotification(caseDetails,
+        nocRemoveClaimantRepNotificationService.sendClaimantRepresentativeRemovalOrgAdminNotification(caseDetails,
                 ORG_ADMIN_EMAIL, REPRESENTATIVE_NAME);
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_TWO,
                 EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION + ERROR_SYSTEM);
@@ -142,15 +162,17 @@ class NocRemoveRepNotificationServiceTest {
     @Test
     void theSendClaimantRepresentativeSelfRemovalRepNotification() {
         // when email is successfully sent, should invoke sendEmail at least once
-        nocRemoveRepNotificationService.sendClaimantRepresentativeSelfRemovalRepNotification(caseDetails, USER_EMAIL);
+        nocRemoveClaimantRepNotificationService.sendClaimantRepresentativeRemovalRepNotification(caseDetails,
+                USER_EMAIL);
         verify(emailService, times(LoggerTestUtils.INTEGER_ONE))
-                .sendEmail(eq(CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_REPRESENTATIVE_TEMPLATE_ID), eq(USER_EMAIL),
+                .sendEmail(eq(CLAIMANT_REPRESENTATIVE_REMOVAL_REPRESENTATIVE_TEMPLATE_ID), eq(USER_EMAIL),
                         anyMap());
         // when email sending fails, should log a warning
         doThrow(new RuntimeException(ERROR_SYSTEM))
-                .when(emailService).sendEmail(eq(CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_REPRESENTATIVE_TEMPLATE_ID),
+                .when(emailService).sendEmail(eq(CLAIMANT_REPRESENTATIVE_REMOVAL_REPRESENTATIVE_TEMPLATE_ID),
                         eq(USER_EMAIL), anyMap());
-        nocRemoveRepNotificationService.sendClaimantRepresentativeSelfRemovalRepNotification(caseDetails, USER_EMAIL);
+        nocRemoveClaimantRepNotificationService.sendClaimantRepresentativeRemovalRepNotification(caseDetails,
+                USER_EMAIL);
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
                 EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_REPRESENTATIVE + ERROR_SYSTEM);
     }

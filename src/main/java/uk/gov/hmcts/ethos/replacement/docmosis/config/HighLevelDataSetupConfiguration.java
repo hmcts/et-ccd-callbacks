@@ -74,7 +74,7 @@ public class HighLevelDataSetupConfiguration extends DataLoaderToDefinitionStore
 
     @Override
     protected boolean shouldTolerateDataSetupFailure() {
-        return true;
+        return false;
     }
 
     @Override

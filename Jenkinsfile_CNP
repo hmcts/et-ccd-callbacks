@@ -110,7 +110,7 @@ withPipeline(type, product, component) {
   env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
   loadVaultSecrets(secrets)
   disableSmokeTestSecrets()
-//  enableHighLevelDataSetup()
+  enableHighLevelDataSetup('ccd')
   enableAksStagingDeployment()
   onMaster {
     disableLegacyDeployment()
@@ -309,32 +309,11 @@ withPipeline(type, product, component) {
       }
     }
   }
-//  env.ENVIRONMENT = "prod"
-//  env.ET_COS_URL = "http://et-cos-prod.service.core-compute-prod.internal"
-//  env.CCD_DEF_URL = "http://ccd-data-store-api-prod.service.core-compute-prod.internal"
-//  env.CCD_DEF_AAC_URL = "http://aac-manage-case-assignment-prod.service.core-compute-prod.internal"
-//
-//  onDemo {
-//    env.ENVIRONMENT = "demo"
-//  }
-//  onPerftest {
-//    env.ENVIRONMENT = "perftest"
-//  }
-//  onIthc {
-//    env.ENVIRONMENT = "ithc"
-//  }
-//  onMaster {
-//    env.ENVIRONMENT = "aat"
-//  }
-//
-//  before('highleveldatasetup') {
-//    stageWithAgent('Generate ET CCD configs - all', product) {
-//      yarnBuilder.yarn('install')
-//      onPR{
-//        yarnBuilder.yarn('generate-excel:preview' + " ${CHANGE_ID}")
-//      }
-//      yarnBuilder.yarn('generate-excel:all-envs')
-//    }
-//    steps.archiveArtifacts artifacts: "ccd-definitions/dist/**"
-//  }
+  before('highleveldatasetup') {
+    dir('ccd-definitions') {
+      sh 'yarn install --immutable'
+      sh "yarn generate-excel:${env.DEPLOYMENT_ENVIRONMENT}"
+    }
+    steps.archiveArtifacts artifacts: "ccd-definitions/dist/${env.DEPLOYMENT_ENVIRONMENT}/**"
+  }
 }

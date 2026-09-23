@@ -3,11 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.domain.digitalcasefile;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import uk.gov.hmcts.ccd.sdk.api.CCDConfig;
-import uk.gov.hmcts.ccd.sdk.json.JsonBackedCCDConfig;
-import uk.gov.hmcts.ccd.sdk.json.JsonCCDConfigSupport;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.ccd.sdk.testing.CcdEventTestSupport;
 import uk.gov.hmcts.ccd.sdk.testing.CcdSdkTest;
 import uk.gov.hmcts.et.common.model.bundle.Bundle;
@@ -16,7 +12,7 @@ import uk.gov.hmcts.et.common.model.bundle.DocumentLink;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.DigitalCaseFileType;
 import uk.gov.hmcts.ethos.replacement.docmosis.client.BundleApiClient;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.EtJsonCcdConfig.PlaceholderRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.EtJsonCcdConfig;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.JacksonConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.ETCaseView;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.CaseState;
@@ -32,13 +28,11 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
 @CcdSdkTest(
-    components = {JacksonConfiguration.class,
-        AsyncStitchingCompleteEventIntegrationTest.TestConfig.class,
+    components = {EtJsonCcdConfig.class, JacksonConfiguration.class,
         AsyncStitchingCompleteEvent.class, ETCaseView.class,
         DigitalCaseFileService.class, DigitalCaseFilePersistenceService.class},
     repositories = {DigitalCaseFileRepository.class, HubLinkStatusRepository.class},
@@ -51,6 +45,12 @@ class AsyncStitchingCompleteEventIntegrationTest {
 
     @Autowired
     private DigitalCaseFileRepository digitalCaseFileRepository;
+
+    @MockitoBean
+    private BundleApiClient bundleApiClient;
+
+    @MockitoBean
+    private AuthTokenGenerator authTokenGenerator;
 
     @ParameterizedTest
     @ValueSource(strings = {ENGLANDWALES_CASE_TYPE_ID, SCOTLAND_CASE_TYPE_ID})
@@ -92,31 +92,5 @@ class AsyncStitchingCompleteEventIntegrationTest {
         assertThat(storedDcf.getData().getStatus()).startsWith("DCF Generated:");
         assertThat(storedDcf.getData().getUploadedDocument().getDocumentFilename())
             .isEqualTo("generated.pdf");
-    }
-
-    @TestConfiguration(proxyBeanMethods = false)
-    static class TestConfig {
-
-        @Bean
-        CCDConfig<CaseData, CaseState, PlaceholderRole> englandWalesJson(JsonCCDConfigSupport support) {
-            return new JsonBackedCCDConfig<CaseData, CaseState, PlaceholderRole>(support,
-                ENGLANDWALES_CASE_TYPE_ID, "file:ccd-definitions/jurisdictions/england-wales/json") { };
-        }
-
-        @Bean
-        CCDConfig<CaseData, CaseState, PlaceholderRole> scotlandJson(JsonCCDConfigSupport support) {
-            return new JsonBackedCCDConfig<CaseData, CaseState, PlaceholderRole>(support,
-                SCOTLAND_CASE_TYPE_ID, "file:ccd-definitions/jurisdictions/scotland/json") { };
-        }
-
-        @Bean
-        BundleApiClient bundleApiClient() {
-            return mock(BundleApiClient.class);
-        }
-
-        @Bean
-        AuthTokenGenerator authTokenGenerator() {
-            return mock(AuthTokenGenerator.class);
-        }
     }
 }

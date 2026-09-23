@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain.notifications.respondent;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.ccd.sdk.testing.CcdEventTestSupport;
 import uk.gov.hmcts.ccd.sdk.testing.CcdSdkTest;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.HubLinkStat
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
 @CcdSdkTest(
     components = {EtJsonCcdConfig.class, ViewAllNotificationsEvent.class, ETCaseView.class,
@@ -26,19 +28,20 @@ class ViewAllNotificationsEventIntegrationTest {
     @Autowired
     private CcdEventTestSupport<CaseData, CaseState> events;
 
-    @Test
-    void submittingViewDoesNotChangeStoredCaseData() {
-        var englandWales = events.forCaseType(ENGLANDWALES_CASE_TYPE_ID);
+    @ParameterizedTest
+    @ValueSource(strings = {ENGLANDWALES_CASE_TYPE_ID, SCOTLAND_CASE_TYPE_ID})
+    void submittingViewDoesNotChangeStoredCaseData(String caseTypeId) {
+        var cases = events.forCaseType(caseTypeId);
         CaseData stored = new CaseData();
         stored.setEthosCaseReference("1234/2026");
-        long reference = englandWales.seed(CaseState.Accepted, stored);
-        final var before = englandWales.snapshot(reference);
+        long reference = cases.seed(CaseState.Accepted, stored);
+        final var before = cases.snapshot(reference);
 
         CaseData submitted = new CaseData();
         submitted.setEthosCaseReference("1234/2026");
         submitted.setPseViewNotifications("Rendered notifications");
-        englandWales.event(reference, ViewAllNotificationsEvent.EVENT_ID, submitted).submitExpectingSuccess();
-        var laterResult = englandWales.event(reference, ViewAllNotificationsEvent.EVENT_ID, submitted)
+        cases.event(reference, ViewAllNotificationsEvent.EVENT_ID, submitted).submitExpectingSuccess();
+        var laterResult = cases.event(reference, ViewAllNotificationsEvent.EVENT_ID, submitted)
             .atRevision(0).submitExpectingSuccess();
 
         assertThat(laterResult.projectedCase().getPseViewNotifications()).isNull();

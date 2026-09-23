@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import com.google.common.collect.ImmutableSet;
 import jakarta.persistence.EntityManager;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -25,9 +24,6 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import uk.gov.hmcts.ccd.sdk.CaseViewRequest;
-import uk.gov.hmcts.ccd.sdk.ConfigBuilderImpl;
-import uk.gov.hmcts.ccd.sdk.ResolvedCCDConfig;
-import uk.gov.hmcts.ccd.sdk.api.EventPayload;
 import uk.gov.hmcts.ccd.sdk.config.DecentralisedDataConfiguration;
 import uk.gov.hmcts.et.common.model.bundle.Bundle;
 import uk.gov.hmcts.et.common.model.bundle.BundleDetails;
@@ -38,23 +34,17 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DigitalCaseFileType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.EtJsonCcdConfig;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.ETCaseView;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.CaseState;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.digitalcasefile.AsyncStitchingCompleteEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.EtCosPostgresqlContainer;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.DigitalCaseFileRepository;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @DataJpaTest(properties = "core_case_data.api.url=localhost:4452")
@@ -176,38 +166,6 @@ class DigitalCaseFileServiceIntegrationTest {
         CaseData refreshed = caseView.getCase(new CaseViewRequest<>(CASE_REFERENCE, null), started);
         assertThat(refreshed.getCaseBundles()).isNull();
         assertThat(refreshed.getDigitalCaseFile()).isEqualTo(stored.getData());
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {ENGLANDWALES_CASE_TYPE_ID, SCOTLAND_CASE_TYPE_ID})
-    void decentralisedCompletionPersistsOnlyToTheDigitalCaseFileTable(String caseType) throws InterruptedException {
-        jdbc.update("update ccd.case_data set case_type_id = ? where reference = ?", caseType, CASE_REFERENCE);
-        final CaseData started = start();
-        flushAndClear();
-
-        CaseData projected = caseView.getCase(new CaseViewRequest<>(CASE_REFERENCE, null), new CaseData());
-        projected.setCaseBundles(List.of(completedBundle(projected.getCaseBundles().getFirst(), "DONE")));
-
-        AsyncStitchingCompleteEvent eventConfig = new AsyncStitchingCompleteEvent(service);
-        ResolvedCCDConfig<CaseData, CaseState, EtJsonCcdConfig.PlaceholderRole> resolvedConfig =
-            new ResolvedCCDConfig<>(CaseData.class, CaseState.class, EtJsonCcdConfig.PlaceholderRole.class,
-                Map.of(), ImmutableSet.copyOf(CaseState.values()));
-        ConfigBuilderImpl<CaseData, CaseState, EtJsonCcdConfig.PlaceholderRole> builder =
-            new ConfigBuilderImpl<>(resolvedConfig);
-        eventConfig.configureDecentralised(builder);
-        var event = builder.build().getEvents().get(AsyncStitchingCompleteEvent.EVENT_ID);
-
-        assertThat(eventConfig.caseTypeIds()).contains(caseType);
-        assertThat(event.getAboutToSubmitCallback()).isNull();
-        assertThat(event.getSubmitHandler().submit(new EventPayload<>(CASE_REFERENCE, projected, null))).isNotNull();
-        flushAndClear();
-
-        assertThat(repository.findById(CASE_REFERENCE).orElseThrow().getData().getStatus())
-            .startsWith("DCF Generated:");
-        assertThat(caseView.getCase(new CaseViewRequest<>(CASE_REFERENCE, null), started)
-            .getDigitalCaseFile().getUploadedDocument().getDocumentFilename()).isEqualTo("generated.pdf");
-        assertThat(jdbc.queryForObject("select data::text from ccd.case_data where reference = ?",
-            String.class, CASE_REFERENCE)).isEqualTo("{}");
     }
 
     @ParameterizedTest

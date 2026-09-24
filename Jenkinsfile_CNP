@@ -140,6 +140,10 @@ withPipeline(type, product, component) {
     '''
   }
 
+  afterSuccess('build') {
+    sh './gradlew --no-daemon --init-script init.gradle dumpCCDDefinitions'
+  }
+
   // Performance stages are temporarily disabled while their runtime and variability are investigated.
   // enablePerformanceTestStages(timeout: 10, perfTestEnvironments: ['preview','aat','perftest'])
   // enableGatlingLoadTests([

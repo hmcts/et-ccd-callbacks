@@ -461,4 +461,24 @@ public final class OrganisationUtils {
                 && ObjectUtils.isNotEmpty(orgResponse.getBody().getSuperUser())
                 && StringUtils.isNotBlank(orgResponse.getBody().getSuperUser().getEmail());
     }
+
+    /**
+     * Determines whether the organisation response is valid and contains an
+     * organisation identifier.
+     * <p>
+     * A response is considered valid when it is not {@code null}, has a successful
+     * 2xx HTTP status, contains a response body, and the body includes an
+     * organisation identifier.
+     * </p>
+     *
+     * @param orgResponse the organisation response to validate
+     * @return {@code true} if the response is successful and contains an organisation
+     *         identifier; otherwise {@code false}
+     */
+    public static boolean hasValidOrganisationResponse(ResponseEntity<OrganisationsResponse> orgResponse) {
+        return ObjectUtils.isNotEmpty(orgResponse)
+                && orgResponse.getStatusCode().is2xxSuccessful()
+                && ObjectUtils.isNotEmpty(orgResponse.getBody())
+                && ObjectUtils.isNotEmpty(orgResponse.getBody().getOrganisationIdentifier());
+    }
 }

@@ -32,4 +32,15 @@ final class ClaimantUtilsTest {
         caseData.getClaimantType().setClaimantEmailAddress(CLAIMANT_EMAIL);
         assertThat(ClaimantUtils.getClaimantEmailAddress(caseData)).isEqualTo(CLAIMANT_EMAIL);
     }
+
+    @Test
+    void theGetClaimantEmailAddressWithoutException() {
+        // when case data does not have claimant should return empty string
+        CaseData caseData = new CaseData();
+        assertThat(ClaimantUtils.getClaimantEmailAddressWithoutException(caseData)).isEmpty();
+        // when case data has claimant email address should return address
+        caseData.setClaimantType(new ClaimantType());
+        caseData.getClaimantType().setClaimantEmailAddress(CLAIMANT_EMAIL);
+        assertThat(ClaimantUtils.getClaimantEmailAddressWithoutException(caseData)).isEqualTo(CLAIMANT_EMAIL);
+    }
 }

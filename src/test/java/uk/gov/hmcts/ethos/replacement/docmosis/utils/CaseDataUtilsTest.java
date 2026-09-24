@@ -8,12 +8,15 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeExceptio
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_YOURSELF;
 
 final class CaseDataUtilsTest {
 
     private static final String DUMMY_SUBMISSION_REFERENCE = "1234567890123456";
+    private static final String DUMMY_NOC_REMOVE_OPTION = "dummyRemoveOption";
 
     private static final String EXPECTED_EXCEPTION_CCD_REQUEST_NOT_FOUND =
             "uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException: CCD request not found.";
@@ -90,5 +93,22 @@ final class CaseDataUtilsTest {
         // when case details has case data should return true
         caseDetails.setCaseData(new CaseData());
         assertThat(CaseDataUtils.areCaseDetailsValid(caseDetails)).isTrue();
+    }
+
+    @Test
+    void theHasValidNocRemoveOption() {
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(new CaseData());
+        // when noc remove option is empty should return false
+        assertThat(CaseDataUtils.hasValidNocRemoveOption(caseDetails)).isFalse();
+        // when noc remove option is not equal to yourself and organisation should return false
+        caseDetails.getCaseData().setNocRemoveOption(DUMMY_NOC_REMOVE_OPTION);
+        assertThat(CaseDataUtils.hasValidNocRemoveOption(caseDetails)).isFalse();
+        // when noc remove option is yourself should return true
+        caseDetails.getCaseData().setNocRemoveOption(NOC_REMOVE_OPTION_YOURSELF);
+        assertThat(CaseDataUtils.hasValidNocRemoveOption(caseDetails)).isTrue();
+        // when noc remove option is organisation should return true
+        caseDetails.getCaseData().setNocRemoveOption(NOC_REMOVE_OPTION_ORGANISATION);
+        assertThat(CaseDataUtils.hasValidNocRemoveOption(caseDetails)).isTrue();
     }
 }

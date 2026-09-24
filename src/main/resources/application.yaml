@@ -267,9 +267,12 @@ template:
 
   removeRepresentationNotifications:
     claimantRepresentative:
+      representative: ${CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_REP_TEMPLATE_ID:fe52b39f-852c-43ca-a42a-b9a27c43b130}
       selfRemoval:
         orgAdmin: ${CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID:6d53b5ec-9247-4abe-b48a-c796ee66fe92}
-        representative: ${CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_REP_TEMPLATE_ID:fe52b39f-852c-43ca-a42a-b9a27c43b130}
+      orgRemoval:
+        orgAdmin: ${CLAIMANT_REPRESENTATIVE_ORGANISATION_REMOVAL_ORG_ADMIN_TEMPLATE_ID:039c5bc5-f2a7-4ba0-b217-ef493c582d2e}
+        claimant: ${CLAIMANT_REPRESENTATIVE_ORGANISATION_REMOVAL_CLAIMANT_TEMPLATE_ID:7bee670f-9110-4000-98ef-5f96274a68fb}
 
 etcos:
   system:

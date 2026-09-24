@@ -16,6 +16,8 @@ import uk.gov.hmcts.et.common.model.bundle.Bundle;
 import uk.gov.hmcts.et.common.model.bundle.BundleDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.DigitalCaseFileType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.HubLinksStatuses;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ccd.DigitalCaseFile;
@@ -30,7 +32,9 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.VIEWED;
 
 @DataJpaTest(properties = "core_case_data.api.url=localhost:4452")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -169,6 +173,22 @@ class ETCaseViewTest {
 
         assertThat(result.getDigitalCaseFile()).isNull();
         assertThat(result.getCaseBundles()).isNull();
+    }
+
+    @Test
+    void appliesViewsRecordedInTheTable() {
+        jdbc.update("insert into public.notification_view (case_reference, item_id) values (?, 'notification')",
+            CASE_REFERENCE);
+        CaseData caseData = new CaseData();
+        caseData.setSendNotificationCollection(List.of(SendNotificationTypeItem.builder()
+            .id("notification")
+            .value(SendNotificationType.builder().notificationState(NOT_VIEWED_YET).build())
+            .build()));
+
+        CaseData result = caseView().getCase(new CaseViewRequest<>(CASE_REFERENCE, null), caseData);
+
+        assertThat(result.getSendNotificationCollection().getFirst().getValue().getNotificationState())
+            .isEqualTo(VIEWED);
     }
 
     private ETCaseView caseView() {

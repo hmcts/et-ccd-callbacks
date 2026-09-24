@@ -37,6 +37,8 @@ public class NotificationView {
     @AllArgsConstructor
     public static class Key implements Serializable {
 
+        private static final long serialVersionUID = 1L;
+
         @Column(name = "case_reference")
         private Long caseReference;
 

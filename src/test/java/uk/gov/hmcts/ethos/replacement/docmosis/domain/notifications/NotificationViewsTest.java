@@ -20,6 +20,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.VIEWED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -79,6 +80,34 @@ class NotificationViewsTest {
         assertThat(notification.getNotificationState()).isEqualTo(NOT_VIEWED_YET);
         assertThat(notification.getRespondNotificationTypeCollection().get(1).getValue().getState())
             .isEqualTo(NOT_VIEWED_YET);
+    }
+
+    @Test
+    void repliedToTribunalResponseDoesNotKeepNotificationUnviewed() {
+        CaseData caseData = caseData(NOT_VIEWED_YET, SUBMITTED, null, null);
+        SendNotificationType notification = caseData.getSendNotificationCollection().getFirst().getValue();
+        notification.getRespondNotificationTypeCollection().add(tribunalResponse("newResponse", NOT_VIEWED_YET));
+
+        NotificationViews.apply(caseData, Set.of("notification", "newResponse"));
+
+        assertThat(notification.getNotificationState()).isEqualTo(VIEWED);
+        assertThat(notification.getRespondNotificationTypeCollection().getFirst().getValue().getState())
+            .isEqualTo(SUBMITTED);
+        assertThat(notification.getRespondNotificationTypeCollection().get(1).getValue().getState())
+            .isEqualTo(VIEWED);
+    }
+
+    @Test
+    void outstandingReplyDoesNotKeepNotificationUnviewed() {
+        CaseData caseData = caseData(NOT_VIEWED_YET, NOT_STARTED_YET, null, null);
+        SendNotificationType notification = caseData.getSendNotificationCollection().getFirst().getValue();
+        notification.getRespondNotificationTypeCollection().add(tribunalResponse("newResponse", NOT_VIEWED_YET));
+
+        NotificationViews.apply(caseData, Set.of("notification", "newResponse"));
+
+        assertThat(notification.getNotificationState()).isEqualTo(VIEWED);
+        assertThat(notification.getRespondNotificationTypeCollection().getFirst().getValue().getState())
+            .isEqualTo(NOT_STARTED_YET);
     }
 
     @Test

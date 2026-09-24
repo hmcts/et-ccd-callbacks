@@ -76,17 +76,18 @@ public final class NotificationViews {
             List<GenericTypeItem<RespondNotificationType>> tribunalResponses =
                 nonNull(notification.getRespondNotificationTypeCollection());
             // A tribunal response added after the claimant last looked resets the notification to unviewed
-            // in the blob, and its new id will not have been recorded yet.
+            // in the blob, and its new id will not have been recorded yet. Responses in other states, such as
+            // one the claimant has replied to, are never marked viewed so cannot be what reset it.
             if (NOT_VIEWED_YET.equals(notification.getNotificationState())
                 && viewedIds.contains(item.getId())
-                && tribunalResponses.stream().allMatch(response -> viewedIds.contains(response.getId()))) {
+                && tribunalResponses.stream()
+                    .filter(NotificationViews::isUnviewed)
+                    .allMatch(response -> viewedIds.contains(response.getId()))) {
                 notification.setNotificationState(VIEWED);
             }
             for (GenericTypeItem<RespondNotificationType> response : tribunalResponses) {
-                RespondNotificationType value = response.getValue();
-                if (value != null && viewedIds.contains(response.getId())
-                    && (value.getState() == null || NOT_VIEWED_YET.equals(value.getState()))) {
-                    value.setState(VIEWED);
+                if (isUnviewed(response) && viewedIds.contains(response.getId())) {
+                    response.getValue().setState(VIEWED);
                 }
             }
             for (PseResponseTypeItem response : nonNull(notification.getRespondCollection())) {
@@ -100,6 +101,11 @@ public final class NotificationViews {
                 response.getValue().setViewedByClaimant(YES);
             }
         }
+    }
+
+    private static boolean isUnviewed(GenericTypeItem<RespondNotificationType> response) {
+        RespondNotificationType value = response.getValue();
+        return value != null && (value.getState() == null || NOT_VIEWED_YET.equals(value.getState()));
     }
 
     private static List<TseRespondTypeItem> tseResponses(CaseData caseData) {

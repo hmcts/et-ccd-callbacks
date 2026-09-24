@@ -14,6 +14,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
 import java.io.IOException;
@@ -38,6 +39,8 @@ class NocRemoveClaimantRepNotificationServiceTest {
     private EmailService emailService;
     @Mock
     private NocNotificationService nocNotificationService;
+    @Mock
+    private OrganisationService organisationService;
 
     @InjectMocks
     private NocRemoveClaimantRepNotificationService nocRemoveClaimantRepNotificationService;
@@ -47,10 +50,12 @@ class NocRemoveClaimantRepNotificationServiceTest {
     private static final String REMOVE_REP_TEST_DATA_SOURCE_FILE = "nocRemoveRepTest.json";
 
     private static final String ORG_ADMIN_EMAIL = "org.admin@example.com";
+    private static final String ORGANISATION_NAME = "Organisation Name";
     private static final String REPRESENTATIVE_NAME = "John Doe";
     private static final String USER_ID = "6281d99e-1a94-4369-870e-9f527801d913";
     private static final String USER_EMAIL = "user@example.com";
     private static final String USER_NAME = "John Smith";
+    private static final String CLAIMANT_EMAIL = "claimant@test.com";
     private static final String DUMMY_NOC_REMOVE_OPTION = "dummyNocRemoveOption";
 
     private static final String CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID_FIELD =
@@ -65,6 +70,14 @@ class NocRemoveClaimantRepNotificationServiceTest {
             "claimantRepresentativeRemovalRepTemplateId";
     private static final String CLAIMANT_REPRESENTATIVE_REMOVAL_REPRESENTATIVE_TEMPLATE_ID =
             "fe52b39f-852c-43ca-a42a-b9a27c43b130";
+    private static final String CLAIMANT_REPRESENTATIVE_REMOVAL_CLAIMANT_TEMPLATE_ID_FIELD =
+            "claimantRepresentativeOrganisationRemovalClaimantTemplateId";
+    private static final String CLAIMANT_REPRESENTATIVE_REMOVAL_CLAIMANT_TEMPLATE_ID =
+            "7bee670f-9110-4000-98ef-5f96274a68fb";
+
+    private static final String CITIZEN_CASE_DETAILS_URL_FIELD = "citizenUrl";
+    private static final String CITIZEN_CASE_DETAILS_URL = "http://localhost:3001/citizen-hub/";
+    private static final String CITIZIEN_CASE_DETAILS_LINK = "http://localhost:3001/citizen-hub/1775651960650043";
 
     private static final String EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION =
             "Failed to send NOC notification email to organisation admin, case id: 1775651960650043, error: ";
@@ -72,7 +85,10 @@ class NocRemoveClaimantRepNotificationServiceTest {
             "Failed to send NOC notification email to representative, case id: 1775651960650043, error: ";
     private static final String EXPECTED_WARNING_INVALID_REMOVE_OPTION =
             "Invalid remove option, case id: 1775651960650043, remove option: " + DUMMY_NOC_REMOVE_OPTION;
+    private static final String EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT =
+            "Failed to send noc notification email to claimant, case id: 1775651960650043, error: ";
 
+    private static final String ERROR_CLAIMANT_EMAIL_NOT_FOUND = "Claimant email not found";
     private static final String ERROR_ORGANISATION_ADMIN_EMAIL_NOT_FOUND = "Organisation admin email not found";
     private static final String ERROR_SYSTEM = "System error";
 
@@ -88,6 +104,10 @@ class NocRemoveClaimantRepNotificationServiceTest {
         ReflectionTestUtils.setField(nocRemoveClaimantRepNotificationService,
                 CLAIMANT_REPRESENTATIVE_REMOVAL_REPRESENTATIVE_TEMPLATE_ID_FIELD,
                 CLAIMANT_REPRESENTATIVE_REMOVAL_REPRESENTATIVE_TEMPLATE_ID);
+        ReflectionTestUtils.setField(nocRemoveClaimantRepNotificationService,
+                CLAIMANT_REPRESENTATIVE_REMOVAL_CLAIMANT_TEMPLATE_ID_FIELD,
+                CLAIMANT_REPRESENTATIVE_REMOVAL_CLAIMANT_TEMPLATE_ID);
+        ReflectionTestUtils.setField(emailService, CITIZEN_CASE_DETAILS_URL_FIELD, CITIZEN_CASE_DETAILS_URL);
 
         caseDetails = generateCaseDetails();
         LoggerTestUtils.initializeLogger(NocRemoveClaimantRepNotificationService.class);
@@ -175,5 +195,36 @@ class NocRemoveClaimantRepNotificationServiceTest {
                 USER_EMAIL);
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
                 EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_REPRESENTATIVE + ERROR_SYSTEM);
+    }
+
+    @Test
+    void theSendClaimantRepresentativeRemovalClaimantNotification() {
+        // when claimant does not have e-mail address should log claimant email not found warning
+        UserDetails userDetails = new UserDetails();
+        CaseDetails tmpCaseDetails = new CaseDetails();
+        tmpCaseDetails.setCaseId(caseDetails.getCaseId());
+        nocRemoveClaimantRepNotificationService.sendClaimantRepresentativeRemovalClaimantNotification(userDetails,
+                tmpCaseDetails);
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
+                EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT
+                        + ERROR_CLAIMANT_EMAIL_NOT_FOUND);
+        // when claimant has a valid email should send notification
+        when(organisationService.resolveClaimantRepresentativeOrganisationName(caseDetails.getCaseData()
+                .getRepresentativeClaimantType(), userDetails)).thenReturn(ORGANISATION_NAME);
+        when(emailService.getCitizenCaseLink(caseDetails.getCaseId())).thenReturn(CITIZIEN_CASE_DETAILS_LINK);
+        doNothing().when(emailService).sendEmail(eq(CLAIMANT_REPRESENTATIVE_REMOVAL_CLAIMANT_TEMPLATE_ID),
+                eq(CLAIMANT_EMAIL), anyMap());
+        nocRemoveClaimantRepNotificationService.sendClaimantRepresentativeRemovalClaimantNotification(userDetails,
+                caseDetails);
+        verify(emailService, times(LoggerTestUtils.INTEGER_ONE))
+                .sendEmail(eq(CLAIMANT_REPRESENTATIVE_REMOVAL_CLAIMANT_TEMPLATE_ID), eq(CLAIMANT_EMAIL), anyMap());
+        // when unable to send email should log failed to send notification warning
+        doThrow(new RuntimeException(ERROR_SYSTEM))
+                .when(emailService).sendEmail(eq(CLAIMANT_REPRESENTATIVE_REMOVAL_CLAIMANT_TEMPLATE_ID),
+                        eq(CLAIMANT_EMAIL), anyMap());
+        nocRemoveClaimantRepNotificationService.sendClaimantRepresentativeRemovalClaimantNotification(userDetails,
+                caseDetails);
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_TWO,
+                EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT + ERROR_SYSTEM);
     }
 }

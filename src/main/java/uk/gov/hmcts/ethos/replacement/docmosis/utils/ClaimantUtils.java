@@ -35,19 +35,28 @@ public final class ClaimantUtils {
      * @throws NotFoundException if the case data or claimant type is missing
      */
     public static String getClaimantEmailAddress(CaseData caseData) {
-        if (ObjectUtils.isEmpty(caseData)
-                || ObjectUtils.isEmpty(caseData.getClaimantType())) {
+        if (ObjectUtils.isEmpty(caseData) || ObjectUtils.isEmpty(caseData.getClaimantType())) {
             throw new NotFoundException(EXCEPTION_CLAIMANT_NOT_FOUND);
         }
         String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
         return StringUtils.isBlank(claimantEmailAddress) ? StringUtils.EMPTY : claimantEmailAddress;
     }
 
-    public static String getClaimant(CaseData caseData) {
-        if (ObjectUtils.isEmpty(caseData)
-                || StringUtils.isBlank(caseData.getClaimant())) {
+    /**
+     * Retrieves the claimant email address from the supplied case data.
+     * <p>
+     * If the claimant email address cannot be found, an empty string is returned
+     * instead of propagating a {@link NotFoundException}.
+     * </p>
+     *
+     * @param caseData the case data containing the claimant information
+     * @return the claimant email address, or an empty string if it cannot be found
+     */
+    public static String getClaimantEmailAddressWithoutException(CaseData caseData) {
+        try {
+            return getClaimantEmailAddress(caseData);
+        } catch (NotFoundException e) {
             return StringUtils.EMPTY;
         }
-        return caseData.getClaimant();
     }
 }

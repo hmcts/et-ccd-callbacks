@@ -9,17 +9,24 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.ClaimantUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UserUtils;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_YOURSELF;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_CLAIMANT_EMAIL_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION_ADMIN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_REPRESENTATIVE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_REMOVE_OPTION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_ORGANISATION_ADMIN_EMAIL_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LEGAL_REP_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LEGAL_REP_ORG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CIT_UI;
 
 @Slf4j
 @Service
@@ -28,6 +35,7 @@ public class NocRemoveClaimantRepNotificationService {
 
     private final EmailService emailService;
     private final NocNotificationService nocNotificationService;
+    private final OrganisationService organisationService;
 
     @Value("${template.removeRepresentationNotifications.claimantRepresentative.selfRemoval.orgAdmin}")
     private String claimantRepresentativeSelfRemovalOrgAdminTemplateId;
@@ -35,6 +43,8 @@ public class NocRemoveClaimantRepNotificationService {
     private String claimantRepresentativeOrganisationRemovalOrgAdminTemplateId;
     @Value("${template.removeRepresentationNotifications.claimantRepresentative.representative}")
     private String claimantRepresentativeRemovalRepTemplateId;
+    @Value("${template.removeRepresentationNotifications.claimantRepresentative.orgRemoval.claimant}")
+    private String claimantRepresentativeOrganisationRemovalClaimantTemplateId;
 
     public void sendClaimantRepresentativeRemovalNotifications(UserDetails userDetails, CaseDetails caseDetails) {
         if (!CaseDataUtils.hasValidNocRemoveOption(caseDetails)) {
@@ -47,6 +57,9 @@ public class NocRemoveClaimantRepNotificationService {
         sendClaimantRepresentativeRemovalOrgAdminNotification(caseDetails, orgAdminEmail,
                 UserUtils.resolveUserDisplayName(userDetails));
         sendClaimantRepresentativeRemovalRepNotification(caseDetails, userDetails.getEmail());
+        if (NOC_REMOVE_OPTION_ORGANISATION.equals(caseDetails.getCaseData().getNocRemoveOption())) {
+            sendClaimantRepresentativeRemovalClaimantNotification(userDetails, caseDetails);
+        }
     }
 
     /**
@@ -107,4 +120,25 @@ public class NocRemoveClaimantRepNotificationService {
                     e.getMessage());
         }
     }
+
+    public void sendClaimantRepresentativeRemovalClaimantNotification(UserDetails userDetails,
+                                                                      CaseDetails caseDetails) {
+        String claimantEmailAddress = ClaimantUtils.getClaimantEmailAddressWithoutException(caseDetails.getCaseData());
+        if (StringUtils.isBlank(claimantEmailAddress)) {
+            log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT, caseDetails.getCaseId(),
+                    WARNING_CLAIMANT_EMAIL_NOT_FOUND);
+            return;
+        }
+        Map<String, String> personalisation = NocNotificationHelper.addCommonEmailValues(caseDetails.getCaseData());
+        personalisation.put(LEGAL_REP_ORG, organisationService.resolveClaimantRepresentativeOrganisationName(
+                caseDetails.getCaseData().getRepresentativeClaimantType(), userDetails));
+        personalisation.put(LINK_TO_CIT_UI, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
+        try {
+            emailService.sendEmail(claimantRepresentativeOrganisationRemovalClaimantTemplateId, claimantEmailAddress,
+                    personalisation);
+        } catch (Exception e) {
+            log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT, caseDetails.getCaseId(), e.getMessage());
+        }
+    }
+
 }

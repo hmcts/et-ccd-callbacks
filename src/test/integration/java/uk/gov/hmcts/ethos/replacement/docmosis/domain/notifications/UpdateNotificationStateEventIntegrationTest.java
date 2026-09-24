@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedCaseEvent;
 import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedEventDetails;
+import uk.gov.hmcts.ccd.decentralised.dto.DecentralisedSubmitEventResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.sdk.impl.CaseSubmissionService;
 import uk.gov.hmcts.ccd.sdk.testing.CcdEventTestSupport;
@@ -42,6 +43,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
@@ -135,6 +137,32 @@ class UpdateNotificationStateEventIntegrationTest {
 
     @ParameterizedTest
     @ValueSource(strings = {ENGLANDWALES_CASE_TYPE_ID, SCOTLAND_CASE_TYPE_ID})
+    void staleViewDoesNotMarkATribunalResponseAddedSinceItStartedAsViewed(String caseTypeId) {
+        var cases = events.forCaseType(caseTypeId);
+        long reference = cases.seed(CaseState.Accepted,
+            notificationWithResponses(NOT_VIEWED_YET, tribunalResponse("tribunalResponse", NOT_VIEWED_YET)));
+        int startVersion = cases.snapshot(reference).blobVersion();
+        // The tribunal responds again while the claimant is viewing, resetting the notification to unviewed.
+        replaceBlob(reference, notificationWithResponses(NOT_VIEWED_YET,
+            tribunalResponse("tribunalResponse", NOT_VIEWED_YET), tribunalResponse("laterResponse", NOT_VIEWED_YET)));
+
+        // The claimant's view was started before the later response existed.
+        DecentralisedSubmitEventResponse response = submitAtVersion(caseTypeId, reference,
+            UpdateNotificationStateEvent.EVENT_ID,
+            notificationWithResponses(VIEWED, tribunalResponse("tribunalResponse", VIEWED)), startVersion);
+
+        assertThat(notificationViewRepository.findItemIds(reference))
+            .containsExactlyInAnyOrder("notification", "tribunalResponse");
+        CaseData projected = mapper.convertValue(response.getCaseDetails().getCaseDetails().getData(), CaseData.class);
+        SendNotificationType notification = projected.getSendNotificationCollection().getFirst().getValue();
+        assertThat(notification.getNotificationState()).isEqualTo(NOT_VIEWED_YET);
+        assertThat(notification.getRespondNotificationTypeCollection())
+            .extracting(GenericTypeItem::getId, item -> item.getValue().getState())
+            .containsExactly(tuple("tribunalResponse", VIEWED), tuple("laterResponse", NOT_VIEWED_YET));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {ENGLANDWALES_CASE_TYPE_ID, SCOTLAND_CASE_TYPE_ID})
     void blobWritingEventIsRejectedAtASupersededVersion(String caseTypeId) {
         // Control for the test above: an event that still writes the blob fails in the same situation.
         var cases = events.forCaseType(caseTypeId);
@@ -156,8 +184,14 @@ class UpdateNotificationStateEventIntegrationTest {
             """, reference);
     }
 
+    private void replaceBlob(long reference, CaseData data) {
+        jdbc.update("update ccd.case_data set data = ?::jsonb, version = version + 1 where reference = ?",
+            mapper.valueToTree(data).toString(), reference);
+    }
+
     // Submits as CCD would for an event started when the case was at the given version.
-    private void submitAtVersion(String caseTypeId, long reference, String eventId, CaseData data, int version) {
+    private DecentralisedSubmitEventResponse submitAtVersion(String caseTypeId, long reference, String eventId,
+                                                             CaseData data, int version) {
         Map<String, Object> stored = jdbc.queryForMap(
             "select id, state, case_revision from ccd.case_data where reference = ?", reference);
         DecentralisedCaseEvent event = DecentralisedCaseEvent.builder()
@@ -171,7 +205,7 @@ class UpdateNotificationStateEventIntegrationTest {
                 .eventName(eventId)
                 .build())
             .build();
-        submissionService.submit(event, SDK_TEST_TOKEN, UUID.randomUUID());
+        return submissionService.submit(event, SDK_TEST_TOKEN, UUID.randomUUID());
     }
 
     private CaseDetails caseDetails(String caseTypeId, long reference, Map<String, Object> stored,
@@ -187,6 +221,27 @@ class UpdateNotificationStateEventIntegrationTest {
         details.setData(mapper.convertValue(data, new TypeReference<Map<String, JsonNode>>() {}));
         details.setSupplementaryData(Map.of());
         return details;
+    }
+
+    @SafeVarargs
+    private static CaseData notificationWithResponses(String notificationState,
+                                                      GenericTypeItem<RespondNotificationType>... responses) {
+        CaseData caseData = new CaseData();
+        caseData.setSendNotificationCollection(List.of(SendNotificationTypeItem.builder()
+            .id("notification")
+            .value(SendNotificationType.builder()
+                .notificationState(notificationState)
+                .respondNotificationTypeCollection(List.of(responses))
+                .build())
+            .build()));
+        return caseData;
+    }
+
+    private static GenericTypeItem<RespondNotificationType> tribunalResponse(String id, String state) {
+        return GenericTypeItem.<RespondNotificationType>builder()
+            .id(id)
+            .value(RespondNotificationType.builder().state(state).build())
+            .build();
     }
 
     private static CaseData caseData(String viewState, String viewedByClaimant) {

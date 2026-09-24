@@ -134,6 +134,29 @@ class NotificationViewsTest {
             .isEqualTo(VIEWED);
     }
 
+    @Test
+    void treatsBlankTribunalResponseStateAsUnviewed() {
+        CaseData caseData = caseData(NOT_VIEWED_YET, "", null, null);
+
+        NotificationViews.apply(caseData, Set.of("notification", "tribunalResponse"));
+
+        SendNotificationType notification = caseData.getSendNotificationCollection().getFirst().getValue();
+        assertThat(notification.getNotificationState()).isEqualTo(VIEWED);
+        assertThat(notification.getRespondNotificationTypeCollection().getFirst().getValue().getState())
+            .isEqualTo(VIEWED);
+    }
+
+    @Test
+    void blankTribunalResponseStateStillNeedsARecordedView() {
+        CaseData caseData = caseData(NOT_VIEWED_YET, "", null, null);
+
+        NotificationViews.apply(caseData, Set.of("notification"));
+
+        SendNotificationType notification = caseData.getSendNotificationCollection().getFirst().getValue();
+        assertThat(notification.getNotificationState()).isEqualTo(NOT_VIEWED_YET);
+        assertThat(notification.getRespondNotificationTypeCollection().getFirst().getValue().getState()).isEmpty();
+    }
+
     static CaseData caseData(String notificationState, String tribunalResponseState,
                              String partyResponseState, String viewedByClaimant) {
         SendNotificationTypeItem notification = notification("notification", notificationState,

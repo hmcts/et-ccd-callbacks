@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.VIEWED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -105,7 +106,8 @@ public final class NotificationViews {
 
     private static boolean isUnviewed(GenericTypeItem<RespondNotificationType> response) {
         RespondNotificationType value = response.getValue();
-        return value != null && (value.getState() == null || NOT_VIEWED_YET.equals(value.getState()));
+        // Matches the claimant notification service, which treats a blank state as unviewed.
+        return value != null && (isNullOrEmpty(value.getState()) || NOT_VIEWED_YET.equals(value.getState()));
     }
 
     private static List<TseRespondTypeItem> tseResponses(CaseData caseData) {

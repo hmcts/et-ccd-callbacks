@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +12,20 @@ import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.PostgreSQLContainer;
 import uk.gov.hmcts.ccd.sdk.CaseViewRequest;
 import uk.gov.hmcts.ccd.sdk.config.DecentralisedDataConfiguration;
+import uk.gov.hmcts.et.common.model.bundle.Bundle;
+import uk.gov.hmcts.et.common.model.bundle.BundleDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.DigitalCaseFileType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.HubLinksStatuses;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ccd.DigitalCaseFile;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ccd.HubLinkStatus;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.EtCosPostgresqlContainer;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.DigitalCaseFileRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.HubLinkStatusRepository;
+
+import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -36,6 +46,12 @@ class ETCaseViewTest {
 
     @Autowired
     private HubLinkStatusRepository repository;
+
+    @Autowired
+    private DigitalCaseFileRepository digitalCaseFileRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @Autowired
     private JdbcTemplate jdbc;
@@ -61,7 +77,7 @@ class ETCaseViewTest {
         CaseData caseData = new CaseData();
         caseData.setHubLinksStatuses(statuses("blob"));
 
-        ETCaseView caseView = new ETCaseView(repository);
+        ETCaseView caseView = new ETCaseView(repository, digitalCaseFileRepository);
         CaseData result = caseView.getCase(new CaseViewRequest<>(CASE_REFERENCE, null), caseData);
 
         assertThat(caseView.caseTypeIds())
@@ -76,12 +92,90 @@ class ETCaseViewTest {
         CaseData caseData = new CaseData();
         caseData.setHubLinksStatuses(statuses("blob"));
 
-        CaseData result = new ETCaseView(repository).getCase(
+        CaseData result = new ETCaseView(repository, digitalCaseFileRepository).getCase(
             new CaseViewRequest<>(CASE_REFERENCE, null),
             caseData
         );
 
         assertThat(result.getHubLinksStatuses().getPersonalDetails()).isEqualTo("table");
+    }
+
+    @Test
+    void fallsBackToBlobDcfWhenNoTableRowExists() {
+        CaseData caseData = new CaseData();
+        DigitalCaseFileType blobDcf = dcf("blob.pdf");
+        caseData.setDigitalCaseFile(blobDcf);
+        List<Bundle> blobBundles = List.of(bundle(UUID.randomUUID()));
+        caseData.setCaseBundles(blobBundles);
+
+        CaseData result = new ETCaseView(repository, digitalCaseFileRepository).getCase(
+            new CaseViewRequest<>(CASE_REFERENCE, null), caseData);
+
+        assertThat(result.getDigitalCaseFile()).isSameAs(blobDcf);
+        assertThat(result.getCaseBundles()).isSameAs(blobBundles);
+    }
+
+    @Test
+    void usesTableDcfInsteadOfBlobDcf() {
+        DigitalCaseFileType tableDcf = dcf("table.pdf");
+        digitalCaseFileRepository.saveAndFlush(DigitalCaseFile.create(CASE_REFERENCE, tableDcf, null));
+        entityManager.clear();
+        CaseData caseData = new CaseData();
+        caseData.setDigitalCaseFile(dcf("blob.pdf"));
+        caseData.setCaseBundles(List.of(bundle(UUID.randomUUID())));
+
+        CaseData result = new ETCaseView(repository, digitalCaseFileRepository).getCase(
+            new CaseViewRequest<>(CASE_REFERENCE, null), caseData);
+
+        assertThat(result.getDigitalCaseFile()).isEqualTo(tableDcf);
+        assertThat(result.getCaseBundles()).isNull();
+    }
+
+    @Test
+    void projectsThePendingBundleInsteadOfStaleBlobBundles() {
+        UUID pendingBundleId = UUID.randomUUID();
+        DigitalCaseFileType tableDcf = dcf("previous.pdf");
+        tableDcf.setStatus("DCF Updating");
+        digitalCaseFileRepository.saveAndFlush(DigitalCaseFile.create(CASE_REFERENCE, tableDcf, pendingBundleId));
+        entityManager.clear();
+        CaseData caseData = new CaseData();
+        caseData.setCaseBundles(List.of(bundle(UUID.randomUUID())));
+
+        CaseData result = new ETCaseView(repository, digitalCaseFileRepository).getCase(
+            new CaseViewRequest<>(CASE_REFERENCE, null), caseData);
+
+        assertThat(result.getDigitalCaseFile()).isEqualTo(tableDcf);
+        assertThat(result.getCaseBundles()).singleElement().satisfies(bundle -> {
+            assertThat(bundle.value().getId()).isEqualTo(pendingBundleId.toString());
+            assertThat(bundle.value().getStitchStatus()).isEqualTo("IN_PROGRESS");
+            assertThat(bundle.value().getDocuments()).isNull();
+        });
+    }
+
+    @Test
+    void doesNotResurrectRemovedDcfFromBlob() {
+        digitalCaseFileRepository.saveAndFlush(DigitalCaseFile.create(CASE_REFERENCE, null, null));
+        entityManager.clear();
+        CaseData caseData = new CaseData();
+        caseData.setDigitalCaseFile(dcf("removed.pdf"));
+        caseData.setCaseBundles(List.of(bundle(UUID.randomUUID())));
+
+        CaseData result = new ETCaseView(repository, digitalCaseFileRepository).getCase(
+            new CaseViewRequest<>(CASE_REFERENCE, null), caseData);
+
+        assertThat(result.getDigitalCaseFile()).isNull();
+        assertThat(result.getCaseBundles()).isNull();
+    }
+
+    private DigitalCaseFileType dcf(String filename) {
+        DigitalCaseFileType dcf = new DigitalCaseFileType();
+        dcf.setUploadedDocument(UploadedDocumentType.builder().documentFilename(filename).build());
+        return dcf;
+    }
+
+    private Bundle bundle(UUID id) {
+        return Bundle.builder().id(UUID.randomUUID().toString())
+            .value(BundleDetails.builder().id(id.toString()).build()).build();
     }
 
     private HubLinksStatuses statuses(String personalDetails) {

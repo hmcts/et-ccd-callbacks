@@ -7626,7 +7626,7 @@
   },
   {
     "ID": "genericTseDetails",
-    "ListElementCode": "closeApplicationNote",
+    "ListElementCode": "closeApplicationNotes",
     "FieldType": "Text",
     "ElementLabel": "General notes",
     "SecurityClassification": "Public"

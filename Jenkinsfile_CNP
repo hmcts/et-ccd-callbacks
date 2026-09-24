@@ -140,8 +140,8 @@ withPipeline(type, product, component) {
     '''
   }
 
-  before('dockerbuild') {
-    sh './gradlew dumpCCDDefinitions'
+  afterSuccess('build') {
+    sh './gradlew --no-daemon --init-script init.gradle dumpCCDDefinitions'
   }
 
   // Performance stages are temporarily disabled while their runtime and variability are investigated.

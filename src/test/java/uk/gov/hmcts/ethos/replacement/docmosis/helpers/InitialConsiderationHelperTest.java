@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -710,6 +712,102 @@ class InitialConsiderationHelperTest {
         Details: Other Default Reason
             """;
         assertEquals(expected, result);
+    }
+
+    @Test
+    void hearingListedAnswers_retainsConvertPostponeAndF2fDetails() throws JsonProcessingException {
+        String json = """
+                {
+                  "etICHearingListedAnswers": {
+                    "etICHearingListed": ["convertFinalToPreliminaryHearing"],
+                    "etICConvertPreliminaryGiveDetails": "List as a preliminary hearing",
+                    "etICPostponeGiveDetails": "Postpone because of a witness",
+                    "etICConvertF2fGiveDetails": "Needs a hearing room"
+                  }
+                }
+                """;
+
+        CaseData parsed = new ObjectMapper().readValue(json, CaseData.class);
+        EtICHearingListedAnswers answers = parsed.getEtICHearingListedAnswers();
+
+        assertEquals("List as a preliminary hearing", answers.getEtICConvertPreliminaryGiveDetails());
+        assertEquals("Postpone because of a witness", answers.getEtICPostponeGiveDetails());
+        assertEquals("Needs a hearing room", answers.getEtICConvertF2fGiveDetails());
+    }
+
+    @Test
+    void getDocumentRequest_scotland_copiesListedHearingDetailsAndLabels() throws JsonProcessingException {
+        EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
+        answers.setEtICHearingListed(List.of(
+                "convertFinalToPreliminaryHearing", "postponeHearing", "convertToF2FHearing"));
+        answers.setEtICConvertPreliminaryGiveDetails("Convert this final hearing");
+        answers.setEtICPostponeGiveDetails("Postpone this hearing");
+        answers.setEtICConvertF2fGiveDetails("Convert to face to face");
+        CaseData scotlandCase = new CaseData();
+        scotlandCase.setEtICHearingListedAnswers(answers);
+
+        JsonNode data = documentData(scotlandCase, SCOTLAND_CASE_TYPE_ID);
+
+        assertEquals("Convert this final hearing", data.get("hearingConvertFinal").asText());
+        assertEquals("Postpone this hearing", data.get("hearingPostpone").asText());
+        assertEquals("Convert to face to face", data.get("hearingConvertF2f").asText());
+        assertEquals("Convert final hearing to preliminary hearing", data.get("hearingListed").get(0).asText());
+        assertEquals("Postpone hearing", data.get("hearingListed").get(1).asText());
+        assertEquals("Convert to F2F hearing", data.get("hearingListed").get(2).asText());
+    }
+
+    @Test
+    void getDocumentRequest_scotland_usesTopLevelDetailsWhenAnswersDoNotContainThem() throws JsonProcessingException {
+        CaseData scotlandCase = new CaseData();
+        scotlandCase.setEtICConvertPreliminaryGiveDetails("Legacy convert text");
+        scotlandCase.setEtICPostponeGiveDetails("Legacy postpone text");
+        scotlandCase.setEtICConvertF2fGiveDetails("Legacy face to face text");
+
+        JsonNode data = documentData(scotlandCase, SCOTLAND_CASE_TYPE_ID);
+
+        assertEquals("Legacy convert text", data.get("hearingConvertFinal").asText());
+        assertEquals("Legacy postpone text", data.get("hearingPostpone").asText());
+        assertEquals("Legacy face to face text", data.get("hearingConvertF2f").asText());
+    }
+
+    @Test
+    void getDocumentRequest_englandWales_copiesListedHearingDetailsAndKeepsLabels()
+            throws JsonProcessingException {
+        EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
+        answers.setEtICHearingListed(List.of("Convert final hearing to preliminary hearing", "Other"));
+        answers.setEtICConvertPreliminaryGiveDetails("Convert this final hearing");
+        answers.setEtICPostponeGiveDetails("Postpone this hearing");
+        answers.setEtICConvertF2fGiveDetails("Convert to face to face");
+        CaseData englandWalesCase = new CaseData();
+        englandWalesCase.setEtICHearingListedAnswers(answers);
+
+        JsonNode data = documentData(englandWalesCase, ENGLANDWALES_CASE_TYPE_ID);
+
+        assertEquals("Convert this final hearing", data.get("hearingConvertFinal").asText());
+        assertEquals("Postpone this hearing", data.get("hearingPostpone").asText());
+        assertEquals("Convert to face to face", data.get("hearingConvertF2f").asText());
+        assertEquals("Convert final hearing to preliminary hearing", data.get("hearingListed").get(0).asText());
+        assertEquals("Other", data.get("hearingListed").get(1).asText());
+    }
+
+    @Test
+    void getDocumentRequest_englandWales_usesTopLevelDetailsWhenAnswersDoNotContainThem()
+            throws JsonProcessingException {
+        CaseData englandWalesCase = new CaseData();
+        englandWalesCase.setEtICConvertPreliminaryGiveDetails("Legacy convert text");
+        englandWalesCase.setEtICPostponeGiveDetails("Legacy postpone text");
+        englandWalesCase.setEtICConvertF2fGiveDetails("Legacy face to face text");
+
+        JsonNode data = documentData(englandWalesCase, ENGLANDWALES_CASE_TYPE_ID);
+
+        assertEquals("Legacy convert text", data.get("hearingConvertFinal").asText());
+        assertEquals("Legacy postpone text", data.get("hearingPostpone").asText());
+        assertEquals("Legacy face to face text", data.get("hearingConvertF2f").asText());
+    }
+
+    private static JsonNode documentData(CaseData caseData, String caseTypeId) throws JsonProcessingException {
+        String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseData, "key", caseTypeId);
+        return new ObjectMapper().readTree(documentRequest).get("data");
     }
 
 }

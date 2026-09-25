@@ -23,6 +23,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.WARNING_CLAIMANT_EMAIL_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_CLAIMANT_REPRESENTATIVE_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
 
 @Slf4j
 public final class ClaimantRepresentativeUtils {
@@ -184,10 +185,12 @@ public final class ClaimantRepresentativeUtils {
      */
     public static void markClaimantAsUnrepresented(CaseData caseData) {
         caseData.setRepresentativeClaimantType(null);
-        caseData.setClaimantRepresentativeRemoved(YES);
-        caseData.setClaimantRepresentedQuestion(NO);
-        caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
+        if (NOC_REMOVE_OPTION_ORGANISATION.equals(caseData.getNocRemoveOption())) {
+            caseData.setClaimantRepresentativeRemoved(YES);
+            caseData.setClaimantRepresentedQuestion(NO);
+            caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder()
+                    .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
+        }
     }
 
     /**
@@ -390,5 +393,20 @@ public final class ClaimantRepresentativeUtils {
         RepresentedTypeC representative =  caseData.getRepresentativeClaimantType();
         caseData.setEt3ResponseAddress(representative.getRepresentativeAddress());
         caseData.setEt3ResponsePhone(representative.getRepresentativePhoneNumber());
+    }
+
+    /**
+     * Checks whether the claimant representative details required for processing are present.
+     *
+     * <p>The representative is considered complete when the representative details exist
+     * and both the representative ID and email address are non-blank.</p>
+     *
+     * @param claimantRepresentative the claimant representative details to check
+     * @return {@code true} if the required claimant representative details are present;
+     *         {@code false} otherwise
+     */
+    public static boolean hasRequiredClaimantRepresentativeDetails(RepresentedTypeC claimantRepresentative) {
+        return ObjectUtils.isNotEmpty(claimantRepresentative)
+                && StringUtils.isNotBlank(claimantRepresentative.getRepresentativeEmailAddress());
     }
 }

@@ -12,8 +12,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.ETCaseView;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.CaseState;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ccd.DigitalCaseFile;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ccd.HubLinkStatus;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ccd.NotificationView;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.DigitalCaseFileRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.HubLinkStatusRepository;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.NotificationViewRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -22,8 +24,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 @CcdSdkTest(
     components = {EtJsonCcdConfig.class, ViewAllNotificationsEvent.class, ETCaseView.class,
         JacksonConfiguration.class},
-    repositories = {HubLinkStatusRepository.class, DigitalCaseFileRepository.class},
-    entities = {HubLinkStatus.class, DigitalCaseFile.class}
+    repositories = {HubLinkStatusRepository.class, DigitalCaseFileRepository.class,
+        NotificationViewRepository.class},
+    entities = {HubLinkStatus.class, DigitalCaseFile.class, NotificationView.class}
 )
 class ViewAllNotificationsEventIntegrationTest {
 

@@ -582,6 +582,12 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
+    void getAdjustedHearingTypeName_shouldReturnDash_whenInputIsNull() {
+        String result = InitialConsiderationService.getAdjustedHearingTypeName(null);
+        assertEquals("-", result);
+    }
+
+    @Test
     void getEarliestHearingDate() {
         setFutureHearingDate(caseData);
         assertThat(initialConsiderationService.getEarliestHearingDateForListedHearings(generateHearingDates()))
@@ -2674,6 +2680,33 @@ class InitialConsiderationServiceTest {
         caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseId("67890");
         caseDetails.setCaseData(caseDataWithNullUpload);
+
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+
+        assertThat(caseDetails.getCaseData().getInitialConsiderationBeforeYouStart())
+                .contains(String.format(VIEW_ALL_DOCUMENTS, "67890"));
+    }
+
+    @Test
+    void initialiseInitialConsideration_shouldIncludeViewAllDocumentsLink_whenDocumentBinaryUrlIsNull_EW() {
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        DocumentTypeItem et1Document = new DocumentTypeItem();
+        et1Document.setValue(DocumentType.from(new UploadedDocumentType()));
+        et1Document.getValue().setDocumentType(ET1);
+        documentCollection.add(et1Document);
+
+        UploadedDocumentType uploadedDocument = new UploadedDocumentType();
+        uploadedDocument.setDocumentBinaryUrl(null);
+        DigitalCaseFileType digitalCaseFile = new DigitalCaseFileType();
+        digitalCaseFile.setUploadedDocument(uploadedDocument);
+
+        CaseData caseDataWithNullBinaryUrl = new CaseData();
+        caseDataWithNullBinaryUrl.setDocumentCollection(documentCollection);
+        caseDataWithNullBinaryUrl.setDigitalCaseFile(digitalCaseFile);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseId("67890");
+        caseDetails.setCaseData(caseDataWithNullBinaryUrl);
 
         initialConsiderationService.initialiseInitialConsideration(caseDetails);
 

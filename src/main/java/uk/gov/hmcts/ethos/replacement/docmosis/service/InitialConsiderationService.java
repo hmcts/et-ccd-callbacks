@@ -153,6 +153,9 @@ public class InitialConsiderationService {
         if (ObjectUtils.isNotEmpty(caseData.getDigitalCaseFile())
             && ObjectUtils.isNotEmpty(caseData.getDigitalCaseFile().getUploadedDocument())) {
             String documentBinaryUrl = caseData.getDigitalCaseFile().getUploadedDocument().getDocumentBinaryUrl();
+            if (documentBinaryUrl == null) {
+                return String.format(VIEW_ALL_DOCUMENTS, caseDetails.getCaseId());
+            }
             String link = documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
             return String.format(BEFORE_LABEL_DCF_IC, link);
         } else {
@@ -433,6 +436,9 @@ public class InitialConsiderationService {
     }
 
     public static String getAdjustedHearingTypeName(String hearingTypeName) {
+        if (hearingTypeName == null) {
+            return "-";
+        }
         return switch (hearingTypeName) {
             case "Hearing" -> "Final Hearing";
             case "Reconsideration" -> "Reconsideration Hearing";

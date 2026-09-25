@@ -61,7 +61,7 @@ public final class InitialConsiderationHelper {
             "extendHearingDuration", "Extend duration of hearing",
             "convertFinalToPreliminaryHearing", "Convert final hearing to preliminary hearing",
             "convertToF2FHearing", "Convert to F2F hearing",
-            "other", "Other");
+            "other", OTHER);
 
     private InitialConsiderationHelper() {
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -653,10 +653,7 @@ public final class InitialConsiderationHelper {
     private static List<String> hearingListedForDocument(CaseData caseData) {
         List<String> selected = Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                 .map(EtICHearingListedAnswers::getEtICHearingListed)
-                .orElse(null);
-        if (selected == null) {
-            return null;
-        }
+                .orElseGet(Collections::emptyList);
         return selected.stream()
                 .map(option -> option == null
                         ? null

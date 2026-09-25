@@ -24,10 +24,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.INITIAL_CONSIDERATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.ISSUE_RULE_27_NOTICE_AND_ORDER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.ISSUE_RULE_27_NOTICE_AND_ORDER_SC;
@@ -52,6 +55,13 @@ public final class InitialConsiderationHelper {
     private static final String PRELIMINARY_HEARING_CM = "Preliminary Hearing(CM)";
     private static final String SPACE_HYPHEN_SPACE = " - ";
     private static final String WITH_MEMBERS = "With members";
+    private static final Map<String, String> HEARING_LISTED_OPTION_LABELS = Map.of(
+            "proceedToHearing", "Proceed to the hearing already listed",
+            "postponeHearing", "Postpone hearing",
+            "extendHearingDuration", "Extend duration of hearing",
+            "convertFinalToPreliminaryHearing", "Convert final hearing to preliminary hearing",
+            "convertToF2FHearing", "Convert to F2F hearing",
+            "other", OTHER);
 
     private InitialConsiderationHelper() {
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -82,9 +92,15 @@ public final class InitialConsiderationHelper {
 
         InitialConsiderationData data = InitialConsiderationData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
-                .hearingPostpone(defaultIfEmpty(caseData.getEtICPostponeGiveDetails(), null))
-                .hearingConvertF2f(defaultIfEmpty(caseData.getEtICConvertF2fGiveDetails(), null))
-                .hearingConvertFinal(defaultIfEmpty(caseData.getEtICConvertPreliminaryGiveDetails(), null))
+                .hearingPostpone(hearingListedDetail(caseData,
+                        EtICHearingListedAnswers::getEtICPostponeGiveDetails,
+                        caseData.getEtICPostponeGiveDetails()))
+                .hearingConvertF2f(hearingListedDetail(caseData,
+                        EtICHearingListedAnswers::getEtICConvertF2fGiveDetails,
+                        caseData.getEtICConvertF2fGiveDetails()))
+                .hearingConvertFinal(hearingListedDetail(caseData,
+                        EtICHearingListedAnswers::getEtICConvertPreliminaryGiveDetails,
+                        caseData.getEtICConvertPreliminaryGiveDetails()))
 
                 // New values
                 .issuesJurisdiction(defaultIfEmpty(caseData.getEtICJuridictionCodesInvalid(), null))
@@ -101,8 +117,7 @@ public final class InitialConsiderationHelper {
                 .hearingAlreadyListed(defaultIfEmpty(caseData.getEtICHearingAlreadyListed(), null))
 
                 // Hearing Listed
-                .hearingListed(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
-                        .map(EtICHearingListedAnswers::getEtICHearingListed).orElse(null))
+                .hearingListed(hearingListedForDocument(caseData))
                 .hearingExtend(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICExtendDurationGiveDetails).orElse(null))
                 .hearingOther(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
@@ -285,6 +300,7 @@ public final class InitialConsiderationHelper {
                 .icDateCompleted(defaultIfEmpty(caseData.getIcDateCompleted(), formattedNow))
                 .icCompletedBy(defaultIfEmpty(caseData.getIcCompletedBy(), null))
                 .build();
+        retainActiveHearingBranch(caseData, data);
 
         InitialConsiderationDocument document = InitialConsiderationDocument.builder()
                 .accessKey(accessKey)
@@ -334,8 +350,16 @@ public final class InitialConsiderationHelper {
                 .hearingAlreadyListed(defaultIfEmpty(caseData.getEtICHearingAlreadyListed(), null))
 
                 // Hearing Listed
-                .hearingListed(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
-                        .map(EtICHearingListedAnswers::getEtICHearingListed).orElse(null))
+                .hearingPostpone(hearingListedDetail(caseData,
+                        EtICHearingListedAnswers::getEtICPostponeGiveDetails,
+                        caseData.getEtICPostponeGiveDetails()))
+                .hearingConvertF2f(hearingListedDetail(caseData,
+                        EtICHearingListedAnswers::getEtICConvertF2fGiveDetails,
+                        caseData.getEtICConvertF2fGiveDetails()))
+                .hearingConvertFinal(hearingListedDetail(caseData,
+                        EtICHearingListedAnswers::getEtICConvertPreliminaryGiveDetails,
+                        caseData.getEtICConvertPreliminaryGiveDetails()))
+                .hearingListed(hearingListedForDocument(caseData))
                 .hearingExtend(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICExtendDurationGiveDetails).orElse(null))
                 .hearingOther(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
@@ -520,6 +544,7 @@ public final class InitialConsiderationHelper {
                 .icDateCompleted(defaultIfEmpty(caseData.getIcDateCompleted(), formattedNow))
                 .icCompletedBy(defaultIfEmpty(caseData.getIcCompletedBy(), null))
                 .build();
+        retainActiveHearingBranch(caseData, data);
 
         InitialConsiderationDocument document = InitialConsiderationDocument.builder()
                 .accessKey(accessKey)
@@ -528,6 +553,112 @@ public final class InitialConsiderationHelper {
                 .data(data).build();
 
         return OBJECT_MAPPER.writeValueAsString(document);
+    }
+
+    /**
+     * The document shows either the listed-hearing section or the not-listed section.
+     * Fields from the other section are left out so a previous Initial Consideration cannot be appended.
+     */
+    private static void retainActiveHearingBranch(CaseData caseData, InitialConsiderationData data) {
+        if (YES.equals(caseData.getEtICHearingAlreadyListed())) {
+            clearNotListedDocumentFields(data);
+        } else {
+            clearListedDocumentFields(data);
+        }
+    }
+
+    private static void clearListedDocumentFields(InitialConsiderationData data) {
+        data.setHearingPostpone(null);
+        data.setHearingExtend(null);
+        data.setHearingConvertFinal(null);
+        data.setHearingConvertF2f(null);
+        data.setHearingOther(null);
+        data.setHearingListed(null);
+        data.setHearingWithJudgeOrMembers(null);
+        data.setHearingWithJudgeOrMembersReason(null);
+        data.setHearingWithJsa(null);
+        data.setHearingWithMembersLabel(null);
+        data.setHearingWithMembers(null);
+        data.setHearingWithJudgeOrMembersFurtherDetails(null);
+        data.setOtherDirections(null);
+    }
+
+    private static void clearNotListedDocumentFields(InitialConsiderationData data) {
+        data.setHearingNotListed(null);
+        data.setCvpHearingType(null);
+        data.setCvpFinalDetails(null);
+        data.setCvpPreliminaryDetails(null);
+        data.setCvpPreliminaryYesNo(null);
+        data.setPreliminaryHearingType(null);
+        data.setPreliminaryHearingPurpose(null);
+        data.setPreliminaryHearingNotice(null);
+        data.setPreliminaryHearingLength(null);
+        data.setPreliminaryHearingLengthType(null);
+        data.setPreliminaryHearingWithMembers(null);
+        data.setPreliminaryHearingWithMembersReason(null);
+        data.setHearingNotListedListAnyOtherDirections(null);
+        data.setEtICFinalHearingType(null);
+        data.setEtICTypeOfVideoHearingOrder(null);
+        data.setEtICTypeOfF2fHearingOrder(null);
+        data.setEtICHearingOrderBUCompliance(null);
+        data.setEtICFinalHearingLength(null);
+        data.setEtICFinalHearingLengthType(null);
+        data.setEtICFinalHearingIsEJSitAlone(null);
+        data.setEtICFinalHearingIsEJSitAloneReasonYes(null);
+        data.setEtICFinalHearingIsEJSitAloneReasonYesOther(null);
+        data.setEtICFinalHearingIsEJSitAloneReasonNo(null);
+        data.setEtICFinalHearingIsEJSitAloneReasonNoOther(null);
+        data.setEtICNoLFinalHearingIsEJSitAloneReasonsJsa(null);
+        data.setEtICNoLFinalHearingIsEJSitAloneReasonsJsaOther(null);
+        data.setEtICNoLFinalHearingIsEJSitAloneReasonsMembers(null);
+        data.setEtICNoLFinalHearingIsEJSitAloneReasonsMembersOther(null);
+        data.setEtICFinalHearingIsEJSitAloneFurtherDetails(null);
+        data.setUdlSitAlone(null);
+        data.setUdlReasons(null);
+        data.setUdlDisputeOnFacts(null);
+        data.setUdlLittleOrNoAgreement(null);
+        data.setUdlIssueOfLawArising(null);
+        data.setUdlViewsOfParties(null);
+        data.setUdlNoViewsExpressedByParties(null);
+        data.setUdlConcurrentProceedings(null);
+        data.setUdlOther(null);
+        data.setUdlHearingFormat(null);
+        data.setUdlCVPIssue(null);
+        data.setUdlFinalF2FIssue(null);
+        data.setUdlCheckComplianceOrders(null);
+        data.setHearingNotListedOtherDirections(null);
+    }
+
+    /**
+     * Hearing-listed free text is stored on {@code etICHearingListedAnswers}. Older cases still have the same
+     * text on the top-level case fields. Prefer the answers captured by the current event.
+     */
+    private static String hearingListedDetail(CaseData caseData,
+                                              Function<EtICHearingListedAnswers, String> fromAnswers,
+                                              String caseLevelValue) {
+        String listedAnswer = Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                .map(fromAnswers)
+                .orElse(null);
+        String preferred = defaultIfEmpty(listedAnswer, null);
+        if (preferred != null) {
+            return preferred;
+        }
+        return defaultIfEmpty(caseLevelValue, null);
+    }
+
+    /**
+     * Scotland stores hearing-listed options as codes. England and Wales stores the display labels.
+     * The document templates branch on the labels.
+     */
+    private static List<String> hearingListedForDocument(CaseData caseData) {
+        List<String> selected = Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                .map(EtICHearingListedAnswers::getEtICHearingListed)
+                .orElseGet(Collections::emptyList);
+        return selected.stream()
+                .map(option -> option == null
+                        ? null
+                        : HEARING_LISTED_OPTION_LABELS.getOrDefault(option, option))
+                .toList();
     }
 
     public static void addToDocumentCollection(CaseData caseData) {

@@ -16,6 +16,8 @@ import uk.gov.hmcts.et.common.model.bundle.Bundle;
 import uk.gov.hmcts.et.common.model.bundle.BundleDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.DigitalCaseFileType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.HubLinksStatuses;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ccd.DigitalCaseFile;
@@ -23,13 +25,16 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.ccd.HubLinkStatus;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.EtCosPostgresqlContainer;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.DigitalCaseFileRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.HubLinkStatusRepository;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.NotificationViewRepository;
 
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.VIEWED;
 
 @DataJpaTest(properties = "core_case_data.api.url=localhost:4452")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -49,6 +54,9 @@ class ETCaseViewTest {
 
     @Autowired
     private DigitalCaseFileRepository digitalCaseFileRepository;
+
+    @Autowired
+    private NotificationViewRepository notificationViewRepository;
 
     @Autowired
     private EntityManager entityManager;
@@ -77,7 +85,7 @@ class ETCaseViewTest {
         CaseData caseData = new CaseData();
         caseData.setHubLinksStatuses(statuses("blob"));
 
-        ETCaseView caseView = new ETCaseView(repository, digitalCaseFileRepository);
+        ETCaseView caseView = caseView();
         CaseData result = caseView.getCase(new CaseViewRequest<>(CASE_REFERENCE, null), caseData);
 
         assertThat(caseView.caseTypeIds())
@@ -92,7 +100,7 @@ class ETCaseViewTest {
         CaseData caseData = new CaseData();
         caseData.setHubLinksStatuses(statuses("blob"));
 
-        CaseData result = new ETCaseView(repository, digitalCaseFileRepository).getCase(
+        CaseData result = caseView().getCase(
             new CaseViewRequest<>(CASE_REFERENCE, null),
             caseData
         );
@@ -108,7 +116,7 @@ class ETCaseViewTest {
         List<Bundle> blobBundles = List.of(bundle(UUID.randomUUID()));
         caseData.setCaseBundles(blobBundles);
 
-        CaseData result = new ETCaseView(repository, digitalCaseFileRepository).getCase(
+        CaseData result = caseView().getCase(
             new CaseViewRequest<>(CASE_REFERENCE, null), caseData);
 
         assertThat(result.getDigitalCaseFile()).isSameAs(blobDcf);
@@ -124,7 +132,7 @@ class ETCaseViewTest {
         caseData.setDigitalCaseFile(dcf("blob.pdf"));
         caseData.setCaseBundles(List.of(bundle(UUID.randomUUID())));
 
-        CaseData result = new ETCaseView(repository, digitalCaseFileRepository).getCase(
+        CaseData result = caseView().getCase(
             new CaseViewRequest<>(CASE_REFERENCE, null), caseData);
 
         assertThat(result.getDigitalCaseFile()).isEqualTo(tableDcf);
@@ -141,7 +149,7 @@ class ETCaseViewTest {
         CaseData caseData = new CaseData();
         caseData.setCaseBundles(List.of(bundle(UUID.randomUUID())));
 
-        CaseData result = new ETCaseView(repository, digitalCaseFileRepository).getCase(
+        CaseData result = caseView().getCase(
             new CaseViewRequest<>(CASE_REFERENCE, null), caseData);
 
         assertThat(result.getDigitalCaseFile()).isEqualTo(tableDcf);
@@ -160,11 +168,31 @@ class ETCaseViewTest {
         caseData.setDigitalCaseFile(dcf("removed.pdf"));
         caseData.setCaseBundles(List.of(bundle(UUID.randomUUID())));
 
-        CaseData result = new ETCaseView(repository, digitalCaseFileRepository).getCase(
+        CaseData result = caseView().getCase(
             new CaseViewRequest<>(CASE_REFERENCE, null), caseData);
 
         assertThat(result.getDigitalCaseFile()).isNull();
         assertThat(result.getCaseBundles()).isNull();
+    }
+
+    @Test
+    void appliesViewsRecordedInTheTable() {
+        jdbc.update("insert into public.notification_view (case_reference, item_id) values (?, 'notification')",
+            CASE_REFERENCE);
+        CaseData caseData = new CaseData();
+        caseData.setSendNotificationCollection(List.of(SendNotificationTypeItem.builder()
+            .id("notification")
+            .value(SendNotificationType.builder().notificationState(NOT_VIEWED_YET).build())
+            .build()));
+
+        CaseData result = caseView().getCase(new CaseViewRequest<>(CASE_REFERENCE, null), caseData);
+
+        assertThat(result.getSendNotificationCollection().getFirst().getValue().getNotificationState())
+            .isEqualTo(VIEWED);
+    }
+
+    private ETCaseView caseView() {
+        return new ETCaseView(repository, digitalCaseFileRepository, notificationViewRepository);
     }
 
     private DigitalCaseFileType dcf(String filename) {

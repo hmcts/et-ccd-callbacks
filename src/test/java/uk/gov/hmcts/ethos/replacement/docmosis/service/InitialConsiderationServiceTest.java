@@ -1690,6 +1690,11 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
+    void clearOldValues_doesNothingWhenCaseDataIsNull() {
+        initialConsiderationService.clearOldValues(null);
+    }
+
+    @Test
     void setPartiesHearingPanelPreferenceDetails_shouldFormatPanelPreferencesCorrectly() {
         CaseData caseDataWithPanelPreferences = new CaseData();
         caseDataWithPanelPreferences.setClaimant("Test Claimant");

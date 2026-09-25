@@ -759,6 +759,9 @@ public class InitialConsiderationService {
     }
 
     public void clearOldValues(CaseData caseData) {
+        if (caseData == null) {
+            return;
+        }
         HearingsHelper.refreshEtICHearingAlreadyListed(caseData);
         clearHiddenValue(caseData);
         caseData.setEtICHearingNotListedListForPrelimHearingUpdated(null);

@@ -2566,6 +2566,32 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
+    void clearOldValues_shouldClearEtICHearingNotListedReferVP() {
+        CaseData data = new CaseData();
+        data.setEtICHearingNotListedReferVP(YES);
+        data.setEtICHearingNotListedReferVPFurtherDetails("Further details");
+
+        InitialConsiderationService service = new InitialConsiderationService(mock(TornadoService.class));
+        service.clearOldValues(data);
+
+        assertNull(data.getEtICHearingNotListedReferVP());
+        assertNull(data.getEtICHearingNotListedReferVPFurtherDetails());
+    }
+
+    @Test
+    void clearOldValues_shouldClearEtICHearingListedReferVP() {
+        CaseData data = new CaseData();
+        data.setEtICHearingListedReferVP(YES);
+        data.setEtICHearingListedReferVPFurtherDetails("Further details");
+
+        InitialConsiderationService service = new InitialConsiderationService(mock(TornadoService.class));
+        service.clearOldValues(data);
+
+        assertNull(data.getEtICHearingListedReferVP());
+        assertNull(data.getEtICHearingListedReferVPFurtherDetails());
+    }
+
+    @Test
     void shouldNotAppendAnythingIfEt1SuggestHearingVenueIsNull() {
         CaseData caseDataWithEt1SuggestedHearingVenue = new CaseData();
         caseDataWithEt1SuggestedHearingVenue.setEt1SuggestHearingVenue(null);

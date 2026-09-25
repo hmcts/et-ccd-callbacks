@@ -1,0 +1,16 @@
+[
+  {
+    "CaseTypeID": "ET_Scotland",
+    "Channel": "CaseWorker",
+    "TabID": "Et1Vetting",
+    "CaseFieldID": "et1VettingEra",
+    "TabFieldDisplayOrder": 20
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "Channel": "CaseWorker",
+    "TabID": "initialConsideration",
+    "CaseFieldID": "etICUnfairDismissalEra",
+    "TabFieldDisplayOrder": 4
+  }
+]

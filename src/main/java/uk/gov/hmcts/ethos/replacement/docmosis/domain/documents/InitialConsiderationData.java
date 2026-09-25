@@ -24,6 +24,8 @@ public class InitialConsiderationData {
     private String icCanProceed;
     @JsonProperty("hearingAlreadyListed")
     private String hearingAlreadyListed;
+    @JsonProperty("udlEra")
+    private String udlEra;
 
     //Scotland & EngWales
 

@@ -1,10 +1,10 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Project Overview
 
 Employment Tribunals CCD Callbacks Service - A Spring Boot 3.3.0 application (Java 21) that handles all CCD (Case and Case Data) callback requests for Employment Tribunal cases in the UK. The application serves England/Wales and Scotland jurisdictions with separate CCD definitions and integrates with HMCTS common platform components.
+
+NOTE: This service is now 'decentralised' managig its own case data in is own database with in-process dispatch of what were previously http callbacks; see https://github.com/hmcts/dtsse-ccd-config-generator/tree/master/docs
 
 ## Build and Test Commands
 

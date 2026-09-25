@@ -762,7 +762,10 @@ public class InitialConsiderationService {
         caseData.setEtICHearingNotListedListForFinalHearing(null);
         caseData.setEtICHearingNotListedUDLHearing(null);
         caseData.setEtICHearingNotListedAnyOtherDirections(null);
-
+        caseData.setEtICHearingNotListedReferVP(null);
+        caseData.setEtICHearingNotListedReferVPFurtherDetails(null);
+        caseData.setEtICHearingListedReferVP(null);
+        caseData.setEtICHearingListedReferVPFurtherDetails(null);
     }
 
     public void clearMarkupAndOldValueAfterSubmit(CaseData caseData) {

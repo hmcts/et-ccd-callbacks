@@ -1117,7 +1117,7 @@
     "CaseTypeID": "ET_Scotland",
     "ID": "updateInitialConsiderationDocument",
     "Name": "Regenerate IC doc",
-    "Description": "Regenerate the Initial Consideration PDF from the current Initial Consideration details. Completed by and date completed are kept from the original Initial Consideration.",
+    "Description": "Regenerate the Initial Consideration PDF. Completed by and date are kept.",
     "DisplayOrder": 45,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",

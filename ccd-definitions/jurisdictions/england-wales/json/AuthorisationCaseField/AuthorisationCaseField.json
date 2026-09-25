@@ -4478,12 +4478,6 @@
   {
     "CaseTypeId": "ET_EnglandWales",
     "CaseFieldID": "hearingDetailsHearing",
-    "UserRole": "citizen",
-    "CRUD": "CRU"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsHearing",
     "UserRole": "caseworker-employment-etjudge-englandwales",
     "CRUD": "CRU"
   },
@@ -4606,12 +4600,6 @@
     "CaseFieldID": "ecmOfficeCT",
     "UserRole": "caseworker-employment-englandwales",
     "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "ecmOfficeCT",
-    "UserRole": "citizen",
-    "CRUD": "CRU"
   },
   {
     "CaseTypeId": "ET_EnglandWales",
@@ -16107,12 +16095,6 @@
     "CaseTypeId": "ET_EnglandWales",
     "CaseFieldID": "suggestedHearingVenues",
     "UserRole": "caseworker-employment-englandwales",
-    "CRUD": "CRU"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "suggestedHearingVenues",
-    "UserRole": "citizen",
     "CRUD": "CRU"
   },
   {

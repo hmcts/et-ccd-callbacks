@@ -1644,6 +1644,46 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
+    void clearOldValues_replacesPreviousNotListedAnswersWhenHearingIsNowListed() {
+        CaseData caseDataNowListed = new CaseData();
+        caseDataNowListed.setEtICCanProceed(YES);
+        caseDataNowListed.setEtICHearingAlreadyListed(NO);
+        caseDataNowListed.setEtICHearingNotListedList(new ArrayList<>(List.of("List for final hearing")));
+        caseDataNowListed.setEtICHearingNotListedListUpdated(new ArrayList<>(List.of("List for final hearing")));
+        EtICHearingListedAnswers previousAnswers = new EtICHearingListedAnswers();
+        previousAnswers.setEtICConvertPreliminaryGiveDetails("Old convert text");
+        caseDataNowListed.setEtICHearingListedAnswers(previousAnswers);
+        caseDataNowListed.setHearingCollection(List.of(
+                createHearingTypeItem("2030-08-01T10:00:00.000", "Listed", "Hearing", "Hours", "1")));
+
+        initialConsiderationService.clearOldValues(caseDataNowListed);
+
+        assertEquals(YES, caseDataNowListed.getEtICHearingAlreadyListed());
+        assertNull(caseDataNowListed.getEtICHearingNotListedList());
+        assertNull(caseDataNowListed.getEtICHearingNotListedListUpdated());
+        assertNull(caseDataNowListed.getEtICHearingListedAnswers());
+    }
+
+    @Test
+    void clearOldValues_clearsListedAnswersWhenHearingIsNoLongerListed() {
+        CaseData caseDataNoLongerListed = new CaseData();
+        caseDataNoLongerListed.setEtICCanProceed(YES);
+        caseDataNoLongerListed.setEtICHearingAlreadyListed(YES);
+        caseDataNoLongerListed.setEtICHearingNotListedList(new ArrayList<>(List.of("List for preliminary hearing")));
+        EtICHearingListedAnswers previousAnswers = new EtICHearingListedAnswers();
+        previousAnswers.setEtICConvertPreliminaryGiveDetails("Old convert text");
+        caseDataNoLongerListed.setEtICHearingListedAnswers(previousAnswers);
+        caseDataNoLongerListed.setHearingCollection(List.of(
+                createHearingTypeItem("2030-08-01T10:00:00.000", "Heard", "Hearing", "Hours", "1")));
+
+        initialConsiderationService.clearOldValues(caseDataNoLongerListed);
+
+        assertEquals(NO, caseDataNoLongerListed.getEtICHearingAlreadyListed());
+        assertNull(caseDataNoLongerListed.getEtICHearingListedAnswers());
+        assertEquals(List.of("List for preliminary hearing"), caseDataNoLongerListed.getEtICHearingNotListedList());
+    }
+
+    @Test
     void setPartiesHearingPanelPreferenceDetails_shouldFormatPanelPreferencesCorrectly() {
         CaseData caseDataWithPanelPreferences = new CaseData();
         caseDataWithPanelPreferences.setClaimant("Test Claimant");

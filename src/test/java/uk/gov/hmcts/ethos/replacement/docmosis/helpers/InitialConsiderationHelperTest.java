@@ -161,7 +161,7 @@ class InitialConsiderationHelperTest {
                 + "\"issuesJurisdiction\":\"No\",\"issuesJurCodesGiveDetails\":null,\"canProceed\":\"Yes\","
                 + "\"hearingAlreadyListed\":\"No\",\"hearingListed\":null,\"hearingPostpone\":null,"
                 + "\"hearingExtend\":null,\"hearingConvertFinal\":null,\"hearingConvertF2f\":null,"
-                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":[\"\"],"
+                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":null,"
                 + "\"hearingWithJsa\":null,\"hearingWithMembersLabel\":null,\"hearingWithMembers\":null,"
                 + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
                 + "\"hearingNotListed\":[\"List for preliminary hearing\"],\"cvpHearingType\":null,"
@@ -215,7 +215,7 @@ class InitialConsiderationHelperTest {
                 + "\"issuesJurisdiction\":\"No\",\"issuesJurCodesGiveDetails\":null,\"canProceed\":\"Yes\","
                 + "\"hearingAlreadyListed\":\"No\",\"hearingListed\":null,\"hearingPostpone\":null,"
                 + "\"hearingExtend\":null,\"hearingConvertFinal\":null,\"hearingConvertF2f\":null,"
-                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":[\"\"],"
+                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":null,"
                 + "\"hearingWithJsa\":null,\"hearingWithMembersLabel\":null,\"hearingWithMembers\":null,"
                 + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
                 + "\"hearingNotListed\":[\"List for final hearing\"],\"cvpHearingType\":null,"
@@ -341,7 +341,7 @@ class InitialConsiderationHelperTest {
                 + "\"issuesJurisdiction\":\"No\",\"issuesJurCodesGiveDetails\":null,\"canProceed\":\"Yes\","
                 + "\"hearingAlreadyListed\":\"No\",\"hearingListed\":null,\"hearingPostpone\":null,"
                 + "\"hearingExtend\":null,\"hearingConvertFinal\":null,\"hearingConvertF2f\":null,"
-                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":[\"\"],"
+                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":null,"
                 + "\"hearingWithJsa\":null,\"hearingWithMembersLabel\":null,\"hearingWithMembers\":null,"
                 + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
                 + "\"hearingNotListed\":[\"List for final hearing\"],\"cvpHearingType\":null,"
@@ -399,7 +399,7 @@ class InitialConsiderationHelperTest {
                 + "\"issuesJurisdiction\":\"No\",\"issuesJurCodesGiveDetails\":null,\"canProceed\":\"Yes\","
                 + "\"hearingAlreadyListed\":\"No\",\"hearingListed\":null,\"hearingPostpone\":null,"
                 + "\"hearingExtend\":null,\"hearingConvertFinal\":null,\"hearingConvertF2f\":null,"
-                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":[\"\"],"
+                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":null,"
                 + "\"hearingWithJsa\":null,\"hearingWithMembersLabel\":null,\"hearingWithMembers\":null,"
                 + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
                 + "\"hearingNotListed\":[\"List for preliminary hearing\"],\"cvpHearingType\":null,"
@@ -451,7 +451,7 @@ class InitialConsiderationHelperTest {
                 + "\"issuesJurisdiction\":null,\"issuesJurCodesGiveDetails\":null,\"canProceed\":null,"
                 + "\"hearingAlreadyListed\":null,\"hearingListed\":null,\"hearingPostpone\":null,"
                 + "\"hearingExtend\":null,\"hearingConvertFinal\":null,\"hearingConvertF2f\":null,"
-                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":[\"\"],"
+                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":null,"
                 + "\"hearingWithJsa\":null,\"hearingWithMembersLabel\":null,\"hearingWithMembers\":null,"
                 + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
                 + "\"hearingNotListed\":null,\"cvpHearingType\":null,\"cvpFinalDetails\":null,"
@@ -525,7 +525,7 @@ class InitialConsiderationHelperTest {
                 + "\"issuesJurisdiction\":\"No\",\"issuesJurCodesGiveDetails\":null,\"canProceed\":\"Yes\","
                 + "\"hearingAlreadyListed\":\"No\",\"hearingListed\":null,\"hearingPostpone\":null,"
                 + "\"hearingExtend\":null,\"hearingConvertFinal\":null,\"hearingConvertF2f\":null,"
-                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":[\"\"],"
+                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":null,"
                 + "\"hearingWithJsa\":null,\"hearingWithMembersLabel\":null,\"hearingWithMembers\":null,"
                 + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
                 + "\"hearingNotListed\":null,\"cvpHearingType\":null,"
@@ -580,7 +580,7 @@ class InitialConsiderationHelperTest {
                 + "\"issuesJurisdiction\":\"No\",\"issuesJurCodesGiveDetails\":null,\"canProceed\":\"Yes\","
                 + "\"hearingAlreadyListed\":\"No\",\"hearingListed\":null,\"hearingPostpone\":null,"
                 + "\"hearingExtend\":null,\"hearingConvertFinal\":null,\"hearingConvertF2f\":null,"
-                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":[\"\"],"
+                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":null,"
                 + "\"hearingWithJsa\":null,\"hearingWithMembersLabel\":null,\"hearingWithMembers\":null,"
                 + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
                 + "\"hearingNotListed\":null,\"cvpHearingType\":null,"
@@ -744,6 +744,7 @@ class InitialConsiderationHelperTest {
         answers.setEtICPostponeGiveDetails("Postpone this hearing");
         answers.setEtICConvertF2fGiveDetails("Convert to face to face");
         CaseData scotlandCase = new CaseData();
+        scotlandCase.setEtICHearingAlreadyListed("Yes");
         scotlandCase.setEtICHearingListedAnswers(answers);
 
         JsonNode data = documentData(scotlandCase, SCOTLAND_CASE_TYPE_ID);
@@ -759,6 +760,7 @@ class InitialConsiderationHelperTest {
     @Test
     void getDocumentRequest_scotland_usesTopLevelDetailsWhenAnswersDoNotContainThem() throws JsonProcessingException {
         CaseData scotlandCase = new CaseData();
+        scotlandCase.setEtICHearingAlreadyListed("Yes");
         scotlandCase.setEtICConvertPreliminaryGiveDetails("Legacy convert text");
         scotlandCase.setEtICPostponeGiveDetails("Legacy postpone text");
         scotlandCase.setEtICConvertF2fGiveDetails("Legacy face to face text");
@@ -779,6 +781,7 @@ class InitialConsiderationHelperTest {
         answers.setEtICPostponeGiveDetails("Postpone this hearing");
         answers.setEtICConvertF2fGiveDetails("Convert to face to face");
         CaseData englandWalesCase = new CaseData();
+        englandWalesCase.setEtICHearingAlreadyListed("Yes");
         englandWalesCase.setEtICHearingListedAnswers(answers);
 
         JsonNode data = documentData(englandWalesCase, ENGLANDWALES_CASE_TYPE_ID);
@@ -794,6 +797,7 @@ class InitialConsiderationHelperTest {
     void getDocumentRequest_englandWales_usesTopLevelDetailsWhenAnswersDoNotContainThem()
             throws JsonProcessingException {
         CaseData englandWalesCase = new CaseData();
+        englandWalesCase.setEtICHearingAlreadyListed("Yes");
         englandWalesCase.setEtICConvertPreliminaryGiveDetails("Legacy convert text");
         englandWalesCase.setEtICPostponeGiveDetails("Legacy postpone text");
         englandWalesCase.setEtICConvertF2fGiveDetails("Legacy face to face text");
@@ -803,6 +807,34 @@ class InitialConsiderationHelperTest {
         assertEquals("Legacy convert text", data.get("hearingConvertFinal").asText());
         assertEquals("Legacy postpone text", data.get("hearingPostpone").asText());
         assertEquals("Legacy face to face text", data.get("hearingConvertF2f").asText());
+    }
+
+    @Test
+    void getDocumentRequest_omitsNotListedDetailsWhenHearingIsAlreadyListed() throws JsonProcessingException {
+        CaseData listedCase = new CaseData();
+        listedCase.setEtICHearingAlreadyListed("Yes");
+        listedCase.setEtICHearingNotListedListUpdated(List.of("List for final hearing"));
+        EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
+        answers.setEtICConvertPreliminaryGiveDetails("Convert this final hearing");
+        listedCase.setEtICHearingListedAnswers(answers);
+
+        JsonNode data = documentData(listedCase, ENGLANDWALES_CASE_TYPE_ID);
+
+        assertEquals("Convert this final hearing", data.get("hearingConvertFinal").asText());
+        assertTrue(data.get("hearingNotListed").isNull());
+    }
+
+    @Test
+    void getDocumentRequest_omitsListedDetailsWhenHearingIsNotAlreadyListed() throws JsonProcessingException {
+        CaseData notListedCase = new CaseData();
+        notListedCase.setEtICHearingAlreadyListed("No");
+        notListedCase.setEtICHearingNotListedListUpdated(List.of("List for final hearing"));
+        notListedCase.setEtICConvertPreliminaryGiveDetails("Convert this final hearing");
+
+        JsonNode data = documentData(notListedCase, SCOTLAND_CASE_TYPE_ID);
+
+        assertEquals("List for final hearing", data.get("hearingNotListed").get(0).asText());
+        assertTrue(data.get("hearingConvertFinal").isNull());
     }
 
     private static JsonNode documentData(CaseData caseData, String caseTypeId) throws JsonProcessingException {

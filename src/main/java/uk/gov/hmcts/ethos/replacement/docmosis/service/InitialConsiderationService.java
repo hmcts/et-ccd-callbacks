@@ -753,6 +753,7 @@ public class InitialConsiderationService {
     }
 
     public void clearOldValues(CaseData caseData) {
+        HearingsHelper.refreshEtICHearingAlreadyListed(caseData);
         clearHiddenValue(caseData);
         caseData.setEtICHearingNotListedListForPrelimHearingUpdated(null);
         caseData.setEtICHearingNotListedListForFinalHearingUpdated(null);
@@ -763,6 +764,10 @@ public class InitialConsiderationService {
         caseData.setEtICHearingNotListedUDLHearing(null);
         caseData.setEtICHearingNotListedAnyOtherDirections(null);
 
+        if (YES.equals(caseData.getEtICHearingAlreadyListed())) {
+            // A future Listed hearing replaces the previous listed answers. The hearing type is set afterwards.
+            removeEtICHearingAlreadyListedNoValue(caseData);
+        }
     }
 
     public void mapOldIcHearingNotListedOptionsToNew(CaseData caseData, String caseTypeId) {

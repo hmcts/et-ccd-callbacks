@@ -49,6 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,6 +68,8 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
     private static final String COMPLETE_INITIAL_CONSIDERATION_URL = "/completeInitialConsideration";
     private static final String START_INITIAL_CONSIDERATION_URL = "/startInitialConsideration";
     private static final String SUBMIT_INITIAL_CONSIDERATION_URL = "/submitInitialConsideration";
+    private static final String UPDATE_IC_DOCUMENT_URL = "/updateInitialConsiderationDocument";
+    private static final String COMPLETE_UPDATE_IC_DOCUMENT_URL = "/completeUpdateInitialConsiderationDocument";
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -216,6 +219,54 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void updateInitialConsiderationDocument_keepsCompletedByAndDate() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(initialConsiderationService.generateDocument(any(), any(), any()))
+                .thenReturn(DocumentInfo.builder().build());
+        when(documentManagementService.addDocumentToDocumentField(any()))
+                .thenReturn(new UploadedDocumentType());
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setIcCompletedBy("Alex Caseworker");
+        caseData.setIcDateCompleted("20 Nov 2024");
+
+        mvc.perform(post(UPDATE_IC_DOCUMENT_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.icCompletedBy").value("Alex Caseworker"))
+                .andExpect(jsonPath("$.data.icDateCompleted").value("20 Nov 2024"))
+                .andExpect(jsonPath("$.data.etInitialConsiderationDocument", notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()));
+
+        verify(initialConsiderationService, times(1)).generateDocument(any(), any(), any());
+        verify(reportDataService, never()).getUserFullName(any());
+        verify(initialConsiderationService, never()).clearOldValues(any());
+    }
+
+    @Test
+    void updateInitialConsiderationDocument_TokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(UPDATE_IC_DOCUMENT_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void completeUpdateInitialConsiderationDocument_TokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(COMPLETE_UPDATE_IC_DOCUMENT_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.confirmation_header", notNullValue()));
     }
 
     @Test

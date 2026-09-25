@@ -31,6 +31,7 @@ import java.time.format.DateTimeFormatter;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
@@ -54,6 +55,7 @@ public class InitialConsiderationController {
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String COMPLETE_IC_HDR = "<h1>Initial consideration complete</h1>";
+    private static final String UPDATE_IC_DOC_HDR = "<h1>Initial consideration document updated</h1>";
 
     @PostMapping(value = "/completeInitialConsideration", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "completes the Initial Consideration flow")
@@ -74,6 +76,62 @@ public class InitialConsiderationController {
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .confirmation_header(COMPLETE_IC_HDR)
+            .build());
+    }
+
+    /**
+     * Regenerates the Initial Consideration PDF from the details already stored on the case.
+     * Completed by and date completed stay as recorded on the Initial Consideration tab.
+     * @param ccdRequest Holds the request and case data
+     * @param userToken Used for authorisation
+     * @return caseData in ccdRequest
+     */
+    @PostMapping(value = "/updateInitialConsiderationDocument", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Regenerates the Initial Consideration PDF from the current tab details")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {
+        @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")})
+    public ResponseEntity<CCDCallbackResponse> updateInitialConsiderationDocument(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+        log.info("UPDATE INITIAL CONSIDERATION DOCUMENT ABOUT TO SUBMIT ---> {}",
+            ccdRequest.getCaseDetails().getCaseId());
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        DocumentInfo documentInfo = initialConsiderationService.generateDocument(caseData, userToken,
+                ccdRequest.getCaseDetails().getCaseTypeId());
+        caseData.setEtInitialConsiderationDocument(documentManagementService.addDocumentToDocumentField(documentInfo));
+        InitialConsiderationHelper.addToDocumentCollection(caseData);
+        setDocumentNumbers(caseData);
+
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    @PostMapping(value = "/completeUpdateInitialConsiderationDocument", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Confirms the Initial Consideration document has been updated")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {
+        @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")})
+    public ResponseEntity<CCDCallbackResponse> completeUpdateInitialConsiderationDocument(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+        log.info("Update Initial Consideration document complete requested for case reference ---> {}",
+            ccdRequest.getCaseDetails().getCaseId());
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+            .confirmation_header(UPDATE_IC_DOC_HDR)
             .build());
     }
 
@@ -165,7 +223,9 @@ public class InitialConsiderationController {
         caseData.setEtInitialConsiderationJurisdictionCodes(initialConsiderationService.generateJurisdictionCodesHtml(
                         caseData.getJurCodesCollection(), caseTypeId));
 
-        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData, caseTypeId);
+        if (!YES.equals(caseData.getEtICHearingAlreadyListed())) {
+            initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData, caseTypeId);
+        }
 
         initialConsiderationService.setEt1VettingAndEt3ProcessingDetails(caseData, caseTypeId);
 

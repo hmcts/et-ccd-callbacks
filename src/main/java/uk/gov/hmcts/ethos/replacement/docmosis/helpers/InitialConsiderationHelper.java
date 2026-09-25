@@ -30,6 +30,7 @@ import java.util.function.Function;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.INITIAL_CONSIDERATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.ISSUE_RULE_27_NOTICE_AND_ORDER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.ISSUE_RULE_27_NOTICE_AND_ORDER_SC;
@@ -299,6 +300,7 @@ public final class InitialConsiderationHelper {
                 .icDateCompleted(defaultIfEmpty(caseData.getIcDateCompleted(), formattedNow))
                 .icCompletedBy(defaultIfEmpty(caseData.getIcCompletedBy(), null))
                 .build();
+        retainActiveHearingBranch(caseData, data);
 
         InitialConsiderationDocument document = InitialConsiderationDocument.builder()
                 .accessKey(accessKey)
@@ -542,6 +544,7 @@ public final class InitialConsiderationHelper {
                 .icDateCompleted(defaultIfEmpty(caseData.getIcDateCompleted(), formattedNow))
                 .icCompletedBy(defaultIfEmpty(caseData.getIcCompletedBy(), null))
                 .build();
+        retainActiveHearingBranch(caseData, data);
 
         InitialConsiderationDocument document = InitialConsiderationDocument.builder()
                 .accessKey(accessKey)
@@ -550,6 +553,80 @@ public final class InitialConsiderationHelper {
                 .data(data).build();
 
         return OBJECT_MAPPER.writeValueAsString(document);
+    }
+
+    /**
+     * The document shows either the listed-hearing section or the not-listed section.
+     * Fields from the other section are left out so a previous Initial Consideration cannot be appended.
+     */
+    private static void retainActiveHearingBranch(CaseData caseData, InitialConsiderationData data) {
+        if (YES.equals(caseData.getEtICHearingAlreadyListed())) {
+            clearNotListedDocumentFields(data);
+        } else {
+            clearListedDocumentFields(data);
+        }
+    }
+
+    private static void clearListedDocumentFields(InitialConsiderationData data) {
+        data.setHearingPostpone(null);
+        data.setHearingExtend(null);
+        data.setHearingConvertFinal(null);
+        data.setHearingConvertF2f(null);
+        data.setHearingOther(null);
+        data.setHearingListed(null);
+        data.setHearingWithJudgeOrMembers(null);
+        data.setHearingWithJudgeOrMembersReason(null);
+        data.setHearingWithJsa(null);
+        data.setHearingWithMembersLabel(null);
+        data.setHearingWithMembers(null);
+        data.setHearingWithJudgeOrMembersFurtherDetails(null);
+        data.setOtherDirections(null);
+    }
+
+    private static void clearNotListedDocumentFields(InitialConsiderationData data) {
+        data.setHearingNotListed(null);
+        data.setCvpHearingType(null);
+        data.setCvpFinalDetails(null);
+        data.setCvpPreliminaryDetails(null);
+        data.setCvpPreliminaryYesNo(null);
+        data.setPreliminaryHearingType(null);
+        data.setPreliminaryHearingPurpose(null);
+        data.setPreliminaryHearingNotice(null);
+        data.setPreliminaryHearingLength(null);
+        data.setPreliminaryHearingLengthType(null);
+        data.setPreliminaryHearingWithMembers(null);
+        data.setPreliminaryHearingWithMembersReason(null);
+        data.setHearingNotListedListAnyOtherDirections(null);
+        data.setEtICFinalHearingType(null);
+        data.setEtICTypeOfVideoHearingOrder(null);
+        data.setEtICTypeOfF2fHearingOrder(null);
+        data.setEtICHearingOrderBUCompliance(null);
+        data.setEtICFinalHearingLength(null);
+        data.setEtICFinalHearingLengthType(null);
+        data.setEtICFinalHearingIsEJSitAlone(null);
+        data.setEtICFinalHearingIsEJSitAloneReasonYes(null);
+        data.setEtICFinalHearingIsEJSitAloneReasonYesOther(null);
+        data.setEtICFinalHearingIsEJSitAloneReasonNo(null);
+        data.setEtICFinalHearingIsEJSitAloneReasonNoOther(null);
+        data.setEtICNoLFinalHearingIsEJSitAloneReasonsJsa(null);
+        data.setEtICNoLFinalHearingIsEJSitAloneReasonsJsaOther(null);
+        data.setEtICNoLFinalHearingIsEJSitAloneReasonsMembers(null);
+        data.setEtICNoLFinalHearingIsEJSitAloneReasonsMembersOther(null);
+        data.setEtICFinalHearingIsEJSitAloneFurtherDetails(null);
+        data.setUdlSitAlone(null);
+        data.setUdlReasons(null);
+        data.setUdlDisputeOnFacts(null);
+        data.setUdlLittleOrNoAgreement(null);
+        data.setUdlIssueOfLawArising(null);
+        data.setUdlViewsOfParties(null);
+        data.setUdlNoViewsExpressedByParties(null);
+        data.setUdlConcurrentProceedings(null);
+        data.setUdlOther(null);
+        data.setUdlHearingFormat(null);
+        data.setUdlCVPIssue(null);
+        data.setUdlFinalF2FIssue(null);
+        data.setUdlCheckComplianceOrders(null);
+        data.setHearingNotListedOtherDirections(null);
     }
 
     /**

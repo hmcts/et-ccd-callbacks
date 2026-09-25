@@ -5,6 +5,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
@@ -27,6 +28,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -48,9 +50,15 @@ public final class Et3ResponseHelper {
     public static final String ET3_RESPONSE_EMPLOYMENT_DETAILS = "et3ResponseEmploymentDetails";
     public static final String ET3_RESPONSE_DETAILS = "et3ResponseDetails";
     public static final String ALL_RESPONDENTS_INCOMPLETE_SECTIONS = "There are no respondents that can currently "
-            + "submit an ET3 Form. Please make sure all 3 sections have been completed for a respondent";
+            + "submit an ET3 Form. Please make sure all mandatory questions in all 3 sections have been answered for a "
+            + "respondent";
     public static final String NO_RESPONDENTS_FOUND = "No respondents found";
     private static final String INVALID_EVENT_ID = "Invalid eventId: ";
+    public static final String RESPONDENT_POSTCODE_REQUIRED = "Enter a UK postcode";
+    public static final String CONTEST_CLAIM_REASON_REQUIRED = "Explain why the respondent contests the claim or "
+            + "upload a document";
+    public static final String EMPLOYER_CLAIM_DETAILS_REQUIRED = "Provide the background and details of the "
+            + "Employer's contract claim or upload a document";
 
     private Et3ResponseHelper() {
         // Access through static methods
@@ -100,6 +108,57 @@ public final class Et3ResponseHelper {
         }
 
         return errors;
+    }
+
+    /**
+     * Validates that a postcode has been entered for the respondent's address.
+     *
+     * @param caseData data for the current case
+     * @return List of validation errors encountered
+     */
+    public static List<String> validateRespondentAddress(CaseData caseData) {
+        return hasPostCode(caseData.getEt3RespondentAddress())
+                ? new ArrayList<>()
+                : List.of(RESPONDENT_POSTCODE_REQUIRED);
+    }
+
+    /**
+     * Validates that a reason has been given, as text or a document, when the respondent contests the claim.
+     *
+     * @param caseData data for the current case
+     * @return List of validation errors encountered
+     */
+    public static List<String> validateContestClaimReason(CaseData caseData) {
+        return isAnsweredIfYes(caseData.getEt3ResponseRespondentContestClaim(),
+                caseData.getEt3ResponseContestClaimDetails(), caseData.getEt3ResponseContestClaimDocument())
+                ? new ArrayList<>()
+                : List.of(CONTEST_CLAIM_REASON_REQUIRED);
+    }
+
+    /**
+     * Validates that details have been given, as text or a document, when the respondent is making an employer's
+     * contract claim.
+     *
+     * @param caseData data for the current case
+     * @return List of validation errors encountered
+     */
+    public static List<String> validateEmployerClaimDetails(CaseData caseData) {
+        return isAnsweredIfYes(caseData.getEt3ResponseEmployerClaim(),
+                caseData.getEt3ResponseEmployerClaimDetails(), caseData.getEt3ResponseEmployerClaimDocument())
+                ? new ArrayList<>()
+                : List.of(EMPLOYER_CLAIM_DETAILS_REQUIRED);
+    }
+
+    private static boolean hasPostCode(Address address) {
+        return address != null && isNotBlank(address.getPostCode());
+    }
+
+    /**
+     * A follow-up to a Yes/No question is answered if the answer wasn't Yes, or if either text or a document has
+     * been provided.
+     */
+    private static boolean isAnsweredIfYes(String answer, String details, Object document) {
+        return !YES.equals(answer) || isNotBlank(details) || isNotEmpty(document);
     }
 
     /**
@@ -264,7 +323,7 @@ public final class Et3ResponseHelper {
         respondent.setEt3ResponseEmployerClaim(caseData.getEt3ResponseEmployerClaim());
         respondent.setEt3ResponseEmployerClaimDetails(caseData.getEt3ResponseEmployerClaimDetails());
         respondent.setEt3ResponseEmployerClaimDocument(caseData.getEt3ResponseEmployerClaimDocument());
-        respondent.setClaimDetailsSection(YES);
+        respondent.setClaimDetailsSection(isResponseDetailsSectionComplete(respondent) ? YES : NO);
         return respondent;
     }
 
@@ -307,8 +366,32 @@ public final class Et3ResponseHelper {
         respondent.setEt3ResponseRespondentSupportNeeded(caseData.getEt3ResponseRespondentSupportNeeded());
         respondent.setEt3ResponseRespondentSupportDetails(caseData.getEt3ResponseRespondentSupportDetails());
         respondent.setEt3ResponseRespondentSupportDocument(caseData.getEt3ResponseRespondentSupportDocument());
-        respondent.setPersonalDetailsSection(YES);
+        respondent.setPersonalDetailsSection(isRespondentDetailsSectionComplete(respondent) ? YES : NO);
         return respondent;
+    }
+
+    /**
+     * The respondent details section is only complete once the claimant has been confirmed and the respondent's
+     * legal name and address (including postcode) have been provided.
+     */
+    private static boolean isRespondentDetailsSectionComplete(RespondentSumType respondent) {
+        return isNotBlank(respondent.getEt3ResponseIsClaimantNameCorrect())
+                && isNotBlank(respondent.getResponseRespondentName())
+                && hasPostCode(respondent.getResponseRespondentAddress());
+    }
+
+    /**
+     * The response details section is only complete once the respondent has said whether they contest the claim
+     * (and why, if they do) and whether they are making an employer's contract claim (and its details, if they are).
+     * Reasons and details can be given as text or as an uploaded document.
+     */
+    private static boolean isResponseDetailsSectionComplete(RespondentSumType respondent) {
+        return isNotBlank(respondent.getEt3ResponseRespondentContestClaim())
+                && isAnsweredIfYes(respondent.getEt3ResponseRespondentContestClaim(),
+                    respondent.getEt3ResponseContestClaimDetails(), respondent.getEt3ResponseContestClaimDocument())
+                && isNotBlank(respondent.getEt3ResponseEmployerClaim())
+                && isAnsweredIfYes(respondent.getEt3ResponseEmployerClaim(),
+                    respondent.getEt3ResponseEmployerClaimDetails(), respondent.getEt3ResponseEmployerClaimDocument());
     }
 
     private static RespondentSumType addEmploymentDetailsToRespondent(CaseData caseData, RespondentSumType respondent) {

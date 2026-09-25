@@ -3,6 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -56,6 +58,9 @@ class Et3ResponseControllerTest extends BaseControllerTest {
     private static final String ABOUT_TO_START_URL = "/et3Response/aboutToStart";
     private static final String PROCESSING_COMPLETE_URL = "/et3Response/processingComplete";
     private static final String MID_EMPLOYMENT_DATES_URL = "/et3Response/midEmploymentDates";
+    private static final String MID_RESPONDENT_ADDRESS_URL = "/et3Response/midRespondentAddress";
+    private static final String MID_CONTEST_CLAIM_REASON_URL = "/et3Response/midContestClaimReason";
+    private static final String MID_EMPLOYER_CLAIM_DETAILS_URL = "/et3Response/midEmployerClaimDetails";
     private static final String ABOUT_TO_SUBMIT_URL = "/et3Response/aboutToSubmit";
     private static final String VALIDATE_RESPONDENT_URL = "/et3Response/validateRespondent";
     private static final String SUBMIT_SECTION_URL = "/et3Response/submitSection";
@@ -159,6 +164,41 @@ class Et3ResponseControllerTest extends BaseControllerTest {
     @Test
     void midEmploymentDates_badRequest() throws Exception {
         mvc.perform(post(MID_EMPLOYMENT_DATES_URL)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {MID_RESPONDENT_ADDRESS_URL, MID_CONTEST_CLAIM_REASON_URL, MID_EMPLOYER_CLAIM_DETAILS_URL})
+    void midPageValidation_tokenOk(String url) throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(url)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {MID_RESPONDENT_ADDRESS_URL, MID_CONTEST_CLAIM_REASON_URL, MID_EMPLOYER_CLAIM_DETAILS_URL})
+    void midPageValidation_tokenFail(String url) throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(url)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {MID_RESPONDENT_ADDRESS_URL, MID_CONTEST_CLAIM_REASON_URL, MID_EMPLOYER_CLAIM_DETAILS_URL})
+    void midPageValidation_badRequest(String url) throws Exception {
+        mvc.perform(post(url)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))

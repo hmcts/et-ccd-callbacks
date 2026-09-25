@@ -729,15 +729,15 @@ public class InitialConsiderationService {
      */
     public void clearHiddenValue(CaseData caseData) {
         if (YES.equals(caseData.getEtICCanProceed())) {
-            removeEtIcCanProceedYesValue(caseData);
+            clearCanNotProceedValue(caseData);
             if (YES.equals(caseData.getEtICHearingAlreadyListed())) {
-                removeEtICHearingAlreadyListedYesValue(caseData);
+                clearHearingNotListedValue(caseData);
             } else {
-                removeEtICHearingAlreadyListedNoValue(caseData);
+                clearHearingListedValue(caseData);
             }
         } else {
-            removeEtICHearingAlreadyListedYesValue(caseData);
-            removeEtICHearingAlreadyListedNoValue(caseData);
+            clearHearingNotListedValue(caseData);
+            clearHearingListedValue(caseData);
         }
     }
 
@@ -763,6 +763,14 @@ public class InitialConsiderationService {
         caseData.setEtICHearingNotListedUDLHearing(null);
         caseData.setEtICHearingNotListedAnyOtherDirections(null);
 
+    }
+
+    public void clearMarkupAndOldValueAfterSubmit(CaseData caseData) {
+        clearHiddenValue(caseData);
+        caseData.setEtIcPartiesHearingFormat(null);
+        caseData.setEtIcPartiesHearingPanelPreference(null);
+        caseData.setEtInitialConsiderationJurisdictionCodes(null);
+        caseData.setEtInitialConsiderationRespondent(null);
     }
 
     public void mapOldIcHearingNotListedOptionsToNew(CaseData caseData, String caseTypeId) {
@@ -858,7 +866,7 @@ public class InitialConsiderationService {
         caseData.setEtICHearingNotListedListUpdated(null);
     }
 
-    private void removeEtIcCanProceedYesValue(CaseData caseData) {
+    private void clearCanNotProceedValue(CaseData caseData) {
         caseData.setEtICFurtherInformation(null);
         caseData.setEtICFurtherInformationHearingAnyOtherDirections(null);
         caseData.setEtICFurtherInformationGiveDetails(null);
@@ -867,7 +875,7 @@ public class InitialConsiderationService {
         caseData.setEtInitialConsiderationRule28(null);
     }
 
-    private void removeEtICHearingAlreadyListedYesValue(CaseData caseData) {
+    private void clearHearingNotListedValue(CaseData caseData) {
         caseData.setEtICHearingNotListedList(null);
         caseData.setEtICHearingNotListedSeekComments(null);
         caseData.setEtICHearingNotListedListForPrelimHearing(null);
@@ -881,7 +889,7 @@ public class InitialConsiderationService {
         caseData.setEtICHearingNotListedListForFinalHearingUpdated(null);
     }
 
-    private void removeEtICHearingAlreadyListedNoValue(CaseData caseData) {
+    private void clearHearingListedValue(CaseData caseData) {
         caseData.setEtICHearingListed(null);
         caseData.setEtICExtendDurationGiveDetails(null);
         caseData.setEtICOtherGiveDetails(null);

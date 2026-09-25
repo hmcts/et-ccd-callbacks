@@ -837,6 +837,55 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
+    void clearMarkupAndOldValueAfterSubmit_shouldClearMarkupAndNotListedFields_whenHearingAlreadyListed() {
+        caseData.setEtICCanProceed(YES);
+        caseData.setEtICHearingAlreadyListed(YES);
+        caseData.setEtICHearingNotListedList(new ArrayList<>());
+        caseData.setEtICHearingNotListedSeekComments(new EtICSeekComments());
+        caseData.setEtICHearingNotListedListForPrelimHearing(new EtICListForPreliminaryHearing());
+        caseData.setEtICHearingNotListedListForFinalHearing(new EtICListForFinalHearing());
+        caseData.setEtICHearingListed(new ArrayList<>());
+        caseData.setEtIcPartiesHearingFormat("format");
+        caseData.setEtIcPartiesHearingPanelPreference("panel preference");
+        caseData.setEtInitialConsiderationJurisdictionCodes("jurisdiction");
+        caseData.setEtInitialConsiderationRespondent("respondent");
+
+        initialConsiderationService.clearMarkupAndOldValueAfterSubmit(caseData);
+
+        assertThat(caseData.getEtIcPartiesHearingFormat()).isNull();
+        assertThat(caseData.getEtIcPartiesHearingPanelPreference()).isNull();
+        assertThat(caseData.getEtInitialConsiderationJurisdictionCodes()).isNull();
+        assertThat(caseData.getEtInitialConsiderationRespondent()).isNull();
+        assertThat(caseData.getEtICHearingNotListedList()).isNull();
+        assertThat(caseData.getEtICHearingNotListedSeekComments()).isNull();
+        assertThat(caseData.getEtICHearingNotListedListForPrelimHearing()).isNull();
+        assertThat(caseData.getEtICHearingNotListedListForFinalHearing()).isNull();
+        assertThat(caseData.getEtICHearingListed()).isNotNull();
+    }
+
+    @Test
+    void clearMarkupAndOldValueAfterSubmit_shouldClearMarkupAndListedFields_whenCaseCannotProceed() {
+        caseData.setEtICCanProceed(NO);
+        caseData.setEtICHearingNotListedList(new ArrayList<>());
+        caseData.setEtICHearingListed(new ArrayList<>());
+        caseData.setEtICFurtherInformation(new ArrayList<>());
+        caseData.setEtIcPartiesHearingFormat("format");
+        caseData.setEtIcPartiesHearingPanelPreference("panel preference");
+        caseData.setEtInitialConsiderationJurisdictionCodes("jurisdiction");
+        caseData.setEtInitialConsiderationRespondent("respondent");
+
+        initialConsiderationService.clearMarkupAndOldValueAfterSubmit(caseData);
+
+        assertThat(caseData.getEtIcPartiesHearingFormat()).isNull();
+        assertThat(caseData.getEtIcPartiesHearingPanelPreference()).isNull();
+        assertThat(caseData.getEtInitialConsiderationJurisdictionCodes()).isNull();
+        assertThat(caseData.getEtInitialConsiderationRespondent()).isNull();
+        assertThat(caseData.getEtICHearingNotListedList()).isNull();
+        assertThat(caseData.getEtICHearingListed()).isNull();
+        assertThat(caseData.getEtICFurtherInformation()).isNotNull();
+    }
+
+    @Test
     void setIsHearingAlreadyListed_shouldBeSetToNo_whenNoHearings() {
         caseData.setEtInitialConsiderationHearing(HEARING_MISSING);
 

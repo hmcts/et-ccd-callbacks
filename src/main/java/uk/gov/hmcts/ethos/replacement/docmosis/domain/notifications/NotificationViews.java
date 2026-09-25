@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -19,12 +20,46 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.VIEWED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 /**
- * Applies the claimant's views recorded in the notification_view table to the "viewed" markers held in the
- * case data blob.
+ * Translates between the claimant's "viewed" markers held in the case data blob and the item ids
+ * recorded in the notification_view table.
  */
 public final class NotificationViews {
 
     private NotificationViews() {
+    }
+
+    /**
+     * Collects the ids of every item the submitted case shows as viewed by the claimant.
+     * Items already viewed in the blob are included; recording them again is harmless.
+     */
+    public static Set<String> viewedItemIds(CaseData caseData) {
+        Set<String> ids = new HashSet<>();
+        for (SendNotificationTypeItem item : nonNull(caseData.getSendNotificationCollection())) {
+            SendNotificationType notification = item.getValue();
+            if (notification == null) {
+                continue;
+            }
+            if (VIEWED.equals(notification.getNotificationState())) {
+                addId(ids, item.getId());
+            }
+            for (GenericTypeItem<RespondNotificationType> response
+                : nonNull(notification.getRespondNotificationTypeCollection())) {
+                if (response.getValue() != null && VIEWED.equals(response.getValue().getState())) {
+                    addId(ids, response.getId());
+                }
+            }
+            for (PseResponseTypeItem response : nonNull(notification.getRespondCollection())) {
+                if (response.getValue() != null && VIEWED.equals(response.getValue().getResponseState())) {
+                    addId(ids, response.getId());
+                }
+            }
+        }
+        for (TseRespondTypeItem response : tseResponses(caseData)) {
+            if (response.getValue() != null && YES.equals(response.getValue().getViewedByClaimant())) {
+                addId(ids, response.getId());
+            }
+        }
+        return ids;
     }
 
     /**
@@ -85,5 +120,11 @@ public final class NotificationViews {
 
     private static <T> List<T> nonNull(List<T> items) {
         return items == null ? List.of() : items.stream().filter(Objects::nonNull).toList();
+    }
+
+    private static void addId(Set<String> ids, String id) {
+        if (id != null) {
+            ids.add(id);
+        }
     }
 }

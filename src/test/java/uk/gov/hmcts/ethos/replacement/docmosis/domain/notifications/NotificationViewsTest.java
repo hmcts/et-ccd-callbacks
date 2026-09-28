@@ -27,6 +27,20 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 class NotificationViewsTest {
 
     @Test
+    void collectsIdsOfEveryViewedItem() {
+        CaseData caseData = caseData(VIEWED, VIEWED, VIEWED, YES);
+        caseData.getSendNotificationCollection().add(notification("unviewed", NOT_VIEWED_YET, List.of()));
+
+        assertThat(NotificationViews.viewedItemIds(caseData))
+            .containsExactlyInAnyOrder("notification", "tribunalResponse", "partyResponse", "tseResponse");
+    }
+
+    @Test
+    void collectsNothingFromCaseWithoutNotificationsOrApplications() {
+        assertThat(NotificationViews.viewedItemIds(new CaseData())).isEmpty();
+    }
+
+    @Test
     void appliesRecordedViewsToUnviewedItems() {
         CaseData caseData = caseData(NOT_VIEWED_YET, NOT_VIEWED_YET, null, null);
 

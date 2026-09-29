@@ -109,14 +109,17 @@ public final class InitialConsiderationHelper {
 
                 // Hearing Listed
                 .hearingListed(hearingListedForDocument(caseData))
-                .hearingPostpone(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
-                        .map(EtICHearingListedAnswers::getEtICPostponeGiveDetails).orElse(null))
+                .hearingPostpone(hearingListedDetail(caseData,
+                        EtICHearingListedAnswers::getEtICPostponeGiveDetails,
+                        caseData.getEtICPostponeGiveDetails()))
                 .hearingExtend(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICExtendDurationGiveDetails).orElse(null))
-                .hearingConvertFinal(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
-                        .map(EtICHearingListedAnswers::getEtICConvertPreliminaryGiveDetails).orElse(null))
-                .hearingConvertF2f(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
-                        .map(EtICHearingListedAnswers::getEtICConvertF2fGiveDetails).orElse(null))
+                .hearingConvertFinal(hearingListedDetail(caseData,
+                        EtICHearingListedAnswers::getEtICConvertPreliminaryGiveDetails,
+                        caseData.getEtICConvertPreliminaryGiveDetails()))
+                .hearingConvertF2f(hearingListedDetail(caseData,
+                        EtICHearingListedAnswers::getEtICConvertF2fGiveDetails,
+                        caseData.getEtICConvertF2fGiveDetails()))
 
                 .hearingOther(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICOtherGiveDetails).orElse(null))

@@ -746,6 +746,9 @@ class InitialConsiderationHelperTest {
         CaseData scotlandCase = new CaseData();
         scotlandCase.setEtICHearingAlreadyListed("Yes");
         scotlandCase.setEtICHearingListedAnswers(answers);
+        scotlandCase.setEtICConvertPreliminaryGiveDetails("Legacy convert text");
+        scotlandCase.setEtICPostponeGiveDetails("Legacy postpone text");
+        scotlandCase.setEtICConvertF2fGiveDetails("Legacy face to face text");
 
         JsonNode data = documentData(scotlandCase, SCOTLAND_CASE_TYPE_ID);
 
@@ -773,6 +776,27 @@ class InitialConsiderationHelperTest {
     }
 
     @Test
+    void getDocumentRequest_scotland_usesTopLevelDetailsWhenAnswerDetailsAreBlank()
+            throws JsonProcessingException {
+        EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
+        answers.setEtICConvertPreliminaryGiveDetails("");
+        answers.setEtICPostponeGiveDetails("");
+        answers.setEtICConvertF2fGiveDetails("");
+        CaseData scotlandCase = new CaseData();
+        scotlandCase.setEtICHearingAlreadyListed("Yes");
+        scotlandCase.setEtICHearingListedAnswers(answers);
+        scotlandCase.setEtICConvertPreliminaryGiveDetails("Legacy convert text");
+        scotlandCase.setEtICPostponeGiveDetails("Legacy postpone text");
+        scotlandCase.setEtICConvertF2fGiveDetails("Legacy face to face text");
+
+        JsonNode data = documentData(scotlandCase, SCOTLAND_CASE_TYPE_ID);
+
+        assertEquals("Legacy convert text", data.get("hearingConvertFinal").asText());
+        assertEquals("Legacy postpone text", data.get("hearingPostpone").asText());
+        assertEquals("Legacy face to face text", data.get("hearingConvertF2f").asText());
+    }
+
+    @Test
     void getDocumentRequest_englandWales_copiesListedHearingDetailsAndKeepsLabels()
             throws JsonProcessingException {
         EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
@@ -783,6 +807,9 @@ class InitialConsiderationHelperTest {
         CaseData englandWalesCase = new CaseData();
         englandWalesCase.setEtICHearingAlreadyListed("Yes");
         englandWalesCase.setEtICHearingListedAnswers(answers);
+        englandWalesCase.setEtICConvertPreliminaryGiveDetails("Legacy convert text");
+        englandWalesCase.setEtICPostponeGiveDetails("Legacy postpone text");
+        englandWalesCase.setEtICConvertF2fGiveDetails("Legacy face to face text");
 
         JsonNode data = documentData(englandWalesCase, ENGLANDWALES_CASE_TYPE_ID);
 

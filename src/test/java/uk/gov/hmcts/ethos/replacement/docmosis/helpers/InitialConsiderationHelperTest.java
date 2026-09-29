@@ -318,7 +318,8 @@ class InitialConsiderationHelperTest {
         assertJsonAsText(data, "etICFinalHearingIsEJSitAloneFurtherDetails", "Test SC - EJ Sit Alone Further Details");
 
         assertJsonAsText(data, "icCompletedBy", "A User");
-        assertJsonAsText(data, "icDateCompleted", "20 Nov 2024");    }
+        assertJsonAsText(data, "icDateCompleted", "20 Nov 2024");
+    }
 
     @Test
     void getDocumentRequestSC_withValidCaseData_And_PreliminaryHearingWithMembersReason_returnsExpectedJson()

@@ -6476,6 +6476,7 @@
     "CaseFieldID": "etICHearingListedAnswers",
     "ListElementCode": "otherDirectionsLabel",
     "FieldDisplayOrder": 22,
+    "FieldShowCondition": "etICHearingAnyOtherDirections != \"dummy\"",
     "DisplayContext": "READONLY"
   },
   {
@@ -6483,7 +6484,7 @@
     "CaseEventID": "initialConsideration",
     "CaseFieldID": "etICHearingListedAnswers",
     "ListElementCode": "etICHearingAnyOtherDirections",
-    "EventElementLabel": " ",
+    "EventElementLabel": "Any other directions",
     "FieldDisplayOrder": 23,
     "DisplayContext": "OPTIONAL",
     "RetainHiddenValue": "No"

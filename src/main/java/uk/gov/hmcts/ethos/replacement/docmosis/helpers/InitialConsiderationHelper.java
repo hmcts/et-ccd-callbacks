@@ -92,15 +92,6 @@ public final class InitialConsiderationHelper {
 
         InitialConsiderationData data = InitialConsiderationData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
-                .hearingPostpone(hearingListedDetail(caseData,
-                        EtICHearingListedAnswers::getEtICPostponeGiveDetails,
-                        caseData.getEtICPostponeGiveDetails()))
-                .hearingConvertF2f(hearingListedDetail(caseData,
-                        EtICHearingListedAnswers::getEtICConvertF2fGiveDetails,
-                        caseData.getEtICConvertF2fGiveDetails()))
-                .hearingConvertFinal(hearingListedDetail(caseData,
-                        EtICHearingListedAnswers::getEtICConvertPreliminaryGiveDetails,
-                        caseData.getEtICConvertPreliminaryGiveDetails()))
 
                 // New values
                 .issuesJurisdiction(defaultIfEmpty(caseData.getEtICJuridictionCodesInvalid(), null))
@@ -118,8 +109,15 @@ public final class InitialConsiderationHelper {
 
                 // Hearing Listed
                 .hearingListed(hearingListedForDocument(caseData))
+                .hearingPostpone(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICPostponeGiveDetails).orElse(null))
                 .hearingExtend(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICExtendDurationGiveDetails).orElse(null))
+                .hearingConvertFinal(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICConvertPreliminaryGiveDetails).orElse(null))
+                .hearingConvertF2f(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICConvertF2fGiveDetails).orElse(null))
+
                 .hearingOther(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICOtherGiveDetails).orElse(null))
                 .otherDirections(Optional.ofNullable(caseData.getEtICHearingListedAnswers())

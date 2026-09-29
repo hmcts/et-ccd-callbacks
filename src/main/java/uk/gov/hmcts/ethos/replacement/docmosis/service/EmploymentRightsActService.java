@@ -73,7 +73,10 @@ public class EmploymentRightsActService {
      */
     public void setEraFlagByReceiptDate(CaseData caseData) {
         if (!featureToggleService.isEraOctober2026Enabled()) {
-            return;
+            if (ObjectUtils.isEmpty(caseData.getAdditionalCaseInfoType())) {
+                caseData.setAdditionalCaseInfoType(new AdditionalCaseInfoType());
+            }
+            caseData.getAdditionalCaseInfoType().setEra(NO);
         }
 
         getParsedReceiptDate(caseData).ifPresent(receiptDate -> {

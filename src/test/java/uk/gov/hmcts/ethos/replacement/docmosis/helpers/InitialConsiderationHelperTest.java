@@ -360,6 +360,40 @@ class InitialConsiderationHelperTest {
     }
 
     @Test
+    void getDocumentRequestSC_withHearingListedReferVP()
+        throws JsonProcessingException {
+        CaseData caseDataScotland = CaseDataBuilder.builder().build();
+        setCaseDataValues(caseDataScotland);
+        caseDataScotland.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdatedSC());
+        caseDataScotland.setEtICHearingListedReferVP("Yes");
+        caseDataScotland.setEtICHearingListedReferVPFurtherDetails("Test Refer VP Details");
+
+        String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataScotland, "key", "ET_Scotland");
+        JsonNode request = new ObjectMapper().readTree(documentRequest);
+        JsonNode data = request.get("data");
+
+        assertJsonAsText(data, "hearingListedReferVP", "Yes");
+        assertJsonAsText(data, "hearingListedReferVPDetails", "Test Refer VP Details");
+    }
+
+    @Test
+    void getDocumentRequestSC_withHearingNotListedReferVP()
+        throws JsonProcessingException {
+        CaseData caseDataScotland = CaseDataBuilder.builder().build();
+        setCaseDataValues(caseDataScotland);
+        caseDataScotland.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdatedSC());
+        caseDataScotland.setEtICHearingNotListedReferVP("Yes");
+        caseDataScotland.setEtICHearingNotListedReferVPFurtherDetails("Test Refer VP Details");
+
+        String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataScotland, "key", "ET_Scotland");
+        JsonNode request = new ObjectMapper().readTree(documentRequest);
+        JsonNode data = request.get("data");
+
+        assertJsonAsText(data, "hearingNotListedReferVP", "Yes");
+        assertJsonAsText(data, "hearingNotListedReferVPDetails", "Test Refer VP Details");
+    }
+
+    @Test
     void getDocumentRequestSC_withNullCaseData_returnsEmptyJson() throws JsonProcessingException {
         CaseData caseDataSC = new CaseData();
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataSC, "key",
@@ -373,6 +407,7 @@ class InitialConsiderationHelperTest {
                 + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":[\"\"],"
                 + "\"hearingWithJsa\":null,\"hearingWithMembersLabel\":null,\"hearingWithMembers\":null,"
                 + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
+                + "\"hearingListedReferVP\":null,\"hearingListedReferVPDetails\":null,"
                 + "\"hearingNotListed\":null,\"cvpHearingType\":null,\"cvpFinalDetails\":null,"
                 + "\"cvpPreliminaryDetails\":null,\"cvpPreliminaryYesNo\":null,\"preliminaryHearingType\":null,"
                 + "\"preliminaryHearingPurpose\":null,\"preliminaryHearingNotice\":null,"
@@ -392,7 +427,9 @@ class InitialConsiderationHelperTest {
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
-                + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,\"udlSitAlone\":null,\"udlReasons\":null,"
+                + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,"
+                + "\"hearingNotListedReferVP\":null,\"hearingNotListedReferVPDetails\":null,"
+                + "\"udlSitAlone\":null,\"udlReasons\":null,"
                 + "\"udlDisputeOnFacts\":null,\"udlLittleOrNoAgreement\":null,\"udlIssueOfLawArising\":null,"
                 + "\"udlViewsOfParties\":null,\"udlNoViewsExpressedByParties\":null,\"udlConcurrentProceedings\":null,"
                 + "\"udlOther\":null,\"udlHearingFormat\":null,\"udlCVPIssue\":null,\"udlFinalF2FIssue\":null,"

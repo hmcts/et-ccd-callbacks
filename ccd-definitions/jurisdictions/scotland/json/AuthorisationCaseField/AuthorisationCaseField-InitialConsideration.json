@@ -1945,5 +1945,61 @@
         "CRUD": "CRUD"
       }
     ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "etICHearingNotListedReferVP",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-api",
+          "caseworker-employment-scotland",
+          "caseworker-employment-etjudge-scotland"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "etICHearingNotListedReferVPFurtherDetails",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-api",
+          "caseworker-employment-scotland",
+          "caseworker-employment-etjudge-scotland"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "etICHearingListedReferVP",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-api",
+          "caseworker-employment-scotland",
+          "caseworker-employment-etjudge-scotland"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "etICHearingListedReferVPFurtherDetails",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-api",
+          "caseworker-employment-scotland",
+          "caseworker-employment-etjudge-scotland"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
   }
 ]

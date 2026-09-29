@@ -6015,9 +6015,18 @@
     "ID": "InitialConsideration",
     "CaseEventID": "initialConsideration",
     "CaseFieldID": "etICHearingNotListedListForPrelimHearingUpdated",
-    "ListElementCode": "etICIsPreliminaryHearingWithMembersReasonV2",
-    "EventElementLabel": "Give reasons for requiring members",
+    "ListElementCode": "etICIsPreliminaryHearingWithMembersYes",
+    "EventElementLabel": "Reason for full Panel",
     "FieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "InitialConsideration",
+    "CaseEventID": "initialConsideration",
+    "CaseFieldID": "etICHearingNotListedListForPrelimHearingUpdated",
+    "ListElementCode": "etICIsPreliminaryHearingWithMembersYesOther",
+    "EventElementLabel": "Other Reason (EJ Sit Alone: No)",
+    "FieldDisplayOrder": 8,
     "DisplayContext": "MANDATORY"
   },
   {
@@ -6135,7 +6144,7 @@
     "CaseEventID": "initialConsideration",
     "CaseFieldID": "etICHearingNotListedListForFinalHearingUpdated",
     "ListElementCode": "etICFinalHearingIsEJSitAloneReasonYesOther",
-    "EventElementLabel": "Reason for JSA",
+    "EventElementLabel": "Other Reason (EJ Sit Alone: Yes)",
     "FieldDisplayOrder": 10,
     "DisplayContext": "MANDATORY"
   },

@@ -81,6 +81,10 @@ public class InitialConsiderationData {
     private String preliminaryHearingLengthType;
     @JsonProperty("preliminaryHearingWithMembers")
     private String preliminaryHearingWithMembers;
+    @JsonProperty("preliminaryHearingWithMembersYes")
+    private List<String> preliminaryHearingWithMembersYes;
+    @JsonProperty("preliminaryHearingWithMembersYesOther")
+    private String preliminaryHearingWithMembersYesOther;
     @JsonProperty("preliminaryHearingWithMembersReason")
     private String preliminaryHearingWithMembersReason;
     @JsonProperty("hearingNotListedListAnyOtherDirections")

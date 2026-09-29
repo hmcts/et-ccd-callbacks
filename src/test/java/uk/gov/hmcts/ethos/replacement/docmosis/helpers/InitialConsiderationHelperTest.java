@@ -37,7 +37,8 @@ class InitialConsiderationHelperTest {
         setCaseDataValues(caseDataForEnglandWales);
         caseDataForEnglandWales.setEtICHearingNotListedListUpdated(
                 Collections.singletonList("List for preliminary hearing"));
-        caseDataForEnglandWales.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdated());
+        caseDataForEnglandWales.setEtICHearingNotListedListForPrelimHearingUpdated(
+            populatePreliminaryHearingUpdatedEW());
 
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataForEnglandWales, "key",
                 ENGLANDWALES_CASE_TYPE_ID);
@@ -153,7 +154,7 @@ class InitialConsiderationHelperTest {
         caseData = CaseDataBuilder.builder().build();
         setCaseDataValues(caseData);
         caseData.setEtICHearingNotListedListUpdated(Collections.singletonList("List for preliminary hearing"));
-        caseData.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdated());
+        caseData.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdatedEW());
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseData,
                 "key", ENGLANDWALES_CASE_TYPE_ID);
 
@@ -327,9 +328,7 @@ class InitialConsiderationHelperTest {
         CaseData caseDataScotland = CaseDataBuilder.builder().build();
         setCaseDataValues(caseDataScotland);
         caseDataScotland.setEtICHearingNotListedListUpdated(Collections.singletonList("List for preliminary hearing"));
-        caseDataScotland.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdated());
-        caseDataScotland.getEtICHearingNotListedListForPrelimHearingUpdated()
-                .setEtICIsPreliminaryHearingWithMembersReason("reasons for requiring members");
+        caseDataScotland.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdatedSC());
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataScotland,
                 "key", "ET_Scotland");
 
@@ -352,7 +351,9 @@ class InitialConsiderationHelperTest {
         assertJsonAsText(data, "preliminaryHearingLength", "1");
         assertJsonAsText(data, "preliminaryHearingLengthType", "Hours");
         assertJsonAsText(data, "preliminaryHearingWithMembers", "Yes");
-        assertJsonAsText(data, "preliminaryHearingWithMembersReason", "reasons for requiring members");
+        assertJsonArrayToString(data, "preliminaryHearingWithMembersYes",
+            "[\"No views expressed by parties\",\"Others\"]");
+        assertJsonAsText(data, "preliminaryHearingWithMembersYesOther", "TestYesOther");
 
         assertJsonAsText(data, "icCompletedBy", "A User");
         assertJsonAsText(data, "icDateCompleted", "20 Nov 2024");
@@ -376,7 +377,10 @@ class InitialConsiderationHelperTest {
                 + "\"cvpPreliminaryDetails\":null,\"cvpPreliminaryYesNo\":null,\"preliminaryHearingType\":null,"
                 + "\"preliminaryHearingPurpose\":null,\"preliminaryHearingNotice\":null,"
                 + "\"preliminaryHearingLength\":null,\"preliminaryHearingLengthType\":null,"
-                + "\"preliminaryHearingWithMembers\":null,\"preliminaryHearingWithMembersReason\":null,"
+                + "\"preliminaryHearingWithMembers\":null,"
+                + "\"preliminaryHearingWithMembersYes\":null,"
+                + "\"preliminaryHearingWithMembersYesOther\":null,"
+                + "\"preliminaryHearingWithMembersReason\":null,"
                 + "\"hearingNotListedListAnyOtherDirections\":null,\"etICFinalHearingType\":null,"
                 + "\"etICTypeOfVideoHearingOrder\":null,\"etICTypeOfF2fHearingOrder\":null,"
                 + "\"etICHearingOrderBUCompliance\":null,"
@@ -414,7 +418,20 @@ class InitialConsiderationHelperTest {
         preliminaryHearingUpdated.setEtICLengthOfPrelimHearing("1");
         preliminaryHearingUpdated.setPrelimHearingLengthNumType("Hours");
         preliminaryHearingUpdated.setEtICIsPreliminaryHearingWithMembers("Yes");
+        return preliminaryHearingUpdated;
+    }
+
+    private EtICListForPreliminaryHearingUpdated populatePreliminaryHearingUpdatedEW() {
+        EtICListForPreliminaryHearingUpdated preliminaryHearingUpdated = populatePreliminaryHearingUpdated();
         preliminaryHearingUpdated.setEtICIsPreliminaryHearingWithMembersReason("reasons for requiring members");
+        return preliminaryHearingUpdated;
+    }
+
+    private EtICListForPreliminaryHearingUpdated populatePreliminaryHearingUpdatedSC() {
+        EtICListForPreliminaryHearingUpdated preliminaryHearingUpdated = populatePreliminaryHearingUpdated();
+        preliminaryHearingUpdated.setEtICIsPreliminaryHearingWithMembersYes(
+            List.of("No views expressed by parties", "Others"));
+        preliminaryHearingUpdated.setEtICIsPreliminaryHearingWithMembersYesOther("TestYesOther");
         return preliminaryHearingUpdated;
     }
 

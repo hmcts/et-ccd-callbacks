@@ -129,6 +129,13 @@ withPipeline(type, product, component) {
   }
   onPR() {
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
+
+    def github = new GithubAPI(this)
+    def labels = github.getLabelsbyPattern(env.BRANCH_NAME, 'enable_')
+
+    if (labels.contains('enable_fortify_scan')) {
+      enableFortifyScan('et-aat')
+    }
   }
   syncBranchesWithMaster(branchesToSync)
   enableSlackNotifications('#et-builds')

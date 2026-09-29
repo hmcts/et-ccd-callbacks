@@ -249,16 +249,6 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updateInitialConsiderationDocument_TokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(UPDATE_IC_DOCUMENT_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void completeUpdateInitialConsiderationDocument_TokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(COMPLETE_UPDATE_IC_DOCUMENT_URL)

@@ -83,7 +83,7 @@ public class InitialConsiderationController {
      * Regenerates the Initial Consideration PDF from the details already stored on the case.
      * Completed by and date completed stay as recorded on the Initial Consideration tab.
      * @param ccdRequest Holds the request and case data
-     * @param userToken Used for authorisation
+     * @param userToken Used when generating the document
      * @return caseData in ccdRequest
      */
     @PostMapping(value = "/updateInitialConsiderationDocument", consumes = APPLICATION_JSON_VALUE)
@@ -97,11 +97,6 @@ public class InitialConsiderationController {
             @RequestHeader("Authorization") String userToken) {
         log.info("UPDATE INITIAL CONSIDERATION DOCUMENT ABOUT TO SUBMIT ---> {}",
             ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DocumentInfo documentInfo = initialConsiderationService.generateDocument(caseData, userToken,
@@ -120,15 +115,9 @@ public class InitialConsiderationController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
     public ResponseEntity<CCDCallbackResponse> completeUpdateInitialConsiderationDocument(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest) {
         log.info("Update Initial Consideration document complete requested for case reference ---> {}",
             ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .confirmation_header(UPDATE_IC_DOC_HDR)

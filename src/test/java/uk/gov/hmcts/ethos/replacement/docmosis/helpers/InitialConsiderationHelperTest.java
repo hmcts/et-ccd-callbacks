@@ -354,7 +354,8 @@ class InitialConsiderationHelperTest {
         assertJsonAsText(data, "preliminaryHearingWithMembersReason", "reasons for requiring members");
 
         assertJsonAsText(data, "icCompletedBy", "A User");
-        assertJsonAsText(data, "icDateCompleted", "20 Nov 2024");    }
+        assertJsonAsText(data, "icDateCompleted", "20 Nov 2024");
+    }
 
     @Test
     void getDocumentRequestSC_withNullCaseData_returnsEmptyJson() throws JsonProcessingException {
@@ -693,4 +694,3 @@ class InitialConsiderationHelperTest {
         assertThat(data.get(field).toString()).isEqualTo(expected);
     }
 }
-

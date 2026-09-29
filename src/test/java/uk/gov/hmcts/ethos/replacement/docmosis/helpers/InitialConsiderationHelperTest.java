@@ -37,7 +37,8 @@ class InitialConsiderationHelperTest {
         setCaseDataValues(caseDataForEnglandWales);
         caseDataForEnglandWales.setEtICHearingNotListedListUpdated(
                 Collections.singletonList("List for preliminary hearing"));
-        caseDataForEnglandWales.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdated());
+        caseDataForEnglandWales.setEtICHearingNotListedListForPrelimHearingUpdated(
+            populatePreliminaryHearingUpdatedEW());
 
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataForEnglandWales, "key",
                 ENGLANDWALES_CASE_TYPE_ID);
@@ -153,7 +154,7 @@ class InitialConsiderationHelperTest {
         caseData = CaseDataBuilder.builder().build();
         setCaseDataValues(caseData);
         caseData.setEtICHearingNotListedListUpdated(Collections.singletonList("List for preliminary hearing"));
-        caseData.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdated());
+        caseData.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdatedEW());
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseData,
                 "key", ENGLANDWALES_CASE_TYPE_ID);
 
@@ -327,9 +328,7 @@ class InitialConsiderationHelperTest {
         CaseData caseDataScotland = CaseDataBuilder.builder().build();
         setCaseDataValues(caseDataScotland);
         caseDataScotland.setEtICHearingNotListedListUpdated(Collections.singletonList("List for preliminary hearing"));
-        caseDataScotland.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdated());
-        caseDataScotland.getEtICHearingNotListedListForPrelimHearingUpdated()
-                .setEtICIsPreliminaryHearingWithMembersReason("reasons for requiring members");
+        caseDataScotland.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdatedSC());
         String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataScotland,
                 "key", "ET_Scotland");
 
@@ -352,10 +351,46 @@ class InitialConsiderationHelperTest {
         assertJsonAsText(data, "preliminaryHearingLength", "1");
         assertJsonAsText(data, "preliminaryHearingLengthType", "Hours");
         assertJsonAsText(data, "preliminaryHearingWithMembers", "Yes");
-        assertJsonAsText(data, "preliminaryHearingWithMembersReason", "reasons for requiring members");
+        assertJsonArrayToString(data, "preliminaryHearingWithMembersYes",
+            "[\"No views expressed by parties\",\"Others\"]");
+        assertJsonAsText(data, "preliminaryHearingWithMembersYesOther", "TestYesOther");
 
         assertJsonAsText(data, "icCompletedBy", "A User");
         assertJsonAsText(data, "icDateCompleted", "20 Nov 2024");
+    }
+
+    @Test
+    void getDocumentRequestSC_withHearingListedReferVP()
+        throws JsonProcessingException {
+        CaseData caseDataScotland = CaseDataBuilder.builder().build();
+        setCaseDataValues(caseDataScotland);
+        caseDataScotland.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdatedSC());
+        caseDataScotland.setEtICHearingListedReferVP("Yes");
+        caseDataScotland.setEtICHearingListedReferVPFurtherDetails("Test Refer VP Details");
+
+        String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataScotland, "key", "ET_Scotland");
+        JsonNode request = new ObjectMapper().readTree(documentRequest);
+        JsonNode data = request.get("data");
+
+        assertJsonAsText(data, "hearingListedReferVP", "Yes");
+        assertJsonAsText(data, "hearingListedReferVPDetails", "Test Refer VP Details");
+    }
+
+    @Test
+    void getDocumentRequestSC_withHearingNotListedReferVP()
+        throws JsonProcessingException {
+        CaseData caseDataScotland = CaseDataBuilder.builder().build();
+        setCaseDataValues(caseDataScotland);
+        caseDataScotland.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdatedSC());
+        caseDataScotland.setEtICHearingNotListedReferVP("Yes");
+        caseDataScotland.setEtICHearingNotListedReferVPFurtherDetails("Test Refer VP Details");
+
+        String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataScotland, "key", "ET_Scotland");
+        JsonNode request = new ObjectMapper().readTree(documentRequest);
+        JsonNode data = request.get("data");
+
+        assertJsonAsText(data, "hearingNotListedReferVP", "Yes");
+        assertJsonAsText(data, "hearingNotListedReferVPDetails", "Test Refer VP Details");
     }
 
     @Test
@@ -372,11 +407,15 @@ class InitialConsiderationHelperTest {
                 + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":null,"
                 + "\"hearingWithJsa\":null,\"hearingWithMembersLabel\":null,\"hearingWithMembers\":null,"
                 + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
+                + "\"hearingListedReferVP\":null,\"hearingListedReferVPDetails\":null,"
                 + "\"hearingNotListed\":null,\"cvpHearingType\":null,\"cvpFinalDetails\":null,"
                 + "\"cvpPreliminaryDetails\":null,\"cvpPreliminaryYesNo\":null,\"preliminaryHearingType\":null,"
                 + "\"preliminaryHearingPurpose\":null,\"preliminaryHearingNotice\":null,"
                 + "\"preliminaryHearingLength\":null,\"preliminaryHearingLengthType\":null,"
-                + "\"preliminaryHearingWithMembers\":null,\"preliminaryHearingWithMembersReason\":null,"
+                + "\"preliminaryHearingWithMembers\":null,"
+                + "\"preliminaryHearingWithMembersYes\":null,"
+                + "\"preliminaryHearingWithMembersYesOther\":null,"
+                + "\"preliminaryHearingWithMembersReason\":null,"
                 + "\"hearingNotListedListAnyOtherDirections\":null,\"etICFinalHearingType\":null,"
                 + "\"etICTypeOfVideoHearingOrder\":null,\"etICTypeOfF2fHearingOrder\":null,"
                 + "\"etICHearingOrderBUCompliance\":null,"
@@ -388,7 +427,9 @@ class InitialConsiderationHelperTest {
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
-                + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,\"udlSitAlone\":null,\"udlReasons\":null,"
+                + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,"
+                + "\"hearingNotListedReferVP\":null,\"hearingNotListedReferVPDetails\":null,"
+                + "\"udlSitAlone\":null,\"udlReasons\":null,"
                 + "\"udlDisputeOnFacts\":null,\"udlLittleOrNoAgreement\":null,\"udlIssueOfLawArising\":null,"
                 + "\"udlViewsOfParties\":null,\"udlNoViewsExpressedByParties\":null,\"udlConcurrentProceedings\":null,"
                 + "\"udlOther\":null,\"udlHearingFormat\":null,\"udlCVPIssue\":null,\"udlFinalF2FIssue\":null,"
@@ -414,7 +455,20 @@ class InitialConsiderationHelperTest {
         preliminaryHearingUpdated.setEtICLengthOfPrelimHearing("1");
         preliminaryHearingUpdated.setPrelimHearingLengthNumType("Hours");
         preliminaryHearingUpdated.setEtICIsPreliminaryHearingWithMembers("Yes");
+        return preliminaryHearingUpdated;
+    }
+
+    private EtICListForPreliminaryHearingUpdated populatePreliminaryHearingUpdatedEW() {
+        EtICListForPreliminaryHearingUpdated preliminaryHearingUpdated = populatePreliminaryHearingUpdated();
         preliminaryHearingUpdated.setEtICIsPreliminaryHearingWithMembersReason("reasons for requiring members");
+        return preliminaryHearingUpdated;
+    }
+
+    private EtICListForPreliminaryHearingUpdated populatePreliminaryHearingUpdatedSC() {
+        EtICListForPreliminaryHearingUpdated preliminaryHearingUpdated = populatePreliminaryHearingUpdated();
+        preliminaryHearingUpdated.setEtICIsPreliminaryHearingWithMembersYes(
+            List.of("No views expressed by parties", "Others"));
+        preliminaryHearingUpdated.setEtICIsPreliminaryHearingWithMembersYesOther("TestYesOther");
         return preliminaryHearingUpdated;
     }
 

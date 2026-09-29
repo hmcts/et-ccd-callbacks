@@ -236,6 +236,9 @@ configurations {
 test {
     exclude '**/*ComponentTest*'
     useJUnitPlatform()
+    // Spread unit test classes across JVMs. Integration and cftlib tests share
+    // databases and containers, so they stay single-forked.
+    maxParallelForks = Math.max(1, Runtime.runtime.availableProcessors().intdiv(2))
     testLogging {
         events "skipped", "failed"
     }

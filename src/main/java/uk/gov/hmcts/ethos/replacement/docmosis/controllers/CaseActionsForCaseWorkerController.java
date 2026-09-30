@@ -200,10 +200,14 @@ public class CaseActionsForCaseWorkerController {
             if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())
                     && REVIEW_SUPPORT_TASK_EVENTS.contains(ccdRequest.getEventId())) {
                 caseManagementForCaseWorkerService.setNextListedDate(caseData);
-                supportTaskService.prepareReviewSupportTasks(caseData);
                 CaseData caseDataBefore = ccdRequest.getCaseDetailsBefore() == null
                         ? null
                         : ccdRequest.getCaseDetailsBefore().getCaseData();
+                if (EVENT_SUBMIT_CASE_DRAFT.equals(ccdRequest.getEventId())) {
+                    supportTaskService.prepareReviewSupportTasks(caseData);
+                } else {
+                    supportTaskService.prepareUpdatedCaseReviewSupportTasks(caseData, caseDataBefore);
+                }
                 supportTaskService.prepareArrangeSupportTask(caseData, caseDataBefore);
             }
 

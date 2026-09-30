@@ -48,10 +48,29 @@ public class SupportTaskService {
     private final SupportTaskConfiguration configuration;
 
     public void prepareReviewSupportTasks(CaseData caseData) {
-        AllPartyFlags allPartyFlags = caseData.getAllPartyFlags();
-        prepareTasks(caseData, allPartyFlags == null
-                ? List.of()
-                : flagDetails(allPartyFlags.getClaimantFlags(), allPartyFlags.getClaimantExternalFlags()).toList());
+        prepareTasks(caseData, claimantFlagDetails(caseData.getAllPartyFlags()));
+    }
+
+    public void prepareUpdatedCaseReviewSupportTasks(CaseData caseData, CaseData caseDataBefore) {
+        retainCreatedTaskState(caseData, caseDataBefore);
+        AllPartyFlags current = caseData.getAllPartyFlags();
+        AllPartyFlags previous = caseDataBefore == null ? null : caseDataBefore.getAllPartyFlags();
+        List<FlagDetailType> claimantFlags = claimantFlagDetails(current);
+        List<FlagDetailType> respondentFlags = respondentFlagDetails(current).toList();
+        List<FlagDetailType> changedPartyFlags = new ArrayList<>();
+        // Both citizen journeys use UPDATE_CASE_SUBMITTED; only review the parties whose flags changed.
+        if (!claimantFlags.equals(claimantFlagDetails(previous))) {
+            changedPartyFlags.addAll(claimantFlags);
+        }
+        if (!respondentFlags.equals(respondentFlagDetails(previous).toList())) {
+            changedPartyFlags.addAll(respondentFlags);
+        }
+        prepareTasks(caseData, changedPartyFlags);
+    }
+
+    private static List<FlagDetailType> claimantFlagDetails(AllPartyFlags flags) {
+        return flags == null ? List.of()
+                : flagDetails(flags.getClaimantFlags(), flags.getClaimantExternalFlags()).toList();
     }
 
     public void prepareRespondentReviewSupportTasks(CaseData caseData) {

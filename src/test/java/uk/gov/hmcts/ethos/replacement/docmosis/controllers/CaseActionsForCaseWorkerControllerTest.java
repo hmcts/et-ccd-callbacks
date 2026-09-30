@@ -363,7 +363,13 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(supportTaskService).prepareReviewSupportTasks(any(CaseData.class));
+        if ("SUBMIT_CASE_DRAFT".equals(eventId)) {
+            verify(supportTaskService).prepareReviewSupportTasks(any(CaseData.class));
+            verify(supportTaskService, never()).prepareUpdatedCaseReviewSupportTasks(any(), any());
+        } else {
+            verify(supportTaskService).prepareUpdatedCaseReviewSupportTasks(any(CaseData.class), any(CaseData.class));
+            verify(supportTaskService, never()).prepareReviewSupportTasks(any());
+        }
         verify(supportTaskService).prepareArrangeSupportTask(
                 any(CaseData.class), any(CaseData.class));
         verify(caseManagementForCaseWorkerService).setNextListedDate(any(CaseData.class));

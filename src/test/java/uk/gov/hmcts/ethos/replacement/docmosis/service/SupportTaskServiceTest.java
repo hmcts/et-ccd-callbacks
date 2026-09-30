@@ -7,6 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.BeanWrapperImpl;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.FlagDetailType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.config.SupportTaskConfiguration.P
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,6 +63,81 @@ class SupportTaskServiceTest {
             List.of("Party", "Reasonable adjustment", "I need help communicating and understanding"));
 
     private final SupportTaskService service = new SupportTaskService(configuration());
+
+    static Stream<Arguments> updatedPartyScenarios() {
+        return Stream.of(Arguments.of("RA0041", TASK_TYPE_ADMIN), Arguments.of("RA0038", TASK_TYPE_JUDGE),
+                        Arguments.of("RA0034", TASK_TYPE_LEGAL_OFFICER))
+                .flatMap(category -> Stream.concat(Stream.of("claimantFlags", "claimantExternalFlags"),
+                                respondentFlagFields())
+                        .map(field -> Arguments.of(category.get()[0], category.get()[1], field)));
+    }
+
+    static Stream<String> respondentFlagFields() {
+        return IntStream.range(0, 10).boxed().flatMap(index -> {
+            String prefix = "respondent" + (index == 0 ? "" : index);
+            return Stream.of(prefix + "Flags", prefix + "ExternalFlags");
+        });
+    }
+
+    static Stream<Arguments> nonRequestedRespondentFlagScenarios() {
+        return respondentFlagFields().flatMap(field -> Stream.of(STATUS_ACTIVE, STATUS_INACTIVE, STATUS_NOT_APPROVED)
+                .map(status -> Arguments.of(field, status)));
+    }
+
+    @ParameterizedTest
+    @MethodSource("updatedPartyScenarios")
+    void submittedCaseUpdateReviewsOnlyChangedPartyAndRetainsCaseWideDeduplication(
+            String code, String category, String field) throws JsonProcessingException {
+        boolean respondent = field.startsWith("respondent");
+        CaseData before = bulkSupportCase(!respondent);
+        ObjectMapper mapper = new ObjectMapper();
+        CaseData current = mapper.readValue(mapper.writeValueAsString(before), CaseData.class);
+        CaseFlagsType requested = caseFlags("new-request", code, STATUS_REQUESTED);
+        new BeanWrapperImpl(current.getAllPartyFlags()).setPropertyValue(field, requested);
+
+        service.prepareUpdatedCaseReviewSupportTasks(current, before);
+
+        for (String taskType : List.of(TASK_TYPE_ADMIN, TASK_TYPE_JUDGE, TASK_TYPE_LEGAL_OFFICER)) {
+            assertEquals(category.equals(taskType) ? YES : null, getTaskRequired(taskState(current), taskType));
+        }
+
+        // An existing task from either citizen journey must prevent another task in the same category.
+        before.setSupportTaskState(new SupportTaskState());
+        setTaskCreated(taskState(before), category, YES);
+        current.setSupportTaskState(null);
+        service.prepareUpdatedCaseReviewSupportTasks(current, before);
+
+        assertEquals(YES, getTaskCreated(taskState(current), category));
+        assertNull(getTaskRequired(taskState(current), category));
+    }
+
+    @ParameterizedTest
+    @MethodSource("nonRequestedRespondentFlagScenarios")
+    void submittedCaseUpdateDoesNotReviewNonRequestedRespondentFlags(String field, String status) {
+        CaseData current = new CaseData();
+        current.setAllPartyFlags(new ObjectMapper().convertValue(
+                Map.of(field, caseFlags("new-flag", "RA0041", status)), AllPartyFlags.class));
+
+        service.prepareUpdatedCaseReviewSupportTasks(current, null);
+
+        assertNull(taskState(current).getAdminTaskRequired());
+    }
+
+    @ParameterizedTest
+    @MethodSource("respondentFlagFields")
+    void submittedCaseUpdateDoesNotReviewUnchangedFlags(String field) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        CaseData before = new CaseData();
+        before.setAllPartyFlags(mapper.convertValue(
+                Map.of(field, bulkSupportCase(true).getAllPartyFlags().getRespondentFlags()), AllPartyFlags.class));
+        CaseData current = mapper.readValue(mapper.writeValueAsString(before), CaseData.class);
+
+        service.prepareUpdatedCaseReviewSupportTasks(current, before);
+
+        assertNull(taskState(current).getAdminTaskRequired());
+        assertNull(taskState(current).getJudgeTaskRequired());
+        assertNull(taskState(current).getLegalOfficerTaskRequired());
+    }
 
     private static SupportTaskConfiguration configuration() {
         SupportTaskConfiguration configuration = new SupportTaskConfiguration();

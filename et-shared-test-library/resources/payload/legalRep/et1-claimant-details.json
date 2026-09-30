@@ -1,0 +1,26 @@
+{
+  "claimantFirstName": "Grayson",
+  "claimantLastName": "Becker",
+  "claimantDateOfBirth": "2000-11-01",
+  "claimantSex": ["Male"],
+  "claimantPreferredTitle": "mr",
+  "claimantContactAddress": {
+    "AddressLine1": "The Deli",
+    "AddressLine2": "1 Whitehall Place",
+    "AddressLine3": "",
+    "PostTown": "Leeds",
+    "County": "",
+    "PostCode": "LS12 1AA",
+    "Country": "United Kingdom"
+  },
+  "representativeAttendHearing": ["Phone"],
+  "hearingContactLanguage": ["English"],
+  "claimantAttendHearing": ["Phone"],
+  "claimantHearingContactLanguage": ["English"],
+  "claimantSupportQuestion": ["Yes"],
+  "claimantSupportQuestionReason": "disability access",
+  "representativeContactPreference": ["Email"],
+  "contactLanguageQuestion": ["English"],
+  "representativePhoneNumber": "01234567890",
+  "representativeReferenceNumber": "reference no: 1"
+}

@@ -1,7 +1,7 @@
 import { BasePage } from "./basePage";
 import { expect, Locator, Page } from '@playwright/test';
 
-export default class RequestSupportPage extends BasePage {
+export class RequestSupportPage extends BasePage {
   private readonly partySupportFlag: Locator;
   private readonly legalRepSupportFlag: Locator;
 

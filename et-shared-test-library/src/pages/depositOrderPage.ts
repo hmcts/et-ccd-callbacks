@@ -2,7 +2,7 @@ import { BasePage } from "./basePage";
 import { Locator, Page, expect } from '@playwright/test';
 import depositOrderData from '../../resources/payload/deposit-order-content.json';
 
-export default class DepositOrderPage extends BasePage {
+export class DepositOrderPage extends BasePage {
     private readonly depositAmnt: Locator;
     private readonly depositOrderAgainst: Locator;
     private readonly depositOrderRequestedBy: Locator;

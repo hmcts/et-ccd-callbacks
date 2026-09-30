@@ -1,7 +1,7 @@
-import { Et3DetailsPage } from './Et3DetailsPage.ts';
+import { Et3DetailsPage } from './Et3DetailsPage';
 import { expect, Locator, Page } from '@playwright/test';
-import { CommonActionsHelper } from '../helpers/CommonActionsHelper.ts';
-import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage.ts';
+import { CommonActionsHelper } from '../helpers/CommonActionsHelper';
+import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage';
 
 export class Et3ResponseDetailsPage extends Et3DetailsPage {
   private readonly et3ResponseDetailsPageTitle: Locator;

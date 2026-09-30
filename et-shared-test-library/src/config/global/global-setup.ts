@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { IdamApi } from '../../data-utils/api/IdamApi.ts';
+import { IdamApi } from '../../data-utils/api/IdamApi';
 
 /**
  * Playwright global setup script to create dynamic test users and store their credentials.
@@ -38,7 +38,7 @@ export async function globalSetup() {
     fs.mkdirSync(tmpDir);
   }
   fs.writeFileSync(path.join(tmpDir, 'test-users.json'), JSON.stringify(creds, null, 2));
-  console.log(`Et Claimant created: ${etClaimant.userEmail}`);
+  console.log(`Et Claimant created from framework: ${etClaimant.userEmail}`);
   console.log(`Et Claimant2 created: ${etClaimant2.userEmail}`);
   console.log(`Et Respondent created: ${etRespondent.userEmail}`);
   console.log(`Et Respondent2 created: ${etRespondent2.userEmail}`);

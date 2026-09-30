@@ -1,6 +1,6 @@
-import { CaseDataBuilder } from '../CaseDataBuilder.ts';
-import { CaseTypeLocation, Events, PayloadPath } from '../../../config/case-data.ts';
-import { CaseEventApi } from '../../api/CaseEventApi.ts';
+import { CaseDataBuilder } from '../CaseDataBuilder';
+import { CaseTypeLocation, Events, PayloadPath } from '../../../config/case-data';
+import { CaseEventApi } from '../../api/CaseEventApi';
 
 export class LegalRepCaseFactory {
   static async createAndProgressToSubmitEnglandWalesCase(): Promise<{ caseId: string; caseNumber: string }> {

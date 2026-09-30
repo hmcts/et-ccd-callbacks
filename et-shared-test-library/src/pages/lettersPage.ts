@@ -2,7 +2,7 @@ import { expect, Locator, Page } from "@playwright/test";
 import { BasePage } from "./basePage";
 import letterPageData from '../../resources/payload/letter-content.json';
 
-export default class LettersPage extends BasePage {
+export class LettersPage extends BasePage {
   private readonly part1DocsEle: Locator;
   private readonly part2DocsEle: Locator;
   private readonly hearingNumberEle: Locator;

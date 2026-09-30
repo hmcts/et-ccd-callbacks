@@ -1,5 +1,5 @@
 {
-  "name": "et-shared-test-library",
+  "name": "@et-shared-test-library/core",
   "version": "0.1.0",
   "description": "Employment Tribunal Shared TypeScript Playwright test utilities for cross-repo reuse.",
   "license": "MIT",
@@ -9,10 +9,26 @@
     "dist",
     "resources"
   ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./config": {
+      "types": "./dist/config/index.d.ts",
+      "default": "./dist/config/index.js"
+    },
+    "./fixtures/common": {
+      "types": "./dist/fixtures/common.fixture.d.ts",
+      "default": "./dist/fixtures/common.fixture.js"
+    },
+    "./resources/*": "./resources/*"
+  },
   "scripts": {
     "clean": "rm -rf dist",
     "build": "yarn clean && yarn tsc -p tsconfig.json",
     "build:package": "yarn build && yarn pack",
+    "build:watch": "yarn tsc -p tsconfig.json --watch --preserveWatchOutput",
     "lint": "yarn eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "yarn build && node --test dist/**/*.test.js",
@@ -28,9 +44,7 @@
   "dependencies": {
     "axios": "1.16.1",
     "dotenv": "^17.2.3",
-    "eslint": "10.3.0",
     "fs-extra": "^11.3.3",
-    "lint-staged": "17.0.4",
     "lodash": "^4.18.1",
     "proper-lockfile": "^4.1.2",
     "totp-generator": "2.0.0",
@@ -39,14 +53,17 @@
     "uuid": "^14.0.0"
   },
   "devDependencies": {
-    "@hmcts/playwright-common": "^1.1.2",
-    "@playwright/test": "^1.61.0",
     "@types/fs-extra": "^11",
     "@types/lodash": "^4.17.24",
-    "@types/node": "^24.3.1",
+    "@types/node": "^25.2.0",
     "@types/proper-lockfile": "^4",
-    "husky": "9.1.7",
+    "eslint": "10.3.0",
     "typescript": "^5.9.2"
+  },
+  "peerDependencies": {
+    "@hmcts/playwright-common": "^1.1.5",
+    "@playwright/test": "^1.61.0",
+    "playwright-core": "^1.61.0"
   },
   "resolutions": {
     "braces": "^3.0.3",

@@ -1,4 +1,4 @@
-import { test } from '../fixtures/common.fixture';
+import { test } from '../fixtures/et.test.fixture.ts';
 import { CaseTypeLocation, Events } from '../config/case-data.ts';
 import { config, users } from '../config/config.dynamic.ts';
 import userDetailsData from '../resources/payload/user-details.json';

@@ -1,5 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { BasePage } from '../basePage.ts';
+import { BasePage } from '../basePage';
 import { AxeUtils } from '@hmcts/playwright-common';
 
 export class NocPage extends BasePage{

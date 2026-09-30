@@ -1,4 +1,4 @@
-import { test } from '../fixtures/common.fixture';
+import { test } from '../fixtures/et.test.fixture.ts';
 import { config, users } from '../config/config.dynamic.ts';
 
 const userDetailsData = require('../resources/payload/user-details.json');

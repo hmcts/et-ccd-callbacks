@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
-    "module": "esnext",
+    "module": "ESNext",
     "moduleResolution": "bundler",
-    "target": "es2016",
-    "allowImportingTsExtensions": true,
+    "target": "ESNext",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
@@ -20,7 +19,7 @@
     "skipLibCheck": true,
     "useDefineForClassFields": false,
     "allowJs": true,
-    "noEmit": true,
+    "noEmit": false,
   },
   "include":["src/**/*"],
   "exclude": ["node_modules", "dist"]

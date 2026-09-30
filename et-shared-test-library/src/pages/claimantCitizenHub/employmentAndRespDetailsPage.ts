@@ -1,12 +1,12 @@
 import { expect, Locator, Page } from '@playwright/test';
-import CitizenHubPage from './CitizenHubPage.ts';
-import { DateUtilComponent } from '../../data-utils/DateUtilComponent.ts';
-import { CaseDetailsValues } from '../../config/case-data.ts';
+import { CitizenHubPage } from './CitizenHubPage';
+import { DateUtilComponent } from '../../data-utils/DateUtilComponent';
+import { CaseDetailsValues } from '../../config/case-data';
 
 const today = new Date();
 let inNoticePeriod: boolean = true;
 
-export default class EmploymentAndRespDetailsPage extends CitizenHubPage {
+export class EmploymentAndRespDetailsPage extends CitizenHubPage {
   private readonly employmentStatusLink: Locator;
   private readonly workedForOrganisationGroup: Locator;
   private readonly stillWorkingFOrOrgGroup: Locator;

@@ -2,7 +2,7 @@ import { BasePage } from "./basePage";
 import { expect, Locator, Page } from "@playwright/test";
 
 
-export default class CaseTransferPage extends BasePage {
+export class CaseTransferPage extends BasePage {
   private readonly caseTransferReason: Locator;
 
   constructor(page: Page) {

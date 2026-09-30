@@ -1,10 +1,10 @@
-import { BasePage } from "../basePage.ts";
+import { BasePage } from "../basePage";
 import respPageData from '../../../resources/payload/respondent-page-content.json';
-import {DateUtilComponent} from '../../data-utils/DateUtilComponent.ts';
+import {DateUtilComponent} from '../../data-utils/DateUtilComponent';
 import { expect, Locator, Page } from '@playwright/test';
-import { CommonActionsHelper } from '../helpers/CommonActionsHelper.ts';
+import { CommonActionsHelper } from '../helpers/CommonActionsHelper';
 
-export default class RespondentDetailsPage extends BasePage {
+export class RespondentDetailsPage extends BasePage {
   private readonly respondentReceivedDateField: Locator;
   private readonly respondentName: Locator;
   private readonly judgePanelEle: Locator;

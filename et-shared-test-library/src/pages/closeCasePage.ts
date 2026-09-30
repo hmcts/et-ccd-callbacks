@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
 import { BasePage } from './basePage';
 
-export default class CloseCasePage extends BasePage {
+export class CloseCasePage extends BasePage {
   private readonly clerkResponsibleDropdown;
   private readonly caseDetailsTab;
 

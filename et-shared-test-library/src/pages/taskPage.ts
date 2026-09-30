@@ -2,7 +2,7 @@ import { BasePage } from "./basePage";
 import { expect } from "@playwright/test";
 
 
-export default class TaskPage extends BasePage {
+export class TaskPage extends BasePage {
 
   async validateTaskAssignToUser(){
     //links visible when task assign to user

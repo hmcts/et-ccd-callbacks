@@ -1,7 +1,7 @@
-import { BaseEventPage } from './BaseEventPage.ts';
+import { BaseEventPage } from './BaseEventPage';
 import { expect, Locator, Page } from '@playwright/test';
 
-export default class CaseTransferToEcmPage extends BaseEventPage {
+export class CaseTransferToEcmPage extends BaseEventPage {
   private readonly caseTransferToEcmTitle: Locator;
   private readonly caseTransferToEcmOffice: Locator;
   private readonly caseTransferToEcmReason: Locator;

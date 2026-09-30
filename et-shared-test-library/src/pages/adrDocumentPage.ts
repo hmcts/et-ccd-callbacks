@@ -1,8 +1,7 @@
 import { BasePage } from "./basePage";
-import { Locator, expect } from '@playwright/test';
+import { Locator } from '@playwright/test';
 
-
-export default class AdrDocumentPage extends BasePage {
+export class AdrDocumentPage extends BasePage {
     private readonly uploadInput: Locator;
     private readonly shortDescriptionInput: Locator;
     private readonly collectionField: Locator;

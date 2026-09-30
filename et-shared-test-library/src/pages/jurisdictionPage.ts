@@ -1,7 +1,7 @@
 import { BasePage } from "./basePage";
 import { expect, Locator, Page } from "@playwright/test";
 
-export default class JurisdictionPage extends BasePage {
+export class JurisdictionPage extends BasePage {
   private readonly jurisdictionDropdown: Locator;
   private readonly judgmentOutcome: Locator;
 

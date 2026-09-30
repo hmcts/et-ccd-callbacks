@@ -1,7 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { BasePage } from '../basePage.ts';
+import { BasePage } from '../basePage';
 
-export default class ResClaimantsApplicationsPage extends BasePage{
+export class ResClaimantsApplicationsPage extends BasePage{
 
   private readonly claimantsApplicationsLink: Locator;
   private readonly claimantsApplicationsTitle: Locator;

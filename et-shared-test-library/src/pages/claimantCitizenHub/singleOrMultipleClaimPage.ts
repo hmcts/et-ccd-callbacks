@@ -1,9 +1,7 @@
-import { BasePage } from "../basePage.ts";
+import { BasePage } from "../basePage";
 import { expect, Locator, Page } from '@playwright/test';
-import CitizenHubPage from './CitizenHubPage.ts';
-
-
-export default class SingleOrMultipleClaimPage extends CitizenHubPage{
+import { CitizenHubPage } from './CitizenHubPage';
+export class SingleOrMultipleClaimPage extends CitizenHubPage{
 
   private readonly singleOrMultipleClaim: Locator;
   private readonly claimingWithOtherPersonRadio: Locator;

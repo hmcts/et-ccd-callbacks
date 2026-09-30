@@ -2,7 +2,7 @@ import { BasePage } from './basePage';
 import { DateUtilComponent } from '../data-utils/DateUtilComponent';
 import { Locator, Page } from '@playwright/test';
 
-export default class UploadHearingBundlePage extends BasePage {
+export class UploadHearingBundlePage extends BasePage {
   private readonly futureHearing: Locator;
   private readonly hearingCombo: Locator;
   private readonly claimantRadio: Locator;

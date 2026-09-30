@@ -1,8 +1,8 @@
-import { BasePage } from './basePage.ts';
+import { BasePage } from './basePage';
 import { expect, Locator, Page } from "@playwright/test";
 import { DateUtilComponent } from '../data-utils/DateUtilComponent';
 import icPageData from '../../resources/payload/ic-page-content.json';
-export default class InitialConsiderationPage extends BasePage {
+export class InitialConsiderationPage extends BasePage {
   private readonly hearingDetails: Locator;
   private readonly jurisdictionCodeInvalidYes: Locator;
   private readonly claimCamProceedYes: Locator;

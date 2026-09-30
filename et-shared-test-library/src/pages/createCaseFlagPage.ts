@@ -1,7 +1,7 @@
 import { BasePage } from "./basePage";
 import { expect, Locator, Page } from "@playwright/test";
 
-export default class CreateCaseFlag extends BasePage {
+export class CreateCaseFlagPage extends BasePage {
     private readonly caseLevelCheckbox: Locator;
     private readonly urgentCaseCheckbox: Locator;
     private readonly rroCheckbox: Locator;

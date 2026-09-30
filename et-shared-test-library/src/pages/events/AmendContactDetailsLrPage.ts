@@ -1,10 +1,10 @@
-import { BasePage } from '../basePage.ts';
+import { BasePage } from '../basePage';
 import { expect, Locator, Page } from '@playwright/test';
-import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage.ts';
-import { Events } from '../../config/case-data.ts';
-import { AddressDetails } from '../../types/address.ts';
+import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage';
+import { Events } from '../../config/case-data';
+import { AddressDetails } from '../../types/address';
 
-export default class AmendContactDetailsLrPage extends BasePage {
+export class AmendContactDetailsLrPage extends BasePage {
 
   private readonly amendContactDetailsTitle: Locator;
   private readonly representativeContactChangeOptionGroup: Locator;

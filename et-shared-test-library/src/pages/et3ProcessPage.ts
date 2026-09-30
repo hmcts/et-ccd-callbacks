@@ -1,7 +1,7 @@
 import { BasePage } from "./basePage";
 import { expect, Locator, Page } from '@playwright/test';
 
-export default class ET3ProcessPage extends BasePage {
+export class ET3ProcessPage extends BasePage {
   private readonly markdownPara: Locator;
   private readonly chooseRespondent: Locator;
   private readonly legendSpan: Locator;

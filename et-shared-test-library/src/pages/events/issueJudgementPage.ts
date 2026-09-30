@@ -1,7 +1,7 @@
 import { expect, Page } from '@playwright/test';
-import { BasePage } from "../basePage.ts";
+import { BasePage } from "../basePage";
 
-export default class IssueJudgementPage extends BasePage {
+export class IssueJudgementPage extends BasePage {
 
   constructor(page: Page) {
     super(page);

@@ -2,7 +2,7 @@ import { BasePage } from "./basePage";
 import { expect, Locator, Page } from "@playwright/test";
 
 
-export default class BfActionPage extends BasePage {
+export class BfActionPage extends BasePage {
   private readonly bfActionDropDown: Locator;
   private readonly bfDate: Locator;
   private readonly bfMonth: Locator;

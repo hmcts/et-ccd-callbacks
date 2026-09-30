@@ -1,7 +1,7 @@
-import { BasePage } from '../basePage.ts';
+import { BasePage } from '../basePage';
 import { expect, Page, Locator } from '@playwright/test';
 
-export default class RespSubmitEt3 extends BasePage {
+export class RespSubmitEt3 extends BasePage {
   private readonly cya: Locator;
   private readonly submitHeader: Locator;
   private readonly closeAndReturnToCaseOverviewButton: Locator;

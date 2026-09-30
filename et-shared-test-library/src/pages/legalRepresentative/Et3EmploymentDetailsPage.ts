@@ -1,6 +1,6 @@
-import { Et3DetailsPage } from './Et3DetailsPage.ts';
+import { Et3DetailsPage } from './Et3DetailsPage';
 import { expect, Locator, Page } from '@playwright/test';
-import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage.ts';
+import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage';
 import { AxeUtils } from '@hmcts/playwright-common';
 
 export class Et3EmploymentDetailsPage extends Et3DetailsPage {

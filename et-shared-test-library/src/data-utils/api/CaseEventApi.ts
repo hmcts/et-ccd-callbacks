@@ -1,7 +1,7 @@
-import { ReplacementAction } from '../../types/replacement-action.ts';
-import { ccdApi } from '../../fixtures/common.fixture.ts';
+import { ReplacementAction } from '../../types/replacement-action';
+import { ccdApi } from '../../fixtures/common.fixture';
 import { CaseTypeLocation, Events, PayloadPath } from '../../config';
-import { DateUtilComponent } from '../DateUtilComponent.ts';
+import { DateUtilComponent } from '../DateUtilComponent';
 import { users } from '../../config';
 
 export class CaseEventApi {

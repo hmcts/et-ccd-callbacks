@@ -1,5 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { BasePage } from '../basePage.ts';
+import { BasePage } from '../basePage';
 
 export class Et1ClaimsListPage extends BasePage {
   private readonly myEt1Claims: Locator;
@@ -48,7 +48,7 @@ export class Et1ClaimsListPage extends BasePage {
   async assertCaseListedInSubmittedClaims(caseId: string) {
     await this.page.waitForLoadState('load');
     await expect(this.submittedClaimsTable).toBeVisible();
-    const targetHref = `/claimant-application/${caseId}?lng=en`;
+    const targetHref = `/citizen-hub/${caseId}?lng=en`;
     const targetLink = this.submittedClaimsTable.locator(`a[href="${targetHref}"]`);
     await expect
       .poll(
@@ -110,7 +110,7 @@ export class Et1ClaimsListPage extends BasePage {
 
   async assertCaseIdNotListedInET1ClaimsPage(caseId: string) {
     await this.page.waitForLoadState('load');
-    const targetHref = `/claimant-application/${caseId}?lng=en`;
+    const targetHref = `/citizen-hub/${caseId}?lng=en`;
     const draftTargetLink = this.draftClaimsTable.locator(`a[href="${targetHref}"]`);
     await expect(draftTargetLink).not.toBeVisible();
     const submittedTargetLink = this.submittedClaimsTable.locator(`a[href="${targetHref}"]`);

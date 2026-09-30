@@ -1,7 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { BasePage } from "../basePage.ts";
+import { BasePage } from "../basePage";
 
-export default class CUIPreLoginPage extends BasePage{
+export class CUIPreLoginPage extends BasePage{
 
   private readonly syaLandingPageTitle: Locator;
   private readonly startNewClaimButton: Locator;

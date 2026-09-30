@@ -1,4 +1,4 @@
-import { test } from "../fixtures/common.fixture";
+import { test } from "../fixtures/et.test.fixture.ts";
 import dateUtilComponent from '../data-utils/DateUtilComponent';
 import { CaseTypeLocation, Events } from '../config/case-data';
 import { CaseworkerCaseFactory } from '../data-utils/factory/exui/CaseworkerCaseFactory.ts';

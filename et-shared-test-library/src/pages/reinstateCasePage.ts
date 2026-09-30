@@ -1,7 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { BasePage } from './basePage';
 
-export default class ReinstateCasePage extends BasePage {
+export class ReinstateCasePage extends BasePage {
   private readonly positionType: Locator;
 
   constructor(page: Page) {

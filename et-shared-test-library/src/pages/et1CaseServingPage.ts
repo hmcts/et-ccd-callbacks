@@ -3,7 +3,7 @@ import { expect, Locator, Page } from "@playwright/test";
 import { AxeUtils } from '@hmcts/playwright-common';
 const today = new Date();
 
-export default class Et1CaseServingPage extends BasePage {
+export class Et1CaseServingPage extends BasePage {
   private readonly dateAcceptedDay: Locator;
   private readonly dateAcceptedMonth: Locator;
   private readonly dateAcceptedYear: Locator;

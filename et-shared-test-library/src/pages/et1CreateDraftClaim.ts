@@ -1,9 +1,9 @@
 import { BasePage } from "./basePage";
 import { expect, Locator, Page } from "@playwright/test";
-import { Events } from '../config/case-data.ts';
+import { Events } from '../config/case-data';
 
 
-export default class Et1CreateDraftClaim extends BasePage {
+export class Et1CreateDraftClaim extends BasePage {
   private readonly et1Postcode: Locator;
   private readonly et1Section1Link: Locator;
   private readonly claimantFirstName: Locator;

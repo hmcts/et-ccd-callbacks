@@ -1,7 +1,7 @@
-import { BasePage } from "../basePage.ts";
+import { BasePage } from "../basePage";
 import { expect, Locator, Page } from '@playwright/test';
 
-export default class CaseWorkerNotificationPage extends BasePage {
+export class CaseWorkerNotificationPage extends BasePage {
   private readonly enterNotificationText: Locator;
   private readonly letterToSendOutRadio: Locator;
   private readonly notificationSubjectCheckbox: Locator;

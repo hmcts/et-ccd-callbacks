@@ -5,7 +5,7 @@ export {
   Events,
   type ReferralOption,
   type CaseEvent,
-} from "./case-data.ts";
+} from "./case-data";
 export {
   type UserCredentials,
   users,

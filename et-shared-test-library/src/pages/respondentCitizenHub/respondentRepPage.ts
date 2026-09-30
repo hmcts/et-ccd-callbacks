@@ -1,8 +1,8 @@
-import { BasePage } from "../basePage.ts";
+import { BasePage } from "../basePage";
 import { expect, Locator, Page } from '@playwright/test';
-import { CaseDetailsValues } from '../../config/case-data.ts';
+import { CaseDetailsValues } from '../../config/case-data';
 
-export default class RespondentRepPage extends BasePage {
+export class RespondentRepPage extends BasePage {
   private readonly nonRegisteredLegalOrg: Locator;
   private readonly registeredLegalOrg: Locator;
   private readonly searchForRegisteredOrg: Locator;

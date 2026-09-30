@@ -1,7 +1,7 @@
 import { BasePage } from './basePage';
 import { expect, Locator, Page } from '@playwright/test';
 
-export default class UploadDocumentPage extends BasePage {
+export class UploadDocumentPage extends BasePage {
   private readonly addNewButtonBottom: Locator;
   private readonly createDcfLink: Locator;
   private readonly createDcfRadio: Locator;

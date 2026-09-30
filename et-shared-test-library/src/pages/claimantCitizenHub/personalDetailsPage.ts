@@ -1,9 +1,9 @@
 import { expect, Locator, Page } from '@playwright/test';
-import CitizenHubPage from './CitizenHubPage.ts';
+import { CitizenHubPage } from './CitizenHubPage';
 import userDetailsData from '../../../resources/payload/user-details.json';
 
 
-export default class PersonalDetailsPage extends CitizenHubPage {
+export class PersonalDetailsPage extends CitizenHubPage {
 
   private readonly personalDetailsLink: Locator;
   private readonly dobHeading: Locator;

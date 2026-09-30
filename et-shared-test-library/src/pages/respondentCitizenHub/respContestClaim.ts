@@ -1,7 +1,7 @@
-import { BasePage } from '../basePage.ts';
+import { BasePage } from '../basePage';
 import { Page, Locator, expect } from '@playwright/test';
 
-export default class RespContestClaim extends BasePage {
+export class RespContestClaim extends BasePage {
   private readonly contestClaimReason: Locator;
   private readonly clickContestClaimLink: Locator;
   private readonly claimSummaryFile: Locator;

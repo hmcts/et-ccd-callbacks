@@ -2,7 +2,7 @@ import { BasePage } from "./basePage";
 import { Locator, Page, expect } from '@playwright/test';
 import respPageData from '../../resources/payload/respondent-page-content.json';
 
-export default class ClaimantDetailsPage extends BasePage {
+export class ClaimantDetailsPage extends BasePage {
   private readonly firstName: Locator;
   private readonly lastName: Locator;
   private readonly addressLine1: Locator;

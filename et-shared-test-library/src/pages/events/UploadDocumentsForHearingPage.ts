@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage';
-import { BaseEventPage } from './BaseEventPage.ts';
+import { BaseEventPage } from './BaseEventPage';
 
 export class UploadDocumentsForHearingPage extends BaseEventPage {
   private readonly prepDocYesOption: Locator;

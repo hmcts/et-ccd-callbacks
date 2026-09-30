@@ -1,7 +1,7 @@
 import { BasePage } from "./basePage";
 import { expect, Locator, Page } from "@playwright/test";
 
-export default class CaseNotesPage extends BasePage {
+export class CaseNotesPage extends BasePage {
   private readonly titleField: Locator;
   private readonly noteField: Locator;
 

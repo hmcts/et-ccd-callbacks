@@ -1,7 +1,7 @@
 import { BasePage } from "./basePage";
 import { expect, Locator, Page } from '@playwright/test';
 
-export default class ManageSupportPage extends BasePage {
+export class ManageSupportPage extends BasePage {
   private readonly caseFlagField: Locator;
 
   constructor(page: Page) {

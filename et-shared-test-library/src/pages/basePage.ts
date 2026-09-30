@@ -1,5 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { CommonActionsHelper } from './helpers/CommonActionsHelper.ts';
+import { CommonActionsHelper } from './helpers/CommonActionsHelper';
 
 export abstract class BasePage {
   readonly page: Page;

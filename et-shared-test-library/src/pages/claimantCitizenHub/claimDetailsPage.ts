@@ -1,7 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
-import CitizenHubPage from './CitizenHubPage.ts';
-
-export default class ClaimDetailsPage extends CitizenHubPage{
+import { CitizenHubPage } from './CitizenHubPage';
+export class ClaimDetailsPage extends CitizenHubPage{
 
   private readonly tellUsAboutYourClaimLink: Locator;
   private readonly whatTypeOfClaimHeading: Locator;

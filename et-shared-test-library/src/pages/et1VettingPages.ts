@@ -2,7 +2,7 @@ import { BasePage } from "./basePage";
 import { expect, Locator, Page } from "@playwright/test";
 import { AxeUtils } from '@hmcts/playwright-common';
 
-export default class Et1VettingPages extends BasePage {
+export class Et1VettingPages extends BasePage {
   private readonly beforeYouStartText: Locator;
   private readonly caseEditPage: Locator;
   private readonly minimumRequiredInfoText: Locator;

@@ -1,7 +1,7 @@
 import { BasePage } from "./basePage";
 import { expect, Locator, Page } from "@playwright/test";
 
-export default class HearingDetailsPage extends BasePage {
+export class HearingDetailsPage extends BasePage {
   private readonly hearingDropdownOption: Locator;
   private readonly hearingDetailsStatus: Locator;
   private readonly hearingDetailsCaseDisposedNo: Locator;

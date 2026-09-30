@@ -1,6 +1,6 @@
 import { BasePage } from './basePage';
 import { expect, Locator, Page } from '@playwright/test';
-import { Events } from '../config/case-data.ts';
+import { Events } from '../config/case-data';
 
 export class LegalRepPage extends BasePage {
   readonly changeDocuUploaded: Locator;

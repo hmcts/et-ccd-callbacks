@@ -1,6 +1,5 @@
-import { test } from '../../fixtures/common.fixture.ts';
-import { users } from '../config.dynamic.ts';
-import { CookieUtils } from '../../data-utils/cookie.utils.ts';
+import {test} from "../../fixtures/et.test.fixture.ts";
+import {CookieUtils, users} from "@et-shared-test-library/core";
 
 test.describe.serial("set up user context", () => {
   test.use({ storageState: { cookies: [], origins: [] } }); // start unauthenticated every setup test

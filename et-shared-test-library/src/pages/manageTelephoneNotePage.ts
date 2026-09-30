@@ -1,7 +1,7 @@
 import { BasePage } from "./basePage";
 import { expect, Locator, Page } from "@playwright/test";
 
-export default class ManageTelephoneNotePage extends BasePage {
+export class ManageTelephoneNotePage extends BasePage {
   private readonly titleField: Locator;
   private readonly noteField: Locator;
   private readonly editButton: Locator;

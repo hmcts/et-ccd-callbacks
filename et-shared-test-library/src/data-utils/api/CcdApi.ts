@@ -2,11 +2,11 @@ import { readFileSync } from 'fs';
 import path from 'path';
 import { set, unset } from 'lodash';
 import { ReplacementAction } from '../../types/replacement-action';
-import {axiosRequest} from './ApiHelper.ts';
-import {getServiceToken, getUserId, getUserAuthToken} from './TokenHelperApi.ts';
+import {axiosRequest} from './ApiHelper';
+import {getServiceToken, getUserId, getUserAuthToken} from './TokenHelperApi';
 import {AxiosResponse} from 'axios';
-import { CaseTypeLocation } from '../../config/case-data.ts';
-import { staticConfig } from '../../config/config.static.ts';
+import { CaseTypeLocation } from '../../config/case-data';
+import { staticConfig } from '../../config/config.static';
 
 const ccdApiUrl = staticConfig.ccdDataStoreApi;
 

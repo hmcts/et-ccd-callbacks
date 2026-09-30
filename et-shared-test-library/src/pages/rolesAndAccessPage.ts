@@ -1,7 +1,7 @@
 import { BasePage } from "./basePage";
 import { expect, Locator, Page } from "@playwright/test";
 
-export default class RolesAndAccessPage extends BasePage {
+export class RolesAndAccessPage extends BasePage {
   private readonly allocateCtscRoleLink: Locator;
   private readonly allocatedCtscCaseworker: Locator;
   private readonly allocateToMe: Locator;

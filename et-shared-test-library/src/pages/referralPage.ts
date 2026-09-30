@@ -1,8 +1,8 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { BasePage } from './basePage';
-import { ReferralOption } from '../config/case-data.ts';
+import { ReferralOption } from '../config/case-data';
 
-export default class ReferralPage extends BasePage {
+export class ReferralPage extends BasePage {
   private readonly judgeReferralOption: Locator;
   private readonly adminReferralOption: Locator;
   private readonly legalOfficerReferralOption: Locator;

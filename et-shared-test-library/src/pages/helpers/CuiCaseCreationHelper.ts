@@ -1,21 +1,20 @@
 import { Page } from '@playwright/test';
-import CUIPreLoginPage from '../claimantCitizenHub/CUIPreLoginPage.ts';
-import CUIPostLoginPages from '../claimantCitizenHub/CUIPostLoginPages.ts';
-import PersonalDetailsPage from '../claimantCitizenHub/personalDetailsPage.ts';
-import EmploymentAndRespDetailsPage from '../claimantCitizenHub/employmentAndRespDetailsPage.ts';
-import ClaimDetailsPage from '../claimantCitizenHub/claimDetailsPage.ts';
-import SubmitClaimPage from '../claimantCitizenHub/submitClaimPage.ts';
-
+import { CUIPreLoginPage } from '../claimantCitizenHub/CUIPreLoginPage';
+import { CUIPostLoginPages } from '../claimantCitizenHub/CUIPostLoginPages';
+import { PersonalDetailsPage } from '../claimantCitizenHub/personalDetailsPage';
+import { EmploymentAndRespDetailsPage } from '../claimantCitizenHub/employmentAndRespDetailsPage';
+import { ClaimDetailsPage } from '../claimantCitizenHub/claimDetailsPage';
+import { SubmitClaimPage } from '../claimantCitizenHub/submitClaimPage';
 import userDetailsData from '../../../resources/payload/user-details.json';
-import LoginPage from '../loginPage.ts';
-import Et1VettingPages from '../et1VettingPages.ts';
-import Et1CaseServingPage from '../et1CaseServingPage.ts';
-import { ManageCaseDashboardPage } from '../ManageCaseDashboardPage.ts';
-import { CaseDetailsValues, CaseTypeLocation, Events } from '../../config/case-data.ts';
-import CaseDetailsPage from '../caseDetailsPage.ts';
-import {DateUtilComponent} from '../../data-utils/DateUtilComponent.ts';
-import { config, UserCredentials } from '../../config/config.dynamic.ts';
-import SingleOrMultipleClaimPage from '../claimantCitizenHub/singleOrMultipleClaimPage.ts';
+import { LoginPage } from '../loginPage';
+import { Et1VettingPages } from '../et1VettingPages';
+import { Et1CaseServingPage } from '../et1CaseServingPage';
+import { ManageCaseDashboardPage } from '../ManageCaseDashboardPage';
+import { CaseDetailsValues, CaseTypeLocation, Events } from '../../config/case-data';
+import { CaseDetailsPage } from '../caseDetailsPage';
+import {DateUtilComponent} from '../../data-utils/DateUtilComponent';
+import { config, UserCredentials } from '../../config/config.dynamic';
+import { SingleOrMultipleClaimPage } from '../claimantCitizenHub/singleOrMultipleClaimPage';
 
 export async function createCaseViaCitizenUI(
   page: Page,

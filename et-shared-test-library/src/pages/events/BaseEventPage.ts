@@ -1,4 +1,4 @@
-import { BasePage } from '../basePage.ts';
+import { BasePage } from '../basePage';
 
 
 export class BaseEventPage extends BasePage{

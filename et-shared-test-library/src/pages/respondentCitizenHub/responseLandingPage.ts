@@ -1,7 +1,7 @@
-import { BasePage } from '../basePage.ts';
+import { BasePage } from '../basePage';
 import { Page, Locator, expect } from '@playwright/test';
 
-export default class ResponseLandingPage extends BasePage {
+export class ResponseLandingPage extends BasePage {
   private readonly mainContent: Locator;
   private readonly responseFormLink: Locator;
 

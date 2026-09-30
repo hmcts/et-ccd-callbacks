@@ -2,9 +2,9 @@ import { BasePage } from "./basePage";
 import { BrowserContext, expect, Locator, Page } from '@playwright/test';
 import { CaseEvent } from '../config/case-data';
 import { Tab, TabContentItem } from '../types/tab';
-import { FileTree } from '../types/case_file_view_tree.ts';
+import { FileTree } from '../types/case_file_view_tree';
 
-export default class CaseDetailsPage extends BasePage {
+export class CaseDetailsPage extends BasePage {
 
   private readonly goButton: Locator;
   private readonly selectNextStepDropDown: Locator;

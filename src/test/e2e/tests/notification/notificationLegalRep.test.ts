@@ -1,4 +1,4 @@
-import { test } from '../../fixtures/common.fixture.ts';
+import { test } from '../../fixtures/et.test.fixture.ts';
 import { LegalRepCaseFactory } from '../../data-utils/factory/exui/LegalRepCaseFactory.ts';
 import { CaseTypeLocation } from '../../config/case-data.ts';
 import { users } from '../../config/config.dynamic.ts';

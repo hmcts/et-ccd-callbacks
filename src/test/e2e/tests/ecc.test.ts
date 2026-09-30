@@ -1,4 +1,4 @@
-import { test } from '../fixtures/common.fixture';
+import { test } from '../fixtures/et.test.fixture.ts';
 import { expect } from '@playwright/test';
 import { CitizenClaimantFactory } from '../data-utils/factory/citizen/ClaimantCitizenFactory.ts';
 import { CaseTypeLocation, Events } from '../config/case-data.ts';

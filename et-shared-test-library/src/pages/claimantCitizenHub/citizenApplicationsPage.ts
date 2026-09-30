@@ -1,7 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { BasePage } from '../basePage.ts';
+import { BasePage } from '../basePage';
 
-export default class CitizenApplicationsPage extends BasePage{
+export class CitizenApplicationsPage extends BasePage{
 
   private readonly yourRequestAndApplications: Locator;
   private readonly respondToApplicationText: Locator;

@@ -1,8 +1,8 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { BaseEventPage } from './BaseEventPage.ts';
-import { users } from '../../config/config.dynamic.ts';
+import { BaseEventPage } from './BaseEventPage';
+import { users } from '../../config/config.dynamic';
 
-export default class ClaimantRepresentativePage extends BaseEventPage {
+export class ClaimantRepresentativePage extends BaseEventPage {
 
   private readonly isClaimantRepresented: Locator;
   private readonly nameOfRepresentative: Locator;

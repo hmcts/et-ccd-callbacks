@@ -1,12 +1,12 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { BasePage } from './basePage';
-import { UserCredentials } from '../config/config.dynamic.ts';
-import { CookieUtils } from '../data-utils/cookie.utils.ts';
-import { staticConfig } from '../config/config.static.ts';
+import { UserCredentials } from '../config/config.dynamic';
+import { CookieUtils } from '../data-utils/cookie.utils';
+import { staticConfig } from '../config/config.static';
 
 const aatUrl = staticConfig.manageCaseBaseUrl;
 
-export default class LoginPage extends BasePage {
+export class LoginPage extends BasePage {
   private readonly username: Locator;
   private readonly password: Locator;
   private readonly signInOrContinueOrSubmitButton: Locator;

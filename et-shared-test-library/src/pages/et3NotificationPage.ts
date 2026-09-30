@@ -1,7 +1,7 @@
 import { BasePage } from "./basePage";
 import { expect, Locator, Page } from '@playwright/test';
 
-export default class Et3NotificationPage extends BasePage {
+export class Et3NotificationPage extends BasePage {
   private readonly documentUpload: Locator;
   private readonly typeOfDocument: Locator;
 

@@ -142,8 +142,11 @@ export class DateUtilComponent {
       day: 'numeric',
       month: 'short',
       year: 'numeric'
-    }).format(date);
+    })
+      .format(date)
+      .replace(/\bSept\b/, 'Sep');
   }
+
 
   static formatDateWithLeadingZeros(date:Date){
 

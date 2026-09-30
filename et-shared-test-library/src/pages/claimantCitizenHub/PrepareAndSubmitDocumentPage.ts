@@ -1,7 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
-import ContactTheTribunalPage from './ContactTheTribunalPage.ts';
-
-export default class PrepareAndSubmitDocumentPage extends ContactTheTribunalPage {
+import { ContactTheTribunalPage } from './ContactTheTribunalPage';
+export class PrepareAndSubmitDocumentPage extends ContactTheTribunalPage {
 
   private readonly prepareAndSubmitDocumentPageHeading: Locator;
   private readonly startPreparingHearingDocButton: Locator;

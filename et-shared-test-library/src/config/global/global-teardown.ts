@@ -1,4 +1,4 @@
-import { deleteAllSessionFiles, deleteCacheFile, deleteUserCredFile } from "../../data-utils/CachingHelper.ts";
+import { deleteAllSessionFiles, deleteCacheFile, deleteUserCredFile } from "../../data-utils/CachingHelper";
 
 export async function globalTeardown() {
   await Promise.all([

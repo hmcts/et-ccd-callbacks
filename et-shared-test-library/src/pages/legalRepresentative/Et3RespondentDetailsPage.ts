@@ -1,11 +1,11 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { CaseDetailsValues } from '../../config/case-data.ts';
-import { CommonActionsHelper } from '../helpers/CommonActionsHelper.ts';
-import { TableRowItem } from '../../types/table.ts';
-import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage.ts';
-import { Et3DetailsPage } from './Et3DetailsPage.ts';
+import { CaseDetailsValues } from '../../config/case-data';
+import { CommonActionsHelper } from '../helpers/CommonActionsHelper';
+import { TableRowItem } from '../../types/table';
+import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage';
+import { Et3DetailsPage } from './Et3DetailsPage';
 
-export default class Et3RespondentDetailsPage extends Et3DetailsPage {
+export class Et3RespondentDetailsPage extends Et3DetailsPage {
 
   private readonly respondentDetailsPageTitle: Locator;
   private readonly isThisCorrectRespondentTitle: Locator;

@@ -1,7 +1,7 @@
-import {BasePage} from "../basePage.ts";
+import {BasePage} from "../basePage";
 import {expect, Page} from "@playwright/test";
 
-export default class Et3ResponsesDashboardPage extends BasePage {
+export class Et3ResponsesDashboardPage extends BasePage {
 
   constructor(page: Page) {
     super(page);

@@ -1,7 +1,7 @@
 import { expect, Page, Locator } from '@playwright/test';
-import {BasePage} from "../basePage.ts";
+import { BasePage } from "../basePage";
 
-export default class RespondentCaseOverviewPage extends BasePage {
+export class RespondentCaseOverviewPage extends BasePage {
   private readonly et1FormLink: Locator;
   private readonly et1FormSubLink: Locator;
   private readonly claimantContactDetails: Locator;

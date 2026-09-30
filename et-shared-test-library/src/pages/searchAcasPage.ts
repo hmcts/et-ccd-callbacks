@@ -2,7 +2,7 @@ import { expect, Locator, Page } from "@playwright/test";
 import { BasePage } from "./basePage";
 import acasCertData from '../../resources/payload/acas-content.json';
 
-export default class SearchAcasPage extends BasePage {
+export class SearchAcasPage extends BasePage {
   private readonly acasCertificateTextBox: Locator;
   private readonly confirmationEle: Locator;
 

@@ -1,6 +1,6 @@
-import { cuiApi } from '../../../fixtures/common.fixture.ts';
-import { CaseTypeLocation } from '../../../config/case-data.ts';
-import { UserCredentials, users } from '../../../config/config.dynamic.ts';
+import { cuiApi } from '../../../fixtures/common.fixture';
+import { CaseTypeLocation } from '../../../config/case-data';
+import { UserCredentials, users } from '../../../config/config.dynamic';
 
 /**
  * Factory class for creating and progressing Citizen Claimant cases via CUI APIs.

@@ -1,5 +1,5 @@
 import {  expect, Locator, Page } from "@playwright/test";
-import { Selectors } from "./Selectors.ts";
+import { Selectors } from "./Selectors";
 
 export class Helpers {
 

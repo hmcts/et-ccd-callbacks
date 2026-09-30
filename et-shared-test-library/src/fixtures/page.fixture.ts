@@ -1,84 +1,86 @@
 import { test as base } from '@playwright/test';
-import { ApplicationTabPage } from '../pages/applicationTabPage';
-import CaseListPage from '../pages/caseListPage';
-import CreateCaseFlagPage from '../pages/createCaseFlag';
-import ManageCaseFlagPage from '../pages/manageCaseFlag';
-import Et1CaseServingPage from '../pages/et1CaseServingPage';
-import LoginPage from '../pages/loginPage';
-import { ListHearingPage } from '../pages/events/listHearingPage';
-import { LegalRepPage } from '../pages/legalRepPage';
-import CitizenHubPage from '../pages/claimantCitizenHub/CitizenHubPage.ts';
-import { CaseLinkPage } from '../pages/caseLinkPage';
-import RespondentRepPage from '../pages/respondentCitizenHub/respondentRepPage.ts';
-import ET3LoginPage from '../pages/respondentCitizenHub/et3LoginPage.ts';
-import RespondentCaseOverviewPage from '../pages/respondentCitizenHub/respondentCaseOverviewPage.ts';
-import RespondentTaskListPage from '../pages/respondentCitizenHub/respondentTaskListPage.ts';
-import ResponseLandingPage from '../pages/respondentCitizenHub/responseLandingPage.ts';
-import RespContactDetailsPages from '../pages/respondentCitizenHub/respContactDetailsPages.ts';
-import RespClaimantDetails from '../pages/respondentCitizenHub/respClaimantDetails.ts';
-import RespContestClaim from '../pages/respondentCitizenHub/respContestClaim.ts';
-import RespSubmitEt3 from '../pages/respondentCitizenHub/respSubmitEt3.ts';
-import BfActionPage from '../pages/bfActionPage';
-import JurisdictionPage from '../pages/jurisdictionPage';
-import CaseTransferPage from '../pages/caseTransferPage';
-import CaseWorkerNotificationPage from '../pages/notifications/CaseWorkerNotificationPage.ts';
-import ClaimantDetailsPage from '../pages/claimantDetailsPage';
-import RespondentDetailsPage from '../pages/respondentCitizenHub/respondentDetailsPage.ts';
-import { ManageOrgPage } from '../pages/manageOrgPage';
-import ICUploadDocPage from '../pages/icUploadDocPage';
-import { RestrictedReportingPage } from '../pages/restrictedReportingPage';
-import UploadDocumentPage from "../pages/uploadDocumentPage";
-import ReferralPage from '../pages/referralPage';
-import DraftJudgementPage from '../pages/events/draftJudgementPage.ts';
-import IssueJudgementPage from '../pages/events/issueJudgementPage.ts';
-import SearchAcasPage from '../pages/searchAcasPage';
-import LettersPage from '../pages/lettersPage';
-import DepositOrderPage from '../pages/depositOrderPage';
-import RolesAndAccessPage from "../pages/rolesAndAccessPage";
-import TaskPage from "../pages/taskPage";
-import HearingDetailsPage from "../pages/hearingDetailsPage";
-import AdrDocumentPage from "../pages/adrDocumentPage";
-import CaseDetailsPage from "../pages/caseDetailsPage";
-import Et3NotificationPage from '../pages/et3NotificationPage';
-import UploadHearingBundlePage from '../pages/uploadHearingBundlePage';
-import CaseNotesPage from '../pages/caseNotesPage';
-import CloseCasePage from '../pages/closeCasePage';
-import ReinstateCasePage from '../pages/reinstateCasePage';
-import ClaimantRepresentativePage from '../pages/events/claimantRepresentativePage.ts';
-import { UploadDocumentsForHearingPage } from '../pages/events/UploadDocumentsForHearingPage';
-import { CheckYourAnswersPage } from '../pages/helpers/CheckYourAnswersPage';
-import { BaseEventPage } from '../pages/events/BaseEventPage.ts';
-import LegalRepNotificationPage from '../pages/notifications/LegalRepNotificationPage.ts';
-import CitizenHubLoginPage from '../pages/claimantCitizenHub/CitizenHubLoginPage.ts';
-import ContactTheTribunalPage from '../pages/claimantCitizenHub/ContactTheTribunalPage.ts';
-import PrepareAndSubmitDocumentPage from '../pages/claimantCitizenHub/PrepareAndSubmitDocumentPage.ts';
-import Et1VettingPages from '../pages/et1VettingPages.ts';
-import CUIPreLoginPage from '../pages/claimantCitizenHub/CUIPreLoginPage.ts';
-import CUIPostLoginPages from '../pages/claimantCitizenHub/CUIPostLoginPages.ts';
-import PersonalDetailsPage from '../pages/claimantCitizenHub/personalDetailsPage.ts';
-import EmploymentAndRespDetailsPage from '../pages/claimantCitizenHub/employmentAndRespDetailsPage.ts';
-import ClaimDetailsPage from '../pages/claimantCitizenHub/claimDetailsPage.ts';
-import SubmitClaimPage from '../pages/claimantCitizenHub/submitClaimPage.ts';
-import { ManageCaseDashboardPage } from '../pages/ManageCaseDashboardPage.ts';
-import Et1CreateDraftClaim from '../pages/et1CreateDraftClaim.ts';
-import { NocPage } from '../pages/legalRepresentative/NocPage.ts';
-import ET3ProcessPage from '../pages/et3ProcessPage.ts';
-import { Et3DetailsPage } from '../pages/legalRepresentative/Et3DetailsPage.ts';
-import Et3RespondentDetailsPage from '../pages/legalRepresentative/Et3RespondentDetailsPage.ts';
-import { Et3EmploymentDetailsPage } from '../pages/legalRepresentative/Et3EmploymentDetailsPage.ts';
-import { Et3ResponseDetailsPage } from '../pages/legalRepresentative/Et3ResponseDetailsPage.ts';
-import InitialConsiderationPage from '../pages/initialConsiderationPage.ts';
-import AllocateHearingPage from '../pages/allocateHearingPage.ts';
-import ManageTelephoneNotePage from '../pages/manageTelephoneNotePage.ts';
-import { Et1ClaimsListPage } from '../pages/claimantCitizenHub/et1ClaimsListPage.ts';
-import AmendContactDetailsLrPage from '../pages/events/AmendContactDetailsLrPage.ts';
-import CitizenApplicationsPage from '../pages/claimantCitizenHub/citizenApplicationsPage.ts';
-import ResClaimantsApplicationsPage from '../pages/respondentCitizenHub/resClaimantsApplicationsPage.ts';
-import CaseTransferToEcmPage from '../pages/events/CaseTransferToEcmPage.ts';
-import SingleOrMultipleClaimPage from '../pages/claimantCitizenHub/singleOrMultipleClaimPage.ts';
-import RequestSupportPage from '../pages/requestSupportPage.ts';
-import ManageSupportPage from '../pages/manageSupportPage.ts';
-import Et3ResponsesDashboardPage from "../pages/respondentCitizenHub/et3ResponsesDashboardPage.ts";
+import {
+  AdrDocumentPage,
+  AllocateHearingPage,
+  AmendContactDetailsLrPage,
+  ApplicationTabPage,
+  BaseEventPage,
+  BfActionPage,
+  CUIPostLoginPages,
+  CUIPreLoginPage,
+  CaseDetailsPage,
+  CaseLinkPage,
+  CaseListPage,
+  CaseNotesPage,
+  CaseTransferPage,
+  CaseTransferToEcmPage,
+  CaseWorkerNotificationPage,
+  CitizenApplicationsPage,
+  CitizenHubLoginPage,
+  CitizenHubPage,
+  ClaimDetailsPage,
+  ClaimantDetailsPage,
+  ClaimantRepresentativePage,
+  CheckYourAnswersPage,
+  CloseCasePage,
+  ContactTheTribunalPage,
+  CreateCaseFlagPage,
+  DepositOrderPage,
+  DraftJudgementPage,
+  ET3LoginPage,
+  ET3ProcessPage,
+  EmploymentAndRespDetailsPage,
+  Et1CaseServingPage,
+  Et1ClaimsListPage,
+  Et1CreateDraftClaim,
+  Et1VettingPages,
+  Et3DetailsPage,
+  Et3EmploymentDetailsPage,
+  Et3NotificationPage,
+  Et3RespondentDetailsPage,
+  Et3ResponseDetailsPage,
+  Et3ResponsesDashboardPage,
+  HearingDetailsPage,
+  ICUploadDocPage,
+  InitialConsiderationPage,
+  IssueJudgementPage,
+  JurisdictionPage,
+  LegalRepNotificationPage,
+  LegalRepPage,
+  LettersPage,
+  ListHearingPage,
+  LoginPage,
+  ManageCaseDashboardPage,
+  ManageCaseFlagPage,
+  ManageOrgPage,
+  ManageSupportPage,
+  ManageTelephoneNotePage,
+  NocPage,
+  PersonalDetailsPage,
+  PrepareAndSubmitDocumentPage,
+  ReferralPage,
+  ReinstateCasePage,
+  RequestSupportPage,
+  ResClaimantsApplicationsPage,
+  RespClaimantDetails,
+  RespContactDetailsPages,
+  RespContestClaim,
+  RespSubmitEt3,
+  RespondentCaseOverviewPage,
+  RespondentDetailsPage,
+  RespondentRepPage,
+  RespondentTaskListPage,
+  ResponseLandingPage,
+  RestrictedReportingPage,
+  RolesAndAccessPage,
+  SearchAcasPage,
+  SingleOrMultipleClaimPage,
+  SubmitClaimPage,
+  TaskPage,
+  UploadDocumentPage,
+  UploadDocumentsForHearingPage,
+  UploadHearingBundlePage,
+} from '../pages';
 
 type PageFixtures = {
   applicationTabPage: ApplicationTabPage;

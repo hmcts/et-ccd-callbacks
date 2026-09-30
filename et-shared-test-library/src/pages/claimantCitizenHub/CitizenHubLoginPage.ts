@@ -1,8 +1,8 @@
 import { expect, Locator, Page } from '@playwright/test';
-import LoginPage from '../loginPage.ts';
-import { config, UserCredentials } from '../../config/config.dynamic.ts';
+import { LoginPage } from '../loginPage';
+import { config, UserCredentials } from '../../config/config.dynamic';
 
-export default class CitizenHubLoginPage extends LoginPage {
+export class CitizenHubLoginPage extends LoginPage {
   private readonly syaLandingPageTitle: Locator;
   private readonly startNewClaimButton: Locator;
   private readonly returnToDraftOrSubmittedClaimLink: Locator;

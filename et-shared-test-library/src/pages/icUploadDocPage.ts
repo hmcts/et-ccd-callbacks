@@ -3,9 +3,9 @@ import { BasePage } from "./basePage";
 import path from "path";
 import icPageData from '../../resources/payload/ic-page-content.json';
 import respPageData from '../../resources/payload/respondent-page-content.json';
-import { Events } from '../config/case-data.ts';
+import { Events } from '../config/case-data';
 
-export default class ICUploadDocPage extends BasePage {
+export class ICUploadDocPage extends BasePage {
     private readonly respNameEle: Locator;
     private readonly jurisdictionCodeInvalidYes: Locator;
     private readonly invalidDetails: Locator;

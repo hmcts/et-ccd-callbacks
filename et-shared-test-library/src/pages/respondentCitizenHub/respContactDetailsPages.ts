@@ -1,7 +1,7 @@
-import { BasePage } from '../basePage.ts';
+import { BasePage } from '../basePage';
 import { Locator, Page, expect } from '@playwright/test';
 
-export default class RespContactDetailsPages extends BasePage {
+export class RespContactDetailsPages extends BasePage {
   private readonly contactDetailsLink: Locator;
 
   constructor(page: Page) {

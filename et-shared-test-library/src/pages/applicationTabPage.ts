@@ -1,8 +1,8 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { BasePage } from './basePage';
-import { CommonActionsHelper } from './helpers/CommonActionsHelper.ts';
+import { CommonActionsHelper } from './helpers/CommonActionsHelper';
 import { AxeUtils } from '@hmcts/playwright-common';
-import { CheckYourAnswersPage } from './helpers/CheckYourAnswersPage.ts';
+import { CheckYourAnswersPage } from './helpers/CheckYourAnswersPage';
 
 export class ApplicationTabPage extends BasePage {
 

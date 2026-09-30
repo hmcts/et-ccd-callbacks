@@ -1,9 +1,11 @@
-import { test } from '../../fixtures/common.fixture.ts';
-import { CaseworkerCaseFactory } from '../../data-utils/factory/exui/CaseworkerCaseFactory.ts';
-import { CaseTypeLocation } from '../../config/case-data.ts';
-import { users } from '../../config/config.dynamic.ts';
-import Et3LoginPage from '../../pages/respondentCitizenHub/et3LoginPage.ts';
-import RespondentCaseOverviewPage from '../../pages/respondentCitizenHub/respondentCaseOverviewPage.ts';
+import { test } from '../../fixtures/et.test.fixture.ts';
+import {
+  CaseTypeLocation,
+  CaseworkerCaseFactory,
+  ET3LoginPage,
+  RespondentCaseOverviewPage,
+  users
+} from "@et-shared-test-library/core";
 
 let caseNumber: any;
 let caseId:string;
@@ -26,7 +28,7 @@ test.describe.skip('Respondent Store Application for unrepresented cases', () =>
 
       //RET-5466
       const respondentBrowserPage = await browserUtils.openNewBrowserContext(users.etRespondent.sessionFile);
-      const et3LoginPage = new Et3LoginPage(respondentBrowserPage);
+      const et3LoginPage = new ET3LoginPage(respondentBrowserPage);
       const respondentCaseOverviewPage = new RespondentCaseOverviewPage(respondentBrowserPage);
       await et3LoginPage.processRespondentLoginForExistingCase(
         users.etRespondent,
@@ -46,7 +48,7 @@ test.describe.skip('Respondent Store Application for unrepresented cases', () =>
 
       //RET-5466
       const respondentBrowserPage = await browserUtils.openNewBrowserContext(users.etRespondent.sessionFile);
-      const et3LoginPage = new Et3LoginPage(respondentBrowserPage);
+      const et3LoginPage = new ET3LoginPage(respondentBrowserPage);
       const respondentCaseOverviewPage = new RespondentCaseOverviewPage(respondentBrowserPage);
 
       await et3LoginPage.processRespondentLoginForExistingCase(

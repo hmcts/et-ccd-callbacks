@@ -1,7 +1,7 @@
-import { BasePage } from '../basePage.ts';
+import { BasePage } from '../basePage';
 import { Page, Locator, expect } from '@playwright/test';
 
-export default class RespClaimantDetails extends BasePage {
+export class RespClaimantDetails extends BasePage {
   private readonly clickAcasEarlyConciliationLink: Locator;
 
   constructor(page: Page) {

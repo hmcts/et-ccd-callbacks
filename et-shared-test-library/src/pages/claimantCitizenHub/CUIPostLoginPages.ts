@@ -1,7 +1,7 @@
-import { BasePage } from '../basePage.ts';
+import { BasePage } from '../basePage';
 import { expect } from '@playwright/test';
 
-export default class CUIPostLoginPages extends BasePage {
+export class CUIPostLoginPages extends BasePage {
 
   async processPostLoginPagesForTheDraftApplication() {
     await this.newAccountLanding();

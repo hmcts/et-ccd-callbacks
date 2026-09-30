@@ -1,7 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { BasePage } from "../basePage.ts";
+import { BasePage } from "../basePage";
 
-export default class DraftJudgementPage extends BasePage {
+export class DraftJudgementPage extends BasePage {
 
     private readonly isThisAJudgement: Locator;
     private readonly directionsText: Locator;

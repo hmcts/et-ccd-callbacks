@@ -7612,7 +7612,7 @@
   },
   {
     "ID": "genericTseDetails",
-    "ListElementCode": "closeApplicationNotes",
+    "ListElementCode": "closeApplicationNote",
     "FieldType": "Text",
     "ElementLabel": "General notes",
     "SecurityClassification": "Public"

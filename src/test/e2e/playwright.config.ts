@@ -29,7 +29,8 @@ export default defineConfig({
     {
       name: 'setup',
       testMatch: /user\.setups\.ts/,
-      workers: 1
+      // Logins are independent; cap concurrency to keep the load on IDAM modest.
+      workers: 4
     },
     {
       name: 'chromium',

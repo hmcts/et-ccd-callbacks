@@ -310,7 +310,7 @@ class TseAdminControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseAdmCloseService).aboutToSubmitCloseApplication(
             any(CaseData.class),
-            ENGLANDWALES_CASE_TYPE_ID);
+            eq(ENGLANDWALES_CASE_TYPE_ID));
     }
 
     @Test
@@ -323,7 +323,7 @@ class TseAdminControllerTest extends BaseControllerTest {
             .andExpect(status().isForbidden());
         verify(tseAdmCloseService, never()).aboutToSubmitCloseApplication(
             any(CaseData.class),
-            ENGLANDWALES_CASE_TYPE_ID);
+            eq(ENGLANDWALES_CASE_TYPE_ID));
     }
 
     @Test
@@ -335,7 +335,7 @@ class TseAdminControllerTest extends BaseControllerTest {
             .andExpect(status().isBadRequest());
         verify(tseAdmCloseService, never()).aboutToSubmitCloseApplication(
             any(CaseData.class),
-            ENGLANDWALES_CASE_TYPE_ID);
+            eq(ENGLANDWALES_CASE_TYPE_ID));
     }
 
     @Test

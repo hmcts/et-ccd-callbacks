@@ -15,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
@@ -39,10 +40,13 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConst
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_RESPONSE_STATUS_NOT_RECEIVED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_RESPONSE_STATUS_REJECTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ALL_RESPONDENTS_INCOMPLETE_SECTIONS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.CONTEST_CLAIM_REASON_REQUIRED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.EMPLOYER_CLAIM_DETAILS_REQUIRED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE_EMPLOYMENT_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.NO_RESPONDENTS_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.RESPONDENT_POSTCODE_REQUIRED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.addEt3DataToRespondent;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.findRepresentativeFromCaseData;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.generateEventHyperlinks;
@@ -168,7 +172,8 @@ class Et3ResponseHelperTest {
 
     @Test
     void addEt3DataToRespondent_allSections() {
-        caseData.setEt3ResponseIsClaimantNameCorrect(YES);
+        answerRespondentDetailsMandatoryQuestions();
+        answerResponseDetailsMandatoryQuestions();
         caseData.setEt3ResponsePhone("1234");
         caseData.setEt3ResponseAcasAgree(YES);
         caseData.setEt3ResponseEmploymentCount("10");
@@ -250,7 +255,7 @@ class Et3ResponseHelperTest {
 
     @Test
     void shouldAddPersonalDetailsToRespondentForEt3Response() {
-        caseData.setEt3ResponseIsClaimantNameCorrect("Yes");
+        answerRespondentDetailsMandatoryQuestions();
         addEt3DataToRespondent(caseData, ET3_RESPONSE);
         RespondentSumType respondent = caseData.getRespondentCollection().getFirst().getValue();
         assertThat(respondent.getEt3ResponseIsClaimantNameCorrect()).isEqualTo("Yes");
@@ -259,6 +264,7 @@ class Et3ResponseHelperTest {
 
     @Test
     void shouldAddClaimDetailsToRespondentForEt3ResponseDetails() {
+        answerResponseDetailsMandatoryQuestions();
         caseData.setEt3ResponseAcasAgree("Yes");
         addEt3DataToRespondent(caseData, ET3_RESPONSE_DETAILS);
         RespondentSumType respondent = caseData.getRespondentCollection().getFirst().getValue();
@@ -273,6 +279,160 @@ class Et3ResponseHelperTest {
         RespondentSumType respondent = caseData.getRespondentCollection().getFirst().getValue();
         assertThat(respondent.getEt3ResponseEmploymentCount()).isEqualTo("5");
         assertThat(respondent.getEmploymentDetailsSection()).isEqualTo("Yes");
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void respondentDetailsSection_incompleteWhenMandatoryQuestionUnanswered(String isClaimantNameCorrect,
+                                                                           String respondentName,
+                                                                           String postCode) {
+        caseData.setEt3ResponseIsClaimantNameCorrect(isClaimantNameCorrect);
+        caseData.setEt3ResponseRespondentLegalName(respondentName);
+        caseData.setEt3RespondentAddress(postCode == null ? null : createAddress(postCode));
+        addEt3DataToRespondent(caseData, ET3_RESPONSE);
+        RespondentSumType respondent = caseData.getRespondentCollection().getFirst().getValue();
+        assertThat(respondent.getPersonalDetailsSection()).isEqualTo(NO);
+    }
+
+    private static Stream<Arguments> respondentDetailsSection_incompleteWhenMandatoryQuestionUnanswered() {
+        return Stream.of(
+                Arguments.of(null, "Respondent Ltd", "AB1 2CD"),
+                Arguments.of(YES, null, "AB1 2CD"),
+                Arguments.of(YES, " ", "AB1 2CD"),
+                Arguments.of(YES, "Respondent Ltd", null),
+                Arguments.of(YES, "Respondent Ltd", "")
+        );
+    }
+
+    @Test
+    void responseDetailsSection_completeWithDocumentsInsteadOfDetails() {
+        caseData.setEt3ResponseRespondentContestClaim(YES);
+        caseData.setEt3ResponseContestClaimDocument(List.of(DocumentTypeItem.builder().build()));
+        caseData.setEt3ResponseEmployerClaim(YES);
+        caseData.setEt3ResponseEmployerClaimDocument(UploadedDocumentType.builder().documentFilename("a.pdf").build());
+        addEt3DataToRespondent(caseData, ET3_RESPONSE_DETAILS);
+        RespondentSumType respondent = caseData.getRespondentCollection().getFirst().getValue();
+        assertThat(respondent.getClaimDetailsSection()).isEqualTo(YES);
+    }
+
+    @Test
+    void responseDetailsSection_completeWhenNotContestingAndNoEmployerClaim() {
+        caseData.setEt3ResponseRespondentContestClaim(NO);
+        caseData.setEt3ResponseEmployerClaim(NO);
+        addEt3DataToRespondent(caseData, ET3_RESPONSE_DETAILS);
+        RespondentSumType respondent = caseData.getRespondentCollection().getFirst().getValue();
+        assertThat(respondent.getClaimDetailsSection()).isEqualTo(YES);
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void responseDetailsSection_incompleteWhenMandatoryQuestionUnanswered(String contestClaim,
+                                                                         String contestClaimDetails,
+                                                                         String employerClaim,
+                                                                         String employerClaimDetails) {
+        caseData.setEt3ResponseRespondentContestClaim(contestClaim);
+        caseData.setEt3ResponseContestClaimDetails(contestClaimDetails);
+        caseData.setEt3ResponseEmployerClaim(employerClaim);
+        caseData.setEt3ResponseEmployerClaimDetails(employerClaimDetails);
+        addEt3DataToRespondent(caseData, ET3_RESPONSE_DETAILS);
+        RespondentSumType respondent = caseData.getRespondentCollection().getFirst().getValue();
+        assertThat(respondent.getClaimDetailsSection()).isEqualTo(NO);
+    }
+
+    private static Stream<Arguments> responseDetailsSection_incompleteWhenMandatoryQuestionUnanswered() {
+        return Stream.of(
+                Arguments.of(null, null, NO, null),
+                Arguments.of(YES, null, NO, null),
+                Arguments.of(YES, " ", NO, null),
+                Arguments.of(NO, null, null, null),
+                Arguments.of(NO, null, YES, null),
+                Arguments.of(NO, null, YES, "")
+        );
+    }
+
+    @Test
+    void responseDetailsSection_resubmittedIncomplete_marksSectionIncomplete() {
+        answerResponseDetailsMandatoryQuestions();
+        addEt3DataToRespondent(caseData, ET3_RESPONSE_DETAILS);
+        caseData.setEt3ResponseContestClaimDetails(null);
+        addEt3DataToRespondent(caseData, ET3_RESPONSE_DETAILS);
+        RespondentSumType respondent = caseData.getRespondentCollection().getFirst().getValue();
+        assertThat(respondent.getClaimDetailsSection()).isEqualTo(NO);
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void validateRespondentAddress(String postCode, List<String> expectedErrors) {
+        caseData.setEt3RespondentAddress(postCode == null ? null : createAddress(postCode));
+        assertThat(Et3ResponseHelper.validateRespondentAddress(caseData)).isEqualTo(expectedErrors);
+    }
+
+    private static Stream<Arguments> validateRespondentAddress() {
+        return Stream.of(
+                Arguments.of("AB1 2CD", List.of()),
+                Arguments.of(null, List.of(RESPONDENT_POSTCODE_REQUIRED)),
+                Arguments.of(" ", List.of(RESPONDENT_POSTCODE_REQUIRED))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void validateContestClaimReason(String contestClaim, String details, List<DocumentTypeItem> documents,
+                                    List<String> expectedErrors) {
+        caseData.setEt3ResponseRespondentContestClaim(contestClaim);
+        caseData.setEt3ResponseContestClaimDetails(details);
+        caseData.setEt3ResponseContestClaimDocument(documents);
+        assertThat(Et3ResponseHelper.validateContestClaimReason(caseData)).isEqualTo(expectedErrors);
+    }
+
+    private static Stream<Arguments> validateContestClaimReason() {
+        return Stream.of(
+                Arguments.of(YES, "Reasons", null, List.of()),
+                Arguments.of(YES, null, List.of(DocumentTypeItem.builder().build()), List.of()),
+                Arguments.of(NO, null, null, List.of()),
+                Arguments.of(YES, null, null, List.of(CONTEST_CLAIM_REASON_REQUIRED)),
+                Arguments.of(YES, " ", List.of(), List.of(CONTEST_CLAIM_REASON_REQUIRED))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void validateEmployerClaimDetails(String employerClaim, String details, UploadedDocumentType document,
+                                      List<String> expectedErrors) {
+        caseData.setEt3ResponseEmployerClaim(employerClaim);
+        caseData.setEt3ResponseEmployerClaimDetails(details);
+        caseData.setEt3ResponseEmployerClaimDocument(document);
+        assertThat(Et3ResponseHelper.validateEmployerClaimDetails(caseData)).isEqualTo(expectedErrors);
+    }
+
+    private static Stream<Arguments> validateEmployerClaimDetails() {
+        return Stream.of(
+                Arguments.of(YES, "Details", null, List.of()),
+                Arguments.of(YES, null, UploadedDocumentType.builder().documentFilename("a.pdf").build(), List.of()),
+                Arguments.of(NO, null, null, List.of()),
+                Arguments.of(YES, null, null, List.of(EMPLOYER_CLAIM_DETAILS_REQUIRED)),
+                Arguments.of(YES, "", null, List.of(EMPLOYER_CLAIM_DETAILS_REQUIRED))
+        );
+    }
+
+    private void answerRespondentDetailsMandatoryQuestions() {
+        caseData.setEt3ResponseIsClaimantNameCorrect(YES);
+        caseData.setEt3ResponseRespondentLegalName("Respondent Ltd");
+        caseData.setEt3RespondentAddress(createAddress("AB1 2CD"));
+    }
+
+    private void answerResponseDetailsMandatoryQuestions() {
+        caseData.setEt3ResponseRespondentContestClaim(YES);
+        caseData.setEt3ResponseContestClaimDetails("Reasons for contesting the claim");
+        caseData.setEt3ResponseEmployerClaim(YES);
+        caseData.setEt3ResponseEmployerClaimDetails("Details of the employer's contract claim");
+    }
+
+    private static Address createAddress(String postCode) {
+        Address address = new Address();
+        address.setAddressLine1("1 Street");
+        address.setPostCode(postCode);
+        return address;
     }
 
     @Test

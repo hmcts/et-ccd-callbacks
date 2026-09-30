@@ -181,7 +181,7 @@ class EmploymentRightsActServiceTest {
 
         employmentRightsActService.setEraFlagByReceiptDate(caseData);
 
-        assertNull(caseData.getAdditionalCaseInfoType());
+        assertEquals(NO, caseData.getAdditionalCaseInfoType().getEra());
     }
 
     @Test

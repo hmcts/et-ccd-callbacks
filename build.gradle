@@ -539,6 +539,10 @@ project.tasks['check'].dependsOn integration
 project.tasks['check'].dependsOn jacocoTestCoverageVerification
 checkstyleMain.shouldRunAfter(compileJava)
 test.shouldRunAfter(checkstyleTest)
+// Static analysis is fast, so run it before the tests: a violation then fails
+// the build in seconds instead of after the full test suite, and a failing test
+// can no longer hide a PMD failure until the next push.
+test.mustRunAfter(pmdMain, pmdTest, pmdCftlib)
 integration.shouldRunAfter(checkstyleIntegrationTest)
 integration.shouldRunAfter(test)
 

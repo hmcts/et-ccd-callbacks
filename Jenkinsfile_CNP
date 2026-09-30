@@ -107,7 +107,23 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
   ]
 }
 
+// The Gradle functional task runs the Playwright UI suite alongside the API functional
+// tests (see awaitUiFunctional in build.gradle) and records its exit code. UI failures
+// keep marking the build unstable rather than failing it.
+def reportUiFunctionalResult() {
+  def exitCodeFile = 'build/ui-functional/exit-code'
+  if (!fileExists(exitCodeFile)) {
+    unstable(message: "${env.STAGE_NAME} is unstable: the UI functional tests did not run")
+    return
+  }
+  def exitCode = readFile(exitCodeFile).trim()
+  if (exitCode != '0') {
+    unstable(message: "${env.STAGE_NAME} is unstable: Playwright exited with status ${exitCode}")
+  }
+}
+
 withPipeline(type, product, component) {
+  env.ET_UI_FUNCTIONAL_IN_PARALLEL = 'true'
   env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
   loadVaultSecrets(secrets)
   disableSmokeTestSecrets()
@@ -198,6 +214,8 @@ withPipeline(type, product, component) {
     env.ET_SUBMIT_DRAFT_CASE_URL = "https://et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/cases/submit-case/"
     env.REF_DATA_URL = "https://rd-caseworker-ref-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.ROLE_ASSIGNMENT_URL = "https://am-role-assignment-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.ET_COS_PREVIEW_ET_SYA_API = "https://et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
+    env.ET_COS_PREVIEW_CCD = "https://ccd-data-store-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
     env.RUNNING_ENV = "aat"
     env.IMPORT_ES_RETRY_COUNT = "20"
     env.IMPORT_ES_RETRY_DELAY_SECONDS = "15"
@@ -241,11 +259,7 @@ withPipeline(type, product, component) {
 
       stage('Functional UI tests chromium') {
         try {
-          env.ET_COS_PREVIEW_ET_SYA_API = "https://et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
-          env.ET_COS_PREVIEW_CCD = "https://ccd-data-store-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
-          yarnBuilder.yarn('test:functional-chromium')
-        } catch (Error) {
-          unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+          reportUiFunctionalResult()
         } finally {
           publishHTML([
                   allowMissing: true,
@@ -300,9 +314,7 @@ withPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
     stage('Functional UI tests chromium') {
       try {
-        yarnBuilder.yarn('test:functional-chromium')
-      } catch (Error) {
-        unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+        reportUiFunctionalResult()
       } finally {
           publishHTML([
               allowMissing: true,

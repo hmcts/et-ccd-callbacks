@@ -9,8 +9,10 @@ import uk.gov.hmcts.et.common.model.bundle.BundleDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.CaseState;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ccd.HubLinkStatus;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.notifications.NotificationViews;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.DigitalCaseFileRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.HubLinkStatusRepository;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.NotificationViewRepository;
 
 import java.util.List;
 import java.util.Set;
@@ -25,6 +27,7 @@ public class ETCaseView implements CaseView<CaseData, CaseState> {
 
     private final HubLinkStatusRepository hubLinkStatusRepository;
     private final DigitalCaseFileRepository digitalCaseFileRepository;
+    private final NotificationViewRepository notificationViewRepository;
 
     @Override
     public Set<String> caseTypeIds() {
@@ -45,6 +48,9 @@ public class ETCaseView implements CaseView<CaseData, CaseState> {
                 blobCase.setCaseBundles(dcf.getPendingBundleId() == null
                     ? null : List.of(pendingBundle(dcf.getPendingBundleId())));
             });
+
+        // Claimant views are recorded outside the blob and only upgrade unviewed items.
+        NotificationViews.apply(blobCase, notificationViewRepository.findItemIds(request.caseRef()));
 
         return blobCase;
     }

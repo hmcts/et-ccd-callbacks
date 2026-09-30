@@ -11,8 +11,8 @@ plugins {
     id 'io.freefair.lombok' version '8.14.4'
     id 'org.sonarqube' version '6.3.1.5724'
     id 'pmd'
-    id 'hmcts.ccd.sdk' version '7.2.0'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.2274'
+    id 'hmcts.ccd.sdk' version '7.5.0'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.2399'
 }
 
 group = 'uk.gov.hmcts.et'
@@ -224,7 +224,6 @@ configurations {
 }
 
 test {
-    dependsOn dumpCCDDefinitions
     exclude '**/*ComponentTest*'
     useJUnitPlatform()
     testLogging {
@@ -264,13 +263,6 @@ allprojects {
                 enabled = false
             }
         }
-    }
-}
-
-processTestResources {
-    dependsOn dumpCCDDefinitions
-    from("$buildDir/cftlib/definition-snapshots") {
-        into 'definition-snapshots'
     }
 }
 
@@ -497,6 +489,10 @@ project.tasks['check'].dependsOn integration
 project.tasks['check'].dependsOn jacocoTestCoverageVerification
 checkstyleMain.shouldRunAfter(compileJava)
 test.shouldRunAfter(checkstyleTest)
+// Static analysis is fast, so run it before the tests: a violation then fails
+// the build in seconds instead of after the full test suite, and a failing test
+// can no longer hide a PMD failure until the next push.
+test.mustRunAfter(pmdMain, pmdTest, pmdCftlib)
 integration.shouldRunAfter(checkstyleIntegrationTest)
 integration.shouldRunAfter(test)
 
@@ -667,7 +663,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    testImplementation group: 'com.auth0', name: 'java-jwt', version: '4.6.0'
+    testImplementation group: 'com.auth0', name: 'java-jwt', version: '4.6.1'
     testImplementation group: 'com.warrenstrange', name: 'googleauth', version: '1.5.0'
     testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: serenity
     testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: serenity
@@ -677,6 +673,8 @@ dependencies {
     testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: serenity
     testImplementation (group: 'org.docx4j', name: 'docx4j', version: '6.1.2') {
         exclude module: 'slf4j-log4j12'
+        exclude group: 'log4j', module: 'log4j'
+        exclude group: 'xalan', module: 'xalan'
     }
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.21.4'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.7'
@@ -711,7 +709,6 @@ bootJar {
         'et-cos.jar'
     })
 
-    dependsOn dumpCCDDefinitions
     from("$buildDir/cftlib/definition-snapshots") {
         into 'BOOT-INF/classes/definition-snapshots'
     }
@@ -724,8 +721,6 @@ bootJar {
 wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
-
-assemble.dependsOn(dumpCCDDefinitions)
 
 // True when ET_WORK_ALLOCATION=true is set explicitly, or when the bootWithCcdAndWa task is invoked.
 def waEnabled = System.getenv('ET_WORK_ALLOCATION') == 'true'

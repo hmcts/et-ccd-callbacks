@@ -48,6 +48,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.MyHmctsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
@@ -80,11 +81,9 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {CaseConverter.class, NoticeOfChangeFieldPopulator.class, ObjectMapper.class})
-@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.ExcessiveMethodLength"})
 class NocRespondentRepresentativeServiceTest {
     private static final String CASE_ID_1 = "1234567890123456";
     private static final String CASE_TYPE_ID_ENGLAND_WALES = "ET_EnglandWales";
@@ -129,6 +128,7 @@ class NocRespondentRepresentativeServiceTest {
     private static final String USER_FULL_NAME = "John Brown";
     private static final String REPRESENTATIVE_EMAIL_1_CAPITALISED = "REPRESENTATIVE1@TESTMAIL.COM";
     private static final String REPRESENTATIVE_NAME = "Representative Name";
+    private static final String REPRESENTATIVE_IDAM_ID = "dda9d1c3-1a11-3c3a-819e-74174fbec26b";
     private static final String RESPONDENT_REPRESENTATIVE_EMAIL = "respondentRepresentative@gmail.com";
     private static final String CLAIMANT_REPRESENTATIVE_EMAIL = "claimantRepresentative@gmail.com";
     private static final String REPRESENTATIVE_EMAIL_1 = "representative1@gmail.com";
@@ -138,6 +138,7 @@ class NocRespondentRepresentativeServiceTest {
     private static final String RESPONDENT_ID_THREE = "106003";
     private static final String ADMIN_USER_TOKEN = "adminUserToken";
     private static final String USER_TOKEN = "userToken";
+    private static final String AUTHORISATION_TOKEN = "authorisationToken";
     private static final String S2S_TOKEN = "someS2SToken";
     private static final String EVENT_UPDATE_CASE_SUBMITTED = "UPDATE_CASE_SUBMITTED";
 
@@ -198,7 +199,7 @@ class NocRespondentRepresentativeServiceTest {
     @MockitoBean
     private OrganisationService organisationService;
     @MockitoBean
-    private uk.gov.hmcts.ethos.replacement.docmosis.service.MyHmctsService myHmctsService;
+    private MyHmctsService myHmctsService;
 
     @InjectMocks
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
@@ -1771,67 +1772,29 @@ class NocRespondentRepresentativeServiceTest {
     }
 
     @Test
-    void saveRespondentRepresentativeContactDetails_updatesRepCollection() throws Exception {
-        Address newAddress = new Address();
-        newAddress.setAddressLine1("New Address");
-        caseData.setEt3ResponsePhone("09876543210");
-        caseData.setEt3ResponseAddress(newAddress);
-
-        RepresentedTypeRItem repItem = RepresentedTypeRItem.builder()
-                .id(REPRESENTATIVE_ID_ONE)
-                .value(RepresentedTypeR.builder().role(ROLE_SOLICITORA).representativePhoneNumber("old").build())
-                .build();
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseId(CASE_ID_1);
-        caseDetails.setCaseData(caseData);
-        caseData.setRepCollection(List.of(repItem));
-
+    void theFindRepresentativeEmail() {
+        RepresentedTypeRItem respondentRepresentative = RepresentedTypeRItem.builder().build();
+        // when respondent representative is not valid should return empty string
+        assertThat(nocRespondentRepresentativeService.resolveRepresentativeEmail(respondentRepresentative)).isEmpty();
+        // when representative does not have email and idam id should return empty string
+        respondentRepresentative.setId(RESPONDENT_ID_ONE);
+        respondentRepresentative.setValue(RepresentedTypeR.builder().build());
+        assertThat(nocRespondentRepresentativeService.resolveRepresentativeEmail(respondentRepresentative)).isEmpty();
+        // when representative has invalid idam id should return empty email address
+        respondentRepresentative.getValue().setIdamId(REPRESENTATIVE_IDAM_ID);
+        when(authTokenGenerator.generate()).thenReturn(AUTHORISATION_TOKEN);
+        when(userIdamService.getUserDetailsById(AUTHORISATION_TOKEN, REPRESENTATIVE_IDAM_ID)).thenReturn(null);
+        assertThat(nocRespondentRepresentativeService.resolveRepresentativeEmail(respondentRepresentative)).isEmpty();
+        // when representative has valid idam id should return idam email
         UserDetails userDetails = new UserDetails();
+        userDetails.setEmail(USER_EMAIL);
         userDetails.setUid(USER_ID);
-        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
-        when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(userDetails);
-        CaseUserAssignmentData assignments = CaseUserAssignmentData.builder()
-                .caseUserAssignments(List.of(CaseUserAssignment.builder()
-                        .userId(USER_ID).caseRole(ROLE_SOLICITORA).build()))
-                .build();
-        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(assignments);
-
-        nocRespondentRepresentativeService.saveRespondentRepresentativeContactDetails(USER_TOKEN, caseDetails);
-
-        assertThat(repItem.getValue().getRepresentativePhoneNumber()).isEqualTo("09876543210");
-        assertThat(repItem.getValue().getRepresentativeAddress()).isEqualTo(newAddress);
-        assertNull(caseData.getMyHmctsAddressText());
-    }
-
-    @Test
-    void saveRespondentRepresentativeContactDetails_useMyHmcts_populatesFromOrg() throws Exception {
-        caseData.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS);
-        OrganisationAddress orgAddress = OrganisationAddress.builder()
-                .addressLine1("Org Street").postCode("EC1A 1BB").build();
-        when(myHmctsService.getUserOrganisationAddress(USER_TOKEN)).thenReturn(orgAddress);
-
-        RepresentedTypeRItem repItem = RepresentedTypeRItem.builder()
-                .id(REPRESENTATIVE_ID_ONE)
-                .value(RepresentedTypeR.builder().role(ROLE_SOLICITORA).build())
-                .build();
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseId(CASE_ID_1);
-        caseDetails.setCaseData(caseData);
-        caseData.setRepCollection(List.of(repItem));
-
-        UserDetails userDetails = new UserDetails();
-        userDetails.setUid(USER_ID);
-        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
-        when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(userDetails);
-        CaseUserAssignmentData assignments = CaseUserAssignmentData.builder()
-                .caseUserAssignments(List.of(CaseUserAssignment.builder()
-                        .userId(USER_ID).caseRole(ROLE_SOLICITORA).build()))
-                .build();
-        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(assignments);
-
-        nocRespondentRepresentativeService.saveRespondentRepresentativeContactDetails(USER_TOKEN, caseDetails);
-
-        assertThat(repItem.getValue().getRepresentativeAddress().getAddressLine1()).isEqualTo("Org Street");
-        assertNull(caseData.getMyHmctsAddressText());
+        when(userIdamService.getUserDetailsById(AUTHORISATION_TOKEN, REPRESENTATIVE_IDAM_ID)).thenReturn(userDetails);
+        assertThat(nocRespondentRepresentativeService.resolveRepresentativeEmail(respondentRepresentative))
+                .isEqualTo(USER_EMAIL);
+        // when representative has email address should return that email
+        respondentRepresentative.getValue().setRepresentativeEmailAddress(USER_EMAIL);
+        assertThat(nocRespondentRepresentativeService.resolveRepresentativeEmail(respondentRepresentative))
+                .isEqualTo(USER_EMAIL);
     }
 }

@@ -92,6 +92,8 @@ public final class NOCConstants {
             "Claimant email not found. Unable to notify claimant for respondent representative update. Case id: {}";
     public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT =
             "Failed to send noc notification email to claimant, case id: {}, error: {}";
+    public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_RESPONDENT =
+            "Failed to send noc notification email to respondent, case id: {}, error: {}";
     public static final String WARNING_FAILED_TO_FIND_ORGANISATION_BY_EMAIL_SYSTEM_ERROR =
             "A system error occurred while trying to find an organisation by email address. Exception: {}";
 
@@ -119,8 +121,6 @@ public final class NOCConstants {
     public static final String WARNING_INVALID_CASE_DETAILS =
             "Invalid case details while sending Notice of Change (NoC) respondent representative removal "
                     + NOTIFICATION_FOR_CASE;
-    public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_RESPONDENT =
-            "Failed to send noc notification email to respondent, case id: {}, error: {}";
     public static final String WARNING_INVALID_CASE_DETAILS_TO_RESOLVE_ORGANISATION_EMAIL =
             "Invalid case details. Unable to resolve organisation's superuser email. Case id: {}, " + NOC_TYPE;
     public static final String WARNING_INVALID_REPRESENTATIVE_TO_RESOLVE_ORGANISATION_EMAIL =
@@ -135,6 +135,7 @@ public final class NOCConstants {
     public static final String WARNING_INVALID_REMOVE_OPTION = "Invalid remove option, case id: {}, remove option: {}";
     public static final String WARNING_ORGANISATION_ADMIN_EMAIL_NOT_FOUND = "Organisation admin email not found";
     public static final String WARNING_CLAIMANT_EMAIL_NOT_FOUND = "Claimant email not found";
+    public static final String WARNING_RESPONDENT_EMAIL_NOT_FOUND = "Respondent email not found";
     public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_REPRESENTATIVE =
             "Failed to send NOC notification email to representative, case id: {}, error: {}";
     public static final String WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_TRIBUNAL_FOR_RESPONDENT_REP_UPDATE =

@@ -59,4 +59,20 @@ public final class ClaimantUtils {
             return StringUtils.EMPTY;
         }
     }
+
+    public static String resolveClaimantName(CaseData caseData) {
+        if (caseData.getClaimantIndType() != null) {
+            String claimantFullName = CallbacksStringUtils.buildFullName(
+                    caseData.getClaimantIndType().getClaimantTitle(),
+                    caseData.getClaimantIndType().getClaimantFirstNames(),
+                    caseData.getClaimantIndType().getClaimantLastName());
+            if (StringUtils.isNotBlank(claimantFullName)) {
+                return claimantFullName;
+            }
+        }
+        if (StringUtils.isNotBlank(caseData.getClaimant())) {
+            return caseData.getClaimant();
+        }
+        return StringUtils.EMPTY;
+    }
 }

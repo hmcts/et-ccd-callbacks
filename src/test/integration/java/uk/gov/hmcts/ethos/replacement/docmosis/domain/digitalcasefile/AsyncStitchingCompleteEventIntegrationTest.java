@@ -18,8 +18,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.ETCaseView;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.CaseState;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ccd.DigitalCaseFile;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ccd.HubLinkStatus;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ccd.NotificationView;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.DigitalCaseFileRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.HubLinkStatusRepository;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.NotificationViewRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DigitalCaseFilePersistenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DigitalCaseFileService;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -35,8 +37,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
     components = {EtJsonCcdConfig.class, JacksonConfiguration.class,
         AsyncStitchingCompleteEvent.class, ETCaseView.class,
         DigitalCaseFileService.class, DigitalCaseFilePersistenceService.class},
-    repositories = {DigitalCaseFileRepository.class, HubLinkStatusRepository.class},
-    entities = {DigitalCaseFile.class, HubLinkStatus.class}
+    repositories = {DigitalCaseFileRepository.class, HubLinkStatusRepository.class,
+        NotificationViewRepository.class},
+    entities = {DigitalCaseFile.class, HubLinkStatus.class, NotificationView.class}
 )
 class AsyncStitchingCompleteEventIntegrationTest {
 

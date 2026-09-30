@@ -311,6 +311,46 @@ tasks.register('functional', Test) {
     outputs.upToDateWhen { false }
 }
 
+// On Jenkins the Playwright UI suite runs alongside the API functional tests rather
+// than after them in the Jenkinsfile hook. awaitUiFunctional records the suite's exit
+// code instead of failing the build, so the Jenkinsfile can keep marking UI failures
+// as unstable.
+def uiFunctionalDir = layout.buildDirectory.dir('ui-functional').get().asFile
+def uiFunctionalLog = new File(uiFunctionalDir, 'playwright.log')
+def uiFunctionalExitCode = new File(uiFunctionalDir, 'exit-code')
+def uiFunctional = [process: null]
+
+tasks.register('awaitUiFunctional') {
+    description = 'Waits for the UI functional suite started alongside the functional task'
+    onlyIf { uiFunctional.process != null }
+    doLast {
+        def finished = uiFunctional.process.waitFor(30, java.util.concurrent.TimeUnit.MINUTES)
+        if (!finished) {
+            uiFunctional.process.destroyForcibly()
+        }
+        def exitCode = finished ? uiFunctional.process.exitValue() : 124
+        uiFunctionalExitCode.text = "${exitCode}\n"
+        logger.lifecycle(uiFunctionalLog.text)
+        logger.lifecycle("Playwright UI functional tests finished with exit code ${exitCode}")
+    }
+}
+
+if (System.getenv('ET_UI_FUNCTIONAL_IN_PARALLEL') == 'true') {
+    tasks.named('functional') {
+        finalizedBy 'awaitUiFunctional'
+        doFirst {
+            uiFunctionalDir.mkdirs()
+            uiFunctionalExitCode.delete()
+            logger.lifecycle("Starting Playwright UI functional tests in the background; output in ${uiFunctionalLog}")
+            uiFunctional.process = new ProcessBuilder('bash', 'bin/run-ui-functional-tests.sh')
+                .directory(projectDir)
+                .redirectErrorStream(true)
+                .redirectOutput(uiFunctionalLog)
+                .start()
+        }
+    }
+}
+
 def puppeteerCacheDir = layout.buildDirectory.dir('puppeteer-cache').get().asFile.absolutePath
 
 tasks.register('yarnInstall', Exec) {
@@ -504,6 +544,10 @@ project.tasks['check'].dependsOn integration
 project.tasks['check'].dependsOn jacocoTestCoverageVerification
 checkstyleMain.shouldRunAfter(compileJava)
 test.shouldRunAfter(checkstyleTest)
+// Static analysis is fast, so run it before the tests: a violation then fails
+// the build in seconds instead of after the full test suite, and a failing test
+// can no longer hide a PMD failure until the next push.
+test.mustRunAfter(pmdMain, pmdTest, pmdCftlib)
 integration.shouldRunAfter(checkstyleIntegrationTest)
 integration.shouldRunAfter(test)
 

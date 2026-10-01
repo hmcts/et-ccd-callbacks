@@ -344,6 +344,7 @@ public final class InitialConsiderationHelper {
                         .orElse(null))
 
                 .icCanProceed(defaultIfEmpty(caseData.getEtICCanProceed(), null))
+                .udlEra(defaultIfEmpty(caseData.getEtICUnfairDismissalEra(), null))
                 .hearingAlreadyListed(defaultIfEmpty(caseData.getEtICHearingAlreadyListed(), null))
 
                 // Hearing Listed

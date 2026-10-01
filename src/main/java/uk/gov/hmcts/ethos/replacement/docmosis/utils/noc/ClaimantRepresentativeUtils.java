@@ -399,7 +399,7 @@ public final class ClaimantRepresentativeUtils {
      * Checks whether the claimant representative details required for processing are present.
      *
      * <p>The representative is considered complete when the representative details exist
-     * and both the representative ID and email address are non-blank.</p>
+     * and email address are non-blank.</p>
      *
      * @param claimantRepresentative the claimant representative details to check
      * @return {@code true} if the required claimant representative details are present;

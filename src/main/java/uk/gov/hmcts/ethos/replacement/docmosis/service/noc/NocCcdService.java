@@ -184,7 +184,7 @@ public class NocCcdService {
      *
      * <p>This method performs the following steps:
      * <ul>
-     *     <li>Returns immediately if the provided {@code userToken} is blank.</li>
+     *     <li>Returns immediately if the provided {@code adminToken} is blank.</li>
      *     <li>Attempts to locate a {@link CaseUserAssignment} for the
      *         {@link ClaimantSolicitorRole#CLAIMANTSOLICITOR} role
      *         associated with the given case ID.</li>
@@ -195,22 +195,22 @@ public class NocCcdService {
      * <p>No action is taken if the user token is invalid or the claimant solicitor
      * role is not currently assigned to the case.
      *
-     * @param userToken   the authorisation token of the user performing the operation;
+     * @param adminToken   the authorisation token of the user performing the operation;
      *                    must not be blank
      * @param caseDetails the case details containing the case ID from which the
      *                    claimant solicitor role should be revoked
      */
-    public void revokeClaimantRepresentation(String userToken, CaseDetails caseDetails) {
-        if (StringUtils.isBlank(userToken)) {
+    public void revokeClaimantRepresentation(String adminToken, CaseDetails caseDetails) {
+        if (StringUtils.isBlank(adminToken)) {
             return;
         }
-        CaseUserAssignment caseUserAssignment = findCaseUserAssignmentByRole(userToken, caseDetails.getCaseId(),
+        CaseUserAssignment caseUserAssignment = findCaseUserAssignmentByRole(adminToken, caseDetails.getCaseId(),
                 ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
         if (ObjectUtils.isEmpty(caseUserAssignment)) {
             return;
         }
         CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder().caseUserAssignments(
                 List.of(caseUserAssignment)).build();
-        revokeCaseAssignments(userToken, caseUserAssignmentData);
+        revokeCaseAssignments(adminToken, caseUserAssignmentData);
     }
 }

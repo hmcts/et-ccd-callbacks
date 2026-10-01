@@ -409,4 +409,35 @@ public final class ClaimantRepresentativeUtils {
         return ObjectUtils.isNotEmpty(claimantRepresentative)
                 && StringUtils.isNotBlank(claimantRepresentative.getRepresentativeEmailAddress());
     }
+
+    /**
+     * Resolves the claimant representative's organisation name from the supplied
+     * representative details.
+     * <p>
+     * The organisation name is taken from the representative's directly populated
+     * organisation name where available, otherwise from the associated MyHMCTS
+     * organisation details. If no organisation name is available, an empty string
+     * is returned.
+     * </p>
+     * <p>
+     * For a deeper organisation lookup, use
+     * {@code OrganisationService.resolveClaimantRepresentativeOrganisationName(...)}.
+     * </p>
+     *
+     * @param claimantRepresentative the claimant representative details
+     * @return the resolved organisation name, or an empty string if none is available
+     */
+    public static String resolveClaimantRepresentativeOrganisationName(RepresentedTypeC claimantRepresentative) {
+        if (claimantRepresentative == null) {
+            return StringUtils.EMPTY;
+        }
+        String organisationName = claimantRepresentative.getNameOfOrganisation();
+        if (StringUtils.isNotBlank(organisationName)) {
+            return organisationName;
+        }
+        var myHmctsOrganisation = claimantRepresentative.getMyHmctsOrganisation();
+        return myHmctsOrganisation != null
+                ? StringUtils.defaultIfBlank(myHmctsOrganisation.getOrganisationName(), StringUtils.EMPTY)
+                : StringUtils.EMPTY;
+    }
 }

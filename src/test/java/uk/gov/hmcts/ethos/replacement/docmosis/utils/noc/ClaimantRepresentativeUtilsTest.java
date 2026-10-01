@@ -36,6 +36,7 @@ final class ClaimantRepresentativeUtilsTest {
     private static final String CLAIMANT_REPRESENTATIVE_EMAIL_ADDRESS = "claimantrep@email.com";
     private static final String ORGANISATION_ID_1 = "dummy12_organisation34_id56";
     private static final String ORGANISATION_ID_2 = "dummy65_organisation43_id21";
+    private static final String ORGANISATION_NAME = "Test Company";
     private static final String RESPONDENT_REPRESENTATIVE_ID = "respondentRepresentativeId";
     private static final String CLAIMANT_REPRESENTATIVE_ID = "claimantRepresentativeId";
     private static final String CLAIMANT_REPRESENTATIVE_NAME = "claimantRepresentativeName";
@@ -372,5 +373,29 @@ final class ClaimantRepresentativeUtilsTest {
         claimantRepresentative.setRepresentativeEmailAddress(CLAIMANT_REPRESENTATIVE_EMAIL_ADDRESS);
         assertThat(ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(claimantRepresentative))
                 .isTrue();
+    }
+
+    @Test
+    void theResolveClaimantRepresentativeOrganisationName() {
+        // when claimant representative is empty should return empty string
+        assertThat(ClaimantRepresentativeUtils.resolveClaimantRepresentativeOrganisationName(null)).isEmpty();
+        // when claimant representative does not have both HMCTS organisation and organisation name should return
+        // empty string
+        RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder().build();
+        assertThat(ClaimantRepresentativeUtils.resolveClaimantRepresentativeOrganisationName(claimantRepresentative))
+                .isEmpty();
+        // when claimant representative's HMCTS organisation does not have organisation name should return empty
+        // string
+        claimantRepresentative.setMyHmctsOrganisation(Organisation.builder().build());
+        assertThat(ClaimantRepresentativeUtils.resolveClaimantRepresentativeOrganisationName(claimantRepresentative))
+                .isEmpty();
+        // when claimant representative's HMCTS organisation have organisation name should return that name
+        claimantRepresentative.getMyHmctsOrganisation().setOrganisationName(ORGANISATION_NAME);
+        assertThat(ClaimantRepresentativeUtils.resolveClaimantRepresentativeOrganisationName(claimantRepresentative))
+                .isEqualTo(ORGANISATION_NAME);
+        // when claimant representative has organisation name should return that organisation name
+        claimantRepresentative.setNameOfOrganisation(ORGANISATION_NAME);
+        assertThat(ClaimantRepresentativeUtils.resolveClaimantRepresentativeOrganisationName(claimantRepresentative))
+                .isEqualTo(ORGANISATION_NAME);
     }
 }

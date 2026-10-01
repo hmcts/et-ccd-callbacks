@@ -31,7 +31,7 @@ export default class Et3LoginPage extends LoginPage {
     this.signInOptionLink = page.locator('//a[@href="/enter-email"]');
   }
 
-  async processRespondentLogin(user: UserCredentials) {
+  async processRespondentLogin(user: UserCredentials, persistSession = false) {
     await this.page.goto(config.etSyrUiUrl);
     await expect(this.page.locator('h1')).toHaveText(/Introduction/);
     await this.returnToExistingResponse.click();
@@ -43,7 +43,7 @@ export default class Et3LoginPage extends LoginPage {
       await this.signInOptionLink.click();
       await this.page.waitForLoadState('load');
     }
-    await this.processLogin(user, config.etSyrUiUrl);
+    await this.processLogin(user, config.etSyrUiUrl, persistSession);
     await this.page.waitForLoadState('load');
   }
 

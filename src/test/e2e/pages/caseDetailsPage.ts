@@ -132,7 +132,8 @@ export default class CaseDetailsPage extends BasePage {
   }
 
   private getTabHeader(tabName: string): Locator {
-    return this.page.getByRole('tab', { name: tabName, exact: true });
+    // The first CCD tab has keyboard instructions appended to its accessible name.
+    return this.page.getByRole('tab').filter({ has: this.page.getByText(tabName, { exact: true }) });
   }
 
   /**
@@ -249,48 +250,20 @@ export default class CaseDetailsPage extends BasePage {
   async navigateToTab(tabName: string): Promise<void> {
     await this.page.waitForLoadState('load', { timeout: 5000 });
 
-    const tabs = this.page.locator("//div[@role='tab']");
-    await tabs.first().waitFor({ state: 'attached', timeout: 5000 });
-
-    const totalTabs = await tabs.count();
-    const tabNames: string[] = [];
-
-    for (let i = 0; i < totalTabs; i++) {
-      const name = (await tabs.nth(i).locator(':scope > div').innerText()).replace(/\s+/g, ' ').trim();
-      tabNames.push(name);
-    }
-
-    const targetIndex = tabNames.indexOf(tabName);
-    if (targetIndex === -1) {
-      throw new Error(`Tab \"${tabName}\" not found in tab list: [${tabNames.join(', ')}]`);
-    }
+    const targetTab = this.getTabHeader(tabName);
+    await targetTab.waitFor({ state: 'attached', timeout: 5000 });
+    const totalTabs = await this.page.getByRole('tab').count();
 
     const tryClickTargetTab = async(): Promise<boolean> => {
       try {
-        const targetTab = tabs.nth(targetIndex);
         await targetTab.click({ trial: true, timeout: 2000 });
-        await targetTab.click();
+        await targetTab.click({ timeout: 2000 });
+        await expect(targetTab).toHaveAttribute('aria-selected', 'true', { timeout: 2000 });
         console.log('Clicked on tab: ' + tabName);
         return true;
       } catch {
         return false;
       }
-    };
-
-    const getVisibleRange = async(): Promise<{ first: number; last: number }> => {
-      let first = -1;
-      let last = -1;
-
-      for (let i = 0; i < totalTabs; i++) {
-        if (await tabs.nth(i).isVisible()) {
-          if (first === -1) {
-            first = i;
-          }
-          last = i;
-        }
-      }
-
-      return { first, last };
     };
 
     const paginateAndClick = async(direction: 'before' | 'after'): Promise<boolean> => {
@@ -316,31 +289,11 @@ export default class CaseDetailsPage extends BasePage {
       return;
     }
 
-    const { first, last } = await getVisibleRange();
-
-    if (first !== -1 && last !== -1) {
-      if (targetIndex < first) {
-        if (await paginateAndClick('before')) {
-          return;
-        }
-        if (await paginateAndClick('after')) {
-          return;
-        }
-      } else if (targetIndex > last) {
-        if (await paginateAndClick('after')) {
-          return;
-        }
-        if (await paginateAndClick('before')) {
-          return;
-        }
-      }
-    } else {
-      if (await paginateAndClick('before')) {
-        return;
-      }
-      if (await paginateAndClick('after')) {
-        return;
-      }
+    if (await paginateAndClick('before')) {
+      return;
+    }
+    if (await paginateAndClick('after')) {
+      return;
     }
 
     throw new Error(`Not able to navigate to Tab ${tabName}`);

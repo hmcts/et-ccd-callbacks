@@ -1,14 +1,12 @@
 import { test } from '../fixtures/et.test.fixture.ts';
-import { CaseDetailsValues, CaseTypeLocation, Events } from '../config/case-data.ts';
-import { users } from '../config/config.dynamic.ts';
-import LoginPage from '../pages/loginPage.ts';
-import { ManageCaseDashboardPage } from '../pages/ManageCaseDashboardPage.ts';
-import CaseDetailsPage from '../pages/caseDetailsPage.ts';
-import { Page } from '@playwright/test';
-import CreateCaseFlag from '../pages/createCaseFlag.ts';
-import ManageSupportPage from '../pages/manageSupportPage.ts';
-import ManageCaseFlag from '../pages/manageCaseFlag.ts';
-import { CaseworkerCaseFactory } from '../data-utils/factory/exui/CaseworkerCaseFactory.ts';
+import {Page} from "@playwright/test";
+import {
+  CaseDetailsPage, CaseDetailsValues, CaseTypeLocation, CaseworkerCaseFactory,
+  CreateCaseFlagPage, Events,
+  LoginPage,
+  ManageCaseDashboardPage, ManageCaseFlagPage,
+  ManageSupportPage, users
+} from "@et-shared-test-library/core";
 
 let caseNumber: string;
 let caseId: string;
@@ -19,9 +17,9 @@ test.describe('Case Flag 2.1 Scotland cases', () => {
   let loginPageCW: LoginPage;
   let manageCaseDashboardPageCW: ManageCaseDashboardPage;
   let caseDetailsPageCW: CaseDetailsPage;
-  let createCaseFlagPageCW: CreateCaseFlag;
+  let createCaseFlagPageCW: CreateCaseFlagPage;
   let manageSupportPageCW: ManageSupportPage;
-  let manageCaseFlagPageCW: ManageCaseFlag;
+  let manageCaseFlagPageCW: ManageCaseFlagPage;
 
   test.use({
     storageState: users.etLegalRepresentative.sessionFile,
@@ -41,9 +39,9 @@ test.describe('Case Flag 2.1 Scotland cases', () => {
     loginPageCW = new LoginPage(caseWorkerBrowserPage);
     manageCaseDashboardPageCW = new ManageCaseDashboardPage(caseWorkerBrowserPage);
     caseDetailsPageCW = new CaseDetailsPage(caseWorkerBrowserPage);
-    createCaseFlagPageCW = new CreateCaseFlag(caseWorkerBrowserPage);
+    createCaseFlagPageCW = new CreateCaseFlagPage(caseWorkerBrowserPage);
     manageSupportPageCW = new ManageSupportPage(caseWorkerBrowserPage);
-    manageCaseFlagPageCW = new ManageCaseFlag(caseWorkerBrowserPage);
+    manageCaseFlagPageCW = new ManageCaseFlagPage(caseWorkerBrowserPage);
   });
 
 

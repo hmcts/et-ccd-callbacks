@@ -1,7 +1,5 @@
 import { test } from '../../fixtures/et.test.fixture.ts';
-import { CaseworkerCaseFactory } from '../../data-utils/factory/exui/CaseworkerCaseFactory.ts';
-import { CaseTypeLocation, Events } from '../../config/case-data.ts';
-import { users } from '../../config/config.dynamic.ts';
+import {CaseTypeLocation, CaseworkerCaseFactory, Events, users} from "@et-shared-test-library/core";
 
 test.describe('Initial Consideration Tests', () => {
   let caseId: string, caseNumber: string;

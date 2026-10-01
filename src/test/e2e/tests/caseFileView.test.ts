@@ -1,7 +1,5 @@
 import { test } from '../fixtures/et.test.fixture.ts';
-import { CaseworkerCaseFactory } from '../data-utils/factory/exui/CaseworkerCaseFactory.ts';
-import { CaseTypeLocation } from '../config/case-data.ts';
-import { users } from '../config/config.dynamic.ts';
+import {CaseTypeLocation, CaseworkerCaseFactory, users} from "@et-shared-test-library/core";
 
 let caseId: string, caseNumber: string;
 

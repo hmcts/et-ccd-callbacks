@@ -1,17 +1,14 @@
 import { test } from '../../fixtures/et.test.fixture.ts';
-import { Helpers } from '../../pages/helpers/Helper.ts';
-import { CaseTypeLocation, Events } from '../../config/case-data.ts';
-import { CaseworkerCaseFactory } from '../../data-utils/factory/exui/CaseworkerCaseFactory.ts';
-import { CitizenClaimantFactory } from '../../data-utils/factory/citizen/ClaimantCitizenFactory.ts';
-import { users } from '../../config/config.dynamic.ts';
-import LoginPage from '../../pages/loginPage.ts';
-import { ManageCaseDashboardPage } from '../../pages/ManageCaseDashboardPage.ts';
-import CaseDetailsPage from '../../pages/caseDetailsPage.ts';
-import ReferralPage from '../../pages/referralPage.ts';
-import DraftJudgementPage from '../../pages/events/draftJudgementPage.ts';
-import { CaseEventApi } from '../../data-utils/api/CaseEventApi.ts';
-import RolesAndAccessPage from '../../pages/rolesAndAccessPage.ts';
-import { expect } from '@playwright/test';
+import {
+  CaseDetailsPage, CaseEventApi,
+  CaseTypeLocation, CaseworkerCaseFactory,
+  CitizenClaimantFactory, DraftJudgementPage, Events,
+  Helpers,
+  LoginPage,
+  ManageCaseDashboardPage, ReferralPage, RolesAndAccessPage,
+  users
+} from "@et-shared-test-library/core";
+import {expect} from "@playwright/test";
 
 let caseNumber: string;
 let caseId: string;

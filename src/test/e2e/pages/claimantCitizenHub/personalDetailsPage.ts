@@ -210,6 +210,20 @@ export default class PersonalDetailsPage extends CitizenHubPage {
 
     await this.hearingFormatVideoOption.click();
     await this.saveAndContinueButton();
+    await this.completeHearingPanelPreferenceIfShown();
+  }
+
+  private async completeHearingPanelPreferenceIfShown() {
+    await this.page.waitForURL(/\/(hearing-panel-preference|reasonable-adjustments)(?:\?.*)?$/, {timeout: 60000});
+
+    if (new URL(this.page.url()).pathname !== '/hearing-panel-preference') {
+      return;
+    }
+
+    await expect(this.page.getByRole('heading', {name: 'Preference for judge or panel', exact: true})).toBeVisible();
+    await this.page.getByLabel('I have no preference').check();
+    await this.saveAndContinueButton();
+    await this.page.waitForURL(/\/reasonable-adjustments(?:\?.*)?$/, {timeout: 60000});
   }
 
   async selectReasonableAdjustment() {

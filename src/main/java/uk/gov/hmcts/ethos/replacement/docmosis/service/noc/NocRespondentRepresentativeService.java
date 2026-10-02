@@ -74,6 +74,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERR
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_REVOKE_RESPONDENT_REPRESENTATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_SET_ROLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REQUEST;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_ADDITION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
@@ -933,7 +934,8 @@ public class NocRespondentRepresentativeService {
         }
         final String adminUserToken = adminUserService.getAdminUserToken();
         nocCcdService.revokeClaimantRepresentation(adminUserToken, caseDetails);
-        ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseDetails.getCaseData());
+        ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseDetails.getCaseData(),
+                NOC_REMOVE_OPTION_ORGANISATION);
         return caseDetails.getCaseData();
     }
 

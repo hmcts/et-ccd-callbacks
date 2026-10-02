@@ -5,10 +5,14 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -157,6 +161,19 @@ public final class RespondentUtils {
     }
 
     /**
+     * Checks whether the specified case data contains at least one respondent.
+     *
+     * @param caseData the case data to check
+     * @return {@code true} if the case data is not {@code null} and its respondent
+     *         collection is not empty; otherwise {@code false}
+     */
+    public static boolean hasRespondents(CaseData caseData) {
+        return ObjectUtils.isNotEmpty(caseData)
+                && CollectionUtils.isNotEmpty(caseData.getRespondentCollection());
+    }
+
+    /**
+     * Finds and returns the name of a respondent with the given respondent ID.
      * Determines whether the provided {@link CaseData} contains at least one respondent.
      *
      * <p>This method performs a simple structural check to verify that:</p>
@@ -166,22 +183,6 @@ public final class RespondentUtils {
      *         at least one respondent entry.</li>
      * </ul>
      *
-     * <p>
-     * This method does not validate the contents or structure of individual respondent items;
-     * it only checks for their presence.
-     * </p>
-     *
-     * @param caseData the case data to inspect
-     * @return {@code true} if the case data contains at least one respondent;
-     *         {@code false} otherwise
-     */
-    public static boolean hasRespondents(CaseData caseData) {
-        return ObjectUtils.isNotEmpty(caseData)
-                && CollectionUtils.isNotEmpty(caseData.getRespondentCollection());
-    }
-
-    /**
-     * Finds and returns the name of a respondent with the given respondent ID.
      * <p>
      * The method iterates through the provided list of respondents and returns the
      * respondent name for the first valid respondent whose ID matches the supplied
@@ -214,7 +215,6 @@ public final class RespondentUtils {
      * <p>The method iterates through the respondent collection and returns the
      * index of the first valid respondent whose ID matches the provided
      * {@code respondentId}.</p>
-     *
      * <p>If the case data is null, the respondent collection is empty, the
      * respondent ID is blank, or no matching respondent is found, the method
      * returns {@code -1}.</p>
@@ -312,5 +312,139 @@ public final class RespondentUtils {
             return null;
         }
         return caseData.getRespondentCollection().get(index);
+    }
+
+    /**
+     * Resolves the notification email addresses for all valid respondents in the case.
+     * <p>
+     * For each valid respondent, the representative's email address is preferred when:
+     * <ul>
+     *     <li>a valid representative exists for the respondent, and</li>
+     *     <li>the representative email address is not blank.</li>
+     * </ul>
+     * Otherwise, the respondent's email address is used if available.
+     *
+     * <h3>Assumptions</h3>
+     * <ul>
+     *     <li>{@code caseDetails}, {@code caseData}, and related collections are expected to be non-null.</li>
+     *     <li>{@link #isValidRespondent(RespondentSumTypeItem)} guarantees that respondent data
+     *     is safe to access.</li>
+     *     <li>{@link #findRepresentativeByRespondentId(List, String)} returns the appropriate
+     *     representative for a respondent when one exists.</li>
+     *     <li>Email addresses are returned in the same order as respondents appear in the collection.</li>
+     * </ul>
+     *
+     * @param caseDetails the case details containing respondents and representatives
+     * @return a list of resolved notification email addresses for valid respondents;
+     *         returns an empty list when no valid respondent email addresses can be resolved
+     */
+    public static List<String> resolveRespondentNotificationEmailAddresses(CaseDetails caseDetails) {
+        List<String> resolvedRespondentEmailAddresses = new ArrayList<>();
+        if (CollectionUtils.isEmpty(caseDetails.getCaseData().getRespondentCollection())) {
+            return resolvedRespondentEmailAddresses;
+        }
+        for (RespondentSumTypeItem respondent : caseDetails.getCaseData().getRespondentCollection()) {
+            if (isValidRespondent(respondent)) {
+                RepresentedTypeRItem representative = findRepresentativeByRespondentId(
+                        caseDetails.getCaseData().getRepCollection(), respondent.getId());
+                if (ObjectUtils.isNotEmpty(representative)
+                        && StringUtils.isNotBlank(representative.getValue().getRepresentativeEmailAddress())) {
+                    resolvedRespondentEmailAddresses.add(representative.getValue().getRepresentativeEmailAddress());
+                    continue;
+                }
+                if (StringUtils.isNotBlank(respondent.getValue().getRespondentEmail())) {
+                    resolvedRespondentEmailAddresses.add(respondent.getValue().getRespondentEmail());
+                }
+            }
+        }
+        return resolvedRespondentEmailAddresses;
+    }
+
+    /**
+     * Finds all non-blank email addresses for valid respondents on the given case.
+     *
+     * <p>This method assumes that {@code caseDetails} is not {@code null} and that it
+     * contains non-null case data. If the respondent collection is empty or not present,
+     * an empty list is returned.</p>
+     *
+     * <p>Respondents are included only when they are considered valid by
+     * {@link #isValidRespondent(RespondentSumTypeItem)} and have a non-blank email
+     * address.</p>
+     *
+     * @param caseDetails the case details containing case data and respondent information;
+     *                    must not be {@code null} and must contain case data
+     * @return a list of email addresses for all valid respondents with non-blank email
+     *         addresses, or an empty list if no matching respondents are found
+     * @throws NullPointerException if {@code caseDetails} or its case data is {@code null}
+     */
+    public static List<RespondentSumTypeItem> findAllRespondents(CaseDetails caseDetails) {
+        List<RespondentSumTypeItem> respondentEmailAddresses = new ArrayList<>();
+        if (CollectionUtils.isEmpty(caseDetails.getCaseData().getRespondentCollection())) {
+            return respondentEmailAddresses;
+        }
+        for (RespondentSumTypeItem respondent : caseDetails.getCaseData().getRespondentCollection()) {
+            if (!isValidRespondent(respondent) || StringUtils.isBlank(respondent.getValue().getRespondentEmail())) {
+                continue;
+            }
+            respondentEmailAddresses.add(respondent);
+        }
+        return respondentEmailAddresses;
+    }
+
+    /**
+     * Finds the first valid representative associated with the given respondent ID.
+     * <p>
+     * A representative is considered valid when it satisfies
+     * {@link RespondentRepresentativeUtils#isValidRepresentative(RepresentedTypeRItem)}.
+     *
+     * <h3>Assumptions</h3>
+     * <ul>
+     *     <li>The respondent ID uniquely identifies a representative within the collection.</li>
+     *     <li>{@code isValidRepresentative(...)} guarantees that the representative and its value
+     *     are safe to access.</li>
+     *     <li>The order of the representatives collection is significant, as the first matching
+     *     representative is returned.</li>
+     * </ul>
+     *
+     * @param representatives the list of representatives to search
+     * @param respondentId the respondent identifier used to match the representative
+     * @return the matching {@link RepresentedTypeRItem} if found; otherwise {@code null}
+     */
+    public static RepresentedTypeRItem findRepresentativeByRespondentId(
+            List<RepresentedTypeRItem> representatives,
+            String respondentId) {
+        if (CollectionUtils.isEmpty(representatives) || StringUtils.isBlank(respondentId)) {
+            return null;
+        }
+        return representatives.stream()
+                .filter(RespondentRepresentativeUtils::isValidRepresentative)
+                .filter(representative ->
+                        respondentId.equals(representative.getValue().getRespondentId()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Finds the email address for the given respondent.
+     * <p>
+     * The response respondent email address is returned first if it is present.
+     * If not, the respondent email address is returned instead.
+     * If the respondent, respondent value, or both email address fields are empty,
+     * an empty string is returned.
+     *
+     * @param respondent the respondent item to retrieve the email address from
+     * @return the respondent email address, or an empty string if no email address is available
+     */
+    public static String findRespondentEmailAddress(RespondentSumTypeItem respondent) {
+        if (ObjectUtils.isEmpty(respondent) || ObjectUtils.isEmpty(respondent.getValue())) {
+            return StringUtils.EMPTY;
+        }
+        if (StringUtils.isNotBlank(respondent.getValue().getResponseRespondentEmail())) {
+            return respondent.getValue().getResponseRespondentEmail();
+        }
+        if (StringUtils.isNotBlank(respondent.getValue().getRespondentEmail())) {
+            return respondent.getValue().getRespondentEmail();
+        }
+        return StringUtils.EMPTY;
     }
 }

@@ -132,10 +132,37 @@ export default class ClaimDetailsPage extends CitizenHubPage{
     return date;
   }
   async enterDescribeWhatHappened() {
+    await this.completeDateOfLastEventIfShown();
     await this.page.waitForLoadState('load');
     await expect(this.describeYourClaimHeading).toBeVisible();
     await this.claimSummaryTextArea.fill('Discrimination, Dismissal and Pay Cut.');
     await this.saveAndContinueButton();
+  }
+
+  private async completeDateOfLastEventIfShown() {
+    await this.page.waitForURL(
+      /\/(date-of-last-event|describe-what-happened|claimant-describe-what-happened)(?:\?.*)?$/,
+      {timeout: 60000}
+    );
+
+    if (new URL(this.page.url()).pathname !== '/date-of-last-event') {
+      return;
+    }
+
+    await expect(this.page.getByRole('heading', {
+      name: 'What is the date of the most recent event you are complaining about?',
+      exact: true,
+    })).toBeVisible();
+    const eventDate = new Date();
+    eventDate.setMonth(eventDate.getMonth() - 4);
+    await this.page.locator('#dateOfLastEvent-day').fill(String(eventDate.getDate()).padStart(2, '0'));
+    await this.page.locator('#dateOfLastEvent-month').fill(String(eventDate.getMonth() + 1).padStart(2, '0'));
+    await this.page.locator('#dateOfLastEvent-year').fill(String(eventDate.getFullYear()));
+    await this.saveAndContinueButton();
+    await this.page.waitForURL(
+      /\/(describe-what-happened|claimant-describe-what-happened)(?:\?.*)?$/,
+      {timeout: 60000}
+    );
   }
 
   async selectTellUsWhatYouWant() {

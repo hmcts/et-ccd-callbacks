@@ -18,7 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -39,8 +39,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HT
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_ZERO_ONE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_ZERO_THREE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_TWO_HUNDRED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole.CLAIMANTSOLICITOR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils.markClaimantAsUnrepresented;
 
 @Slf4j
 @RequestMapping("/claimantRepresentative")
@@ -50,6 +50,8 @@ public class ClaimantRepresentativeController {
 
     private static final String LOG_MESSAGE =
             "received claimant's remove own representative request for case reference : ";
+
+    private final FeatureToggleService featureToggleService;
 
     /**
      * Handles the removal of a claimant's own representative from the case data.
@@ -105,10 +107,8 @@ public class ClaimantRepresentativeController {
         CaseData caseData = caseDetails.getCaseData();
         if (StringUtils.isNotBlank(caseData.getClaimantRepresentedQuestion())
                 && NO.equals(caseData.getClaimantRepresentedQuestion())) {
-            caseData.setRepresentativeClaimantType(null);
-            caseData.setClaimantRepresentativeOrganisationPolicy(
-                    OrganisationPolicy.builder().orgPolicyCaseAssignedRole(CLAIMANTSOLICITOR.getCaseRoleLabel()).build()
-            );
+            markClaimantAsUnrepresented(caseData,
+                    featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId()));
         }
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }

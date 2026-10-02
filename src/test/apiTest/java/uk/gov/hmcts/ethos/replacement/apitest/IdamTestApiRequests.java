@@ -93,7 +93,7 @@ public class IdamTestApiRequests {
         List<String> cookies = idamAuth();
 
         String auth = cookies.stream().filter(o -> o.startsWith("__auth__")).findFirst().get();
-        return "Bearer " + auth.substring(9, auth.indexOf(";"));
+        return "Bearer " + auth.substring(9, auth.indexOf(';'));
     }
 
     /**
@@ -105,7 +105,7 @@ public class IdamTestApiRequests {
 
         List<String> cookies =
                 Arrays.stream(response.getHeaders("Set-Cookie")).map(o -> o.getValue().substring(0,
-                        o.getValue().indexOf(";"))).collect(Collectors.toList());
+                        o.getValue().indexOf(';'))).collect(Collectors.toList());
 
         cookies.add("seen_cookie_message=yes");
         cookies.add("cookies_policy={ \"essential\": true, \"analytics\": false, \"apm\": false }");

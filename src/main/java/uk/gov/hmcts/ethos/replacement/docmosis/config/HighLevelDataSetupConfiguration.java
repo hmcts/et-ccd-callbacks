@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.config;
 
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.befta.BeftaMain;
 import uk.gov.hmcts.befta.dse.ccd.CcdEnvironment;
 import uk.gov.hmcts.befta.dse.ccd.CcdRoleConfig;
 import uk.gov.hmcts.befta.dse.ccd.DataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.util.BeftaUtils;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 
@@ -16,6 +18,8 @@ import java.util.Locale;
 @Slf4j
 public class HighLevelDataSetupConfiguration extends DataLoaderToDefinitionStore {
 
+    private static final String PRODUCTION_DEFINITION_STORE_HOST =
+        "ccd-definition-store-api-prod.service.core-compute-prod.internal";
     private final CcdEnvironment environment;
     public static final String PUBLIC = "PUBLIC";
     private static final CcdRoleConfig[] CCD_ROLES = {
@@ -43,7 +47,21 @@ public class HighLevelDataSetupConfiguration extends DataLoaderToDefinitionStore
 
     public HighLevelDataSetupConfiguration(CcdEnvironment dataSetupEnvironment) {
         super(dataSetupEnvironment);
+        validateDefinitionStoreTarget(dataSetupEnvironment, BeftaMain.getConfig().getDefinitionStoreUrl());
         environment = dataSetupEnvironment;
+    }
+
+    static void validateDefinitionStoreTarget(CcdEnvironment definitionEnvironment, String definitionStoreUrl) {
+        String definitionStoreHost = URI.create(definitionStoreUrl).getHost();
+        boolean hasProductionDefinitions = definitionEnvironment == CcdEnvironment.PROD;
+        boolean hasProductionTarget = PRODUCTION_DEFINITION_STORE_HOST.equalsIgnoreCase(definitionStoreHost);
+
+        if (hasProductionDefinitions != hasProductionTarget) {
+            throw new IllegalStateException(
+                "Refusing to load %s definitions into Definition Store host '%s'"
+                    .formatted(definitionEnvironment, definitionStoreHost)
+            );
+        }
     }
 
     public static void main(String[] args) throws Throwable {
@@ -74,7 +92,7 @@ public class HighLevelDataSetupConfiguration extends DataLoaderToDefinitionStore
 
     @Override
     protected boolean shouldTolerateDataSetupFailure() {
-        return true;
+        return false;
     }
 
     @Override

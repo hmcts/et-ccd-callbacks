@@ -245,7 +245,31 @@ public class ET3Service {
         CaseData caseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(caseDetails.getData());
         RespondentSumTypeItem selectedRespondent =
             findSelectedRespondentByRespondentSumTypeItem(caseData, et3Request.getRespondent());
-        copyProperties(et3Request.getRespondent(), selectedRespondent);
+        // Copy at the RespondentSumType value level so individual fields are merged rather than
+        // replacing the entire value reference. Fields managed by the backend or other portals
+        // are excluded to prevent accidental data loss (e.g. et3Form uploaded via ExUI/MyHMCTS).
+        copyProperties(et3Request.getRespondent().getValue(), selectedRespondent.getValue(),
+            "et3Form",
+            "et3FormWelsh",
+            "responseReceived",
+            "responseReceivedDate",
+            "responseReceivedCount",
+            "et3Vetting",
+            "et3VettingCompleted",
+            "responseStruckOut",
+            "responseStruckOutDate",
+            "responseStruckOutChairman",
+            "responseStruckOutReason",
+            "responseReferredToJudge",
+            "responseReturnedFromJudge",
+            "responseToClaim",
+            "rejectionReason",
+            "rejectionReasonOther",
+            "responseOutOfTime",
+            "responseNotOnPrescribedForm",
+            "responseRequiredInfoAbsent",
+            "responseNotes"
+        );
         HubLinksUtil.setLinkStatuses(caseData, selectedRespondent.getValue(), et3Request);
         if (MODIFICATION_TYPE_SUBMIT.equals(et3Request.getRequestType())) {
             if (isBlank(selectedRespondent.getValue().getResponseRespondentEmail())) {

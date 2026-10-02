@@ -6,6 +6,7 @@ import org.mockito.Mock;
 import org.springframework.context.annotation.Import;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.Et1CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.TaskListCheckType;
 import uk.gov.hmcts.reform.et.syaapi.model.CaseTestData;
 
 import java.util.Map;
@@ -44,6 +45,7 @@ class EmploymentObjectMapperTest {
     @Test
     void shouldMapCaseRequestToCaseData() {
         Map<String, Object> requestCaseData = caseTestData.getCaseRequestCaseDataMap();
+        ((TaskListCheckType) requestCaseData.get("claimantTaskListChecks")).setGroupClaimsCheck("Yes");
         CaseData caseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(requestCaseData);
         assertThat(caseData.getTypesOfClaim().get(0)).isEqualTo(TYPE_OF_CLAIM_DISCRIMINATION);
         assertThat(caseData.getTypesOfClaim().get(1)).isEqualTo(TYPE_OF_CLAIM_BREACH_OF_CONTRACT);
@@ -69,5 +71,6 @@ class EmploymentObjectMapperTest {
         assertThat(caseData.getClaimantHearingPreference()).isEqualTo(
             requestCaseData.get("claimantHearingPreference"));
         assertThat(caseData.getClaimantTaskListChecks()).isEqualTo(requestCaseData.get("claimantTaskListChecks"));
+        assertThat(caseData.getClaimantTaskListChecks().getGroupClaimsCheck()).isEqualTo("Yes");
     }
 }

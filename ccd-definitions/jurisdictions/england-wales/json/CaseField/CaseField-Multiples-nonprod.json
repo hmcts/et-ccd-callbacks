@@ -285,6 +285,15 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales_Multiple",
+    "ID": "sendNotificationGroupClaims",
+    "Label": "Which notification is required?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "fl_sendNotificationGroupClaims",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
     "ID": "sendNotificationResponseTribunal",
     "Label": "Is a response to the tribunal required?",
     "FieldType": "FixedRadioList",
@@ -305,6 +314,49 @@
     "Label": "Full name",
     "FieldType": "Text",
     "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "ID": "sendNotificationGroupClaimsMadeBy",
+    "Label": "Who made the order?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "fl_sendNotificationWhoCaseOrder",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "ID": "sendNotificationFullName3",
+    "Label": "Full name",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "sendNotificationGroupClaims",
+    "Label": "Which notification is required?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "fl_sendNotificationGroupClaims",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "sendNotificationGroupClaimsMadeBy",
+    "Label": "Who made the order?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "fl_sendNotificationWhoCaseOrder",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "sendNotificationFullName3",
+    "Label": "Full name",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   },
   {
     "CaseTypeID": "ET_EnglandWales_Multiple",

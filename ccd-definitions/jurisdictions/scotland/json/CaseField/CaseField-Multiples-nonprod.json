@@ -276,6 +276,14 @@
   },
   {
     "CaseTypeID": "ET_Scotland_Multiple",
+    "ID": "sendNotificationGroupClaims",
+    "Label": "Which notification is required?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "fl_sendNotificationGroupClaims",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland_Multiple",
     "ID": "sendNotificationResponseTribunal",
     "Label": "Is a response to the tribunal required?",
     "FieldType": "FixedRadioList",
@@ -293,6 +301,44 @@
   {
     "CaseTypeID": "ET_Scotland_Multiple",
     "ID": "sendNotificationFullName",
+    "Label": "Full name",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland_Multiple",
+    "ID": "sendNotificationGroupClaimsMadeBy",
+    "Label": "Who made the order?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "fl_sendNotificationWhoCaseOrder",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland_Multiple",
+    "ID": "sendNotificationFullName3",
+    "Label": "Full name",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "sendNotificationGroupClaims",
+    "Label": "Which notification is required?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "fl_sendNotificationGroupClaims",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "sendNotificationGroupClaimsMadeBy",
+    "Label": "Who made the order?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "fl_sendNotificationWhoCaseOrder",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "sendNotificationFullName3",
     "Label": "Full name",
     "FieldType": "Text",
     "SecurityClassification": "Public"

@@ -402,7 +402,7 @@ class InitialConsiderationHelperTest {
         String expected = "{\"accessKey\":\"key\",\"templateName\":\"EM-TRB-SCO-ENG-02204.docx\","
                 + "\"outputName\":\"Initial Consideration.pdf\",\"data\":{\"caseNumber\":null,"
                 + "\"issuesJurisdiction\":null,\"issuesJurCodesGiveDetails\":null,\"canProceed\":null,"
-                + "\"hearingAlreadyListed\":null,\"hearingListed\":null,\"hearingPostpone\":null,"
+                + "\"hearingAlreadyListed\":null,\"udlEra\":null,\"hearingListed\":null,\"hearingPostpone\":null,"
                 + "\"hearingExtend\":null,\"hearingConvertFinal\":null,\"hearingConvertF2f\":null,"
                 + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":null,"
                 + "\"hearingWithJsa\":null,\"hearingWithMembersLabel\":null,\"hearingWithMembers\":null,"

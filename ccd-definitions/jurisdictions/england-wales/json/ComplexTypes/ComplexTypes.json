@@ -1490,7 +1490,7 @@
     "ID": "ClaimantRequest",
     "ListElementCode": "linked_cases",
     "FieldType": "YesOrNo",
-    "ElementLabel": " ",
+    "ElementLabel": "Are there any linked cases?",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },
@@ -1498,7 +1498,7 @@
     "ID": "ClaimantRequest",
     "ListElementCode": "linked_cases_detail",
     "FieldType": "TextArea",
-    "ElementLabel": " ",
+    "ElementLabel": "Details of linked cases",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },
@@ -1610,6 +1610,13 @@
     "FieldTypeParameter": "msl_PreAcceptanceResponse",
     "FieldShowCondition": "caseAccepted=\"No\"",
     "RetainHiddenValue": "Yes",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "AdditionalCaseDetails",
+    "ListElementCode": "era",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "ERA",
     "SecurityClassification": "Public"
   },
   {

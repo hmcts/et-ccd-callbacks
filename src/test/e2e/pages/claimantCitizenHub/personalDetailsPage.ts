@@ -23,6 +23,8 @@ export default class PersonalDetailsPage extends CitizenHubPage {
   private readonly hearingFormatQuestion: Locator;
   private readonly hearingFormatAudioOption: Locator;
   private readonly hearingFormatVideoOption: Locator
+  private readonly hearingPanelPreferenceHeading: Locator;
+  private readonly hearingPanelPreferenceNoPreference: Locator;
   private readonly extraSupportHeading: Locator;
   private readonly reasonableAdjustmentQuestion: Locator;
   private readonly reasonableAdjustmentNo: Locator;
@@ -67,6 +69,8 @@ export default class PersonalDetailsPage extends CitizenHubPage {
     this.hearingFormatQuestion = this.page.locator('fieldset:has(legend:text("Would you be able to take part in hearings by video and phone?"))');
     this.hearingFormatAudioOption = this.page.locator(`#hearingPreferences-2`);
     this.hearingFormatVideoOption = this.page.locator(`#hearingPreferences`);
+    this.hearingPanelPreferenceHeading = this.page.getByRole('heading', { name: 'Preference for judge or panel' });
+    this.hearingPanelPreferenceNoPreference = this.page.getByLabel('I have no preference');
     this.extraSupportHeading = this.page.getByRole('heading', { name: /extra support during (your case|the case) \(optional\)/i });
     this.reasonableAdjustmentQuestion = this.page.locator(
       'fieldset:has(legend:text-matches("Do you have a physical, mental or learning disability or long term health condition that means you need support during your case\\?|Does anyone in the claimant party have a physical, mental or learning disability or health condition that means they need support during the case\\?", "i"))'
@@ -210,22 +214,21 @@ export default class PersonalDetailsPage extends CitizenHubPage {
 
     await this.hearingFormatVideoOption.click();
     await this.saveAndContinueButton();
-    await this.completeHearingPanelPreferenceIfShown();
+    await this.completeHearingPanelPreferenceIfEnabled();
   }
 
-  private async completeHearingPanelPreferenceIfShown() {
-    await this.page.waitForURL(/\/(hearing-panel-preference|reasonable-adjustments)(?:\?.*)?$/, {timeout: 60000});
+  private async completeHearingPanelPreferenceIfEnabled() {
+    await this.page.waitForURL(/\/(hearing-panel-preference|reasonable-adjustments)(?:\?.*)?$/);
 
     if (new URL(this.page.url()).pathname !== '/hearing-panel-preference') {
       return;
     }
 
-    await expect(this.page.getByRole('heading', {name: 'Preference for judge or panel', exact: true})).toBeVisible();
-    await this.page.getByLabel('I have no preference').check();
+    await expect(this.hearingPanelPreferenceHeading).toBeVisible();
+    await this.hearingPanelPreferenceNoPreference.check();
     await this.saveAndContinueButton();
-    await this.page.waitForURL(/\/reasonable-adjustments(?:\?.*)?$/, {timeout: 60000});
+    await this.page.waitForURL(/\/reasonable-adjustments(?:\?.*)?$/);
   }
-
   async selectReasonableAdjustment() {
     //Select No to reasonable adjustment question
     await this.page.waitForLoadState('load');

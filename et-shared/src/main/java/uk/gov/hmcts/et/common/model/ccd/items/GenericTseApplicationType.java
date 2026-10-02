@@ -1,6 +1,8 @@
 package uk.gov.hmcts.et.common.model.ccd.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,7 +42,11 @@ public class GenericTseApplicationType {
     @JsonProperty("status")
     private String status;
     @JsonProperty("closeApplicationNotes")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String closeApplicationNotes;
+    @JsonProperty("closeApplicationNote")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String closeApplicationNote;
     @JsonProperty("applicationState")
     private String applicationState;
     @JsonProperty("respondentState")
@@ -59,5 +65,9 @@ public class GenericTseApplicationType {
 
     @JsonProperty("adminDecision")
     private List<TseAdminRecordDecisionTypeItem> adminDecision;
+    @JsonIgnore
+    public String getCloseApplicationNotesValue() {
+        return closeApplicationNotes != null ? closeApplicationNotes : closeApplicationNote;
+    }
 
 }

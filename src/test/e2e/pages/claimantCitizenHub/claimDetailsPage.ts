@@ -10,6 +10,10 @@ export default class ClaimDetailsPage extends CitizenHubPage{
   private readonly yourDiscriminationClaimHeading: Locator;
   private readonly yourDiscriminationAgeOption: Locator;
   private readonly yourDiscriminationDisabilityOption: Locator;
+  private readonly dateOfLastEventHeading: Locator;
+  private readonly dateOfLastEventDay: Locator;
+  private readonly dateOfLastEventMonth: Locator;
+  private readonly dateOfLastEventYear: Locator;
   private readonly describeYourClaimHeading: Locator;
   private readonly claimSummaryTextArea: Locator;
   private readonly whatDoYouWantHeading: Locator;
@@ -40,6 +44,12 @@ export default class ClaimDetailsPage extends CitizenHubPage{
     this.yourDiscriminationClaimHeading = this.page.getByRole('heading', { name: /^(?:Your\s+)?Discrimination claim\b/i });
     this.yourDiscriminationAgeOption = this.page.locator('#age');
     this.yourDiscriminationDisabilityOption = this.page.locator('#disability');
+    this.dateOfLastEventHeading = this.page.getByRole('heading', {
+      name: 'What is the date of the most recent event you are complaining about?',
+    });
+    this.dateOfLastEventDay = this.page.locator('#dateOfLastEvent-day');
+    this.dateOfLastEventMonth = this.page.locator('#dateOfLastEvent-month');
+    this.dateOfLastEventYear = this.page.locator('#dateOfLastEvent-year');
     this.describeYourClaimHeading = this.page.getByRole('heading', {
       name: /^(Describe your claim|Describe the claim)$/,
     });
@@ -93,8 +103,34 @@ export default class ClaimDetailsPage extends CitizenHubPage{
     await this.yourDiscriminationAgeOption.check();
     await this.yourDiscriminationDisabilityOption.check();
     await this.saveAndContinueButton();
+    await this.completeDateOfLastEventIfEnabled();
   }
 
+  private async completeDateOfLastEventIfEnabled() {
+    await this.page.waitForURL(/\/(date-of-last-event|describe-what-happened)(?:\?.*)?$/);
+
+    if (new URL(this.page.url()).pathname !== '/date-of-last-event') {
+      return;
+    }
+
+    await expect(this.dateOfLastEventHeading).toBeVisible();
+    const dateOfLastEvent = this.getDateFourMonthsAgo();
+    await this.dateOfLastEventDay.fill(String(dateOfLastEvent.getDate()).padStart(2, '0'));
+    await this.dateOfLastEventMonth.fill(String(dateOfLastEvent.getMonth() + 1).padStart(2, '0'));
+    await this.dateOfLastEventYear.fill(String(dateOfLastEvent.getFullYear()));
+    await this.saveAndContinueButton();
+    await this.page.waitForURL(/\/describe-what-happened(?:\?.*)?$/);
+  }
+
+  private getDateFourMonthsAgo(): Date {
+    const date = new Date();
+    const day = date.getDate();
+    date.setDate(1);
+    date.setMonth(date.getMonth() - 4);
+    date.setDate(Math.min(day, new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()));
+
+    return date;
+  }
   async enterDescribeWhatHappened() {
     await this.completeDateOfLastEventIfShown();
     await this.page.waitForLoadState('load');

@@ -8,6 +8,7 @@ export default class Et1VettingPages extends BasePage {
   private readonly minimumRequiredInfoText: Locator;
   private readonly caseEditForm: Locator;
   private readonly acasCertYes: Locator;
+  private readonly eraNotApplicable: Locator;
   private readonly substantiveDefectsList: Locator;
   private readonly caseEditFormNotes: Locator;
   private readonly jurisdictionCodes: Locator;
@@ -29,6 +30,9 @@ export default class Et1VettingPages extends BasePage {
     this.minimumRequiredInfoText = page.getByText('Minimum required information');
     this.caseEditForm = page.locator('#caseEditForm');
     this.acasCertYes = page.locator('#et1VettingAcasCertIsYesOrNo1_Yes');
+    this.eraNotApplicable = page
+      .getByRole('group', { name: 'Is this claim proceeding under the ERA regulations?' })
+      .getByLabel('Not applicable', { exact: true });
     this.substantiveDefectsList = page.locator('#substantiveDefectsList');
     this.caseEditFormNotes = page.locator('#caseEditForm');
     this.jurisdictionCodes = page.locator('#areTheseCodesCorrect');
@@ -81,6 +85,8 @@ export default class Et1VettingPages extends BasePage {
 
   async processACASCertificatePage() {
     await this.acasCertYes.click();
+    await expect(this.eraNotApplicable).toBeVisible();
+    await this.eraNotApplicable.check();
     await this.clickContinue();
   }
 

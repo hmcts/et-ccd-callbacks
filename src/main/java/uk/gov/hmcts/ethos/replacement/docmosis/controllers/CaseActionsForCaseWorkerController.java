@@ -67,6 +67,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -278,6 +279,10 @@ public class CaseActionsForCaseWorkerController {
         CaseData caseData = caseDetails.getCaseData();
         if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())) {
             supportTaskService.prepareReviewSupportRequest(caseData, callbackRequest.getEventId());
+            if (isEmpty(caseData.getReviewSupportRequestFlags())) {
+                return getCallbackRespEntityErrors(
+                        List.of("This case has no requested flags for your role"), caseData);
+            }
         }
         return getCallbackRespEntityNoErrors(caseData);
     }

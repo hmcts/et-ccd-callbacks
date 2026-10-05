@@ -176,6 +176,56 @@ class SupportTaskCallbackLifecycleTest {
         callback(callbackUrl, EVENT_CREATE_FLAG, new CaseData(), new CaseData(), null);
     }
 
+    static Stream<Arguments> reviewStartCategories() {
+        return reviewLifecycles().filter(arguments -> MANUAL_REVIEW.equals(arguments.get()[1]))
+                .map(arguments -> Arguments.of(arguments.get()[0], arguments.get()[2]));
+    }
+
+    @ParameterizedTest
+    @MethodSource("reviewStartCategories")
+    void reviewStartShowsRoleSpecificErrorWhenNoEligibleFlags(Category category, String type)
+            throws Exception {
+        caseType = type;
+        String otherCode = ADMIN_CODE.equals(category.code()) ? JUDGE_CODE : ADMIN_CODE;
+        for (AllPartyFlags partyFlags : List.of(
+                new AllPartyFlags(),
+                AllPartyFlags.builder().claimantFlags(flags("active", category.code(), FLAG_STATUS_ACTIVE)).build(),
+                AllPartyFlags.builder().claimantFlags(flags("other", otherCode, FLAG_STATUS_REQUESTED)).build())) {
+            CaseData data = new CaseData();
+            data.setAllPartyFlags(partyFlags);
+            MvcResult result = callback(REVIEW_START, category.reviewEvent(), data, new CaseData(), null);
+
+            JsonNode errors = mapper.readTree(result.getResponse().getContentAsString()).path("errors");
+            assertEquals(1, errors.size());
+            assertEquals("This case has no requested flags for your role", errors.get(0).asText());
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("reviewStartCategories")
+    void reviewStartAllowsEligibleRequestedFlags(Category category, String type) throws Exception {
+        caseType = type;
+        CaseData data = new CaseData();
+        data.setAllPartyFlags(AllPartyFlags.builder()
+                .claimantFlags(flags("requested", category.code(), FLAG_STATUS_REQUESTED)).build());
+
+        MvcResult result = callback(REVIEW_START, category.reviewEvent(), data, new CaseData(), null);
+
+        assertEquals(0, mapper.readTree(result.getResponse().getContentAsString()).path("errors").size());
+        assertEquals(1, responseData(result).getReviewSupportRequestFlags().size());
+    }
+
+    @ParameterizedTest
+    @MethodSource("reviewStartCategories")
+    void reviewStartDoesNotValidateWhenV2Disabled(Category category, String type) throws Exception {
+        caseType = type;
+        when(featureToggleService.isCaseFlagsV2Enabled(type)).thenReturn(false);
+
+        MvcResult result = callback(REVIEW_START, category.reviewEvent(), new CaseData(), new CaseData(), null);
+
+        assertEquals(0, mapper.readTree(result.getResponse().getContentAsString()).path("errors").size());
+    }
+
     private JsonCallbackBridge sdkBridge() throws NoSuchMethodException {
         ApplicationContext context = mvc.getDispatcherServlet().getWebApplicationContext();
         return BeanUtils.instantiateClass(JsonCallbackBridge.class.getDeclaredConstructor(

@@ -78,8 +78,11 @@ public class DigitalCaseFileService {
     }
 
     public void completeDcf(CaseDetails caseDetails) {
-        CaseData caseData = caseDetails.getCaseData();
-        persistenceService.complete(Long.parseLong(caseDetails.getCaseId()), caseData);
+        completeDcf(Long.parseLong(caseDetails.getCaseId()), caseDetails.getCaseData());
+    }
+
+    public void completeDcf(long caseReference, CaseData caseData) {
+        persistenceService.complete(caseReference, caseData);
         caseData.setCaseBundles(null);
     }
 
@@ -152,4 +155,3 @@ public class DigitalCaseFileService {
                 bundleRequestMapper(caseDetails));
     }
 }
-

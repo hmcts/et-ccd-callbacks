@@ -1,11 +1,11 @@
 import { test } from '../fixtures/et.test.fixture.ts';
-import { CitizenClaimantFactory } from '../data-utils/factory/citizen/ClaimantCitizenFactory.ts';
-import { CaseTypeLocation, Events } from '../config/case-data.ts';
-import { users } from '../config/config.dynamic.ts';
-import CitizenHubLoginPage from '../pages/claimantCitizenHub/CitizenHubLoginPage.ts';
-import CitizenHubPage from '../pages/claimantCitizenHub/CitizenHubPage.ts';
-import Et3LoginPage from '../pages/respondentCitizenHub/et3LoginPage.ts';
-import RespondentCaseOverviewPage from '../pages/respondentCitizenHub/respondentCaseOverviewPage.ts';
+import {
+  CaseTypeLocation,
+  CitizenClaimantFactory,
+  CitizenHubLoginPage, CitizenHubPage, ET3LoginPage,
+  Events, RespondentCaseOverviewPage,
+  users
+} from "@et-shared-test-library/core";
 
 let caseNumber: string;
 let subRef: string;
@@ -49,7 +49,7 @@ test.describe('ET3/Respondent Journey validates respondent/claimant details', ()
 
     //Assign a claim to respondent
     const respondentBrowserPage = await browserUtils.openNewBrowserContext(users.etRespondent.sessionFile);
-    const et3LoginPage = new Et3LoginPage(respondentBrowserPage);
+    const et3LoginPage = new ET3LoginPage(respondentBrowserPage);
     await et3LoginPage.processRespondentLoginForExistingCase(users.etRespondent, caseNumber);
     const respondentCaseOverviewPage = new RespondentCaseOverviewPage(respondentBrowserPage);
     await respondentCaseOverviewPage.validateRespondentClaimantContactDetailsPage();

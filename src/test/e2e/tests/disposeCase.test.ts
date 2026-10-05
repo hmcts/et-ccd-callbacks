@@ -1,9 +1,12 @@
 import { test } from '../fixtures/et.test.fixture.ts';
 import assert from 'node:assert';
-import { CaseworkerCaseFactory } from '../data-utils/factory/exui/CaseworkerCaseFactory.ts';
-import { CaseTypeLocation, Events } from '../config/case-data.ts';
-import { CitizenClaimantFactory } from '../data-utils/factory/citizen/ClaimantCitizenFactory.ts';
-import { users } from '../config/config.dynamic.ts';
+import {
+  CaseTypeLocation,
+  CaseworkerCaseFactory,
+  CitizenClaimantFactory,
+  Events,
+  users
+} from "@et-shared-test-library/core";
 
 let caseNumber: any;
 let caseId: any;
@@ -13,7 +16,8 @@ test.describe('Close Case & Reinstate Case', () => {
     storageState: users.etCaseWorker.sessionFile,
   });
   test.beforeEach(async () => {
-    ({ caseId, caseNumber } = await CaseworkerCaseFactory.createEnglandAndAcceptCase());
+    ({ caseId, caseNumber } = await CaseworkerCaseFactory
+      .createEnglandAndAcceptCase());
   });
 
   test('Create a claim , Close case  & Reinstate Case',

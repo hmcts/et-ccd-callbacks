@@ -1,11 +1,13 @@
 import { test } from '../fixtures/et.test.fixture.ts';
-import { CaseworkerCaseFactory } from '../data-utils/factory/exui/CaseworkerCaseFactory.ts';
-import { CaseTypeLocation, Events } from '../config/case-data.ts';
-import { users } from '../config/config.dynamic.ts';
-import LoginPage from '../pages/loginPage.ts';
-import { ManageCaseDashboardPage } from '../pages/ManageCaseDashboardPage.ts';
-import CaseDetailsPage from '../pages/caseDetailsPage.ts';
-import ICUploadDocPage from '../pages/icUploadDocPage.ts';
+import {
+  CaseDetailsPage,
+  CaseTypeLocation,
+  CaseworkerCaseFactory,
+  Events, ICUploadDocPage,
+  LoginPage,
+  ManageCaseDashboardPage,
+  users
+} from "@et-shared-test-library/core";
 
 let caseId: string;
 let caseNumber: string;

@@ -1,5 +1,5 @@
 import { test } from '../fixtures/et.test.fixture.ts';
-import { config, users } from '../config/config.dynamic.ts';
+import {config, users} from "@et-shared-test-library/core";
 
 const userDetailsData = require('../resources/payload/user-details.json');
 

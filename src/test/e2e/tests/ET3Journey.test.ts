@@ -1,8 +1,5 @@
 import { test } from '../fixtures/et.test.fixture.ts';
-import { CaseworkerCaseFactory } from '../data-utils/factory/exui/CaseworkerCaseFactory.ts';
-import { users } from '../config/config.dynamic.ts';
-import { CaseDetailsValues } from '../config/case-data.ts';
-import Et3LoginPage from '../pages/respondentCitizenHub/et3LoginPage.ts';
+import {CaseDetailsValues, CaseworkerCaseFactory, ET3LoginPage, users} from "@et-shared-test-library/core";
 
 let caseNumber: string;
 let caseId: string;
@@ -43,7 +40,7 @@ test.describe('ET3/Respondent Journey', () => {
       await et3LoginPage.replyToNewClaim(caseId, caseNumber, CaseDetailsValues.respondentName, CaseDetailsValues.claimantFirstName, CaseDetailsValues.claimantLastName);
 
       const respondent2BrowserPage = await browserUtils.openNewBrowserContext(users.etRespondent2.sessionFile);
-      const et3LoginPageForRespondent2 = new Et3LoginPage(respondent2BrowserPage);
+      const et3LoginPageForRespondent2 = new ET3LoginPage(respondent2BrowserPage);
 
       await et3LoginPageForRespondent2.processRespondentLogin(users.etRespondent2);
       await et3LoginPageForRespondent2.replyToClaimAsNewRespondent(caseId, caseNumber, CaseDetailsValues.respondentName, CaseDetailsValues.claimantFirstName, CaseDetailsValues.claimantLastName);

@@ -1,14 +1,13 @@
 import { test } from '../fixtures/et.test.fixture.ts';
-import userDetailsData from '../resources/payload/user-details.json';
-import { CaseEventApi } from '../data-utils/api/CaseEventApi.ts';
-import { CaseTypeLocation, Events } from '../config/case-data.ts';
-import { users } from '../config/config.dynamic.ts';
-import { ManageCaseDashboardPage } from '../pages/ManageCaseDashboardPage.ts';
-import LoginPage from '../pages/loginPage.ts';
-import CaseDetailsPage from '../pages/caseDetailsPage.ts';
-import ClaimantDetailsPage from '../pages/claimantDetailsPage.ts';
-import RespondentDetailsPage from '../pages/respondentCitizenHub/respondentDetailsPage.ts';
-import { NocPage } from '../pages/legalRepresentative/NocPage.ts';
+import userDetailsData from '@et-shared-test-library/core/resources/payload/user-details.json';
+import {
+  CaseDetailsPage,
+  CaseEventApi, CaseTypeLocation,
+  ClaimantDetailsPage, Events,
+  LoginPage,
+  ManageCaseDashboardPage, NocPage, RespondentDetailsPage,
+  users
+} from "@et-shared-test-library/core";
 
 let caseNumber: string;
 let caseId: string;

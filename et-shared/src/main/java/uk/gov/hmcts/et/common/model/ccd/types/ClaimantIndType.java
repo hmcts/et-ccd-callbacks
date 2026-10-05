@@ -59,7 +59,7 @@ public class ClaimantIndType {
 
         var fullNameList = List.of(title,
                 getInitials(),
-                StringUtils.isBlank(claimantLastName)? StringUtils.EMPTY : claimantLastName);
+                StringUtils.isBlank(claimantLastName) ? StringUtils.EMPTY : claimantLastName);
         return String.join(" ", notNullOrEmptyAtt(new ArrayList<>(), fullNameList));
     }
 

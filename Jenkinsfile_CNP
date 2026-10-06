@@ -158,7 +158,7 @@ withPipeline(type, product, component) {
   enableSlackNotifications('#et-builds')
 
   before('build') {
-    sh './gradlew --info --stacktrace validateCcdDefinitionsLockfile'
+    sh './gradlew --no-daemon --init-script init.gradle validateCcdDefinitionsLockfile'
     sh '''
       env AZURE_CONFIG_DIR=/opt/jenkins/.azure-nonprod az acr login --name hmctsprod
     '''

@@ -1,6 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { BasePage } from './basePage';
-import { ReferralOption } from '../config/case-data';
+import { ReferralOption } from '../config';
+import {resolveResourcePath} from "../data-utils/resourcePath";
 
 export class ReferralPage extends BasePage {
   private readonly judgeReferralOption: Locator;
@@ -59,7 +60,7 @@ export class ReferralPage extends BasePage {
 
     await this.addNewButtonClick();
     await this.docUploadEle.waitFor();
-    await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.docUploadEle, 'src/test/e2e/resources/test_file/test.txt');
+    await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.docUploadEle, resolveResourcePath('resources/test_file/test.txt'));
 
     await this.clickContinue();
     await this.clickSubmitButton();
@@ -93,7 +94,7 @@ export class ReferralPage extends BasePage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.replyDocUploadEle,
-      'src/test/e2e/resources/test_file/test.txt'
+      resolveResourcePath('resources/test_file/test.txt')
     );
 
     await this.clickContinue();

@@ -1,5 +1,5 @@
-import { ReplacementAction } from '../../types/replacement-action';
-import { ccdApi } from '../../fixtures/common.fixture';
+import { ReplacementAction } from '../../types';
+import { ccdApi } from '../../fixtures';
 import { CaseTypeLocation, Events, PayloadPath } from '../../config';
 import { DateUtilComponent } from '../DateUtilComponent';
 import { users } from '../../config';

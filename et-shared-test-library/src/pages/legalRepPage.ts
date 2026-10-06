@@ -1,6 +1,7 @@
 import { BasePage } from './basePage';
 import { expect, Locator, Page } from '@playwright/test';
-import { Events } from '../config/case-data';
+import { Events } from '../config';
+import {resolveResourcePath} from "../data-utils/resourcePath";
 
 export class LegalRepPage extends BasePage {
   readonly changeDocuUploaded: Locator;
@@ -126,7 +127,7 @@ export class LegalRepPage extends BasePage {
     await this.loadingSpinner.waitFor({ state: 'hidden', timeout: 10000 });
     await this.page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await expect(this.page.locator('text=Upload your file of documents')).toBeVisible();
-    await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.uploadBundleDocument, `src/test/e2e/resources/test_file/welshTest.pdf`);
+    await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.uploadBundleDocument, resolveResourcePath('resources/test_file/welshTest.pdf'));
     await this.clickContinue(expUrl +'/submit');
     await this.page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await expect(this.changeDocuUploaded).toBeVisible({ timeout: 10000 });

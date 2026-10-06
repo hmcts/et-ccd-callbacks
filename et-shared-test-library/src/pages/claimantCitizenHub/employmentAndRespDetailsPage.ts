@@ -1,7 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { CitizenHubPage } from './CitizenHubPage';
-import { DateUtilComponent } from '../../data-utils/DateUtilComponent';
-import { CaseDetailsValues } from '../../config/case-data';
+import { DateUtilComponent } from '../../data-utils';
+import { CaseDetailsValues } from '../../config';
 
 const today = new Date();
 let inNoticePeriod: boolean = true;

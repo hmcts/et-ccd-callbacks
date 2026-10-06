@@ -1,5 +1,6 @@
 import { BasePage } from './basePage';
 import { expect, Locator, Page } from '@playwright/test';
+import {resolveResourcePath} from "../data-utils/resourcePath";
 
 export class UploadDocumentPage extends BasePage {
   private readonly addNewButtonBottom: Locator;
@@ -20,8 +21,8 @@ export class UploadDocumentPage extends BasePage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.page.locator('#documentCollection_1_uploadedDocument'),
-      'src/test/e2e/resources/test_file/welshTest.pdf',
-    )
+      resolveResourcePath('resources/test_file/welshTest.pdf'),
+    );
     await this.clickSubmitButton();
   }
 
@@ -43,7 +44,7 @@ export class UploadDocumentPage extends BasePage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.page.locator(`#documentCollection_${docNumber}_uploadedDocument`),
-      `src/test/e2e/resources/test_file/${fileName}`,
+      resolveResourcePath(`resources/test_file/${fileName}`),
     );
     await this.clickSubmitButton();
   }

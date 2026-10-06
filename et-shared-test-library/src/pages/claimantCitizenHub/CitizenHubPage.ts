@@ -1,6 +1,7 @@
 import { BasePage } from "../basePage";
 import { expect, Locator, Page } from '@playwright/test';
-import { config } from '../../config/config.dynamic';
+import { config } from '../../config';
+import {resolveResourcePath} from "../../data-utils/resourcePath";
 
 export class CitizenHubPage extends BasePage {
   private readonly caseOverviewPageTitle: Locator;
@@ -243,7 +244,7 @@ export class CitizenHubPage extends BasePage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.supportingMaterialFile,
-      `src/test/e2e/resources/test_file/welshTest.pdf`
+      resolveResourcePath(`resources/test_file/welshTest.pdf`)
     )
 
     await this.uploadFielButton.waitFor();
@@ -444,7 +445,7 @@ export class CitizenHubPage extends BasePage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.supportingMaterialFile,
-      `src/test/e2e/resources/test_file/welshTest.pdf`
+      resolveResourcePath(`resources/test_file/welshTest.pdf`)
     )
 
     await this.uploadFielButton.waitFor();

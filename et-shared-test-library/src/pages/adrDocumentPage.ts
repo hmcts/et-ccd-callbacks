@@ -1,5 +1,6 @@
 import { BasePage } from "./basePage";
 import { Locator } from '@playwright/test';
+import {resolveResourcePath} from "../data-utils/resourcePath";
 
 export class AdrDocumentPage extends BasePage {
     private readonly uploadInput: Locator;
@@ -15,7 +16,7 @@ export class AdrDocumentPage extends BasePage {
 
     async adrUploadDocument() {
         await this.addNewButtonClick();
-        await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.uploadInput, 'src/test/e2e/resources/test_file/welshTest.pdf')
+        await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.uploadInput, resolveResourcePath('resources/test_file/welshTest.pdf'))
         await this.shortDescriptionInput.fill('description');
         await this.clickSubmitButton();
     }

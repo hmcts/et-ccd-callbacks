@@ -1,6 +1,6 @@
 import { BasePage } from "../basePage";
 import { expect, Locator, Page } from '@playwright/test';
-import { CaseDetailsValues } from '../../config/case-data';
+import { CaseDetailsValues } from '../../config';
 
 export class RespondentRepPage extends BasePage {
   private readonly nonRegisteredLegalOrg: Locator;

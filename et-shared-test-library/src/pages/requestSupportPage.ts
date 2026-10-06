@@ -5,7 +5,6 @@ export class RequestSupportPage extends BasePage {
   private readonly partySupportFlag: Locator;
   private readonly legalRepSupportFlag: Locator;
 
-
   constructor(page: Page) {
     super(page);
     this.partySupportFlag = page.locator('#flag-location-0');

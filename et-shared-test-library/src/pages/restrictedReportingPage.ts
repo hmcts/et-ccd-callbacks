@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from "@playwright/test";
 import { BasePage } from "./basePage";
-import { DateUtilComponent } from "../data-utils/DateUtilComponent";
+import { DateUtilComponent } from "../data-utils";
 
 const today = new Date();
 const restrictedMonth = today.getMonth() + 1;

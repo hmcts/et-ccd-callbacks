@@ -1,5 +1,6 @@
 import { BasePage } from '../basePage';
 import { expect, Locator, Page } from '@playwright/test';
+import {resolveResourcePath} from "../../data-utils/resourcePath";
 
 export class ContactTheTribunalPage extends BasePage {
 
@@ -95,7 +96,7 @@ export class ContactTheTribunalPage extends BasePage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.applicationFileUploadInput,
-      'src/test/e2e/resources/test_file/test.txt'
+      resolveResourcePath('resources/test_file/test.txt')
     );
   }
 

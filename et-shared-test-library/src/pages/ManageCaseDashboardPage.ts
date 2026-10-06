@@ -1,7 +1,7 @@
 import { BasePage } from './basePage';
 import { expect, Locator, Page } from '@playwright/test';
-import { CaseTypeLocation } from '../config/case-data';
-import { config } from '../config/config.dynamic';
+import { CaseTypeLocation } from '../config';
+import { config } from '../config';
 
 export class ManageCaseDashboardPage extends BasePage {
   private readonly url: string;

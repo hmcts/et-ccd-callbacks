@@ -1,8 +1,8 @@
 import { getUserAuthToken } from './TokenHelperApi';
 import { axiosRequest } from './ApiHelper';
-import { CaseDetailsValues } from '../../config/case-data';
+import { CaseDetailsValues } from '../../config';
 import { v4 as uuidv4 } from "uuid";
-import { staticUsers } from '../../config/config.static';
+import { staticUsers } from '../../config';
 
 const env = process.env.RUNNING_ENV && process.env.RUNNING_ENV.startsWith('pr-') ? 'aat' : (process.env.RUNNING_ENV || 'aat');
 const idamTestingSupportUrl = `https://idam-testing-support-api.${env}.platform.hmcts.net`;

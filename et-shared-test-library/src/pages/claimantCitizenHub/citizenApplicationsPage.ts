@@ -1,5 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { BasePage } from '../basePage';
+import {resolveResourcePath} from "../../data-utils/resourcePath";
 
 export class CitizenApplicationsPage extends BasePage{
 
@@ -67,7 +68,7 @@ export class CitizenApplicationsPage extends BasePage{
       this.page,
       this.supportingMaterialFile,
       await this.commonActionsHelper.createAliasPDFPayload(
-      `src/test/e2e/resources/test_file/welshTest.pdf`, 'citizenResponse.pdf')
+        resolveResourcePath(`resources/test_file/welshTest.pdf`), 'citizenResponse.pdf')
     )
     await this.uploadFileButton.waitFor();
     await this.uploadFileButton.click();

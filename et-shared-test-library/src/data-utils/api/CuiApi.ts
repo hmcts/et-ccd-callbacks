@@ -8,10 +8,10 @@ import engCase from '../../../resources/payload/citizen/et-england-case-data.jso
 import scotCase from '../../../resources/payload/citizen/et-scotland-case-data.json';
 import eng2RespondentCase from '../../../resources/payload/citizen/et-england-case-data-2-repondent.json';
 import et3 from '../../../resources/payload/citizen/et3.json';
-import { CaseTypeLocation } from '../../config/case-data';
+import { CaseTypeLocation } from '../../config';
 import { getUserAuthToken, getUserId } from './TokenHelperApi';
 import { set, unset } from 'lodash';
-import { staticConfig } from '../../config/config.static';
+import { staticConfig } from '../../config';
 
 const syaApiBaseUrl = staticConfig.EtCosPreviewEtSyaApiUrl;
 const payloadMap: Record<CaseTypeLocation, any> = {

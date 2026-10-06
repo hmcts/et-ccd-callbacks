@@ -1,6 +1,7 @@
 import { BasePage } from './basePage';
 import { DateUtilComponent } from '../data-utils/DateUtilComponent';
 import { Locator, Page } from '@playwright/test';
+import {resolveResourcePath} from "../data-utils/resourcePath";
 
 export class UploadHearingBundlePage extends BasePage {
   private readonly futureHearing: Locator;
@@ -28,7 +29,7 @@ export class UploadHearingBundlePage extends BasePage {
     await this.futureHearing.check();
     await this.hearingCombo.selectOption({ value: '1: 1' });
     await this.addNewButtonClick();
-    await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.uploadDocInput, `src/test/e2e/resources/test_file/welshTest.pdf`);
+    await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.uploadDocInput, resolveResourcePath('resources/test_file/welshTest.pdf'));
     await this.whatHearingDocument.getByRole('radio', { name: 'Hearing Bundle' }).check();
     await this.claimantRadio.check();
     await this.dateSubmittedDay.fill(DateUtilComponent.getCurrentDateParts().dd);

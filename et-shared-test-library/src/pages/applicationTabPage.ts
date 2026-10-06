@@ -1,8 +1,8 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { BasePage } from './basePage';
-import { CommonActionsHelper } from './helpers/CommonActionsHelper';
 import { AxeUtils } from '@hmcts/playwright-common';
 import { CheckYourAnswersPage } from './helpers/CheckYourAnswersPage';
+import {resolveResourcePath} from "../data-utils/resourcePath";
 
 export class ApplicationTabPage extends BasePage {
 
@@ -103,7 +103,7 @@ export class ApplicationTabPage extends BasePage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.fileUpload,
-      'src/test/e2e/resources/test_file/welshTest.pdf',
+      resolveResourcePath('resources/test_file/welshTest.pdf'),
     );
   }
 
@@ -251,7 +251,7 @@ export class ApplicationTabPage extends BasePage {
 
   }
 
-  async uploadSupportingMaterial(filePaths: string[] = ['src/test/e2e/resources/test_file/welshTest.pdf']) {
+  async uploadSupportingMaterial(filePaths: string[] = ['resources/test_file/welshTest.pdf']) {
     for (let i=0; i<filePaths.length; i++) {
       await this.addNewButtonClick();
       await this.page.waitForLoadState('load');
@@ -259,7 +259,7 @@ export class ApplicationTabPage extends BasePage {
       await this.commonActionsHelper.uploadWithRateLimitRetry(
         this.page,
         uploadLocator,
-        filePaths[i],
+        resolveResourcePath(filePaths[i]),
       );
       await this.page.waitForLoadState('load');
       await this.page.locator(`#tseAdminResponseRequiredNoDoc_${i}_shortDescription, #tseResponseSupportingMaterial_${i}_shortDescription, #tseAdmReplyAddDocument_${i}_shortDescription`).fill(`Supporting material ${i+1}`);

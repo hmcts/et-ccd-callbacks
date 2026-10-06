@@ -1,6 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage';
 import { BaseEventPage } from './BaseEventPage';
+import {resolveResourcePath} from "../../data-utils/resourcePath";
 
 export class UploadDocumentsForHearingPage extends BaseEventPage {
   private readonly prepDocYesOption: Locator;
@@ -122,7 +123,7 @@ export class UploadDocumentsForHearingPage extends BaseEventPage {
       this.page,
       this.uploadDocumentInput,
       await this.commonActionsHelper.createAliasPDFPayload(
-        'src/test/e2e/resources/test_file/welshTest.pdf',
+        resolveResourcePath('resources/test_file/welshTest.pdf'),
         'welshTest.pdf'
       )
     );

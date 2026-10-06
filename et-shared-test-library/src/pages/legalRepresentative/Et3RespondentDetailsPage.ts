@@ -1,7 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { CaseDetailsValues } from '../../config/case-data';
-import { CommonActionsHelper } from '../helpers/CommonActionsHelper';
-import { TableRowItem } from '../../types/table';
+import { CaseDetailsValues } from '../../config';
+import { TableRowItem } from '../../types';
 import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage';
 import { Et3DetailsPage } from './Et3DetailsPage';
 

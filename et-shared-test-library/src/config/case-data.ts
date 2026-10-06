@@ -16,20 +16,20 @@ export const CaseDetailsValues = {
 
 export const PayloadPath = {
   CaseWorker: {
-    england: 'src/test/e2e/resources/payload/caseworker/et-england-case-data-caseworker.json',
-    scotland: 'src/test/e2e/resources/payload/caseworker/et-scotland-case-data-caseworker.json',
+    england: 'resources/payload/caseworker/et-england-case-data-caseworker.json',
+    scotland: 'resources/payload/caseworker/et-scotland-case-data-caseworker.json',
   },
   LegalRep: {
-    createEnglandWalesCase: 'src/test/e2e/resources/payload/legalRep/et-england-create-case-data.json',
-    et1section1: 'src/test/e2e/resources/payload/legalRep/et1-claimant-details.json',
-    et1Section2: 'src/test/e2e/resources/payload/legalRep/et1-employment-respondent-details.json',
-    et1Section3: 'src/test/e2e/resources/payload/legalRep/et1-claim-details.json',
-    et1SubmitClaim: 'src/test/e2e/resources/payload/legalRep/et1-submit-claim-details.json',
+    createEnglandWalesCase: 'resources/payload/legalRep/et-england-create-case-data.json',
+    et1section1: 'resources/payload/legalRep/et1-claimant-details.json',
+    et1Section2: 'resources/payload/legalRep/et1-employment-respondent-details.json',
+    et1Section3: 'resources/payload/legalRep/et1-claim-details.json',
+    et1SubmitClaim: 'resources/payload/legalRep/et1-submit-claim-details.json',
   },
   events: {
-    et1vetting: 'src/test/e2e/resources/payload/events/et1Vetting.json',
-    acceptCase: 'src/test/e2e/resources/payload/events/acceptCase.json',
-    listHearingAmersham: 'src/test/e2e/resources/payload/events/listHearingEnglandAmersham.json',
+    et1vetting: 'resources/payload/events/et1Vetting.json',
+    acceptCase: 'resources/payload/events/acceptCase.json',
+    listHearingAmersham: 'resources/payload/events/listHearingEnglandAmersham.json',
   },
 };
 

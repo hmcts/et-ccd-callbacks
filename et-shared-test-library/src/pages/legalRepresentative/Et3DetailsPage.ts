@@ -1,6 +1,6 @@
 import { BasePage } from '../basePage';
 import { expect, Locator, Page } from '@playwright/test';
-import { CaseDetailsValues } from '../../config/case-data';
+import { CaseDetailsValues } from '../../config';
 import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage';
 
 export class Et3DetailsPage extends BasePage {

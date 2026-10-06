@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { LoginPage } from '../loginPage';
-import { config, UserCredentials } from '../../config/config.dynamic';
+import { config, UserCredentials } from '../../config';
 
 export class CitizenHubLoginPage extends LoginPage {
   private readonly syaLandingPageTitle: Locator;

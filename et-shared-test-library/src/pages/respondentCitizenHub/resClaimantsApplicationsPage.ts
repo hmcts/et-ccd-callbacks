@@ -1,5 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { BasePage } from '../basePage';
+import {resolveResourcePath} from "../../data-utils/resourcePath";
 
 export class ResClaimantsApplicationsPage extends BasePage{
 
@@ -73,7 +74,7 @@ export class ResClaimantsApplicationsPage extends BasePage{
     await this.supportingMaterialYes.click();
 
     await this.clickContinue();
-    await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.supportingFileUpload, 'src/test/e2e/resources/test_file/test.txt')
+    await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.supportingFileUpload, resolveResourcePath('resources/test_file/test.txt'))
     await this.page.getByRole('button', { name: 'Upload file' }).click();
     await this.clickContinue();
     if (copyToCorrespondenceFlag) {

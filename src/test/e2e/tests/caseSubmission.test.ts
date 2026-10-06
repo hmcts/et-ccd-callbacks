@@ -1,5 +1,5 @@
 import { test } from '../fixtures/et.test.fixture.ts';
-import userDetailsData from '../resources/payload/user-details.json';
+import userDetailsData from '@et-shared-test-library/core/resources/payload/user-details.json';
 import {
   CaseTypeLocation, config,
   createCaseViaCitizenUI,

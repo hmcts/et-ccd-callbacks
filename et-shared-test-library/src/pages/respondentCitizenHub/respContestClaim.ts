@@ -1,5 +1,6 @@
 import { BasePage } from '../basePage';
 import { Page, Locator, expect } from '@playwright/test';
+import {resolveResourcePath} from "../../data-utils/resourcePath";
 
 export class RespContestClaim extends BasePage {
   private readonly contestClaimReason: Locator;
@@ -38,7 +39,7 @@ export class RespContestClaim extends BasePage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.claimSummaryFile,
-      'src/test/e2e/resources/test_file/test.txt'
+      resolveResourcePath('resources/test_file/test.txt')
     );
     await this.saveAndContinueButton();
     await this.page.getByText('Yes, I’ve completed this').click();

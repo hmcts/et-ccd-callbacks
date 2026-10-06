@@ -10,10 +10,10 @@ import { LoginPage } from '../loginPage';
 import { Et1VettingPages } from '../et1VettingPages';
 import { Et1CaseServingPage } from '../et1CaseServingPage';
 import { ManageCaseDashboardPage } from '../ManageCaseDashboardPage';
-import { CaseDetailsValues, CaseTypeLocation, Events } from '../../config/case-data';
+import { CaseDetailsValues, CaseTypeLocation, Events } from '../../config';
 import { CaseDetailsPage } from '../caseDetailsPage';
-import {DateUtilComponent} from '../../data-utils/DateUtilComponent';
-import { config, UserCredentials } from '../../config/config.dynamic';
+import {DateUtilComponent} from '../../data-utils';
+import { config, UserCredentials } from '../../config';
 import { SingleOrMultipleClaimPage } from '../claimantCitizenHub/singleOrMultipleClaimPage';
 
 export async function createCaseViaCitizenUI(

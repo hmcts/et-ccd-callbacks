@@ -1,8 +1,7 @@
 import { BasePage } from '../basePage';
 import { expect, Locator, Page } from '@playwright/test';
 import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage';
-import { Events } from '../../config/case-data';
-import { AddressDetails } from '../../types/address';
+import { AddressDetails } from '../../types';
 
 export class AmendContactDetailsLrPage extends BasePage {
 

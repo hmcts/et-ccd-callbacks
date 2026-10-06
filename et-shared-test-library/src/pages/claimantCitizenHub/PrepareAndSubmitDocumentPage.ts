@@ -1,5 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { ContactTheTribunalPage } from './ContactTheTribunalPage';
+import {resolveResourcePath} from "../../data-utils/resourcePath";
 export class PrepareAndSubmitDocumentPage extends ContactTheTribunalPage {
 
   private readonly prepareAndSubmitDocumentPageHeading: Locator;
@@ -114,13 +115,13 @@ export class PrepareAndSubmitDocumentPage extends ContactTheTribunalPage {
     await expect(this.uploadYourFileOfDocumentsPage).toBeVisible();
   }
 
-  async uploadYourFileOfDocuments(files: string[] = ['src/test/e2e/resources/test_file/welshTest.pdf']) {
+  async uploadYourFileOfDocuments(files: string[] = ['resources/test_file/welshTest.pdf']) {
       for (let file of files) {
         await expect(this.chooseFile).toBeVisible();
         await this.commonActionsHelper.uploadWithRateLimitRetry(
           this.page,
           this.chooseFile,
-          file
+          resolveResourcePath(file)
         );
         await this.page.waitForLoadState('load');
         await this.uploadFile.click();

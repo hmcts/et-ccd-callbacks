@@ -1,7 +1,6 @@
 import { BasePage } from "./basePage";
 import { expect, Locator, Page } from "@playwright/test";
 
-
 export class CaseTransferPage extends BasePage {
   private readonly caseTransferReason: Locator;
 

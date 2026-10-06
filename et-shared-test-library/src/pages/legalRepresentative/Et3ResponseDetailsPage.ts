@@ -1,7 +1,7 @@
 import { Et3DetailsPage } from './Et3DetailsPage';
 import { expect, Locator, Page } from '@playwright/test';
-import { CommonActionsHelper } from '../helpers/CommonActionsHelper';
 import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage';
+import {resolveResourcePath} from "../../data-utils/resourcePath";
 
 export class Et3ResponseDetailsPage extends Et3DetailsPage {
   private readonly et3ResponseDetailsPageTitle: Locator;
@@ -75,7 +75,7 @@ export class Et3ResponseDetailsPage extends Et3DetailsPage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.eccFileUploadInput,
-      'src/test/e2e/resources/test_file/welshTest.pdf',
+      resolveResourcePath('resources/test_file/welshTest.pdf'),
     );
   }
 

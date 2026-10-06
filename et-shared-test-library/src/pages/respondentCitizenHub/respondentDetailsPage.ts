@@ -1,8 +1,8 @@
 import { BasePage } from "../basePage";
 import respPageData from '../../../resources/payload/respondent-page-content.json';
-import {DateUtilComponent} from '../../data-utils/DateUtilComponent';
+import {DateUtilComponent} from '../../data-utils';
 import { expect, Locator, Page } from '@playwright/test';
-import { CommonActionsHelper } from '../helpers/CommonActionsHelper';
+import {resolveResourcePath} from "../../data-utils/resourcePath";
 
 export class RespondentDetailsPage extends BasePage {
   private readonly respondentReceivedDateField: Locator;
@@ -41,14 +41,14 @@ export class RespondentDetailsPage extends BasePage {
     await this.commonActionsHelper.enterUkAddressWithPostcode(postCodeLookup, selectAddress);
   }
 
-  async uploadET3Form(position: number =1, file: string = 'src/test/e2e/resources/test_file/welshTest.pdf' ){
+  async uploadET3Form(position: number =1, file: string = 'resources/test_file/welshTest.pdf' ){
     const fileUpload = this.page.locator(`#respondentCollection_${position-1}_et3Form`);
     await expect(fileUpload).toBeVisible();
 
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       fileUpload,
-      await this.commonActionsHelper.createAliasPDFPayload(file, 'ET3Form.pdf'));
+      await this.commonActionsHelper.createAliasPDFPayload(resolveResourcePath(file), 'ET3Form.pdf'));
   }
 
   async processRespondentDetails() {

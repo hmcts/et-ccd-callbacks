@@ -3,7 +3,8 @@ import { BasePage } from "./basePage";
 import path from "path";
 import icPageData from '../../resources/payload/ic-page-content.json';
 import respPageData from '../../resources/payload/respondent-page-content.json';
-import { Events } from '../config/case-data';
+import { Events } from '../config';
+import {resolveResourcePath} from "../data-utils/resourcePath";
 
 export class ICUploadDocPage extends BasePage {
     private readonly respNameEle: Locator;
@@ -45,7 +46,7 @@ export class ICUploadDocPage extends BasePage {
 
         // Click and upload a document
         await this.addNewBtn.click();
-        await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.fileUploadEle,'src/test/e2e/resources/test_file/test-doc.pdf' )
+        await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.fileUploadEle, resolveResourcePath('resources/test_file/test-doc.pdf'));
         await this.delay(2000);
         await this.clickContinue(expUrl+ '/submit');
 

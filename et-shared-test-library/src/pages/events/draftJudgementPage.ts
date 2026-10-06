@@ -1,5 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { BasePage } from "../basePage";
+import {resolveResourcePath} from "../../data-utils/resourcePath";
 
 export class DraftJudgementPage extends BasePage {
 
@@ -48,7 +49,7 @@ export class DraftJudgementPage extends BasePage {
         await this.assertDraftJudgementPageIsDisplayed();
         await this.selectIsThisAJudgement('Yes');
         await this.addNewButtonClick();
-        await this.uploadDocument(0,'src/test/e2e/resources/test_file/test.txt');
+        await this.uploadDocument(0,resolveResourcePath('resources/test_file/test.txt'));
         await this.fillAnyFurtherDirections('Test Draft Judgement');
         await this.selectIsThisUrgent('Yes');
         await this.clickContinue();

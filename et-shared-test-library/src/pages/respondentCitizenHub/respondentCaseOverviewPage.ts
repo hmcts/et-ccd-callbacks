@@ -1,5 +1,6 @@
 import { expect, Page, Locator } from '@playwright/test';
 import { BasePage } from "../basePage";
+import {resolveResourcePath} from "../../data-utils/resourcePath";
 
 export class RespondentCaseOverviewPage extends BasePage {
   private readonly et1FormLink: Locator;
@@ -54,7 +55,7 @@ export class RespondentCaseOverviewPage extends BasePage {
         throw new Error('... Incorrect input, select correct application type');
     }
     await this.page.locator('#contactApplicationText').isVisible();
-    await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.contactApplicationFileUpload, 'src/test/e2e/resources/test_file/test.txt')
+    await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.contactApplicationFileUpload, resolveResourcePath('resources/test_file/test.txt'))
     await this.page.getByRole('button', { name: 'Upload file' }).click();
     await expect(this.page.locator('#contactApplicationFile-hint')).toContainText('You have previously uploaded: test.txt');
     await this.page.locator('#contactApplicationText').fill('this is respondent application');
@@ -93,7 +94,7 @@ export class RespondentCaseOverviewPage extends BasePage {
         throw new Error('... Incorrect input, select correct application type');
     }
     await this.page.locator('#contactApplicationText').isVisible();
-    await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.contactApplicationFileUpload, 'src/test/e2e/resources/test_file/test.txt')
+    await this.commonActionsHelper.uploadWithRateLimitRetry(this.page, this.contactApplicationFileUpload, resolveResourcePath('resources/test_file/test.txt'))
     await this.page.getByRole('button', { name: 'Upload file' }).click();
     await expect(this.page.locator('#contactApplicationFile-hint')).toContainText('You have previously uploaded: test.txt');
     await this.page.locator('#contactApplicationText').fill('this is unrepresented respondent application');
@@ -195,7 +196,7 @@ export class RespondentCaseOverviewPage extends BasePage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.supportingFileUpload,
-      `src/test/e2e/resources/test_file/welshTest.pdf`
+      resolveResourcePath('resources/test_file/welshTest.pdf')
     )
     await this.page.getByRole('button', { name: 'Upload file' }).click();
     await this.page.waitForLoadState('load');

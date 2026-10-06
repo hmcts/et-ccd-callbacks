@@ -1,7 +1,6 @@
 import { BasePage } from "./basePage";
 import { expect } from "@playwright/test";
 
-
 export class TaskPage extends BasePage {
 
   async validateTaskAssignToUser(){

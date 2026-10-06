@@ -20,6 +20,8 @@
     "useDefineForClassFields": false,
     "allowJs": true,
     "noEmit": false,
+    "sourceMap": true,
+    "inlineSources": true,
   },
   "include":["src/**/*"],
   "exclude": ["node_modules", "dist"]

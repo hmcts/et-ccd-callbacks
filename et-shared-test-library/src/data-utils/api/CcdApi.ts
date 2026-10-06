@@ -7,6 +7,7 @@ import {getServiceToken, getUserId, getUserAuthToken} from './TokenHelperApi';
 import {AxiosResponse} from 'axios';
 import { CaseTypeLocation } from '../../config/case-data';
 import { staticConfig } from '../../config/config.static';
+import {resolveResourcePath} from "../resourcePath";
 
 const ccdApiUrl = staticConfig.ccdDataStoreApi;
 
@@ -94,7 +95,7 @@ export class CcdApi {
 
     const eventToken = await this.getStartEventToken(ccdStartCasePath, authToken, serviceToken);
 
-    const content = readFileSync(path.resolve(dataLocation), 'utf-8');
+    const content = readFileSync(resolveResourcePath(dataLocation), 'utf-8');
     const data = JSON.parse(content);
 
     this.makeModifications(dataModifications, data);
@@ -153,7 +154,7 @@ export class CcdApi {
 
     const eventToken = await this.getStartEventToken(ccdStartEventPath, authToken, serviceToken);
 
-    const content = dataLocation ? readFileSync(path.resolve(dataLocation), 'utf-8') : '{}';
+    const content = dataLocation ? readFileSync(resolveResourcePath(dataLocation), 'utf-8') : '{}';
     const rawData = JSON.parse(content);
 
     // Apply the key-based mutations

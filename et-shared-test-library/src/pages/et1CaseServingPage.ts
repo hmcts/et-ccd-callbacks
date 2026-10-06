@@ -1,6 +1,8 @@
 import { BasePage } from "./basePage";
 import { expect, Locator, Page } from "@playwright/test";
 import { AxeUtils } from '@hmcts/playwright-common';
+import {resolveResourcePath} from "../data-utils/resourcePath";
+
 const today = new Date();
 
 export class Et1CaseServingPage extends BasePage {
@@ -43,7 +45,7 @@ export class Et1CaseServingPage extends BasePage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.servingDocUpload,
-      `src/test/e2e/resources/test_file/welshTest.pdf`
+      resolveResourcePath(`resources/test_file/welshTest.pdf`)
     );
     await this.page.waitForTimeout(3000);
     await this.servingDocShortDesc.fill('ET1 serving');
@@ -56,7 +58,7 @@ export class Et1CaseServingPage extends BasePage {
     await this.commonActionsHelper.uploadWithRateLimitRetry(
       this.page,
       this.servingDocUpload,
-      `src/test/e2e/resources/test_file/welshTest.pdf`
+      resolveResourcePath(`resources/test_file/welshTest.pdf`)
     );
     await this.page.waitForTimeout(3000);
     await this.servingDocShortDesc.fill('ET1 serving');

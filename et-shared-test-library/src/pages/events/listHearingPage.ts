@@ -1,5 +1,4 @@
-import { BasePage } from '../basePage';
-import { DateUtilComponent } from '../../data-utils/DateUtilComponent';
+import { DateUtilComponent } from '../../data-utils';
 import { expect } from '@playwright/test';
 import { BaseEventPage } from './BaseEventPage';
 

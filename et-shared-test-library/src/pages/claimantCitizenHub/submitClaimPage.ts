@@ -1,4 +1,3 @@
-import { BasePage } from "../basePage";
 import { expect, Locator, Page } from '@playwright/test';
 import { CitizenHubPage } from './CitizenHubPage';
 export class SubmitClaimPage extends CitizenHubPage{

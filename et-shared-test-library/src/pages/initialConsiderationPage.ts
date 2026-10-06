@@ -1,6 +1,6 @@
 import { BasePage } from './basePage';
 import { expect, Locator, Page } from "@playwright/test";
-import { DateUtilComponent } from '../data-utils/DateUtilComponent';
+import { DateUtilComponent } from '../data-utils';
 import icPageData from '../../resources/payload/ic-page-content.json';
 export class InitialConsiderationPage extends BasePage {
   private readonly hearingDetails: Locator;

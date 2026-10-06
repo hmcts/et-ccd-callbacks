@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { BaseEventPage } from './BaseEventPage';
-import { users } from '../../config/config.dynamic';
+import { users } from '../../config';
 
 export class ClaimantRepresentativePage extends BaseEventPage {
 

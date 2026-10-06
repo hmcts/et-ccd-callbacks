@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceExceptio
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveRepNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveRepresentationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CallbackObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,11 +82,14 @@ public class NocRemoveRepresentationController {
         try {
             UserDetails userDetails = userService.getValidatedUserDetails(userToken, caseDetails.getCaseId());
             nocRemoveRepresentationService.setNocRemoveOption(userDetails, caseDetails);
+            CaseDetails caseDetailsBeforeRevoke =
+                    CallbackObjectUtils.cloneObject(ccdRequest.getCaseDetails(), CaseDetails.class);
             nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails);
-            nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails, caseDetails);
+            nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails,
+                    caseDetailsBeforeRevoke);
             caseDetails.getCaseData().setNocRemoveOption(null);
-        } catch (GenericServiceException gse) {
-            errors.add(gse.getMessage());
+        } catch (GenericServiceException | JsonProcessingException e) {
+            errors.add(e.getMessage());
         }
         return getCallbackRespEntity(errors, caseDetails);
     }

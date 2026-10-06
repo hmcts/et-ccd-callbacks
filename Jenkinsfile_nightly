@@ -102,9 +102,17 @@ withNightlyPipeline(type, product, component) {
             ls -la et-shared-test-library/dist/index.js || true
             '''
             yarnBuilder.yarn('build:shared')
+            sh 'ls -la et-shared-test-library/dist/index.js'
         }
          stage('Accessibility tests') {
             try {
+                sh '''
+  pwd
+  ls -la
+  ls -la .yarn || true
+  ls -la .yarn/install-state.gz || true
+  ls -la et-shared-test-library/dist/index.js || true
+'''
                 yarnBuilder.yarn('test:accessibility')
             } catch (Error) {
                 unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())

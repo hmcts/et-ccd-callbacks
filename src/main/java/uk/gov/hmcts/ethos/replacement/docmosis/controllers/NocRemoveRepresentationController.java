@@ -85,8 +85,7 @@ public class NocRemoveRepresentationController {
             CaseDetails caseDetailsBeforeRevoke =
                     CallbackObjectUtils.cloneObject(ccdRequest.getCaseDetails(), CaseDetails.class);
             nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails);
-            nocRemoveClaimantRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails,
-                    caseDetailsBeforeRevoke);
+            nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails, caseDetailsBeforeRevoke);
             caseDetails.getCaseData().setNocRemoveOption(null);
         } catch (GenericServiceException | JsonProcessingException e) {
             errors.add(e.getMessage());

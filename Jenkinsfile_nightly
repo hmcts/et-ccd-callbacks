@@ -95,6 +95,9 @@ withNightlyPipeline(type, product, component) {
         stage('Prepare JS deps') {
             sh '''
   set -eu
+  corepack enable
+  corepack prepare yarn@4.18.0 --activate
+  yarn --version
   yarn --cwd et-shared-test-library install
   yarn --cwd et-shared-test-library build
   ls -la et-shared-test-library/dist/index.js

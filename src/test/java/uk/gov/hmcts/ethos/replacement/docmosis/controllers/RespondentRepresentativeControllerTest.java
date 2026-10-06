@@ -674,9 +674,10 @@ class RespondentRepresentativeControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, notNullValue()));
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     @SneakyThrows
-    void amendRespondentRepresentativeSubmitted() {
+    void amendRespondentRepresentativeSubmitted(boolean caseFlagsV2Enabled) {
         CaseData caseData = new CaseData();
         RespondentSumTypeItem respondent = new RespondentSumTypeItem();
         respondent.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_1).build());
@@ -690,6 +691,8 @@ class RespondentRepresentativeControllerTest {
                 RepresentedTypeR.builder().dynamicRespRepName(dynamicFixedListType).build()).build()));
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
+        caseDetails.setCaseTypeId("ET_Scotland");
+        when(featureToggleService.isCaseFlagsV2Enabled("ET_Scotland")).thenReturn(caseFlagsV2Enabled);
         CallbackRequest callbackRequest = CallbackRequest.builder().caseDetails(caseDetails)
                 .caseDetailsBefore(caseDetails).build();
         callbackRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
@@ -699,7 +702,8 @@ class RespondentRepresentativeControllerTest {
                         .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-
+        verify(nocRespondentRepresentativeService, times(caseFlagsV2Enabled ? 1 : 0))
+                .realignRespondentRepresentativeAccess(any(CallbackRequest.class));
     }
 
     @Test

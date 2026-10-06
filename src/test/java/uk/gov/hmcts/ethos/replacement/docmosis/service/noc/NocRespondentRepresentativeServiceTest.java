@@ -956,6 +956,42 @@ class NocRespondentRepresentativeServiceTest {
     }
 
     @Test
+    void realignRespondentRepresentativeAccessRotatesThreeRepresentatives() {
+        CaseData current = new CaseData();
+        current.setRepCollection(List.of(
+                representativeForRespondent("rep-1", RESPONDENT_ID_ONE, ROLE_SOLICITORA,
+                        REPRESENTATIVE_ID_ONE, ORGANISATION_ID_ONE),
+                representativeForRespondent("rep-2", RESPONDENT_ID_THREE, ROLE_SOLICITORC,
+                        REPRESENTATIVE_ID_TWO, ORGANISATION_ID_TWO),
+                representativeForRespondent("rep-3", RESPONDENT_ID_TWO, ROLE_SOLICITORB,
+                        REPRESENTATIVE_ID_THREE, ORGANISATION_ID_THREE)));
+        CaseDetails details = new CaseDetails();
+        details.setCaseId(CASE_ID_1);
+        details.setCaseData(current);
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1))
+                .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(List.of(
+                        assignment(REPRESENTATIVE_ID_ONE, ROLE_SOLICITORB, ORGANISATION_ID_ONE),
+                        assignment(REPRESENTATIVE_ID_TWO, ROLE_SOLICITORA, ORGANISATION_ID_TWO),
+                        assignment(REPRESENTATIVE_ID_THREE, ROLE_SOLICITORC, ORGANISATION_ID_THREE))).build());
+        when(nocService.grantCaseAccess(anyString(), eq(CASE_ID_1), anyString())).thenReturn(true);
+
+        nocRespondentRepresentativeService.realignRespondentRepresentativeAccess(
+                CallbackRequest.builder().caseDetails(details).build());
+
+        verify(nocService).grantCaseAccess(REPRESENTATIVE_ID_ONE, CASE_ID_1, ROLE_SOLICITORA);
+        verify(nocService).grantCaseAccess(REPRESENTATIVE_ID_TWO, CASE_ID_1, ROLE_SOLICITORC);
+        verify(nocService).grantCaseAccess(REPRESENTATIVE_ID_THREE, CASE_ID_1, ROLE_SOLICITORB);
+        ArgumentCaptor<CaseUserAssignmentData> revoked = ArgumentCaptor.forClass(CaseUserAssignmentData.class);
+        verify(nocCcdService).revokeCaseAssignments(eq(ADMIN_USER_TOKEN), revoked.capture());
+        assertThat(revoked.getValue().getCaseUserAssignments())
+                .extracting(assignment -> assignment.getUserId() + ":" + assignment.getCaseRole())
+                .containsExactlyInAnyOrder(REPRESENTATIVE_ID_ONE + ":" + ROLE_SOLICITORB,
+                        REPRESENTATIVE_ID_TWO + ":" + ROLE_SOLICITORA,
+                        REPRESENTATIVE_ID_THREE + ":" + ROLE_SOLICITORC);
+    }
+
+    @Test
     void realignRespondentRepresentativeAccessMovesAssignmentsWithRespondents() {
         CaseData previousCaseData = new CaseData();
         previousCaseData.setRepCollection(List.of(

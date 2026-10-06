@@ -92,9 +92,12 @@ withNightlyPipeline(type, product, component) {
     }
 
     afterAlways('DependencyCheckNightly') {
+        stage('Prepare JS deps') {
+            yarnBuilder.yarn('install')
+            yarnBuilder.yarn('build:shared')
+        }
          stage('Accessibility tests') {
             try {
-                yarnBuilder.yarn('install')
                 yarnBuilder.yarn('test:accessibility')
             } catch (Error) {
                 unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())

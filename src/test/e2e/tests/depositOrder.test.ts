@@ -1,7 +1,7 @@
 import { test } from '../fixtures/et.test.fixture.ts';
 import {CaseTypeLocation, CaseworkerCaseFactory, Events, users} from "@et-shared-test-library/core";
 
-const depositOrderData = require('../resources/payload/deposit-order-content.json');
+const depositOrderData = require('@et-shared-test-library/core/resources/payload/deposit-order-content.json');
 let formattedAmount: string;
 let caseNumber: string;
 let caseId: string;

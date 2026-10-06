@@ -82,7 +82,6 @@ __metadata:
     eslint: "npm:10.3.0"
     fs-extra: "npm:^11.3.3"
     lodash: "npm:^4.18.1"
-    playwright-core: "npm:^1.61.0"
     proper-lockfile: "npm:^4.1.2"
     totp-generator: "npm:2.0.0"
     typescript: "npm:^5.9.2"
@@ -92,6 +91,7 @@ __metadata:
   peerDependencies:
     "@hmcts/playwright-common": ^1.1.5
     "@playwright/test": ^1.61.0
+    playwright-core: ^1.61.0
   languageName: unknown
   linkType: soft
 
@@ -931,15 +931,6 @@ __metadata:
   version: 3.1.1
   resolution: "path-key@npm:3.1.1"
   checksum: 10/55cd7a9dd4b343412a8386a743f9c746ef196e57c823d90ca3ab917f90ab9f13dd0ded27252ba49dbdfcab2b091d998bc446f6220cd3cea65db407502a740020
-  languageName: node
-  linkType: hard
-
-"playwright-core@npm:^1.61.0":
-  version: 1.63.0
-  resolution: "playwright-core@npm:1.63.0"
-  bin:
-    playwright-core: cli.js
-  checksum: 10/d0f7c70786f5e08aa7553a77ba28c07427086e323ae8c4126a647debd8181966dc11d6f8fe1462f2a776ad60c95451b08f01fbee17b11e69a5bd9a2070fe75a6
   languageName: node
   linkType: hard
 

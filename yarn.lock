@@ -137,7 +137,6 @@ __metadata:
     dotenv: "npm:^17.2.3"
     fs-extra: "npm:^11.3.3"
     lodash: "npm:^4.18.1"
-    playwright-core: "npm:^1.61.0"
     proper-lockfile: "npm:^4.1.2"
     totp-generator: "npm:2.0.0"
     typescript-logging: "npm:^2.2.0"
@@ -1487,6 +1486,7 @@ __metadata:
     "@et-shared-test-library/core": "portal:./et-shared-test-library"
     "@hmcts/playwright-common": "npm:^1.1.4"
     "@playwright/test": "npm:^1.61.0"
+    playwright-core: "npm:^1.61.0"
   languageName: unknown
   linkType: soft
 

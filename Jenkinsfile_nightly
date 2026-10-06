@@ -93,6 +93,7 @@ withNightlyPipeline(type, product, component) {
 
     afterAlways('DependencyCheckNightly') {
         stage('Prepare JS deps') {
+            yarnBuilder.yarn('install')
             yarnBuilder.yarn('build:shared')
             sh 'ls -la et-shared-test-library/dist/index.js'
         }

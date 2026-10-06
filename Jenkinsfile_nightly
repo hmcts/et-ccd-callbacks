@@ -93,6 +93,14 @@ withNightlyPipeline(type, product, component) {
 
     afterAlways('DependencyCheckNightly') {
         stage('Prepare JS deps') {
+            yarnBuilder.yarn('install')
+            sh'''
+            pwd
+            ls -la
+            ls -la .yarn || true
+            ls -la .yarn/install-state.gz || true
+            ls -la et-shared-test-library/dist/index.js || true
+            '''
             yarnBuilder.yarn('build:shared')
         }
          stage('Accessibility tests') {

@@ -95,6 +95,7 @@ class TseAdminControllerTest extends BaseControllerTest {
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseData)
+            .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
             .build();
     }
 
@@ -308,7 +309,8 @@ class TseAdminControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseAdmCloseService).aboutToSubmitCloseApplication(
-            any(CaseData.class));
+            ccdRequest.getCaseDetails().getCaseData(),
+            ENGLANDWALES_CASE_TYPE_ID);
     }
 
     @Test
@@ -320,7 +322,8 @@ class TseAdminControllerTest extends BaseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isForbidden());
         verify(tseAdmCloseService, never()).aboutToSubmitCloseApplication(
-            any(CaseData.class));
+            ccdRequest.getCaseDetails().getCaseData(),
+            ENGLANDWALES_CASE_TYPE_ID);
     }
 
     @Test
@@ -331,7 +334,8 @@ class TseAdminControllerTest extends BaseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
         verify(tseAdmCloseService, never()).aboutToSubmitCloseApplication(
-            any(CaseData.class));
+            ccdRequest.getCaseDetails().getCaseData(),
+            ENGLANDWALES_CASE_TYPE_ID);
     }
 
     @Test

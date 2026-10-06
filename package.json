@@ -7,7 +7,7 @@
   "license": "hmcts",
   "private": true,
   "scripts": {
-    "build:shared": "yarn --cwd et-shared-test-library build",
+    "build:shared": "yarn --cwd et-shared-test-library install && yarn --cwd et-shared-test-library build",
     "pwinstall": "yarn exec playwright install",
     "pwtest": "yarn exec playwright test -c src/test/e2e/playwright.config.ts",
     "test:smoke": "yarn pwinstall chromium && yarn pwtest --project=chromium --grep @smoke",

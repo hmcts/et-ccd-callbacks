@@ -194,16 +194,12 @@ public class ManageCaseController {
     @ApiResponseGroup
     public ResponseEntity<CaseDetails> updateHubLinksStatuses(
         @RequestHeader(AUTHORIZATION) String authorization,
-        @RequestParam(value = CASE_USER_ROLE_API_PARAMETER_NAME, required = false) String caseUserRole,
         @NotNull @RequestBody HubLinksStatusesRequest request
     ) {
         log.info("Received update hub link statuses request - caseTypeId: {} caseId: {}",
                  request.getCaseTypeId(), request.getCaseId()
         );
-        return ok(hubLinkService.updateHubLinkStatuses(
-            request,
-            authorization,
-            ManageCaseRoleServiceUtil.getCaseUserRoles(caseUserRole)));
+        return ok(hubLinkService.updateHubLinkStatuses(request, authorization));
     }
 
     /**

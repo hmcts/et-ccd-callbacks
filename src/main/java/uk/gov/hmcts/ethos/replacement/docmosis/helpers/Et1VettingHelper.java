@@ -73,6 +73,7 @@ public final class Et1VettingHelper {
                 .substantiveDefectsList(CollectionUtils.isEmpty(caseData.getSubstantiveDefectsList())
                         ? null
                         : caseData.getSubstantiveDefectsList().toString())
+                .et1VettingEra(defaultIfEmpty(caseData.getEt1VettingEra(), null))
                 .rule121aTextArea(defaultIfEmpty(caseData.getRule121aTextArea(), null))
                 .rule121bTextArea(defaultIfEmpty(caseData.getRule121bTextArea(), null))
                 .rule121cTextArea(defaultIfEmpty(caseData.getRule121cTextArea(), null))

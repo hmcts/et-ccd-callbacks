@@ -316,29 +316,15 @@ export class CaseDetailsPage extends BasePage {
       return;
     }
 
-    const { first, last } = await getVisibleRange();
+    // isVisible() does not account for tabs scrolled out of the tab header, so a tab inside the
+    // "visible" range can still need paginating to. Try the likelier direction first, then the other.
+    const { last } = await getVisibleRange();
+    const directions: Array<'before' | 'after'> = last !== -1 && targetIndex > last
+      ? ['after', 'before']
+      : ['before', 'after'];
 
-    if (first !== -1 && last !== -1) {
-      if (targetIndex < first) {
-        if (await paginateAndClick('before')) {
-          return;
-        }
-        if (await paginateAndClick('after')) {
-          return;
-        }
-      } else if (targetIndex > last) {
-        if (await paginateAndClick('after')) {
-          return;
-        }
-        if (await paginateAndClick('before')) {
-          return;
-        }
-      }
-    } else {
-      if (await paginateAndClick('before')) {
-        return;
-      }
-      if (await paginateAndClick('after')) {
+    for (const direction of directions) {
+      if (await paginateAndClick(direction)) {
         return;
       }
     }

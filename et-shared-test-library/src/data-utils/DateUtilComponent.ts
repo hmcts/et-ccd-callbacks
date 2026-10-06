@@ -139,14 +139,13 @@ export class DateUtilComponent {
   static formatToDayMonthYearShort(dateStr: string): string {
     const date = new Date(dateStr);
     return new Intl.DateTimeFormat('en-GB', {
-      day: 'numeric',
+      day: '2-digit',
       month: 'short',
-      year: 'numeric'
-    })
-      .format(date)
+      year: 'numeric',
+      timeZone: 'UTC'
+    }).format(date)
       .replace(/\bSept\b/, 'Sep');
   }
-
 
   static formatDateWithLeadingZeros(date:Date){
 

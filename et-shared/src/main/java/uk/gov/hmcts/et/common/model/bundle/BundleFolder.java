@@ -7,5 +7,5 @@ import lombok.extern.jackson.Jacksonized;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder(toBuilder = true)
 @Jacksonized
-public record BundleFolder(BundleFolderDetails value) {
+public record BundleFolder(String id, BundleFolderDetails value) {
 }

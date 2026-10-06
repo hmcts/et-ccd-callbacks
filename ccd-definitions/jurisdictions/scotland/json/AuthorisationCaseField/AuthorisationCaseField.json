@@ -2775,7 +2775,7 @@
     "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "printHearingDetails",
     "UserRole": "caseworker-employment-scotland",
-    "CRUD": "CRU"
+    "CRUD": "CRUD"
   },
   {
     "CaseTypeId": "ET_Scotland",
@@ -2787,7 +2787,7 @@
     "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "printHearingDetails",
     "UserRole": "caseworker-employment-etjudge-scotland",
-    "CRUD": "CRU"
+    "CRUD": "CRUD"
   },
   {
     "CaseTypeId": "ET_Scotland",
@@ -23186,6 +23186,13 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "SearchCriteria",
+    "UserRole": "caseworker-employment",
+    "CRUD": "CRUD"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "caseNameHmctsInternal",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
@@ -23861,5 +23868,41 @@
     "CaseFieldID": "batchUpdateJurisdictionList",
     "UserRole": "caseworker-employment-scotland",
     "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "currentClaimantEmail",
+    "UserRole": "caseworker-employment",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "currentClaimantEmail",
+    "UserRole": "caseworker-employment-scotland",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "currentClaimantEmail",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "newClaimantEmail",
+    "UserRole": "caseworker-employment",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "newClaimantEmail",
+    "UserRole": "caseworker-employment-scotland",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "newClaimantEmail",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
   }
 ]

@@ -1,0 +1,17 @@
+[
+  {
+    "CaseTypeID": "ET_Scotland_Multiple",
+    "ID": "multipleCasesMarkdown",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland_Multiple",
+    "ID": "multipleCasesLabel",
+    "Label": "${multipleCasesMarkdown}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  }
+]

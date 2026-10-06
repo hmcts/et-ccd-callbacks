@@ -360,7 +360,6 @@ tasks.register('validateCcdDefinitionsLockfile', Exec) {
     description = 'Fails when the CCD definitions package manifests and yarn.lock are out of sync.'
     workingDir 'ccd-definitions'
     commandLine './gradlew', '--no-daemon', '--init-script', 'init.gradle', 'validateCcdDefinitionsLockfile'
-    commandLine 'yarn', 'install', '--immutable', '--mode=skip-build'
 }
 
 tasks.register('setupCcdDefinitionsWorkspace', Exec) {

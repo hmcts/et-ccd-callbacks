@@ -21,7 +21,7 @@
     "pretest:functional-firefox": "yarn build:shared",
     "test:functional-firefox": "yarn pwinstall firefox && yarn pwtest --project=firefox --grep @cx",
     "pretest:accessibility": "yarn build:shared",
-    "test:accessibility": "yarn pwinstall && yarn pwtest --project=chromium --grep @accessibility",
+    "test:accessibility": "yarn build:shared && yarn pwinstall && yarn pwtest --project=chromium --grep @accessibility",
     "pretest:functional-ccd-callback": "yarn build:shared",
     "test:functional-ccd-callback": "yarn pwinstall chromium && yarn pwtest --project=chromium --grep @ccd-callback-tests",
     "pretest:functional-chromium-demo": "yarn build:shared",

@@ -362,10 +362,7 @@ class ManageCaseControllerTest {
             "Bloggs",
             null
         ));
-        when(hubLinkService.updateHubLinkStatuses(hubLinksStatusesRequest,
-                                                  TEST_SERVICE_AUTH_TOKEN,
-                                                  List.of(CASE_USER_ROLE_CREATOR,
-                                                          CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE)))
+        when(hubLinkService.updateHubLinkStatuses(hubLinksStatusesRequest, TEST_SERVICE_AUTH_TOKEN))
             .thenReturn(expectedDetails);
 
         mockMvc.perform(
@@ -376,8 +373,7 @@ class ManageCaseControllerTest {
         ).andExpect(status().isOk());
         verify(hubLinkService, times(1)).updateHubLinkStatuses(
             hubLinksStatusesRequest,
-            TEST_SERVICE_AUTH_TOKEN,
-            List.of(CASE_USER_ROLE_CREATOR, CASE_USER_ROLE_CLAIMANT_NON_LEGAL_REPRESENTATIVE)
+            TEST_SERVICE_AUTH_TOKEN
         );
     }
 

@@ -35,14 +35,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValueWhenCaseFlagsLinkingIsEnabled(boolean toggleStat) {
-        givenToggle("case-flags-linking-enabled", toggleStat);
-
-        assertThat(featureToggleService.isCaseFlagsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValueWhenWorkAllocationIsEnabled(boolean toggleStat) {
         givenToggle("work-allocation", toggleStat);
 

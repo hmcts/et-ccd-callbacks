@@ -2,6 +2,7 @@ java:
   enabled: true
   image: 'hmctsprod.azurecr.io/et/et-cos:latest'
   applicationPort: 8081
+  startupFailureThreshold: 30
   ingressHost: et-cos-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   aadIdentityName: et
   keyVaults:
@@ -99,15 +100,11 @@ wa:
   enabled: false
 servicebus:
   enabled: false
-ccd-message-publisher:
-  enabled: false
 aac-manage-case-assignment:
   enabled: false
 am-org-role-mapping-service:
   enabled: false
 em-ccdorc:
-  enabled: false
-et-migration:
   enabled: false
 rd-judicial-data-load:
   enabled: false

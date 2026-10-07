@@ -107,6 +107,8 @@ export class Et3RespondentDetailsPage extends Et3DetailsPage {
 
     await this.selectHearingFormatForRepresentativeAndRespondent();
     await this.clickContinue();
+    // continuing to next page from hearing Panel preference, as its optional
+    await this.clickContinue();
 
     await this.selectMentalHealthSupportNeeded('No');
     await this.clickContinue();

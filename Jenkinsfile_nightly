@@ -97,12 +97,25 @@ withNightlyPipeline(type, product, component) {
             yarnBuilder.yarn('build:shared')
             sh 'ls -la et-shared-test-library/dist/index.js'
         }
+        stage('Smoke test') {
+            try {
+                yarnBuilder.yarn('test:smoke')
+            } catch (Error) {
+                unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+            } finally {
+                publishHTML([
+                        allowMissing         : true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll              : true,
+                        reportDir            : 'playwright-report',
+                        reportFiles          : 'index.html',
+                        reportName           : 'ET Smoke Test Report'
+                ])
+                steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
+            }
+        }
          stage('Accessibility tests') {
             try {
-                sh '''
-  pwd
-  ls -la et-shared-test-library/dist/index.js || true
-'''
                 yarnBuilder.yarn('test:accessibility')
             } catch (Error) {
                 unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
@@ -118,23 +131,6 @@ withNightlyPipeline(type, product, component) {
             steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
             }
         }
-        stage('Smoke test') {
-            try {
-                yarnBuilder.yarn('test:smoke')
-            } catch (Error) {
-                unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-            } finally {
-                publishHTML([
-                    allowMissing         : true,
-                    alwaysLinkToLastBuild: true,
-                    keepAll              : true,
-                    reportDir            : 'playwright-report',
-                    reportFiles          : 'index.html',
-                    reportName           : 'ET Smoke Test Report'
-            ])
-            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
-            }
-         }
          stage('Cross browser test - Chromium') {
             try {
                 yarnBuilder.yarn('test:functional-chromium')

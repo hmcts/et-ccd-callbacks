@@ -246,6 +246,7 @@ test {
 // Java when those outputs are present. Cold and local runs still build
 // any missing outputs normally.
 def requestedTaskNames = gradle.startParameter.taskNames.collect { it.tokenize(':').last() }
+def requestedTask = { String taskName -> requestedTaskNames.contains(taskName) }
 def rerunOnlyDeploymentTests = !requestedTaskNames.isEmpty()
     && requestedTaskNames.every { it in ['smoke', 'functional'] }
 def deploymentCompilationMarker = layout.buildDirectory

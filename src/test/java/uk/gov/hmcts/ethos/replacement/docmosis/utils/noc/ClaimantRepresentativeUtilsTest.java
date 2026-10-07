@@ -158,11 +158,12 @@ final class ClaimantRepresentativeUtilsTest {
     void theMarkClaimantAsUnrepresented() {
         // Should not remove representative organisation if selected removal type is not organisation
         CaseData caseData = new CaseData();
+        caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().build());
         caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
                 ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
         caseData.setClaimantRepresentedQuestion(YES);
         ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseData, NOC_REMOVE_OPTION_YOURSELF);
-        assertThat(caseData.getRepresentativeClaimantType()).isNull();
+        assertThat(caseData.getRepresentativeClaimantType()).isNotNull();
         // should remove organisation when selected removal type is organisation
         caseData.setNocRemoveOption(NOC_REMOVE_OPTION_ORGANISATION);
         caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().representativeId(CLAIMANT_REPRESENTATIVE_ID)

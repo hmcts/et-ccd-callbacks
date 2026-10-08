@@ -1,0 +1,189 @@
+[
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveRepLandingPageLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]",
+          "[SOLICITORA]",
+          "[SOLICITORB]",
+          "[SOLICITORC]",
+          "[SOLICITORD]",
+          "[SOLICITORE]",
+          "[SOLICITORF]",
+          "[SOLICITORG]",
+          "[SOLICITORH]",
+          "[SOLICITORI]",
+          "[SOLICITORJ]"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveRepOption",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]",
+          "[SOLICITORA]",
+          "[SOLICITORB]",
+          "[SOLICITORC]",
+          "[SOLICITORD]",
+          "[SOLICITORE]",
+          "[SOLICITORF]",
+          "[SOLICITORG]",
+          "[SOLICITORH]",
+          "[SOLICITORI]",
+          "[SOLICITORJ]"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveRepRemoveLabelSelf",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]",
+          "[SOLICITORA]",
+          "[SOLICITORB]",
+          "[SOLICITORC]",
+          "[SOLICITORD]",
+          "[SOLICITORE]",
+          "[SOLICITORF]",
+          "[SOLICITORG]",
+          "[SOLICITORH]",
+          "[SOLICITORI]",
+          "[SOLICITORJ]"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveRepRemoveSelfConfirm",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]",
+          "[SOLICITORA]",
+          "[SOLICITORB]",
+          "[SOLICITORC]",
+          "[SOLICITORD]",
+          "[SOLICITORE]",
+          "[SOLICITORF]",
+          "[SOLICITORG]",
+          "[SOLICITORH]",
+          "[SOLICITORI]",
+          "[SOLICITORJ]"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveRepRemoveLabelOrg",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]",
+          "[SOLICITORA]",
+          "[SOLICITORB]",
+          "[SOLICITORC]",
+          "[SOLICITORD]",
+          "[SOLICITORE]",
+          "[SOLICITORF]",
+          "[SOLICITORG]",
+          "[SOLICITORH]",
+          "[SOLICITORI]",
+          "[SOLICITORJ]"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveRepRemoveOrgLabelClaimant",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveRepRemoveOrgLabelRespondent",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[SOLICITORA]",
+          "[SOLICITORB]",
+          "[SOLICITORC]",
+          "[SOLICITORD]",
+          "[SOLICITORE]",
+          "[SOLICITORF]",
+          "[SOLICITORG]",
+          "[SOLICITORH]",
+          "[SOLICITORI]",
+          "[SOLICITORJ]"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveRepRemoveOrgConfirm1",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]",
+          "[SOLICITORA]",
+          "[SOLICITORB]",
+          "[SOLICITORC]",
+          "[SOLICITORD]",
+          "[SOLICITORE]",
+          "[SOLICITORF]",
+          "[SOLICITORG]",
+          "[SOLICITORH]",
+          "[SOLICITORI]",
+          "[SOLICITORJ]"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveRepRemoveOrgConfirm2",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]",
+          "[SOLICITORA]",
+          "[SOLICITORB]",
+          "[SOLICITORC]",
+          "[SOLICITORD]",
+          "[SOLICITORE]",
+          "[SOLICITORF]",
+          "[SOLICITORG]",
+          "[SOLICITORH]",
+          "[SOLICITORI]",
+          "[SOLICITORJ]"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  }
+]

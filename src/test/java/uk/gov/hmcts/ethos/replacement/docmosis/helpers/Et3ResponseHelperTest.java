@@ -287,7 +287,7 @@ class Et3ResponseHelperTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("respondentDetailsSectionIncompleteArguments")
     void respondentDetailsSection_incompleteWhenMandatoryQuestionUnanswered(String isClaimantNameCorrect,
                                                                            String respondentName,
                                                                            String postCode) {
@@ -299,7 +299,7 @@ class Et3ResponseHelperTest {
         assertThat(respondent.getPersonalDetailsSection()).isEqualTo(NO);
     }
 
-    private static Stream<Arguments> respondentDetailsSection_incompleteWhenMandatoryQuestionUnanswered() {
+    private static Stream<Arguments> respondentDetailsSectionIncompleteArguments() {
         return Stream.of(
                 Arguments.of(null, "Respondent Ltd", "AB1 2CD"),
                 Arguments.of(YES, null, "AB1 2CD"),
@@ -330,7 +330,7 @@ class Et3ResponseHelperTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("responseDetailsSectionIncompleteArguments")
     void responseDetailsSection_incompleteWhenMandatoryQuestionUnanswered(String contestClaim,
                                                                          String contestClaimDetails,
                                                                          String employerClaim,
@@ -344,7 +344,7 @@ class Et3ResponseHelperTest {
         assertThat(respondent.getClaimDetailsSection()).isEqualTo(NO);
     }
 
-    private static Stream<Arguments> responseDetailsSection_incompleteWhenMandatoryQuestionUnanswered() {
+    private static Stream<Arguments> responseDetailsSectionIncompleteArguments() {
         return Stream.of(
                 Arguments.of(null, null, NO, null),
                 Arguments.of(YES, null, NO, null),
@@ -366,13 +366,13 @@ class Et3ResponseHelperTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("validateRespondentAddressArguments")
     void validateRespondentAddress(String postCode, List<String> expectedErrors) {
         caseData.setEt3RespondentAddress(postCode == null ? null : createAddress(postCode));
         assertThat(Et3ResponseHelper.validateRespondentAddress(caseData)).isEqualTo(expectedErrors);
     }
 
-    private static Stream<Arguments> validateRespondentAddress() {
+    private static Stream<Arguments> validateRespondentAddressArguments() {
         return Stream.of(
                 Arguments.of("AB1 2CD", List.of()),
                 Arguments.of(null, List.of(RESPONDENT_POSTCODE_REQUIRED)),
@@ -381,7 +381,7 @@ class Et3ResponseHelperTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("validateContestClaimReasonArguments")
     void validateContestClaimReason(String contestClaim, String details, List<DocumentTypeItem> documents,
                                     List<String> expectedErrors) {
         caseData.setEt3ResponseRespondentContestClaim(contestClaim);
@@ -390,7 +390,7 @@ class Et3ResponseHelperTest {
         assertThat(Et3ResponseHelper.validateContestClaimReason(caseData)).isEqualTo(expectedErrors);
     }
 
-    private static Stream<Arguments> validateContestClaimReason() {
+    private static Stream<Arguments> validateContestClaimReasonArguments() {
         return Stream.of(
                 Arguments.of(YES, "Reasons", null, List.of()),
                 Arguments.of(YES, null, List.of(DocumentTypeItem.builder().build()), List.of()),
@@ -401,7 +401,7 @@ class Et3ResponseHelperTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("validateEmployerClaimDetailsArguments")
     void validateEmployerClaimDetails(String employerClaim, String details, UploadedDocumentType document,
                                       List<String> expectedErrors) {
         caseData.setEt3ResponseEmployerClaim(employerClaim);
@@ -410,7 +410,7 @@ class Et3ResponseHelperTest {
         assertThat(Et3ResponseHelper.validateEmployerClaimDetails(caseData)).isEqualTo(expectedErrors);
     }
 
-    private static Stream<Arguments> validateEmployerClaimDetails() {
+    private static Stream<Arguments> validateEmployerClaimDetailsArguments() {
         return Stream.of(
                 Arguments.of(YES, "Details", null, List.of()),
                 Arguments.of(YES, null, UploadedDocumentType.builder().documentFilename("a.pdf").build(), List.of()),

@@ -214,5 +214,10 @@ em-ccd-orchestrator:
   config:
     default: et-dcf-2.yaml
 
+wa:
+  task-management:
+    api:
+      url: ${WA_TASK_MANAGEMENT_API_URL:http://localhost:8087}
+
 pdf:
   et3form: "ET3_0224.pdf"

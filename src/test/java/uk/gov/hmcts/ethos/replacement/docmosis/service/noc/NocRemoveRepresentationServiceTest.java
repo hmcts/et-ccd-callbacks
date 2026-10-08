@@ -99,8 +99,8 @@ class NocRemoveRepresentationServiceTest {
     @Test
     void shouldRevokeClaimantLegalRep_missingRepresentativeClaimantType() {
         caseDetails.getCaseData().setRepresentativeClaimantType(null);
-        IllegalStateException exception = assertThrows(
-                IllegalStateException.class,
+        GenericServiceException exception = assertThrows(
+                GenericServiceException.class,
                 () -> nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails)
         );
         assertThat(exception.getMessage())

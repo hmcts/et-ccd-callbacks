@@ -72,12 +72,15 @@ public class NocRemoveRepresentationService {
      * @param caseDetails The case details containing the case data and ID.
      * @throws IllegalStateException if the claimant representative is missing in the case data.
      */
-    public void revokeClaimantLegalRep(CaseDetails caseDetails) {
+    public void revokeClaimantLegalRep(CaseDetails caseDetails) throws GenericServiceException {
+        final String methodName = "revokeClaimantLegalRep";
         CaseData caseData = caseDetails.getCaseData();
         // get existing rep and organisation details for sending emails
         RepresentedTypeC existingClaimantRep = caseData.getRepresentativeClaimantType();
         if (existingClaimantRep == null) {
-            throw new IllegalStateException(String.format(EXCEPTION_REPRESENTATIVE_NOT_FOUND, caseDetails.getCaseId()));
+            String exceptionMessage = String.format(EXCEPTION_REPRESENTATIVE_NOT_FOUND, caseDetails.getCaseId());
+            throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
+                    caseDetails.getCaseId(), NocRemoveRepresentationService.class.getSimpleName(), methodName);
         }
 
         // revoke claimant legal rep

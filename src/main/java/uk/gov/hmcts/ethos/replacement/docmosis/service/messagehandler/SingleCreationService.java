@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper.generateMarkUp;
 
 /**
@@ -37,7 +39,6 @@ public class SingleCreationService {
 
     private static class CaseTransferContext {
         private final String caseId;
-        private final String caseTypeId;
         private final String ccdGatewayBaseUrl;
         private final String positionTypeCT;
         private final String jurisdiction;
@@ -45,10 +46,9 @@ public class SingleCreationService {
         private final String owningOfficeCT;
         private final String reasonForCT;
 
-        CaseTransferContext(String caseId, String caseTypeId, String ccdGatewayBaseUrl, String positionTypeCT,
+        CaseTransferContext(String caseId, String ccdGatewayBaseUrl, String positionTypeCT,
                             String jurisdiction, String state, String owningOfficeCT, String reasonForCT) {
             this.caseId = caseId;
-            this.caseTypeId = caseTypeId;
             this.ccdGatewayBaseUrl = ccdGatewayBaseUrl;
             this.positionTypeCT = positionTypeCT;
             this.jurisdiction = jurisdiction;
@@ -95,7 +95,6 @@ public class SingleCreationService {
 
         CaseTransferContext context = new CaseTransferContext(
             caseId,
-            caseTypeId,
             ccdGatewayBaseUrl,
             creationSingleDataModel.getPositionTypeCT(),
             jurisdiction,
@@ -126,7 +125,6 @@ public class SingleCreationService {
 
         CaseTransferContext context = new CaseTransferContext(
             caseId,
-            caseTypeId,
             ccdGatewayBaseUrl,
             creationSingleDataModel.getPositionTypeCT(),
             jurisdiction,
@@ -275,7 +273,8 @@ public class SingleCreationService {
         newCaseData.setRespondentOrganisationPolicy8(oldCaseData.getRespondentOrganisationPolicy8());
         newCaseData.setRespondentOrganisationPolicy9(oldCaseData.getRespondentOrganisationPolicy9());
 
-        if (featureToggleService.isCaseFlagsV2Enabled(context.caseTypeId)) {
+        if (featureToggleService.isCaseFlagsV2Enabled(ENGLANDWALES_CASE_TYPE_ID)
+                && featureToggleService.isCaseFlagsV2Enabled(SCOTLAND_CASE_TYPE_ID)) {
             newCaseData.setAllPartyFlags(oldCaseData.getAllPartyFlags());
         }
 

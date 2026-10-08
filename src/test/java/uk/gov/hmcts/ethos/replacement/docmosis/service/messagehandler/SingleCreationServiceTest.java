@@ -1,7 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.messagehandler;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -56,15 +57,17 @@ class SingleCreationServiceTest {
     ArgumentCaptor<CaseData> caseDataArgumentCaptor;
     private static final String USER_TOKEN = "accessToken";
 
-    @Test
+    @ParameterizedTest
+    @CsvSource({"false, false", "false, true", "true, false", "true, true"})
     @SuppressWarnings({"PMD.LawOfDemeter"})
-    void caseTransferToScotlandCreateCase() throws IOException {
+    void caseTransferToScotlandCreateCase(boolean englandWalesEnabled, boolean scotlandEnabled) throws IOException {
         var ethosCaseReference = "4150002/2020";
         var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         var caseData = new CaseData();
         caseData.setEthosCaseReference(ethosCaseReference);
         caseData.setManagingOffice(managingOffice);
-        caseData.setAllPartyFlags(createAllPartyFlags());
+        AllPartyFlags allPartyFlags = createAllPartyFlags();
+        caseData.setAllPartyFlags(allPartyFlags);
         var submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
         CaseData newCaseData = new CaseData();
@@ -93,14 +96,16 @@ class SingleCreationServiceTest {
             .thenReturn(new ArrayList<>());
         when(ccdClient.startCaseCreationTransfer(eq(USER_TOKEN), any()))
             .thenReturn(updateCCDRequest);
-        when(featureToggleService.isCaseFlagsV2Enabled(SCOTLAND_CASE_TYPE_ID)).thenReturn(false);
+        when(featureToggleService.isCaseFlagsV2Enabled(ENGLANDWALES_CASE_TYPE_ID)).thenReturn(englandWalesEnabled);
+        when(featureToggleService.isCaseFlagsV2Enabled(SCOTLAND_CASE_TYPE_ID)).thenReturn(scotlandEnabled);
 
         singleCreationService.sendCreation(submitEvent, USER_TOKEN, updateCaseMsg);
 
         verify(ccdClient, times(1))
             .retrieveCasesElasticSearch(USER_TOKEN, SCOTLAND_CASE_TYPE_ID, List.of(ethosCaseReference));
         verify(ccdClient, times(1)).startCaseCreationTransfer(eq(USER_TOKEN), caseDetailsArgumentCaptor.capture());
-        assertNull(caseDetailsArgumentCaptor.getValue().getCaseData().getAllPartyFlags());
+        assertSame(englandWalesEnabled && scotlandEnabled ? allPartyFlags : null,
+                caseDetailsArgumentCaptor.getValue().getCaseData().getAllPartyFlags());
         var expectedEventSummary = String.format(CREATE_CASE_EVENT_SUMMARY_TEMPLATE, managingOffice);
         verify(ccdClient, times(1)).submitCaseCreation(eq(USER_TOKEN), any(), any(),
                                                        eq(expectedEventSummary));
@@ -115,9 +120,10 @@ class SingleCreationServiceTest {
         verifyNoMoreInteractions(ccdClient);
     }
 
-    @Test
+    @ParameterizedTest
+    @CsvSource({"false, false", "false, true", "true, false", "true, true"})
     @SuppressWarnings({"PMD.LawOfDemeter"})
-    void caseTransferToEnglandCreateCase() throws IOException {
+    void caseTransferToEnglandCreateCase(boolean englandWalesEnabled, boolean scotlandEnabled) throws IOException {
         String ethosCaseReference = "4150002/2020";
         String managingOffice = TribunalOffice.DUNDEE.getOfficeName();
         CaseData caseData = new CaseData();
@@ -132,7 +138,8 @@ class SingleCreationServiceTest {
         UpdateCaseMsg updateCaseMsg = MessageHandlerTestHelper.generateCreationSingleCaseMsg();
         ((CreationSingleDataModel)updateCaseMsg.getDataModelParent()).setOfficeCT(
             TribunalOffice.NEWCASTLE.getOfficeName());
-        when(featureToggleService.isCaseFlagsV2Enabled(ENGLANDWALES_CASE_TYPE_ID)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(ENGLANDWALES_CASE_TYPE_ID)).thenReturn(englandWalesEnabled);
+        when(featureToggleService.isCaseFlagsV2Enabled(SCOTLAND_CASE_TYPE_ID)).thenReturn(scotlandEnabled);
 
         singleCreationService.sendCreation(submitEvent, USER_TOKEN, updateCaseMsg);
 
@@ -140,7 +147,8 @@ class SingleCreationServiceTest {
                                                      List.of(ethosCaseReference));
         verify(ccdClient).startCaseCreationTransfer(eq(USER_TOKEN), caseDetailsArgumentCaptor.capture());
         assertNull(caseDetailsArgumentCaptor.getValue().getCaseData().getFeeGroupReference());
-        assertSame(allPartyFlags, caseDetailsArgumentCaptor.getValue().getCaseData().getAllPartyFlags());
+        assertSame(englandWalesEnabled && scotlandEnabled ? allPartyFlags : null,
+                caseDetailsArgumentCaptor.getValue().getCaseData().getAllPartyFlags());
         var expectedEventSummary = String.format(CREATE_CASE_EVENT_SUMMARY_TEMPLATE, managingOffice);
         verify(ccdClient).submitCaseCreation(eq(USER_TOKEN), any(), any(), eq(expectedEventSummary));
         verify(ccdClient, times(0)).returnCaseCreationTransfer(eq(USER_TOKEN), any(), any(),
@@ -148,9 +156,10 @@ class SingleCreationServiceTest {
         verifyNoMoreInteractions(ccdClient);
     }
 
-    @Test
+    @ParameterizedTest
+    @CsvSource({"false, false", "false, true", "true, false", "true, true"})
     @SuppressWarnings({"PMD.LawOfDemeter"})
-    void caseTransferToScotlandUpdateExisting() throws IOException {
+    void caseTransferToScotlandUpdateExisting(boolean englandWalesEnabled, boolean scotlandEnabled) throws IOException {
         var ethosCaseReference = "4150002/2020";
         var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         var caseData = new CaseData();
@@ -166,10 +175,18 @@ class SingleCreationServiceTest {
         var updateCaseMsg = MessageHandlerTestHelper.generateCreationSingleCaseMsg();
         ((CreationSingleDataModel)updateCaseMsg.getDataModelParent()).setOfficeCT(
             TribunalOffice.GLASGOW.getOfficeName());
-        when(featureToggleService.isCaseFlagsV2Enabled(SCOTLAND_CASE_TYPE_ID)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(ENGLANDWALES_CASE_TYPE_ID)).thenReturn(englandWalesEnabled);
+        when(featureToggleService.isCaseFlagsV2Enabled(SCOTLAND_CASE_TYPE_ID)).thenReturn(scotlandEnabled);
+
+        AllPartyFlags existingFlags = createAllPartyFlags();
+        CaseData existingCaseData = new CaseData();
+        existingCaseData.setAllPartyFlags(existingFlags);
+        SubmitEvent existingCase = new SubmitEvent();
+        existingCase.setCaseId(caseId);
+        existingCase.setCaseData(existingCaseData);
 
         when(ccdClient.retrieveCasesElasticSearch(USER_TOKEN, SCOTLAND_CASE_TYPE_ID, List.of(ethosCaseReference)))
-            .thenReturn(new ArrayList<>(Collections.singletonList(submitEvent)));
+            .thenReturn(new ArrayList<>(Collections.singletonList(existingCase)));
 
         singleCreationService.sendCreation(submitEvent, USER_TOKEN, updateCaseMsg);
 
@@ -179,7 +196,8 @@ class SingleCreationServiceTest {
         verify(ccdClient).submitEventForCase(eq(USER_TOKEN), caseDataArgumentCaptor.capture(),
                                              eq(SCOTLAND_CASE_TYPE_ID), eq("EMPLOYMENT"), any(),
                                              eq(String.valueOf(caseId)));
-        assertSame(allPartyFlags, caseDataArgumentCaptor.getValue().getAllPartyFlags());
+        assertSame(englandWalesEnabled && scotlandEnabled ? allPartyFlags : existingFlags,
+                caseDataArgumentCaptor.getValue().getAllPartyFlags());
         verify(ccdClient, times(0)).startCaseCreationTransfer(eq(USER_TOKEN), any());
         verifyNoMoreInteractions(ccdClient);
     }

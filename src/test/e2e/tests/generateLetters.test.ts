@@ -24,11 +24,22 @@ test.describe('Generate Letters', () => {
       await caseDetailsPage.selectNextEvent(Events.letters);
       await lettersPage.generateShortTrackLetter();
 
-      await caseListPage.verifyCaseDetailsOnTab(letterPageData.claimLabel, DateUtilComponent.formatTodaysDate(new Date()));
-      await caseListPage.verifyCaseDetailsOnTab(letterPageData.et3DueDateLabel, DateUtilComponent.addDaysAndMonths(28));
-
-      await caseDetailsPage.navigateToTab("BF Actions");
-      await caseListPage.verifyBFActionsTab('Description', 'Other action');
+      await caseDetailsPage.assertTabData([
+        {
+          tabName: 'Case Details',
+          tabContent:[
+            { tabItem: letterPageData.claimLabel, value: DateUtilComponent.formatTodaysDate(new Date()) },
+            { tabItem: letterPageData.et3DueDateLabel, value: DateUtilComponent.addDaysAndMonths(28) }
+          ]
+        },
+        {
+          tabName: 'BF Actions',
+          tabContent: [
+            { tabItem: DateUtilComponent.addDaysAndMonths(29), value: '', clickable: true },
+            { tabItem: 'Description', value: 'Other action' },
+          ]
+        }
+      ])
 
       // RET-5793 Validate initial consideration hearing details
       await caseDetailsPage.selectNextEvent(Events.initialConsideration);

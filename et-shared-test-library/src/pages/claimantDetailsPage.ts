@@ -12,6 +12,8 @@ export class ClaimantDetailsPage extends BasePage {
   private readonly hearingPreferenceVideo: Locator;
   private readonly panelEle: Locator;
   private readonly panelPreferenceReason: Locator;
+  private readonly reasonableAdjustmentYes: Locator;
+  private readonly reasonableAdjustmentDetail: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -24,6 +26,8 @@ export class ClaimantDetailsPage extends BasePage {
     this.hearingPreferenceVideo = page.locator('#claimantHearingPreference_hearing_preferences-Video');
     this.panelEle = page.locator('#claimantHearingPreference_claimant_hearing_panel_preference-Panel');
     this.panelPreferenceReason = page.locator('#claimantHearingPreference_claimant_hearing_panel_preference_why');
+    this.reasonableAdjustmentYes = page.locator('#claimantHearingPreference_reasonable_adjustments_Yes');
+    this.reasonableAdjustmentDetail = page.locator('#claimantHearingPreference_reasonable_adjustments_detail');
   }
 
   async processClaimantDetails(hearingPanelPreference?: boolean) {
@@ -31,16 +35,26 @@ export class ClaimantDetailsPage extends BasePage {
     await this.firstName.fill('Laila');
     await this.lastName.fill('McDonald');
     await this.clickContinue();
+
     await expect(this.addressLine1).toBeVisible();
     await this.clickContinue();
+
     await expect(this.claimantWorkPhone).toBeVisible();
     await this.clickContinue();
+
     await expect(this.occupation).toBeVisible();
     await this.clickContinue();
+
     await expect(this.hearingPreference).toBeVisible();
     await this.hearingPreferenceVideo.click();
     await this.hearingPreference.check();
     if (hearingPanelPreference) await this.fillPanelPreference();
+
+    await expect(this.reasonableAdjustmentYes).toBeVisible();
+    await this.reasonableAdjustmentYes.check();
+    await expect(this.reasonableAdjustmentDetail).toBeVisible();
+    await this.reasonableAdjustmentDetail.fill('Test Reasonable Adjustment');
+
     await this.clickSubmitButton();
   }
 

@@ -116,9 +116,15 @@ export class Et1CreateDraftClaim extends BasePage {
     await this.claimantHearingContactLanguage.check();
     await this.clickContinue(url, 6);
 
-    await this.claimantSupportQuestion.check();
-    await this.page.locator('#claimantSupportQuestionReason').fill('disability access');
+    // New page for preference for Judge or panel
+    await expect(this.page.getByRole('heading', { name: 'Preference for judge or panel' })).toBeVisible();
+    await this.page.getByLabel('No preference').check();
     await this.clickContinue(url, 7);
+
+    await this.claimantSupportQuestion.check();
+    // seems this field is not visible in the UI, so cannot fill it in
+    //await this.page.locator('#claimantSupportQuestionReason').fill('disability access');
+    await this.clickContinue(url, 8);
 
     //await expect(this.page.locator('ccd-case-edit-page')).toContainText('Your information (as the representative)');
     await this.representativeContactPreference.isVisible();
@@ -238,6 +244,9 @@ export class Et1CreateDraftClaim extends BasePage {
     await this.page.waitForLoadState('load');
     await this.clickContinue(url, 2);
 
+    await this.page.getByLabel('Day').fill('1');
+    await this.page.getByLabel('Month').fill('1');
+    await this.page.getByLabel('Year').fill('2026');
     await this.page.locator('#et1SectionThreeClaimDetails').fill('No supplemetary Details');
     await this.clickContinue(url, 3);
 

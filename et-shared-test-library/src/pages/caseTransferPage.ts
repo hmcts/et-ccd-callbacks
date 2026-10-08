@@ -1,5 +1,7 @@
 import { BasePage } from "./basePage";
 import { expect, Locator, Page } from "@playwright/test";
+import {CheckYourAnswersPage} from "./helpers/CheckYourAnswersPage";
+import {CaseDetailsPage} from "./caseDetailsPage";
 
 export class CaseTransferPage extends BasePage {
   private readonly caseTransferReason: Locator;
@@ -15,39 +17,35 @@ export class CaseTransferPage extends BasePage {
     await this.clickContinue();
   }
 
-  async checkYourAnswer(caseNumber: string) {
-    await expect(this.page.locator('ccd-case-edit-submit')).toContainText(
-      'Select the office you want to transfer the case to',
-    );
-    await expect(this.page.locator('ccd-case-edit-submit')).toContainText('Reason for Case Transfer');
-    await this.page.getByRole('button', { name: 'Transfer Case' }).click();
-
-    await expect(this.page.locator('#case-viewer-field-read--positionType')).toContainText(
-      'Case transferred - other country',
-    );
-    await expect(this.page.locator('h4')).toContainText('Case Status: Transferred');
-    await this.delay(10000);
-    await this.page.reload();
-    try {
-      // Check if the element is visible
-      const isVisible = await this.page.getByRole('link', { name: '/2025' }).isVisible();
-
-      if (!isVisible) {
-        // Click the button if the element is not visible
-        await this.page.reload();
-      }
-    } catch (error) {
-      console.error('Scotland Case Transfer link not visible', error);
+  async checkYourAnswer(checkYourAnswersPage: CheckYourAnswersPage) {
+    await checkYourAnswersPage.assertCheckYourAnswersPage({
+      tableName: 'Check your answers',
+    rows: [
+      {
+      cellItem: 'Select the office you want to transfer the case to', value : 'Glasgow'
+    },
+    {
+      cellItem: 'Reason for Case Transfer', value: 'Transfer case to Scotland RET'
     }
-    await expect(this.page.getByLabel('Case Details').getByRole('paragraph')).toContainText(
-      'Case Transfer: Transferred to Glasgow ',
-    );
-/*    await expect(this.page.getByRole('link', { name: '/2026' })).toBeVisible();
-    await this.page.getByRole('link', { name: '/2026' }).click();
-    const page1Promise = this.page.waitForEvent('popup');
-    const page1 = await page1Promise;
-    await page1.reload();*/
-    //await expect(this.page.locator('#case-viewer-field-read--managingOffice')).toContainText('Glasgow');
+    ]
+    });
+    await this.page.getByRole('button', { name: 'Transfer Case' }).click();
+  }
+
+  async assertCaseDetailsTabDataAfterCaseTransfer(caseDetailsPage: CaseDetailsPage) {
+    await caseDetailsPage.assertTabData([
+      {
+        tabName: 'Case Details',
+        tabContent:[
+          'Case Status:  Transferred',
+          'Case Transfer: Transferred to Glasgow',
+          { tabItem: 'Current Position', value: 'Case transferred - other country' },
+        ]
+      },
+    ]);
+  }
+
+  async getNewDigitalCaseReferenceNumber() {
     const newSubRef = await this.page.locator('#case-viewer-field-read--feeGroupReference').textContent();
     return newSubRef? newSubRef.trim() : '';
   }

@@ -53,10 +53,11 @@ test.describe('Various events in mange case application', () => {
   });
 
   //EXUI-3451
-  test('Create a England/Wales claim and transfer to Scotland', {tag: '@demo'}, async ({ caseDetailsPage, caseTransferPage }) => {
+  test('Create a England/Wales claim and transfer to Scotland', {tag: '@demo'}, async ({ caseDetailsPage, caseTransferPage, checkYourAnswersPage }) => {
     await caseDetailsPage.selectNextEvent(Events.caseTransferScotland);
     await caseTransferPage.progressCaseTransfer();
-    await caseTransferPage.checkYourAnswer(caseNumber);
+    await caseTransferPage.checkYourAnswer(checkYourAnswersPage);
+    await caseTransferPage.assertCaseDetailsTabDataAfterCaseTransfer(caseDetailsPage);
   });
 
   //RET-5790
@@ -122,10 +123,12 @@ test.describe('Claimant retaining access to transferred case', () => {
   });
 
   //EXUI-3451
-  test('Create a England/Wales claim and transfer to Scotland, Claimant retains case', async ({ browserUtils, caseDetailsPage, caseTransferPage }) => {
+  test('Create a England/Wales claim and transfer to Scotland, Claimant retains case', async ({ browserUtils, caseDetailsPage, caseTransferPage, checkYourAnswersPage }) => {
     await caseDetailsPage.selectNextEvent(Events.caseTransferScotland);
     await caseTransferPage.progressCaseTransfer();
-    let newSubRef= await caseTransferPage.checkYourAnswer(caseNumber);
+    await caseTransferPage.checkYourAnswer(checkYourAnswersPage);
+    await caseTransferPage.assertCaseDetailsTabDataAfterCaseTransfer(caseDetailsPage);
+    let newSubRef= await caseTransferPage.getNewDigitalCaseReferenceNumber();
 
     //login as claimant and access transferred case
     const claimantBrowserPage = await browserUtils.openNewBrowserContext(users.etClaimant.sessionFile);

@@ -100,6 +100,12 @@ export class RespContactDetailsPages extends BasePage {
     await expect(this.page.locator('legend')).toContainText('Would you be able to take part in hearings by video and phone? (optional)');
     await this.page.getByText('Yes, I can take part in video').click();
     await this.saveAndContinueButton();
+
+    // new Page about preference for judge or panel
+    await this.page.waitForLoadState('load');
+    await this.page.getByLabel('I have no preference').check();
+    await this.saveAndContinueButton();
+
     await this.page.getByLabel('Yes').check();
     await expect(this.page.getByLabel('Tell us what support you need')).toBeVisible();
     await this.page.getByLabel('Tell us what support you need').fill('disable access');

@@ -51,8 +51,18 @@ export class CheckYourAnswersPage {
     const actualRows: string[][] = [];
     for (const row of allRows) {
       if (!await row.isVisible()) continue;
-      const cells = await row.locator('th, td').allTextContents();
-      actualRows.push(cells.map(cell => {return normalize(cell);}));
+      const cells = await row.locator('th, td').evaluateAll((cellEls) => {
+        return cellEls.map((cell) => {
+          // Work on a clone so the real DOM is untouched
+          const clone = cell.cloneNode(true) as HTMLElement;
+
+          // Remove visually-hidden content from extraction
+          clone.querySelectorAll('.govuk-visually-hidden').forEach(el => el.remove());
+
+          return (clone.textContent ?? '').trim();
+        });
+      });
+      actualRows.push(cells.map(cell => normalize(cell)));
     }
     // Collect all assertion failures
     const errors: string[] = [];

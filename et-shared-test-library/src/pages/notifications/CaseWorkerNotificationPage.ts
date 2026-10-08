@@ -42,7 +42,7 @@ export class CaseWorkerNotificationPage extends BasePage {
     this.partiesToNotifyRadio = page.locator(`#sendNotificationNotify`);
     this.additionalInformationTextBox = page.locator(`#sendNotificationAdditionalInfo`);
     this.notificationDropDown = page.locator('#claimantSelectNotification');
-    this.notificationLink = page.getByText('Send a notification');
+    this.notificationLink = page.getByRole('link', { name: 'Send a notification' });
     this.respondToNotificationLink = page.getByText('Respond to an order or request from the tribunal');
     this.notificationsTab = page.getByText('Notifications');
     this.judgmentsOrdersTab = page.getByText('Judgments, orders &');

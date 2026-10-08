@@ -256,9 +256,14 @@ class Et3ResponseHelperTest {
     @Test
     void shouldAddPersonalDetailsToRespondentForEt3Response() {
         answerRespondentDetailsMandatoryQuestions();
+        caseData.setEt3ResponseHearingPanelPreference("Judge");
+        caseData.setEt3HearingPanelPreferenceReason("Legal issues predominate");
         addEt3DataToRespondent(caseData, ET3_RESPONSE);
         RespondentSumType respondent = caseData.getRespondentCollection().getFirst().getValue();
         assertThat(respondent.getEt3ResponseIsClaimantNameCorrect()).isEqualTo("Yes");
+        assertThat(respondent.getRespondentHearingPanelPreference()).isEqualTo("Judge");
+        assertThat(respondent.getRespondentHearingPanelPreferenceReason()).isEqualTo(
+                "Legal issues predominate");
         assertThat(respondent.getPersonalDetailsSection()).isEqualTo("Yes");
     }
 

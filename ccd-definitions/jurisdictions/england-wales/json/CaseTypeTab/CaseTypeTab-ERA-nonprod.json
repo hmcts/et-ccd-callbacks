@@ -1,0 +1,9 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "Channel": "CaseWorker",
+    "TabID": "initialConsideration",
+    "CaseFieldID": "etICUnfairDismissalEra",
+    "TabFieldDisplayOrder": 15
+  }
+]

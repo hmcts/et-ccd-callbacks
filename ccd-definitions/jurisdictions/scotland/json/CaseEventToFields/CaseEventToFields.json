@@ -2663,7 +2663,7 @@
     "DisplayContext": "OPTIONAL",
     "PageID": 3,
     "PageDisplayOrder": 3,
-    "PageFieldDisplayOrder": 27,
+    "PageFieldDisplayOrder": 30,
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -4753,8 +4753,8 @@
     "CaseEventID": "et3Response",
     "CaseFieldID": "et3ResponseHealthInsetPreamble",
     "DisplayContext": "READONLY",
-    "PageID": 8,
-    "PageDisplayOrder": 8,
+    "PageID": 9,
+    "PageDisplayOrder": 9,
     "PageFieldDisplayOrder": 1,
     "PageLabel": "In the respondent party - are you aware of any physical, mental or learning disability or health conditions which requires support?"
   },
@@ -4763,8 +4763,8 @@
     "CaseEventID": "et3Response",
     "CaseFieldID": "et3ResponseRespondentSupportNeeded",
     "DisplayContext": "OPTIONAL",
-    "PageID": 8,
-    "PageDisplayOrder": 8,
+    "PageID": 9,
+    "PageDisplayOrder": 9,
     "PageFieldDisplayOrder": 2,
     "ShowSummaryChangeOption": "Y"
   },
@@ -4773,8 +4773,8 @@
     "CaseEventID": "et3Response",
     "CaseFieldID": "et3ResponseHealthDetailsPreamble",
     "DisplayContext": "READONLY",
-    "PageID": 9,
-    "PageDisplayOrder": 9,
+    "PageID": 10,
+    "PageDisplayOrder": 10,
     "PageFieldDisplayOrder": 1,
     "PageShowCondition": "et3ResponseRespondentSupportNeeded=\"Yes\"",
     "PageLabel": "Give details of the support you require for the parties"
@@ -4784,8 +4784,8 @@
     "CaseEventID": "et3Response",
     "CaseFieldID": "et3ResponseRespondentSupportDetails",
     "DisplayContext": "OPTIONAL",
-    "PageID": 9,
-    "PageDisplayOrder": 9,
+    "PageID": 10,
+    "PageDisplayOrder": 10,
     "PageFieldDisplayOrder": 2,
     "ShowSummaryChangeOption": "Y"
   },
@@ -4794,8 +4794,8 @@
     "CaseEventID": "et3Response",
     "CaseFieldID": "et3ResponseRespondentSupportDocument",
     "DisplayContext": "OPTIONAL",
-    "PageID": 9,
-    "PageDisplayOrder": 9,
+    "PageID": 10,
+    "PageDisplayOrder": 10,
     "PageFieldDisplayOrder": 3,
     "ShowSummaryChangeOption": "Y"
   },

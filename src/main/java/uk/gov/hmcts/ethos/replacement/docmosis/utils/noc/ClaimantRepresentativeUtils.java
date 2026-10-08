@@ -184,8 +184,8 @@ public final class ClaimantRepresentativeUtils {
      *                 must not be {@code null}
      */
     public static void markClaimantAsUnrepresented(CaseData caseData, String removeOption) {
-        caseData.setRepresentativeClaimantType(null);
         if (NOC_REMOVE_OPTION_ORGANISATION.equals(removeOption)) {
+            caseData.setRepresentativeClaimantType(null);
             caseData.setClaimantRepresentativeRemoved(YES);
             caseData.setClaimantRepresentedQuestion(NO);
             caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder()

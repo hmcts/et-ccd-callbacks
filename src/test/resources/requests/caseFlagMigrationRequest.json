@@ -1,0 +1,901 @@
+{
+  "caseType": "Single",
+  "claimant": "Test Company",
+  "caseFlags": {
+    "details": [
+      {
+        "id": "1061a022-2518-493b-a0aa-d7db0d5d19d2",
+        "value": {
+          "name": "Urgent case",
+          "path": [
+            {
+              "id": "5ad87e2f-91fe-436a-a310-00dec1ef175c",
+              "value": "Case"
+            }
+          ],
+          "status": "Inactive",
+          "name_cy": "Achos brys",
+          "flagCode": "CF0007",
+          "flagComment": "test",
+          "dateTimeCreated": "2025-09-20T18:21:32.471Z",
+          "hearingRelevant": "No",
+          "dateTimeModified": "2025-09-20T18:23:15.447Z",
+          "availableExternally": "No"
+        }
+      }
+    ]
+  },
+  "docMarkUp": "<a target=\"_blank\" href=\"https://manage-case.aat.platform.hmcts.net/documents/eba524be-5a0b-415a-9b30-556a51ff0025/binary\">ACAS Certificate - Henry Marsh's coffee shop - R444444/89/74.pdf</a>",
+  "trackType": "Open",
+  "caseSource": "ET1 Online",
+  "claimantId": "b328966e-ab3f-4217-ba69-af17a43e4423",
+  "respondent": "Henry Marsh's coffee shop",
+  "receiptDate": "2024-06-24",
+  "claimantType": {
+    "claimant_addressUK": {
+      "Country": "England",
+      "PostCode": "LS9 9HE",
+      "PostTown": "Leeds",
+      "AddressLine1": "3, Skelton Avenue"
+    },
+    "claimant_phone_number": "07898787676",
+    "claimant_email_address": "Ethan.Materassi9186@email.com",
+    "claimant_contact_preference": "Email"
+  },
+  "multipleFlag": "No",
+  "positionType": "ET1 Online submission",
+  "typesOfClaim": [
+    "discrimination",
+    "whistleBlowing"
+  ],
+  "ClaimantPcqId": "1e28e8a4-8f2d-418d-935b-1353f3a28d76",
+  "claimantFlags": {
+    "details": [
+      {
+        "id": "a76c2949-c5ec-4824-ad89-f0a5cc922868",
+        "value": {
+          "name": "Language Interpreter",
+          "path": [
+            {
+              "id": "f56e8781-b7b8-4f4a-8f35-f8e67216a0ef",
+              "value": "Party"
+            }
+          ],
+          "status": "Active",
+          "name_cy": "Cyfieithydd",
+          "flagCode": "PF0015",
+          "subTypeKey": "tam",
+          "flagComment": "test",
+          "subTypeValue": "Tamil",
+          "dateTimeCreated": "2026-08-17T15:13:24.412Z",
+          "hearingRelevant": "Yes",
+          "availableExternally": "No"
+        }
+      },
+      {
+        "id": "ae6413f6-ce55-4f46-9995-67136badb891",
+        "value": {
+          "name": "Vulnerable user",
+          "path": [
+            {
+              "id": "cd6e276e-7078-45ed-9e30-41fedd063cfb",
+              "value": "Party"
+            }
+          ],
+          "status": "Active",
+          "name_cy": "Defnyddiwr bregus",
+          "flagCode": "PF0002",
+          "dateTimeCreated": "2026-08-17T15:12:55.942Z",
+          "hearingRelevant": "Yes",
+          "availableExternally": "No"
+        }
+      }
+    ],
+    "partyName": "Test Company",
+    "roleOnCase": "claimant"
+  },
+  "icCompletedBy": "test test",
+  "preAcceptCase": {
+    "caseAccepted": "Yes",
+    "dateAccepted": "2024-06-24"
+  },
+  "repCollection": [
+    {
+      "id": "cf2679ed-3f99-4213-8f21-17c96a5aaf90",
+      "value": {
+        "role": "[SOLICITORA]",
+        "idamId": "b6577c8d-16b7-4f97-90b4-4d1fc028c587",
+        "myHmctsYesNo": "Yes",
+        "respondentId": "15419256-e1c2-4e70-9b6f-d8b861f66293",
+        "resp_rep_name": "Henry Marsh's coffee shop",
+        "name_of_organisation": "ET Test Factory Solicitor",
+        "dynamic_resp_rep_name": {
+          "value": {
+            "code": "Henry Marsh's coffee shop",
+            "label": "Henry Marsh's coffee shop"
+          },
+          "selectedCode": "Henry Marsh's coffee shop",
+          "selectedLabel": "Henry Marsh's coffee shop"
+        },
+        "name_of_representative": "ET Legal Representative",
+        "representative_address": {
+          "PostCode": "SN1 4ET",
+          "PostTown": "SWINDON",
+          "AddressLine1": "10, GROVELANDS AVENUE"
+        },
+        "respondentOrganisation": {
+          "OrganisationID": "PG7Q7JU",
+          "OrganisationName": "ET Test Factory Solicitor"
+        },
+        "representative_email_address": "et.legalrep.1@gmail.com"
+      }
+    }
+  ],
+  "SearchCriteria": {
+    "SearchParties": [
+      {
+        "id": "ae988fd7-5617-47d6-a9fc-7437add38bae",
+        "value": {
+          "Name": "Ethan Materassi",
+          "PostCode": "LS9 9HE",
+          "DateOfBirth": "1989-01-01",
+          "AddressLine1": "3, Skelton Avenue",
+          "EmailAddress": "Ethan.Materassi9186@email.com"
+        }
+      },
+      {
+        "id": "8de5c1dc-a6e3-4513-a32b-c6d140d65570",
+        "value": {
+          "Name": "Henry Marsh's coffee shop",
+          "PostCode": "LS7 4QE",
+          "AddressLine1": "7, Valley Gardens"
+        }
+      },
+      {
+        "id": "1885d08a-f85d-44f8-b3a6-5b26668ee47e",
+        "value": {
+          "Name": "Henry Marsh's coffee shop",
+          "PostCode": "SN1 4ET",
+          "AddressLine1": "10, GROVELANDS AVENUE",
+          "EmailAddress": "et.legalrep.1@gmail.com"
+        }
+      }
+    ],
+    "OtherCaseReferences": [
+      {
+        "id": "1b3cbb58-2754-488d-9777-f7591175a491",
+        "value": "6015303/2024"
+      }
+    ]
+  },
+  "dateToPosition": "2024-06-24",
+  "etICCanProceed": "Yes",
+  "managingOffice": "Leeds",
+  "publicCaseName": "Test Company vs Henry Marsh's coffee shop",
+  "claimantIndType": {
+    "claimant_sex": "Male",
+    "claimant_last_name": "Materassi",
+    "claimant_first_names": "Ethan",
+    "claimant_date_of_birth": "1989-01-01",
+    "claimant_preferred_title": "Mr"
+  },
+  "companyPremises": {
+    "address": {
+      "Country": "United Kingdom",
+      "PostCode": "LS16 6NB",
+      "PostTown": "Leeds",
+      "AddressLine1": "Cookridge Court",
+      "AddressLine2": "Iveson Rise"
+    }
+  },
+  "currentPosition": "ET1 Online submission",
+  "icDateCompleted": "27 Nov 2024",
+  "respondentFlags": {
+    "details": [
+      {
+        "id": "d50baf8c-2c64-487a-beb5-05cb2136b56f",
+        "value": {
+          "name": "Language Interpreter",
+          "path": [
+            {
+              "id": "08f2ff93-a33c-4da3-b4b3-1ea6ef13ff33",
+              "value": "Party"
+            }
+          ],
+          "status": "Active",
+          "name_cy": "Cyfieithydd",
+          "flagCode": "PF0015",
+          "subTypeKey": "tel",
+          "flagComment": "test",
+          "subTypeValue": "Telugu",
+          "dateTimeCreated": "2026-08-17T15:14:21.959Z",
+          "hearingRelevant": "Yes",
+          "availableExternally": "No"
+        }
+      },
+      {
+        "id": "ae27af96-9e3b-41e5-a6b4-345885efe105",
+        "value": {
+          "name": "Documents in a specified colour",
+          "path": [
+            {
+              "id": "707e7c37-4f91-4851-832b-03e9a731793b",
+              "value": "Party"
+            },
+            {
+              "id": "74bde6fe-8217-4f6a-8bce-3e320b3ef89c",
+              "value": "Reasonable adjustment"
+            },
+            {
+              "id": "80ce846d-896c-4ca6-8325-cb12deb0716b",
+              "value": "I need documents in an alternative format"
+            }
+          ],
+          "status": "Active",
+          "name_cy": "Dogfennau mewn lliw penodol",
+          "flagCode": "RA0010",
+          "flagComment": "test",
+          "dateTimeCreated": "2026-08-17T15:13:52.039Z",
+          "hearingRelevant": "Yes",
+          "availableExternally": "Yes"
+        }
+      }
+    ],
+    "partyName": "Henry Marsh's coffee shop",
+    "roleOnCase": "respondent"
+  },
+  "triageQuestions": {
+    "caseType": "Single",
+    "postcode": "LS9 9HE",
+    "acasMultiple": "Yes",
+    "typesOfClaim": [
+      "discrimination",
+      "whistleBlowing"
+    ],
+    "claimantRepresentedQuestion": "No"
+  },
+  "claimantRequests": {
+    "linked_cases": "No",
+    "claim_outcome": [
+      "compensation",
+      "tribunal",
+      "oldJob"
+    ],
+    "whistleblowing": "Yes",
+    "claim_description": "Discrimination, Dismissal and Pay Cut.",
+    "discrimination_claims": [
+      "Age",
+      "Disability"
+    ],
+    "whistleblowing_authority": "Rupert Regulator",
+    "claimant_compensation_text": "Seeking months wage and job back",
+    "claimant_compensation_amount": "2000",
+    "claimant_tribunal_recommendation": "Get Job back and my boss to say sorry"
+  },
+  "claimant_Company": "Test Company",
+  "et1DateCompleted": "24 Jun 2024",
+  "claimantOtherType": {
+    "pastEmployer": "Yes",
+    "stillWorking": "Working",
+    "claimant_benefits": "Yes",
+    "claimant_pay_cycle": "Weeks",
+    "claimant_occupation": "Tester",
+    "claimant_employed_from": "2014-04-20",
+    "claimant_notice_period": "Yes",
+    "claimant_pay_after_tax": "35000",
+    "claimant_pay_before_tax": "40000",
+    "claimant_notice_period_unit": "Weeks",
+    "claimant_average_weekly_hours": "20",
+    "claimant_pension_contribution": "Yes",
+    "claimant_notice_period_duration": "4",
+    "claimant_pension_weekly_contribution": "200"
+  },
+  "conciliationTrack": "Open Track",
+  "et1TribunalRegion": "Leeds",
+  "feeGroupReference": "1719217306281635",
+  "hearingCollection": [
+    {
+      "id": "84e10ed7-54ab-43c1-ab20-029d687e11ad",
+      "value": {
+        "Hearing_type": "Costs Hearing",
+        "Hearing_venue": {
+          "value": {
+            "code": "Hull",
+            "label": "Hull"
+          },
+          "list_items": [
+            {
+              "code": "Harrogate CJC",
+              "label": "Harrogate CJC"
+            },
+            {
+              "code": "Hull",
+              "label": "Hull"
+            },
+            {
+              "code": "Hull Combined Court Centre",
+              "label": "Hull Combined Court Centre"
+            },
+            {
+              "code": "IAC",
+              "label": "IAC"
+            },
+            {
+              "code": "Leeds",
+              "label": "Leeds"
+            },
+            {
+              "code": "Scarborough",
+              "label": "Scarborough"
+            },
+            {
+              "code": "Sheffield Combi",
+              "label": "Sheffield Combined Court"
+            },
+            {
+              "code": "Teesside ET",
+              "label": "Teesside ET"
+            },
+            {
+              "code": "Wakefield Count",
+              "label": "Wakefield Civil and Family Justice Centre"
+            }
+          ],
+          "selectedCode": "Hull",
+          "selectedLabel": "Hull"
+        },
+        "hearingFormat": [
+          "In person"
+        ],
+        "hearingNumber": "1",
+        "hearingSitAlone": "Sit Alone",
+        "judicialMediation": "No",
+        "hearingEstLengthNum": "1",
+        "hearingDateCollection": [
+          {
+            "id": "5b1f7401-eca5-46e1-adec-3c707a0e2849",
+            "value": {
+              "listedDate": "2024-01-08T12:00:00.000",
+              "Hearing_status": "Listed",
+              "hearingVenueDay": {
+                "value": {
+                  "code": "Hull",
+                  "label": "Hull"
+                },
+                "list_items": [
+                  {
+                    "code": "Harrogate CJC",
+                    "label": "Harrogate CJC"
+                  },
+                  {
+                    "code": "Hull",
+                    "label": "Hull"
+                  },
+                  {
+                    "code": "Hull Combined Court Centre",
+                    "label": "Hull Combined Court Centre"
+                  },
+                  {
+                    "code": "IAC",
+                    "label": "IAC"
+                  },
+                  {
+                    "code": "Leeds",
+                    "label": "Leeds"
+                  },
+                  {
+                    "code": "Scarborough",
+                    "label": "Scarborough"
+                  },
+                  {
+                    "code": "Sheffield Combi",
+                    "label": "Sheffield Combined Court"
+                  },
+                  {
+                    "code": "Teesside ET",
+                    "label": "Teesside ET"
+                  },
+                  {
+                    "code": "Wakefield Count",
+                    "label": "Wakefield Civil and Family Justice Centre"
+                  }
+                ],
+                "selectedCode": "Hull",
+                "selectedLabel": "Hull"
+              },
+              "hearingTimingStart": "2024-01-08T12:00:00.000",
+              "hearingTimingFinish": "2024-01-08T12:00:00.000"
+            }
+          }
+        ],
+        "hearingEstLengthNumType": "Days"
+      }
+    }
+  ],
+  "hmctsCaseCategory": "Employment Tribunals",
+  "isLocationCorrect": "Yes",
+  "targetHearingDate": "2024-12-21",
+  "documentCollection": [
+    {
+      "id": "9639390d-5e55-4efb-880a-5c931f816c57",
+      "value": {
+        "docNumber": "1",
+        "documentType": "ET1",
+        "typeOfDocument": "ET1",
+        "shortDescription": "ET1 - Ethan Materassi",
+        "uploadedDocument": {
+          "category_id": "C11",
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/afb613b7-fe7d-4b10-8636-ce6f71788972",
+          "document_filename": "ET1 - Ethan Materassi.pdf",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/afb613b7-fe7d-4b10-8636-ce6f71788972/binary"
+        },
+        "topLevelDocuments": "Starting a Claim",
+        "dateOfCorrespondence": "2024-06-24",
+        "startingClaimDocuments": "ET1"
+      }
+    },
+    {
+      "id": "6ec9c4aa-aa88-4792-9dfc-42115f77ffa6",
+      "value": {
+        "docNumber": "2",
+        "documentType": "ACAS Certificate",
+        "typeOfDocument": "ACAS Certificate",
+        "shortDescription": "ACAS Certificate - Henry Marsh - R444444_89_74",
+        "uploadedDocument": {
+          "category_id": "C13",
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/bd757431-0947-4f99-bcd8-37a10bde8af2",
+          "document_filename": "ACAS Certificate - Henry Marsh - R444444_89_74.pdf",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/bd757431-0947-4f99-bcd8-37a10bde8af2/binary"
+        },
+        "topLevelDocuments": "Starting a Claim",
+        "dateOfCorrespondence": "2024-06-24",
+        "startingClaimDocuments": "ACAS Certificate"
+      }
+    },
+    {
+      "id": "7a36863e-5f1c-4aeb-9493-1cc43b59a10b",
+      "value": {
+        "docNumber": "3",
+        "documentType": "ET1 Vetting",
+        "uploadedDocument": {
+          "category_id": "C71",
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/b84551d7-89ed-4321-9bf3-0d33464179b9",
+          "document_filename": "ET1 Vetting - Ethan Materassi.pdf",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/b84551d7-89ed-4321-9bf3-0d33464179b9/binary"
+        },
+        "topLevelDocuments": "Starting a Claim",
+        "dateOfCorrespondence": "2024-06-24",
+        "startingClaimDocuments": "ET1 Vetting"
+      }
+    },
+    {
+      "id": "18512a28-c30d-4d85-ba28-f5974ba2dcf1",
+      "value": {
+        "docNumber": "4",
+        "documentType": "Initial Consideration",
+        "uploadedDocument": {
+          "category_id": "C23",
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/b1fc1631-a67c-4c55-94ae-03134c73953f",
+          "document_filename": "Initial Consideration.pdf",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/b1fc1631-a67c-4c55-94ae-03134c73953f/binary"
+        },
+        "topLevelDocuments": "Initial Consideration",
+        "dateOfCorrespondence": "2024-11-27",
+        "initialConsiderationDocuments": "Initial Consideration"
+      }
+    }
+  ],
+  "et1VettingDocument": {
+    "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/b84551d7-89ed-4321-9bf3-0d33464179b9",
+    "document_filename": "ET1 Vetting - Ethan Materassi.pdf",
+    "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/b84551d7-89ed-4321-9bf3-0d33464179b9/binary"
+  },
+  "ethosCaseReference": "6015303/2024",
+  "flagsImageFileName": "EMP-TRIB-000000000000000.jpg",
+  "jurCodesCollection": [
+    {
+      "id": "1d9b6d69-4df3-4481-b24c-68ce31ae9bb3",
+      "value": {
+        "juridictionCodesList": "DDA"
+      }
+    },
+    {
+      "id": "cfaaf947-12f2-4e7d-8839-169a21e70a2e",
+      "value": {
+        "juridictionCodesList": "PID"
+      }
+    },
+    {
+      "id": "4a23d8f3-344f-42d7-9287-3023586e9564",
+      "value": {
+        "juridictionCodesList": "DAG"
+      }
+    }
+  ],
+  "referralCollection": [
+    {
+      "id": "b59e63fb-178a-49b8-90de-6fab608bf03a",
+      "value": {
+        "isUrgent": "No",
+        "referredBy": "test test",
+        "referCaseTo": "Admin",
+        "referralDate": "10 Oct 2024",
+        "referralNumber": "1",
+        "referralStatus": "Awaiting instructions",
+        "referralDetails": "asdsdadas",
+        "referralSubject": "ET1",
+        "referralSummaryPdf": {
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6dd86b59-02e5-4b1b-a138-16c40ab20a3d",
+          "document_filename": "Referral Summary.pdf",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6dd86b59-02e5-4b1b-a138-16c40ab20a3d/binary"
+        },
+        "referralHearingDate": "None",
+        "referralInstruction": "dsadsaasd"
+      }
+    },
+    {
+      "id": "34f86e2f-9c18-440b-9cad-488a26db5f6f",
+      "value": {
+        "isUrgent": "Yes",
+        "referredBy": "test test",
+        "referCaseTo": "Admin",
+        "referralDate": "03 Apr 2025",
+        "referralNumber": "2",
+        "referralStatus": "Awaiting instructions",
+        "referralDetails": "aa",
+        "referralSubject": "ET3/ECC",
+        "referralSummaryPdf": {
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/f7030980-7743-45c6-b15d-87833c4db1d6",
+          "document_filename": "Referral Summary.pdf",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/f7030980-7743-45c6-b15d-87833c4db1d6/binary"
+        },
+        "referralHearingDate": "None"
+      }
+    },
+    {
+      "id": "bd3109aa-4827-4d71-b6e7-50f1cd15d92a",
+      "value": {
+        "isUrgent": "Yes",
+        "referredBy": "test test",
+        "referCaseTo": "Judge",
+        "referralDate": "03 Apr 2025",
+        "referralNumber": "3",
+        "referralStatus": "Awaiting instructions",
+        "referralDetails": "data from one case session copied over to another \nJudge urgent yes",
+        "referralSubject": "ET1",
+        "referralSummaryPdf": {
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/ed331f77-4303-4d00-9ae6-4a1b877ecb90",
+          "document_filename": "Referral Summary.pdf",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/ed331f77-4303-4d00-9ae6-4a1b877ecb90/binary"
+        },
+        "referralHearingDate": "None",
+        "referralInstruction": "instructions"
+      }
+    },
+    {
+      "id": "b0c4b60d-e264-45f7-bdc1-55a7fef09c75",
+      "value": {
+        "isUrgent": "Yes",
+        "referredBy": "ET LegalOps",
+        "referCaseTo": "Legal officer",
+        "referralDate": "13 Jul 2026",
+        "referralNumber": "4",
+        "referralStatus": "Awaiting instructions",
+        "referralDetails": "test",
+        "referralSubject": "ET3/ECC",
+        "referralSummaryPdf": {
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/7d905893-f75e-4c04-a002-6cb55ad7f4fa",
+          "document_filename": "Referral Summary.pdf",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/7d905893-f75e-4c04-a002-6cb55ad7f4fa/binary"
+        },
+        "referralHearingDate": "None"
+      }
+    },
+    {
+      "id": "47a21bc2-7b0a-4c7a-a4ff-68ff4b135493",
+      "value": {
+        "isUrgent": "No",
+        "referredBy": "ET LegalOps",
+        "referCaseTo": "Admin",
+        "referralDate": "13 Jul 2026",
+        "referralNumber": "5",
+        "referralStatus": "Awaiting instructions",
+        "referralDetails": "test test",
+        "referralSubject": "Withdraw claim",
+        "referralSummaryPdf": {
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/a3ef7b17-d61b-402e-857c-99f44212d4a5",
+          "document_filename": "Referral Summary.pdf",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/a3ef7b17-d61b-402e-857c-99f44212d4a5/binary"
+        },
+        "referralHearingDate": "None"
+      }
+    }
+  ],
+  "et1OnlineSubmission": "Yes",
+  "areTheseCodesCorrect": "Yes",
+  "respondentCollection": [
+    {
+      "id": "15419256-e1c2-4e70-9b6f-d8b861f66293",
+      "value": {
+        "idamId": "61ea2f83-4431-42dd-9d29-b80fed24f585",
+        "et3Status": "inProgress",
+        "represented": "Yes",
+        "respondentEcc": "No",
+        "respondentType": "Organisation",
+        "respondent_ACAS": "R444444/89/74",
+        "respondent_name": "Henry Marsh's coffee shop",
+        "representativeId": "cf2679ed-3f99-4213-8f21-17c96a5aaf90",
+        "responseContinue": "Yes",
+        "responseReceived": "No",
+        "responseStruckOut": "No",
+        "extensionRequested": "No",
+        "respondent_address": {
+          "Country": "England",
+          "PostCode": "LS7 4QE",
+          "PostTown": "Leeds",
+          "AddressLine1": "7, Valley Gardens"
+        },
+        "et3HubLinksStatuses": {
+          "contestClaim": "notStartedYet",
+          "contactDetails": "notStartedYet",
+          "checkYorAnswers": "cannotStartYet",
+          "employerDetails": "notStartedYet",
+          "payPensionBenefitDetails": "notStartedYet",
+          "conciliationAndEmployeeDetails": "notStartedYet"
+        },
+        "representativeRemoved": "No",
+        "respondentOrganisation": "Henry Marsh's coffee shop",
+        "respondent_ACAS_question": "Yes",
+        "et3CaseDetailsLinksStatuses": {
+          "documents": "optional",
+          "et1ClaimForm": "notViewedYet",
+          "hearingDetails": "notAvailableYet",
+          "tribunalOrders": "notAvailableYet",
+          "contactTribunal": "optional",
+          "personalDetails": "notAvailableYet",
+          "respondentResponse": "notStartedYet",
+          "tribunalJudgements": "notAvailableYet",
+          "claimantApplications": "notAvailableYet",
+          "respondentRequestsAndApplications": "notAvailableYet"
+        }
+      }
+    }
+  ],
+  "caseNameHmctsInternal": "Test Company vs Henry Marsh's coffee shop",
+  "et1GovOrMajorQuestion": "No",
+  "et1VettingCompletedBy": "et api1",
+  "caseManagementCategory": {
+    "value": {
+      "code": "Employment Tribunals",
+      "label": "Employment"
+    },
+    "list_items": [
+      {
+        "code": "Employment Tribunals",
+        "label": "Employment"
+      }
+    ],
+    "selectedCode": "Employment Tribunals",
+    "selectedLabel": "Employment"
+  },
+  "caseManagementLocation": {
+    "region": "3",
+    "baseLocation": "36313"
+  },
+  "claimantTaskListChecks": {
+    "claimDetailsCheck": "Yes",
+    "personalDetailsCheck": "Yes",
+    "employmentAndRespondentCheck": "Yes"
+  },
+  "et1SuggestHearingVenue": "No",
+  "noticeOfChangeAnswers0": {
+    "respondentName": "Henry Marsh",
+    "claimantLastName": "Materassi",
+    "claimantFirstName": "Ethan"
+  },
+  "suggestedHearingVenues": {
+    "list_items": [
+      {
+        "code": "Harrogate CJC",
+        "label": "Harrogate CJC"
+      },
+      {
+        "code": "Hull",
+        "label": "Hull"
+      },
+      {
+        "code": "Hull Combined Court Centre",
+        "label": "Hull Combined Court Centre"
+      },
+      {
+        "code": "IAC",
+        "label": "IAC"
+      },
+      {
+        "code": "Leeds",
+        "label": "Leeds"
+      },
+      {
+        "code": "Scarborough",
+        "label": "Scarborough"
+      },
+      {
+        "code": "Sheffield Combi",
+        "label": "Sheffield Combined Court"
+      },
+      {
+        "code": "Teesside ET",
+        "label": "Teesside ET"
+      },
+      {
+        "code": "Wakefield Count",
+        "label": "Wakefield Civil and Family Justice Centre"
+      }
+    ]
+  },
+  "claimant_TypeOfClaimant": "Company",
+  "et1VideoHearingQuestion": "Yes",
+  "listedDateInPastWarning": "Yes",
+  "etICHearingAlreadyListed": "No",
+  "etICHearingNotListedList": [
+    "List for preliminary hearing",
+    "List for final hearing"
+  ],
+  "isTrackAllocationCorrect": "Yes",
+  "tribunalCorrespondenceDX": "DX 742940 Leeds 75",
+  "claimantHearingPreference": {
+    "contact_language": "English",
+    "hearing_preferences": [
+      "Video"
+    ],
+    "reasonable_adjustments": "No"
+  },
+  "tribunalCorrespondenceFax": "01264 785136",
+  "caseManagementLocationCode": "36313",
+  "claimantDocumentCollection": [
+    {
+      "id": "9639390d-5e55-4efb-880a-5c931f816c57",
+      "value": {
+        "docNumber": "1",
+        "documentType": "ET1",
+        "typeOfDocument": "ET1",
+        "shortDescription": "ET1 - Ethan Materassi",
+        "uploadedDocument": {
+          "category_id": "C11",
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/afb613b7-fe7d-4b10-8636-ce6f71788972",
+          "document_filename": "ET1 - Ethan Materassi.pdf",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/afb613b7-fe7d-4b10-8636-ce6f71788972/binary"
+        },
+        "topLevelDocuments": "Starting a Claim",
+        "dateOfCorrespondence": "2024-06-24",
+        "startingClaimDocuments": "ET1"
+      }
+    },
+    {
+      "id": "6ec9c4aa-aa88-4792-9dfc-42115f77ffa6",
+      "value": {
+        "docNumber": "2",
+        "documentType": "ACAS Certificate",
+        "typeOfDocument": "ACAS Certificate",
+        "shortDescription": "ACAS Certificate - Henry Marsh - R444444_89_74",
+        "uploadedDocument": {
+          "category_id": "C13",
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/bd757431-0947-4f99-bcd8-37a10bde8af2",
+          "document_filename": "ACAS Certificate - Henry Marsh - R444444_89_74.pdf",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/bd757431-0947-4f99-bcd8-37a10bde8af2/binary"
+        },
+        "topLevelDocuments": "Starting a Claim",
+        "dateOfCorrespondence": "2024-06-24",
+        "startingClaimDocuments": "ACAS Certificate"
+      }
+    }
+  ],
+  "etIcHearingPanelPreference": "|Claimant's hearing panel preference | |\n|-------------|:------------|\n|Panel Preference | -|\n|Reason for Panel Preference | -|",
+  "privateHearingRequiredFlag": "No",
+  "representativeClaimantType": {
+    "myHmctsOrganisation": {
+      "OrganisationID": "HEBFGBR"
+    },
+    "name_of_organisation": "NFD Solicitor Organisation",
+    "name_of_representative": "User Test",
+    "representative_address": {
+      "County": "Westminster",
+      "PostCode": "SW1H 9AJ",
+      "PostTown": "London",
+      "AddressLine1": "102 Petty France"
+    },
+    "representative_email_address": "TEST_SOLICITORONLY_USER@mailinator.com"
+  },
+  "claimantRepresentedQuestion": "Yes",
+  "claimantWorkAddressQuestion": "Yes",
+  "etICJuridictionCodesInvalid": "No",
+  "tribunalCorrespondenceEmail": "LeedsET@justice.gov.uk",
+  "et1VettingAcasCertIsYesOrNo1": "Yes",
+  "claimantRepresentativeRemoved": "No",
+  "etInitialConsiderationHearing": "|Hearing details | |\r\n|-------------|:------------|\r\n|Date | -|\r\n|Type | -|\r\n|Duration | -|",
+  "respondentOrganisationPolicy0": {
+    "Organisation": {
+      "OrganisationID": "PG7Q7JU",
+      "OrganisationName": "ET Test Factory Solicitor"
+    },
+    "OrgPolicyCaseAssignedRole": "[SOLICITORA]"
+  },
+  "respondentOrganisationPolicy1": {
+    "OrgPolicyCaseAssignedRole": "[SOLICITORB]"
+  },
+  "respondentOrganisationPolicy2": {
+    "OrgPolicyCaseAssignedRole": "[SOLICITORC]"
+  },
+  "respondentOrganisationPolicy3": {
+    "OrgPolicyCaseAssignedRole": "[SOLICITORD]"
+  },
+  "respondentOrganisationPolicy4": {
+    "OrgPolicyCaseAssignedRole": "[SOLICITORE]"
+  },
+  "respondentOrganisationPolicy5": {
+    "OrgPolicyCaseAssignedRole": "[SOLICITORF]"
+  },
+  "respondentOrganisationPolicy6": {
+    "OrgPolicyCaseAssignedRole": "[SOLICITORG]"
+  },
+  "respondentOrganisationPolicy7": {
+    "OrgPolicyCaseAssignedRole": "[SOLICITORH]"
+  },
+  "respondentOrganisationPolicy8": {
+    "OrgPolicyCaseAssignedRole": "[SOLICITORI]"
+  },
+  "respondentOrganisationPolicy9": {
+    "OrgPolicyCaseAssignedRole": "[SOLICITORJ]"
+  },
+  "tribunalCorrespondenceAddress": {
+    "PostCode": "LS1 2RP",
+    "PostTown": "Leeds",
+    "AddressLine1": "Westgate",
+    "AddressLine2": "6 Grace Street"
+  },
+  "changeOrganisationRequestField": {
+    "OrganisationToAdd": {}
+  },
+  "et1VettingCanServeClaimYesOrNo": "Yes",
+  "etInitialConsiderationDocument": {
+    "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/b1fc1631-a67c-4c55-94ae-03134c73953f",
+    "document_filename": "Initial Consideration.pdf",
+    "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/b1fc1631-a67c-4c55-94ae-03134c73953f/binary"
+  },
+  "tribunalCorrespondenceTelephone": "0300 323 0196",
+  "et1ReasonableAdjustmentsQuestion": "No",
+  "etInitialConsiderationRespondent": "| Respondent 1 name given | |\r\n|-------------|:------------|\r\n|In ET1 by claimant | Henry Marsh's coffee shop|\r\n|In ET3 by respondent | |",
+  "icRespondentHearingPanelPreference": "| Respondent 1 hearing panel preference | |\r\n|-------------|:------------|\r\n|Preference | -|\r\n|Reason | -|",
+  "etICHearingNotListedListForFinalHearing": {
+    "etICTypeOfFinalHearing": [
+      "Telephone",
+      "Video",
+      "F2F"
+    ],
+    "etICLengthOfFinalHearing": "2",
+    "finalHearingLengthNumType": "Hours"
+  },
+  "etInitialConsiderationJurisdictionCodes": "<h2>Jurisdiction codes</h2><a target=\"_blank\" href=\"https://judiciary.sharepoint.com/:b:/s/empjudgesew/EZowDqUAYpBEl9NkTirLUdYBjXdpi3-7b18HlsDqZNV3xA?e=tR7Wof\">View all jurisdiction codes and descriptors (opens in new tab)</a><br><br><strong>DDA</strong> - Suffered a detriment, discrimination, including indirect discrimination, and discrimination based on association or perception, harassment and/or dismissal on grounds of disability or failure of employer to make reasonable adjustments<br><br><strong>PID</strong> - Suffered a detriment and/or dismissal due to exercising rights under the Public Interest Disclosure Act<br><br><strong>DAG</strong> - Discrimination, including harassment or discrimination based on association or perception on grounds of age<br><br><hr>",
+  "claimantRepresentativeOrganisationPolicy": {
+    "Organisation": {
+      "OrganisationID": "HEBFGBR"
+    },
+    "OrgPolicyCaseAssignedRole": "[CLAIMANTSOLICITOR]"
+  },
+  "etICHearingNotListedListForPrelimHearing": {
+    "etICLengthOfPrelimHearing": "2",
+    "prelimHearingLengthNumType": "Days",
+    "etICTypeOfPreliminaryHearing": [
+      "Telephone",
+      "Video",
+      "F2F"
+    ],
+    "etICGiveDetailsOfHearingNotice": "Test",
+    "etICPurposeOfPreliminaryHearing": [
+      "Case management",
+      "Preliminary issue",
+      "Strike out",
+      "Deposit"
+    ]
+  }
+}

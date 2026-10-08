@@ -1,8 +1,12 @@
-import { test } from '../fixtures/common.fixture';
-import userDetailsData from '../resources/payload/user-details.json';
-import { createCaseViaCitizenUI, vetAndAcceptCitizenCase, partiallyCreateCaseViaCitizenUI } from '../pages/helpers/CuiCaseCreationHelper.ts';
-import { CaseTypeLocation, Events } from '../config/case-data.ts';
-import { config, users } from '../config/config.dynamic.ts';
+import { test } from '../fixtures/et.test.fixture.ts';
+import userDetailsData from '@et-shared-test-library/core/resources/payload/user-details.json';
+import {
+  CaseTypeLocation, config,
+  createCaseViaCitizenUI,
+  Events, partiallyCreateCaseViaCitizenUI,
+  users,
+  vetAndAcceptCitizenCase
+} from "@et-shared-test-library/core";
 
 let caseId: string;
 let caseNumber: string;

@@ -1,10 +1,13 @@
-import { test } from '../fixtures/common.fixture';
+import { test } from '../fixtures/et.test.fixture.ts';
 import { expect } from '@playwright/test';
-import { CitizenClaimantFactory } from '../data-utils/factory/citizen/ClaimantCitizenFactory.ts';
-import { CaseTypeLocation, Events } from '../config/case-data.ts';
-import { config, users } from '../config/config.dynamic.ts';
-import CitizenHubPage from '../pages/claimantCitizenHub/CitizenHubPage.ts';
-import CitizenHubLoginPage from '../pages/claimantCitizenHub/CitizenHubLoginPage.ts';
+import {
+  CaseTypeLocation,
+  CitizenClaimantFactory,
+  CitizenHubLoginPage, CitizenHubPage,
+  config,
+  Events,
+  users
+} from "@et-shared-test-library/core";
 
 let subRef: any;
 let caseNumber: any;

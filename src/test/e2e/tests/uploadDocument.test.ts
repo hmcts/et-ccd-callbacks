@@ -1,8 +1,6 @@
-import { test } from '../fixtures/common.fixture';
-import fileUploadData from '../resources/payload/file-upload-content.json';
-import { CaseworkerCaseFactory } from '../data-utils/factory/exui/CaseworkerCaseFactory.ts';
-import { CaseTypeLocation, Events } from '../config/case-data.ts';
-import { users } from '../config/config.dynamic.ts';
+import { test } from '../fixtures/et.test.fixture.ts';
+import fileUploadData from '@et-shared-test-library/core/resources/payload/file-upload-content.json';
+import {CaseTypeLocation, CaseworkerCaseFactory, Events, users} from "@et-shared-test-library/core";
 
 let caseNumber: string;
 let caseId: string;

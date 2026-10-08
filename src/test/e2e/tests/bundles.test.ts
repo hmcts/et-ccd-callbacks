@@ -1,17 +1,12 @@
-import { test } from '../fixtures/common.fixture';
-import { CaseDetailsValues, CaseTypeLocation, Events } from '../config/case-data';
-import DateUtilComponent from '../data-utils/DateUtilComponent';
-import { CaseworkerCaseFactory } from '../data-utils/factory/exui/CaseworkerCaseFactory.ts';
-import { CitizenClaimantFactory } from '../data-utils/factory/citizen/ClaimantCitizenFactory.ts';
-import { CaseEventApi } from '../data-utils/api/CaseEventApi.ts';
-import { users } from '../config/config.dynamic.ts';
-import { ManageCaseDashboardPage } from '../pages/ManageCaseDashboardPage.ts';
-import LoginPage from '../pages/loginPage.ts';
-import CaseDetailsPage from '../pages/caseDetailsPage.ts';
-import CitizenHubLoginPage from '../pages/claimantCitizenHub/CitizenHubLoginPage.ts';
-import CitizenHubPage from '../pages/claimantCitizenHub/CitizenHubPage.ts';
-import PrepareAndSubmitDocumentPage from '../pages/claimantCitizenHub/PrepareAndSubmitDocumentPage.ts';
-import { ListHearingPage } from '../pages/events/listHearingPage.ts';
+import { test } from '../fixtures/et.test.fixture.ts';
+import {
+  CaseDetailsPage, CaseDetailsValues, CaseEventApi, CaseTypeLocation,
+  CaseworkerCaseFactory, CitizenClaimantFactory, CitizenHubLoginPage,
+  CitizenHubPage, DateUtilComponent, Events, ListHearingPage,
+  LoginPage,
+  ManageCaseDashboardPage, PrepareAndSubmitDocumentPage,
+  users
+} from "@et-shared-test-library/core";
 
 let caseId: string;
 let caseNumber: string;

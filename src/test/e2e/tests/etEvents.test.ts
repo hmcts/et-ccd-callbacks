@@ -1,11 +1,12 @@
-import { test } from "../fixtures/common.fixture";
-import { CaseworkerCaseFactory } from '../data-utils/factory/exui/CaseworkerCaseFactory.ts';
-import { CaseTypeLocation, Events } from '../config/case-data.ts';
-import { CitizenClaimantFactory } from '../data-utils/factory/citizen/ClaimantCitizenFactory.ts';
-import { CaseEventApi } from '../data-utils/api/CaseEventApi.ts';
-import { users } from '../config/config.dynamic.ts';
-import CitizenHubLoginPage from '../pages/claimantCitizenHub/CitizenHubLoginPage.ts';
-import CitizenHubPage from '../pages/claimantCitizenHub/CitizenHubPage.ts';
+import { test } from "../fixtures/et.test.fixture.ts";
+import {
+  CaseEventApi,
+  CaseTypeLocation,
+  CaseworkerCaseFactory,
+  CitizenClaimantFactory, CitizenHubLoginPage, CitizenHubPage,
+  Events,
+  users
+} from "@et-shared-test-library/core";
 
 let caseNumber: string;
 let caseId: string;
@@ -52,10 +53,11 @@ test.describe('Various events in mange case application', () => {
   });
 
   //EXUI-3451
-  test('Create a England/Wales claim and transfer to Scotland', {tag: '@demo'}, async ({ caseDetailsPage, caseTransferPage }) => {
+  test('Create a England/Wales claim and transfer to Scotland', {tag: '@demo'}, async ({ caseDetailsPage, caseTransferPage, checkYourAnswersPage }) => {
     await caseDetailsPage.selectNextEvent(Events.caseTransferScotland);
     await caseTransferPage.progressCaseTransfer();
-    await caseTransferPage.checkYourAnswer(caseNumber);
+    await caseTransferPage.checkYourAnswer(checkYourAnswersPage);
+    await caseTransferPage.assertCaseDetailsTabDataAfterCaseTransfer(caseDetailsPage);
   });
 
   //RET-5790
@@ -121,10 +123,12 @@ test.describe('Claimant retaining access to transferred case', () => {
   });
 
   //EXUI-3451
-  test('Create a England/Wales claim and transfer to Scotland, Claimant retains case', async ({ browserUtils, caseDetailsPage, caseTransferPage }) => {
+  test('Create a England/Wales claim and transfer to Scotland, Claimant retains case', async ({ browserUtils, caseDetailsPage, caseTransferPage, checkYourAnswersPage }) => {
     await caseDetailsPage.selectNextEvent(Events.caseTransferScotland);
     await caseTransferPage.progressCaseTransfer();
-    let newSubRef= await caseTransferPage.checkYourAnswer(caseNumber);
+    await caseTransferPage.checkYourAnswer(checkYourAnswersPage);
+    await caseTransferPage.assertCaseDetailsTabDataAfterCaseTransfer(caseDetailsPage);
+    let newSubRef= await caseTransferPage.getNewDigitalCaseReferenceNumber();
 
     //login as claimant and access transferred case
     const claimantBrowserPage = await browserUtils.openNewBrowserContext(users.etClaimant.sessionFile);

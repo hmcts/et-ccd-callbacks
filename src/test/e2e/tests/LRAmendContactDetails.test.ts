@@ -1,19 +1,14 @@
-import { test } from '../fixtures/common.fixture.ts';
-import { config, users } from '../config/config.dynamic.ts';
-import { CitizenClaimantFactory } from '../data-utils/factory/citizen/ClaimantCitizenFactory.ts';
-import { CaseDetailsValues, CaseTypeLocation, Events } from '../config/case-data.ts';
-import { CaseEventApi } from '../data-utils/api/CaseEventApi.ts';
-import { AddressDetails } from '../types/address.ts';
-import LoginPage from '../pages/loginPage.ts';
-import { ManageCaseDashboardPage } from '../pages/ManageCaseDashboardPage.ts';
-import { Page } from '@playwright/test';
-import CaseDetailsPage from '../pages/caseDetailsPage.ts';
-import { createCaseViaCitizenUI } from '../pages/helpers/CuiCaseCreationHelper.ts';
-import userDetailsData from '../resources/payload/user-details.json';
-import { NocPage } from '../pages/legalRepresentative/NocPage.ts';
-import RespondentRepPage from '../pages/respondentCitizenHub/respondentRepPage.ts';
-import AmendContactDetailsLrPage from '../pages/events/AmendContactDetailsLrPage.ts';
-import { CheckYourAnswersPage } from '../pages/helpers/CheckYourAnswersPage.ts';
+import { test } from '../fixtures/et.test.fixture.ts';
+import userDetailsData from '@et-shared-test-library/core/resources/payload/user-details.json';
+import {Page} from "@playwright/test";
+import {
+  AddressDetails, AmendContactDetailsLrPage,
+  CaseDetailsPage, CaseDetailsValues, CaseEventApi, CaseTypeLocation, CheckYourAnswersPage,
+  CitizenClaimantFactory, config, createCaseViaCitizenUI, Events,
+  LoginPage,
+  ManageCaseDashboardPage, NocPage, RespondentRepPage,
+  users
+} from "@et-shared-test-library/core";
 
 let caseId: string;
 let caseNumber: string;

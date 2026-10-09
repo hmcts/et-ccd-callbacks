@@ -24,6 +24,16 @@ docker pull wiremock/wiremock:latest
 # Download DM Store
 docker pull hmctsprod.azurecr.io/dm/store:latest
 
+#*************************CUI RA / COMMON DATA************************
+# Download CUI RA
+docker pull "${CUI_RA_IMAGE:-hmctsprod.azurecr.io/cui/ra:latest}"
+# Download RD Common Data API
+docker pull "${RD_COMMONDATA_API_IMAGE:-hmctsprod.azurecr.io/rd/commondata-api:latest}"
+# Download CUI RA Redis
+docker pull redis:8.8.0
+# Download local IDAM simulator proxy
+docker pull nginx:alpine
+
 
 #*************************WORK ALLOCATION*****************************
 # Download camunda

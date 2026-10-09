@@ -1,0 +1,113 @@
+---
+# CUI RA and common reference data services for CFTLib local development.
+# Loaded when ET_CUI_RA=true is set before running bootWithCCD, or via bootWithCcdAndCuiRa.
+
+services:
+  rd-idam-simulator-proxy:
+    image: nginx:alpine
+    volumes:
+      - ./rd-commondata/idam-simulator-proxy.conf:/etc/nginx/conf.d/default.conf:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  rd-commondata-api:
+    image: "${RD_COMMONDATA_API_IMAGE:-hmctsprod.azurecr.io/rd/commondata-api:latest}"
+    environment:
+      SERVER_PORT: 4550
+      POSTGRES_HOST: host.docker.internal
+      POSTGRES_PORT: 6432
+      POSTGRES_NAME: dbcommondata
+      POSTGRES_DB_NAME: dbcommondata
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: ${ET_COS_CFTLIB_DB_PASSWORD:-postgres}
+      COMMONDATA_API_S2S_SECRET: ${COMMONDATA_API_S2S_SECRET:-AAAAAAAAAAAAAAAA}
+      S2S_URL: http://host.docker.internal:8489
+      CRD_S2S_AUTHORISED_SERVICES: ${CRD_S2S_AUTHORISED_SERVICES:-rd_commondata_api,cui_ra,et_cos,xui_webapp}
+      OPEN_ID_API_BASE_URI: ${RD_COMMONDATA_OPEN_ID_API_BASE_URI:-http://rd-idam-simulator-proxy:5062/o}
+      OIDC_ISSUER_URL: ${RD_COMMONDATA_OIDC_ISSUER_URL:-http://localhost:5062/o}
+      IDAM_URL: ${RD_COMMONDATA_IDAM_URL:-http://host.docker.internal:5062}
+      idam_url: ${RD_COMMONDATA_IDAM_URL:-http://host.docker.internal:5062}
+      LD_SDK_KEY: ${RD_COMMONDATA_LD_SDK_KEY:-}
+      LAUNCH_DARKLY_ENV: ${RD_COMMONDATA_LAUNCH_DARKLY_ENV:-aat}
+      ENVIRONMENT_NAME: ${RD_COMMONDATA_LAUNCH_DARKLY_ENV:-aat}
+      APPLICATIONINSIGHTS_CONNECTION_STRING: ${RD_COMMONDATA_APPLICATIONINSIGHTS_CONNECTION_STRING:-InstrumentationKey=00000000-0000-0000-0000-000000000000}
+    ports:
+      - "${RD_COMMONDATA_API_PORT:-4550}:4550"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - rd-idam-simulator-proxy
+    restart: on-failure
+
+  rd-commondata-api-seed:
+    image: postgres:16
+    environment:
+      PGHOST: host.docker.internal
+      PGPORT: 6432
+      PGDATABASE: dbcommondata
+      PGUSER: postgres
+      PGPASSWORD: ${ET_COS_CFTLIB_DB_PASSWORD:-postgres}
+    volumes:
+      - ./rd-commondata/seed-bha1-case-flags.sql:/seed/seed-bha1-case-flags.sql:ro
+    command:
+      - /bin/sh
+      - -c
+      - |
+        until psql -tAc "select 1 from information_schema.columns where table_schema = 'public' and table_name = 'flag_service' and column_name = 'available_externally'" | grep -q 1; do
+          echo "Waiting for rd-commondata-api Flyway migrations..."
+          sleep 2
+        done
+        psql -v ON_ERROR_STOP=1 -f /seed/seed-bha1-case-flags.sql
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - rd-commondata-api
+    restart: "no"
+
+  cui-ra-redis:
+    image: redis:8.8.0
+    command: ["redis-server", "--requirepass", "${CUI_RA_REDIS_PASSWORD:-password}"]
+
+  cui-ra:
+    image: "${CUI_RA_IMAGE:-hmctsprod.azurecr.io/cui/ra:latest}"
+    environment:
+      PORT: 3100
+      NODE_ENV: production
+      ENV_INSTANCE: cftlib
+      DEMO_ENABLED: ${CUI_RA_DEMO_ENABLED:-true}
+      IS_DEV: ${CUI_RA_IS_DEV:-true}
+      SESSION_SECRET: ${CUI_RA_SESSION_SECRET:-local}
+      S2S_ALLOWED_SERVICES: ${CUI_RA_ALLOWED_SERVICES:-et_cos,et_sya,et_sya_api,et_syr,xui_webapp,prl_citizen_frontend}
+      REDIS_HOST: cui-ra-redis
+      REDIS_PORT: 6379
+      REDIS_TLS: "false"
+      REDIS_PROTOCOL: redis
+      SERVICES_S2S_ENDPOINT: http://host.docker.internal:8489
+      SERVICES_REFDATA_ENDPOINT: http://rd-commondata-api:4550
+      NODE_CONFIG: |-
+        {
+          "services": {
+            "s2s": {
+              "secret": "${CUI_RA_S2S_SECRET:-AAAAAAAAAAAAAAAA}"
+            }
+          },
+          "session": {
+            "secure": ${CUI_RA_SESSION_SECURE:-false},
+            "redis": {
+              "key": "${CUI_RA_REDIS_PASSWORD:-password}"
+            }
+          }
+        }
+    ports:
+      - "${CUI_RA_PORT:-3100}:3100"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - cui-ra-redis
+      - rd-commondata-api
+    restart: on-failure
+
+networks:
+  default:
+    name: cftlib_default
+    external: true

@@ -117,7 +117,7 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
         when(userService.getValidatedUserDetails(AUTH_TOKEN, ccdRequest.getCaseDetails().getCaseId()))
                 .thenReturn(userDetails);
         doNothing().when(nocRemoveRepresentationService).setNocRemoveOption(userDetails, ccdRequest.getCaseDetails());
-        doNothing().when(nocRemoveRepresentationService).revokeClaimantLegalRep(any(CaseDetails.class));
+        doNothing().when(nocRemoveRepresentationService).revokeClaimantLegalRep(eq(AUTH_TOKEN), any(CaseDetails.class));
         doNothing().when(nocRemoveRepNotificationService).sendClaimantRepresentativeRemovalNotifications(
                 eq(userDetails), any(CaseDetails.class));
         mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_SUBMIT)

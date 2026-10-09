@@ -2,11 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
@@ -29,7 +26,6 @@ final class NotificationUtilsTest {
     private static final String RESPONDENT_EMAIL = "respondent@hmcts.org";
     private static final String REPRESENTATIVE_ID = "Representative ID";
     private static final String ORGANISATION_ID = "Organisation ID";
-    private static final String ORGANISATION_EMAIL = "organisation@hmcts.org";
 
     @BeforeEach
     void setUp() {
@@ -102,62 +98,5 @@ final class NotificationUtilsTest {
         claimantRepresentative.getMyHmctsOrganisation().setOrganisationID(ORGANISATION_ID);
         assertThat(NotificationUtils.findClaimantRepresentativeOrganisationId(claimantRepresentative))
                 .isEqualTo(ORGANISATION_ID);
-    }
-
-    @Test
-    void theHasOrganisationSuperuserEmail() {
-        // when organisation id is empty should return false
-        RetrieveOrgByIdResponse retrieveOrgByIdResponse = RetrieveOrgByIdResponse.builder().build();
-        ResponseEntity<RetrieveOrgByIdResponse> orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse,
-                HttpStatus.OK);
-        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
-        // when case id is empty should return false
-        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
-        // when noc type is empty should return false
-        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
-        // when organisation response is empty should return false
-        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(null)).isFalse();
-        // when organisation response status code is different from successful should return false
-        orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse, HttpStatus.BAD_REQUEST);
-        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
-        // when organisation response not has body should return false
-        orgResponse = new ResponseEntity<>(null, HttpStatus.OK);
-        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
-        // when organisation response body not has superuser should return false
-        orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse, HttpStatus.OK);
-        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
-        // when superuser not has email should return false
-        retrieveOrgByIdResponse.setSuperUser(RetrieveOrgByIdResponse.SuperUser.builder().build());
-        orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse, HttpStatus.OK);
-        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
-        // when superuser has email should return true
-        retrieveOrgByIdResponse.getSuperUser().setEmail(ORGANISATION_EMAIL);
-        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isTrue();
-    }
-
-    @Test
-    void theHasOrganisationSuperuserEmailWithoutCaseId() {
-        // when organisation response is valid should return true
-        RetrieveOrgByIdResponse retrieveOrgByIdResponse = RetrieveOrgByIdResponse.builder()
-                .superUser(RetrieveOrgByIdResponse.SuperUser.builder().email(ORGANISATION_EMAIL).build())
-                .build();
-        ResponseEntity<RetrieveOrgByIdResponse> orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse,
-                HttpStatus.OK);
-        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isTrue();
-        // when organisation response is empty should return false
-        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(null)).isFalse();
-        // when organisation response status code is different from successful should return false
-        orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse, HttpStatus.BAD_REQUEST);
-        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
-        // when organisation response not has body should return false
-        orgResponse = new ResponseEntity<>(null, HttpStatus.OK);
-        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
-        // when organisation response body not has superuser should return false
-        orgResponse = new ResponseEntity<>(RetrieveOrgByIdResponse.builder().build(), HttpStatus.OK);
-        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
-        // when superuser not has email should return false
-        retrieveOrgByIdResponse.setSuperUser(RetrieveOrgByIdResponse.SuperUser.builder().build());
-        orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse, HttpStatus.OK);
-        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
     }
 }

@@ -64,7 +64,6 @@ import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_ALLOCATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.CASE_DETAILS_OR_CASE_DATA_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES;
@@ -133,7 +132,7 @@ public class NocRespondentRepresentativeService {
     public List<String> validateRepresentativesOrganisationsAndEmails(CaseData caseData)
             throws GenericServiceException {
         List<String> warnings = new ArrayList<>();
-        if (!RespondentRepresentativeUtils.hasRepresentatives(caseData)) {
+        if (!RespondentRepresentativeUtils.hasRespondentRepresentative(caseData)) {
             return warnings;
         }
         for (RepresentedTypeRItem representativeItem :  caseData.getRepCollection()) {
@@ -1256,31 +1255,47 @@ public class NocRespondentRepresentativeService {
     }
 
     /**
-     * Saves the amended contact details (phone and address) back to all respondent representatives
-     * associated with the authenticated user.
+     * Resolves the email address associated with the given representative.
+     * <p>
+     * The method first checks whether the supplied representative is valid. If the
+     * representative is invalid, an empty string is returned.
+     * </p>
      *
-     * <p>If the user selected "Use MyHMCTS details", the organisation address is first fetched and
-     * applied to the case data before being persisted to the representative collection.
+     * <p>
+     * If an email address is already present on the representative, that value is
+     * returned directly. Otherwise, the method attempts to retrieve the email address
+     * from IDAM using the representative's IDAM identifier.
+     * </p>
      *
-     * @param userToken   the IDAM authentication token of the logged-in legal rep
-     * @param caseDetails the case details containing the representative collection and form values
-     * @throws GenericServiceException if the MyHMCTS organisation address cannot be retrieved
+     * <p><strong>Assumptions:</strong></p>
+     * <ul>
+     *     <li>A valid representative contains a non-null value object.</li>
+     *     <li>The representative email stored in case data takes precedence over the
+     *         email held in IDAM.</li>
+     *     <li>An IDAM lookup is performed only when the representative does not already
+     *         have an email address and has a non-blank IDAM identifier.</li>
+     *     <li>If no email can be resolved, the method returns {@link StringUtils#EMPTY}
+     *         rather than {@code null}.</li>
+     *     <li>The IDAM service may return {@code null}, in which case an empty string
+     *         is returned.</li>
+     * </ul>
+     *
+     * @param representative the representative whose email address is to be resolved
+     * @return the representative's email address, or {@link StringUtils#EMPTY} if no
+     *         email address can be resolved
      */
-    public void saveRespondentRepresentativeContactDetails(String userToken, CaseDetails caseDetails)
-            throws GenericServiceException {
-        CaseData caseData = caseDetails.getCaseData();
-        if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS.equals(
-                caseData.getRepresentativeContactChangeOption())) {
-            populateMyHmctsOrganisationAddress(userToken, caseData);
+    public String resolveRepresentativeEmail(RepresentedTypeRItem representative) {
+        if (!RespondentRepresentativeUtils.isValidRepresentative(representative)) {
+            return StringUtils.EMPTY;
         }
-        List<RepresentedTypeRItem> representatives = findRepresentativesByToken(userToken, caseDetails);
-        for (RepresentedTypeRItem item : representatives) {
-            if (ObjectUtils.isEmpty(item) || ObjectUtils.isEmpty(item.getValue())) {
-                continue;
-            }
-            item.getValue().setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
-            item.getValue().setRepresentativeAddress(caseData.getEt3ResponseAddress());
+        if (StringUtils.isNotBlank(representative.getValue().getRepresentativeEmailAddress())) {
+            return representative.getValue().getRepresentativeEmailAddress();
         }
-        caseData.setMyHmctsAddressText(null);
+        if (StringUtils.isBlank(representative.getValue().getIdamId())) {
+            return StringUtils.EMPTY;
+        }
+        UserDetails userDetails = userIdamService.getUserDetailsById(authTokenGenerator.generate(),
+                representative.getValue().getIdamId());
+        return userDetails != null ? userDetails.getEmail() : StringUtils.EMPTY;
     }
 }

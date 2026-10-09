@@ -104,23 +104,38 @@ class NocRemoveRepresentationServiceTest {
         GenericServiceException gse = assertThrows(GenericServiceException.class,
                 () -> nocRemoveRepresentationService.revokeClaimantLegalRep(DUMMY_USER_TOKEN, tmpCaseDetails));
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_REPRESENTATIVE_NOT_FOUND);
-        // when claimant representative exists, should revoke representation
+        // when claimant representative exists, but noc remove option is not organisation should revoke only
+        // representation
         tmpCaseDetails.getCaseData().setRepresentativeClaimantType(RepresentedTypeC.builder()
                 .representativeId(CLAIMANT_REPRESENTATIVE_ID).build());
         tmpCaseDetails.getCaseData().setClaimantRepresentativeRemoved(NO);
         tmpCaseDetails.getCaseData().setClaimantRepresentedQuestion(YES);
-        tmpCaseDetails.getCaseData().setNocRemoveOption(NOC_REMOVE_OPTION_ORGANISATION);
+        tmpCaseDetails.getCaseData().setNocRemoveOption(NOC_REMOVE_OPTION_YOURSELF);
         tmpCaseDetails.getCaseData().setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder()
                 .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
                 .organisation(Organisation.builder().organisationID(ORGANISATION_ID).build()).build());
         nocRemoveRepresentationService.revokeClaimantLegalRep(DUMMY_USER_TOKEN, tmpCaseDetails);
         verify(nocCcdService, times(LoggerTestUtils.INTEGER_ONE))
                 .revokeClaimantRepresentation(DUMMY_USER_TOKEN, tmpCaseDetails);
+        assertThat(tmpCaseDetails.getCaseData().getRepresentativeClaimantType()).isEqualTo(RepresentedTypeC.builder()
+                .representativeId(CLAIMANT_REPRESENTATIVE_ID).build());
+        assertThat(tmpCaseDetails.getCaseData().getClaimantRepresentativeRemoved()).isEqualTo(NO);
+        assertThat(tmpCaseDetails.getCaseData().getClaimantRepresentedQuestion()).isEqualTo(YES);
+        assertThat(tmpCaseDetails.getCaseData().getClaimantRepresentativeOrganisationPolicy()).isEqualTo(
+                OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                        ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).organisation(
+                                Organisation.builder().organisationID(ORGANISATION_ID).build()).build());
+        // when claimant representative exists, and noc remove option is organisation should revoke representation and
+        // mark claimant as unrepresented
+        tmpCaseDetails.getCaseData().setNocRemoveOption(NOC_REMOVE_OPTION_ORGANISATION);
+        nocRemoveRepresentationService.revokeClaimantLegalRep(DUMMY_USER_TOKEN, tmpCaseDetails);
+        verify(nocCcdService, times(LoggerTestUtils.INTEGER_TWO))
+                .revokeClaimantRepresentation(DUMMY_USER_TOKEN, tmpCaseDetails);
         assertThat(tmpCaseDetails.getCaseData().getRepresentativeClaimantType()).isNull();
         assertThat(tmpCaseDetails.getCaseData().getClaimantRepresentativeRemoved()).isEqualTo(YES);
         assertThat(tmpCaseDetails.getCaseData().getClaimantRepresentedQuestion()).isEqualTo(NO);
         assertThat(tmpCaseDetails.getCaseData().getClaimantRepresentativeOrganisationPolicy()).isEqualTo(
-                OrganisationPolicy.builder().orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR
-                        .getCaseRoleLabel()).build());
+                OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                        ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
     }
 }

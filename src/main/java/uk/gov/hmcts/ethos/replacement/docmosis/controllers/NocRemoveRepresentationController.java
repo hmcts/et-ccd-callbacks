@@ -73,7 +73,7 @@ public class NocRemoveRepresentationController {
         List<String> errors = new ArrayList<>();
         try {
             nocRemoveRepresentationService.setNocRemoveOption(userToken, caseDetails);
-            nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails);
+            nocRemoveRepresentationService.revokeClaimantLegalRep(userToken, caseDetails);
             caseDetails.getCaseData().setNocRemoveOption(null);
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());

@@ -8,7 +8,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UserUtils;
@@ -25,7 +24,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC
 public class NocRemoveRepresentationService {
 
     private final NocCcdService nocCcdService;
-    private final AdminUserService adminUserService;
     private final UserIdamService userIdamService;
 
     public void setNocRemoveOption(String userToken, CaseDetails caseDetails) throws GenericServiceException {
@@ -47,18 +45,22 @@ public class NocRemoveRepresentationService {
     }
 
     /**
-     * Revokes the claimant's legal representative from the case and sends notification emails to all relevant parties.
-     * This method performs the following actions:
-     * - Retrieves the current claimant representative and organisation details.
-     * - Revokes the claimant's legal representation in CCD.
-     * - Marks the claimant as unrepresented in the case data.
-     * - Sends notification emails to the organisation admin, removed legal representative, claimant, and all other
-     *   respondents.
+     * Revokes the claimant's legal representative from the specified case and
+     * updates the case data to mark the claimant as unrepresented.
      *
-     * @param caseDetails The case details containing the case data and ID.
-     * @throws IllegalStateException if the claimant representative is missing in the case data.
+     * <p>The method first verifies that an existing claimant representative is
+     * present. If no representative is found, a {@link GenericServiceException}
+     * is thrown.</p>
+     *
+     * <p>Once the claimant representation has been revoked, the claimant is marked
+     * as unrepresented based on the configured notice of change removal option.</p>
+     *
+     * @param userToken the authentication token used to perform the revocation
+     * @param caseDetails the case containing the claimant representation details
+     * @throws GenericServiceException if no existing claimant representative is found
+     *         or if the representation cannot be revoked
      */
-    public void revokeClaimantLegalRep(CaseDetails caseDetails) throws GenericServiceException {
+    public void revokeClaimantLegalRep(String userToken, CaseDetails caseDetails) throws GenericServiceException {
         final String methodName = "revokeClaimantLegalRep";
         CaseData caseData = caseDetails.getCaseData();
         // get existing rep and organisation details for sending emails
@@ -68,10 +70,8 @@ public class NocRemoveRepresentationService {
             throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
                     caseDetails.getCaseId(), NocRemoveRepresentationService.class.getSimpleName(), methodName);
         }
-
         // revoke claimant legal rep
-        final String adminUserToken = adminUserService.getAdminUserToken();
-        nocCcdService.revokeClaimantRepresentation(adminUserToken, caseDetails);
+        nocCcdService.revokeClaimantRepresentation(userToken, caseDetails);
         ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseData, caseData.getNocRemoveOption());
     }
 }

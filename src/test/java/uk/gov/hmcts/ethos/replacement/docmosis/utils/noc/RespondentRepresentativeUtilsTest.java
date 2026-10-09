@@ -839,6 +839,122 @@ final class RespondentRepresentativeUtilsTest {
     }
 
     @Test
+    void theFindRepresentativesByRoles_withUnknownRoleDoesNotThrow() {
+        CaseData caseData = new CaseData();
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setId(RESPONDENT_ID_1);
+        caseData.setRespondentCollection(List.of(respondent));
+        caseData.setRepCollection(List.of(RepresentedTypeRItem.builder()
+                .id(REPRESENTATIVE_ID_1)
+                .value(RepresentedTypeR.builder().respondentId(RESPONDENT_ID_1).build())
+                .build()));
+        // an unrecognised role resolves to index -1 and must be skipped, not cause an index error
+        assertThat(RespondentRepresentativeUtils.findRepresentativesByRoles(caseData, List.of(ROLE_INVALID)))
+                .isEmpty();
+        assertThat(RespondentRepresentativeUtils.findRepresentativesByRoles(null, List.of(ROLE_SOLICITOR_A)))
+                .isEmpty();
+        assertThat(RespondentRepresentativeUtils.findRepresentativesByRoles(caseData, List.of(ROLE_SOLICITOR_A)))
+                .hasSize(LoggerTestUtils.INTEGER_ONE);
+    }
+
+    @Test
+    void theFindRepresentativesByRoles_withNullRespondentIdOnRepresentative() {
+        CaseData caseData = new CaseData();
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setId(RESPONDENT_ID_1);
+        caseData.setRespondentCollection(List.of(respondent));
+        caseData.setRepCollection(List.of(RepresentedTypeRItem.builder()
+                .id(REPRESENTATIVE_ID_1)
+                .value(RepresentedTypeR.builder().build())
+                .build()));
+        assertThat(RespondentRepresentativeUtils.findRepresentativesByRoles(caseData, List.of(ROLE_SOLICITOR_A)))
+                .isEmpty();
+    }
+
+    @Test
+    void theLoadAndSaveStagedRepresentativeContactDetails() {
+        CaseData caseData = new CaseData();
+        Address address = createRepresentativeAddress();
+        RepresentedTypeR representativeValue = RepresentedTypeR.builder()
+                .respondentId(RESPONDENT_ID_1)
+                .representativeAddress(address)
+                .representativePhoneNumber(REPRESENTATIVE_1_PHONE)
+                .build();
+        caseData.setRepCollection(List.of(RepresentedTypeRItem.builder()
+                .id(REPRESENTATIVE_ID_1).value(representativeValue).build()));
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setId(RESPONDENT_ID_1);
+        caseData.setRespondentCollection(List.of(respondent));
+        List<String> roles = List.of(ROLE_SOLICITOR_A);
+
+        // load copies the current representative contact into the dedicated staging fields
+        RespondentRepresentativeUtils.loadStagedRepresentativeContactDetails(caseData, roles);
+        assertThat(caseData.getRespRepPhoneNumber()).isEqualTo(REPRESENTATIVE_1_PHONE);
+        assertThat(caseData.getRespRepAddress()).isEqualTo(address);
+        // the live ET3 response fields are not used as staging
+        assertThat(caseData.getEt3ResponsePhone()).isNull();
+        assertThat(caseData.getEt3ResponseAddress()).isNull();
+
+        // save writes the staged values back onto the representative
+        Address newAddress = new Address();
+        newAddress.setAddressLine1("1 New Street");
+        caseData.setRespRepPhoneNumber("07999999999");
+        caseData.setRespRepAddress(newAddress);
+        RespondentRepresentativeUtils.saveStagedRepresentativeContactDetails(caseData, roles);
+        assertThat(representativeValue.getRepresentativePhoneNumber()).isEqualTo("07999999999");
+        assertThat(representativeValue.getRepresentativeAddress()).isEqualTo(newAddress);
+        assertThat(caseData.getEt3ResponsePhone()).isNull();
+        assertThat(caseData.getEt3ResponseAddress()).isNull();
+    }
+
+    @Test
+    void theSaveStagedRepresentativeAddress_leavesPhoneUnchanged() {
+        CaseData caseData = new CaseData();
+        RepresentedTypeR representativeValue = RepresentedTypeR.builder()
+                .respondentId(RESPONDENT_ID_1)
+                .representativePhoneNumber(REPRESENTATIVE_1_PHONE)
+                .build();
+        caseData.setRepCollection(List.of(RepresentedTypeRItem.builder()
+                .id(REPRESENTATIVE_ID_1).value(representativeValue).build()));
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setId(RESPONDENT_ID_1);
+        caseData.setRespondentCollection(List.of(respondent));
+
+        Address newAddress = new Address();
+        newAddress.setAddressLine1("1 New Street");
+        caseData.setRespRepAddress(newAddress);
+        caseData.setRespRepPhoneNumber(null);
+
+        RespondentRepresentativeUtils.saveStagedRepresentativeAddress(caseData, List.of(ROLE_SOLICITOR_A));
+
+        assertThat(representativeValue.getRepresentativeAddress()).isEqualTo(newAddress);
+        assertThat(representativeValue.getRepresentativePhoneNumber()).isEqualTo(REPRESENTATIVE_1_PHONE);
+    }
+
+    @Test
+    void theClearStagedRepresentativeContactDetails() {
+        CaseData caseData = new CaseData();
+        Address et3Address = createRepresentativeAddress();
+        caseData.setRespRepPhoneNumber(REPRESENTATIVE_1_PHONE);
+        caseData.setRespRepAddress(new Address());
+        caseData.setRepresentativeContactChangeOption("Amend contact details");
+        caseData.setMyHmctsAddressText("Org House");
+        caseData.setEt3ResponsePhone(REPRESENTATIVE_1_PHONE);
+        caseData.setEt3ResponseAddress(et3Address);
+
+        RespondentRepresentativeUtils.clearStagedRepresentativeContactDetails(caseData);
+
+        assertThat(caseData.getRespRepPhoneNumber()).isNull();
+        assertThat(caseData.getRespRepAddress()).isNull();
+        assertThat(caseData.getRepresentativeContactChangeOption()).isNull();
+        assertThat(caseData.getMyHmctsAddressText()).isNull();
+        // clearing staged fields must never wipe the live ET3 response fields
+        assertThat(caseData.getEt3ResponsePhone()).isEqualTo(REPRESENTATIVE_1_PHONE);
+        assertThat(caseData.getEt3ResponseAddress()).isEqualTo(et3Address);
+        assertDoesNotThrow(() -> RespondentRepresentativeUtils.clearStagedRepresentativeContactDetails(null));
+    }
+
+    @Test
     void theUpdateET3ResponseContactDetails() {
         // when case data representative collection is empty should not update et3 response address and phone number.
         List<String> roles = new ArrayList<>();
@@ -900,5 +1016,17 @@ final class RespondentRepresentativeUtilsTest {
         RespondentRepresentativeUtils.updateET3ResponseContactDetails(caseData, roles);
         assertThat(caseData.getEt3ResponseAddress()).isEqualTo(address);
         assertThat(caseData.getEt3ResponsePhone()).isEqualTo(REPRESENTATIVE_1_PHONE);
+    }
+
+    private static Address createRepresentativeAddress() {
+        Address address = new Address();
+        address.setAddressLine1(REPRESENTATIVE_1_ADDRESS_LINE_1);
+        address.setAddressLine2(REPRESENTATIVE_1_ADDRESS_LINE_2);
+        address.setAddressLine3(REPRESENTATIVE_1_ADDRESS_LINE_3);
+        address.setPostTown(REPRESENTATIVE_1_POST_TOWN);
+        address.setCounty(REPRESENTATIVE_1_COUNTY);
+        address.setCountry(REPRESENTATIVE_1_COUNTRY);
+        address.setPostCode(REPRESENTATIVE_1_POSTCODE);
+        return address;
     }
 }

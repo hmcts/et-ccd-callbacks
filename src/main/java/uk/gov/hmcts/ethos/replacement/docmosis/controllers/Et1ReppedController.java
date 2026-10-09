@@ -29,6 +29,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -748,7 +749,7 @@ public class Et1ReppedController {
         List<String> errors = new ArrayList<>();
         try {
             et1ReppedService.setClaimantRepresentativeValues(userToken, caseData);
-            caseData.setMyHmctsAddressText(null);
+            AddressUtils.clearMyHmctsAddressText(caseData);
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
         }

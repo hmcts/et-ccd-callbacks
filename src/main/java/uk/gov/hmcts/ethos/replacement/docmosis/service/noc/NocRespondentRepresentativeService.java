@@ -57,6 +57,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.ObjectUtils.getIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -71,10 +72,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERR
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_SOLICITOR_ROLE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_REVOKE_CLAIMANT_REPRESENTATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_REVOKE_RESPONDENT_REPRESENTATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_SET_ROLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REQUEST;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_ADDITION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
@@ -450,13 +451,13 @@ public class NocRespondentRepresentativeService {
         List<CaseUserAssignment> representativeRemainingAssignments = RespondentRepresentativeUtils
                 .findCaseUserAssignmentsByRepresentativeId(caseUserAssignments,
                         accountIdByEmailResponse.getUserIdentifier());
-        List<CaseUserAssignment> caseUserAssignmentsToRevoke = new ArrayList<>();
+
         // finds representative's other case assignments
-        for (CaseUserAssignment caseUserAssignment : representativeRemainingAssignments) {
-            if (NocUtils.countAssignmentsByRole(caseUserAssignments, caseUserAssignment.getCaseRole()) > 1) {
-                caseUserAssignmentsToRevoke.add(caseUserAssignment);
-            }
-        }
+        List<CaseUserAssignment> caseUserAssignmentsToRevoke = representativeRemainingAssignments.stream()
+                .filter(assignment ->
+                                NocUtils.countAssignmentsByRole(
+                                        caseUserAssignments,
+                                        assignment.getCaseRole()) > 1).collect(Collectors.toCollection(ArrayList::new));
         caseUserAssignments.removeAll(caseUserAssignmentsToRevoke);
         // finds role's other case assignments
         List<CaseUserAssignment> caseUserAssignmentsByRole =
@@ -933,9 +934,12 @@ public class NocRespondentRepresentativeService {
             return caseDetails.getCaseData();
         }
         final String adminUserToken = adminUserService.getAdminUserToken();
-        nocCcdService.revokeClaimantRepresentation(adminUserToken, caseDetails);
-        ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseDetails.getCaseData(),
-                NOC_REMOVE_OPTION_ORGANISATION);
+        try {
+            nocCcdService.revokeClaimantRepresentation(adminUserToken, caseDetails);
+        } catch (GenericServiceException e) {
+            log.warn(ERROR_UNABLE_TO_REVOKE_CLAIMANT_REPRESENTATION, caseDetails.getCaseId(), e.getMessage());
+        }
+        ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseDetails.getCaseData());
         return caseDetails.getCaseData();
     }
 

@@ -84,7 +84,7 @@ public class NocRemoveRepresentationController {
             nocRemoveRepresentationService.setNocRemoveOption(userDetails, caseDetails);
             CaseDetails caseDetailsBeforeRevoke =
                     CallbackObjectUtils.cloneObject(ccdRequest.getCaseDetails(), CaseDetails.class);
-            nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails);
+            nocRemoveRepresentationService.revokeClaimantLegalRep(userToken, caseDetails);
             nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails,
                     caseDetailsBeforeRevoke);
             caseDetails.getCaseData().setNocRemoveOption(null);

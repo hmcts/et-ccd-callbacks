@@ -38,6 +38,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.GROUP_CLAIMS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.VIEWED;
@@ -223,6 +224,30 @@ class SendNotificationServiceTest {
                 .build()
         );
         assertEquals(items, data.getSendNotificationCollection());
+    }
+
+    @Test
+    void shouldUpdateSubmittedGroupClaimsSendNotification() {
+        SendNotificationStateUpdateRequest request = testData.getSendNotificationStateUpdateRequest();
+
+        StartEventResponse updateCaseEventResponse = updateCaseEventResponseSubmittedNotificationNoResponses();
+        addNotificationSubject(updateCaseEventResponse, List.of(GROUP_CLAIMS));
+        when(caseService.startUpdate(
+            TEST_SERVICE_AUTH_TOKEN,
+            request.getCaseId(),
+            request.getCaseTypeId(),
+            UPDATE_NOTIFICATION_STATE
+        )).thenReturn(updateCaseEventResponse);
+
+        sendNotificationService.updateSendNotificationState(TEST_SERVICE_AUTH_TOKEN, request);
+
+        ArgumentCaptor<CaseData> argumentCaptor = ArgumentCaptor.forClass(CaseData.class);
+        verify(caseDetailsConverter).caseDataContent(any(), argumentCaptor.capture());
+        CaseData data = argumentCaptor.getValue();
+
+        SendNotificationTypeItem notification = data.getSendNotificationCollection().getFirst();
+        assertEquals(ID, notification.getId());
+        assertEquals(VIEWED, notification.getValue().getNotificationState());
     }
 
     @Test

@@ -16,7 +16,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
 import java.io.IOException;
@@ -30,7 +29,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
@@ -41,8 +39,6 @@ class NocRemoveRepresentationServiceTest {
 
     @Mock
     private NocCcdService nocCcdService;
-    @Mock
-    private UserIdamService userIdamService;
 
     @InjectMocks
     private NocRemoveRepresentationService nocRemoveRepresentationService;
@@ -77,20 +73,18 @@ class NocRemoveRepresentationServiceTest {
     @SneakyThrows
     void theSetNocRemoveOption() {
         // when case details are not valid should throw generic service exception
-        GenericServiceException gse = assertThrows(GenericServiceException.class,
-                () -> nocRemoveRepresentationService.setNocRemoveOption(DUMMY_USER_TOKEN, null));
-        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_INVALID_CASE_DETAILS);
-        // when representative is lead representative, should set nocRemoveOption to organisation
         UserDetails userDetails = new UserDetails();
         userDetails.setEmail(CLAIMANT_REPRESENTATIVE_EMAIL_VALID);
         userDetails.setUid(UUID.randomUUID().toString());
-        when(userIdamService.getUserDetails(DUMMY_USER_TOKEN)).thenReturn(userDetails);
-        nocRemoveRepresentationService.setNocRemoveOption(DUMMY_USER_TOKEN, caseDetails);
+        GenericServiceException gse = assertThrows(GenericServiceException.class,
+                () -> nocRemoveRepresentationService.setNocRemoveOption(userDetails, null));
+        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_INVALID_CASE_DETAILS);
+        // when representative is lead representative, should set nocRemoveOption to organisation
+        nocRemoveRepresentationService.setNocRemoveOption(userDetails, caseDetails);
         assertThat(caseDetails.getCaseData().getNocRemoveOption()).isEqualTo(NOC_REMOVE_OPTION_ORGANISATION);
         // when representative is not lead representative, should set nocRemoveOption to yourself
         userDetails.setEmail(CLAIMANT_REPRESENTATIVE_EMAIL_INVALID);
-        when(userIdamService.getUserDetails(DUMMY_USER_TOKEN)).thenReturn(userDetails);
-        nocRemoveRepresentationService.setNocRemoveOption(DUMMY_USER_TOKEN, caseDetails);
+        nocRemoveRepresentationService.setNocRemoveOption(userDetails, caseDetails);
         assertThat(caseDetails.getCaseData().getNocRemoveOption()).isEqualTo(NOC_REMOVE_OPTION_YOURSELF);
     }
 

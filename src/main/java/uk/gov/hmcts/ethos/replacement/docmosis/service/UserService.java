@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_EMAIL_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_ID_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_NOT_FOUND;
 
@@ -20,6 +21,22 @@ public class UserService {
 
     private static final String CLASS_NAME = UserService.class.getName();
 
+    /**
+     * Retrieves the user details associated with the supplied authentication token
+     * and validates that the required user information is present.
+     * <p>
+     * The returned user details must contain a user ID and email address.
+     * If the user cannot be found, or either of the required fields is missing,
+     * a {@link GenericServiceException} is thrown using the supplied submission
+     * reference for error tracking.
+     * </p>
+     *
+     * @param userToken the authentication token used to retrieve the user details
+     * @param submissionReference the submission reference used for error tracking
+     * @return the validated user details
+     * @throws GenericServiceException if the user details cannot be found, or if the
+     *                                 user ID or email address is missing
+     */
     public UserDetails getValidatedUserDetails(String userToken, String submissionReference)
             throws GenericServiceException {
         final String methodName = "getUserDetails";
@@ -36,6 +53,14 @@ public class UserService {
             throw new GenericServiceException(ERROR_USER_ID_NOT_FOUND,
                     new Exception(ERROR_USER_ID_NOT_FOUND),
                     ERROR_USER_ID_NOT_FOUND,
+                    submissionReference,
+                    CLASS_NAME,
+                    methodName);
+        }
+        if (StringUtils.isBlank(userDetails.getEmail())) {
+            throw new GenericServiceException(ERROR_USER_EMAIL_NOT_FOUND,
+                    new Exception(ERROR_USER_EMAIL_NOT_FOUND),
+                    ERROR_USER_EMAIL_NOT_FOUND,
                     submissionReference,
                     CLASS_NAME,
                     methodName);

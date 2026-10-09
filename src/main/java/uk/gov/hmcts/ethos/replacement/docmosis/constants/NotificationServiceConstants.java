@@ -6,6 +6,8 @@ public final class NotificationServiceConstants {
     public static final String APPLICATION_TYPE = "applicationType";
     public static final String CASE_ID = "caseId";
     public static final String CLAIMANT = "claimant";
+    public static final String LIST_OF_RESPONDENTS = "list_of_respondents";
+    public static final String CASE_NUMBER_PROP = "case_number";
     public static final String RESPONDENTS = "respondents";
     public static final String RESPONDENT_NAMES = "respondentNames";
     public static final String EXUI_CASE_DETAILS_LINK = "exuiCaseDetailsLink";
@@ -31,6 +33,7 @@ public final class NotificationServiceConstants {
     public static final String APPLICANT_NAME = "applicantName";
     public static final String LINK_TO_CIT_UI = "linkToCitUI";
     public static final String PARTY_NAME = "party_name";
+    public static final String LEGAL_REP_NAME = "legalRepName";
 
     private NotificationServiceConstants() {
         // restrict instantiation

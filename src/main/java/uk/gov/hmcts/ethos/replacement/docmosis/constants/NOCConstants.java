@@ -9,6 +9,8 @@ public final class NOCConstants {
     public static final String EVENT_UPDATE_CASE_SUBMITTED = "UPDATE_CASE_SUBMITTED";
     public static final String NOC_TYPE_REMOVAL = "Removal";
     public static final String NOC_TYPE_ADDITION = "Addition";
+    public static final String NOC_REMOVE_OPTION_ORGANISATION = "your organisation";
+    public static final String NOC_REMOVE_OPTION_YOURSELF = "yourself";
 
     public static final String EXCEPTION_RESPONDENT_NOT_FOUND = "Respondent not found for case ID %s.";
     public static final String EXCEPTION_RESPONDENT_ID_NOT_FOUND =
@@ -19,6 +21,8 @@ public final class NOCConstants {
             "Respondent name could not be found for respondent ID %s in case %s.";
     public static final String EXCEPTION_REPRESENTATIVE_NOT_FOUND =
             "Representative not found for case ID %s.";
+    public static final String EXCEPTION_REPRESENTATIVE_NOT_FOUND_BY_TOKEN =
+            "Representative not found by token for case ID %s.";
     public static final String EXCEPTION_REPRESENTATIVE_ID_NOT_FOUND =
             "Representative ID not found for case ID %s.";
     public static final String EXCEPTION_REPRESENTATIVE_DETAILS_NOT_EXIST =
@@ -59,6 +63,8 @@ public final class NOCConstants {
             "User's organisation and selected organisation does not match, for case %s.";
     public static final String EXCEPTION_CLAIMANT_REPRESENTATIVE_NOT_FOUND =
             "Claimant representative not found.";
+    public static final String ERROR_UNABLE_TO_REVOKE_CLAIMANT_REPRESENTATION =
+            "Unable to revoke claimant representative case id: {}, exception: {}.";
 
     public static final String ERROR_RESPONDENT_HAS_MULTIPLE_REPRESENTATIVES =
             "Respondent with name %s has more than one representative";

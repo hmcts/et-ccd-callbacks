@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils.noc;
 
 import ch.qos.logback.classic.Level;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
@@ -23,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -154,21 +154,21 @@ final class ClaimantRepresentativeUtilsTest {
 
     @Test
     void theMarkClaimantAsUnrepresented() {
-        // should remove all claimant representative details and not throw any exception
+        // Should not remove representative organisation if selected removal type is not organisation
         CaseData caseData = new CaseData();
-        caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
         caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().representativeId(CLAIMANT_REPRESENTATIVE_ID)
                 .myHmctsOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_1).build()).build());
         caseData.setClaimantRepresentativeRemoved(NO);
         caseData.setClaimantRepresentedQuestion(YES);
+        caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_1).build()).build());
         ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseData);
         assertThat(caseData.getRepresentativeClaimantType()).isNull();
         assertThat(caseData.getClaimantRepresentativeRemoved()).isEqualTo(YES);
         assertThat(caseData.getClaimantRepresentedQuestion()).isEqualTo(NO);
         assertThat(caseData.getClaimantRepresentativeOrganisationPolicy()).isEqualTo(OrganisationPolicy.builder()
                 .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
-
     }
 
     @Test
@@ -316,8 +316,8 @@ final class ClaimantRepresentativeUtilsTest {
         CaseData caseData = new CaseData();
         caseData.setEt3ResponseAddress(address);
         caseData.setEt3ResponsePhone(REPRESENTATIVE_PHONE);
-        GenericServiceException gse = assertThrows(GenericServiceException.class, () -> ClaimantRepresentativeUtils
-                .updateRepresentativeContactDetails(caseData, SUBMISSION_REFERENCE));
+        GenericServiceException gse = Assertions.assertThrows(GenericServiceException.class,
+                () -> ClaimantRepresentativeUtils.updateRepresentativeContactDetails(caseData, SUBMISSION_REFERENCE));
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_CLAIMANT_REPRESENTATIVE_NOT_FOUND);
         // when case data has representative claimant type should update contact details without throwing any exception
         caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().build());
@@ -350,5 +350,23 @@ final class ClaimantRepresentativeUtilsTest {
         ClaimantRepresentativeUtils.updateET3ResponseContactDetails(caseData);
         assertThat(caseData.getEt3ResponseAddress()).isEqualTo(address);
         assertThat(caseData.getEt3ResponsePhone()).isEqualTo(REPRESENTATIVE_PHONE);
+    }
+
+    @Test
+    void theHasRequiredClaimantRepresentativeDetails() {
+        // when claimant representative is empty should return false
+        assertThat(ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(null)).isFalse();
+        // when claimant representative's id is empty should return false
+        RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder().build();
+        assertThat(ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(claimantRepresentative))
+                .isFalse();
+        // when claimant representative's email address is not empty should return true
+        claimantRepresentative.setRepresentativeId(CLAIMANT_REPRESENTATIVE_ID);
+        assertThat(ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(claimantRepresentative))
+                .isFalse();
+        // when claimant representative's email address is not empty should return true
+        claimantRepresentative.setRepresentativeEmailAddress(CLAIMANT_REPRESENTATIVE_EMAIL_ADDRESS);
+        assertThat(ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(claimantRepresentative))
+                .isTrue();
     }
 }

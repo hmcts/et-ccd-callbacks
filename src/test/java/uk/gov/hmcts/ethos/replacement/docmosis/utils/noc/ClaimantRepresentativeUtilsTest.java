@@ -26,8 +26,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_YOURSELF;
 
 final class ClaimantRepresentativeUtilsTest {
 
@@ -159,17 +157,14 @@ final class ClaimantRepresentativeUtilsTest {
     void theMarkClaimantAsUnrepresented() {
         // Should not remove representative organisation if selected removal type is not organisation
         CaseData caseData = new CaseData();
-        caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().build());
-        caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
-        caseData.setClaimantRepresentedQuestion(YES);
-        ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseData, NOC_REMOVE_OPTION_YOURSELF);
-        assertThat(caseData.getRepresentativeClaimantType()).isNotNull();
-        // should remove organisation when selected removal type is organisation
-        caseData.setNocRemoveOption(NOC_REMOVE_OPTION_ORGANISATION);
         caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().representativeId(CLAIMANT_REPRESENTATIVE_ID)
                 .myHmctsOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_1).build()).build());
-        ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseData, NOC_REMOVE_OPTION_ORGANISATION);
+        caseData.setClaimantRepresentativeRemoved(NO);
+        caseData.setClaimantRepresentedQuestion(YES);
+        caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_1).build()).build());
+        ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseData);
         assertThat(caseData.getRepresentativeClaimantType()).isNull();
         assertThat(caseData.getClaimantRepresentativeRemoved()).isEqualTo(YES);
         assertThat(caseData.getClaimantRepresentedQuestion()).isEqualTo(NO);

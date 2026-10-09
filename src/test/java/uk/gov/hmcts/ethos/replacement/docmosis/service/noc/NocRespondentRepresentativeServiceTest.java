@@ -1239,6 +1239,7 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(tmpCaseData.getClaimantRepresentativeRemoved()).isEqualTo(YES);
         assertThat(tmpCaseData.getRepresentativeClaimantType()).isNull();
         assertThat(tmpCaseData.getClaimantRepresentativeOrganisationPolicy()).isEqualTo(tmpClaimantOrganisationPolicy);
+
     }
 
     @Test

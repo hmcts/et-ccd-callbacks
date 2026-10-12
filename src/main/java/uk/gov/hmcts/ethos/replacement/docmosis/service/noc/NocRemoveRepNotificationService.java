@@ -61,6 +61,7 @@ public class NocRemoveRepNotificationService {
         if (StringUtils.isBlank(orgAdminEmail)) {
             log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION_ADMIN, caseDetails.getCaseId(),
                     WARNING_ORGANISATION_ADMIN_EMAIL_NOT_FOUND);
+            return;
         }
         Map<String, String> personalisation = NocNotificationHelper.addCommonEmailValues(caseDetails.getCaseData());
         personalisation.put(LEGAL_REP_NAME, representativeName);

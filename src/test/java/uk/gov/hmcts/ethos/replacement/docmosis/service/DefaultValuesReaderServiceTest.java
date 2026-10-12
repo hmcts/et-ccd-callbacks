@@ -183,7 +183,7 @@ class DefaultValuesReaderServiceTest {
 
         defaultValuesReaderService.setCaseData(caseData, withStreet);
 
-        assertEquals("TestAddress3\\n3 Atlantic Quay, 20 York Street",
+        assertEquals("TestAddress3\n3 Atlantic Quay, 20 York Street",
                 caseData.getTribunalCorrespondenceAddress().getAddressLine3());
 
         DefaultValues streetOnly = createDefaultValues();

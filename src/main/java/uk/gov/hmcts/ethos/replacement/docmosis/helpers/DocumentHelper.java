@@ -1085,7 +1085,14 @@ public final class DocumentHelper {
         if (isNullOrEmpty(line3)) {
             return line4;
         }
-        return line3 + "\\n" + line4;
+        return line3 + "\n" + line4;
+    }
+
+    private static String lineBreak(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value.replace("\\n", "\n");
     }
 
     private static StringBuilder getCourtData(CaseData caseData, DefaultValues allocatedCourtAddress) {
@@ -1115,7 +1122,8 @@ public final class DocumentHelper {
                         .append(NEW_LINE).append("\"Court_addressLine2\":\"")
                         .append(nullCheck(caseData.getTribunalCorrespondenceAddress().getAddressLine2()))
                         .append(NEW_LINE).append("\"Court_addressLine3\":\"")
-                        .append(nullCheck(caseData.getTribunalCorrespondenceAddress().getAddressLine3()))
+                        .append(nullCheck(lineBreak(
+                                caseData.getTribunalCorrespondenceAddress().getAddressLine3())))
                         .append(NEW_LINE).append("\"Court_town\":\"")
                         .append(nullCheck(caseData.getTribunalCorrespondenceAddress().getPostTown())).append(NEW_LINE)
                         .append("\"Court_county\":\"")

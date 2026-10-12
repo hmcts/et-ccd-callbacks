@@ -62,7 +62,7 @@
     "PageID": 2,
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder": 1,
-    "fieldShowCondition": "nocRemoveOption=\"your organisation\"",
+    "FieldShowCondition": "nocRemoveOption=\"your organisation\"",
     "ShowSummaryChangeOption": "N"
   },
   {

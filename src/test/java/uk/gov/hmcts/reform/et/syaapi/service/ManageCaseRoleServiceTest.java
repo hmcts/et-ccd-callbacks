@@ -977,7 +977,7 @@ class ManageCaseRoleServiceTest {
                                    eq(HttpMethod.GET),
                                    any(HttpEntity.class),
                                    eq(CaseUserAssignmentData.class))).thenReturn(
-                                       new ResponseEntity<>(null, HttpStatus.OK));
+                                       new ResponseEntity<>(HttpStatus.OK));
         CaseDetails caseDetails = CaseDetails.builder().id(TEST_CASE_ID_LONG).build();
         ManageCaseRoleException caseRoleException = assertThrows(ManageCaseRoleException.class, () ->
             manageCaseRoleService.findCaseUserAssignmentsByRoleAndCase(

@@ -155,4 +155,32 @@ public final class LoggingUtils {
         };
         return isEmpty ? emptyMessage : notEmptyMessage;
     }
+
+    /**
+     * Logs a Notice of Change (NoC) warning when all required warning details are present.
+     * <p>
+     * The warning is logged only when {@code warningMessage}, {@code caseId}, and
+     * {@code warningCause} are all non-blank. If any of these values is {@code null},
+     * empty, or contains only whitespace, the method returns without logging anything.
+     * </p>
+     *
+     * <p><strong>Assumptions:</strong></p>
+     * <ul>
+     *     <li>The warning message contains placeholders compatible with the supplied
+     *         {@code caseId} and {@code warningCause} arguments.</li>
+     *     <li>All three parameters are required for a meaningful NoC warning.</li>
+     *     <li>Invalid or incomplete warning information should be silently ignored
+     *         rather than logged.</li>
+     * </ul>
+     *
+     * @param warningMessage the warning message template to be logged
+     * @param caseId the case identifier associated with the warning
+     * @param warningCause the reason or cause of the warning
+     */
+    public static void logNocWarningIfValid(String warningMessage, String caseId, String warningCause) {
+        if (StringUtils.isBlank(warningMessage) || StringUtils.isBlank(caseId) || StringUtils.isBlank(warningCause)) {
+            return;
+        }
+        log.warn(warningMessage, caseId, warningCause);
+    }
 }

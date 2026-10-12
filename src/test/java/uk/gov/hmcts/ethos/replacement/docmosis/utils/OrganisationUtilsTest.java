@@ -9,6 +9,7 @@ import org.mockito.MockedStatic;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
@@ -34,6 +35,7 @@ final class OrganisationUtilsTest {
     private static final String TEST_RESPONDENT_NAME_2 = "Test Respondent Name 2";
     private static final String TEST_ORGANISATION_ID_1 = "Test Organisation ID 1";
     private static final String TEST_ORGANISATION_ID_2 = "Test Organisation ID 2";
+    private static final String TEST_ORGANISATION_EMAIL = "test_organisation_email@example.com";
 
     private MockedStatic<OrganisationUtils> organisationUtils;
 
@@ -308,5 +310,52 @@ final class OrganisationUtilsTest {
         // when organisation id and organisation response identification are same should return true
         organisationsResponse.setOrganisationIdentifier(TEST_ORGANISATION_ID_1);
         assertThat(OrganisationUtils.hasMatchingOrganisationId(organisation, organisationsResponse)).isTrue();
+    }
+
+    @Test
+    void theHasOrganisationSuperuserEmail() {
+        organisationUtils.close();
+        RetrieveOrgByIdResponse retrieveOrgByIdResponse = RetrieveOrgByIdResponse.builder().build();
+        // when organisation response is empty should return false
+        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(null)).isFalse();
+        // when organisation response status code is different from successful should return false
+        ResponseEntity<RetrieveOrgByIdResponse> orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse,
+                HttpStatus.BAD_REQUEST);
+        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
+        // when organisation response not has body should return false
+        orgResponse = new ResponseEntity<>(null, HttpStatus.OK);
+        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
+        // when organisation response body not has superuser should return false
+        orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse, HttpStatus.OK);
+        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
+        // when superuser not has email should return false
+        retrieveOrgByIdResponse.setSuperUser(RetrieveOrgByIdResponse.SuperUser.builder().build());
+        orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse, HttpStatus.OK);
+        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
+        // when superuser has email should return true
+        retrieveOrgByIdResponse.getSuperUser().setEmail(TEST_ORGANISATION_EMAIL);
+        assertThat(OrganisationUtils.hasOrganisationSuperuserEmail(orgResponse)).isTrue();
+    }
+
+    @Test
+    void theHasValidOrganisationResponse() {
+        organisationUtils.close();
+        // when organisation response is empty should return false
+        assertThat(OrganisationUtils.hasValidOrganisationResponse(null)).isFalse();
+        // when status code is not successful should return false
+        OrganisationsResponse organisationsResponse = OrganisationsResponse.builder().build();
+        ResponseEntity<OrganisationsResponse> orgResponse = new ResponseEntity<>(organisationsResponse,
+                HttpStatus.BAD_REQUEST);
+        assertThat(OrganisationUtils.hasValidOrganisationResponse(orgResponse)).isFalse();
+        // when response body is empty should return false
+        orgResponse = new ResponseEntity<>(null, HttpStatus.OK);
+        assertThat(OrganisationUtils.hasValidOrganisationResponse(orgResponse)).isFalse();
+        // when there is no organisation identifier should return false
+        orgResponse = new ResponseEntity<>(organisationsResponse, HttpStatus.OK);
+        assertThat(OrganisationUtils.hasValidOrganisationResponse(orgResponse)).isFalse();
+        // when there is organisation identifier should return true
+        organisationsResponse.setOrganisationIdentifier(TEST_ORGANISATION_ID_1);
+        orgResponse = new ResponseEntity<>(organisationsResponse, HttpStatus.OK);
+        assertThat(OrganisationUtils.hasValidOrganisationResponse(orgResponse)).isTrue();
     }
 }

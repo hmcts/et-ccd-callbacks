@@ -17,15 +17,20 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 final class LoggingUtilsTest {
 
+    private static final String CASE_ID = "1234567890123456";
     private static final String ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT = "Failed to send email to claimant, error: {}";
     private static final String DUMMY_STRING = "Dummy string";
     private static final String EMPTY_MESSAGE = "Empty message";
     private static final String NOT_EMPTY_MESSAGE = "Not empty message";
+    private static final String WARNING_CAUSE = "Needs to be warned problem";
+    private static final String WARNING_MESSAGE = "There is a warning for case with id {}, error is {}";
 
     private static final String EXCEPTION_MESSAGE = "Exception message";
     private static final String EXPECTED_CCD_ERROR_LOGGING_MESSAGE = "Error from ccd - Exception message";
     private static final String EXPECTED_NOTIFICATION_ERROR_LOGGING_MESSAGE =
             "Failed to send email to claimant, error: Exception message";
+    private static final String EXPECTED_NOTIFICATION_WARNING_MESSAGE =
+            "There is a warning for case with id 1234567890123456, error is Needs to be warned problem";
 
     @BeforeEach
     void setUp() {
@@ -87,5 +92,21 @@ final class LoggingUtilsTest {
         // when object is not empty should return not empty message
         assertThat(LoggingUtils.resolveMessageByPresence(new CallbackRequest(), EMPTY_MESSAGE, NOT_EMPTY_MESSAGE))
                 .isEqualTo(NOT_EMPTY_MESSAGE);
+    }
+
+    @Test
+    void theLogNocWarningIfValid() {
+        // when warning message is empty should return without logging warning
+        LoggingUtils.logNocWarningIfValid(StringUtils.EMPTY, CASE_ID, WARNING_CAUSE);
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ZERO, StringUtils.EMPTY);
+        // when case id is empty should return without logging warning
+        LoggingUtils.logNocWarningIfValid(WARNING_MESSAGE, StringUtils.EMPTY, WARNING_CAUSE);
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ZERO, StringUtils.EMPTY);
+        // when warning cause is empty should return without logging warning
+        LoggingUtils.logNocWarningIfValid(WARNING_MESSAGE, CASE_ID, StringUtils.EMPTY);
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ZERO, StringUtils.EMPTY);
+        // when all params are provided should log warning
+        LoggingUtils.logNocWarningIfValid(WARNING_MESSAGE, CASE_ID, WARNING_CAUSE);
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE, EXPECTED_NOTIFICATION_WARNING_MESSAGE);
     }
 }

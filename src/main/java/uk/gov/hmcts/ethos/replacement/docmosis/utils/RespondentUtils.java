@@ -6,9 +6,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RoleUtils;
+import uk.gov.hmcts.reform.et.syaapi.service.utils.NoticeOfChangeUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -240,6 +244,20 @@ public final class RespondentUtils {
     }
 
     /**
+     * Determines the expected solicitor role for the respondent identified by the given respondent ID.
+     * <p>
+     * The respondent's index is resolved from the case data and then used to obtain
+     * the corresponding solicitor role label.
+     *
+     * @param caseData the case data containing the respondent information
+     * @param respondentId the ID of the respondent whose expected role is required
+     * @return the solicitor role label associated with the respondent
+     */
+    public static String determineExpectedRoleByRespondentId(CaseData caseData, String respondentId) {
+        return RoleUtils.solicitorRoleLabelForIndex(getRespondentIndexById(caseData, respondentId));
+    }
+
+    /**
      * Finds and returns a respondent with the given respondent name.
      * <p>
      * The method iterates through the provided list of respondents and returns the first
@@ -312,5 +330,75 @@ public final class RespondentUtils {
             return null;
         }
         return caseData.getRespondentCollection().get(index);
+    }
+
+    /**
+     * Returns the valid respondents associated with the supplied case data.
+     * <p>
+     * If the case data is {@code null} or contains no respondents, an empty list
+     * is returned. Respondents that do not satisfy the validation criteria defined
+     * by {@code isValidRespondent(...)} are excluded from the result.
+     * </p>
+     *
+     * @param caseData the case data containing the respondent collection
+     * @return a list of valid respondents, or an empty list if none are available
+     */
+    public static List<RespondentSumTypeItem> getValidRespondents(CaseData caseData) {
+        if (caseData == null || CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+            return Collections.emptyList();
+        }
+        return caseData.getRespondentCollection().stream()
+                .filter(RespondentUtils::isValidRespondent)
+                .toList();
+    }
+
+    /**
+     * Retrieves the respondent name associated with the specified role from the case data.
+     *
+     * <p>The method determines the index of the given role using
+     * {@link RoleUtils#findRoleIndexByRoleLabel(String)} and then retrieves the corresponding
+     * {@link NoticeOfChangeAnswers} from the {@link CaseData}. If a matching entry exists and
+     * contains a respondent name, that name is returned.</p>
+     *
+     * <p>If the role cannot be resolved to a valid index, or if the corresponding
+     * {@link NoticeOfChangeAnswers} object or respondent name is empty, the method returns {@code null}.</p>
+     *
+     * @param caseData the case data containing notice of change answers
+     * @param role the role label used to locate the respondent
+     * @return the respondent name associated with the given role, or {@code null} if the role is invalid
+     *         or no respondent name is available
+     */
+    public static String findRespondentNameByRole(CaseData caseData, String role) {
+        int roleIndex = RoleUtils.findRoleIndexByRoleLabel(role);
+        if (roleIndex == -1) {
+            return null;
+        }
+        NoticeOfChangeAnswers noticeOfChangeAnswers = NoticeOfChangeUtils
+                .getNoticeOfChangeAnswersAtIndex(caseData, roleIndex);
+        if (ObjectUtils.isEmpty(noticeOfChangeAnswers)
+                || ObjectUtils.isEmpty(noticeOfChangeAnswers.getRespondentName())) {
+            return null;
+        }
+        return noticeOfChangeAnswers.getRespondentName();
+    }
+
+    /**
+     * Determines whether the given respondent contains sufficient information
+     * to be used when looking up a representative.
+     * <p>
+     * The respondent is considered to have representative lookup criteria when
+     * it has a non-null value and at least one of the following is present:
+     * the respondent ID, representative ID, or respondent name.
+     *
+     * @param respondent the respondent to inspect
+     * @return {@code true} if representative lookup criteria are available;
+     *         {@code false} otherwise
+     */
+    public static boolean hasRepresentativeLookupData(RespondentSumTypeItem respondent) {
+        return respondent != null
+                && (StringUtils.isNotBlank(respondent.getId())
+                || (respondent.getValue() != null
+                && (StringUtils.isNotBlank(respondent.getValue().getRepresentativeId())
+                || StringUtils.isNotBlank(respondent.getValue().getRespondentName()))));
     }
 }

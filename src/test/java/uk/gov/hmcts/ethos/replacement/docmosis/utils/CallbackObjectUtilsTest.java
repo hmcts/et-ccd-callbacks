@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 
@@ -12,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
 
@@ -23,12 +23,17 @@ final class CallbackObjectUtilsTest {
     @Test
     @SneakyThrows
     void theCloneObject() {
+        // document type item
         assertNull(CallbackObjectUtils.cloneObject(null, DocumentTypeItem.class));
         CaseData caseData =
                 ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
         DocumentTypeItem documentTypeItem = caseData.getDocumentCollection().getFirst();
         assertNull(CallbackObjectUtils.cloneObject(documentTypeItem, null));
-        assertEquals(CallbackObjectUtils.cloneObject(documentTypeItem, DocumentTypeItem.class), documentTypeItem);
+        assertThat(CallbackObjectUtils.cloneObject(documentTypeItem, DocumentTypeItem.class))
+                .isEqualTo(documentTypeItem);
+        // case details
+        CaseDetails caseDetails = ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseDetails.class);
+        assertThat(CallbackObjectUtils.cloneObject(caseDetails, CaseDetails.class)).isEqualTo(caseDetails);
     }
 
     @Test

@@ -12,6 +12,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_CASE_DETAILS_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_CCD_REQUEST_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_SUBMISSION_REFERENCE_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_YOURSELF;
 
 public final class CaseDataUtils {
 
@@ -151,5 +153,21 @@ public final class CaseDataUtils {
                     new Exception(exceptionMessage), exceptionMessage,
                     exceptionMessage, CLASS_NAME, methodName);
         }
+    }
+
+    /**
+     * Determines whether the case contains a valid notice of change removal option.
+     * <p>
+     * A removal option is considered valid when it is set to either remove the
+     * current representative or remove the representative's organisation.
+     * </p>
+     *
+     * @param caseDetails the case details containing the notice of change removal option
+     * @return {@code true} if the removal option is valid; otherwise {@code false}
+     */
+    public static boolean hasValidNocRemoveOption(CaseDetails caseDetails) {
+        return StringUtils.isNotBlank(caseDetails.getCaseData().getNocRemoveOption())
+                && (NOC_REMOVE_OPTION_YOURSELF.equals(caseDetails.getCaseData().getNocRemoveOption())
+                || NOC_REMOVE_OPTION_ORGANISATION.equals(caseDetails.getCaseData().getNocRemoveOption()));
     }
 }

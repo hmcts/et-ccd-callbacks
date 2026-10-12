@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Strings;
 import lombok.Data;
 import lombok.val;
+import org.apache.tika.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,7 +57,9 @@ public class ClaimantIndType {
     public String claimantFullName() {
         String title = getTitle();
 
-        var fullNameList = List.of(title, getInitials(), claimantLastName);
+        var fullNameList = List.of(title,
+                getInitials(),
+                StringUtils.isBlank(claimantLastName) ? StringUtils.EMPTY : claimantLastName);
         return String.join(" ", notNullOrEmptyAtt(new ArrayList<>(), fullNameList));
     }
 

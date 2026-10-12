@@ -9,11 +9,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
-import uk.gov.hmcts.reform.et.syaapi.service.utils.NoticeOfChangeUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -597,24 +595,6 @@ public final class RespondentRepresentativeUtils {
     }
 
     /**
-     * Determines whether the provided {@link CaseData} contains
-     * a non-empty collection of representatives.
-     *
-     * <p>This method returns {@code true} only if:
-     * <ul>
-     *     <li>The {@code caseData} object is not {@code null} or empty, and</li>
-     *     <li>The representative collection within {@code caseData} is not {@code null} or empty.</li>
-     * </ul>
-     *
-     * @param caseData the case data to evaluate; may be {@code null}
-     * @return {@code true} if the case data contains one or more representatives,
-     *         otherwise {@code false}
-     */
-    public static boolean hasRepresentatives(CaseData caseData) {
-        return ObjectUtils.isNotEmpty(caseData) && CollectionUtils.isNotEmpty(caseData.getRepCollection());
-    }
-
-    /**
      * Determines whether the given {@link RepresentedTypeR} is associated
      * with a valid organisation.
      *
@@ -713,7 +693,7 @@ public final class RespondentRepresentativeUtils {
         if (ObjectUtils.isNotEmpty(representative)) {
             return representative;
         }
-        String respondentName = findRespondentNameByRole(caseData, role);
+        String respondentName = RespondentUtils.findRespondentNameByRole(caseData, role);
         return findRepresentativeByRespondentName(caseData, respondentName);
     }
 
@@ -782,7 +762,7 @@ public final class RespondentRepresentativeUtils {
      *         or no matching representative exists
      */
     public static RepresentedTypeRItem findRepresentativeByRole(CaseData caseData, String role) {
-        if (StringUtils.isBlank(role)) {
+        if (StringUtils.isBlank(role) || CollectionUtils.isEmpty(caseData.getRepCollection())) {
             return null;
         }
         return caseData.getRepCollection().stream()
@@ -790,36 +770,6 @@ public final class RespondentRepresentativeUtils {
                 .filter(rep -> role.equals(rep.getValue().getRole()))
                 .findFirst()
                 .orElse(null);
-    }
-
-    /**
-     * Retrieves the respondent name associated with the specified role from the case data.
-     *
-     * <p>The method determines the index of the given role using
-     * {@link RoleUtils#findRoleIndexByRoleLabel(String)} and then retrieves the corresponding
-     * {@link NoticeOfChangeAnswers} from the {@link CaseData}. If a matching entry exists and
-     * contains a respondent name, that name is returned.</p>
-     *
-     * <p>If the role cannot be resolved to a valid index, or if the corresponding
-     * {@link NoticeOfChangeAnswers} object or respondent name is empty, the method returns {@code null}.</p>
-     *
-     * @param caseData the case data containing notice of change answers
-     * @param role the role label used to locate the respondent
-     * @return the respondent name associated with the given role, or {@code null} if the role is invalid
-     *         or no respondent name is available
-     */
-    public static String findRespondentNameByRole(CaseData caseData, String role) {
-        int roleIndex = RoleUtils.findRoleIndexByRoleLabel(role);
-        if (roleIndex == -1) {
-            return null;
-        }
-        NoticeOfChangeAnswers noticeOfChangeAnswers = NoticeOfChangeUtils
-                .getNoticeOfChangeAnswersAtIndex(caseData, roleIndex);
-        if (ObjectUtils.isEmpty(noticeOfChangeAnswers)
-                || ObjectUtils.isEmpty(noticeOfChangeAnswers.getRespondentName())) {
-            return null;
-        }
-        return noticeOfChangeAnswers.getRespondentName();
     }
 
     /**
@@ -1081,5 +1031,35 @@ public final class RespondentRepresentativeUtils {
                 }
             }
         }
+    }
+
+    /**
+     * Finds the representative associated with the specified respondent.
+     * <p>
+     * The lookup is performed only when the respondent contains the required
+     * representative lookup data. The method first attempts to find a representative
+     * using the expected representative role derived from the respondent's ID. If no
+     * matching representative is found, it falls back to searching by the
+     * representative ID stored against the respondent.
+     *
+     * @param caseData   the case data containing respondent and representative information
+     * @param respondent the respondent whose representative should be found
+     * @return the matching {@link RepresentedTypeRItem}, or {@code null} if the respondent
+     *         does not contain sufficient lookup data or no matching representative is found
+     */
+    public static RepresentedTypeRItem findRepresentativeByRespondent(CaseData caseData,
+                                                                        RespondentSumTypeItem respondent) {
+        if (!RespondentUtils.hasRepresentativeLookupData(respondent)) {
+            return null;
+        }
+        RepresentedTypeRItem respondentRepresentative =
+                findRepresentativeByRoleOrRespondentName(caseData,
+                        RespondentUtils.determineExpectedRoleByRespondentId(caseData, respondent.getId()));
+        if (respondentRepresentative != null) {
+            return respondentRepresentative;
+        }
+        respondentRepresentative =
+                findRepresentativeById(caseData, respondent.getValue().getRepresentativeId());
+        return respondentRepresentative;
     }
 }

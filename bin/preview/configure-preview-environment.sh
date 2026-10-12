@@ -96,6 +96,13 @@ if [[ "${EXISTING_FINGERPRINT}" == "${FINGERPRINT}" ]]; then
   echo "Preview configuration marker is current, but expected ET case types are missing; running configuration again."
 fi
 
+# These hostnames are published by the preview cluster's external-dns, which
+# writes records in a periodic batch rather than when the ingress appears. The
+# batch has landed up to about 3.5 minutes after this check starts, so allow
+# 5 minutes by default; builds whose records already exist pass immediately.
+dns_retry_count=${PREVIEW_DNS_RETRY_COUNT:-60}
+dns_retry_delay_seconds=${PREVIEW_DNS_RETRY_DELAY_SECONDS:-5}
+
 for hostname in \
   "camunda-et-cos-pr-${PR_ID}.preview.platform.hmcts.net" \
   "ccd-definition-store-et-cos-pr-${PR_ID}.preview.platform.hmcts.net" \
@@ -104,14 +111,14 @@ for hostname in \
 do
   attempt=0
   until getent hosts "${hostname}" > /dev/null; do
-    if [[ "${attempt}" -ge 6 ]]; then
-      echo "DNS did not resolve for ${hostname}"
+    if [[ "${attempt}" -ge "${dns_retry_count}" ]]; then
+      echo "DNS did not resolve for ${hostname} after $((dns_retry_count * dns_retry_delay_seconds)) seconds"
       exit 1
     fi
 
     attempt=$((attempt + 1))
-    echo "Waiting for DNS for ${hostname} (retry ${attempt}/6)"
-    sleep 5
+    echo "Waiting for DNS for ${hostname} (retry ${attempt}/${dns_retry_count})"
+    sleep "${dns_retry_delay_seconds}"
   done
 done
 

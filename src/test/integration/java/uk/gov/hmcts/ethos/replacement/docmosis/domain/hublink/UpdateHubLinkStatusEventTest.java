@@ -13,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.PostgreSQLContainer;
 import uk.gov.hmcts.ccd.sdk.ConfigBuilderImpl;
 import uk.gov.hmcts.ccd.sdk.ResolvedCCDConfig;
-import uk.gov.hmcts.ccd.sdk.api.CaseDetails;
+import uk.gov.hmcts.ccd.sdk.api.EventPayload;
 import uk.gov.hmcts.ccd.sdk.config.DecentralisedDataConfiguration;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.HubLinksStatuses;
@@ -76,32 +76,29 @@ class UpdateHubLinkStatusEventTest {
             ImmutableSet.copyOf(CaseState.values())
         );
         ConfigBuilderImpl<CaseData, CaseState, PlaceholderRole> builder = new ConfigBuilderImpl<>(resolvedConfig);
-        eventConfig.configure(builder);
-        var callback = builder.build()
+        eventConfig.configureDecentralised(builder);
+        var event = builder.build()
             .getEvents()
-            .get(UpdateHubLinkStatusEvent.EVENT_ID)
-            .getAboutToSubmitCallback();
+            .get(UpdateHubLinkStatusEvent.EVENT_ID);
 
         CaseData caseData = new CaseData();
         caseData.setHubLinksStatuses(statuses("notStarted"));
-        var response = callback.handle(caseDetails(caseData), null);
+        var response = event.getSubmitHandler().submit(eventPayload(caseData));
 
         assertThat(eventConfig.caseTypeIds()).containsExactlyInAnyOrder("ET_EnglandWales", "ET_Scotland");
-        assertThat(response.getData()).isSameAs(caseData);
+        assertThat(event.getAboutToSubmitCallback()).isNull();
+        assertThat(response).isNotNull();
         flushAndClear();
         assertStoredStatus("notStarted");
 
         caseData.setHubLinksStatuses(statuses("completed"));
-        callback.handle(caseDetails(caseData), null);
+        event.getSubmitHandler().submit(eventPayload(caseData));
         flushAndClear();
         assertStoredStatus("completed");
     }
 
-    private CaseDetails<CaseData, CaseState> caseDetails(CaseData caseData) {
-        return CaseDetails.<CaseData, CaseState>builder()
-            .id(CASE_REFERENCE)
-            .data(caseData)
-            .build();
+    private EventPayload<CaseData, CaseState> eventPayload(CaseData caseData) {
+        return new EventPayload<>(CASE_REFERENCE, caseData, null);
     }
 
     private HubLinksStatuses statuses(String personalDetails) {

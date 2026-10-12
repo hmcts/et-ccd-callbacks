@@ -5,9 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.ccd.sdk.api.CCDConfig;
-import uk.gov.hmcts.ccd.sdk.api.CaseDetails;
-import uk.gov.hmcts.ccd.sdk.api.ConfigBuilder;
-import uk.gov.hmcts.ccd.sdk.api.callback.AboutToStartOrSubmitResponse;
+import uk.gov.hmcts.ccd.sdk.api.DecentralisedConfigBuilder;
+import uk.gov.hmcts.ccd.sdk.api.EventPayload;
+import uk.gov.hmcts.ccd.sdk.api.callback.SubmitResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.EtJsonCcdConfig.PlaceholderRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.state.CaseState;
@@ -33,25 +33,25 @@ public class UpdateHubLinkStatusEvent implements CCDConfig<CaseData, CaseState, 
     }
 
     @Override
-    public void configure(ConfigBuilder<CaseData, CaseState, PlaceholderRole> builder) {
-        builder.event(EVENT_ID)
-            .forAllStates()
-            .aboutToSubmitCallback((details, detailsBefore) -> submit(details));
+    public void configureDecentralised(DecentralisedConfigBuilder<CaseData, CaseState, PlaceholderRole> builder) {
+        // Decentralised events do not touch the legacy case_data.data json blob.
+        // We persist to our table without touching the blob, avoiding conflicts.
+        builder.decentralisedEvent(EVENT_ID, this::submit)
+            .forAllStates();
     }
 
-    private AboutToStartOrSubmitResponse<CaseData, CaseState> submit(
-        CaseDetails<CaseData, CaseState> details
-    ) {
-        CaseData data = details.getData();
+    private SubmitResponse<CaseState> submit(EventPayload<CaseData, CaseState> eventPayload) {
+        CaseData data = eventPayload.caseData();
         if (data.getHubLinksStatuses() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Hub-link statuses are required");
         }
+        // Intentionally last write wins mirroring the SYA frontend client.
+        // Do not copy this pattern for data requiring concurrency protection;
+        // use versioning and optimistic locking by default.
         hubLinkStatusRepository.save(
-            HubLinkStatus.create(details.getId(), data.getHubLinksStatuses())
+            HubLinkStatus.create(eventPayload.caseReference(), data.getHubLinksStatuses())
         );
 
-        return AboutToStartOrSubmitResponse.<CaseData, CaseState>builder()
-            .data(data)
-            .build();
+        return SubmitResponse.defaultResponse();
     }
 }

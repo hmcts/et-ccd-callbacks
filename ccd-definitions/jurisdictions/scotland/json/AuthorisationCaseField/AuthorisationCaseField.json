@@ -2775,7 +2775,7 @@
     "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "printHearingDetails",
     "UserRole": "caseworker-employment-scotland",
-    "CRUD": "CRU"
+    "CRUD": "CRUD"
   },
   {
     "CaseTypeId": "ET_Scotland",
@@ -2787,7 +2787,7 @@
     "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "printHearingDetails",
     "UserRole": "caseworker-employment-etjudge-scotland",
-    "CRUD": "CRU"
+    "CRUD": "CRUD"
   },
   {
     "CaseTypeId": "ET_Scotland",
@@ -23181,6 +23181,13 @@
     "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "SearchCriteria",
     "UserRole": "citizen",
+    "CRUD": "CRUD"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "SearchCriteria",
+    "UserRole": "caseworker-employment",
     "CRUD": "CRUD"
   },
   {

@@ -29,7 +29,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ACAS_API;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ACAS_EMAIL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ADMIN_CONFIG_FILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ADMIN_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_APPROVER;
@@ -59,7 +58,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.EMPLOYMENT_
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.EMPLOYMENT_SENIOR_TRIBUNAL_CASEWORKER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.EMPLOYMENT_TRIBUNAL_CASEWORKER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ENGLANDWALES_EMAIL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ENGLANGWALES_CONFIG_FILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ET_CASEADMIN_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ET_LEGALOPS_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ET_SYSTEM_EMAIL;
@@ -84,7 +82,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.PUI_USER_MA
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.RAS_VALIDATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.RESPONDENT_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ROLE_ASSIGNMENT_ADMIN_EMAIL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SCOTLAND_CONFIG_FILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SCOTLAND_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SENIOR_TRIBUNAL_CASEWORKER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SOLICITOR_1_EMAIL;
@@ -127,6 +124,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.WA_TASK_CON
  * <pre>
  *     CFTLIB_IMPORT_CCD_DEFS_ON_BOOT
  * </pre>
+ *
+ * CCD definitions are imported from JSON located in:
+ * ccd-definitions/jurisdictions/{england-wales,scotland,admin}/json
  * </p>
  *
  * <p>
@@ -192,6 +192,15 @@ public class CftlibConfig implements CFTLibConfigurer {
 
     @Value("${cftlib.import-ccd-defs-on-boot}")
     private boolean importCcdDefsOnBoot;
+
+    @Value("${decentralisation.local-callback-base-url:http://localhost:8081}")
+    private String localCallbackBaseUrl;
+
+    @Value("${ccd.data-store-api-url:http://localhost:4452}")
+    private String ccdDataStoreApiUrl;
+
+    @Value("${assign_case_access_api_url:http://localhost:4454}")
+    private String assignCaseAccessApiUrl;
 
     @Value("${rse.lib.dump_definitions:false}")
     private boolean dumpDefinitions;
@@ -582,25 +591,37 @@ public class CftlibConfig implements CFTLibConfigurer {
     }
 
     private void importEnglandWales(CFTLib lib) throws IOException {
-        importCcdDefinition(lib, ENGLANGWALES_CONFIG_FILE);
+        importJsonDefinition(lib, "ccd-definitions/jurisdictions/england-wales");
     }
 
     private void importScotland(CFTLib lib) throws IOException {
-        importCcdDefinition(lib, SCOTLAND_CONFIG_FILE);
+        importJsonDefinition(lib, "ccd-definitions/jurisdictions/scotland");
     }
 
     private void importAdmin(CFTLib lib) throws IOException {
-        importCcdDefinition(lib, ADMIN_CONFIG_FILE);
+        importJsonDefinition(lib, "ccd-definitions/jurisdictions/admin");
     }
 
-    private void importCcdDefinition(CFTLib lib, String file) throws IOException {
-        Path definitionFile = resolveDefinitionFile(file);
+    private void importJsonDefinition(CFTLib lib, String jurisdictionFolder) throws IOException {
+        Path root = resolveDefinitionFile(jurisdictionFolder);
+        Path jsonFolder = root.resolve("json");
+        Path template = root.resolve("data/ccd-template.xlsx");
         try {
-            byte[] def = Files.readAllBytes(definitionFile);
-            lib.importDefinition(def);
+            log.info("Importing JSON definition from {}", jsonFolder);
+            lib.importJsonDefinition(
+                    jsonFolder.toFile(),
+                    template.toFile(),
+                    Map.of(
+                            "ET_COS_URL", localCallbackBaseUrl,
+                            "CCD_DEF_BASE_URL", localCallbackBaseUrl,
+                            "CCD_DEF_URL", ccdDataStoreApiUrl,
+                            "CCD_DEF_AAC_URL", assignCaseAccessApiUrl
+                    ),
+                    "*-prod.json"
+            );
         } catch (Exception e) {
-            log.error("Unable to import {} from {}", file, definitionFile, e);
-            throw new IOException("Unable to import CCD definition " + definitionFile, e);
+            log.error("Unable to import JSON definition from {}", jsonFolder, e);
+            throw new IOException("Unable to import JSON definition from " + jsonFolder, e);
         }
     }
 

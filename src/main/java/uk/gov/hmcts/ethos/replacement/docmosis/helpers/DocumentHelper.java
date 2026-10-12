@@ -1078,7 +1078,7 @@ public final class DocumentHelper {
 
     private static void appendAddressLineIfPresent(StringBuilder sb, String fieldName, String value) {
         if (!isNullOrEmpty(value)) {
-            sb.append("\"").append(fieldName).append("\":\"")
+            sb.append('"').append(fieldName).append("\":\"")
                     .append(nullCheck(value))
                     .append(NEW_LINE);
         }

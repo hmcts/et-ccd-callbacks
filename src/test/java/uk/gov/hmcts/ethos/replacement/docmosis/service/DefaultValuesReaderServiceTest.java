@@ -187,6 +187,14 @@ class DefaultValuesReaderServiceTest {
         assertEquals("TestAddress3", caseData.getTribunalCorrespondenceAddress().getAddressLine3());
         assertEquals("TestAddress3\n3 Atlantic Quay, 20 York Street",
                 DocumentHelper.correspondenceAddressLine3(withStreet));
+        assertEquals("Glasgow Tribunals Centre",
+                DocumentHelper.letterAddressLine3("Glasgow Tribunals Centre", ""));
+        assertEquals("3 Atlantic Quay, 20 York Street",
+                DocumentHelper.letterAddressLine3(null, "3 Atlantic Quay, 20 York Street"));
+        assertEquals("Glasgow Tribunals Centre\n3 Atlantic Quay, 20 York Street",
+                DocumentHelper.letterAddressLine3(
+                        "Glasgow Tribunals Centre\\n3 Atlantic Quay, 20 York Street",
+                        "3 Atlantic Quay, 20 York Street"));
     }
 
     @Test

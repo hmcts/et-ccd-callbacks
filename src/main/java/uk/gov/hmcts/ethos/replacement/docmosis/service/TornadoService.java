@@ -140,14 +140,32 @@ public class TornadoService {
         try (OutputStreamWriter os = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
             DefaultValues allocatedCourtAddress = getAllocatedCourtAddress(caseData, caseTypeId, multipleData);
             UserDetails userDetails = userIdamService.getUserDetails(authToken);
+            String addressLine4 = managingOfficeAddressLine4(caseData, allocatedCourtAddress);
 
             StringBuilder documentContent = DocumentHelper.buildDocumentContent(caseData,
                     tornadoConnection.getAccessKey(),
                     userDetails, caseTypeId, correspondenceType,
-                    correspondenceScotType, multipleData, allocatedCourtAddress, venueAddressReaderService);
+                    correspondenceScotType, multipleData, allocatedCourtAddress, venueAddressReaderService,
+                    addressLine4);
 
             writeOutputStream(os, documentContent);
         }
+    }
+
+    private String managingOfficeAddressLine4(CaseData caseData, DefaultValues allocatedCourtAddress) {
+        if (allocatedCourtAddress != null || caseData.getTribunalCorrespondenceAddress() == null
+                || isNullOrEmpty(caseData.getManagingOffice())) {
+            return null;
+        }
+        DefaultValues officeDefaults = defaultValuesReaderService.getDefaultValues(caseData.getManagingOffice());
+        if (officeDefaults == null) {
+            return null;
+        }
+        String savedLine3 = caseData.getTribunalCorrespondenceAddress().getAddressLine3();
+        if (savedLine3 != null && savedLine3.equals(officeDefaults.getTribunalCorrespondenceAddressLine3())) {
+            return officeDefaults.getTribunalCorrespondenceAddressLine4();
+        }
+        return null;
     }
 
     private DefaultValues getAllocatedCourtAddress(CaseData caseData, String caseTypeId, MultipleData multipleData) {

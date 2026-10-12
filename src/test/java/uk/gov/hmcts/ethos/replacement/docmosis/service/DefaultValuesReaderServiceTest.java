@@ -21,6 +21,7 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.CaseDefaultValuesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
@@ -176,25 +177,16 @@ class DefaultValuesReaderServiceTest {
     }
 
     @Test
-    void addressLine4IsJoinedOntoTheSavedAddressLine3() {
+    void addressLine4StaysOffTheSavedAddressAndJoinsOnTheLetter() {
         DefaultValues withStreet = createDefaultValues();
         withStreet.setTribunalCorrespondenceAddressLine4("3 Atlantic Quay, 20 York Street");
         CaseData caseData = new CaseData();
 
         defaultValuesReaderService.setCaseData(caseData, withStreet);
 
+        assertEquals("TestAddress3", caseData.getTribunalCorrespondenceAddress().getAddressLine3());
         assertEquals("TestAddress3\n3 Atlantic Quay, 20 York Street",
-                caseData.getTribunalCorrespondenceAddress().getAddressLine3());
-
-        DefaultValues streetOnly = createDefaultValues();
-        streetOnly.setTribunalCorrespondenceAddressLine3("");
-        streetOnly.setTribunalCorrespondenceAddressLine4("3 Atlantic Quay, 20 York Street");
-        CaseData streetOnlyCase = new CaseData();
-
-        defaultValuesReaderService.setCaseData(streetOnlyCase, streetOnly);
-
-        assertEquals("3 Atlantic Quay, 20 York Street",
-                streetOnlyCase.getTribunalCorrespondenceAddress().getAddressLine3());
+                DocumentHelper.correspondenceAddressLine3(withStreet));
     }
 
     @Test

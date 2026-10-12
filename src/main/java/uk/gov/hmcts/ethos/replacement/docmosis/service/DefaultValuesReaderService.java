@@ -13,7 +13,6 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.CaseDefaultValuesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 
 import java.util.Optional;
 
@@ -142,8 +141,8 @@ public class DefaultValuesReaderService {
                 Optional.ofNullable(defaultValues.getTribunalCorrespondenceAddressLine1()).orElse(""));
         address.setAddressLine2(
                 Optional.ofNullable(defaultValues.getTribunalCorrespondenceAddressLine2()).orElse(""));
-        address.setAddressLine3(Optional.ofNullable(
-                DocumentHelper.correspondenceAddressLine3(defaultValues)).orElse(""));
+        address.setAddressLine3(
+                Optional.ofNullable(defaultValues.getTribunalCorrespondenceAddressLine3()).orElse(""));
         address.setPostTown(
                 Optional.ofNullable(defaultValues.getTribunalCorrespondenceTown()).orElse(""));
         address.setPostCode(

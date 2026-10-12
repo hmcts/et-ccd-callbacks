@@ -2,6 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
@@ -10,6 +12,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceExceptio
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 final class UserUtilsTest {
 
@@ -66,5 +70,24 @@ final class UserUtilsTest {
         // When userDetails and claimant representative emails match, should return true.
         claimantRepresentative.setRepresentativeEmailAddress(DUMMY_EMAIL_1);
         assertThat(UserUtils.isLeadClaimantRepresentative(userDetails, claimantRepresentative)).isTrue();
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"'John Smith', 'John', 'Smith', 'John Smith'",
+        "null, 'John', 'Smith', 'John Smith'",
+        "null, 'John', null, 'John'",
+        "null, null, 'Smith', 'Smith'",
+        "null, null,   null, ''",
+        "' ', 'John', 'Smith', 'John Smith'",
+        "null, ' John  ', '  Smith  ', 'John Smith'"},
+        nullValues = "null")
+    void theResolveUserDisplayName(String name, String firstName, String lastName, String expected) {
+        UserDetails userDetails = mock(UserDetails.class);
+
+        when(userDetails.getName()).thenReturn(name);
+        when(userDetails.getFirstName()).thenReturn(firstName);
+        when(userDetails.getLastName()).thenReturn(lastName);
+
+        assertThat(expected).isEqualTo(UserUtils.resolveUserDisplayName(userDetails));
     }
 }

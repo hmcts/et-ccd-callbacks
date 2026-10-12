@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
-import org.joda.time.LocalDateTime;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,6 +46,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -106,8 +106,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 
 @ExtendWith(SpringExtension.class)
 class InitialConsiderationServiceTest {
-    private static final LocalDateTime EARLIEST_FUTURE_HEARING_DATE = LocalDateTime.now().plusDays(5);
-    private static final LocalDateTime SECOND_FUTURE_HEARING_DATE = LocalDateTime.now().plusDays(9);
+    private static final LocalDate TODAY = LocalDate.now();
+    private static final LocalDate EARLIEST_FUTURE_HEARING_DATE = TODAY.plusDays(5);
+    private static final LocalDate SECOND_FUTURE_HEARING_DATE = TODAY.plusDays(9);
+    private static final DateTimeFormatter HEARING_DATE_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+    private static final DateTimeFormatter HEARING_DATE_DISPLAY_FORMATTER =
+            DateTimeFormatter.ofPattern("d MMM uuuu", Locale.UK);
     private static final String GIVE_DETAILS = "Give Details:";
 
     private static final String EXPECTED_HEARING_DETAILS_STRING = """
@@ -197,6 +201,14 @@ class InitialConsiderationServiceTest {
                 .url("https://test.com/documents/random-uuid")
                 .build();
         doCallRealMethod().when(documentManagementService).addDocumentToDocumentField(documentInfo);
+    }
+
+    private static String formatHearingDateTime(LocalDate date) {
+        return date.atTime(10, 0).format(HEARING_DATE_TIME_FORMATTER);
+    }
+
+    private static String formatHearingDateForDisplay(LocalDate date) {
+        return date.format(HEARING_DATE_DISPLAY_FORMATTER);
     }
 
     @Test
@@ -544,7 +556,7 @@ class InitialConsiderationServiceTest {
         DateListedType dateListed = caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection()
                 .getFirst().getValue();
         dateListed.setHearingStatus("Listed");
-        dateListed.setListedDate(EARLIEST_FUTURE_HEARING_DATE.toString());
+        dateListed.setListedDate(formatHearingDateTime(EARLIEST_FUTURE_HEARING_DATE));
         dateListed.setHearingTimingDuration("3.5 Hours");
     }
 
@@ -552,7 +564,7 @@ class InitialConsiderationServiceTest {
         DateListedType dateListed = caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection()
                 .getFirst().getValue();
         dateListed.setHearingStatus("Settled");
-        dateListed.setListedDate(EARLIEST_FUTURE_HEARING_DATE.toString());
+        dateListed.setListedDate(formatHearingDateTime(EARLIEST_FUTURE_HEARING_DATE));
         dateListed.setHearingTimingDuration("3.5 Hours");
     }
 
@@ -591,18 +603,14 @@ class InitialConsiderationServiceTest {
     void getEarliestHearingDate() {
         setFutureHearingDate(caseData);
         assertThat(initialConsiderationService.getEarliestHearingDateForListedHearings(generateHearingDates()))
-                .isEqualTo(Optional.of(LocalDate.of(EARLIEST_FUTURE_HEARING_DATE.getYear(),
-                        EARLIEST_FUTURE_HEARING_DATE.getMonthOfYear(),
-                        EARLIEST_FUTURE_HEARING_DATE.getDayOfMonth())));
+                .isEqualTo(Optional.of(EARLIEST_FUTURE_HEARING_DATE));
     }
 
     @Test
     void getEarliestHearingDateWithEmptyDateListedTypeItem() {
         setFutureHearingDate(caseData);
         assertThat(initialConsiderationService.getEarliestHearingDateForListedHearings(generateHearingDatesWithEmpty()))
-                .isEqualTo(Optional.of(LocalDate.of(EARLIEST_FUTURE_HEARING_DATE.getYear(),
-                        EARLIEST_FUTURE_HEARING_DATE.getMonthOfYear(),
-                        EARLIEST_FUTURE_HEARING_DATE.getDayOfMonth())));
+                .isEqualTo(Optional.of(EARLIEST_FUTURE_HEARING_DATE));
     }
 
     @Test
@@ -899,22 +907,22 @@ class InitialConsiderationServiceTest {
     }
 
     private List<DateListedTypeItem> generateHearingDates() {
-        return List.of(createDate("2022-07-15T10:00:00.000", null),
-                createDate("2022-07-15T10:00:00.000", null),
-                createDate("2022-05-20T10:00:00.000", null),
-                createDate("2022-03-22T10:00:00.000", null),
-                createDate("2022-01-07T10:00:00.000", null),
-                createDate("2022-01-07T10:00:00.000", null),
-                createDate(EARLIEST_FUTURE_HEARING_DATE.toString(), "Listed"),
-                createDate(SECOND_FUTURE_HEARING_DATE.toString(), "Listed"));
+        return List.of(createDate(formatHearingDateTime(TODAY.minusDays(1)), null),
+                createDate(formatHearingDateTime(TODAY.minusDays(2)), null),
+                createDate(formatHearingDateTime(TODAY.minusDays(3)), null),
+                createDate(formatHearingDateTime(TODAY.minusDays(4)), null),
+                createDate(formatHearingDateTime(TODAY.minusDays(5)), null),
+                createDate(formatHearingDateTime(TODAY.minusDays(6)), null),
+                createDate(formatHearingDateTime(EARLIEST_FUTURE_HEARING_DATE), "Listed"),
+                createDate(formatHearingDateTime(SECOND_FUTURE_HEARING_DATE), "Listed"));
     }
 
     private List<DateListedTypeItem> generateHearingDatesWithEmpty() {
-        return List.of(createDate("2022-07-15T10:00:00.000", null),
-                createDate("2022-07-15T10:00:00.000", null),
+        return List.of(createDate(formatHearingDateTime(TODAY.minusDays(1)), null),
+                createDate(formatHearingDateTime(TODAY.minusDays(2)), null),
                 new DateListedTypeItem(),
-                createDate("2022-03-22T10:00:00.000", null),
-                createDate(EARLIEST_FUTURE_HEARING_DATE.toString(), "Listed"));
+                createDate(formatHearingDateTime(TODAY.minusDays(3)), null),
+                createDate(formatHearingDateTime(EARLIEST_FUTURE_HEARING_DATE), "Listed"));
     }
 
     private DateListedTypeItem createDate(String dateString, String status) {
@@ -1146,41 +1154,39 @@ class InitialConsiderationServiceTest {
 
     @Test
     void getEarliestHearingDateForListedHearings_shouldReturnEarliestFutureDate_whenMultipleValidListedHearingsExist() {
+        LocalDate earliestFutureHearingDate = TODAY.plusDays(5);
         List<DateListedTypeItem> hearingDates = List.of(
-                createDateListedTypeItem("2026-10-15T10:00:00", "Listed", "2 Hours"),
-                createDateListedTypeItem("2026-10-10T09:00:00", "Listed", "1 Hour"),
-                createDateListedTypeItem("2026-10-20T11:00:00", "Listed", "3 Hours")
+                createDateListedTypeItem(formatHearingDateTime(TODAY.plusDays(10)), "Listed", "2 Hours"),
+                createDateListedTypeItem(formatHearingDateTime(earliestFutureHearingDate), "Listed", "1 Hour"),
+                createDateListedTypeItem(formatHearingDateTime(TODAY.plusDays(15)), "Listed", "3 Hours")
         );
 
         Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
 
         assertThat(result).isPresent();
-        assertThat(result.get().getYear()).isEqualTo(2026);
-        assertThat(result.get().getMonthValue()).isEqualTo(10);
-        assertThat(result.get().getDayOfMonth()).isEqualTo(10);
+        assertThat(result).contains(earliestFutureHearingDate);
     }
 
     @Test
     void getEarliestHearingDateForListedHearings_shouldIgnoreNonListedHearings() {
+        LocalDate listedFutureHearingDate = TODAY.plusDays(5);
         List<DateListedTypeItem> hearingDates = List.of(
-                createDateListedTypeItem("2026-10-15T10:00:00", "NotListed", "2 Hours"),
-                createDateListedTypeItem("2026-10-10T09:00:00", "Listed", "1 Hour"),
-                createDateListedTypeItem("2026-10-20T11:00:00", "NotListed", "3 Hours")
+                createDateListedTypeItem(formatHearingDateTime(TODAY.plusDays(10)), "NotListed", "2 Hours"),
+                createDateListedTypeItem(formatHearingDateTime(listedFutureHearingDate), "Listed", "1 Hour"),
+                createDateListedTypeItem(formatHearingDateTime(TODAY.plusDays(15)), "NotListed", "3 Hours")
         );
 
         Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
 
         assertThat(result).isPresent();
-        assertThat(result.get().getYear()).isEqualTo(2026);
-        assertThat(result.get().getMonthValue()).isEqualTo(10);
-        assertThat(result.get().getDayOfMonth()).isEqualTo(10);
+        assertThat(result).contains(listedFutureHearingDate);
     }
 
     @Test
     void getEarliestHearingDateForListedHearings_shouldReturnEmpty_whenAllHearingDatesAreInThePast() {
         List<DateListedTypeItem> hearingDates = List.of(
-                createDate("2022-10-15T10:00:00.000", "Listed"),
-                createDate("2022-10-10T10:00:00.000", "Listed")
+                createDate(formatHearingDateTime(TODAY.minusDays(10)), "Listed"),
+                createDate(formatHearingDateTime(TODAY.minusDays(5)), "Listed")
         );
 
         Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
@@ -1207,17 +1213,16 @@ class InitialConsiderationServiceTest {
 
     @Test
     void getEarliestHearingDateForListedHearings_shouldIgnoreInvalidDateFormats() {
+        LocalDate validHearingDate = TODAY.plusDays(5);
         List<DateListedTypeItem> hearingDates = List.of(
                 createDate("InvalidDate", "Listed"),
-                createDate("2026-10-15T10:00:00.000", "Listed")
+                createDate(formatHearingDateTime(validHearingDate), "Listed")
         );
 
         Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
 
         assertThat(result).isPresent();
-        assertThat(result.get().getYear()).isEqualTo(2026);
-        assertThat(result.get().getMonthValue()).isEqualTo(10);
-        assertThat(result.get().getDayOfMonth()).isEqualTo(15);
+        assertThat(result).contains(validHearingDate);
     }
 
     @Test
@@ -1435,8 +1440,10 @@ class InitialConsiderationServiceTest {
     @Test
     void getHearingDetails_shouldReturnMissingMessage_whenNoListedHearingsExist() {
         List<HearingTypeItem> hearingCollection = List.of(
-                createHearingTypeItem("2023-10-15T10:00:00.000", "Not Listed", "Hearing Type 1", "Hours", "3"),
-                createHearingTypeItem("2023-10-10T10:00:00.000", "Cancelled", "Hearing Type 2", "Hours", "2")
+                createHearingTypeItem(formatHearingDateTime(TODAY.plusDays(10)), "Not Listed",
+                        "Hearing Type 1", "Hours", "3"),
+                createHearingTypeItem(formatHearingDateTime(TODAY.plusDays(5)), "Cancelled",
+                        "Hearing Type 2", "Hours", "2")
         );
 
         String expectedResult = """
@@ -1480,10 +1487,11 @@ class InitialConsiderationServiceTest {
 
     @Test
     void getHearingDetails_shouldReturnFormattedDetails_whenValidHearingCollectionExists() {
+        LocalDate earliestFutureHearingDate = TODAY.plusDays(5);
         List<HearingTypeItem> hearingCollection = List.of(
-                createHearingTypeItem("2026-10-15T10:00:00.000", "Listed",
+                createHearingTypeItem(formatHearingDateTime(TODAY.plusDays(10)), "Listed",
                         "Hearing Type 1", "Hours", "3"),
-                createHearingTypeItem("2026-10-10T10:00:00.000", "Listed",
+                createHearingTypeItem(formatHearingDateTime(earliestFutureHearingDate), "Listed",
                         "Hearing Type 2", "Hours", "2")
         );
 
@@ -1501,7 +1509,7 @@ class InitialConsiderationServiceTest {
                  <thead>
                  <tbody>
                     <tr>
-                        <td>Date</td> <td> 10 Oct 2026 </td>
+                        <td>Date</td> <td> DATE_PLACEHOLDER </td>
                     </tr>
                     <tr>
                         <td>Type</td> <td> Hearing Type 2 </td>
@@ -1520,7 +1528,7 @@ class InitialConsiderationServiceTest {
                     </tr>
                 </tbody>
                 </table>
-                """;
+                """.replace("DATE_PLACEHOLDER", formatHearingDateForDisplay(earliestFutureHearingDate));
         String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
         assertThat(result).isEqualTo(expectedResult);
     }
@@ -1528,7 +1536,7 @@ class InitialConsiderationServiceTest {
     @Test
     void getHearingDetails_shouldReturnFormattedDetails_whenEarliestListedHearingExists() {
         HearingTypeItem hearingTypeItem = createHearingTypeItem(
-                "2027-02-04T10:00:00.000", "Listed", "Final Hearing", "Full Day", "6");
+                formatHearingDateTime(TODAY.plusDays(5)), "Listed", "Final Hearing", "Full Day", "6");
 
         List<HearingTypeItem> hearingCollection = List.of(hearingTypeItem);
 
@@ -1536,15 +1544,17 @@ class InitialConsiderationServiceTest {
 
         assertNotNull(result);
         assertTrue(result.contains("Listed Hearing Details"));
-        assertTrue(result.contains("2027"));
+        assertTrue(result.contains(formatHearingDateForDisplay(TODAY.plusDays(5))));
         assertTrue(result.contains("Final Hearing"));
     }
 
     @Test
     void getHearingDetails_shouldIgnoreInvalidDateFormats() {
+        LocalDate validHearingDate = TODAY.plusDays(5);
         List<HearingTypeItem> hearingCollection = List.of(
                 createHearingTypeItem("InvalidDate", "Listed", "Hearing Type 1", "Hours", "3"),
-                createHearingTypeItem("2026-10-15T10:00:00.000", "Listed", "Hearing Type 2", "Hours", "2")
+                createHearingTypeItem(formatHearingDateTime(validHearingDate), "Listed",
+                        "Hearing Type 2", "Hours", "2")
         );
 
         String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
@@ -1562,7 +1572,7 @@ class InitialConsiderationServiceTest {
                  <thead>
                  <tbody>
                     <tr>
-                        <td>Date</td> <td> 15 Oct 2026 </td>
+                        <td>Date</td> <td> DATE_PLACEHOLDER </td>
                     </tr>
                     <tr>
                         <td>Type</td> <td> Hearing Type 2 </td>
@@ -1581,7 +1591,7 @@ class InitialConsiderationServiceTest {
                     </tr>
                 </tbody>
                 </table>
-                """;
+                """.replace("DATE_PLACEHOLDER", formatHearingDateForDisplay(validHearingDate));
         assertThat(result).isEqualTo(detail);
     }
 

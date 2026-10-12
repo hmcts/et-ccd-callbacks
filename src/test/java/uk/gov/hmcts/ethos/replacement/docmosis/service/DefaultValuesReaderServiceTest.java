@@ -60,6 +60,7 @@ class DefaultValuesReaderServiceTest {
         contactDetails.setAddress1("TestAddress1");
         contactDetails.setAddress2("TestAddress2");
         contactDetails.setAddress3("TestAddress3");
+        contactDetails.setAddress4("TestAddress4");
         contactDetails.setTown("TestTown");
         contactDetails.setPostcode("TestPostcode");
         contactDetails.setTelephone("TestTelephone");
@@ -84,6 +85,7 @@ class DefaultValuesReaderServiceTest {
         assertEquals("TestAddress1", defaultValues.getTribunalCorrespondenceAddressLine1());
         assertEquals("TestAddress2", defaultValues.getTribunalCorrespondenceAddressLine2());
         assertEquals("TestAddress3", defaultValues.getTribunalCorrespondenceAddressLine3());
+        assertEquals("TestAddress4", defaultValues.getTribunalCorrespondenceAddressLine4());
         assertEquals("TestTown", defaultValues.getTribunalCorrespondenceTown());
         assertEquals("TestPostcode", defaultValues.getTribunalCorrespondencePostCode());
         assertEquals("TestTelephone", defaultValues.getTribunalCorrespondenceTelephone());

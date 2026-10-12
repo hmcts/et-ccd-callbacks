@@ -176,6 +176,28 @@ class DefaultValuesReaderServiceTest {
     }
 
     @Test
+    void addressLine4IsJoinedOntoTheSavedAddressLine3() {
+        DefaultValues withStreet = createDefaultValues();
+        withStreet.setTribunalCorrespondenceAddressLine4("3 Atlantic Quay, 20 York Street");
+        CaseData caseData = new CaseData();
+
+        defaultValuesReaderService.setCaseData(caseData, withStreet);
+
+        assertEquals("TestAddress3\\n3 Atlantic Quay, 20 York Street",
+                caseData.getTribunalCorrespondenceAddress().getAddressLine3());
+
+        DefaultValues streetOnly = createDefaultValues();
+        streetOnly.setTribunalCorrespondenceAddressLine3("");
+        streetOnly.setTribunalCorrespondenceAddressLine4("3 Atlantic Quay, 20 York Street");
+        CaseData streetOnlyCase = new CaseData();
+
+        defaultValuesReaderService.setCaseData(streetOnlyCase, streetOnly);
+
+        assertEquals("3 Atlantic Quay, 20 York Street",
+                streetOnlyCase.getTribunalCorrespondenceAddress().getAddressLine3());
+    }
+
+    @Test
     void testSetCaseDataWithExistingValues() {
         DefaultValues defaultValues = createDefaultValues();
         CaseData caseData = createCaseWithValues();

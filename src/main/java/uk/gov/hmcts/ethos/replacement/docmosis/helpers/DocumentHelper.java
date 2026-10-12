@@ -1076,7 +1076,7 @@ public final class DocumentHelper {
         return sb;
     }
 
-    private static String addressLine3(DefaultValues address) {
+    public static String correspondenceAddressLine3(DefaultValues address) {
         String line3 = address.getTribunalCorrespondenceAddressLine3();
         String line4 = address.getTribunalCorrespondenceAddressLine4();
         if (isNullOrEmpty(line4)) {
@@ -1096,7 +1096,7 @@ public final class DocumentHelper {
                     .append("\"Court_addressLine2\":\"")
                     .append(nullCheck(allocatedCourtAddress.getTribunalCorrespondenceAddressLine2())).append(NEW_LINE)
                     .append("\"Court_addressLine3\":\"")
-                    .append(nullCheck(addressLine3(allocatedCourtAddress))).append(NEW_LINE)
+                    .append(nullCheck(correspondenceAddressLine3(allocatedCourtAddress))).append(NEW_LINE)
                     .append("\"Court_town\":\"")
                     .append(nullCheck(allocatedCourtAddress.getTribunalCorrespondenceTown())).append(NEW_LINE)
                     .append("\"Court_county\":\"").append(NEW_LINE).append("\"Court_postCode\":\"")

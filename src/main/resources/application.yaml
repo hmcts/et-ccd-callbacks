@@ -318,6 +318,10 @@ cron:
   reconfigurationLimit: ${CRON_RECONFIGURATION_LIMIT:1000}
   ecmMigrationCaseNoteIds: ${CRON_ECM_MIGRATION_CASE_NOTE_IDS:}
   ecmMigrationCaseNotesDryRun: ${CRON_ECM_MIGRATION_CASE_NOTES_DRY_RUN:true}
+  clearCaseTtlMaxCasesPerSearch: ${CRON_CLEAR_CASE_TTL_MAX_CASES_PER_SEARCH:500}
+  clearCaseTtlMaxCasesToProcess: ${CRON_CLEAR_CASE_TTL_MAX_CASES_TO_PROCESS:1000}
+  clearCaseTtlConcurrency: ${CRON_CLEAR_CASE_TTL_CONCURRENCY:15}
+  clearCaseTtlDryRun: ${CRON_CLEAR_CASE_TTL_DRY_RUN:true}
 
 pdf:
   english: "ET1_0224.pdf"

@@ -135,7 +135,7 @@ class ClearCaseTtlTaskTest {
                 "{\"TTL\":{\"SystemTTL\":\"2026-10-01\"}}");
         insertCase(scotlandCaseId, SCOTLAND_CASE_TYPE_ID, DRAFT_STATE,
                 "{\"TTL\":{\"SystemTTL\":\"2026-10-01\"}}");
-        task = new ClearCaseTtlTask(adminUserService, ccdClient, jdbcTemplate, caseTypeIds, true, 2, 1000);
+        task = new ClearCaseTtlTask(adminUserService, ccdClient, jdbcTemplate, caseTypeIds, true, 2, 1000, 15);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
         when(ccdClient.startEventForCase(eq(ADMIN_TOKEN), anyString(), eq(EMPLOYMENT), anyString(),
                 eq(ClearCaseTtlTask.ROLLBACK_TTL_EVENT))).thenAnswer(invocation -> {
@@ -221,7 +221,7 @@ class ClearCaseTtlTaskTest {
 
     private ClearCaseTtlTask createTask(boolean dryRun) {
         return new ClearCaseTtlTask(adminUserService, ccdClient, jdbcTemplate, ENGLANDWALES_CASE_TYPE_ID, dryRun,
-                2, 1000);
+                2, 1000, 15);
     }
 
     private static CCDRequest requestWithTtl(String caseId) {

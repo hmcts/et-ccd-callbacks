@@ -56,6 +56,7 @@ public class ClearCaseTtlTask implements Runnable {
     private final boolean dryRun;
     private final int maxCasesPerSearch;
     private final int maxCasesToProcess;
+    private final int maxConcurrentCcdCalls;
 
     public ClearCaseTtlTask(
             AdminUserService adminUserService,
@@ -64,7 +65,8 @@ public class ClearCaseTtlTask implements Runnable {
             @Value("${cron.caseTypeId}") String caseTypeIds,
             @Value("${cron.clearCaseTtlDryRun:true}") boolean dryRun,
             @Value("${cron.clearCaseTtlMaxCasesPerSearch:500}") int maxCasesPerSearch,
-            @Value("${cron.clearCaseTtlMaxCasesToProcess:1000}") int maxCasesToProcess) {
+            @Value("${cron.clearCaseTtlMaxCasesToProcess:1000}") int maxCasesToProcess,
+            @Value("${cron.clearCaseTtlConcurrency:15}") int maxConcurrentCcdCalls) {
         this.adminUserService = adminUserService;
         this.ccdClient = ccdClient;
         this.jdbcTemplate = jdbcTemplate;
@@ -72,12 +74,14 @@ public class ClearCaseTtlTask implements Runnable {
         this.dryRun = dryRun;
         this.maxCasesPerSearch = maxCasesPerSearch;
         this.maxCasesToProcess = maxCasesToProcess;
+        this.maxConcurrentCcdCalls = maxConcurrentCcdCalls;
     }
 
     @Override
     public void run() {
         validateConfiguration();
-        log.info("Clear case TTL task started; dryRun={}, maxCasesToProcess={}", dryRun, maxCasesToProcess);
+        log.info("Clear case TTL task started; dryRun={}, maxCasesToProcess={}, maxConcurrentCcdCalls={}",
+                dryRun, maxCasesToProcess, maxConcurrentCcdCalls);
 
         String adminUserToken = adminUserService.getAdminUserToken();
         MigrationSummary summary = new MigrationSummary();
@@ -97,6 +101,9 @@ public class ClearCaseTtlTask implements Runnable {
         if (maxCasesToProcess <= 0) {
             throw new IllegalArgumentException("cron.clearCaseTtlMaxCasesToProcess must be greater than zero");
         }
+        if (maxConcurrentCcdCalls <= 0) {
+            throw new IllegalArgumentException("cron.clearCaseTtlConcurrency must be greater than zero");
+        }
     }
 
     private void processCaseType(String adminUserToken, String caseType, MigrationSummary summary) {
@@ -111,12 +118,12 @@ public class ClearCaseTtlTask implements Runnable {
 
             log.info("Found {} cases with TTL for caseType={}", caseReferences.size(), caseType);
 
-            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            try (var executor = Executors.newFixedThreadPool(maxConcurrentCcdCalls, Thread.ofVirtual().factory())) {
                 for (Long caseReference : caseReferences) {
                     foundForCaseType++;
                     int totalCandidates = summary.found.incrementAndGet();
-                    log.info("TTL task progress; caseType={}, caseId={}, processedForCaseType={}/{}",
-                            caseType, caseReference, foundForCaseType, totalCandidates);
+                    log.info("TTL task progress; caseType={}, caseId={}, processedForCaseType={}/{}, totalCandidates={}",
+                            caseType, caseReference, foundForCaseType, maxCasesToProcess, totalCandidates);
                     executor.submit(() -> processCandidate(adminUserToken, caseType, String.valueOf(caseReference),
                             summary));
                 }

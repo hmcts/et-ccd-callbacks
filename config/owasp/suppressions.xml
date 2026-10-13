@@ -166,7 +166,7 @@
          in the commercial 6.2.20 release at the time of writing. ET does not use the affected
          SSE view-fragment, Aalto Jaxb2Decoder, escaped Errors accessor, or self-populating
          data-binding patterns. Remove when a patched OSS Spring Boot 3.5 release is available. -->
-    <suppress until="2026-10-03">
+    <suppress until="2026-11-30">
         <notes><![CDATA[
    file name: spring-aop-6.2.19.jar, spring-beans-6.2.19.jar, spring-context-6.2.19.jar,
    spring-core-6.2.19.jar, spring-expression-6.2.19.jar, spring-jcl-6.2.19.jar,
@@ -184,7 +184,7 @@
          ET does not use Digest authentication, KeyBasedPersistenceTokenService, the affected
          Password4j encoders, InMemoryOAuth2AuthorizationService, AesBytesEncryptor/Encryptors,
          WebAuthn, or DPoP. -->
-    <suppress until="2026-10-03">
+    <suppress until="2026-11-30">
         <notes><![CDATA[
    file name: spring-security-crypto-6.5.11.jar
    CVE-2026-59276: timing-attack-sensitive components not used.

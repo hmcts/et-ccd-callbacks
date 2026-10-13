@@ -4693,9 +4693,15 @@
   },
   {
     "ID": "fl_Part_13",
+    "ListElementCode": "13.22",
+    "ListElement": "13.22 - Representative coming off record - action required from claimant or respondent.",
+    "DisplayOrder": 36
+  },
+  {
+    "ID": "fl_Part_13",
     "ListElementCode": "ETF1",
     "ListElement": "ETF1 - Returned form notice",
-    "DisplayOrder": 36
+    "DisplayOrder": 37
   },
   {
     "ID": "fl_Part_14",

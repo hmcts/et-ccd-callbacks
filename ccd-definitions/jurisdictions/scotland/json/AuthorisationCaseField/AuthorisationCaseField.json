@@ -2775,7 +2775,7 @@
     "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "printHearingDetails",
     "UserRole": "caseworker-employment-scotland",
-    "CRUD": "CRU"
+    "CRUD": "CRUD"
   },
   {
     "CaseTypeId": "ET_Scotland",
@@ -2787,7 +2787,7 @@
     "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "printHearingDetails",
     "UserRole": "caseworker-employment-etjudge-scotland",
-    "CRUD": "CRU"
+    "CRUD": "CRUD"
   },
   {
     "CaseTypeId": "ET_Scotland",

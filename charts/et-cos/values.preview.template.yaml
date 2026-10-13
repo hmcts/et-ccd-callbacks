@@ -534,10 +534,8 @@ wa:
       devcpuLimits: 1000m
       devmemoryRequests: 756Mi
       devmemoryLimits: 1536Mi
-      image: hmctsprod.azurecr.io/wa/task-management-api:latest
       ingressHost: wa-task-management-api-${SERVICE_FQDN}
       environment:
-        TASK_MANAGEMENT_EXCLUSIVE_CLIENTS: wa_task_management_api,wa_task_monitor,wa_case_event_handler,wa_workflow_api,camunda_bpm,et_cos
         CAMUNDA_URL: "http://{{ .Release.Name }}-camunda/engine-rest"
         IDAM_URL: "https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net"
         S2S_URL: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"

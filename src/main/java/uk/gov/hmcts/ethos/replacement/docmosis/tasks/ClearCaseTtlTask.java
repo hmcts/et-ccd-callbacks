@@ -122,8 +122,8 @@ public class ClearCaseTtlTask implements Runnable {
                 for (Long caseReference : caseReferences) {
                     foundForCaseType++;
                     int totalCandidates = summary.found.incrementAndGet();
-                    log.info("TTL task progress; caseType={}, caseId={}, processedForCaseType={}/{}, totalCandidates={}",
-                            caseType, caseReference, foundForCaseType, maxCasesToProcess, totalCandidates);
+                    log.info("TTL task progress; caseType={}, caseId={}, processedForCaseType={}/{}",
+                            caseType, caseReference, foundForCaseType, totalCandidates);
                     executor.submit(() -> processCandidate(adminUserToken, caseType, String.valueOf(caseReference),
                             summary));
                 }

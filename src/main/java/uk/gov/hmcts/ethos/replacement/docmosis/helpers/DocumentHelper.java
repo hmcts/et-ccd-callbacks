@@ -1088,11 +1088,6 @@ public final class DocumentHelper {
         return sb;
     }
 
-    public static String correspondenceAddressLine3(DefaultValues address) {
-        return letterAddressLine3(address.getTribunalCorrespondenceAddressLine3(),
-                address.getTribunalCorrespondenceAddressLine4());
-    }
-
     public static String letterAddressLine3(String line3, String line4) {
         String normalised = lineBreak(line3);
         if (isNullOrEmpty(line4)) {
@@ -1131,7 +1126,11 @@ public final class DocumentHelper {
                     .append("\"Court_addressLine2\":\"")
                     .append(nullCheck(allocatedCourtAddress.getTribunalCorrespondenceAddressLine2())).append(NEW_LINE)
                     .append("\"Court_addressLine3\":\"")
-                    .append(nullCheck(correspondenceAddressLine3(allocatedCourtAddress))).append(NEW_LINE)
+                    .append(nullCheck(allocatedCourtAddress.getTribunalCorrespondenceAddressLine3()))
+                    .append(StringUtils.isNotBlank(allocatedCourtAddress.getTribunalCorrespondenceAddressLine4())
+                            ? "\n" + nullCheck(allocatedCourtAddress.getTribunalCorrespondenceAddressLine4())
+                            : "")
+                    .append(NEW_LINE)
                     .append("\"Court_town\":\"")
                     .append(nullCheck(allocatedCourtAddress.getTribunalCorrespondenceTown())).append(NEW_LINE)
                     .append("\"Court_county\":\"").append(NEW_LINE).append("\"Court_postCode\":\"")

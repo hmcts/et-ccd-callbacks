@@ -33,12 +33,6 @@ export default defineConfig({
       // Logins are independent; cap concurrency to keep the load on IDAM modest.
       workers: 4
     },
-    { // This project is used to run tests tagged with @single-worker-test in a single worker to avoid concurrency issues with shared state (e.g., user logins).
-      name: 'chromium-single-worker-test',
-      use: { ...devices['Desktop Chrome'] },
-      grep: /@single-worker-test/,
-      workers: 1
-    },
     {
       name: 'chromium',
       use: {

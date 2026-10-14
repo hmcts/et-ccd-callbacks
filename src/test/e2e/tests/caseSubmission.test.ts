@@ -11,8 +11,7 @@ import {
 let caseId: string;
 let caseNumber: string;
 
-test.describe('Case creation in Citizen UI',
-  { tag: ['@single-worker-test']},
+test.describe.serial('Case creation in Citizen UI',
   () => {
 
   test(

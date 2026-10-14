@@ -36,6 +36,33 @@ public class CreateUpdatesBusSender {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Enqueues a single pre-built {@link CreateUpdatesMsg} directly, bypassing the batch-splitting
+     * logic in {@link #sendUpdatesToQueue}.  Use this when the caller has already constructed
+     * the message (e.g. for multiple-creation triggers where one message is sent per claimant).
+     *
+     * @param msg    the message to enqueue
+     * @param errors list to which any serialisation or persistence errors are appended
+     */
+    @Transactional
+    public void sendSingleMessage(CreateUpdatesMsg msg, List<String> errors) {
+        try {
+            String messageBody = objectMapper.writeValueAsString(msg);
+            CreateUpdatesQueueMessage queueMessage = CreateUpdatesQueueMessage.builder()
+                    .messageId(msg.getMsgId())
+                    .messageBody(messageBody)
+                    .status(QueueMessageStatus.PENDING)
+                    .createdAt(LocalDateTime.now())
+                    .retryCount(0)
+                    .build();
+            createUpdatesQueueRepository.save(queueMessage);
+            log.info("SENT single message to create-updates queue -----> {}", msg.getMsgId());
+        } catch (Exception e) {
+            log.error("Error sending single message to create-updates queue", e);
+            errors.add(ERROR_MESSAGE);
+        }
+    }
+
     @Transactional
     public void sendUpdatesToQueue(CreateUpdatesDto createUpdatesDto, DataModelParent dataModelParent,
                                    List<String> errors, String updateSize) {

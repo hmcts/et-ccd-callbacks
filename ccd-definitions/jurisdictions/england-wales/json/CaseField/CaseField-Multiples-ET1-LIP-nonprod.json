@@ -1,0 +1,27 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "additionalClaimants",
+    "Label": "Additional claimants",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "AdditionalClaimant",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "addClaimantMethod",
+    "Label": "Add claimant method",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "additionalClaimantSpreadsheet",
+    "Label": "Additional claimant spreadsheet",
+    "FieldType": "Document",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

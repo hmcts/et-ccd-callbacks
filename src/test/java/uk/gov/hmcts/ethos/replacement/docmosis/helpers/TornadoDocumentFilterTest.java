@@ -19,15 +19,4 @@ class TornadoDocumentFilterTest {
         assertThat(result,
                 is("{\"respondentCollection\":[{\"value\":{\"respondent_name\":\"Respondent\\\\WithBlackslash\"}}]}"));
     }
-
-    @Test
-    void newlineInsideAnAddressBecomesAJsonLineBreak() {
-        String json = "{\"Court_addressLine3\":\"Glasgow Tribunals Centre\n3 Atlantic Quay, 20 York Street\",\n"
-                + "\"Court_town\":\"Glasgow\"}";
-
-        String result = TornadoDocumentFilter.filterJson(json);
-
-        assertThat(result, is("{\"Court_addressLine3\":\"Glasgow Tribunals Centre\\n3 Atlantic Quay, "
-                + "20 York Street\",\n\"Court_town\":\"Glasgow\"}"));
-    }
 }

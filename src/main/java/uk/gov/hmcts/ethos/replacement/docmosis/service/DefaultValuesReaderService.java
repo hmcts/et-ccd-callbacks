@@ -124,7 +124,6 @@ public class DefaultValuesReaderService {
                 .tribunalCorrespondenceAddressLine1(contactDetails.getAddress1())
                 .tribunalCorrespondenceAddressLine2(contactDetails.getAddress2())
                 .tribunalCorrespondenceAddressLine3(contactDetails.getAddress3())
-                .tribunalCorrespondenceAddressLine4(contactDetails.getAddress4())
                 .tribunalCorrespondenceTown(contactDetails.getTown())
                 .tribunalCorrespondencePostCode(contactDetails.getPostcode())
                 .tribunalCorrespondenceTelephone(contactDetails.getTelephone())

@@ -11,3 +11,4 @@ dist/
 /package.tgz
 /.tmp
 /token-cache.json
+/.yarn/releases/

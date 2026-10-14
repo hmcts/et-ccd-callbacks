@@ -61,7 +61,9 @@ export abstract class BasePage {
         }
       }
       // Check if error is visible
-      const h3Visible = await this.errorHeading.isVisible().catch(() => false);
+      const h3Visible = await this.errorHeading.waitFor({ state: 'visible', timeout: 3000 })
+        .then(() => true)
+        .catch(() => false);
       if (h3Visible) {
         // Check if Continue button is still visible
        const errStr = await this.errorHeading.textContent();
@@ -132,7 +134,9 @@ export abstract class BasePage {
       await this.waitForSpinner(180_000);
       if (!submitted) return;
       // Check if error is visible
-      const h3Visible = await this.errorHeading.isVisible().catch(() => false);
+      const h3Visible = await this.errorHeading.waitFor({ state: 'visible', timeout: 3000 })
+        .then(() => true)
+        .catch(() => false);
       if (h3Visible) {
         const errStr = await this.errorHeading.textContent();
         attempt++;

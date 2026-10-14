@@ -27,10 +27,17 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'setup',
+      name: 'setup-chromium',
       testMatch: /user\.setups\.ts/,
+      use: { ...devices['Desktop Chrome'] },
       // Logins are independent; cap concurrency to keep the load on IDAM modest.
       workers: 4
+    },
+    { // This project is used to run tests tagged with @single-worker-test in a single worker to avoid concurrency issues with shared state (e.g., user logins).
+      name: 'chromium-single-worker-test',
+      use: { ...devices['Desktop Chrome'] },
+      grep: /@single-worker-test/,
+      workers: 1
     },
     {
       name: 'chromium',
@@ -38,19 +45,31 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         viewport: { width: 1920, height: 1080 },
       },
-      dependencies: ["setup"]
+      dependencies: ["setup-chromium", "chromium-single-worker-test"]
     },
-
+    {
+      name: 'setup-fire-fox',
+      testMatch: /user\.setups\.ts/,
+      use: { ...devices['Desktop Firefox'] },
+      // Logins are independent; cap concurrency to keep the load on IDAM modest.
+      workers: 4
+    },
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
-      dependencies: ["setup"]
+      dependencies: ["setup-fire-fox"]
     },
-
+    {
+      name: 'setup-webkit',
+      testMatch: /user\.setups\.ts/,
+      use: { ...devices['Desktop Safari'] },
+      // Logins are independent; cap concurrency to keep the load on IDAM modest.
+      workers: 4
+    },
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
-      dependencies: ["setup"]
+      dependencies: ["setup-webkit"]
     },
   ],
 });

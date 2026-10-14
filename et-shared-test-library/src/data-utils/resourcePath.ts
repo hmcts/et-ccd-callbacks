@@ -1,25 +1,42 @@
+import { existsSync } from 'node:fs';
 import path from 'node:path';
+import { createRequire } from 'node:module';
+
+const require = createRequire(process.cwd() + '/');
+
+function resolvePackageResourcesRoot(): string {
+  try {
+    const marker = require.resolve('@et-shared-test-library/core/resources/payload/user-details.json');
+    return path.resolve(marker, '..', '..'); // .../resources
+  } catch {
+    // local workspace fallback
+    return path.resolve(process.cwd(), 'et-shared-test-library', 'resources');
+  }
+}
+
+const packageResourcesRoot = resolvePackageResourcesRoot();
+
+function normalizeResourcePath(resourcePath: string): string {
+  const trimmed = resourcePath.replace(/^[/\\]+/, '');
+  // Prevent ".../resources/resources/..." when callers already include "resources/" prefix
+  return trimmed.replace(/^resources[/\\]+/, '');
+}
 
 export function resolveResourcePath(resourcePath: string): string {
   if (path.isAbsolute(resourcePath)) return resourcePath;
 
-  const normalized = resourcePath.replace(/^[/\\]+/, '');
+  const normalized = normalizeResourcePath(resourcePath);
 
-  // Resolve from process cwd (repo root in your runs)
-  // and support both shared-lib and consumer paths.
   const candidates = [
-    path.resolve(process.cwd(), normalized),
-    path.resolve(process.cwd(), 'et-shared-test-library', normalized),
+    path.resolve(process.cwd(), normalized),            // consumer override
+    path.resolve(process.cwd(), 'resources', normalized), // consumer repo resources/
+    path.resolve(packageResourcesRoot, normalized),     // package default
   ];
 
-  for (const p of candidates) {
-    // lazy require to avoid ESM/CJS fs import friction
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const fs = require('node:fs');
-    if (fs.existsSync(p)) return p;
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) return candidate;
   }
 
-  // fallback first candidate
-  return candidates[0];
+  // deterministic fallback to package path
+  return candidates[2];
 }
-

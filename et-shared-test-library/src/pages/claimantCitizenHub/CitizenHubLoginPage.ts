@@ -55,12 +55,10 @@ export class CitizenHubLoginPage extends LoginPage {
     await this.page.waitForLoadState('load');
     await this.employmentTribunalAccountCheckbox.check();
     await this.clickContinue();
-    const isNewIdam = await this.signInOptionLink.isVisible().catch(() => false);
-    if(isNewIdam) { // Remove if condition when new IDAM is rolled out to all environments
-      await this.signInOptionLink.click();
-      await this.page.waitForLoadState('load');
-    }
-    if (await this.signOutLink.isVisible({ timeout: 2000 }).catch(() => false)) return;
+
+    if (await this.signOutLink.waitFor({ state: 'visible', timeout: 2000 }).then(() => true).catch(() => false)) return;
+    await this.signInOptionLink.click();
+    await this.page.waitForLoadState('load');
     await this.processLogin(user, config.etSyaUiUrl);
     //TODO remove url check to landing page, as UI will be logged as soon as user is created.
     const url = this.page.url();

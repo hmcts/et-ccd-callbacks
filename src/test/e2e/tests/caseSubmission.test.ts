@@ -11,7 +11,9 @@ import {
 let caseId: string;
 let caseNumber: string;
 
-test.describe('Case creation in Citizen UI', () => {
+test.describe('Case creation in Citizen UI',
+  { tag: ['@single-worker-test']},
+  () => {
 
   test(
     'Create a claim for still working for organisation, submit and process within manage cases',

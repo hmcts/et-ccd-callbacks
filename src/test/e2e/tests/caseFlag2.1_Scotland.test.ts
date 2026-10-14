@@ -92,13 +92,14 @@ test.describe('Case Flag 2.1 Scotland cases', () => {
   });
 
   //RET-6178,79
-  test('Respondent legal representative (external case flags) - Creates a Case Flags for the respondent and respondent`s legal representative', async ({
-                                                                                                                                                         manageCaseDashboardPage,
-                                                                                                                                                         nocPage,
-                                                                                                                                                         caseDetailsPage,
-                                                                                                                                                         requestSupportPage,
-                                                                                                                                                         manageSupportPage
-                                                                                                                                                       }) => {
+  test('Respondent legal representative (external case flags) - Creates a Case Flags for the respondent and respondent`s legal representative',
+    async ({
+             manageCaseDashboardPage,
+             nocPage,
+             caseDetailsPage,
+             requestSupportPage,
+             manageSupportPage
+   }) => {
     // LR takes the case by NOC
     await manageCaseDashboardPage.navigateToNoticeOfChange();
     await nocPage.processNocRequest(caseId, CaseDetailsValues.respondentName, caseNumber);

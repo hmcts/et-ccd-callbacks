@@ -9,7 +9,9 @@ import {
   vetAndAcceptCitizenCase
 } from "@et-shared-test-library/core";
 
-test.describe('Add & Search ACAS certificate tests', () => {
+test.describe('Add & Search ACAS certificate tests',
+  { tag: ['single-worker-test']},
+  () => {
   test.use({
     storageState: users.etCaseWorker.sessionFile
   })

@@ -1,7 +1,5 @@
 import { BasePage } from "./basePage";
 import { expect, Locator, Page } from "@playwright/test";
-import {CheckYourAnswersPage} from "./helpers/CheckYourAnswersPage";
-import {CaseDetailsPage} from "./caseDetailsPage";
 
 export class CaseTransferPage extends BasePage {
   private readonly caseTransferReason: Locator;
@@ -17,32 +15,9 @@ export class CaseTransferPage extends BasePage {
     await this.clickContinue();
   }
 
-  async checkYourAnswer(checkYourAnswersPage: CheckYourAnswersPage) {
-    await checkYourAnswersPage.assertCheckYourAnswersPage({
-      tableName: 'Check your answers',
-    rows: [
-      {
-      cellItem: 'Select the office you want to transfer the case to', value : 'Glasgow'
-    },
-    {
-      cellItem: 'Reason for Case Transfer', value: 'Transfer case to Scotland RET'
-    }
-    ]
-    });
+  async clickTransferNow() {
+    await this.page.waitForLoadState('load');
     await this.page.getByRole('button', { name: 'Transfer Case' }).click();
-  }
-
-  async assertCaseDetailsTabDataAfterCaseTransfer(caseDetailsPage: CaseDetailsPage) {
-    await caseDetailsPage.assertTabData([
-      {
-        tabName: 'Case Details',
-        tabContent:[
-          'Case Status:  Transferred',
-          'Case Transfer: Transferred to Glasgow',
-          { tabItem: 'Current Position', value: 'Case transferred - other country' },
-        ]
-      },
-    ]);
   }
 
   async getNewDigitalCaseReferenceNumber() {

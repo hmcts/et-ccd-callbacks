@@ -52,14 +52,6 @@ test.describe('Various events in mange case application', () => {
     await icUploadDocPage.verifyJurisdictionCodeInICevent();
   });
 
-  //EXUI-3451
-  test('Create a England/Wales claim and transfer to Scotland', {tag: '@demo'}, async ({ caseDetailsPage, caseTransferPage, checkYourAnswersPage }) => {
-    await caseDetailsPage.selectNextEvent(Events.caseTransferScotland);
-    await caseTransferPage.progressCaseTransfer();
-    await caseTransferPage.checkYourAnswer(checkYourAnswersPage);
-    await caseTransferPage.assertCaseDetailsTabDataAfterCaseTransfer(caseDetailsPage);
-  });
-
   //RET-5790
   test('perform ADR document event', {tag: '@demo'}, async ({ adrDocument, caseDetailsPage }) => {
     await caseDetailsPage.selectNextEvent(Events.adrPrivilegedDocuments);
@@ -76,7 +68,6 @@ test.describe('Various events in mange case application', () => {
     ]);
   });
 
-
   //RET-6511
   test('Add and manage telephone notes', async ({ caseNotesPage, caseDetailsPage, manageTelephoneNotePage}) => {
     await caseDetailsPage.selectNextEvent(Events.addTelephoneNote);
@@ -89,7 +80,6 @@ test.describe('Various events in mange case application', () => {
           { tabItem: 'Case Notes', value: '', clickable: true },
           { tabItem: 'Note', value: 'This is test'}
         ]
-
       }
     ]);
 
@@ -104,9 +94,8 @@ test.describe('Various events in mange case application', () => {
           { tabItem: 'Case Notes', value: '', clickable: true },
           { tabItem: 'Note', value: 'This is amended test'}
         ]
-
       }
-    ])
+    ]);
   });
 });
 
@@ -126,8 +115,28 @@ test.describe('Claimant retaining access to transferred case', () => {
   test('Create a England/Wales claim and transfer to Scotland, Claimant retains case', async ({ browserUtils, caseDetailsPage, caseTransferPage, checkYourAnswersPage }) => {
     await caseDetailsPage.selectNextEvent(Events.caseTransferScotland);
     await caseTransferPage.progressCaseTransfer();
-    await caseTransferPage.checkYourAnswer(checkYourAnswersPage);
-    await caseTransferPage.assertCaseDetailsTabDataAfterCaseTransfer(caseDetailsPage);
+    await checkYourAnswersPage.assertCheckYourAnswersPage({
+      tableName: 'Check your answers',
+      rows: [
+        {
+          cellItem: 'Select the office you want to transfer the case to', value : 'Glasgow'
+        },
+        {
+          cellItem: 'Reason for Case Transfer', value: 'Transfer case to Scotland RET'
+        }
+      ]
+    });
+    await caseTransferPage.clickTransferNow();
+    await caseDetailsPage.assertTabData([
+      {
+        tabName: 'Case Details',
+        tabContent:[
+          'Case Status:  Transferred',
+          'Case Transfer: Transferred to Glasgow',
+          { tabItem: 'Current Position', value: 'Case transferred - other country' },
+        ]
+      },
+    ]);
     let newSubRef= await caseTransferPage.getNewDigitalCaseReferenceNumber();
 
     //login as claimant and access transferred case
@@ -168,7 +177,6 @@ test.describe('Various events in mange case application for Scotland case', () =
           { tabItem: 'Case Notes', value: '', clickable: true },
           { tabItem: 'Note', value: 'This is test'}
         ]
-
       }
     ])
     // RET-5796 Validate initial consideration links

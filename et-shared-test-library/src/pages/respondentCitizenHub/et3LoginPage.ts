@@ -38,11 +38,10 @@ export class ET3LoginPage extends LoginPage {
     await this.page.waitForTimeout(1000);
     await this.etAccountRadio.click();
     await this.clickContinue();
-    const isNewIdam = await this.signInOptionLink.isVisible().catch(() => false);
-    if(isNewIdam) { // Remove if condition when new IDAM is rolled out to all environments
-      await this.signInOptionLink.click();
-      await this.page.waitForLoadState('load');
-    }
+
+    await this.signInOptionLink.click();
+    await this.page.waitForLoadState('load');
+
     await this.processLogin(user, config.etSyrUiUrl);
     await this.page.waitForLoadState('load');
   }
@@ -71,7 +70,7 @@ export class ET3LoginPage extends LoginPage {
       async () => {
         await this.checkAndSubmitPage(caseNumber);
         const error = this.page.getByText('Unable to assign role. Please try again later');
-        return error.isVisible().catch(() => false);
+        return error.waitFor({ state: 'visible', timeout: 3000 }).then(() => true).catch(() => false);
       },
       {
         intervals: [5_000],

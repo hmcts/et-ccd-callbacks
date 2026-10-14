@@ -57,7 +57,11 @@ export class Et3DetailsPage extends BasePage {
       await this.page.waitForLoadState('load', { timeout: 4000 });
       await this.waitForSpinner();
       // Check if error is visible
-      const h3Visible = await errorHeading.isVisible().catch(() => false);
+      const h3Visible = await errorHeading
+        .waitFor({ state: 'visible', timeout: 3000 })
+        .then(() => true)
+        .catch(() => false);
+
       if (h3Visible) {
         const errStr = await errorHeading.textContent();
         attempt++;

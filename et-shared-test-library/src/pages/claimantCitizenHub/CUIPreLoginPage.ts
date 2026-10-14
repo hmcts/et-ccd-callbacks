@@ -31,11 +31,10 @@ export class CUIPreLoginPage extends BasePage{
     await this.processAreYouMakingTheClaimOnYourOwnPage();// Remove this once latest changes are made in all env
     await this.whereYouMakeTheClaimPage(region);
     await this.processDoYouHaveAnACASEarlyConciliation();
-    const isNewIdam = await this.signInOptionLink.isVisible().catch(() => false);
-    if(isNewIdam) { // Remove if condition when new IDAM is rolled out to all environments
-      await this.signInOptionLink.click();
-      await this.page.waitForLoadState('load');
-    }
+
+    await this.signInOptionLink.click();
+    await this.page.waitForLoadState('load');
+
   }
 
   async startDraftApplication() {
@@ -74,10 +73,17 @@ export class CUIPreLoginPage extends BasePage{
 
   async processAreYouMakingTheClaimOnYourOwnPage() {
     await this.page.waitForLoadState('load');
-    const heading = this.page.locator(`//h1[normalize-space()='Claiming on your own or with others']`);
-    if(await heading.isVisible().catch(() => false)) {
+    const heading = this.page.getByRole('heading', {
+      name: /Claiming on your own or with others/i
+    });
+
+    const isOnThisPage = await heading
+      .waitFor({ state: 'visible', timeout: 5000 })
+      .then(() => true)
+      .catch(() => false);
+    if(isOnThisPage) {
       console.log('Claiming on your own or with other claim question');
-      await this.page.check('input[id=single-or-multiple-claim]');
+      await this.page.locator('#single-or-multiple-claim').check();
       await this.clickContinue();
     }
   }

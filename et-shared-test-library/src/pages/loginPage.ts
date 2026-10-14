@@ -36,18 +36,10 @@ export class LoginPage extends BasePage {
     }
     const currentHeading = await this.headingText();
 
-    if (currentHeading === 'Sign in or create an account' || currentHeading === 'Sign in') {
-      await this.username.fill(user.email);
-      await this.password.fill(user.password);
-      await this.signInOrContinueOrSubmitButton.click();
-    } else if(currentHeading === 'Enter your email address') {
-      await this.username.fill(user.email);
-      await this.signInOrContinueOrSubmitButton.click();
-      await this.password.fill(user.password);
-      await this.signInOrContinueOrSubmitButton.click();
-    } else {
-      throw new Error(`Unexpected login Page heading: '${currentHeading}'`)
-    }
+    await this.username.fill(user.email);
+    await this.signInOrContinueOrSubmitButton.click();
+    await this.password.fill(user.password);
+    await this.signInOrContinueOrSubmitButton.click();
 
     await this.page.waitForURL(new RegExp(baseUrl), { timeout: 10000 });
     await this.saveSession(user.sessionFile);

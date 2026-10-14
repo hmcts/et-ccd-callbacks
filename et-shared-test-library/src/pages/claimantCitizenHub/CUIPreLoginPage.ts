@@ -32,7 +32,14 @@ export class CUIPreLoginPage extends BasePage{
     await this.whereYouMakeTheClaimPage(region);
     await this.processDoYouHaveAnACASEarlyConciliation();
 
-    await this.signInOptionLink.click();
+    const isSignInOptionAvailable = await this.signInOptionLink
+      .waitFor({ state: 'visible', timeout: 3000 })
+      .then(() => true)
+      .catch(() => false);
+    if(isSignInOptionAvailable) {
+      await this.signInOptionLink.click();
+      await this.page.waitForLoadState('load');
+    }
     await this.page.waitForLoadState('load');
 
   }

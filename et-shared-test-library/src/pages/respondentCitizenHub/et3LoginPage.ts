@@ -39,7 +39,14 @@ export class ET3LoginPage extends LoginPage {
     await this.etAccountRadio.click();
     await this.clickContinue();
 
-    await this.signInOptionLink.click();
+    const isSignInOptionAvailable = await this.signInOptionLink
+      .waitFor({ state: 'visible', timeout: 3000 })
+      .then(() => true)
+      .catch(() => false);
+    if(isSignInOptionAvailable) {
+      await this.signInOptionLink.click();
+      await this.page.waitForLoadState('load');
+    }
     await this.page.waitForLoadState('load');
 
     await this.processLogin(user, config.etSyrUiUrl);

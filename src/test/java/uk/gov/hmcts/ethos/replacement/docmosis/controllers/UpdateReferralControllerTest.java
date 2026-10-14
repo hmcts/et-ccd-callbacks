@@ -26,18 +26,19 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
-import uk.gov.hmcts.ethos.replacement.docmosis.wa.ReferralTaskCompletionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.wa.ReferralTaskClientContextService;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -45,9 +46,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.wa.ReferralTaskClientContextService.CLIENT_CONTEXT_HEADER;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest({UpdateReferralController.class, JsonMapper.class})
+@WebMvcTest({UpdateReferralController.class, JsonMapper.class, ReferralTaskClientContextService.class})
 @SuppressWarnings({"PMD.MethodNamingConventions", "PMD.ExcessiveImports", "PMD.UnusedPrivateField"})
 class UpdateReferralControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
@@ -57,8 +59,6 @@ class UpdateReferralControllerTest {
 
     @MockitoBean
     private VerifyTokenService verifyTokenService;
-    @MockitoBean
-    private ReferralTaskCompletionService referralTaskCompletionService;
     @MockitoBean
     private UserIdamService userIdamService;
     @MockitoBean
@@ -235,30 +235,23 @@ class UpdateReferralControllerTest {
     }
 
     @Test
-    void aboutToSubmitUpdateReferral_completesTasksForTheUpdatedReferral() throws Exception {
+    void initHearingAndReferralDetails_doesNotCompleteTaskForAnotherReferral() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        UserDetails details = new UserDetails();
-        details.setName("First Last");
-        when(userIdamService.getUserDetails(any())).thenReturn(details);
+        // Referral 1 is selected, but the task ExUI is about to complete was raised for referral 2.
+        String clientContext = Base64.getEncoder().encodeToString((
+            "{\"client_context\":{\"user_task\":{\"task_data\":{\"id\":\"task-id\","
+            + "\"type\":\"ReviewReferralLegalOps\",\"task_title\":\"LO - Review Referral #2 - ET1\"},"
+            + "\"complete_task\":true}}}").getBytes(UTF_8));
 
-        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
-        respondentSumTypeItem.setId(UUID.randomUUID().toString());
-        RespondentSumType respondentSumType = new RespondentSumType();
-        respondentSumType.setRespondentName("respondent Name");
-        respondentSumTypeItem.setValue(respondentSumType);
-        ccdRequest.getCaseDetails().getCaseData().setRespondentCollection(List.of(respondentSumTypeItem));
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setUpdateIsUrgent("Yes");
-        caseData.setUpdateReferentEmail("example@example.com");
-        caseData.setUpdateReferralSubject("subject");
-
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+        String updatedClientContext = mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .header(CLIENT_CONTEXT_HEADER, clientContext)
                 .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getHeader(CLIENT_CONTEXT_HEADER);
 
-        verify(referralTaskCompletionService)
-            .completeTasksForUpdatedReferral(any(), eq("1"), eq(AUTH_TOKEN));
+        assertThat(new String(Base64.getDecoder().decode(updatedClientContext), UTF_8))
+            .contains("\"complete_task\":false");
     }
 }

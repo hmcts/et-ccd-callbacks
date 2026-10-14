@@ -17,7 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.wa.ReferralTaskCompletionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.wa.ReferralTaskClientContextService;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
@@ -28,7 +28,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.cle
 @RestController
 @RequiredArgsConstructor
 public class CloseReferralController {
-    private final ReferralTaskCompletionService referralTaskCompletionService;
+    private final ReferralTaskClientContextService referralTaskClientContextService;
 
     private static final String CLOSE_REFERRAL_BODY = "<hr>"
         + "<h3>What happens next</h3>"
@@ -87,7 +87,8 @@ public class CloseReferralController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setCloseReferralHearingDetails(ReferralHelper.populateHearingReferralDetails(caseData));
-        return getCallbackRespEntityNoErrors(caseData);
+        return referralTaskClientContextService.applyTaskCompletion(
+            getCallbackRespEntityNoErrors(caseData), caseData);
     }
 
     /**
@@ -114,13 +115,7 @@ public class CloseReferralController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         ReferralHelper.addReferralDocumentToDocumentCollection(caseData);
         ReferralHelper.setReferralStatusToClosed(caseData);
-
-        String referralNumber = ReferralHelper.getSelectedReferral(caseData).getReferralNumber();
         ReferralHelper.clearCloseReferralDataFromCaseData(caseData);
-
-        referralTaskCompletionService.completeTasksForClosedReferral(
-            ccdRequest.getCaseDetails().getCaseId(), referralNumber, userToken);
-
         return getCallbackRespEntityNoErrors(caseData);
     }
 

@@ -32,7 +32,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
-import uk.gov.hmcts.ethos.replacement.docmosis.wa.ReferralTaskCompletionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.wa.ReferralTaskClientContextService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +59,7 @@ public class ReplyToReferralController {
     private final EmailService emailService;
     private final FeatureToggleService featureToggleService;
     private final DigitalCaseFileService digitalCaseFileService;
-    private final ReferralTaskCompletionService referralTaskCompletionService;
+    private final ReferralTaskClientContextService referralTaskClientContextService;
     @Value("${template.referral}")
     private String referralTemplateId;
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
@@ -124,7 +124,8 @@ public class ReplyToReferralController {
                 ccdRequest.getCaseDetails().getCaseId());
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setHearingAndReferralDetails(ReferralHelper.populateHearingReferralDetails(caseData));
-        return getCallbackRespEntityNoErrors(caseData);
+        return referralTaskClientContextService.applyTaskCompletion(
+            getCallbackRespEntityNoErrors(caseData), caseData);
     }
 
     /**
@@ -218,10 +219,6 @@ public class ReplyToReferralController {
 
         clearReferralReplyDataFromCaseData(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
-
-        referralTaskCompletionService.completeTasksForReferralReply(
-            caseDetails.getCaseId(), referral.getReferralNumber(), userToken);
-
         return getCallbackRespEntityNoErrors(caseData);
     }
 

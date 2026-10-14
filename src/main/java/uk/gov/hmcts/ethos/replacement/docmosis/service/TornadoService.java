@@ -139,15 +139,24 @@ public class TornadoService {
                                   MultipleData multipleData) throws IOException {
         try (OutputStreamWriter os = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
             DefaultValues allocatedCourtAddress = getAllocatedCourtAddress(caseData, caseTypeId, multipleData);
+            DefaultValues managingOfficeAddress = managingOfficeAddress(caseData, allocatedCourtAddress);
             UserDetails userDetails = userIdamService.getUserDetails(authToken);
 
             StringBuilder documentContent = DocumentHelper.buildDocumentContent(caseData,
                     tornadoConnection.getAccessKey(),
                     userDetails, caseTypeId, correspondenceType,
-                    correspondenceScotType, multipleData, allocatedCourtAddress, venueAddressReaderService);
+                    correspondenceScotType, multipleData, allocatedCourtAddress, venueAddressReaderService,
+                    managingOfficeAddress);
 
             writeOutputStream(os, documentContent);
         }
+    }
+
+    private DefaultValues managingOfficeAddress(CaseData caseData, DefaultValues allocatedCourtAddress) {
+        if (allocatedCourtAddress != null || isNullOrEmpty(caseData.getManagingOffice())) {
+            return null;
+        }
+        return defaultValuesReaderService.getDefaultValues(caseData.getManagingOffice());
     }
 
     private DefaultValues getAllocatedCourtAddress(CaseData caseData, String caseTypeId, MultipleData multipleData) {

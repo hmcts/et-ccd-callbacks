@@ -120,6 +120,18 @@ public final class DocumentHelper {
                                                      MultipleData multipleData,
                                                      DefaultValues allocatedCourtAddress,
                                                      VenueAddressReaderService venueAddressReaderService) {
+        return buildDocumentContent(caseData, accessKey, userDetails, caseTypeId, correspondenceType,
+                correspondenceScotType, multipleData, allocatedCourtAddress, venueAddressReaderService, null);
+    }
+
+    public static StringBuilder buildDocumentContent(CaseData caseData, String accessKey,
+                                                     UserDetails userDetails, String caseTypeId,
+                                                     CorrespondenceType correspondenceType,
+                                                     CorrespondenceScotType correspondenceScotType,
+                                                     MultipleData multipleData,
+                                                     DefaultValues allocatedCourtAddress,
+                                                     VenueAddressReaderService venueAddressReaderService,
+                                                     DefaultValues managingOfficeAddress) {
         StringBuilder sb = new StringBuilder(260);
         String templateName = getTemplateName(correspondenceType, correspondenceScotType);
 
@@ -142,7 +154,7 @@ public final class DocumentHelper {
                             correspondenceScotType, venueAddressReaderService))
                 .append(getCorrespondenceData(correspondenceType))
                 .append(getCorrespondenceScotData(correspondenceScotType))
-                .append(getCourtData(caseData, allocatedCourtAddress));
+                .append(getCourtData(caseData, allocatedCourtAddress, managingOfficeAddress));
         }
 
         sb.append("\"i").append(getEWSectionName(correspondenceType).replace(".", "_")
@@ -1076,7 +1088,37 @@ public final class DocumentHelper {
         return sb;
     }
 
-    private static StringBuilder getCourtData(CaseData caseData, DefaultValues allocatedCourtAddress) {
+    public static String letterAddressLine3(String line3, String line4) {
+        String normalised = lineBreak(line3);
+        if (isNullOrEmpty(line4)) {
+            return normalised;
+        }
+        if (isNullOrEmpty(normalised)) {
+            return line4;
+        }
+        if (normalised.contains(line4)) {
+            return normalised;
+        }
+        return normalised + "\n" + line4;
+    }
+
+    private static String lineBreak(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value.replace("\\n", "\n");
+    }
+
+    private static String streetForSavedAddress(String savedLine3, DefaultValues managingOfficeAddress) {
+        if (managingOfficeAddress == null || savedLine3 == null
+                || !savedLine3.equals(managingOfficeAddress.getTribunalCorrespondenceAddressLine3())) {
+            return null;
+        }
+        return managingOfficeAddress.getTribunalCorrespondenceAddressLine4();
+    }
+
+    private static StringBuilder getCourtData(CaseData caseData, DefaultValues allocatedCourtAddress,
+                                              DefaultValues managingOfficeAddress) {
         StringBuilder sb = new StringBuilder();
         if (allocatedCourtAddress != null) {
             sb.append("\"Court_addressLine1\":\"")
@@ -1084,7 +1126,11 @@ public final class DocumentHelper {
                     .append("\"Court_addressLine2\":\"")
                     .append(nullCheck(allocatedCourtAddress.getTribunalCorrespondenceAddressLine2())).append(NEW_LINE)
                     .append("\"Court_addressLine3\":\"")
-                    .append(nullCheck(allocatedCourtAddress.getTribunalCorrespondenceAddressLine3())).append(NEW_LINE)
+                    .append(nullCheck(allocatedCourtAddress.getTribunalCorrespondenceAddressLine3()))
+                    .append(StringUtils.isNotBlank(allocatedCourtAddress.getTribunalCorrespondenceAddressLine4())
+                            ? "\n" + nullCheck(allocatedCourtAddress.getTribunalCorrespondenceAddressLine4())
+                            : "")
+                    .append(NEW_LINE)
                     .append("\"Court_town\":\"")
                     .append(nullCheck(allocatedCourtAddress.getTribunalCorrespondenceTown())).append(NEW_LINE)
                     .append("\"Court_county\":\"").append(NEW_LINE).append("\"Court_postCode\":\"")
@@ -1103,7 +1149,11 @@ public final class DocumentHelper {
                         .append(NEW_LINE).append("\"Court_addressLine2\":\"")
                         .append(nullCheck(caseData.getTribunalCorrespondenceAddress().getAddressLine2()))
                         .append(NEW_LINE).append("\"Court_addressLine3\":\"")
-                        .append(nullCheck(caseData.getTribunalCorrespondenceAddress().getAddressLine3()))
+                        .append(nullCheck(letterAddressLine3(
+                                caseData.getTribunalCorrespondenceAddress().getAddressLine3(),
+                                streetForSavedAddress(
+                                        caseData.getTribunalCorrespondenceAddress().getAddressLine3(),
+                                        managingOfficeAddress))))
                         .append(NEW_LINE).append("\"Court_town\":\"")
                         .append(nullCheck(caseData.getTribunalCorrespondenceAddress().getPostTown())).append(NEW_LINE)
                         .append("\"Court_county\":\"")

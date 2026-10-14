@@ -18,9 +18,6 @@ public class ContactDetails {
     @JsonProperty("address3")
     private String address3;
 
-    @JsonProperty("address4")
-    private String address4;
-
     @JsonProperty("town")
     private String town;
 

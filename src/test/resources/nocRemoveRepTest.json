@@ -1,0 +1,139 @@
+{
+  "id": 1775651960650043,
+  "jurisdiction": "EMPLOYMENT",
+  "state": "Accepted",
+  "case_type_id" : "ET_EnglandWales",
+  "case_data": {
+    "respondentCollection": [
+      {
+        "id": "84ac5b15-f28a-40fe-a5f4-c7127366fb41",
+        "value": {
+          "respondent_name": "Rich Respondent",
+          "respondent_email": "rich@test.com",
+          "respondentLastName": "Respondent",
+          "respondentFirstName": "Rich",
+          "representativeRemoved": "No",
+          "responseRespondentName": "Rich Respondent"
+        }
+      },
+      {
+        "id": "dc890d23-21f1-4290-bc4f-db9ec272badf",
+        "value": {
+          "respondent_name": "Robert Respondent",
+          "respondent_email": "robert@test.com",
+          "respondentLastName": "Respondent",
+          "respondentFirstName": "Robert",
+          "representativeRemoved": "No"
+        }
+      },
+      {
+        "id": "51f53e15-727f-4df8-85b9-085b0c0e866a",
+        "value": {
+          "respondent_name": "Rachel Respondent",
+          "respondent_email": "rachel@test.com",
+          "respondentLastName": "Respondent",
+          "respondentFirstName": "Rachel",
+          "representativeRemoved": "No"
+        }
+      },
+      {
+        "id": "86473456-de5f-4dc4-ab53-5f9596621700",
+        "value": {
+          "respondent_name": "Ryan Respondent",
+          "respondent_email": "ryan@test.com",
+          "respondentLastName": "Respondent",
+          "respondentFirstName": "Ryan"
+        }
+      },
+      {
+        "id": "53f2060b-d0ce-4e73-bfbe-9b50e2af62d2",
+        "value": {
+          "respondent_name": "Ruth Respondent",
+          "respondent_email": "ruth@test.com",
+          "respondentLastName": "Respondent",
+          "respondentFirstName": "Ruth"
+        }
+      }
+    ],
+    "respondent": "Rich Respondent",
+    "ethosCaseReference": "123456789/1234",
+    "claimantIndType": {
+      "claimant_last_name": "Claimant",
+      "claimant_first_names": "Chris"
+    },
+    "representativeClaimantType": {
+      "myHmctsOrganisation": {
+        "OrganisationID": "GHJ789G"
+      },
+      "name_of_organisation": "Org C",
+      "name_of_representative": "Legal Rep C",
+      "representative_email_address": "rep.c@test.com"
+    },
+    "claimant": "Chris Claimant",
+    "repCollection": [
+      {
+        "id": "6281d99e-1a94-4369-870e-9f527801d913",
+        "value": {
+          "role": "[SOLICITORA]",
+          "myHmctsYesNo": "Yes",
+          "respondentId": "84ac5b15-f28a-40fe-a5f4-c7127366fb41",
+          "resp_rep_name": "Rich Respondent",
+          "name_of_organisation": "Org A",
+          "name_of_representative": "Legal Rep A1",
+          "respondentOrganisation": {
+            "OrganisationID": "ABC123A"
+          },
+          "representative_email_address": "rep.a1@test.com"
+        }
+      },
+      {
+        "id": "5d03177a-859b-4709-9d62-ba6c337362c2",
+        "value": {
+          "role": "[SOLICITORB]",
+          "myHmctsYesNo": "Yes",
+          "respondentId": "dc890d23-21f1-4290-bc4f-db9ec272badf",
+          "resp_rep_name": "Robert Respondent",
+          "name_of_organisation": "Org A",
+          "name_of_representative": "Legal Rep A1",
+          "respondentOrganisation": {
+            "OrganisationID": "ABC123A"
+          },
+          "representative_email_address": "rep.a1@test.com"
+        }
+      },
+      {
+        "id": "733c6718-a538-463e-a03a-d0feb7b0e336",
+        "value": {
+          "role": "[SOLICITORC]",
+          "myHmctsYesNo": "Yes",
+          "respondentId": "51f53e15-727f-4df8-85b9-085b0c0e866a",
+          "resp_rep_name": "Rachel Respondent",
+          "name_of_organisation": "Org A",
+          "name_of_representative": "Legal Rep A2",
+          "respondentOrganisation": {
+            "OrganisationID": "ABC123A"
+          },
+          "representative_email_address": "rep.a2@test.com"
+        }
+      },
+      {
+        "id": "12351f63-ff8b-47e5-ad9d-b15f9cd55f63",
+        "value": {
+          "role": "[SOLICITORD]",
+          "myHmctsYesNo": "Yes",
+          "respondentId": "86473456-de5f-4dc4-ab53-5f9596621700",
+          "resp_rep_name": "Ryan Respondent",
+          "name_of_organisation": "Org B",
+          "name_of_representative": "Legal Rep B",
+          "respondentOrganisation": {
+            "OrganisationID": "DEF456D"
+          },
+          "representative_email_address": "rep.b@test.com"
+        }
+      }
+    ],
+    "claimantType": {
+      "claimant_email_address": "claimant@test.com"
+    }
+  }
+}

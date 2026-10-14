@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
 import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse.SuperUser;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
@@ -22,6 +23,7 @@ import java.util.List;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_CHECK_REPRESENTATIVE_ACCOUNT_BY_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL_LOG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_UNABLE_TO_FIND_ORGANISATION_SUPER_USER;
 
 @Service
@@ -97,6 +99,42 @@ public class OrganisationService {
     }
 
     /**
+     * Finds and returns organisation details for the given IDAM user ID.
+     *
+     * <p>This method retrieves organisation details by calling the organisation service using
+     * an admin user token and a generated service authentication token. If the response contains
+     * a valid organisation identifier, the organisation details are returned. If no valid
+     * organisation is found, or if the organisation service call fails with a {@link FeignException},
+     * the method logs a warning and returns {@code null}.</p>
+     *
+     * <p>Assumptions:</p>
+     * <ul>
+     *     <li>The provided {@code userIdamId} is a valid IDAM user identifier.</li>
+     *     <li>The admin user token returned by {@code adminUserService} is valid.</li>
+     *     <li>The generated service authentication token is valid for calling the organisation service.</li>
+     *     <li>A valid organisation response must contain an organisation identifier.</li>
+     *     <li>If the organisation cannot be found or the response is invalid, returning {@code null} is acceptable.
+     *     </li>
+     * </ul>
+     *
+     * @param userIdamId the IDAM user ID used to retrieve organisation details
+     * @return the organisation details if found and valid; otherwise {@code null}
+     */
+    public OrganisationsResponse findOrganisationByIdamUserId(String userIdamId) {
+        try {
+            ResponseEntity<OrganisationsResponse> organisationRepsonse =
+                    organisationClient.retrieveOrganisationDetailsByUserId(adminUserService.getAdminUserToken(),
+                            authTokenGenerator.generate(), userIdamId);
+            if (OrganisationUtils.hasOrganisationIdentifier(organisationRepsonse)) {
+                return organisationRepsonse.getBody();
+            }
+        } catch (FeignException e) {
+            log.warn(WARNING_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID, e.getMessage());
+        }
+        return null;
+    }
+
+    /** Finds the superuser for the organisation with the given organisation ID.
      * Finds the superuser for the organisation with the given organisation ID.
      *
      * <p>Returns {@code null} if the organisation ID is blank, the organisation

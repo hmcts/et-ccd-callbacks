@@ -9,17 +9,16 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
-import uk.gov.hmcts.reform.et.syaapi.service.utils.NoticeOfChangeUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -96,7 +95,7 @@ public final class RespondentRepresentativeUtils {
      *         {@code false} otherwise
      */
     public static boolean isValidRepresentative(RepresentedTypeRItem representative) {
-        return ObjectUtils.isNotEmpty(representative)
+        return representative != null
                 && StringUtils.isNotBlank(representative.getId())
                 && ObjectUtils.isNotEmpty(representative.getValue());
     }
@@ -456,13 +455,9 @@ public final class RespondentRepresentativeUtils {
      */
     public static RespondentSumTypeItem findRespondentByRepresentative(CaseData caseData,
                                                                        RepresentedTypeRItem representative) {
-        if (ObjectUtils.isEmpty(caseData)
-                || CollectionUtils.isEmpty(caseData.getRespondentCollection())
-                || ObjectUtils.isEmpty(representative)
-                || ObjectUtils.isEmpty(representative.getValue())
+        if (!isValidRepresentative(representative)
                 || StringUtils.isBlank(representative.getValue().getRespondentId())
-                && StringUtils.isBlank(representative.getValue().getRespRepName())
-                && StringUtils.isBlank(representative.getId())) {
+                && StringUtils.isBlank(representative.getValue().getRespRepName())) {
             return null;
         }
         RespondentSumTypeItem respondent = RespondentUtils.findRespondentById(caseData.getRespondentCollection(),
@@ -476,6 +471,48 @@ public final class RespondentRepresentativeUtils {
                     representative.getId());
         }
         return respondent;
+    }
+
+    /**
+     * Finds all respondents associated with the given representatives.
+     *
+     * <p>If {@code caseData}, the respondent collection, or the list of representatives
+     * is empty or not present, an empty list is returned.</p>
+     *
+     * <p>For each representative, this method delegates to
+     * {@link #findRespondentByRepresentative(CaseData, RepresentedTypeRItem)} to find the
+     * matching respondent. Any non-empty respondent returned by that method is added to
+     * the result list.</p>
+     *
+     * <p>Assumptions:</p>
+     * <ul>
+     *     <li>{@code caseData}, when provided, contains the respondent collection to search.</li>
+     *     <li>{@code representatives}, when provided, contains representative items that can be
+     *         used to identify matching respondents.</li>
+     *     <li>{@link #findRespondentByRepresentative(CaseData, RepresentedTypeRItem)} handles
+     *         the matching logic and any required field-level checks.</li>
+     *     <li>No duplicate filtering is performed; if multiple representatives resolve to the
+     *         same respondent, that respondent may appear more than once in the returned list.</li>
+     * </ul>
+     *
+     * @param caseData the case data containing the respondent collection to search
+     * @param representatives the representatives whose associated respondents should be found
+     * @return a list of respondents associated with the given representatives, or an empty list
+     *         if no matching respondents are found
+     */
+    public static List<RespondentSumTypeItem> findRespondentsByRepresentatives(
+            CaseData caseData, List<RepresentedTypeRItem> representatives) {
+        List<RespondentSumTypeItem> respondents = new ArrayList<>();
+        if (CollectionUtils.isEmpty(representatives)) {
+            return respondents;
+        }
+        for (RepresentedTypeRItem representative : representatives) {
+            RespondentSumTypeItem respondent = findRespondentByRepresentative(caseData, representative);
+            if (ObjectUtils.isNotEmpty(respondent)) {
+                respondents.add(respondent);
+            }
+        }
+        return respondents;
     }
 
     /**
@@ -694,63 +731,93 @@ public final class RespondentRepresentativeUtils {
     }
 
     /**
+     * Finds a representative by IDAM ID, falling back to case role if no representative is found.
      * Finds a respondent representative associated with the given role using a fallback strategy.
      *
+     * <p>The method first validates that the supplied case data and representative collection
+     * are present. If the supplied {@code role} is not a respondent representative role, an
+     * {@code idamId} must also be provided; otherwise {@code null} is returned.</p>
      * <p>The method first attempts to locate a valid representative in the {@link CaseData}
      * whose role matches the provided role. If no representative is found, it retrieves the
      * respondent name associated with the role and attempts to find a representative by that
      * respondent name instead.</p>
      *
+     * <p>The lookup is performed in two stages. The method first attempts to find a
+     * representative by the supplied {@code idamId}. If no representative is found, it then
+     * attempts to find a representative associated with the supplied {@code role}.</p>
      * <p>If neither lookup returns a matching representative, the method returns {@code null}.</p>
      *
-     * @param caseData the case data containing the representative collection and notice of change answers
-     * @param role the role used to identify the representative
-     * @return the matching {@link RepresentedTypeRItem}, or {@code null} if no representative
-     *         can be found using either lookup strategy
+     * <p>Assumptions:</p>
+     * <ul>
+     *     <li>{@code caseData}, when provided, contains the representative collection required
+     *     for the lookup.</li>
+     *     <li>{@code idamId} may be blank only where {@code role} is a respondent representative
+     *     role.</li>
+     *     <li>{@code role}, when used as a fallback, represents a valid case role that can be
+     *     resolved to a representative.</li>
+     *     <li>A representative matched by {@code idamId} takes precedence over one matched by
+     *     {@code role}.</li>
+     * </ul>
+     *
+     * @param caseData the case data containing the representative collection
+     * @param idamId the IDAM ID of the representative to find
+     * @param role the case role used as a fallback to find the associated representative
+     * @return the matching valid {@link RepresentedTypeRItem}, or {@code null} if the required
+     *         data is missing or no valid representative can be found
      */
-    public static RepresentedTypeRItem findRepresentativeByRoleOrRespondentName(CaseData caseData, String role) {
-        RepresentedTypeRItem representative = findRepresentativeByRole(caseData, role);
+    public static RepresentedTypeRItem findRepresentativeByIdamIdOrRole(CaseData caseData,
+                                                                        String idamId,
+                                                                        String role) {
+        if (ObjectUtils.isEmpty(caseData)
+                || CollectionUtils.isEmpty(caseData.getRepCollection())
+                || (!RoleUtils.isRespondentRepresentativeRole(role) && StringUtils.isBlank(idamId))) {
+            return null;
+        }
+        RepresentedTypeRItem representative = findRepresentativeByIdamId(caseData, idamId);
         if (ObjectUtils.isNotEmpty(representative)) {
             return representative;
         }
-        String respondentName = findRespondentNameByRole(caseData, role);
-        return findRepresentativeByRespondentName(caseData, respondentName);
+        representative = findRepresentativeByRole(caseData, role);
+        return isValidRepresentative(representative) ? representative : null;
     }
 
     /**
-     * Finds a representative based on the provided role or respondent name and verifies
-     * that the representative exists within the supplied list of representatives.
+     * Finds a representative in the case data by their IDAM ID.
      *
-     * <p>The method first attempts to locate a representative using
-     * {@link #findRepresentativeByRoleOrRespondentName(CaseData, String)}. If a representative
-     * is found, it then checks whether a valid representative with the same identifier exists
-     * in the provided {@code representatives} list.</p>
+     * <p>This method assumes that {@code caseData} is not {@code null} and that it contains
+     * a representative collection. Each representative in the collection is validated before
+     * comparing its IDAM ID with the supplied {@code idamId}.</p>
      *
-     * <p>If a matching representative is found in the list, the representative returned by
-     * {@code findRepresentativeByRoleOrRespondentName} is returned. If no matching representative
-     * is found or the initially resolved representative is empty, {@code null} is returned.</p>
+     * @param caseData the case data containing the representative collection
+     * @param idamId the IDAM ID of the representative to find
+     * @return the matching {@link RepresentedTypeRItem}, or {@code null} if no valid
+     *         representative with the supplied IDAM ID is found
+     */
+    public static RepresentedTypeRItem findRepresentativeByIdamId(CaseData caseData, String idamId) {
+        for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
+            if (isValidRepresentative(representative)
+                    && Strings.CS.equals(representative.getValue().getIdamId(), idamId)) {
+                return representative;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Finds a representative associated with the specified role and verifies that
+     * the representative exists in the supplied list of valid representatives.
      *
-     * <h3>Assumptions</h3>
-     * <ul>
-     *     <li>{@code caseData} contains sufficient information to resolve a representative
-     *     via role or respondent name.</li>
-     *     <li>The {@code role} parameter corresponds to a valid representative role or can
-     *     be used to determine the respondent name.</li>
-     *     <li>The {@code representatives} list may contain invalid or incomplete entries,
-     *     therefore each element is validated using {@code isValidRepresentative}.</li>
-     *     <li>Representative identity comparison is performed using the representative
-     *     identifier ({@code id}).</li>
-     *     <li>The method may return {@code null} if no matching representative is found.</li>
-     * </ul>
+     * <p>The representative is considered a match when it has a non-blank ID and
+     * a valid representative in the supplied list has the same ID.</p>
      *
-     * @param caseData the case data used to resolve the representative
+     * @param caseData the case data used to locate the representative
      * @param role the role used to identify the representative
-     * @param representatives the list of representatives to search within
-     * @return the matching {@link RepresentedTypeRItem} if present in the list; otherwise {@code null}
+     * @param representatives the list of representatives against which the result is validated
+     * @return the matching representative, or {@code null} if no valid match is found
      */
     public static RepresentedTypeRItem findRepresentativeInListByRoleOrRespondentName(
             CaseData caseData, String role, List<RepresentedTypeRItem> representatives) {
-        RepresentedTypeRItem tmpRepresentative = findRepresentativeByRoleOrRespondentName(caseData, role);
+        RepresentedTypeRItem tmpRepresentative = findRepresentativeByRole(caseData, role);
         if (tmpRepresentative != null && StringUtils.isNotBlank(tmpRepresentative.getId())) {
             for (RepresentedTypeRItem representative : representatives) {
                 if (!isValidRepresentative(representative)) {
@@ -767,59 +834,130 @@ public final class RespondentRepresentativeUtils {
     /**
      * Finds the first valid respondent representative in the case data whose role matches
      * the specified role.
+     * Finds the representative associated with the specified case role.
      *
+     * <p>The method first validates that the case data, representative collection and role
+     * are present. It then attempts to find a valid representative whose role directly
+     * matches the supplied {@code role}.</p>
      * <p>The method searches the representative collection in the provided {@link CaseData},
      * filters out invalid representatives using
      * {@link RespondentRepresentativeUtils#isValidRepresentative}, and returns the first
      * representative whose {@code role} matches the given role.</p>
      *
+     * <p>If no direct representative match is found, the method attempts to find the
+     * respondent associated with the role. Where a respondent is found, the method then
+     * attempts to resolve the representative by respondent ID, and finally by respondent
+     * name.</p>
      * <p>If the provided role is blank or no matching representative is found, the method
      * returns {@code null}.</p>
      *
-     * @param caseData the case data containing the representative collection
-     * @param role the role used to identify the representative
-     * @return the first matching {@link RepresentedTypeRItem}, or {@code null} if the role is blank
-     *         or no matching representative exists
+     * @param caseData the case data containing representatives and respondents
+     * @param role the case role used to find the associated representative
+     * @return the matching valid {@link RepresentedTypeRItem}, or {@code null} if no
+     *         representative can be found
      */
     public static RepresentedTypeRItem findRepresentativeByRole(CaseData caseData, String role) {
-        if (StringUtils.isBlank(role)) {
+        if (ObjectUtils.isEmpty(caseData)
+                || CollectionUtils.isEmpty(caseData.getRepCollection())
+                || StringUtils.isBlank(role)) {
             return null;
         }
-        return caseData.getRepCollection().stream()
+        RepresentedTypeRItem representative = caseData.getRepCollection().stream()
                 .filter(RespondentRepresentativeUtils::isValidRepresentative)
                 .filter(rep -> role.equals(rep.getValue().getRole()))
                 .findFirst()
                 .orElse(null);
+        if (isValidRepresentative(representative)) {
+            return representative;
+        }
+        RespondentSumTypeItem respondent = RoleUtils.findRespondentByRole(caseData, role);
+        if (ObjectUtils.isNotEmpty(respondent) && ObjectUtils.isNotEmpty(respondent.getValue())) {
+            representative = findRepresentativeByRespondentId(caseData, respondent.getId());
+            if (isValidRepresentative(representative)) {
+                return representative;
+            }
+            representative = findRepresentativeByRespondentName(caseData, respondent.getValue().getRespondentName());
+        }
+        return isValidRepresentative(representative) ? representative : null;
     }
 
     /**
+     * Determines whether the supplied case user assignment is associated with the supplied
+     * representative by matching the representative's respondent representative name to a
+     * solicitor role.
+     *
+     * <p>The method first validates the representative, representative name, case user
+     * assignment and assignment case role. It then finds the solicitor role index associated
+     * with the representative's respondent representative name. If a matching role index is
+     * found, the corresponding solicitor role label is compared with the assignment's case
+     * role.</p>
      * Retrieves the respondent name associated with the specified role from the case data.
      *
-     * <p>The method determines the index of the given role using
-     * {@link RoleUtils#findRoleIndexByRoleLabel(String)} and then retrieves the corresponding
-     * {@link NoticeOfChangeAnswers} from the {@link CaseData}. If a matching entry exists and
-     * contains a respondent name, that name is returned.</p>
+     * <p>Assumptions:</p>
+     * <ul>
+     *     <li>{@code caseData} is not {@code null} and contains the respondent data required
+     *     to resolve the solicitor role index.</li>
+     *     <li>{@code representative}, when valid, contains a respondent representative name
+     *     that can be mapped to a solicitor role.</li>
+     *     <li>{@code caseUserAssignment}, when provided, contains a case role to compare
+     *     against the resolved solicitor role label.</li>
+     * </ul>
      *
-     * <p>If the role cannot be resolved to a valid index, or if the corresponding
-     * {@link NoticeOfChangeAnswers} object or respondent name is empty, the method returns {@code null}.</p>
-     *
-     * @param caseData the case data containing notice of change answers
-     * @param role the role label used to locate the respondent
-     * @return the respondent name associated with the given role, or {@code null} if the role is invalid
-     *         or no respondent name is available
+     * @param caseData the case data used to resolve the solicitor role index by respondent name
+     * @param representative the representative whose respondent representative name is used
+     *                       for the role lookup
+     * @param caseUserAssignment the case user assignment to check
+     * @return {@code true} if the assignment case role matches the solicitor role associated
+     *         with the representative's respondent representative name; otherwise {@code false}
      */
-    public static String findRespondentNameByRole(CaseData caseData, String role) {
-        int roleIndex = RoleUtils.findRoleIndexByRoleLabel(role);
+    public static boolean isCaseUserAssignmentForRepresentativeByRespondentName(CaseData caseData,
+                                                                                RepresentedTypeRItem representative,
+                                                                                CaseUserAssignment caseUserAssignment) {
+        if (!isValidRepresentative(representative)
+                || StringUtils.isBlank(representative.getValue().getRespRepName())
+                || ObjectUtils.isEmpty(caseUserAssignment)
+                || StringUtils.isBlank(caseUserAssignment.getCaseRole())) {
+            return false;
+        }
+        int roleIndex = RoleUtils.findSolicitorRoleIndexByRespondentName(caseData,
+                representative.getValue().getRespRepName());
         if (roleIndex == -1) {
-            return null;
+            return false;
         }
-        NoticeOfChangeAnswers noticeOfChangeAnswers = NoticeOfChangeUtils
-                .getNoticeOfChangeAnswersAtIndex(caseData, roleIndex);
-        if (ObjectUtils.isEmpty(noticeOfChangeAnswers)
-                || ObjectUtils.isEmpty(noticeOfChangeAnswers.getRespondentName())) {
-            return null;
+        return RoleUtils.solicitorRoleLabelForIndex(roleIndex).equals(caseUserAssignment.getCaseRole());
+    }
+
+    /**
+     * Determines whether the supplied case-user assignment relates to the specified
+     * representative by matching the representative's respondent ID to the respondent
+     * associated with the assignment's case role.
+     *
+     * <p>The assignment is considered a match only when the representative and assignment
+     * are valid, the representative has a respondent ID, the case role resolves to a valid
+     * respondent index, and the respondent at that index has the same ID.</p>
+     *
+     * @param caseData the case data containing the respondents
+     * @param representative the representative to check
+     * @param caseUserAssignment the case-user assignment whose case role identifies the respondent
+     * @return {@code true} if the representative's respondent ID matches the respondent
+     *         associated with the assignment's case role; otherwise {@code false}
+     */
+    public static boolean isCaseUserAssignmentForRepresentativeByRespondentId(CaseData caseData,
+                                                                              RepresentedTypeRItem representative,
+                                                                              CaseUserAssignment caseUserAssignment) {
+        if (!isValidRepresentative(representative)
+                || StringUtils.isBlank(representative.getValue().getRespondentId())
+                || ObjectUtils.isEmpty(caseUserAssignment)
+                || StringUtils.isBlank(caseUserAssignment.getCaseRole())) {
+            return false;
         }
-        return noticeOfChangeAnswers.getRespondentName();
+        int roleIndex = RoleUtils.findRoleIndexByRoleLabel(caseUserAssignment.getCaseRole());
+        if (roleIndex == -1) {
+            return false;
+        }
+        RespondentSumTypeItem respondent = RespondentUtils.getRespondentAtIndex(caseData, roleIndex);
+        return ObjectUtils.isNotEmpty(respondent)
+                && representative.getValue().getRespondentId().equals(respondent.getId());
     }
 
     /**
@@ -846,6 +984,33 @@ public final class RespondentRepresentativeUtils {
         return caseData.getRepCollection().stream()
                 .filter(RespondentRepresentativeUtils::isValidRepresentative)
                 .filter(rep -> respondentName.equals(rep.getValue().getRespRepName()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Finds a representative in the case data by the associated respondent ID.
+     *
+     * <p>This method assumes that {@code caseData} is not {@code null} and that it contains
+     * a representative collection. If the supplied {@code respondentId} is blank, the method
+     * returns {@code null}.</p>
+     *
+     * <p>Only valid representatives are considered when matching the representative's
+     * respondent ID against the supplied {@code respondentId}.</p>
+     *
+     * @param caseData the case data containing the representative collection
+     * @param respondentId the respondent ID used to find the associated representative
+     * @return the matching {@link RepresentedTypeRItem}, or {@code null} if the respondent ID
+     *         is blank or no valid representative is found
+     */
+    public static RepresentedTypeRItem findRepresentativeByRespondentId(CaseData caseData,
+                                                                          String respondentId) {
+        if (StringUtils.isBlank(respondentId)) {
+            return null;
+        }
+        return caseData.getRepCollection().stream()
+                .filter(RespondentRepresentativeUtils::isValidRepresentative)
+                .filter(rep -> respondentId.equals(rep.getValue().getRespondentId()))
                 .findFirst()
                 .orElse(null);
     }
@@ -960,15 +1125,15 @@ public final class RespondentRepresentativeUtils {
      * </ul>
      *
      * @param caseUserAssignments the list of case user assignments to search
-     * @param representativeId the user ID of the representative whose assignments should be returned
+     * @param representativeIdamId the user ID of the representative whose assignments should be returned
      * @return a new list containing the case user assignments for the given representative ID;
      *         an empty list if no matching assignments are found
      */
-    public static List<CaseUserAssignment> findCaseUserAssignmentsByRepresentativeId(
-            List<CaseUserAssignment> caseUserAssignments, String representativeId) {
+    public static List<CaseUserAssignment> findCaseUserAssignmentsByRepresentativeIdamId(
+            List<CaseUserAssignment> caseUserAssignments, String representativeIdamId) {
         List<CaseUserAssignment> tmpCaseUserAssignments = new ArrayList<>();
         for (CaseUserAssignment caseUserAssignment : caseUserAssignments) {
-            if (representativeId.equals(caseUserAssignment.getUserId())) {
+            if (representativeIdamId.equals(caseUserAssignment.getUserId())) {
                 tmpCaseUserAssignments.add(caseUserAssignment);
             }
         }
@@ -1081,5 +1246,73 @@ public final class RespondentRepresentativeUtils {
                 }
             }
         }
+    }
+
+    /**
+     * Finds the case user assignments that were manually assigned to the specified representative.
+     *
+     * <p>An assignment is considered manually assigned when the assignment's case role can be
+     * used to find a valid representative in the case data, and that representative has the
+     * same ID as the provided representative.</p>
+     *
+     * <p>Assumptions:</p>
+     * <ul>
+     *     <li>Manually assigned representatives have a corresponding case role in the case data.</li>
+     *     <li>{@code findRepresentativeByRole} can resolve the representative associated with
+     *         a manually assigned case role.</li>
+     *     <li>The representative ID is the reliable value used to compare representatives.</li>
+     *     <li>If {@code caseUserAssignments} is empty, or {@code representative} is invalid, there are
+     *         no manually assigned cases to return.</li>
+     * </ul>
+     *
+     * @param caseData the case data used to resolve representatives by case role
+     * @param caseUserAssignments the list of all case user assignments to search
+     * @param representative the representative whose manually assigned cases should be returned
+     * @return a list of case user assignments manually assigned to the specified representative;
+     *         an empty list if no matching assignments are found or the input is invalid
+     */
+    public static List<CaseUserAssignment> findManualAssignments(CaseData caseData,
+                                                                 List<CaseUserAssignment> caseUserAssignments,
+                                                                 RepresentedTypeRItem representative) {
+        List<CaseUserAssignment> manualAssignments = new ArrayList<>();
+        if (CollectionUtils.isEmpty(caseUserAssignments) || !isValidRepresentative(representative)) {
+            return manualAssignments;
+        }
+        for (CaseUserAssignment caseUserAssignment : caseUserAssignments) {
+            // If a representative is manually assigned, he/she should have a correspondent respondent searched by role
+            RepresentedTypeRItem tmpRepresentative = findRepresentativeByRole(caseData,
+                    caseUserAssignment.getCaseRole());
+            if (isValidRepresentative(tmpRepresentative)
+                    && Strings.CS.equals(representative.getId(), tmpRepresentative.getId())) {
+                manualAssignments.add(caseUserAssignment);
+            }
+        }
+        return manualAssignments;
+    }
+
+    public static List<CaseUserAssignment> findAutoAssignments(RepresentedTypeRItem representative,
+                                                               List<CaseUserAssignment> manualAssignments,
+                                                               List<CaseUserAssignment> caseUserAssignments) {
+        List<CaseUserAssignment> autoAssignments = new ArrayList<>();
+        if (CollectionUtils.isEmpty(caseUserAssignments) || !isValidRepresentative(representative)) {
+            return autoAssignments;
+        }
+        // searching for remaining roles
+        if (CollectionUtils.isNotEmpty(manualAssignments)) {
+            Set<String> manualCaseRoles = manualAssignments.stream()
+                    .map(CaseUserAssignment::getCaseRole)
+                    .collect(Collectors.toSet());
+
+            caseUserAssignments.stream()
+                    .filter(caseUserAssignment ->
+                            manualCaseRoles.contains(caseUserAssignment.getCaseRole()))
+                    .forEach(autoAssignments::add);
+        }
+        String representativeIdamId = representative.getValue().getIdamId();
+        caseUserAssignments.stream()
+                .filter(assignment -> Strings.CS.equals(representativeIdamId, assignment.getUserId()))
+                .filter(assignment -> !autoAssignments.contains(assignment))
+                .forEach(autoAssignments::add);
+        return autoAssignments;
     }
 }

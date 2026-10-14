@@ -9,9 +9,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
-import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -107,13 +107,8 @@ public class EmailNotificationService {
      */
     private void getRespondentEmailAddress(RespondentSumTypeItem respondentSumTypeItem,
                                                  Map<String, String> emailAddressesMap) {
-        RespondentSumType respondent = respondentSumTypeItem.getValue();
-        String responseEmail = respondent.getResponseRespondentEmail();
-        String respondentEmail = respondent.getRespondentEmail();
-
-        if (StringUtils.isNotBlank(responseEmail)) {
-            emailAddressesMap.put(responseEmail, respondentSumTypeItem.getId());
-        } else if (StringUtils.isNotBlank(respondentEmail)) {
+        String respondentEmail = RespondentUtils.findRespondentEmailAddress(respondentSumTypeItem);
+        if (StringUtils.isNotBlank(respondentEmail) && respondentSumTypeItem != null) {
             emailAddressesMap.put(respondentEmail, respondentSumTypeItem.getId());
         }
     }

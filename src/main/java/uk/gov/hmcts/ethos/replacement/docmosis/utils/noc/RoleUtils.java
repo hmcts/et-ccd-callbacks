@@ -251,6 +251,38 @@ public final class RoleUtils {
     }
 
     /**
+     * Finds a respondent in the case data by the supplied role label.
+     *
+     * <p>The supplied role is converted to an index using
+     * {@link RoleUtils#findRoleIndexByRoleLabel(String)}. If a valid index is found,
+     * this method returns the respondent at that index from the respondent collection.</p>
+     *
+     * <p>This method returns {@code null} if:
+     * <ul>
+     *     <li>the role cannot be resolved to a valid respondent index,</li>
+     *     <li>the case data is {@code null} or empty,</li>
+     *     <li>the respondent collection is {@code null} or empty, or</li>
+     *     <li>the resolved index is outside the respondent collection bounds.</li>
+     * </ul>
+     *
+     * @param caseData the case data containing the respondent collection
+     * @param role the role label used to identify the respondent
+     * @return the matching {@link RespondentSumTypeItem}, or {@code null} if no matching respondent is found
+     */
+    public static RespondentSumTypeItem findRespondentByRole(CaseData caseData, String role) {
+        int roleIndex = RoleUtils.findRoleIndexByRoleLabel(role);
+        if (roleIndex == -1) {
+            return null;
+        }
+        if (ObjectUtils.isEmpty(caseData)
+                || CollectionUtils.isEmpty(caseData.getRespondentCollection())
+                || roleIndex >= caseData.getRespondentCollection().size()) {
+            return null;
+        }
+        return caseData.getRespondentCollection().get(roleIndex);
+    }
+
+    /**
      * Resets the respondent organisation policy associated with the given representative.
      * <p>
      * The method determines the solicitor role for the provided representative within the

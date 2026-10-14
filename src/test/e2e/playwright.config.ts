@@ -45,7 +45,7 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         viewport: { width: 1920, height: 1080 },
       },
-      dependencies: ["setup-chromium", "chromium-single-worker-test"]
+      dependencies: ["setup-chromium"]
     },
     {
       name: 'setup-fire-fox',

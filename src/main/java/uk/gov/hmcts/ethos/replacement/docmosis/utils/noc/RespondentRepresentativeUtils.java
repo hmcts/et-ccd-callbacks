@@ -354,6 +354,19 @@ public final class RespondentRepresentativeUtils {
     }
 
     /**
+     * Checks whether a representative's name has changed.
+     *
+     * @param oldRepresentative representative before the update
+     * @param newRepresentative representative after the update
+     * @return {@code true} when the names differ
+     */
+    public static boolean isRepresentativeNameChanged(RepresentedTypeR oldRepresentative,
+                                                       RepresentedTypeR newRepresentative) {
+        return !Strings.CS.equals(oldRepresentative.getNameOfRepresentative(),
+                newRepresentative.getNameOfRepresentative());
+    }
+
+    /**
      * Determines whether the provided new representative is both valid and
      * represents the same respondent as the old representative.
      *
@@ -400,7 +413,7 @@ public final class RespondentRepresentativeUtils {
      * </p>
      * <p>
      * Representatives are considered unchanged only when they represent the same respondent
-     * and both the organisation and email address remain the same.
+     * and the name, organisation and email address remain the same.
      * </p>
      * <p>
      * Any invalid representatives are ignored during the comparison.
@@ -409,7 +422,7 @@ public final class RespondentRepresentativeUtils {
      * @param newRepresentatives the list of representatives from the updated case data
      * @param oldRepresentatives the list of representatives from the previous case data
      * @return a list of representatives that are either new or have been updated due to
-     *         a change in organisation or email address
+     *         a change in name, organisation or email address
      */
     public static List<RepresentedTypeRItem> findNewOrUpdatedRepresentatives(
             List<RepresentedTypeRItem> newRepresentatives, List<RepresentedTypeRItem> oldRepresentatives) {
@@ -430,6 +443,7 @@ public final class RespondentRepresentativeUtils {
                         && representsSameRespondent(oldRepresentative, newRepresentative)
                         && !hasRespondentRepresentativeOrganisationChanged(oldRepresentative.getValue(),
                         newRepresentative.getValue())
+                        && !isRepresentativeNameChanged(oldRepresentative.getValue(), newRepresentative.getValue())
                         && !isRepresentativeEmailChanged(oldRepresentative.getValue(), newRepresentative.getValue())) {
                     representsSameRespondent = true;
                     break;

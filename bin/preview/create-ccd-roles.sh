@@ -37,6 +37,8 @@ declare -a ET_ROLES=(
     "caseworker-wa-task-officer"
     "caseworker-employment-etjudge-leeds"
     "caseworker-employment-leeds"
+    "caseworker-employment-caseflags"
+    "caseworker-employment-support"
 )
 
 echo "⏳ Waiting for CCD definition-store schema..."

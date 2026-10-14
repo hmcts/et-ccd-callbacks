@@ -130,9 +130,11 @@
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/postDefaultValues",
+    "CallBackURLSubmittedEvent": "${ET_COS_URL}/supportTasks/submitted",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
-    "ShowSummary": "N"
+    "ShowSummary": "N",
+    "Publish": "Y"
   },
   {
     "CaseTypeID": "ET_EnglandWales",

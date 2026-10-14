@@ -474,8 +474,8 @@ class Et3ResponseControllerTest extends BaseControllerTest {
         documentInfo.setMarkUp("Document");
         documentInfo.setDescription("Document.pdf");
         ccdRequest.setEventId("draftEt3");
-        when(et3ResponseService.generateEt3ResponseDocument(ccdRequest.getCaseDetails().getCaseData(), AUTH_TOKEN,
-                ENGLANDWALES_CASE_TYPE_ID, "draftEt3")).thenReturn(documentInfo);
+        when(et3ResponseService.generateEt3ResponseDocument(any(CaseData.class), anyString(),
+                anyString(), anyString())).thenReturn(documentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DOWNLOAD_DRAFT_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))

@@ -24,6 +24,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
+import uk.gov.hmcts.ethos.replacement.docmosis.wa.ReferralTaskClientContextService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,7 @@ public class UpdateReferralController {
     private final FeatureToggleService featureToggleService;
     private final ReferralService referralService;
     private final DocumentManagementService documentManagementService;
+    private final ReferralTaskClientContextService referralTaskClientContextService;
     private static final String LOG_MESSAGE = "received update referral request for case reference : ";
 
     /**
@@ -113,7 +115,8 @@ public class UpdateReferralController {
         } else {
             errors.add("Only referrals with status awaiting instructions can be updated.");
         }
-        return getCallbackRespEntityErrors(errors, caseData);
+        return referralTaskClientContextService.applyTaskCompletion(
+            getCallbackRespEntityErrors(errors, caseData), caseData);
     }
 
     /**

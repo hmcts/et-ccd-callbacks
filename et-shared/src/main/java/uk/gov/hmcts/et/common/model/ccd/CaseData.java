@@ -1975,4 +1975,8 @@ public class CaseData extends Et1CaseData {
     private String editOrDeleteCaseNote;
     @JsonProperty("caseNoteList")
     private DynamicFixedListType caseNoteList;
+
+    //noc remove option for representative removal
+    @JsonProperty("nocRemoveOption")
+    private String nocRemoveOption;
 }

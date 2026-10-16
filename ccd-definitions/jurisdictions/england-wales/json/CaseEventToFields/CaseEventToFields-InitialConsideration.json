@@ -838,5 +838,28 @@
     "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 11,
     "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "updateInitialConsiderationDocument",
+    "CaseFieldID": "icCompletedBy",
+    "DisplayContext": "READONLY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageLabel": "Update IC doc",
+    "ShowSummaryChangeOption": "N",
+    "PageColumnNumber": 1
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "updateInitialConsiderationDocument",
+    "CaseFieldID": "icDateCompleted",
+    "DisplayContext": "READONLY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "ShowSummaryChangeOption": "N",
+    "PageColumnNumber": 1
   }
 ]

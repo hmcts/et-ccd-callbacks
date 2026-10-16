@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.AmendRepresentativeContactService;
 
 import java.util.ArrayList;
@@ -134,7 +135,10 @@ public class AmendRepresentativeContactController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(HTTP_HEADER_AUTHORIZATION) String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = new ArrayList<>();
+        List<String> errors = PhoneNumberValidator.validatePhoneNumber(caseData.getEt3ResponsePhone());
+        if (!errors.isEmpty()) {
+            return getCallbackRespEntityErrors(errors, caseData);
+        }
         try {
             amendRepresentativeContactService.saveStagedContactDetails(
                     userToken, caseData, ccdRequest.getCaseDetails().getCaseId());

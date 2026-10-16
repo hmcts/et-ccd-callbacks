@@ -18,7 +18,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
@@ -295,10 +294,7 @@ public class SendNotificationService {
 
         // Send notification to the respondent(s)
         if (!CLAIMANT_ONLY.equals(caseData.getSendNotificationNotify())) {
-            Map<String, String> personalisation = buildPersonalisation(caseDetails,
-                    emailService.getExuiCaseLink(caseId));
-            List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
-            sendRespondentEmailHearingOther(caseData, personalisation, respondents, caseUserAssignments);
+            sendRespondentEmailHearingOther(caseDetails, caseUserAssignments);
         }
     }
 
@@ -351,22 +347,64 @@ public class SendNotificationService {
 
     }
 
-    private void sendRespondentEmailHearingOther(CaseData caseData, Map<String, String> emailData,
-                                                 List<RespondentSumTypeItem> respondents,
+    private void sendRespondentEmailHearingOther(CaseDetails caseDetails,
                                                  List<CaseUserAssignment> assignments) {
+        CaseData caseData = caseDetails.getCaseData();
+        Map<String, String> exuiEmailData = buildPersonalisation(caseDetails,
+                emailService.getExuiCaseLink(caseDetails.getCaseId()));
+        Set<String> sentEmails = new HashSet<>();
 
-        Set<String> emails = new HashSet<>();
-        respondents.stream()
-                .map(respondent ->
-                        NotificationHelper.getEmailAddressForRespondent(caseData, respondent.getValue()))
-                .filter(email -> email != null && !email.isEmpty())
-                .forEach(emails::add);
+        if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
+            caseData.getRespondentCollection().stream()
+                    .map(respondent ->
+                            NotificationHelper.getEmailAddressForRespondent(caseData, respondent.getValue()))
+                    .filter(StringUtils::isNotBlank)
+                    .forEach(email -> sendRespondentNotificationEmail(exuiEmailData, email, sentEmails));
+        }
+
+        sendUnrepresentedRespondentNotificationEmails(caseDetails, assignments, sentEmails);
 
         emailNotificationService.getRespondentSolicitorEmails(assignments).stream()
-                .filter(email -> email != null && !email.isEmpty())
-                .forEach(emails::add);
-        emails.forEach(email ->
-                emailService.sendEmail(respondentSendNotificationTemplateId, email, emailData));
+                .filter(StringUtils::isNotBlank)
+                .forEach(email -> sendRespondentNotificationEmail(exuiEmailData, email, sentEmails));
+    }
+
+    /**
+     * Emails a self-representing respondent who can sign in to the respondent portal.
+     * A represented respondent is not emailed here; their representative is emailed instead.
+     */
+    private void sendUnrepresentedRespondentNotificationEmails(CaseDetails caseDetails,
+                                                               List<CaseUserAssignment> assignments,
+                                                               Set<String> sentEmails) {
+        CaseData caseData = caseDetails.getCaseData();
+        if (CollectionUtils.isEmpty(caseData.getRespondentCollection()) || CollectionUtils.isEmpty(assignments)) {
+            return;
+        }
+
+        String caseId = caseDetails.getCaseId();
+        assignments.stream()
+                .filter(assignment -> CASE_USER_ROLE_DEFENDANT.equals(assignment.getCaseRole()))
+                .forEach(assignment -> caseData.getRespondentCollection().stream()
+                        .filter(respondentItem -> assignment.getUserId()
+                                .equals(respondentItem.getValue().getIdamId()))
+                        .findFirst()
+                        .ifPresent(respondentItem -> {
+                            String respondentEmail = NotificationHelper.getEmailAddressForUnrepresentedRespondent(
+                                    caseData, respondentItem.getValue());
+                            if (StringUtils.isNotBlank(respondentEmail)) {
+                                Map<String, String> personalisation = buildPersonalisation(caseDetails,
+                                        emailService.getSyrCaseLink(caseId, respondentItem.getId()));
+                                sendRespondentNotificationEmail(personalisation, respondentEmail, sentEmails);
+                            }
+                        }));
+    }
+
+    private void sendRespondentNotificationEmail(Map<String, String> emailData, String email,
+                                                 Set<String> sentEmails) {
+        if (!sentEmails.add(email)) {
+            return;
+        }
+        emailService.sendEmail(respondentSendNotificationTemplateId, email, emailData);
     }
 
     private Map<String, String> buildPersonalisation(CaseDetails caseDetails, String envUrl) {

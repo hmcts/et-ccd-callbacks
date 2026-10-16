@@ -23,16 +23,16 @@ export default class AmendContactDetailsLrPage extends BasePage {
     super(page);
     this.amendContactDetailsTitle = this.page.getByRole('heading', { name: 'Amend contact details' });
     this.representativeContactChangeOptionGroup = this.page.locator(`#representativeContactChangeOption`);
-    this.repPhoneNumberInput = this.page.locator(`#representativePhoneNumber, #et3ResponsePhone`);
-    this.repAddressPostCodeInput = this.page.locator(`#representativeAddress_representativeAddress_postcodeInput, #et3ResponseAddress_et3ResponseAddress_postcodeInput`);
-    this.repAddressListDropdown = this.page.locator(`#representativeAddress_representativeAddress_addressList, #et3ResponseAddress_et3ResponseAddress_addressList`);
-    this.repAddressLine1 = this.page.locator(`#representativeAddress__detailAddressLine1, #et3ResponseAddress__detailAddressLine1`);
-    this.repAddressLine2 = this.page.locator(`#representativeAddress__detailAddressLine2, #et3ResponseAddress__detailAddressLine2`);
-    this.repAddressLine3 = this.page.locator(`#representativeAddress__detailAddressLine3, #et3ResponseAddress__detailAddressLine3`);
-    this.repTownOrCityInput = this.page.locator(`#representativeAddress__detailPostTown, #et3ResponseAddress__detailPostTown`);
-    this.repCountyInput = this.page.locator(`#representativeAddress__detailCounty, #et3ResponseAddress__detailCounty`);
-    this.repPostCodeInput = this.page.locator(`#representativeAddress__detailPostCode, #et3ResponseAddress__detailPostCode`);
-    this.repCountryInput = this.page.locator(`#representativeAddress__detailCountry, #et3ResponseAddress__detailCountry`);
+    this.repPhoneNumberInput = this.page.locator(`#representativePhoneNumber, #respRepPhoneNumber`);
+    this.repAddressPostCodeInput = this.page.locator(`#representativeAddress_representativeAddress_postcodeInput, #respRepAddress_respRepAddress_postcodeInput`);
+    this.repAddressListDropdown = this.page.locator(`#representativeAddress_representativeAddress_addressList, #respRepAddress_respRepAddress_addressList`);
+    this.repAddressLine1 = this.page.locator(`#representativeAddress__detailAddressLine1, #respRepAddress__detailAddressLine1`);
+    this.repAddressLine2 = this.page.locator(`#representativeAddress__detailAddressLine2, #respRepAddress__detailAddressLine2`);
+    this.repAddressLine3 = this.page.locator(`#representativeAddress__detailAddressLine3, #respRepAddress__detailAddressLine3`);
+    this.repTownOrCityInput = this.page.locator(`#representativeAddress__detailPostTown, #respRepAddress__detailPostTown`);
+    this.repCountyInput = this.page.locator(`#representativeAddress__detailCounty, #respRepAddress__detailCounty`);
+    this.repPostCodeInput = this.page.locator(`#representativeAddress__detailPostCode, #respRepAddress__detailPostCode`);
+    this.repCountryInput = this.page.locator(`#representativeAddress__detailCountry, #respRepAddress__detailCountry`);
 
   }
 
@@ -92,6 +92,7 @@ export default class AmendContactDetailsLrPage extends BasePage {
       await cyaPage.assertCheckYourAnswersPage({
         tableName: 'Check your answers',
         rows :[
+          'Contact address if different from registered address',
           { cellItem: 'Building and Street', value: addressDetails.addressLine1 },
           { cellItem: 'Town or City', value: addressDetails.townOrCity },
           { cellItem: 'Postcode/Zipcode', value: addressDetails.postcode },

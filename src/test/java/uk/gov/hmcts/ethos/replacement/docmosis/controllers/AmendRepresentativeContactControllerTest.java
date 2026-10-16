@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -92,7 +93,7 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
     @SneakyThrows
     void theAboutToStart() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(amendRepresentativeContactService).setEt3ResponseContactAddress(AUTH_TOKEN,
+        doNothing().when(amendRepresentativeContactService).loadStagedContactDetails(AUTH_TOKEN,
                 ccdRequest.getCaseDetails().getCaseData(), ccdRequest.getCaseDetails().getCaseId());
         mvc.perform(post(ABOUT_TO_START)
                         .contentType(APPLICATION_JSON)
@@ -113,8 +114,8 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
                 ERROR_CASE_DATA_NOT_FOUND,
                 StringUtils.EMPTY,
                 "amendRepresentativeContactService",
-                "setEt3ResponseContactAddress")).when(amendRepresentativeContactService)
-                .setEt3ResponseContactAddress(anyString(), any(CaseData.class), anyString());
+                "loadStagedContactDetails")).when(amendRepresentativeContactService)
+                .loadStagedContactDetails(anyString(), any(CaseData.class), anyString());
         mvc.perform(post(ABOUT_TO_START)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -130,8 +131,8 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
     @SneakyThrows
     void theMidEventAmendRepresentativeContact() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(amendRepresentativeContactService).updateRepresentativeContactDetails(AUTH_TOKEN,
-                ccdRequest.getCaseDetails().getCaseData(), ccdRequest.getCaseDetails().getCaseId());
+        doNothing().when(amendRepresentativeContactService).setStagedMyHmctsContactAddress(AUTH_TOKEN,
+                ccdRequest.getCaseDetails().getCaseData());
         ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption(
                 REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS);
         mvc.perform(post(MID_EVENT)
@@ -147,6 +148,24 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
+    void theMidEventAmendRepresentativeContact_skipsMyHmctsWhenAmendOptionSelected() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption("Amend contact details");
+        mvc.perform(post(MID_EVENT)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors.size()", is(LoggerTestUtils.INTEGER_ZERO)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(amendRepresentativeContactService, never())
+                .setStagedMyHmctsContactAddress(anyString(), any(CaseData.class));
+        ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption("DUMMY");
+    }
+
+    @Test
+    @SneakyThrows
     void theMidEventAmendRepresentativeContact_WithException() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         doThrow(new GenericServiceException(ERROR_CASE_DATA_NOT_FOUND,
@@ -154,8 +173,8 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
                 ERROR_CASE_DATA_NOT_FOUND,
                 StringUtils.EMPTY,
                 "amendRepresentativeContactService",
-                "setRepresentativeMyHmctsContactAddress")).when(amendRepresentativeContactService)
-                .setRepresentativeMyHmctsContactAddress(anyString(), any(CaseData.class));
+                "setStagedMyHmctsContactAddress")).when(amendRepresentativeContactService)
+                .setStagedMyHmctsContactAddress(anyString(), any(CaseData.class));
         ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption(
                 REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS);
         mvc.perform(post(MID_EVENT)
@@ -174,14 +193,27 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
     @SneakyThrows
     void theAboutToSubmitRepresentativeContactDetails() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(amendRepresentativeContactService).updateRepresentativeContactDetails(AUTH_TOKEN,
-                ccdRequest.getCaseDetails().getCaseData(), ccdRequest.getCaseDetails().getCaseId());
+        Address stagingAddress = new Address();
+        stagingAddress.setAddressLine1("221b Baker Street");
+        Address et3Address = new Address();
+        et3Address.setAddressLine1("10 Downing Street");
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setRespRepAddress(stagingAddress);
+        caseData.setRespRepPhoneNumber("07234567890");
+        caseData.setMyHmctsAddressText("221b Baker Street, London");
+        caseData.setEt3ResponseAddress(et3Address);
+        caseData.setEt3ResponsePhone("01234567890");
+        doNothing().when(amendRepresentativeContactService).saveStagedContactDetails(AUTH_TOKEN,
+                caseData, ccdRequest.getCaseDetails().getCaseId());
         mvc.perform(post(ABOUT_TO_SUBMIT)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                // the live ET3 response fields must be left untouched by this event
+                .andExpect(jsonPath("$.data.et3ResponseAddress.AddressLine1", is("10 Downing Street")))
+                .andExpect(jsonPath("$.data.et3ResponsePhone", is("01234567890")))
                 .andExpect(jsonPath("$.errors.size()", is(LoggerTestUtils.INTEGER_ZERO)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
@@ -195,8 +227,8 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
                 ERROR_CASE_DATA_NOT_FOUND,
                 StringUtils.EMPTY,
                 "amendRepresentativeContactService",
-                "updateRepresentativeContactDetails")).when(amendRepresentativeContactService)
-                .updateRepresentativeContactDetails(anyString(), any(CaseData.class), anyString());
+                "saveStagedContactDetails")).when(amendRepresentativeContactService)
+                .saveStagedContactDetails(anyString(), any(CaseData.class), anyString());
         mvc.perform(post(ABOUT_TO_SUBMIT)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

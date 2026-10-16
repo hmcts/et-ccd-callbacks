@@ -377,6 +377,9 @@ notifications:
   respondentTseTypeBClaimantAckTemplateId: ${RESPONDENT_TSE_TYPE_B_CLAIMANT_ACK_TEMPLATE_ID:f09e2e85-04bf-43cd-a959-4344924175c0}
   cyRespondentTseTypeBClaimantAckTemplateId: ${CY_RESPONDENT_TSE_TYPE_B_CLAIMANT_ACK_TEMPLATE_ID:3c317fe0-f87f-4032-af2e-a50a57a7a601}
   et3SubmissionConfirmation: ${ET3_SUBMISSION_CONFIRMATION:16efc13b-3365-4bb8-aa27-5c0544645be8}
+  userInsights:
+    claimantUserInsightTemplateId: ${CLAIMANT_USER_INSIGHT_TEMPLATE_ID:40726033-3362-485a-b655-9b900b5ba1e8}
+    respondentUserInsightTemplateId: ${RESPONDENT_USER_INSIGHT_TEMPLATE_ID:9188bfe8-5c77-400c-8825-2dae99d7a141}
   tse:
     claimantResponseYes: ${TSE_CLAIMANT_RESPONSE_YES:091abb61-0a21-4208-b3b6-22121e8682be}
     claimantResponseNo: ${TSE_CLAIMANT_RESPONSE_NO:0727a137-322f-458b-9941-ee8b6d3c11c2}

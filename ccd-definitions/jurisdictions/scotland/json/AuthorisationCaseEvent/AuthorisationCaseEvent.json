@@ -2370,6 +2370,13 @@
           "caseworker-employment-api"
         ],
         "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment",
+          "caseworker-employment-scotland"
+        ],
+        "CRUD": "R"
       }
     ]
   },

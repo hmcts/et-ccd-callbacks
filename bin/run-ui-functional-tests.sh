@@ -18,8 +18,8 @@ export PATH="${HOME}/.local/bin:${PATH}"
 
 if [[ ! -f node_modules/.yarn-state.yml && ! -f .pnp.cjs ]]; then
   echo "Installing yarn dependencies for the UI functional tests"
-  YarnBuilder.yarn('install')
-  YarnBuilder.yarn('build:shared')
+  yarn install
+  yarn build:shared
 fi
 
 exec yarn "${UI_FUNCTIONAL_YARN_TASK:-test:functional-chromium}"

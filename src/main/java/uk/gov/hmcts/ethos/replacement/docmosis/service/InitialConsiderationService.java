@@ -153,6 +153,9 @@ public class InitialConsiderationService {
         if (ObjectUtils.isNotEmpty(caseData.getDigitalCaseFile())
             && ObjectUtils.isNotEmpty(caseData.getDigitalCaseFile().getUploadedDocument())) {
             String documentBinaryUrl = caseData.getDigitalCaseFile().getUploadedDocument().getDocumentBinaryUrl();
+            if (documentBinaryUrl == null) {
+                return String.format(VIEW_ALL_DOCUMENTS, caseDetails.getCaseId());
+            }
             String link = documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
             return String.format(BEFORE_LABEL_DCF_IC, link);
         } else {
@@ -433,6 +436,9 @@ public class InitialConsiderationService {
     }
 
     public static String getAdjustedHearingTypeName(String hearingTypeName) {
+        if (hearingTypeName == null) {
+            return "-";
+        }
         return switch (hearingTypeName) {
             case "Hearing" -> "Final Hearing";
             case "Reconsideration" -> "Reconsideration Hearing";
@@ -753,6 +759,10 @@ public class InitialConsiderationService {
     }
 
     public void clearOldValues(CaseData caseData) {
+        if (caseData == null) {
+            return;
+        }
+        HearingsHelper.refreshEtICHearingAlreadyListed(caseData);
         clearHiddenValue(caseData);
         caseData.setEtICHearingNotListedListForPrelimHearingUpdated(null);
         caseData.setEtICHearingNotListedListForFinalHearingUpdated(null);
@@ -763,6 +773,10 @@ public class InitialConsiderationService {
         caseData.setEtICHearingNotListedUDLHearing(null);
         caseData.setEtICHearingNotListedAnyOtherDirections(null);
 
+        if (YES.equals(caseData.getEtICHearingAlreadyListed())) {
+            // A future Listed hearing replaces the previous listed answers. The hearing type is set afterwards.
+            removeEtICHearingAlreadyListedNoValue(caseData);
+        }
     }
 
     public void mapOldIcHearingNotListedOptionsToNew(CaseData caseData, String caseTypeId) {

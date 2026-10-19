@@ -947,6 +947,24 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "updateInitialConsiderationDocument",
+    "UserRole": "caseworker-employment-scotland",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "updateInitialConsiderationDocument",
+    "UserRole": "caseworker-employment-etjudge-scotland",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "updateInitialConsiderationDocument",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
     "CaseEventID": "et3Response",
     "AccessControl": [
       {

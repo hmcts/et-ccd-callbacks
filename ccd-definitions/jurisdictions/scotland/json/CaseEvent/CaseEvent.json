@@ -26,10 +26,7 @@
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "N",
-    "EventEnablingCondition": "caseType=\"dummy\"",
-    "CallBackURLAboutToStartEvent": "",
-    "CallBackURLAboutToSubmitEvent": "",
-    "CallBackURLSubmittedEvent": ""
+    "EventEnablingCondition": "caseType=\"dummy\""
   },
   {
     "CaseTypeID": "ET_Scotland",
@@ -959,10 +956,7 @@
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "N",
-    "EventEnablingCondition": "caseType=\"dummy\"",
-    "CallBackURLAboutToStartEvent": "",
-    "CallBackURLAboutToSubmitEvent": "",
-    "CallBackURLSubmittedEvent": ""
+    "EventEnablingCondition": "caseType=\"dummy\""
   },
   {
     "CaseTypeID": "ET_Scotland",

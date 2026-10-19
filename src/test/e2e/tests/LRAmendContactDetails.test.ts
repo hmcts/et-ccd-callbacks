@@ -67,7 +67,13 @@ test.describe( 'Legal Rep updates update contact to colleagues in his org', () =
     await manageCaseDashboardPageCW.visit();
     await loginPageCW.processLogin(users.etCaseWorker);
     await manageCaseDashboardPageCW.navigateToCaseDetails(caseId, CaseTypeLocation.EnglandAndWales);
-    await caseDetailsPageCW.assertTabData(tabData);
+    await caseDetailsPageCW.assertTabData([
+      ...tabData,
+      {
+        tabName: 'History',
+        tabContent: ['Amend contact details']
+      }
+    ]);
 
 // LR updates contact details by 'Use MyHMCTS details'
     await caseDetailsPage.selectNextEvent(Events.amendContactDetailsClaimant);
@@ -90,7 +96,6 @@ test.describe( 'Legal Rep updates update contact to colleagues in his org', () =
     await caseWorkerBrowserPage.close();
   });
 
-  //RET-6237 to be released before testing this for Respondent LR
   test('Respondent Legal Rep updates contact to colleagues in his org',
     async ({
              nocPage, manageCaseDashboardPage, caseDetailsPage, amendContactDetailsLrPage, checkYourAnswersPage
@@ -120,7 +125,13 @@ test.describe( 'Legal Rep updates update contact to colleagues in his org', () =
       await manageCaseDashboardPageCW.visit();
       await loginPageCW.processLogin(users.etCaseWorker);
       await manageCaseDashboardPageCW.navigateToCaseDetails(caseId, CaseTypeLocation.EnglandAndWales);
-      await caseDetailsPageCW.assertTabData(tabData);
+      await caseDetailsPageCW.assertTabData([
+        ...tabData,
+        {
+          tabName: 'History',
+          tabContent: ['Amend contact details']
+        }
+      ]);
 
       await caseDetailsPage.selectNextEvent(Events.amendContactDetails);
       ({ addressDetails,  phNumber} = await amendContactDetailsLrPage.amendLegalRepContactDetails('Use MyHMCTS details', checkYourAnswersPage));
@@ -138,7 +149,13 @@ test.describe( 'Legal Rep updates update contact to colleagues in his org', () =
 
       // login as Caseworker check the detail updated
       await manageCaseDashboardPageCW.navigateToCaseDetails(caseId, CaseTypeLocation.EnglandAndWales);
-      await caseDetailsPageCW.assertTabData(updatedTabData);
+      await caseDetailsPageCW.assertTabData([
+        ...updatedTabData,
+        {
+          tabName: 'History',
+          tabContent: ['Amend contact details']
+        }
+      ]);
       await caseWorkerBrowserPage.close();
     });
 });

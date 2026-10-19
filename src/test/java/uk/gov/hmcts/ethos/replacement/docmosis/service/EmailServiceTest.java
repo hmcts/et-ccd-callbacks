@@ -71,21 +71,31 @@ class EmailServiceTest {
     }
 
     @Test
-    void getRespondentCitizenCaseLink_addsCaseDetailsPathAndEnglishLanguage() {
+    void getRespondentCitizenCaseLink_addsCaseDetailsPathWithoutLanguageQuery() {
         ReflectionTestUtils.setField(emailService, "syrUrl", SYR_HOST);
 
         assertThat(emailService.getRespondentCitizenCaseLink("1792404615243049",
-                "38eaac91-6908-4d87-af04-afba6788dda6"))
+                "38eaac91-6908-4d87-af04-afba6788dda6", false))
                 .isEqualTo(SYR_HOST + "case-details/1792404615243049/"
-                        + "38eaac91-6908-4d87-af04-afba6788dda6?lng=en");
+                        + "38eaac91-6908-4d87-af04-afba6788dda6");
+    }
+
+    @Test
+    void getRespondentCitizenCaseLink_appendsWelshLanguageParam() {
+        ReflectionTestUtils.setField(emailService, "syrUrl", SYR_HOST);
+
+        assertThat(emailService.getRespondentCitizenCaseLink("1792404615243049",
+                "38eaac91-6908-4d87-af04-afba6788dda6", true))
+                .isEqualTo(SYR_HOST + "case-details/1792404615243049/"
+                        + "38eaac91-6908-4d87-af04-afba6788dda6?lng=cy");
     }
 
     @Test
     void getRespondentCitizenCaseLink_doesNotDuplicateCaseDetailsPath() {
         ReflectionTestUtils.setField(emailService, "syrUrl", SYR_CASE_DETAILS);
 
-        assertThat(emailService.getRespondentCitizenCaseLink("1792404615243049", "respondent-1"))
-                .isEqualTo(SYR_CASE_DETAILS + "1792404615243049/respondent-1?lng=en");
+        assertThat(emailService.getRespondentCitizenCaseLink("1792404615243049", "respondent-1", false))
+                .isEqualTo(SYR_CASE_DETAILS + "1792404615243049/respondent-1");
     }
 
     @Test

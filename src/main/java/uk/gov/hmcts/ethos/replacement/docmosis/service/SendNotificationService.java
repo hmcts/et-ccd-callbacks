@@ -55,6 +55,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
@@ -397,7 +398,8 @@ public class SendNotificationService {
                 return;
             }
             Map<String, String> personalisation = buildPersonalisation(caseDetails,
-                    emailService.getRespondentCitizenCaseLink(caseId, respondentItem.getId()));
+                    emailService.getRespondentCitizenCaseLink(
+                            caseId, respondentItem.getId(), isWelshRespondent(respondentItem.getValue())));
             sendRespondentNotificationEmail(personalisation, respondentEmail, sentEmails);
         });
     }
@@ -407,6 +409,11 @@ public class SendNotificationService {
             return respondent.getResponseRespondentEmail();
         }
         return respondent.getRespondentEmail();
+    }
+
+    private boolean isWelshRespondent(RespondentSumType respondent) {
+        return featureToggleService.isWelshEnabled()
+                && WELSH_LANGUAGE.equals(respondent.getEt3ResponseLanguagePreference());
     }
 
     private void sendRespondentNotificationEmail(Map<String, String> emailData, String email,

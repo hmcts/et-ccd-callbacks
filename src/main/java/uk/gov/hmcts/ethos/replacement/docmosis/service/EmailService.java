@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DOCUMENTS_PATH;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 
 /**
  * EmailService is a class that is used for sending email via the GOV.UK Notify service.
@@ -67,9 +68,15 @@ public class EmailService {
     /**
      * Citizen respondent case page. Deployed portal roots are the host only, so the case-details path
      * is added when it is not already part of the configured root.
+     * English is the portal default and has no language query. Pass {@code welsh} to append
+     * {@code ?lng=cy}, matching other citizen notification links.
      */
-    public String getRespondentCitizenCaseLink(String caseId, String respondentId) {
-        return respondentCitizenCaseBase() + caseId + "/" + respondentId + "?lng=en";
+    public String getRespondentCitizenCaseLink(String caseId, String respondentId, boolean welsh) {
+        String link = respondentCitizenCaseBase() + caseId + "/" + respondentId;
+        if (welsh) {
+            return link + WELSH_LANGUAGE_PARAM;
+        }
+        return link;
     }
 
     private String respondentCitizenCaseBase() {

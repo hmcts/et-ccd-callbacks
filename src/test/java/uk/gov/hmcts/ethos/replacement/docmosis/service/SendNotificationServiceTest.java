@@ -60,6 +60,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_RESPONSE_REQUIRED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService.CASE_MANAGEMENT_ORDERS_REQUESTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService.EMPLOYER_CONTRACT_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService.NOTICE_OF_EMPLOYER_CONTRACT_CLAIM;
@@ -590,6 +592,41 @@ class SendNotificationServiceTest {
     }
 
     @Test
+    void sendNotifyEmails_respondentOnly_unrepresentedWelshPreferenceUsesWelshLink() {
+        givenUnrepresentedRespondentWithPortalAccess();
+        caseData.setSendNotificationNotify(RESPONDENT_ONLY);
+        caseData.getRespondentCollection().getFirst().getValue().setEt3ResponseLanguagePreference(WELSH_LANGUAGE);
+        when(featureToggleService.isWelshEnabled()).thenReturn(true);
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(defendantAssignment()));
+
+        sendNotificationService.sendNotifyEmails(caseDetails);
+
+        verify(emailService, times(1)).sendEmail(
+                eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID),
+                eq("respondent@email.com"),
+                personalisationCaptor.capture());
+        assertEquals(syrNotificationLink() + WELSH_LANGUAGE_PARAM,
+                personalisationCaptor.getValue().get("environmentUrl"));
+    }
+
+    @Test
+    void sendNotifyEmails_respondentOnly_welshPreferenceIgnoredWhenWelshDisabled() {
+        givenUnrepresentedRespondentWithPortalAccess();
+        caseData.setSendNotificationNotify(RESPONDENT_ONLY);
+        caseData.getRespondentCollection().getFirst().getValue().setEt3ResponseLanguagePreference(WELSH_LANGUAGE);
+        when(featureToggleService.isWelshEnabled()).thenReturn(false);
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(defendantAssignment()));
+
+        sendNotificationService.sendNotifyEmails(caseDetails);
+
+        verify(emailService, times(1)).sendEmail(
+                eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID),
+                eq("respondent@email.com"),
+                personalisationCaptor.capture());
+        assertEquals(syrNotificationLink(), personalisationCaptor.getValue().get("environmentUrl"));
+    }
+
+    @Test
     void sendNotifyEmails_bothParties_unrepresentedWithPortalAccess() {
         givenUnrepresentedRespondentWithPortalAccess();
         caseData.setSendNotificationNotify(BOTH_PARTIES);
@@ -1096,6 +1133,6 @@ class SendNotificationServiceTest {
     }
 
     private String syrNotificationLink() {
-        return "syrUrl/case-details/1234/respondent-1?lng=en";
+        return "syrUrl/case-details/1234/respondent-1";
     }
 }

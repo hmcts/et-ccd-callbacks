@@ -16,10 +16,8 @@ if [[ -f .nvmrc && -s /opt/nvm/nvm.sh ]]; then
 fi
 export PATH="${HOME}/.local/bin:${PATH}"
 
-if [[ ! -f node_modules/.yarn-state.yml && ! -f .pnp.cjs ]]; then
-  echo "Installing yarn dependencies for the UI functional tests"
-  yarn install
-  yarn build:shared
-fi
+echo "Installing yarn dependencies for the UI functional tests"
+yarn install
+yarn build:shared
 
 exec yarn "${UI_FUNCTIONAL_YARN_TASK:-test:functional-chromium}"

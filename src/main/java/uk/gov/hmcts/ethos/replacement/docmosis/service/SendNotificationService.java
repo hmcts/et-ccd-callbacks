@@ -21,6 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
@@ -362,7 +363,7 @@ public class SendNotificationService {
                     .forEach(email -> sendRespondentNotificationEmail(exuiEmailData, email, sentEmails));
         }
 
-        sendUnrepresentedRespondentNotificationEmails(caseDetails, assignments, sentEmails);
+        sendUnrepresentedRespondentNotificationEmails(caseDetails, sentEmails);
 
         emailNotificationService.getRespondentSolicitorEmails(assignments).stream()
                 .filter(StringUtils::isNotBlank)
@@ -370,33 +371,42 @@ public class SendNotificationService {
     }
 
     /**
-     * Emails a self-representing respondent who can sign in to the respondent portal.
-     * A represented respondent is not emailed here; their representative is emailed instead.
+     * Emails a self-representing respondent who has linked their portal account.
+     * Linking stores their IdAM id and, when they had no response email, their sign-in address on
+     * responseRespondentEmail. A represented respondent is not emailed here.
      */
     private void sendUnrepresentedRespondentNotificationEmails(CaseDetails caseDetails,
-                                                               List<CaseUserAssignment> assignments,
                                                                Set<String> sentEmails) {
         CaseData caseData = caseDetails.getCaseData();
-        if (CollectionUtils.isEmpty(caseData.getRespondentCollection()) || CollectionUtils.isEmpty(assignments)) {
+        if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
             return;
         }
 
         String caseId = caseDetails.getCaseId();
-        assignments.stream()
-                .filter(assignment -> CASE_USER_ROLE_DEFENDANT.equals(assignment.getCaseRole()))
-                .forEach(assignment -> caseData.getRespondentCollection().stream()
-                        .filter(respondentItem -> assignment.getUserId()
-                                .equals(respondentItem.getValue().getIdamId()))
-                        .findFirst()
-                        .ifPresent(respondentItem -> {
-                            String respondentEmail = NotificationHelper.getEmailAddressForUnrepresentedRespondent(
-                                    caseData, respondentItem.getValue());
-                            if (StringUtils.isNotBlank(respondentEmail)) {
-                                Map<String, String> personalisation = buildPersonalisation(caseDetails,
-                                        emailService.getSyrCaseLink(caseId, respondentItem.getId()));
-                                sendRespondentNotificationEmail(personalisation, respondentEmail, sentEmails);
-                            }
-                        }));
+        caseData.getRespondentCollection().forEach(respondentItem -> {
+            if (respondentItem.getValue() == null || StringUtils.isBlank(respondentItem.getValue().getIdamId())) {
+                return;
+            }
+            if (NotificationHelper.getRespondentRepresentative(caseData, respondentItem.getValue()) != null) {
+                return;
+            }
+            String respondentEmail = emailForUnrepresentedRespondent(respondentItem.getValue());
+            if (StringUtils.isBlank(respondentEmail)) {
+                log.info("No email address for unrepresented respondent {} on case {}",
+                        respondentItem.getId(), caseId);
+                return;
+            }
+            Map<String, String> personalisation = buildPersonalisation(caseDetails,
+                    emailService.getRespondentCitizenCaseLink(caseId, respondentItem.getId()));
+            sendRespondentNotificationEmail(personalisation, respondentEmail, sentEmails);
+        });
+    }
+
+    private String emailForUnrepresentedRespondent(RespondentSumType respondent) {
+        if (StringUtils.isNotBlank(respondent.getResponseRespondentEmail())) {
+            return respondent.getResponseRespondentEmail();
+        }
+        return respondent.getRespondentEmail();
     }
 
     private void sendRespondentNotificationEmail(Map<String, String> emailData, String email,

@@ -610,8 +610,35 @@ class SendNotificationServiceTest {
     }
 
     @Test
+    void sendNotifyEmails_bothParties_unrepresentedUsesPortalEmailWithoutDefendantRole() {
+        givenUnrepresentedRespondentWithPortalAccess();
+        caseData.setSendNotificationNotify(BOTH_PARTIES);
+        caseData.getRespondentCollection().getFirst().getValue().setRespondentEmail(null);
+        caseData.getRespondentCollection().getFirst().getValue()
+                .setResponseRespondentEmail("portal@email.com");
+        CaseUserAssignment claimantAssignment = new CaseUserAssignment();
+        claimantAssignment.setCaseId("1234");
+        claimantAssignment.setUserId("claimant-user-id");
+        claimantAssignment.setCaseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(claimantAssignment));
+
+        sendNotificationService.sendNotifyEmails(caseDetails);
+
+        verify(emailService, times(1)).sendEmail(
+                eq(CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID),
+                eq("claimant@email.com"),
+                any());
+        verify(emailService, times(1)).sendEmail(
+                eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID),
+                eq("portal@email.com"),
+                personalisationCaptor.capture());
+        assertEquals(syrNotificationLink(), personalisationCaptor.getValue().get("environmentUrl"));
+    }
+
+    @Test
     void sendNotifyEmails_respondentOnly_unrepresentedWithoutPortalAccess() {
         givenUnrepresentedRespondentWithPortalAccess();
+        caseData.getRespondentCollection().getFirst().getValue().setIdamId(null);
         caseData.setSendNotificationNotify(RESPONDENT_ONLY);
         CaseUserAssignment claimantAssignment = new CaseUserAssignment();
         claimantAssignment.setCaseId("1234");
@@ -626,6 +653,7 @@ class SendNotificationServiceTest {
     @Test
     void sendNotifyEmails_bothParties_unrepresentedWithoutPortalAccess_stillEmailsClaimant() {
         givenUnrepresentedRespondentWithPortalAccess();
+        caseData.getRespondentCollection().getFirst().getValue().setIdamId(null);
         caseData.setSendNotificationNotify(BOTH_PARTIES);
         CaseUserAssignment claimantAssignment = new CaseUserAssignment();
         claimantAssignment.setCaseId("1234");
@@ -647,6 +675,8 @@ class SendNotificationServiceTest {
     void sendNotifyEmails_respondentOnly_representedRespondentIsNotEmailed() {
         caseData.setSendNotificationNotify(RESPONDENT_ONLY);
         caseData.getRespondentCollection().getFirst().getValue().setIdamId("defendant-user-id");
+        caseData.getRespondentCollection().getFirst().getValue()
+                .setResponseRespondentEmail("portal@email.com");
         when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(defendantAssignment()));
 
         sendNotificationService.sendNotifyEmails(caseDetails);
@@ -659,6 +689,10 @@ class SendNotificationServiceTest {
         verify(emailService, never()).sendEmail(
                 eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID),
                 eq("respondent@email.com"),
+                any());
+        verify(emailService, never()).sendEmail(
+                eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID),
+                eq("portal@email.com"),
                 any());
     }
 
@@ -1062,6 +1096,6 @@ class SendNotificationServiceTest {
     }
 
     private String syrNotificationLink() {
-        return "syrUrl1234/respondent-1";
+        return "syrUrl/case-details/1234/respondent-1?lng=en";
     }
 }

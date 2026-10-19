@@ -26,6 +26,11 @@ public class EmailUtils extends EmailService {
     }
 
     @Override
+    public String getRespondentCitizenCaseLink(String caseId, String respondentId) {
+        return "syrUrl/case-details/" + caseId + "/" + respondentId + "?lng=en";
+    }
+
+    @Override
     public String getExuiHearingDocumentsLink(String caseId) {
         return "exuiUrl" + caseId + "#Hearing%20Documents";
     }

@@ -64,6 +64,22 @@ public class EmailService {
         return syrUrl + caseId + "/" + respondentId;
     }
 
+    /**
+     * Citizen respondent case page. Deployed portal roots are the host only, so the case-details path
+     * is added when it is not already part of the configured root.
+     */
+    public String getRespondentCitizenCaseLink(String caseId, String respondentId) {
+        return respondentCitizenCaseBase() + caseId + "/" + respondentId + "?lng=en";
+    }
+
+    private String respondentCitizenCaseBase() {
+        String base = syrUrl.endsWith("/") ? syrUrl : syrUrl + "/";
+        if (base.endsWith("/case-details/")) {
+            return base;
+        }
+        return base + "case-details/";
+    }
+
     public String getClaimantRepExuiCaseNotificationsLink(String caseId) {
         return exuiUrl + caseId + "#Notifications";
     }

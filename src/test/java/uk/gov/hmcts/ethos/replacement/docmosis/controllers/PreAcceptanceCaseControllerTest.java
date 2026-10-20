@@ -10,12 +10,16 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PreAcceptanceCaseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
@@ -46,8 +50,15 @@ class PreAcceptanceCaseControllerTest extends BaseControllerTest {
     protected void setUp() {
         when(preAcceptanceCaseService.validateAcceptanceDate(any())).thenReturn(new ArrayList<>());
 
+        CaseData caseData = CaseDataBuilder.builder().build();
+        JurCodesType jurCodesType = new JurCodesType();
+        jurCodesType.setJuridictionCodesList("DAG");
+        JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
+        jurCodesTypeItem.setValue(jurCodesType);
+        caseData.setJurCodesCollection(new ArrayList<>(List.of(jurCodesTypeItem)));
+
         ccdRequest = CCDRequestBuilder.builder()
-                .withCaseData(CaseDataBuilder.builder().build())
+                .withCaseData(caseData)
                 .build();
     }
 
@@ -60,6 +71,7 @@ class PreAcceptanceCaseControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.data.jurCodesCollection[0].id", notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }

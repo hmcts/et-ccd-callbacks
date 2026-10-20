@@ -63,7 +63,7 @@
     "CaseTypeId": "ET_EnglandWales",
     "CaseFieldID": "caseBundles",
     "UserRole": "caseworker-employment-englandwales",
-    "CRUD": "CRU"
+    "CRUD": "CRUD"
   },
   {
     "CaseTypeId": "ET_EnglandWales",
@@ -87,7 +87,7 @@
     "CaseTypeId": "ET_EnglandWales",
     "CaseFieldID": "digitalCaseFile",
     "UserRole": "caseworker-employment-englandwales",
-    "CRUD": "CRU"
+    "CRUD": "CRUD"
   },
   {
     "CaseTypeId": "ET_EnglandWales",

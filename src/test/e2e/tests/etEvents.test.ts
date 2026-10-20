@@ -1,11 +1,12 @@
-import { test } from "../fixtures/common.fixture";
-import { CaseworkerCaseFactory } from '../data-utils/factory/exui/CaseworkerCaseFactory.ts';
-import { CaseTypeLocation, Events } from '../config/case-data.ts';
-import { CitizenClaimantFactory } from '../data-utils/factory/citizen/ClaimantCitizenFactory.ts';
-import { CaseEventApi } from '../data-utils/api/CaseEventApi.ts';
-import { users } from '../config/config.dynamic.ts';
-import CitizenHubLoginPage from '../pages/claimantCitizenHub/CitizenHubLoginPage.ts';
-import CitizenHubPage from '../pages/claimantCitizenHub/CitizenHubPage.ts';
+import { test } from "../fixtures/et.test.fixture.ts";
+import {
+  CaseEventApi,
+  CaseTypeLocation,
+  CaseworkerCaseFactory,
+  CitizenClaimantFactory, CitizenHubLoginPage, CitizenHubPage,
+  Events,
+  users
+} from "@et-shared-test-library/core";
 
 let caseNumber: string;
 let caseId: string;
@@ -51,13 +52,6 @@ test.describe('Various events in mange case application', () => {
     await icUploadDocPage.verifyJurisdictionCodeInICevent();
   });
 
-  //EXUI-3451
-  test('Create a England/Wales claim and transfer to Scotland', {tag: '@demo'}, async ({ caseDetailsPage, caseTransferPage }) => {
-    await caseDetailsPage.selectNextEvent(Events.caseTransferScotland);
-    await caseTransferPage.progressCaseTransfer();
-    await caseTransferPage.checkYourAnswer(caseNumber);
-  });
-
   //RET-5790
   test('perform ADR document event', {tag: '@demo'}, async ({ adrDocument, caseDetailsPage }) => {
     await caseDetailsPage.selectNextEvent(Events.adrPrivilegedDocuments);
@@ -74,7 +68,6 @@ test.describe('Various events in mange case application', () => {
     ]);
   });
 
-
   //RET-6511
   test('Add and manage telephone notes', async ({ caseNotesPage, caseDetailsPage, manageTelephoneNotePage}) => {
     await caseDetailsPage.selectNextEvent(Events.addTelephoneNote);
@@ -87,7 +80,6 @@ test.describe('Various events in mange case application', () => {
           { tabItem: 'Case Notes', value: '', clickable: true },
           { tabItem: 'Note', value: 'This is test'}
         ]
-
       }
     ]);
 
@@ -102,9 +94,8 @@ test.describe('Various events in mange case application', () => {
           { tabItem: 'Case Notes', value: '', clickable: true },
           { tabItem: 'Note', value: 'This is amended test'}
         ]
-
       }
-    ])
+    ]);
   });
 });
 
@@ -121,10 +112,32 @@ test.describe('Claimant retaining access to transferred case', () => {
   });
 
   //EXUI-3451
-  test('Create a England/Wales claim and transfer to Scotland, Claimant retains case', async ({ browserUtils, caseDetailsPage, caseTransferPage }) => {
+  test('Create a England/Wales claim and transfer to Scotland, Claimant retains case', async ({ browserUtils, caseDetailsPage, caseTransferPage, checkYourAnswersPage }) => {
     await caseDetailsPage.selectNextEvent(Events.caseTransferScotland);
     await caseTransferPage.progressCaseTransfer();
-    let newSubRef= await caseTransferPage.checkYourAnswer(caseNumber);
+    await checkYourAnswersPage.assertCheckYourAnswersPage({
+      tableName: 'Check your answers',
+      rows: [
+        {
+          cellItem: 'Select the office you want to transfer the case to', value : 'Glasgow'
+        },
+        {
+          cellItem: 'Reason for Case Transfer', value: 'Transfer case to Scotland RET'
+        }
+      ]
+    });
+    await caseTransferPage.clickTransferNow();
+    await caseDetailsPage.assertTabData([
+      {
+        tabName: 'Case Details',
+        tabContent:[
+          'Case Status:  Transferred',
+          'Case Transfer: Transferred to Glasgow',
+          { tabItem: 'Current Position', value: 'Case transferred - other country' },
+        ]
+      },
+    ]);
+    let newSubRef= await caseTransferPage.getNewDigitalCaseReferenceNumber();
 
     //login as claimant and access transferred case
     const claimantBrowserPage = await browserUtils.openNewBrowserContext(users.etClaimant.sessionFile);
@@ -164,7 +177,6 @@ test.describe('Various events in mange case application for Scotland case', () =
           { tabItem: 'Case Notes', value: '', clickable: true },
           { tabItem: 'Note', value: 'This is test'}
         ]
-
       }
     ])
     // RET-5796 Validate initial consideration links

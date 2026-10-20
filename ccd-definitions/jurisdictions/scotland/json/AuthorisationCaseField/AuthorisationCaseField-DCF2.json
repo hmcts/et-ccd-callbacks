@@ -63,7 +63,7 @@
     "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "caseBundles",
     "UserRole": "caseworker-employment-scotland",
-    "CRUD": "CRU"
+    "CRUD": "CRUD"
   },
   {
     "CaseTypeId": "ET_Scotland",
@@ -87,7 +87,7 @@
     "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "digitalCaseFile",
     "UserRole": "caseworker-employment-scotland",
-    "CRUD": "CRU"
+    "CRUD": "CRUD"
   },
   {
     "CaseTypeId": "ET_Scotland",

@@ -1,13 +1,12 @@
-import { test } from '../../fixtures/common.fixture.ts';
-import { CaseDetailsValues, CaseTypeLocation, Events } from '../../config/case-data.ts';
-import { CitizenClaimantFactory } from '../../data-utils/factory/citizen/ClaimantCitizenFactory.ts';
-import { CaseEventApi } from '../../data-utils/api/CaseEventApi.ts';
-import { users } from '../../config/config.dynamic.ts';
-import { ManageCaseDashboardPage } from '../../pages/ManageCaseDashboardPage.ts';
-import LoginPage from '../../pages/loginPage.ts';
-import CaseDetailsPage from '../../pages/caseDetailsPage.ts';
-import { Page } from '@playwright/test';
-import RespondentRepPage from '../../pages/respondentCitizenHub/respondentRepPage.ts';
+import { test } from '../../fixtures/et.test.fixture.ts';
+import {Page} from "@playwright/test";
+import {
+  CaseDetailsPage,
+  CaseDetailsValues, CaseEventApi, CaseTypeLocation, CitizenClaimantFactory, Events,
+  LoginPage,
+  ManageCaseDashboardPage,
+  RespondentRepPage, users
+} from "@et-shared-test-library/core";
 
 let caseId: string;
 let caseNumber: string;

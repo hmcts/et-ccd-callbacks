@@ -15,6 +15,8 @@ public final class PhoneNumberValidator {
 
     public static final String INVALID_PHONE_NUMBER_FORMAT_MESSAGE =
             "Enter a telephone number in the correct format";
+    public static final String INVALID_REPRESENTATIVE_PHONE_NUMBER_FORMAT_MESSAGE =
+            INVALID_PHONE_NUMBER_FORMAT_MESSAGE + " for %s";
     public static final String INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE =
             "Do not include the + symbol. Enter the number using digits only.";
 
@@ -55,19 +57,34 @@ public final class PhoneNumberValidator {
     }
 
     /**
-     * Validates the telephone numbers of all respondent representatives in the given collection.
+     * Validates the telephone numbers of all respondent representatives in the given collection. Each invalid
+     * telephone number gets its own error naming the representative, followed by a single digits-only message.
      *
      * @param representatives the respondent representatives to validate
      * @return List of validation errors or an empty list if all telephone numbers are valid
      */
     public static List<String> validateRepresentativePhoneNumbers(List<RepresentedTypeRItem> representatives) {
+        List<String> validationErrors = new ArrayList<>();
         if (CollectionUtils.isEmpty(representatives)) {
-            return new ArrayList<>();
+            return validationErrors;
         }
-        boolean allValid = representatives.stream()
-                .filter(item -> item != null && item.getValue() != null)
-                .allMatch(item -> isValidPhoneNumber(item.getValue().getRepresentativePhoneNumber()));
-        return allValid ? new ArrayList<>() : invalidPhoneNumberErrors();
+        for (int i = 0; i < representatives.size(); i++) {
+            RepresentedTypeRItem item = representatives.get(i);
+            if (item != null && item.getValue() != null
+                    && !isValidPhoneNumber(item.getValue().getRepresentativePhoneNumber())) {
+                validationErrors.add(String.format(INVALID_REPRESENTATIVE_PHONE_NUMBER_FORMAT_MESSAGE,
+                        getRepresentativeName(item, i)));
+            }
+        }
+        if (!validationErrors.isEmpty()) {
+            validationErrors.add(INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE);
+        }
+        return validationErrors;
+    }
+
+    private static String getRepresentativeName(RepresentedTypeRItem representative, int index) {
+        String name = representative.getValue().getNameOfRepresentative();
+        return StringUtils.isNotBlank(name) ? name : "representative " + (index + 1);
     }
 
     private static List<String> invalidPhoneNumberErrors() {

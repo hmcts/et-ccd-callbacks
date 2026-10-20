@@ -5100,7 +5100,7 @@
     "retainHiddenValue": "Yes",
     "PageShowCondition": "representativeContactChangeOption=\"Amend contact details\"",
     "ShowSummaryChangeOption": "Y",
-    "CallBackURLMidEvent": "${ET_COS_URL}/et3Response/midValidatePhoneNumber"
+    "CallBackURLMidEvent": "${ET_COS_URL}/amendRepresentativeContact/midValidatePhoneNumber"
   },
   {
     "CaseTypeID": "ET_Scotland",

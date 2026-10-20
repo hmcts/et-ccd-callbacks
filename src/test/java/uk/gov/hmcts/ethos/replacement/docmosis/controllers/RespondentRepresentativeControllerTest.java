@@ -40,14 +40,13 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_PHONE_NUMBER_FORMAT_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_REPRESENTATIVE_PHONE_NUMBER_FORMAT_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({RespondentRepresentativeController.class, JsonMapper.class})
@@ -467,17 +466,21 @@ class RespondentRepresentativeControllerTest {
     void amendRespondentRepresentativeMidEventWithInvalidPhoneNumber() {
         CaseData caseData = new CaseData();
         caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().id(ID_REPRESENTATIVE_1).value(
-                RepresentedTypeR.builder().representativePhoneNumber("Via representative").build()).build()));
+                RepresentedTypeR.builder().nameOfRepresentative(REPRESENTATIVE_NAME)
+                        .representativePhoneNumber("Via representative").build()).build()));
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
         ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
+        when(nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(
+                any(CaseData.class))).thenReturn(List.of());
         mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_MID_EVENT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.errors[0]", is(INVALID_PHONE_NUMBER_FORMAT_MESSAGE)))
+                .andExpect(jsonPath("$.errors[0]",
+                        is(String.format(INVALID_REPRESENTATIVE_PHONE_NUMBER_FORMAT_MESSAGE, REPRESENTATIVE_NAME))))
                 .andExpect(jsonPath("$.errors[1]", is(INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE)));
-        verify(nocRespondentRepresentativeService, never())
+        verify(nocRespondentRepresentativeService)
                 .validateRepresentativesOrganisationsAndEmails(any(CaseData.class));
     }
 
@@ -495,6 +498,7 @@ class RespondentRepresentativeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasItems(
-                        INVALID_PHONE_NUMBER_FORMAT_MESSAGE, INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE)));
+                        String.format(INVALID_REPRESENTATIVE_PHONE_NUMBER_FORMAT_MESSAGE, "representative 1"),
+                        INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE)));
     }
 }

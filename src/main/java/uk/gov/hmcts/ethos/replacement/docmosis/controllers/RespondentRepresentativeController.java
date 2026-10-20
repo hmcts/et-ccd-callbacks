@@ -122,9 +122,6 @@ public class RespondentRepresentativeController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>(
                 PhoneNumberValidator.validateRepresentativePhoneNumbers(caseData.getRepCollection()));
-        if (!errors.isEmpty()) {
-            return getCallbackRespEntityErrors(errors, caseData);
-        }
         List<String> warnings = new ArrayList<>();
         try {
             warnings.addAll(nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(caseData));

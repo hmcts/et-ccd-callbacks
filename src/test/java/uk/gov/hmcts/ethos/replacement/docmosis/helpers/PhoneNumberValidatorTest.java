@@ -13,6 +13,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_PHONE_NUMBER_FORMAT_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_REPRESENTATIVE_PHONE_NUMBER_FORMAT_MESSAGE;
 
 class PhoneNumberValidatorTest {
 
@@ -58,16 +59,25 @@ class PhoneNumberValidatorTest {
     }
 
     @Test
-    void validateRepresentativePhoneNumbers_anyInvalid_returnsErrorsOnce() {
+    void validateRepresentativePhoneNumbers_anyInvalid_namesEachInvalidRepresentative() {
         List<RepresentedTypeRItem> representatives = List.of(
-                representative("07700900123"), representative("Via representative"), representative("+44770090"));
-        assertThat(PhoneNumberValidator.validateRepresentativePhoneNumbers(representatives))
-                .containsExactly(INVALID_PHONE_NUMBER_FORMAT_MESSAGE, INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE);
+                representative("Jane Smith", "07700900123"),
+                representative("John Doe", "Via representative"),
+                representative(null, "+44770090"));
+        assertThat(PhoneNumberValidator.validateRepresentativePhoneNumbers(representatives)).containsExactly(
+                String.format(INVALID_REPRESENTATIVE_PHONE_NUMBER_FORMAT_MESSAGE, "John Doe"),
+                String.format(INVALID_REPRESENTATIVE_PHONE_NUMBER_FORMAT_MESSAGE, "representative 3"),
+                INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE);
     }
 
     private static RepresentedTypeRItem representative(String phoneNumber) {
+        return representative(null, phoneNumber);
+    }
+
+    private static RepresentedTypeRItem representative(String name, String phoneNumber) {
         return RepresentedTypeRItem.builder()
-                .value(RepresentedTypeR.builder().representativePhoneNumber(phoneNumber).build())
+                .value(RepresentedTypeR.builder().nameOfRepresentative(name).representativePhoneNumber(phoneNumber)
+                        .build())
                 .build();
     }
 }

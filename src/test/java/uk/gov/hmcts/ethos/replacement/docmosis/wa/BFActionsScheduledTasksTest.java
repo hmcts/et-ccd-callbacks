@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.ccd.sdk.impl.PostgresAdvisoryLock;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -20,9 +21,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.sql.DataSource;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -46,10 +50,20 @@ class BFActionsScheduledTasksTest {
     @MockitoBean
     private FeatureToggleService featureToggleService;
 
+    @MockitoBean
+    private PostgresAdvisoryLock advisoryLock;
+
     @BeforeEach
     void setUp() {
-        bfActionsScheduledTasks = new BFActionsScheduledTasks(adminUserService, ccdClient, featureToggleService);
+        bfActionsScheduledTasks = new BFActionsScheduledTasks(
+                adminUserService, ccdClient, featureToggleService, advisoryLock);
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
+        when(advisoryLock.runIfAcquired(eq("et-bf-actions"), eq("task"), any(Runnable.class)))
+                .thenAnswer(invocation -> {
+                    Runnable operation = invocation.getArgument(2);
+                    operation.run();
+                    return true;
+                });
         ReflectionTestUtils.setField(bfActionsScheduledTasks, "caseTypeIdsString", "ET_EnglandWales,ET_Scotland");
         ReflectionTestUtils.setField(bfActionsScheduledTasks, "maxCases", 10);
         ReflectionTestUtils.setField(bfActionsScheduledTasks, "bfActionCronCaseIdsToSkip", "");
@@ -102,6 +116,28 @@ class BFActionsScheduledTasksTest {
         when(ccdClient.buildAndGetElasticSearchRequest(any(), any(), any())).thenThrow(new IOException());
 
         bfActionsScheduledTasks.createTasksForBFDates();
+        verify(advisoryLock, times(0)).runIfAcquired(any(), any(), any(Runnable.class));
         verify(ccdClient, times(0)).startEventForCase(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void testCreateTasksForBFDates_lockNotAcquired() throws IOException {
+        when(advisoryLock.runIfAcquired(eq("et-bf-actions"), eq("task"), any(Runnable.class)))
+                .thenReturn(false);
+
+        bfActionsScheduledTasks.createTasksForBFDates();
+
+        verify(advisoryLock, times(1)).runIfAcquired(eq("et-bf-actions"), eq("task"), any(Runnable.class));
+        verify(adminUserService, times(0)).getAdminUserToken();
+        verify(ccdClient, times(0)).buildAndGetElasticSearchRequest(any(), any(), any());
+        verify(ccdClient, times(0)).startEventForCase(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void testDataSourceConstructor() {
+        DataSource dataSource = mock(DataSource.class);
+        BFActionsScheduledTasks tasks = new BFActionsScheduledTasks(
+                adminUserService, ccdClient, featureToggleService, dataSource);
+        assertNotNull(tasks);
     }
 }

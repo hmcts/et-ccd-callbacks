@@ -21,20 +21,20 @@ public final class PhoneNumberValidator {
             "Do not include the + symbol. Enter the number using digits only.";
 
     /**
-     * Maximum number of digits allowed in a telephone number, as defined by ITU-T E.164.
+     * The UK national number formats accepted by the CCD PhoneUK field type, which representative_phone_number
+     * uses. The +44 prefix, brackets and extensions that PhoneUK also allows are excluded, so a number accepted
+     * here is always accepted by PhoneUK.
      */
-    static final int MAX_PHONE_NUMBER_DIGITS = 15;
-    private static final Pattern VALID_PHONE_NUMBER =
-            Pattern.compile("\\d{1," + MAX_PHONE_NUMBER_DIGITS + "}");
-    private static final Pattern WHITESPACE = Pattern.compile("\\s+");
+    private static final Pattern VALID_PHONE_NUMBER = Pattern.compile(
+            "0\\d{4}\\s?\\d{3}\\s?\\d{3}|0\\d{3}\\s?\\d{3}\\s?\\d{4}|0\\d{2}\\s?\\d{4}\\s?\\d{4}");
 
     private PhoneNumberValidator() {
         // All access through static methods
     }
 
     /**
-     * Checks whether the given telephone number contains digits only (spaces are ignored) and is no longer than
-     * {@value #MAX_PHONE_NUMBER_DIGITS} digits. An empty value is considered valid as the field is optional.
+     * Checks whether the given telephone number is an 11 digit UK number starting with 0, optionally split by
+     * single spaces in the positions PhoneUK allows. An empty value is considered valid as the field is optional.
      *
      * @param phoneNumber the telephone number to validate
      * @return true if the telephone number is empty or valid, false otherwise
@@ -43,7 +43,7 @@ public final class PhoneNumberValidator {
         if (StringUtils.isBlank(phoneNumber)) {
             return true;
         }
-        return VALID_PHONE_NUMBER.matcher(WHITESPACE.matcher(phoneNumber).replaceAll(StringUtils.EMPTY)).matches();
+        return VALID_PHONE_NUMBER.matcher(phoneNumber).matches();
     }
 
     /**

@@ -20,13 +20,15 @@ class PhoneNumberValidatorTest {
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {" ", "07700900123", "07700 900123", "07700 900 123", "01632 960001", "0161 496 0000",
-        "0161 4960000", "020 7946 0000", "02079460000"})
+        "0161 4960000", "020 7946 0000", "02079460000", "+447700900123", "+44 7700 900123", "+44 7700 900 123",
+        "+44 161 496 0000", "+44 20 7946 0000"})
     void isValidPhoneNumber_validValues(String phoneNumber) {
         assertThat(PhoneNumberValidator.isValidPhoneNumber(phoneNumber)).isTrue();
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"Via representative", "+447700900123", "+44 7700 900123", "07700-900-123",
+    @ValueSource(strings = {"Via representative", "+4407700900123", "+44 (0)7700 900123", "+1 202 555 0100",
+        "+33 1 23 45 67 89", "+44770090012", "+44-7700-900123", "07700-900-123",
         "(020) 79460000", "07700 900123 #1234", "07700900123 ext 2", "0770090012a", "0044 7700 900123",
         "00447700900123", "17700900123", "0770090012", "077009001234", "0 7700900123", "07700  900123",
         " 07700900123", "07700900123 07700900124"})

@@ -22,19 +22,22 @@ public final class PhoneNumberValidator {
 
     /**
      * The UK national number formats accepted by the CCD PhoneUK field type, which representative_phone_number
-     * uses. The +44 prefix, brackets and extensions that PhoneUK also allows are excluded, so a number accepted
-     * here is always accepted by PhoneUK.
+     * uses. The brackets and extensions that PhoneUK also allows are excluded, so a number accepted here is
+     * always accepted by PhoneUK.
      */
     private static final Pattern VALID_PHONE_NUMBER = Pattern.compile(
-            "0\\d{4}\\s?\\d{3}\\s?\\d{3}|0\\d{3}\\s?\\d{3}\\s?\\d{4}|0\\d{2}\\s?\\d{4}\\s?\\d{4}");
+            "(\\+44\\s?\\d{4}|0\\d{4})\\s?\\d{3}\\s?\\d{3}"
+                    + "|(\\+44\\s?\\d{3}|0\\d{3})\\s?\\d{3}\\s?\\d{4}"
+                    + "|(\\+44\\s?\\d{2}|0\\d{2})\\s?\\d{4}\\s?\\d{4}");
 
     private PhoneNumberValidator() {
         // All access through static methods
     }
 
     /**
-     * Checks whether the given telephone number is an 11 digit UK number starting with 0, optionally split by
-     * single spaces in the positions PhoneUK allows. An empty value is considered valid as the field is optional.
+     * Checks whether the given telephone number is a UK number starting with 0 (11 digits) or +44 (followed by
+     * 10 digits), optionally split by single spaces in the positions PhoneUK allows. An empty value is considered
+     * valid as the field is optional.
      *
      * @param phoneNumber the telephone number to validate
      * @return true if the telephone number is empty or valid, false otherwise

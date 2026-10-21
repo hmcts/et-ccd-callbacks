@@ -34,6 +34,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper.buildFlagsImageFileName;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.JurisdictionCodeHelper.populateJurCodesCollectionIds;
 
 @Slf4j
 @RestController
@@ -169,6 +170,7 @@ public class Et1VettingController {
         caseData.setSuggestedHearingVenues(caseData.getEt1HearingVenues());
         setDocumentNumbers(caseData);
         et1VettingService.clearEt1FieldsFromCaseData(ccdRequest.getCaseDetails().getCaseData());
+        populateJurCodesCollectionIds(caseData);
         buildFlagsImageFileName(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }

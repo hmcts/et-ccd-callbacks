@@ -181,6 +181,19 @@ class NoticeOfChangeFieldPopulatorTest {
     }
 
     @Test
+    void shouldGeneratePoliciesWhenRespondentCollectionIsNull() {
+        CaseData emptyCaseData = new CaseData();
+        when(policyConverter.generate(any(), eq(Optional.empty()))).thenReturn(ORG_POLICY_A);
+
+        Map<String, Object> data = noticeOfChangeFieldPopulator.generate(emptyCaseData);
+
+        assertThat(data).isNotNull();
+        assertThat(data).containsKey("claimantRepresentativeOrganisationPolicy");
+        assertThat(data).containsKey("respondentOrganisationPolicy0");
+        assertThat(data).doesNotContainKey("noticeOfChangeAnswers0");
+    }
+
+    @Test
     void shouldGenerateRespondentOrganisationPoliciesUsingCurrentRespondentOrder() {
         caseData.setRespondentCollection(new ArrayList<>());
         caseData.getRespondentCollection().add(respondent1);

@@ -26,7 +26,7 @@ final class DockerComposeProcessRunner {
     @SneakyThrows
     static void start()  {
         String cftlibExtraComposeFiles = System.getenv("CFTLIB_EXTRA_COMPOSE_FILES");
-        String strComposeFiles = "docker-compose.yml," + Optional.of(cftlibExtraComposeFiles).orElse("");
+        String strComposeFiles = "docker-compose.yml," + Optional.ofNullable(cftlibExtraComposeFiles).orElse("");
 
         String[] composeFiles = strComposeFiles.split(",");
         URL compose = Thread.currentThread().getContextClassLoader().getResource("compose");

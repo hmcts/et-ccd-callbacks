@@ -1,19 +1,13 @@
-import { test } from '../../fixtures/common.fixture.ts';
-import { CitizenClaimantFactory } from '../../data-utils/factory/citizen/ClaimantCitizenFactory.ts';
-import { CaseDetailsValues, CaseTypeLocation, Events } from '../../config/case-data.ts';
-import { CaseEventApi } from '../../data-utils/api/CaseEventApi.ts';
-import DateUtilComponent from '../../data-utils/DateUtilComponent.ts';
-import { users } from '../../config/config.dynamic.ts';
-import CitizenHubLoginPage from '../../pages/claimantCitizenHub/CitizenHubLoginPage.ts';
-import CitizenHubPage from '../../pages/claimantCitizenHub/CitizenHubPage.ts';
-import { ManageCaseDashboardPage } from '../../pages/ManageCaseDashboardPage.ts';
-import LoginPage from '../../pages/loginPage.ts';
-import CaseDetailsPage from '../../pages/caseDetailsPage.ts';
-import { ApplicationTabPage } from '../../pages/applicationTabPage.ts';
-import { CheckYourAnswersPage } from '../../pages/helpers/CheckYourAnswersPage.ts';
-import Et3LoginPage from "../../pages/respondentCitizenHub/et3LoginPage.ts";
-import Et3ResponsesDashboardPage from "../../pages/respondentCitizenHub/et3ResponsesDashboardPage.ts";
-import RespondentCaseOverviewPage from "../../pages/respondentCitizenHub/respondentCaseOverviewPage.ts";
+import { test } from '../../fixtures/et.test.fixture.ts';
+import {
+  ApplicationTabPage,
+  CaseDetailsPage, CaseDetailsValues, CaseEventApi, CaseTypeLocation, CheckYourAnswersPage, CitizenClaimantFactory,
+  CitizenHubLoginPage,
+  CitizenHubPage, DateUtilComponent, ET3LoginPage, Et3ResponsesDashboardPage, Events,
+  LoginPage,
+  ManageCaseDashboardPage, RespondentCaseOverviewPage,
+  users
+} from "@et-shared-test-library/core";
 
 let caseId: string;
 let caseNumber: string;
@@ -154,7 +148,7 @@ test.describe('LR Make an application and view Recorded Decision for respondent'
     }) => {
 
     const respondentBrowser = await browserUtils.openNewBrowserContext(users.etRespondent.sessionFile);
-    const et3LoginPage = new Et3LoginPage(respondentBrowser);
+    const et3LoginPage = new ET3LoginPage(respondentBrowser);
     const et3ResponseDashboardPage = new Et3ResponsesDashboardPage(respondentBrowser);
     const respondentCaseOverviewPage = new RespondentCaseOverviewPage(respondentBrowser);
 

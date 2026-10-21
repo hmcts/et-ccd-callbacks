@@ -1,14 +1,12 @@
-import { test } from '../../fixtures/common.fixture.ts';
-import { users } from '../../config/config.dynamic.ts';
-import { CitizenClaimantFactory } from '../../data-utils/factory/citizen/ClaimantCitizenFactory.ts';
-import { CaseDetailsValues, CaseTypeLocation } from '../../config/case-data.ts';
-import { CaseEventApi } from '../../data-utils/api/CaseEventApi.ts';
-import CitizenHubLoginPage from '../../pages/claimantCitizenHub/CitizenHubLoginPage.ts';
-import CitizenHubPage from '../../pages/claimantCitizenHub/CitizenHubPage.ts';
-import { Helpers } from '../../pages/helpers/Helper.ts';
-import { expect } from '@playwright/test';
-import Et3LoginPage from '../../pages/respondentCitizenHub/et3LoginPage.ts';
-import RespondentCaseOverviewPage from '../../pages/respondentCitizenHub/respondentCaseOverviewPage.ts';
+import { test } from '../../fixtures/et.test.fixture.ts';
+import {
+  CaseDetailsValues,
+  CaseEventApi,
+  CaseTypeLocation,
+  CitizenClaimantFactory, CitizenHubLoginPage, CitizenHubPage,
+  ET3LoginPage, Helpers, RespondentCaseOverviewPage,
+  users
+} from "@et-shared-test-library/core";
 
 let caseId: string;
 let caseNumber: string;
@@ -37,7 +35,7 @@ test.describe.serial('Notification Responses Work Allocation', () => {
     notificationTitle2 = await caseWorkerNotificationPage.sendNotification('ECC', 'Yes', 'Both parties', '2');
 
     const respondentBrowserPage = await browserUtils.openNewBrowserContext(users.etRespondent.sessionFile);
-    const et3LoginPage = new Et3LoginPage(respondentBrowserPage);
+    const et3LoginPage = new ET3LoginPage(respondentBrowserPage);
     const respondentCaseOverviewPage = new RespondentCaseOverviewPage(respondentBrowserPage);
 
     await et3LoginPage.processRespondentLogin(users.etRespondent);

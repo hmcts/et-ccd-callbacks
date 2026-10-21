@@ -11,18 +11,23 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -37,19 +42,21 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_YOURSELF;
 
 @ExtendWith(SpringExtension.class)
-class NocRemoveRepresentationServiceTest {
+class NocRemoveClaimantRepresentationServiceTest {
 
     @Mock
     private NocCcdService nocCcdService;
     @Mock
-    private UserIdamService userIdamService;
+    private UserService userService;
 
     @InjectMocks
-    private NocRemoveRepresentationService nocRemoveRepresentationService;
+    private NocRemoveClaimantRepresentationService nocRemoveClaimantRepresentationService;
 
     private static final String CLAIMANT_REPRESENTATIVE_EMAIL_VALID = "rep.c@test.com";
     private static final String CLAIMANT_REPRESENTATIVE_EMAIL_INVALID = "rep.r@test.com";
     private static final String CLAIMANT_REPRESENTATIVE_ID = "claimantRepresentativeId";
+    private static final String CLAIMANT_REPRESENTATIVE_IDAM_ID_1 = "claimantRepresentativeIdamId1";
+    private static final String CLAIMANT_REPRESENTATIVE_IDAM_ID_2 = "claimantRepresentativeIdamId2";
     private static final String CASE_ID = "1775651960650043";
     private static final String DUMMY_USER_TOKEN = "dummyUserToken";
     private static final String ORGANISATION_ID = "organisationId";
@@ -78,20 +85,51 @@ class NocRemoveRepresentationServiceTest {
     void theSetNocRemoveOption() {
         // when case details are not valid should throw generic service exception
         GenericServiceException gse = assertThrows(GenericServiceException.class,
-                () -> nocRemoveRepresentationService.setNocRemoveOption(DUMMY_USER_TOKEN, null));
+                () -> nocRemoveClaimantRepresentationService.setNocRemoveOption(DUMMY_USER_TOKEN, null));
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_INVALID_CASE_DETAILS);
         // when representative is lead representative, should set nocRemoveOption to organisation
         UserDetails userDetails = new UserDetails();
         userDetails.setEmail(CLAIMANT_REPRESENTATIVE_EMAIL_VALID);
         userDetails.setUid(UUID.randomUUID().toString());
-        when(userIdamService.getUserDetails(DUMMY_USER_TOKEN)).thenReturn(userDetails);
-        nocRemoveRepresentationService.setNocRemoveOption(DUMMY_USER_TOKEN, caseDetails);
+        when(userService.getValidatedUserDetails(DUMMY_USER_TOKEN, CASE_ID)).thenReturn(userDetails);
+        nocRemoveClaimantRepresentationService.setNocRemoveOption(DUMMY_USER_TOKEN, caseDetails);
         assertThat(caseDetails.getCaseData().getNocRemoveOption()).isEqualTo(NOC_REMOVE_OPTION_ORGANISATION);
         // when representative is not lead representative, should set nocRemoveOption to yourself
         userDetails.setEmail(CLAIMANT_REPRESENTATIVE_EMAIL_INVALID);
-        when(userIdamService.getUserDetails(DUMMY_USER_TOKEN)).thenReturn(userDetails);
-        nocRemoveRepresentationService.setNocRemoveOption(DUMMY_USER_TOKEN, caseDetails);
+        when(userService.getValidatedUserDetails(DUMMY_USER_TOKEN, CASE_ID)).thenReturn(userDetails);
+        nocRemoveClaimantRepresentationService.setNocRemoveOption(DUMMY_USER_TOKEN, caseDetails);
         assertThat(caseDetails.getCaseData().getNocRemoveOption()).isEqualTo(NOC_REMOVE_OPTION_YOURSELF);
+    }
+
+    @Test
+    void theFindOtherClaimantRepresentative() {
+        // when no claimant representative found should return null
+        when(nocCcdService.findCaseUserAssignmentsByCaseIdAndRole(caseDetails.getCaseId(),
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(List.of());
+        UserDetails userDetails1 = new UserDetails();
+        userDetails1.setUid(CLAIMANT_REPRESENTATIVE_IDAM_ID_1);
+        assertThat(nocRemoveClaimantRepresentationService.findOtherClaimantRepresentative(caseDetails, userDetails1))
+                .isNull();
+        // when no other claimant representative found should return null
+        CaseUserAssignment caseUserAssignment1 = CaseUserAssignment.builder().userId(CLAIMANT_REPRESENTATIVE_IDAM_ID_1)
+                .build();
+        List<CaseUserAssignment> caseUserAssignments = new ArrayList<>(Collections.singletonList(caseUserAssignment1));
+        when(nocCcdService.findCaseUserAssignmentsByCaseIdAndRole(caseDetails.getCaseId(),
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(caseUserAssignments);
+        assertThat(nocRemoveClaimantRepresentationService.findOtherClaimantRepresentative(caseDetails, userDetails1))
+                .isNull();
+        // when other claimant representative found should return user details of the other representative
+        CaseUserAssignment caseUserAssignment2 = CaseUserAssignment.builder().userId(CLAIMANT_REPRESENTATIVE_IDAM_ID_2)
+                .build();
+        caseUserAssignments = new ArrayList<>(Arrays.asList(caseUserAssignment1,
+                caseUserAssignment2));
+        when(nocCcdService.findCaseUserAssignmentsByCaseIdAndRole(caseDetails.getCaseId(),
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(caseUserAssignments);
+        UserDetails userDetails2 = new UserDetails();
+        userDetails2.setUid(CLAIMANT_REPRESENTATIVE_IDAM_ID_2);
+        when(userService.findUserDetailsByIdamId(CLAIMANT_REPRESENTATIVE_IDAM_ID_2)).thenReturn(userDetails2);
+        assertThat(nocRemoveClaimantRepresentationService.findOtherClaimantRepresentative(caseDetails, userDetails1))
+                .isEqualTo(userDetails2);
     }
 
     @Test
@@ -102,7 +140,7 @@ class NocRemoveRepresentationServiceTest {
         tmpCaseDetails.setCaseData(new CaseData());
         tmpCaseDetails.setCaseId(CASE_ID);
         GenericServiceException gse = assertThrows(GenericServiceException.class,
-                () -> nocRemoveRepresentationService.revokeClaimantLegalRep(DUMMY_USER_TOKEN, tmpCaseDetails));
+                () -> nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(DUMMY_USER_TOKEN, tmpCaseDetails));
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_REPRESENTATIVE_NOT_FOUND);
         // when claimant representative exists, but noc remove option is not organisation should revoke only
         // representation
@@ -114,7 +152,7 @@ class NocRemoveRepresentationServiceTest {
         tmpCaseDetails.getCaseData().setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder()
                 .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
                 .organisation(Organisation.builder().organisationID(ORGANISATION_ID).build()).build());
-        nocRemoveRepresentationService.revokeClaimantLegalRep(DUMMY_USER_TOKEN, tmpCaseDetails);
+        nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(DUMMY_USER_TOKEN, tmpCaseDetails);
         verify(nocCcdService, times(LoggerTestUtils.INTEGER_ONE))
                 .revokeClaimantRepresentation(DUMMY_USER_TOKEN, tmpCaseDetails);
         assertThat(tmpCaseDetails.getCaseData().getRepresentativeClaimantType()).isEqualTo(RepresentedTypeC.builder()
@@ -128,7 +166,7 @@ class NocRemoveRepresentationServiceTest {
         // when claimant representative exists, and noc remove option is organisation should revoke representation and
         // mark claimant as unrepresented
         tmpCaseDetails.getCaseData().setNocRemoveOption(NOC_REMOVE_OPTION_ORGANISATION);
-        nocRemoveRepresentationService.revokeClaimantLegalRep(DUMMY_USER_TOKEN, tmpCaseDetails);
+        nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(DUMMY_USER_TOKEN, tmpCaseDetails);
         verify(nocCcdService, times(LoggerTestUtils.INTEGER_TWO))
                 .revokeClaimantRepresentation(DUMMY_USER_TOKEN, tmpCaseDetails);
         assertThat(tmpCaseDetails.getCaseData().getRepresentativeClaimantType()).isNull();

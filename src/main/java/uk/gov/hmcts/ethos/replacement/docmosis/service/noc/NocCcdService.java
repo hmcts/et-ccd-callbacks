@@ -291,7 +291,7 @@ public class NocCcdService {
             String exceptionMessage = String.format(EXCEPTION_REPRESENTATIVE_NOT_FOUND_BY_TOKEN,
                     caseDetails.getCaseId());
             throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
-                    caseDetails.getCaseId(), NocRemoveRepresentationService.class.getSimpleName(), methodName);
+                    caseDetails.getCaseId(), NocRemoveClaimantRepresentationService.class.getSimpleName(), methodName);
         }
         List<CaseUserAssignment> caseUserAssignments = findCaseUserAssignmentsByCaseIdIdamIdAndRole(
                 caseDetails.getCaseId(), userDetails.getUid(),

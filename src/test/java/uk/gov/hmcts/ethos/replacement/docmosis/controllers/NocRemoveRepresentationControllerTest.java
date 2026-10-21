@@ -9,7 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveRepresentationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveClaimantRepresentationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -35,7 +35,7 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
     private CCDRequest ccdRequest;
 
     @MockitoBean
-    private NocRemoveRepresentationService nocRemoveRepresentationService;
+    private NocRemoveClaimantRepresentationService nocRemoveClaimantRepresentationService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -55,7 +55,8 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
     @SneakyThrows
     void aboutToSubmitClaimant_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(nocRemoveRepresentationService).setNocRemoveOption(AUTH_TOKEN, ccdRequest.getCaseDetails());
+        doNothing().when(nocRemoveClaimantRepresentationService).setNocRemoveOption(AUTH_TOKEN,
+                ccdRequest.getCaseDetails());
         mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -70,7 +71,8 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
     @SneakyThrows
     void aboutToSubmitClaimant_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        doNothing().when(nocRemoveRepresentationService).setNocRemoveOption(AUTH_TOKEN, ccdRequest.getCaseDetails());
+        doNothing().when(nocRemoveClaimantRepresentationService).setNocRemoveOption(AUTH_TOKEN,
+                ccdRequest.getCaseDetails());
         mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -82,7 +84,8 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
     @SneakyThrows
     void aboutToSubmitClaimant_badRequest() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(nocRemoveRepresentationService).setNocRemoveOption(AUTH_TOKEN, ccdRequest.getCaseDetails());
+        doNothing().when(nocRemoveClaimantRepresentationService).setNocRemoveOption(AUTH_TOKEN,
+                ccdRequest.getCaseDetails());
         mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_SUBMIT)
                         .content("garbage content")
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -94,7 +97,8 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
     @SneakyThrows
     void aboutToStartClaimant_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(nocRemoveRepresentationService).setNocRemoveOption(AUTH_TOKEN, ccdRequest.getCaseDetails());
+        doNothing().when(nocRemoveClaimantRepresentationService).setNocRemoveOption(AUTH_TOKEN,
+                ccdRequest.getCaseDetails());
         mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_START)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -109,7 +113,8 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
     @SneakyThrows
     void aboutToStartClaimant_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        doNothing().when(nocRemoveRepresentationService).setNocRemoveOption(AUTH_TOKEN, ccdRequest.getCaseDetails());
+        doNothing().when(nocRemoveClaimantRepresentationService).setNocRemoveOption(AUTH_TOKEN,
+                ccdRequest.getCaseDetails());
         mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_START)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -121,7 +126,8 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
     @SneakyThrows
     void aboutToStartClaimant_badRequest() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(nocRemoveRepresentationService).setNocRemoveOption(AUTH_TOKEN, ccdRequest.getCaseDetails());
+        doNothing().when(nocRemoveClaimantRepresentationService).setNocRemoveOption(AUTH_TOKEN,
+                ccdRequest.getCaseDetails());
         mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_START)
                         .content("garbage content")
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

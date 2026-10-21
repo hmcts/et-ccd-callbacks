@@ -8,19 +8,24 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 class UserServiceTest {
 
-    private UserService userService;
     @MockitoBean
     private UserIdamService userIdamService;
+    @MockitoBean
+    private AuthTokenGenerator authTokenGenerator;
+
+    private UserService userService;
 
     private static final String USER_TOKEN = "dummy user token";
+    private static final String AUTH_TOKEN = "dummy auth token";
     private static final String SUBMISSION_REFERENCE = "dummy submission reference";
     private static final String USER_ID = "dummy user id";
     private static final String EXPECTED_EXCEPTION_USER_NOT_FOUND = "User not found";
@@ -29,7 +34,7 @@ class UserServiceTest {
     @BeforeEach
     @SneakyThrows
     void setUp() {
-        userService = new UserService(userIdamService);
+        userService = new UserService(authTokenGenerator, userIdamService);
     }
 
     @Test
@@ -50,5 +55,21 @@ class UserServiceTest {
         userDetails.setUid(USER_ID);
         assertThat(userService.getValidatedUserDetails(USER_TOKEN, SUBMISSION_REFERENCE))
                 .isEqualTo(userDetails);
+    }
+
+    @Test
+    void theGetUserDetailsByIdamId() {
+        when(authTokenGenerator.generate()).thenReturn(AUTH_TOKEN);
+        // when user idam service returns empty user details should return null
+        when(userIdamService.getUserDetailsById(AUTH_TOKEN, USER_ID)).thenReturn(null);
+        assertThat(userService.findUserDetailsByIdamId(USER_ID)).isNull();
+        // when user idam service returns user details without user id should return null
+        UserDetails userDetails = new UserDetails();
+        when(userIdamService.getUserDetailsById(AUTH_TOKEN, USER_ID)).thenReturn(userDetails);
+        assertThat(userService.findUserDetailsByIdamId(USER_ID)).isNull();
+        // when user idam service returns correct user details should return the same user details
+        userDetails.setUid(USER_ID);
+        when(userIdamService.getUserDetailsById(AUTH_TOKEN, USER_ID)).thenReturn(userDetails);
+        assertThat(userService.findUserDetailsByIdamId(USER_ID)).isEqualTo(userDetails);
     }
 }

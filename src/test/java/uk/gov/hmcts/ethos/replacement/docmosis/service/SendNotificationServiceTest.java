@@ -60,6 +60,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_RESPONSE_REQUIRED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService.CASE_MANAGEMENT_ORDERS_REQUESTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService.EMPLOYER_CONTRACT_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService.NOTICE_OF_EMPLOYER_CONTRACT_CLAIM;
@@ -574,6 +576,193 @@ class SendNotificationServiceTest {
     }
 
     @Test
+    void sendNotifyEmails_respondentOnly_unrepresentedWithPortalAccess() {
+        givenUnrepresentedRespondentWithPortalAccess();
+        caseData.setSendNotificationNotify(RESPONDENT_ONLY);
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(defendantAssignment()));
+
+        sendNotificationService.sendNotifyEmails(caseDetails);
+
+        verify(emailService, times(1)).sendEmail(
+                eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID),
+                eq("respondent@email.com"),
+                personalisationCaptor.capture());
+        assertEquals(syrNotificationLink(), personalisationCaptor.getValue().get("environmentUrl"));
+        verify(emailService, never()).sendEmail(eq(CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID), any(), any());
+    }
+
+    @Test
+    void sendNotifyEmails_respondentOnly_unrepresentedWelshPreferenceUsesWelshLink() {
+        givenUnrepresentedRespondentWithPortalAccess();
+        caseData.setSendNotificationNotify(RESPONDENT_ONLY);
+        caseData.getRespondentCollection().getFirst().getValue().setEt3ResponseLanguagePreference(WELSH_LANGUAGE);
+        when(featureToggleService.isWelshEnabled()).thenReturn(true);
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(defendantAssignment()));
+
+        sendNotificationService.sendNotifyEmails(caseDetails);
+
+        verify(emailService, times(1)).sendEmail(
+                eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID),
+                eq("respondent@email.com"),
+                personalisationCaptor.capture());
+        assertEquals(syrNotificationLink() + WELSH_LANGUAGE_PARAM,
+                personalisationCaptor.getValue().get("environmentUrl"));
+    }
+
+    @Test
+    void sendNotifyEmails_respondentOnly_welshPreferenceIgnoredWhenWelshDisabled() {
+        givenUnrepresentedRespondentWithPortalAccess();
+        caseData.setSendNotificationNotify(RESPONDENT_ONLY);
+        caseData.getRespondentCollection().getFirst().getValue().setEt3ResponseLanguagePreference(WELSH_LANGUAGE);
+        when(featureToggleService.isWelshEnabled()).thenReturn(false);
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(defendantAssignment()));
+
+        sendNotificationService.sendNotifyEmails(caseDetails);
+
+        verify(emailService, times(1)).sendEmail(
+                eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID),
+                eq("respondent@email.com"),
+                personalisationCaptor.capture());
+        assertEquals(syrNotificationLink(), personalisationCaptor.getValue().get("environmentUrl"));
+    }
+
+    @Test
+    void sendNotifyEmails_bothParties_unrepresentedWithPortalAccess() {
+        givenUnrepresentedRespondentWithPortalAccess();
+        caseData.setSendNotificationNotify(BOTH_PARTIES);
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(defendantAssignment()));
+
+        sendNotificationService.sendNotifyEmails(caseDetails);
+
+        verify(emailService, times(1)).sendEmail(
+                eq(CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID),
+                eq("claimant@email.com"),
+                personalisationCaptor.capture());
+        verify(emailService, times(1)).sendEmail(
+                eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID),
+                eq("respondent@email.com"),
+                personalisationCaptor.capture());
+        assertEquals("citizenUrl1234", personalisationCaptor.getAllValues().get(0).get("environmentUrl"));
+        assertEquals(syrNotificationLink(), personalisationCaptor.getAllValues().get(1).get("environmentUrl"));
+    }
+
+    @Test
+    void sendNotifyEmails_bothParties_unrepresentedUsesPortalEmailWithoutDefendantRole() {
+        givenUnrepresentedRespondentWithPortalAccess();
+        caseData.setSendNotificationNotify(BOTH_PARTIES);
+        caseData.getRespondentCollection().getFirst().getValue().setRespondentEmail(null);
+        caseData.getRespondentCollection().getFirst().getValue()
+                .setResponseRespondentEmail("portal@email.com");
+        CaseUserAssignment claimantAssignment = new CaseUserAssignment();
+        claimantAssignment.setCaseId("1234");
+        claimantAssignment.setUserId("claimant-user-id");
+        claimantAssignment.setCaseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(claimantAssignment));
+
+        sendNotificationService.sendNotifyEmails(caseDetails);
+
+        verify(emailService, times(1)).sendEmail(
+                eq(CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID),
+                eq("claimant@email.com"),
+                any());
+        verify(emailService, times(1)).sendEmail(
+                eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID),
+                eq("portal@email.com"),
+                personalisationCaptor.capture());
+        assertEquals(syrNotificationLink(), personalisationCaptor.getValue().get("environmentUrl"));
+    }
+
+    @Test
+    void sendNotifyEmails_respondentOnly_unrepresentedWithoutPortalAccess() {
+        givenUnrepresentedRespondentWithPortalAccess();
+        caseData.getRespondentCollection().getFirst().getValue().setIdamId(null);
+        caseData.setSendNotificationNotify(RESPONDENT_ONLY);
+        CaseUserAssignment claimantAssignment = new CaseUserAssignment();
+        claimantAssignment.setCaseId("1234");
+        claimantAssignment.setCaseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(claimantAssignment));
+
+        sendNotificationService.sendNotifyEmails(caseDetails);
+
+        verify(emailService, never()).sendEmail(anyString(), anyString(), anyMap());
+    }
+
+    @Test
+    void sendNotifyEmails_bothParties_unrepresentedWithoutPortalAccess_stillEmailsClaimant() {
+        givenUnrepresentedRespondentWithPortalAccess();
+        caseData.getRespondentCollection().getFirst().getValue().setIdamId(null);
+        caseData.setSendNotificationNotify(BOTH_PARTIES);
+        CaseUserAssignment claimantAssignment = new CaseUserAssignment();
+        claimantAssignment.setCaseId("1234");
+        claimantAssignment.setCaseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(claimantAssignment));
+
+        sendNotificationService.sendNotifyEmails(caseDetails);
+
+        verify(emailService, times(1)).sendEmail(
+                eq(CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID),
+                eq("claimant@email.com"),
+                personalisationCaptor.capture());
+        assertEquals("citizenUrl1234", personalisationCaptor.getValue().get("environmentUrl"));
+        verify(emailService, never()).sendEmail(
+                eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID), any(), any());
+    }
+
+    @Test
+    void sendNotifyEmails_respondentOnly_representedRespondentIsNotEmailed() {
+        caseData.setSendNotificationNotify(RESPONDENT_ONLY);
+        caseData.getRespondentCollection().getFirst().getValue().setIdamId("defendant-user-id");
+        caseData.getRespondentCollection().getFirst().getValue()
+                .setResponseRespondentEmail("portal@email.com");
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(defendantAssignment()));
+
+        sendNotificationService.sendNotifyEmails(caseDetails);
+
+        verify(emailService, times(1)).sendEmail(
+                eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID),
+                eq("respondentRep@email.com"),
+                personalisationCaptor.capture());
+        assertEquals("exuiUrl1234", personalisationCaptor.getValue().get("environmentUrl"));
+        verify(emailService, never()).sendEmail(
+                eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID),
+                eq("respondent@email.com"),
+                any());
+        verify(emailService, never()).sendEmail(
+                eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID),
+                eq("portal@email.com"),
+                any());
+    }
+
+    @Test
+    void sendNotifyEmails_claimantOnly_doesNotEmailUnrepresentedRespondent() {
+        givenUnrepresentedRespondentWithPortalAccess();
+        caseData.setSendNotificationNotify(CLAIMANT_ONLY);
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(defendantAssignment()));
+
+        sendNotificationService.sendNotifyEmails(caseDetails);
+
+        verify(emailService, times(1)).sendEmail(
+                eq(CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID),
+                eq("claimant@email.com"),
+                personalisationCaptor.capture());
+        assertEquals("citizenUrl1234", personalisationCaptor.getValue().get("environmentUrl"));
+        verify(emailService, never()).sendEmail(
+                eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID), any(), any());
+    }
+
+    @Test
+    void sendNotifyEmails_respondentOnly_unrepresentedWithPortalAccessButNoEmail() {
+        givenUnrepresentedRespondentWithPortalAccess();
+        caseData.setSendNotificationNotify(RESPONDENT_ONLY);
+        caseData.getRespondentCollection().getFirst().getValue().setRespondentEmail(null);
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(defendantAssignment()));
+
+        sendNotificationService.sendNotifyEmails(caseDetails);
+
+        verify(emailService, never()).sendEmail(anyString(), anyString(), anyMap());
+    }
+
+    @Test
     void sendNotifyEmails_claimantOnly_hearing() {
         caseData.setSendNotificationNotify(CLAIMANT_ONLY);
         caseData.setSendNotificationSubject(List.of("Hearing"));
@@ -918,5 +1107,32 @@ class SendNotificationServiceTest {
         List<String> errors = sendNotificationService.validateInput(caseData);
         assertThat(errors).hasSize(1);
         assertThat(errors.getFirst()).isEqualTo(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
+    }
+
+    private void givenUnrepresentedRespondentWithPortalAccess() {
+        caseDetails = CaseDataBuilder.builder().withEthosCaseReference("1234")
+                .withClaimantType("claimant@email.com")
+                .withRespondent("Name", YES, "2020-01-02", "respondent@email.com", false)
+                .buildAsCaseDetails(SCOTLAND_CASE_TYPE_ID);
+        caseDetails.setCaseId("1234");
+        caseData = caseDetails.getCaseData();
+        caseData.setClaimant("claimant");
+        caseData.setSendNotificationTitle("title");
+        caseData.setSendNotificationSubject(List.of("Hearing"));
+        caseData.setEt1OnlineSubmission("Yes");
+        caseData.setHubLinksStatuses(new HubLinksStatuses());
+        caseData.getRespondentCollection().getFirst().setId("respondent-1");
+        caseData.getRespondentCollection().getFirst().getValue().setIdamId("defendant-user-id");
+    }
+
+    private CaseUserAssignment defendantAssignment() {
+        return CaseUserAssignment.builder()
+                .userId("defendant-user-id")
+                .caseRole(CASE_USER_ROLE_DEFENDANT)
+                .build();
+    }
+
+    private String syrNotificationLink() {
+        return "syrUrl/case-details/1234/respondent-1";
     }
 }

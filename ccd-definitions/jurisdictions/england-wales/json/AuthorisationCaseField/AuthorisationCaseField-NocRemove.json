@@ -37,6 +37,30 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocCaseSharingStatus",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRepresentativeType",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
     "CaseFieldID": "nocRemoveRepRemoveLabelSelf",
     "AccessControl": [
       {

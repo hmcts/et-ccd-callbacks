@@ -11,6 +11,10 @@ public final class NOCConstants {
     public static final String NOC_TYPE_ADDITION = "Addition";
     public static final String NOC_REMOVE_OPTION_ORGANISATION = "your organisation";
     public static final String NOC_REMOVE_OPTION_YOURSELF = "yourself";
+    public static final String NOC_REPRESENTATIVE_TYPE_LEAD = "leadRepresentative";
+    public static final String NOC_REPRESENTATIVE_TYPE_SHARED = "sharedRepresentative";
+    public static final String NOC_CASE_SHARING_STATUS_SHARED = "shared";
+    public static final String NOC_CASE_SHARING_STATUS_NOT_SHARED = "notShared";
 
     public static final String EXCEPTION_RESPONDENT_NOT_FOUND = "Respondent not found for case ID %s.";
     public static final String EXCEPTION_RESPONDENT_ID_NOT_FOUND =

@@ -49,7 +49,7 @@ public class NocRemoveRepresentationController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         List<String> errors = new ArrayList<>();
         try {
-            nocRemoveClaimantRepresentationService.setNocRemoveOption(userToken, caseDetails);
+            nocRemoveClaimantRepresentationService.populateNocRemovalDetails(userToken, caseDetails);
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
         }
@@ -72,7 +72,7 @@ public class NocRemoveRepresentationController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         List<String> errors = new ArrayList<>();
         try {
-            nocRemoveClaimantRepresentationService.setNocRemoveOption(userToken, caseDetails);
+            nocRemoveClaimantRepresentationService.populateNocRemovalDetails(userToken, caseDetails);
             nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(userToken, caseDetails);
             caseDetails.getCaseData().setNocRemoveOption(null);
         } catch (GenericServiceException gse) {

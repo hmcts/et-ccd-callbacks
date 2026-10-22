@@ -1979,4 +1979,8 @@ public class CaseData extends Et1CaseData {
     //noc remove option for representative removal
     @JsonProperty("nocRemoveOption")
     private String nocRemoveOption;
+    @JsonProperty("nocCaseSharingStatus")
+    private String nocCaseSharingStatus;
+    @JsonProperty("nocRepresentativeType")
+    private String nocRepresentativeType;
 }

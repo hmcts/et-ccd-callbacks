@@ -1,6 +1,30 @@
 [
   {
     "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRemoveOption",
+    "Label": "Who do you wish to remove from this case?",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocCaseSharingStatus",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRepresentativeType",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
     "ID": "nocRemoveRepLandingPageLeadLabel",
     "Label": "This will remove you and your organisation from the case. You will no longer represent the client.",
     "FieldType": "Label",
@@ -12,14 +36,6 @@
     "ID": "nocRemoveRepLandingPageSharedLabel",
     "Label": "This will remove you from the case. You will no longer represent the client.",
     "FieldType": "Label",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "nocRemoveOption",
-    "Label": "Who do you wish to remove from this case?",
-    "FieldType": "Text",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },

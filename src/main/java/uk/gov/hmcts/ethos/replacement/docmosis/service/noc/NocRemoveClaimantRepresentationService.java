@@ -20,8 +20,12 @@ import java.util.List;
 
 import static uk.gov.hmcts.et.common.model.hmc.ValidationError.INVALID_CASE_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_CASE_SHARING_STATUS_NOT_SHARED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_CASE_SHARING_STATUS_SHARED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_YOURSELF;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_LEAD;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_SHARED;
 
 @Slf4j
 @Service
@@ -32,21 +36,29 @@ public class NocRemoveClaimantRepresentationService {
     private final UserService userService;
 
     /**
-     * Sets the NOC removal option in the supplied case details based on whether
-     * the authenticated user is the lead claimant representative.
+     * Populates the NOC representative type, case-sharing status, and removal option
+     * in the supplied case details for the authenticated user.
      *
-     * <p>The option is set to {@code NOC_REMOVE_OPTION_ORGANISATION} for the lead
-     * claimant representative, or {@code NOC_REMOVE_OPTION_YOURSELF} otherwise.
-     * Case details are validated before retrieving the user details or updating
-     * the option.
+     * <p>Validates the case details and retrieves validated user details before
+     * updating the case data. Sets the representative type to
+     * {@code NOC_REPRESENTATIVE_TYPE_LEAD} for the lead claimant representative,
+     * or {@code NOC_REPRESENTATIVE_TYPE_SHARED} otherwise.
      *
-     * @param userToken the authentication token used to retrieve the current user's details
-     * @param caseDetails the case details containing the claimant representative
-     *                    information and the NOC removal option to update
+     * <p>Sets the case-sharing status to {@code NOC_CASE_SHARING_STATUS_SHARED}
+     * if a shared representative exists, or {@code NOC_CASE_SHARING_STATUS_NOT_SHARED}
+     * otherwise.
+     *
+     * <p>Sets the removal option to {@code NOC_REMOVE_OPTION_YOURSELF} for non-lead
+     * representatives, or clears it to {@code null} for the lead representative.
+     * This method modifies the supplied case data.
+     *
+     * @param userToken the authentication token used to retrieve and validate
+     *                  the current user's details
+     * @param caseDetails the case details whose NOC removal fields are updated
      * @throws GenericServiceException if the supplied case details are invalid
      */
-    public void setNocRemoveOption(String userToken, CaseDetails caseDetails) throws GenericServiceException {
-        final String methodName = "setNocRemoveOption";
+    public void populateNocRemovalDetails(String userToken, CaseDetails caseDetails) throws GenericServiceException {
+        final String methodName = "populateNocRemovalDetails";
         if (!CaseDataUtils.areCaseDetailsValid(caseDetails)) {
             throw new GenericServiceException(INVALID_CASE_DETAILS,
                     new Exception(INVALID_CASE_DETAILS),
@@ -59,8 +71,12 @@ public class NocRemoveClaimantRepresentationService {
         UserDetails userDetails = userService.getValidatedUserDetails(userToken, caseDetails.getCaseId());
         boolean isLeadRepresentative = UserUtils.isLeadClaimantRepresentative(userDetails,
                 caseDetails.getCaseData().getRepresentativeClaimantType());
-        caseDetails.getCaseData().setNocRemoveOption(
-                isLeadRepresentative ? NOC_REMOVE_OPTION_ORGANISATION : NOC_REMOVE_OPTION_YOURSELF);
+        caseDetails.getCaseData().setNocRepresentativeType(isLeadRepresentative
+                ? NOC_REPRESENTATIVE_TYPE_LEAD : NOC_REPRESENTATIVE_TYPE_SHARED);
+        boolean hasSharedRepresentative = hasSharedRepresentative(caseDetails, userDetails);
+        caseDetails.getCaseData().setNocCaseSharingStatus(hasSharedRepresentative
+                ? NOC_CASE_SHARING_STATUS_SHARED : NOC_CASE_SHARING_STATUS_NOT_SHARED);
+        caseDetails.getCaseData().setNocRemoveOption(!isLeadRepresentative ? NOC_REMOVE_OPTION_YOURSELF : null);
     }
 
     /**
@@ -91,6 +107,10 @@ public class NocRemoveClaimantRepresentationService {
             return null;
         }
         return userService.findUserDetailsByIdamId(caseUserAssignment.getUserId());
+    }
+
+    public boolean hasSharedRepresentative(CaseDetails caseDetails, UserDetails userDetails) {
+        return findOtherClaimantRepresentative(caseDetails, userDetails) != null;
     }
 
     /**

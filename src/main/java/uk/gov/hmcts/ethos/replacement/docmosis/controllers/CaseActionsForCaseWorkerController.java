@@ -108,8 +108,8 @@ public class CaseActionsForCaseWorkerController {
     private static final List<String> NEW_FLAG_REVIEW_SUPPORT_TASK_EVENTS =
             List.of(EVENT_REQUEST_SUPPORT, EVENT_CREATE_FLAG);
     public static final String CREATE_ECM_CASE = "createEcmCase";
-    private static final List<String> SUBMISSION_EVENTS = List.of(EVENT_SUBMIT_CASE_DRAFT, "initiateCase", "submitEt1Draft",
-            CREATE_ECM_CASE);
+    private static final List<String> SUBMISSION_EVENTS = List.of(EVENT_SUBMIT_CASE_DRAFT, "initiateCase",
+            "submitEt1Draft", CREATE_ECM_CASE);
 
     private final CaseCloseValidator caseCloseValidator;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;

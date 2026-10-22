@@ -73,6 +73,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hmcts/et-shared-test-library@workspace:."
   dependencies:
+    "@playwright/test": "npm:^1.64.0"
     "@types/fs-extra": "npm:^11"
     "@types/lodash": "npm:^4.17.24"
     "@types/node": "npm:^25.2.0"
@@ -89,9 +90,9 @@ __metadata:
     typescript-logging-log4ts-style: "npm:^2.2.0"
     uuid: "npm:^14.0.0"
   peerDependencies:
-    "@hmcts/playwright-common": ^1.1.5
-    "@playwright/test": ^1.61.0
-    playwright-core: ^1.61.0
+    "@hmcts/playwright-common": ^1.1.7
+    "@playwright/test": ^1.64.0
+    playwright-core: ^1.64.0
   languageName: unknown
   linkType: soft
 
@@ -133,6 +134,17 @@ __metadata:
   version: 0.4.3
   resolution: "@humanwhocodes/retry@npm:0.4.3"
   checksum: 10/0b32cfd362bea7a30fbf80bb38dcaf77fee9c2cae477ee80b460871d03590110ac9c77d654f04ec5beaf71b6f6a89851bdf6c1e34ccdf2f686bd86fcd97d9e61
+  languageName: node
+  linkType: hard
+
+"@playwright/test@npm:^1.64.0":
+  version: 1.64.1
+  resolution: "@playwright/test@npm:1.64.1"
+  dependencies:
+    playwright: "npm:1.64.1"
+  bin:
+    playwright: cli.js
+  checksum: 10/589855c5fbc9ebbfb072e77e4b24a646f302ca9823d56ac3ff08a8e4ecf7ee13a390fe19236f4f9737e9a736194324f244f90c409a10edeb480c5f99ce77d10e
   languageName: node
   linkType: hard
 
@@ -931,6 +943,26 @@ __metadata:
   version: 3.1.1
   resolution: "path-key@npm:3.1.1"
   checksum: 10/55cd7a9dd4b343412a8386a743f9c746ef196e57c823d90ca3ab917f90ab9f13dd0ded27252ba49dbdfcab2b091d998bc446f6220cd3cea65db407502a740020
+  languageName: node
+  linkType: hard
+
+"playwright-core@npm:1.64.1":
+  version: 1.64.1
+  resolution: "playwright-core@npm:1.64.1"
+  bin:
+    playwright-core: cli.js
+  checksum: 10/4a173590bc784d8d5bfe2cace53ccc31316dac11475660b59cea24a2e833875d87183d41a957a20355301ac2b339a17940faaf0b42217156fa9c0c3cfdd4633c
+  languageName: node
+  linkType: hard
+
+"playwright@npm:1.64.1":
+  version: 1.64.1
+  resolution: "playwright@npm:1.64.1"
+  dependencies:
+    playwright-core: "npm:1.64.1"
+  bin:
+    playwright: cli.js
+  checksum: 10/1096fa91e433f84c8677433a26052aa4f269bf0811aa793fe667d7053feb1c2852e9f10f9f0cced77fa2678f8580ed47192f29adbc9c027efa5ba87b38e23e50
   languageName: node
   linkType: hard
 

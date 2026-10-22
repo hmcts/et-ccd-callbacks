@@ -1,2 +1,2 @@
-import { globalTeardown as sharedGlobalTeardown } from '@et-shared-test-library/core';
+import { globalTeardown as sharedGlobalTeardown } from '@hmcts/et-shared-test-library';
 export default sharedGlobalTeardown;

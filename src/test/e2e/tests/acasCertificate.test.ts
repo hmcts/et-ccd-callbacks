@@ -1,5 +1,5 @@
-import userDetailsData from '@et-shared-test-library/core/resources/payload/user-details.json';
-import acasCertData from '@et-shared-test-library/core/resources/payload/acas-content.json';
+import userDetailsData from '@hmcts/et-shared-test-library/resources/payload/user-details.json';
+import acasCertData from '@hmcts/et-shared-test-library/resources/payload/acas-content.json';
 import {
   CaseTypeLocation,
   config,
@@ -7,7 +7,7 @@ import {
   test,
   users,
   vetAndAcceptCitizenCase
-} from "@et-shared-test-library/core";
+} from "@hmcts/et-shared-test-library";
 
 test.describe.serial('Add & Search ACAS certificate tests',
   () => {

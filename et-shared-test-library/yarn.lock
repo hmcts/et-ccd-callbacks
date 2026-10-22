@@ -69,9 +69,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@et-shared-test-library/core@workspace:.":
+"@hmcts/et-shared-test-library@workspace:.":
   version: 0.0.0-use.local
-  resolution: "@et-shared-test-library/core@workspace:."
+  resolution: "@hmcts/et-shared-test-library@workspace:."
   dependencies:
     "@types/fs-extra": "npm:^11"
     "@types/lodash": "npm:^4.17.24"

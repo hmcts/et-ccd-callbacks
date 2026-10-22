@@ -197,27 +197,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@et-shared-test-library/core@portal:./et-shared-test-library::locator=et-ccd-callbacks-e2e-tests%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "@et-shared-test-library/core@portal:./et-shared-test-library::locator=et-ccd-callbacks-e2e-tests%40workspace%3A."
-  dependencies:
-    axios: "npm:1.20.0"
-    dotenv: "npm:^17.2.3"
-    fs-extra: "npm:^11.3.3"
-    lodash: "npm:^4.18.1"
-    proper-lockfile: "npm:^4.1.2"
-    totp-generator: "npm:2.0.0"
-    typescript: "npm:^5.9.3"
-    typescript-logging: "npm:^2.2.0"
-    typescript-logging-log4ts-style: "npm:^2.2.0"
-    uuid: "npm:^14.0.0"
-  peerDependencies:
-    "@hmcts/playwright-common": ^1.1.5
-    "@playwright/test": ^1.61.0
-    playwright-core: ^1.61.0
-  languageName: node
-  linkType: soft
-
 "@formatjs/ecma402-abstract@npm:2.3.6":
   version: 2.3.6
   resolution: "@formatjs/ecma402-abstract@npm:2.3.6"
@@ -268,6 +247,27 @@ __metadata:
   checksum: 10/eb12a7f5367bbecdfafc20d7f005559ce840f420e970f425c5213d35e94e86dfe75bde03464971a26494bf8427d4961269db22ecad2834f2a19d888b5d9cc064
   languageName: node
   linkType: hard
+
+"@hmcts/et-shared-test-library@portal:./et-shared-test-library::locator=et-ccd-callbacks-e2e-tests%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@hmcts/et-shared-test-library@portal:./et-shared-test-library::locator=et-ccd-callbacks-e2e-tests%40workspace%3A."
+  dependencies:
+    axios: "npm:1.20.0"
+    dotenv: "npm:^17.2.3"
+    fs-extra: "npm:^11.3.3"
+    lodash: "npm:^4.18.1"
+    proper-lockfile: "npm:^4.1.2"
+    totp-generator: "npm:2.0.0"
+    typescript: "npm:^5.9.3"
+    typescript-logging: "npm:^2.2.0"
+    typescript-logging-log4ts-style: "npm:^2.2.0"
+    uuid: "npm:^14.0.0"
+  peerDependencies:
+    "@hmcts/playwright-common": ^1.1.5
+    "@playwright/test": ^1.61.0
+    playwright-core: ^1.61.0
+  languageName: node
+  linkType: soft
 
 "@hmcts/playwright-common@npm:^1.1.5":
   version: 1.1.5
@@ -1668,7 +1668,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "et-ccd-callbacks-e2e-tests@workspace:."
   dependencies:
-    "@et-shared-test-library/core": "portal:./et-shared-test-library"
+    "@hmcts/et-shared-test-library": "portal:./et-shared-test-library"
     "@hmcts/playwright-common": "npm:^1.1.5"
     "@playwright/test": "npm:^1.61.0"
     eslint: "npm:^10.12.0"

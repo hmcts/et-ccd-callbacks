@@ -1,6 +1,6 @@
 import { test } from "../fixtures/et.test.fixture.ts";
-import letterPageData from '@et-shared-test-library/core/resources/payload/letter-content.json';
-import {CaseTypeLocation, CaseworkerCaseFactory, DateUtilComponent, Events, users} from "@et-shared-test-library/core";
+import letterPageData from '@hmcts/et-shared-test-library/resources/payload/letter-content.json';
+import {CaseTypeLocation, CaseworkerCaseFactory, DateUtilComponent, Events, users} from "@hmcts/et-shared-test-library";
 
 let caseNumber: string;
 let caseId: string;

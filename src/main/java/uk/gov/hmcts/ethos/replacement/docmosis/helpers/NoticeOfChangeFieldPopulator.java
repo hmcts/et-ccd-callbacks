@@ -42,7 +42,7 @@ public class NoticeOfChangeFieldPopulator {
                                         NoticeOfChangeAnswersPopulationStrategy strategy) {
         Map<String, Object> data = new ConcurrentHashMap<>();
 
-        List<RespondentSumTypeItem> respondentType = caseData.getRespondentCollection();
+        List<RespondentSumTypeItem> respondentType = emptyIfNull(caseData.getRespondentCollection());
 
         int numElements = respondentType.size();
 
@@ -56,7 +56,7 @@ public class NoticeOfChangeFieldPopulator {
                 : Optional.empty();
 
             Optional<RespondentSumTypeItem> respondent = i < numElements
-                ? Optional.of(respondentType.get(i))
+                ? Optional.ofNullable(respondentType.get(i))
                 : Optional.empty();
 
             OrganisationPolicy organisationPolicy = policyConverter.generate(

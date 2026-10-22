@@ -69,6 +69,16 @@ ccd:
   decentralised-runtime:
     cdam-attach:
       enabled: ${CCD_DECENTRALISED_RUNTIME_CDAM_ATTACH_ENABLED:true}
+    retain-and-dispose:
+      # https://github.com/hmcts/dtsse-ccd-config-generator/blob/master/docs/retain-and-dispose.md
+      mode: ${ET_RETAIN_AND_DISPOSE_MODE:off}
+      cron: "${ET_RETAIN_AND_DISPOSE_CRON:0 0 2 * * *}"
+      zone: ${ET_RETAIN_AND_DISPOSE_ZONE:UTC}
+      maximum-candidate-percentage-by-state:
+        Delete: 100
+      system-user:
+        username: ${ET_COS_SYSTEM_USER}
+        password: ${ET_COS_SYSTEM_USER_PASSWORD}
   servicebus:
     destination: ${CCD_SERVICEBUS_DESTINATION:${AZURE_SERVICE_BUS_TOPIC_NAME:ccd-case-events-aat}}
     scheduler-enabled: ${ET_SERVICEBUS_SCHEDULER_ENABLED:false}
@@ -318,6 +328,9 @@ cron:
   reconfigurationLimit: ${CRON_RECONFIGURATION_LIMIT:1000}
   ecmMigrationCaseNoteIds: ${CRON_ECM_MIGRATION_CASE_NOTE_IDS:}
   ecmMigrationCaseNotesDryRun: ${CRON_ECM_MIGRATION_CASE_NOTES_DRY_RUN:true}
+  ecmMigrationNocCaseIds: ${CRON_ECM_MIGRATION_NOC_CASE_IDS:}
+  ecmMigrationNocDryRun: ${CRON_ECM_MIGRATION_NOC_DRY_RUN:false}
+  ecmMigrationNocConcurrency: ${CRON_ECM_MIGRATION_NOC_CONCURRENCY:20}
   clearCaseTtlMaxCasesPerSearch: ${CRON_CLEAR_CASE_TTL_MAX_CASES_PER_SEARCH:500}
   clearCaseTtlMaxCasesToProcess: ${CRON_CLEAR_CASE_TTL_MAX_CASES_TO_PROCESS:1000}
   clearCaseTtlConcurrency: ${CRON_CLEAR_CASE_TTL_CONCURRENCY:15}

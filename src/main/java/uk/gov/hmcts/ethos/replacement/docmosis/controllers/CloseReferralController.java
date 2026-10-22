@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.wa.ReferralTaskClientContextService;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
@@ -27,6 +28,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.cle
 @RestController
 @RequiredArgsConstructor
 public class CloseReferralController {
+    private final ReferralTaskClientContextService referralTaskClientContextService;
+
     private static final String CLOSE_REFERRAL_BODY = "<hr>"
         + "<h3>What happens next</h3>"
         + "<p>We have closed this referral. You can still view it in the "
@@ -84,7 +87,8 @@ public class CloseReferralController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setCloseReferralHearingDetails(ReferralHelper.populateHearingReferralDetails(caseData));
-        return getCallbackRespEntityNoErrors(caseData);
+        return referralTaskClientContextService.applyTaskCompletion(
+            getCallbackRespEntityNoErrors(caseData), caseData);
     }
 
     /**

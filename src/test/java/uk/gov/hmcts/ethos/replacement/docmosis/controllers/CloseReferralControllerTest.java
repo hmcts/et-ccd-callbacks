@@ -20,11 +20,15 @@ import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
+import uk.gov.hmcts.ethos.replacement.docmosis.wa.ReferralTaskClientContextService;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.util.Base64;
 import java.util.List;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.when;
@@ -33,9 +37,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.wa.ReferralTaskClientContextService.CLIENT_CONTEXT_HEADER;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest({CloseReferralController.class, JsonMapper.class})
+@WebMvcTest({CloseReferralController.class, JsonMapper.class, ReferralTaskClientContextService.class})
 class CloseReferralControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String START_CLOSE_REFERRAL_URL = "/closeReferral/aboutToStart";
@@ -171,5 +176,26 @@ class CloseReferralControllerTest {
         referralTypeItem.setValue(referralType);
         referralType.setReferralStatus("referralStatus");
         return referralTypeItem;
+    }
+
+    @Test
+    void initHearingAndReferralDetails_doesNotCompleteTaskForAnotherReferral() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        // Referral 1 is selected, but the task ExUI is about to complete was raised for referral 2.
+        String clientContext = Base64.getEncoder().encodeToString((
+            "{\"client_context\":{\"user_task\":{\"task_data\":{\"id\":\"task-id\","
+            + "\"type\":\"ReviewReferralLegalOps\",\"task_title\":\"LO - Review Referral #2 - ET1\"},"
+            + "\"complete_task\":true}}}").getBytes(UTF_8));
+
+        String updatedClientContext = mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .header(CLIENT_CONTEXT_HEADER, clientContext)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getHeader(CLIENT_CONTEXT_HEADER);
+
+        assertThat(new String(Base64.getDecoder().decode(updatedClientContext), UTF_8))
+            .contains("\"complete_task\":false");
     }
 }

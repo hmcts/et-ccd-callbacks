@@ -13,6 +13,10 @@ jobs:
       contents: read
       packages: write
 
+    defaults:
+      run:
+        working-directory: et-shared-test-library
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,23 +28,21 @@ jobs:
           registry-url: https://npm.pkg.github.com
           scope: '@hmcts'
 
-      - name: Install dependencies
-        run: yarn install --immutable
-
       - name: Debug dependency resolution
         run: |
+          yarn install --immutable
           yarn workspaces list
-          yarn workspace @hmcts/et-shared-test-library why @playwright/test
-          yarn workspace @hmcts/et-shared-test-library why playwright-core
-          yarn workspace @hmcts/et-shared-test-library why @hmcts/playwright-common
+          yarn why @playwright/test
+          yarn why playwright-core
+          yarn why @hmcts/playwright-common
 
       - name: Build package
-        run: yarn workspace @hmcts/et-shared-test-library build
+        run: yarn build
 
       - name: Verify package contents
-        run: yarn workspace @hmcts/et-shared-test-library exec npm pack --dry-run
+        run: yarn npm pack --dry-run
 
       - name: Verify publish would succeed
-        run: yarn workspace @hmcts/et-shared-test-library exec npm publish --dry-run
+        run: yarn npm publish --dry-run
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

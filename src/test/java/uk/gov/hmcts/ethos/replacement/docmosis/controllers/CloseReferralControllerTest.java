@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,13 +18,13 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClientContextHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
@@ -38,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClientContextHelper.CLIENT_CONTEXT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralTaskCompletionHelper.CLIENT_CONTEXT;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CloseReferralController.class, JsonMapper.class})
@@ -119,9 +120,9 @@ class CloseReferralControllerTest {
     }
 
     @Test
-    void aboutToSubmitCloseReferral_taskForOtherReferral_preventsTaskCompletion() throws Exception {
+    void initHearingAndReferralDetails_taskForOtherReferral_preventsTaskCompletion() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+        mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .header(CLIENT_CONTEXT, reviewReferralClientContext("32"))
@@ -133,12 +134,37 @@ class CloseReferralControllerTest {
     }
 
     @Test
-    void aboutToSubmitCloseReferral_taskForClosedReferral_completesTask() throws Exception {
+    void initHearingAndReferralDetails_taskForSelectedReferral_completesTask() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .header(CLIENT_CONTEXT, reviewReferralClientContext("1", false))
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk())
+            .andExpect(header().exists(CLIENT_CONTEXT))
+            .andExpect(result -> assertThat(decodeCompleteTask(result.getResponse().getHeader(CLIENT_CONTEXT)))
+                .isTrue());
+    }
+
+    @Test
+    void initHearingAndReferralDetails_noClientContext_noHeaderReturned() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk())
+            .andExpect(header().doesNotExist(CLIENT_CONTEXT));
+    }
+
+    @Test
+    void aboutToSubmitCloseReferral_doesNotReturnClientContext() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .header(CLIENT_CONTEXT, reviewReferralClientContext("1"))
+                .header(CLIENT_CONTEXT, reviewReferralClientContext("32"))
                 .content(jsonMapper.toJson(ccdRequest)))
             .andExpect(status().isOk())
             .andExpect(header().doesNotExist(CLIENT_CONTEXT));
@@ -196,16 +222,20 @@ class CloseReferralControllerTest {
     }
 
     private static String reviewReferralClientContext(String referralNumber) {
+        return reviewReferralClientContext(referralNumber, true);
+    }
+
+    private static String reviewReferralClientContext(String referralNumber, boolean completeTask) {
         String json = """
-            {"client_context":{"user_task":{"complete_task":true,"task_data":{
+            {"client_context":{"user_task":{"complete_task":%s,"task_data":{
             "id":"task-id","type":"ReviewReferralAdmin","task_title":"Review Referral #%s - Other"}}}}
-            """.formatted(referralNumber);
+            """.formatted(completeTask, referralNumber);
         return Base64.getEncoder().encodeToString(json.getBytes(StandardCharsets.UTF_8));
     }
 
-    private static boolean decodeCompleteTask(String clientContext) {
-        return ClientContextHelper.decode(clientContext).flatMap(ClientContextHelper::getUserTask)
-            .orElseThrow().get("complete_task").asBoolean();
+    private static boolean decodeCompleteTask(String clientContext) throws IOException {
+        return new ObjectMapper().readTree(Base64.getDecoder().decode(clientContext))
+            .at("/client_context/user_task/complete_task").asBoolean();
     }
 
     private ReferralTypeItem createReferralTypeItem() {

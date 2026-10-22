@@ -20,7 +20,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClientContextHelper.getRequestClientContext;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClientContextHelper.withClientContext;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralDataFromCaseData;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralTaskCompletionHelper.preventCompletionOfUnrelatedReferralTask;
 
 @Slf4j
 @RequestMapping("/closeReferral")
@@ -89,6 +92,8 @@ public class CloseReferralController {
 
     /**
      * Called at the end of Close Referral event, it sets the referral status to Closed.
+     * If ExUI is about to complete a Review Referral task for a different referral, the Client-Context
+     * response header tells ExUI not to complete it.
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
@@ -109,10 +114,13 @@ public class CloseReferralController {
         @RequestHeader("Authorization") String userToken) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        String closedReferralNumber = caseData.getSelectReferral().getValue().getCode();
         ReferralHelper.addReferralDocumentToDocumentCollection(caseData);
         ReferralHelper.setReferralStatusToClosed(caseData);
         ReferralHelper.clearCloseReferralDataFromCaseData(caseData);
-        return getCallbackRespEntityNoErrors(caseData);
+        String clientContext = preventCompletionOfUnrelatedReferralTask(
+            getRequestClientContext(), closedReferralNumber);
+        return withClientContext(getCallbackRespEntityNoErrors(caseData), clientContext);
     }
 
     /**

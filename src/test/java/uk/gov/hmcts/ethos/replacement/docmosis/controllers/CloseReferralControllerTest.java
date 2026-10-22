@@ -17,22 +17,28 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClientContextHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClientContextHelper.CLIENT_CONTEXT;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CloseReferralController.class, JsonMapper.class})
@@ -113,6 +119,32 @@ class CloseReferralControllerTest {
     }
 
     @Test
+    void aboutToSubmitCloseReferral_taskForOtherReferral_preventsTaskCompletion() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .header(CLIENT_CONTEXT, reviewReferralClientContext("32"))
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk())
+            .andExpect(header().exists(CLIENT_CONTEXT))
+            .andExpect(result -> assertThat(decodeCompleteTask(result.getResponse().getHeader(CLIENT_CONTEXT)))
+                .isFalse());
+    }
+
+    @Test
+    void aboutToSubmitCloseReferral_taskForClosedReferral_completesTask() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .header(CLIENT_CONTEXT, reviewReferralClientContext("1"))
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk())
+            .andExpect(header().doesNotExist(CLIENT_CONTEXT));
+    }
+
+    @Test
     void aboutToStartCloseReferral_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(START_CLOSE_REFERRAL_URL)
@@ -161,6 +193,19 @@ class CloseReferralControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))
             .andExpect(status().isForbidden());
+    }
+
+    private static String reviewReferralClientContext(String referralNumber) {
+        String json = """
+            {"client_context":{"user_task":{"complete_task":true,"task_data":{
+            "id":"task-id","type":"ReviewReferralAdmin","task_title":"Review Referral #%s - Other"}}}}
+            """.formatted(referralNumber);
+        return Base64.getEncoder().encodeToString(json.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private static boolean decodeCompleteTask(String clientContext) {
+        return ClientContextHelper.decode(clientContext).flatMap(ClientContextHelper::getUserTask)
+            .orElseThrow().get("complete_task").asBoolean();
     }
 
     private ReferralTypeItem createReferralTypeItem() {

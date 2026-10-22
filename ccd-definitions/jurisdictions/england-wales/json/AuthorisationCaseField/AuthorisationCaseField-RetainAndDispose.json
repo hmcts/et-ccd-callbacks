@@ -15,7 +15,7 @@
     "CaseTypeId": "ET_EnglandWales",
     "CaseFieldID": "TTL",
     "UserRole": "citizen",
-    "CRUD": "CRUD"
+    "CRUD": "R"
   },
   {
     "CaseTypeId": "ET_EnglandWales",

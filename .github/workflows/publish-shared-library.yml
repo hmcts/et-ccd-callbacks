@@ -37,13 +37,11 @@ jobs:
           yarn why @hmcts/playwright-common
 
       - name: Build package
-        run: yarn build --verbose
+        run: yarn build
 
       - name: verify build artifacts
         run: |
           ls -l dist
-          ls -l dist/esm
-          ls -l dist/cjs
           test -f dist/index.js && test -f dist/index.d.ts && echo "Build artifacts verified"
 
       - name: Verify package contents

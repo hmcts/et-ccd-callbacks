@@ -6,12 +6,12 @@ on:
       - 'et-shared-test-library/**'
 
 jobs:
-  publish-gpr:
+  publish-npm:
     runs-on: ubuntu-latest
 
     permissions:
       contents: read
-      packages: write
+      id-token: write
 
     defaults:
       run:
@@ -19,16 +19,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
           node-version: 24
-          registry-url: https://npm.pkg.github.com
-          scope: '@hmcts'
-          cache: yarn
-          cache-dependency-path: yarn.lock
+
+      - name: Ensure npm version (Trusted Publishing)
+        run: |
+          npm --version
+          npm i -g npm@11.5.1
+          npm --version
 
       - name: Install dependencies
         run: yarn install --immutable
@@ -36,7 +38,16 @@ jobs:
       - name: Build package
         run: yarn build
 
-      - name: Publish to GitHub Package Registry (dry run)
-        run: yarn npm publish --dry-run
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify package contents
+        run: npm pack --dry-run
+
+      - name: Validate npm publish (dry run)
+        run: |
+          export NPM_CONFIG_USERCONFIG="$RUNNER_TEMP/npmrc-noauth"
+          printf "registry=https://registry.npmjs.org/\n" > "$NPM_CONFIG_USERCONFIG"
+          printf "@hmcts:registry=https://registry.npmjs.org/\n" >> "$NPM_CONFIG_USERCONFIG"
+
+          npm config delete //registry.npmjs.org/:_authToken || true
+          npm config delete _authToken || true
+
+          npm publish --dry-run --access public

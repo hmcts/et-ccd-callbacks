@@ -25,7 +25,9 @@
     "./resources/*": "./resources/*"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
     "clean": "rm -rf dist",

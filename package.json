@@ -29,10 +29,10 @@
     "test/**/*.{js,jsx,ts,tsx}": "eslint"
   },
   "dependencies": {
-    "@et-shared-test-library/core": "portal:./et-shared-test-library",
-    "@hmcts/playwright-common": "^1.1.5",
-    "@playwright/test": "^1.61.0",
-    "playwright-core": "^1.61.0"
+    "@hmcts/et-shared-test-library": "portal:./et-shared-test-library",
+    "@hmcts/playwright-common": "1.1.7",
+    "@playwright/test": "1.64.0",
+    "playwright-core": "1.64.0"
   },
   "devDependencies": {
     "eslint": "^10.12.0",

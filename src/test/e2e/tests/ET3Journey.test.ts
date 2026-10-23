@@ -1,5 +1,5 @@
 import { test } from '../fixtures/et.test.fixture.ts';
-import {CaseDetailsValues, CaseworkerCaseFactory, ET3LoginPage, users} from "@et-shared-test-library/core";
+import {CaseDetailsValues, CaseworkerCaseFactory, ET3LoginPage, users} from "@hmcts/et-shared-test-library";
 
 let caseNumber: string;
 let caseId: string;

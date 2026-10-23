@@ -1,6 +1,6 @@
 import { test } from '../fixtures/et.test.fixture.ts';
-import userDetailsData from '@et-shared-test-library/core/resources/payload/user-details.json';
-import {config, createCaseViaCitizenUI, users} from "@et-shared-test-library/core";
+import userDetailsData from '@hmcts/et-shared-test-library/resources/payload/user-details.json';
+import {config, createCaseViaCitizenUI, users} from "@hmcts/et-shared-test-library";
 
 test.describe('Group Claim Case creation in Citizen UI', () => {
 

@@ -1,5 +1,5 @@
 import { test } from '../fixtures/et.test.fixture.ts';
-import userDetailsData from '@et-shared-test-library/core/resources/payload/user-details.json';
+import userDetailsData from '@hmcts/et-shared-test-library/resources/payload/user-details.json';
 import {Page} from "@playwright/test";
 import {
   AddressDetails, AmendContactDetailsLrPage,
@@ -8,7 +8,7 @@ import {
   LoginPage,
   ManageCaseDashboardPage, NocPage, RespondentRepPage,
   users
-} from "@et-shared-test-library/core";
+} from "@hmcts/et-shared-test-library";
 
 let caseId: string;
 let caseNumber: string;

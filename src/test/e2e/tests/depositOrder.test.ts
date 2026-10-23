@@ -1,7 +1,7 @@
 import { test } from '../fixtures/et.test.fixture.ts';
-import {CaseTypeLocation, CaseworkerCaseFactory, Events, users} from "@et-shared-test-library/core";
+import {CaseTypeLocation, CaseworkerCaseFactory, Events, users} from "@hmcts/et-shared-test-library";
 
-const depositOrderData = require('@et-shared-test-library/core/resources/payload/deposit-order-content.json');
+const depositOrderData = require('@hmcts/et-shared-test-library/resources/payload/deposit-order-content.json');
 let formattedAmount: string;
 let caseNumber: string;
 let caseId: string;

@@ -6,7 +6,7 @@ import {
   CitizenClaimantFactory,
   Events,
   users
-} from "@et-shared-test-library/core";
+} from "@hmcts/et-shared-test-library";
 
 let caseNumber: any;
 let caseId: any;

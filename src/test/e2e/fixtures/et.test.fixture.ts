@@ -1,4 +1,4 @@
-import { test as base } from '@et-shared-test-library/core/fixtures/common'
+import { test as base } from '@hmcts/et-shared-test-library/fixtures/common'
 
 export const test = base.extend({});
 

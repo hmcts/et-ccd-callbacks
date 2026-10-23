@@ -1,6 +1,6 @@
 import { test } from '../fixtures/et.test.fixture.ts';
-import fileUploadData from '@et-shared-test-library/core/resources/payload/file-upload-content.json';
-import {CaseTypeLocation, CaseworkerCaseFactory, Events, users} from "@et-shared-test-library/core";
+import fileUploadData from '@hmcts/et-shared-test-library/resources/payload/file-upload-content.json';
+import {CaseTypeLocation, CaseworkerCaseFactory, Events, users} from "@hmcts/et-shared-test-library";
 
 let caseNumber: string;
 let caseId: string;

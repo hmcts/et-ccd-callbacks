@@ -1,6 +1,6 @@
 {
-  "name": "@et-shared-test-library/core",
-  "version": "0.1.0",
+  "name": "@hmcts/et-shared-test-library",
+  "version": "1.0.0",
   "description": "Employment Tribunal Shared TypeScript Playwright test utilities for cross-repo reuse.",
   "license": "MIT",
   "main": "dist/index.js",
@@ -24,16 +24,18 @@
     },
     "./resources/*": "./resources/*"
   },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "clean": "rm -rf dist",
     "build": "yarn clean && yarn tsc -p tsconfig.json",
     "build:package": "yarn build && yarn pack",
     "build:watch": "yarn tsc -p tsconfig.json --watch --preserveWatchOutput",
     "lint": "yarn eslint .",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "prerelease:tag": "git tag -a prerelease-$(git rev-parse --short HEAD) -m \"prerelease\"",
-    "prerelease:push": "git push origin --tags",
-    "prerelease": "yarn prerelease:tag && yarn prerelease:push"
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "engines": {
     "node": ">=20"
@@ -52,16 +54,19 @@
     "uuid": "^14.0.0"
   },
   "devDependencies": {
+    "@hmcts/playwright-common": "1.1.7",
+    "@playwright/test": "1.64.0",
     "@types/fs-extra": "^11",
     "@types/lodash": "^4.17.24",
     "@types/node": "^25.2.0",
     "@types/proper-lockfile": "^4",
-    "eslint": "10.3.0"
+    "eslint": "10.3.0",
+    "playwright-core": "1.64.0"
   },
   "peerDependencies": {
-    "@hmcts/playwright-common": "^1.1.5",
-    "@playwright/test": "^1.61.0",
-    "playwright-core": "^1.61.0"
+    "@hmcts/playwright-common": "1.1.7",
+    "@playwright/test": "1.64.0",
+    "playwright-core": "1.64.0"
   },
   "resolutions": {
     "braces": "^3.0.3",

@@ -17,18 +17,18 @@ public final class PhoneNumberValidator {
             "Enter a telephone number in the correct format";
     public static final String INVALID_REPRESENTATIVE_PHONE_NUMBER_FORMAT_MESSAGE =
             INVALID_PHONE_NUMBER_FORMAT_MESSAGE + " for %s";
-    public static final String INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE =
-            "Do not include the + symbol. Enter the number using digits only.";
+    public static final String INVALID_PHONE_NUMBER_UK_FORMAT_MESSAGE =
+            "Enter a UK phone number starting with 0 or +44, using digits and spaces only.";
 
     /**
      * The UK national number formats accepted by the CCD PhoneUK field type, which representative_phone_number
      * uses. The brackets and extensions that PhoneUK also allows are excluded, so a number accepted here is
      * always accepted by PhoneUK.
      */
-    private static final Pattern VALID_PHONE_NUMBER = Pattern.compile(
-            "(\\+44\\s?\\d{4}|0\\d{4})\\s?\\d{3}\\s?\\d{3}"
-                    + "|(\\+44\\s?\\d{3}|0\\d{3})\\s?\\d{3}\\s?\\d{4}"
-                    + "|(\\+44\\s?\\d{2}|0\\d{2})\\s?\\d{4}\\s?\\d{4}");
+    private static final Pattern GROUP_4_3_3 = Pattern.compile("(\\+44\\s?\\d{4}|0\\d{4})\\s?\\d{3}\\s?\\d{3}");
+    private static final Pattern GROUP_3_3_4 = Pattern.compile("(\\+44\\s?\\d{3}|0\\d{3})\\s?\\d{3}\\s?\\d{4}");
+    private static final Pattern GROUP_2_4_4 = Pattern.compile("(\\+44\\s?\\d{2}|0\\d{2})\\s?\\d{4}\\s?\\d{4}");
+    private static final List<Pattern> VALID_PHONE_NUMBERS = List.of(GROUP_4_3_3, GROUP_3_3_4, GROUP_2_4_4);
 
     private PhoneNumberValidator() {
         // All access through static methods
@@ -46,7 +46,7 @@ public final class PhoneNumberValidator {
         if (StringUtils.isBlank(phoneNumber)) {
             return true;
         }
-        return VALID_PHONE_NUMBER.matcher(phoneNumber).matches();
+        return VALID_PHONE_NUMBERS.stream().anyMatch(pattern -> pattern.matcher(phoneNumber).matches());
     }
 
     /**
@@ -61,7 +61,7 @@ public final class PhoneNumberValidator {
 
     /**
      * Validates the telephone numbers of all respondent representatives in the given collection. Each invalid
-     * telephone number gets its own error naming the representative, followed by a single digits-only message.
+     * telephone number gets its own error naming the representative, followed by a single UK format message.
      *
      * @param representatives the respondent representatives to validate
      * @return List of validation errors or an empty list if all telephone numbers are valid
@@ -80,7 +80,7 @@ public final class PhoneNumberValidator {
             }
         }
         if (!validationErrors.isEmpty()) {
-            validationErrors.add(INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE);
+            validationErrors.add(INVALID_PHONE_NUMBER_UK_FORMAT_MESSAGE);
         }
         return validationErrors;
     }
@@ -91,6 +91,6 @@ public final class PhoneNumberValidator {
     }
 
     private static List<String> invalidPhoneNumberErrors() {
-        return new ArrayList<>(List.of(INVALID_PHONE_NUMBER_FORMAT_MESSAGE, INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE));
+        return new ArrayList<>(List.of(INVALID_PHONE_NUMBER_FORMAT_MESSAGE, INVALID_PHONE_NUMBER_UK_FORMAT_MESSAGE));
     }
 }

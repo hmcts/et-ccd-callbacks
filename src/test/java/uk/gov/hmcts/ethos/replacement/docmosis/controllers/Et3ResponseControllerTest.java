@@ -51,8 +51,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_DATA_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_PHONE_NUMBER_FORMAT_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_PHONE_NUMBER_UK_FORMAT_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({Et3ResponseController.class, JsonMapper.class})
@@ -566,7 +566,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors[0]", is(INVALID_PHONE_NUMBER_FORMAT_MESSAGE)))
-                .andExpect(jsonPath("$.errors[1]", is(INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE)));
+                .andExpect(jsonPath("$.errors[1]", is(INVALID_PHONE_NUMBER_UK_FORMAT_MESSAGE)));
     }
 
     @Test
@@ -590,7 +590,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors[0]", is(INVALID_PHONE_NUMBER_FORMAT_MESSAGE)))
-                .andExpect(jsonPath("$.errors[1]", is(INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE)));
+                .andExpect(jsonPath("$.errors[1]", is(INVALID_PHONE_NUMBER_UK_FORMAT_MESSAGE)));
         verify(amendRepresentativeContactService, never()).updateRepresentativeContactDetails(
                 anyString(), any(CaseData.class), anyString());
     }

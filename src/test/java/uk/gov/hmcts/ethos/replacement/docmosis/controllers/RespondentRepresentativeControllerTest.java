@@ -45,7 +45,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_PHONE_NUMBER_UK_FORMAT_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_REPRESENTATIVE_PHONE_NUMBER_FORMAT_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
@@ -479,7 +479,7 @@ class RespondentRepresentativeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors[0]",
                         is(String.format(INVALID_REPRESENTATIVE_PHONE_NUMBER_FORMAT_MESSAGE, REPRESENTATIVE_NAME))))
-                .andExpect(jsonPath("$.errors[1]", is(INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE)));
+                .andExpect(jsonPath("$.errors[1]", is(INVALID_PHONE_NUMBER_UK_FORMAT_MESSAGE)));
         verify(nocRespondentRepresentativeService)
                 .validateRepresentativesOrganisationsAndEmails(any(CaseData.class));
     }
@@ -499,6 +499,6 @@ class RespondentRepresentativeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasItems(
                         String.format(INVALID_REPRESENTATIVE_PHONE_NUMBER_FORMAT_MESSAGE, "representative 1"),
-                        INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE)));
+                        INVALID_PHONE_NUMBER_UK_FORMAT_MESSAGE)));
     }
 }

@@ -45,8 +45,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_DATA_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_AMEND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_PHONE_NUMBER_FORMAT_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_PHONE_NUMBER_UK_FORMAT_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({AmendRepresentativeContactController.class, JsonMapper.class})
@@ -257,7 +257,7 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath("$.errors[0]", is(INVALID_PHONE_NUMBER_FORMAT_MESSAGE)))
-                .andExpect(jsonPath("$.errors[1]", is(INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE)));
+                .andExpect(jsonPath("$.errors[1]", is(INVALID_PHONE_NUMBER_UK_FORMAT_MESSAGE)));
         verify(amendRepresentativeContactService, never())
                 .saveStagedContactDetails(anyString(), any(CaseData.class), anyString());
     }
@@ -310,6 +310,6 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors[0]", is(INVALID_PHONE_NUMBER_FORMAT_MESSAGE)))
-                .andExpect(jsonPath("$.errors[1]", is(INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE)));
+                .andExpect(jsonPath("$.errors[1]", is(INVALID_PHONE_NUMBER_UK_FORMAT_MESSAGE)));
     }
 }

@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_PHONE_NUMBER_FORMAT_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_PHONE_NUMBER_UK_FORMAT_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_REPRESENTATIVE_PHONE_NUMBER_FORMAT_MESSAGE;
 
 class PhoneNumberValidatorTest {
@@ -44,7 +44,7 @@ class PhoneNumberValidatorTest {
     @Test
     void validatePhoneNumber_invalid_returnsErrors() {
         assertThat(PhoneNumberValidator.validatePhoneNumber("Via representative"))
-                .containsExactly(INVALID_PHONE_NUMBER_FORMAT_MESSAGE, INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE);
+                .containsExactly(INVALID_PHONE_NUMBER_FORMAT_MESSAGE, INVALID_PHONE_NUMBER_UK_FORMAT_MESSAGE);
     }
 
     @Test
@@ -72,7 +72,7 @@ class PhoneNumberValidatorTest {
         assertThat(PhoneNumberValidator.validateRepresentativePhoneNumbers(representatives)).containsExactly(
                 String.format(INVALID_REPRESENTATIVE_PHONE_NUMBER_FORMAT_MESSAGE, "John Doe"),
                 String.format(INVALID_REPRESENTATIVE_PHONE_NUMBER_FORMAT_MESSAGE, "representative 3"),
-                INVALID_PHONE_NUMBER_DIGITS_ONLY_MESSAGE);
+                INVALID_PHONE_NUMBER_UK_FORMAT_MESSAGE);
     }
 
     private static RepresentedTypeRItem representative(String phoneNumber) {

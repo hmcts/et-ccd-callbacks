@@ -3,7 +3,8 @@
     "CaseTypeID": "ET_EnglandWales",
     "ID": "nocRemoveOption",
     "Label": "Who do you wish to remove from this case?",
-    "FieldType": "Text",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "frl_NocRemoveOption",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },

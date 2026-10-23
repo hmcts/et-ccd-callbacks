@@ -2,7 +2,7 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "nocRemoveRepClaimant",
-    "CaseFieldID": "nocRemoveOption",
+    "CaseFieldID": "nocCaseSharingStatus",
     "DisplayContext": "MANDATORY",
     "PageID": 1,
     "PageDisplayOrder": 1,
@@ -13,10 +13,32 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "nocRemoveRepClaimant",
-    "CaseFieldID": "nocRemoveRepLandingPageLeadLabel",
-    "DisplayContext": "READONLY",
+    "CaseFieldID": "nocRepresentativeType",
+    "DisplayContext": "MANDATORY",
     "PageID": 1,
     "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "FieldShowCondition": "nocRemoveRepLandingPageLeadLabel=\"DUMMY\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveOption",
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "FieldShowCondition": "nocRepresentativeType=\"leadRepresentative\" AND nocCaseSharingStatus=\"shared\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepLandingPageLeadLabel",
+    "DisplayContext": "READONLY",
+    "PageID": 2,
+    "PageDisplayOrder": 2,
     "PageFieldDisplayOrder": 1,
     "FieldShowCondition": "nocRemoveOption=\"your organisation\"",
     "ShowSummaryChangeOption": "N"
@@ -26,9 +48,9 @@
     "CaseEventID": "nocRemoveRepClaimant",
     "CaseFieldID": "nocRemoveRepLandingPageSharedLabel",
     "DisplayContext": "READONLY",
-    "PageID": 1,
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 1,
+    "PageID": 2,
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 2,
     "FieldShowCondition": "nocRemoveOption!=\"your organisation\"",
     "ShowSummaryChangeOption": "N"
   },

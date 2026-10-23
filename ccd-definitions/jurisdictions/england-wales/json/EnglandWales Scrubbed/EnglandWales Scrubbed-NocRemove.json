@@ -1,5 +1,17 @@
 [
   {
+    "ID": "frl_NocRemoveOption",
+    "ListElementCode": "yourself",
+    "ListElement": "yourself",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_NocRemoveOption",
+    "ListElementCode": "yourOrganisation",
+    "ListElement": "your organisation",
+    "DisplayOrder": 1
+  },
+  {
     "ID": "msl_NocRemove_ConfirmSelf",
     "ListElementCode": "I confirm I'm removing myself from this case",
     "ListElement": "I confirm I'm removing myself from this case",

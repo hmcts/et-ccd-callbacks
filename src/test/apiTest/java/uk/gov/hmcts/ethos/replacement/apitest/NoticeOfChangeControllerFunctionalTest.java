@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
@@ -27,6 +28,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 public class NoticeOfChangeControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";
 
+    private static final String ABOUT_TO_SUBMIT_URL = "/noc-decision/about-to-submit";
     private static final String SUBMITTED_URL = "/noc-decision/submitted";
 
     private static final String SOLICITORA = "[SOLICITORA]";
@@ -36,6 +38,7 @@ public class NoticeOfChangeControllerFunctionalTest extends BaseFunctionalTest {
     private static final String ET_ORG_2 = "ET Org 2";
 
     private CCDRequest ccdRequest;
+    private CallbackRequest callbackRequest;
 
     @BeforeAll
     public void setUpCaseData() throws IOException {
@@ -76,6 +79,23 @@ public class NoticeOfChangeControllerFunctionalTest extends BaseFunctionalTest {
                 .withCaseId(String.valueOf(caseId))
                 .build();
 
+        callbackRequest = CallbackRequest.builder()
+                .caseDetails(ccdRequest.getCaseDetails())
+                .build();
+    }
+
+    @Test
+    void nocAboutToSubmitSuccessResponse() {
+        RestAssured.given()
+                .spec(spec)
+                .contentType(ContentType.JSON)
+                .header(new Header(AUTHORIZATION, userToken))
+                .body(callbackRequest)
+                .post(ABOUT_TO_SUBMIT_URL)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .log()
+                .all(true);
     }
 
     @Test

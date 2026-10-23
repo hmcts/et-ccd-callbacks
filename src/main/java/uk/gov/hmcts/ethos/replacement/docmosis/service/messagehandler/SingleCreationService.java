@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,6 +19,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper.generateMarkUp;
 
 /**
@@ -31,6 +34,7 @@ public class SingleCreationService {
     public static final String CREATE_CASE_EVENT_SUMMARY_TEMPLATE = "Case created by transfer from %s";
 
     private final CcdClient ccdClient;
+    private final FeatureToggleService featureToggleService;
     private String ccdGatewayBaseUrl;
 
     private static class CaseTransferContext {
@@ -55,8 +59,9 @@ public class SingleCreationService {
     }
 
     @Autowired
-    public SingleCreationService(CcdClient ccdClient) {
+    public SingleCreationService(CcdClient ccdClient, FeatureToggleService featureToggleService) {
         this.ccdClient = ccdClient;
+        this.featureToggleService = featureToggleService;
     }
 
     public void sendCreation(SubmitEvent oldSubmitEvent, String accessToken, UpdateCaseMsg updateCaseMsg)
@@ -267,6 +272,11 @@ public class SingleCreationService {
         newCaseData.setRespondentOrganisationPolicy7(oldCaseData.getRespondentOrganisationPolicy7());
         newCaseData.setRespondentOrganisationPolicy8(oldCaseData.getRespondentOrganisationPolicy8());
         newCaseData.setRespondentOrganisationPolicy9(oldCaseData.getRespondentOrganisationPolicy9());
+
+        if (featureToggleService.isCaseFlagsV2Enabled(ENGLANDWALES_CASE_TYPE_ID)
+                && featureToggleService.isCaseFlagsV2Enabled(SCOTLAND_CASE_TYPE_ID)) {
+            newCaseData.setAllPartyFlags(oldCaseData.getAllPartyFlags());
+        }
 
         return newCaseData;
     }

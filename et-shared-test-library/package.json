@@ -52,17 +52,19 @@
     "uuid": "^14.0.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.64.0",
+    "@hmcts/playwright-common": "1.1.7",
+    "@playwright/test": "1.64.0",
     "@types/fs-extra": "^11",
     "@types/lodash": "^4.17.24",
     "@types/node": "^25.2.0",
     "@types/proper-lockfile": "^4",
-    "eslint": "10.3.0"
+    "eslint": "10.3.0",
+    "playwright-core": "1.64.0"
   },
   "peerDependencies": {
-    "@hmcts/playwright-common": "^1.1.7",
-    "@playwright/test": "^1.64.0",
-    "playwright-core": "^1.64.0"
+    "@hmcts/playwright-common": "1.1.7",
+    "@playwright/test": "1.64.0",
+    "playwright-core": "1.64.0"
   },
   "resolutions": {
     "braces": "^3.0.3",

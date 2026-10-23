@@ -30,9 +30,9 @@
   },
   "dependencies": {
     "@hmcts/et-shared-test-library": "portal:./et-shared-test-library",
-    "@hmcts/playwright-common": "^1.1.7",
-    "@playwright/test": "^1.64.0",
-    "playwright-core": "^1.64.0"
+    "@hmcts/playwright-common": "1.1.7",
+    "@playwright/test": "1.64.0",
+    "playwright-core": "1.64.0"
   },
   "devDependencies": {
     "eslint": "^10.12.0",

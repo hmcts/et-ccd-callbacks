@@ -2,7 +2,7 @@
 
 The operating manual is `AGENTS.md` at the repository root. Read it before editing. If this file and `AGENTS.md` disagree, follow `AGENTS.md`.
 
-This service is `et-ccd-callbacks` (et-cos): Java 21, Spring Boot 3.5, CCD callbacks, and the citizen API in `uk.gov.hmcts.reform.et.syaapi`. The archived `et-sya-api` repository is not the live backend.
+This service is `et-ccd-callbacks` (et-cos): Java 21, Spring Boot 3.5, CCD callbacks. The Spring MVC API in this repo is `uk.gov.hmcts.reform.et.syaapi`. The archived `et-sya-api` repository is not the live backend.
 
 ## Always
 
@@ -27,4 +27,4 @@ This service is `et-ccd-callbacks` (et-cos): Java 21, Spring Boot 3.5, CCD callb
 
 ## Before a pull request
 
-Follow the "Before a pull request" section in `AGENTS.md`. Review the diff for logged case data, unsanitised paths or URLs, and a new callback that skips `VerifyTokenService`. Add the `enable_fortify_scan` label when the change is security-sensitive. In the pull-request note, include the JIRA link, the behaviour change, the test commands that were actually run, and whether the change is breaking. After a push, read Jenkins and the Sonar quality gate. A Playwright UI failure is recorded as unstable.
+Follow the "Before a pull request" section in `AGENTS.md`. Before the note, read the JaCoCo HTML report for the changed class and review the diff for Fortify-class issues: logs, paths and URLs, secrets, `VerifyTokenService` on a new callback, and authorisation on a new endpoint. Cover new branches, including null case data. Fix duplicated blocks, possible null dereferences, duplicated constants, and null collections in code. Add `enable_fortify_scan` for a new endpoint, file or URL handling, authorisation, or document generation. The note has a JIRA link, the behaviour change, the commands that were run, and whether the change is breaking. After a push, read Jenkins and the Sonar quality gate. A green unit-test check can sit beside a failed quality gate. A Playwright UI failure is recorded as unstable.

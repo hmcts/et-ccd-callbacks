@@ -22,6 +22,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3ResponseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.AmendRepresentativeContactService;
@@ -131,6 +132,34 @@ public class Et3ResponseController {
     }
 
     /**
+     * Called when trying to continue from the ET3 representative contact details page.
+     * Validates the representative's telephone number.
+     *
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data and errors attached.
+     */
+    @PostMapping(value = "/midValidatePhoneNumber", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "validate representative telephone number")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> midValidatePhoneNumber(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = PhoneNumberValidator.validatePhoneNumber(caseData.getEt3ResponsePhone());
+
+        return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    /**
      * Called when trying to continue from the ET3 Respondent Address page.
      * Validates that a postcode has been entered.
      *
@@ -230,6 +259,12 @@ public class Et3ResponseController {
             @RequestHeader("Authorization") String userToken) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        if (ET3_RESPONSE.equals(ccdRequest.getEventId())) {
+            List<String> phoneNumberErrors = PhoneNumberValidator.validatePhoneNumber(caseData.getEt3ResponsePhone());
+            if (!phoneNumberErrors.isEmpty()) {
+                return getCallbackRespEntityErrors(phoneNumberErrors, caseData);
+            }
+        }
         Et3ResponseHelper.addEt3DataToRespondent(caseData, ccdRequest.getEventId());
         List<String> errors = new ArrayList<>();
         if (ET3_RESPONSE.equals(ccdRequest.getEventId())) {

@@ -1,12 +1,28 @@
 # Employment Tribunals CCD Callbacks Service
 
 [![Java](https://img.shields.io/badge/Java-21-blue.svg)](https://www.oracle.com/java/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.16-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Gradle](https://img.shields.io/badge/Gradle-Wrapper-blue.svg)](https://gradle.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
 
 This application is responsible for handling all CCD callback requests for Employment Tribunal cases.
 
+## Coding agents
+
+Agents working in this repository follow [AGENTS.md](AGENTS.md). That file is the Java 21 and Spring Boot operating manual: commands, style, and the checks to run before a pull request.
+
+These tools read it when the workspace is this repository:
+
+- Cursor, through `.cursor/rules/follow-agents-md.mdc`
+- Claude Code, through `CLAUDE.md`
+- GitHub Copilot agent mode reads `AGENTS.md`. Copilot Chat reads the shorter `.github/copilot-instructions.md`
+- Codex and Warp read `AGENTS.md` directly
+
+You do not run the file. Name the section in the prompt when you want that part applied:
+
+- "Add the null-safe read in `ResetEraFlagTask`. Follow `AGENTS.md`: cover both branches, including a case that omits the field, and run Checkstyle, PMD, and the unit test."
+- "Follow the Before a pull request section. Run the unit test with `jacocoTestReport` and report which new lines are still red."
+- "Draft the pull-request note in the `AGENTS.md` format, including the Fortify diff review, the JaCoCo result, and the Sonar read of the diff."
 
 ## CCD Definitions
 
@@ -29,7 +45,7 @@ For detailed information about working with the CCD definitions, see [ccd-defini
 | Component | Version | Status |
 |-----------|---------|--------|
 | Java | 21 | ✅ Supported |
-| Spring Boot | 3.3.0 | ✅ Current |
+| Spring Boot | 3.5.16 | ✅ Current |
 | Spring Security | 6.x | ✅ Current |
 | Node.js | 18+ | ✅ Supported |
 | Gradle | Wrapper | ✅ Current |
@@ -41,7 +57,7 @@ For detailed information about working with the CCD definitions, see [ccd-defini
 ### Java
 - [JDK 21](https://www.oracle.com/java) (upgraded from JDK 17)
 
-**Note: This application has been upgraded to Spring Boot 3.3.0 and requires Java 21.**
+**Note: This application uses Spring Boot 3.5.16 and requires Java 21.**
 
 ### CCD Common Components
 The application should be run locally in an environment that includes CCD common components.

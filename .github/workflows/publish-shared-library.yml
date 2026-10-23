@@ -35,6 +35,7 @@ jobs:
           yarn why @playwright/test
           yarn why playwright-core
           yarn why @hmcts/playwright-common
+          yarn build
 
       - name: Build package
         run: yarn build

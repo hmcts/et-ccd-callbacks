@@ -35,13 +35,19 @@ jobs:
           yarn why @playwright/test
           yarn why playwright-core
           yarn why @hmcts/playwright-common
-          yarn build
 
       - name: Build package
-        run: yarn build
+        run: yarn build --verbose
+
+      - name: verify build artifacts
+        run: |
+          ls -l dist
+          ls -l dist/esm
+          ls -l dist/cjs
+          test -f dist/index.js && test -f dist/index.d.ts && echo "Build artifacts verified"
 
       - name: Verify package contents
-        run: yarn npm pack --dry-run
+        run: npm pack --dry-run
 
       - name: Verify publish would succeed
         run: yarn npm publish --dry-run

@@ -1,0 +1,10 @@
+---
+description: Follow the repository operating manual in AGENTS.md
+alwaysApply: true
+---
+
+# Project instructions
+
+`AGENTS.md` at the repository root is the source of truth for commands, layout, Java style, boundaries, and pull-request checks.
+
+Read it before editing. When this rule and `AGENTS.md` disagree, follow `AGENTS.md`.

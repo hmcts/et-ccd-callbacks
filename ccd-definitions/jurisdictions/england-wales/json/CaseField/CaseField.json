@@ -2988,7 +2988,7 @@
     "CaseTypeID": "ET_EnglandWales",
     "ID": "et3ResponsePhone",
     "Label": "What is your contact phone number?",
-    "HintText": "Where we can contact you during the day. For international numbers include the country code.",
+    "HintText": "Enter a UK phone number",
     "FieldType": "Text",
     "SecurityClassification": "Public",
     "Searchable": "N"
@@ -6536,7 +6536,7 @@
     "CaseTypeID": "ET_EnglandWales",
     "ID": "respRepPhoneNumber",
     "Label": "What is your contact phone number?",
-    "HintText": "Where we can contact you during the day. For international numbers include the country code.",
+    "HintText": "Enter a UK phone number",
     "FieldType": "Text",
     "SecurityClassification": "Public",
     "Searchable": "N"

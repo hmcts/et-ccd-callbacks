@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils.noc;
 
 import ch.qos.logback.classic.Level;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
@@ -20,10 +21,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceExceptio
 import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -36,6 +37,8 @@ final class ClaimantRepresentativeUtilsTest {
     private static final String ORGANISATION_ID_2 = "dummy65_organisation43_id21";
     private static final String RESPONDENT_REPRESENTATIVE_ID = "respondentRepresentativeId";
     private static final String CLAIMANT_REPRESENTATIVE_ID = "claimantRepresentativeId";
+    private static final String CLAIMANT_REPRESENTATIVE_IDAM_ID_1 = "claimantRepresentativeIdamId1";
+    private static final String CLAIMANT_REPRESENTATIVE_IDAM_ID_2 = "claimantRepresentativeIdamId2";
     private static final String CLAIMANT_REPRESENTATIVE_NAME = "claimantRepresentativeName";
     private static final String ROLE_SOLICITORA = "[SOLICITORA]";
     private static final String ROLE_SOLICITORB = "[SOLICITORB]";
@@ -154,21 +157,21 @@ final class ClaimantRepresentativeUtilsTest {
 
     @Test
     void theMarkClaimantAsUnrepresented() {
-        // should remove all claimant representative details and not throw any exception
+        // Should not remove representative organisation if selected removal type is not organisation
         CaseData caseData = new CaseData();
-        caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
         caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().representativeId(CLAIMANT_REPRESENTATIVE_ID)
                 .myHmctsOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_1).build()).build());
         caseData.setClaimantRepresentativeRemoved(NO);
         caseData.setClaimantRepresentedQuestion(YES);
+        caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_1).build()).build());
         ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseData);
         assertThat(caseData.getRepresentativeClaimantType()).isNull();
         assertThat(caseData.getClaimantRepresentativeRemoved()).isEqualTo(YES);
         assertThat(caseData.getClaimantRepresentedQuestion()).isEqualTo(NO);
         assertThat(caseData.getClaimantRepresentativeOrganisationPolicy()).isEqualTo(OrganisationPolicy.builder()
                 .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
-
     }
 
     @Test
@@ -316,8 +319,8 @@ final class ClaimantRepresentativeUtilsTest {
         CaseData caseData = new CaseData();
         caseData.setEt3ResponseAddress(address);
         caseData.setEt3ResponsePhone(REPRESENTATIVE_PHONE);
-        GenericServiceException gse = assertThrows(GenericServiceException.class, () -> ClaimantRepresentativeUtils
-                .updateRepresentativeContactDetails(caseData, SUBMISSION_REFERENCE));
+        GenericServiceException gse = Assertions.assertThrows(GenericServiceException.class,
+                () -> ClaimantRepresentativeUtils.updateRepresentativeContactDetails(caseData, SUBMISSION_REFERENCE));
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_CLAIMANT_REPRESENTATIVE_NOT_FOUND);
         // when case data has representative claimant type should update contact details without throwing any exception
         caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().build());
@@ -350,5 +353,66 @@ final class ClaimantRepresentativeUtilsTest {
         ClaimantRepresentativeUtils.updateET3ResponseContactDetails(caseData);
         assertThat(caseData.getEt3ResponseAddress()).isEqualTo(address);
         assertThat(caseData.getEt3ResponsePhone()).isEqualTo(REPRESENTATIVE_PHONE);
+    }
+
+    @Test
+    void theHasRequiredClaimantRepresentativeDetails() {
+        // when claimant representative is empty should return false
+        assertThat(ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(null)).isFalse();
+        // when claimant representative's id is empty should return false
+        RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder().build();
+        assertThat(ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(claimantRepresentative))
+                .isFalse();
+        // when claimant representative's email address is not empty should return true
+        claimantRepresentative.setRepresentativeId(CLAIMANT_REPRESENTATIVE_ID);
+        assertThat(ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(claimantRepresentative))
+                .isFalse();
+        // when claimant representative's email address is not empty should return true
+        claimantRepresentative.setRepresentativeEmailAddress(CLAIMANT_REPRESENTATIVE_EMAIL_ADDRESS);
+        assertThat(ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(claimantRepresentative))
+                .isTrue();
+    }
+
+    @Test
+    void theFindCaseUserAssignmentByIdamId() {
+        // when case user assignments is empty should return null
+        List<CaseUserAssignment> caseUserAssignments = new ArrayList<>();
+        assertThat(ClaimantRepresentativeUtils.findCaseUserAssignmentByIdamId(caseUserAssignments,
+                CLAIMANT_REPRESENTATIVE_IDAM_ID_1)).isNull();
+        // when user idam id is empty should return null
+        CaseUserAssignment caseUserAssignment = CaseUserAssignment.builder()
+                .userId(CLAIMANT_REPRESENTATIVE_IDAM_ID_1).caseId(SUBMISSION_REFERENCE).caseRole(ROLE_SOLICITORA)
+                .organisationId(ORGANISATION_ID_1).build();
+        caseUserAssignments.add(caseUserAssignment);
+        assertThat(ClaimantRepresentativeUtils.findCaseUserAssignmentByIdamId(caseUserAssignments, StringUtils.EMPTY))
+                .isNull();
+        // when case user assignments has a matching IDAM id should return that assignment
+        assertThat(ClaimantRepresentativeUtils.findCaseUserAssignmentByIdamId(caseUserAssignments,
+                CLAIMANT_REPRESENTATIVE_IDAM_ID_1)).isEqualTo(caseUserAssignment);
+        // when case user assignments has no matching IDAM id should return null
+        assertThat(ClaimantRepresentativeUtils.findCaseUserAssignmentByIdamId(caseUserAssignments,
+                CLAIMANT_REPRESENTATIVE_IDAM_ID_2)).isNull();
+    }
+
+    @Test
+    void theRemoveUserAssignmentAndGetFirstRemainingAssignment() {
+        // when case user assignments is empty should return false
+        List<CaseUserAssignment> caseUserAssignments = new ArrayList<>();
+        assertThat(ClaimantRepresentativeUtils.removeUserAssignmentAndGetFirstRemainingAssignment(caseUserAssignments,
+                CLAIMANT_REPRESENTATIVE_IDAM_ID_1)).isNull();
+        // when case user assignments has a matching IDAM id but not has any other assignments should return false
+        CaseUserAssignment caseUserAssignment1 = CaseUserAssignment.builder()
+                .userId(CLAIMANT_REPRESENTATIVE_IDAM_ID_1).caseId(SUBMISSION_REFERENCE).caseRole(ROLE_SOLICITORA)
+                .organisationId(ORGANISATION_ID_1).build();
+        caseUserAssignments.add(caseUserAssignment1);
+        assertThat(ClaimantRepresentativeUtils.removeUserAssignmentAndGetFirstRemainingAssignment(caseUserAssignments,
+                CLAIMANT_REPRESENTATIVE_IDAM_ID_1)).isNull();
+        // when case user assignments has a matching IDAM id and has other assignments should return true
+        CaseUserAssignment caseUserAssignment2 = CaseUserAssignment.builder()
+                .userId(CLAIMANT_REPRESENTATIVE_IDAM_ID_2).caseId(SUBMISSION_REFERENCE).caseRole(ROLE_SOLICITORB)
+                .organisationId(ORGANISATION_ID_2).build();
+        caseUserAssignments.addAll(Arrays.asList(caseUserAssignment1, caseUserAssignment2));
+        assertThat(ClaimantRepresentativeUtils.removeUserAssignmentAndGetFirstRemainingAssignment(caseUserAssignments,
+                CLAIMANT_REPRESENTATIVE_IDAM_ID_1)).isEqualTo(caseUserAssignment2);
     }
 }

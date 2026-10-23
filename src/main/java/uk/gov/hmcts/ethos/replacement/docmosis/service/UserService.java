@@ -16,6 +16,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConst
 @RequiredArgsConstructor
 public class UserService {
 
+    private final AdminUserService adminUserService;
     private final UserIdamService userIdamService;
 
     private static final String CLASS_NAME = UserService.class.getName();
@@ -39,6 +40,21 @@ public class UserService {
                     submissionReference,
                     CLASS_NAME,
                     methodName);
+        }
+        return userDetails;
+    }
+
+    /**
+     * Finds user details in IDAM for the given IDAM ID.
+     *
+     * @param idamId the IDAM ID of the user whose details are requested
+     * @return the user details, or {@code null} if the service returns no details
+     *         or the returned user's UID is {@code null}, empty, or whitespace only
+     */
+    public UserDetails findUserDetailsByIdamId(String idamId) {
+        UserDetails userDetails = userIdamService.getUserDetailsById(adminUserService.getAdminUserToken(), idamId);
+        if (ObjectUtils.isEmpty(userDetails) || StringUtils.isBlank(userDetails.getUid())) {
+            return null;
         }
         return userDetails;
     }

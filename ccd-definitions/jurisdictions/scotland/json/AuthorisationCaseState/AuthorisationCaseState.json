@@ -448,5 +448,17 @@
     "CaseStateID": "Transferred",
     "UserRole": "GS_profile",
     "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseStateID": "Closed",
+    "UserRole": "caseworker-caa",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseStateID": "Rejected",
+    "UserRole": "caseworker-caa",
+    "CRUD": "CRUD"
   }
 ]

@@ -7,7 +7,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -292,11 +291,11 @@ class ResetEraFlagTaskTest {
     }
 
     @Test
-    void processCases_skipsUnknownCaseId() throws IOException {
-        SubmitEvent unknownEvent = new SubmitEvent();
-        unknownEvent.setCaseId(0);
+    void processCases_skipsInvalidCaseId() throws IOException {
+        SubmitEvent zeroEvent = new SubmitEvent();
+        zeroEvent.setCaseId(0);
 
-        task.processCases(List.of(unknownEvent), ENGLANDWALES_CASE_TYPE_ID, ADMIN_TOKEN);
+        task.processCases(List.of(zeroEvent), ENGLANDWALES_CASE_TYPE_ID, ADMIN_TOKEN);
 
         verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
     }
@@ -308,50 +307,27 @@ class ResetEraFlagTaskTest {
     }
 
     @Test
-    void findCaseId_returnsExpectedId() {
-        SubmitEvent submitEvent = new SubmitEvent();
-        submitEvent.setCaseId(123_456_789L);
-        assertEquals("123456789", ResetEraFlagTask.findCaseId(submitEvent));
+    void extractLastCaseReference_returnsExpectedId() {
+        SubmitEvent event1 = buildSubmitEvent(1_111L);
+        SubmitEvent event2 = buildSubmitEvent(2_222L);
+        assertEquals("2222", ResetEraFlagTask.extractLastCaseReference(List.of(event1, event2)));
 
         SubmitEvent zeroEvent = new SubmitEvent();
         zeroEvent.setCaseId(0);
-        assertEquals("<unknown>", ResetEraFlagTask.findCaseId(zeroEvent));
+        assertEquals("1111", ResetEraFlagTask.extractLastCaseReference(List.of(event1, zeroEvent)));
 
-        assertEquals("<unknown>", ResetEraFlagTask.findCaseId(null));
+        assertNull(ResetEraFlagTask.extractLastCaseReference(Collections.emptyList()));
+        assertNull(ResetEraFlagTask.extractLastCaseReference(null));
     }
 
     @Test
-    void setLastCaseId_updatesLastCaseIdCorrectly() {
-        SubmitEvent event1 = buildSubmitEvent(1111L);
-        SubmitEvent event2 = buildSubmitEvent(2222L);
-
-        task.setLastCaseId(List.of(event1, event2));
-        String lastCaseId = (String) ReflectionTestUtils.getField(task, "lastCaseId");
-        assertEquals("2222", lastCaseId);
-
-        SubmitEvent eventZero = buildSubmitEvent(0);
-        task.setLastCaseId(List.of(event1, eventZero));
-        lastCaseId = (String) ReflectionTestUtils.getField(task, "lastCaseId");
-        assertEquals("1111", lastCaseId);
-
-        task.setLastCaseId(Collections.emptyList());
-        lastCaseId = (String) ReflectionTestUtils.getField(task, "lastCaseId");
-        assertEquals("0", lastCaseId);
-
-        task.setLastCaseId(null);
-        lastCaseId = (String) ReflectionTestUtils.getField(task, "lastCaseId");
-        assertEquals("0", lastCaseId);
-    }
-
-    @Test
-    void buildQuery_buildsElasticsearchQueryWithSearchAfter() {
-        String query = task.buildQuery();
+    void buildSearchQuery_buildsElasticsearchQueryWithSearchAfter() {
+        String query = task.buildSearchQuery(null);
         assertTrue(query.contains("data.additionalCaseInfo.era"));
         assertTrue(query.contains("reference.keyword"));
         assertFalse(query.contains("search_after"));
 
-        ReflectionTestUtils.setField(task, "lastCaseId", CASE_ID);
-        String queryWithSearchAfter = task.buildQuery();
+        String queryWithSearchAfter = task.buildSearchQuery(CASE_ID);
         assertTrue(queryWithSearchAfter.contains("search_after"));
         assertTrue(queryWithSearchAfter.contains(CASE_ID));
     }

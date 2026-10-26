@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.tasks;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
@@ -21,7 +19,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,16 +37,12 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 public class ResetEraFlagTask implements Runnable {
 
     private static final String FIX_CASE_API = "fixCaseAPI";
-    private static final String UNKNOWN_CASE_ID = "<unknown>";
-    private static final String INITIAL_CASE_ID = "0";
 
     private final AdminUserService adminUserService;
     private final CcdClient ccdClient;
     private final String caseTypeIdsString;
     private final int maxCases;
     private final boolean dryRun;
-
-    private String lastCaseId;
 
     @Autowired
     public ResetEraFlagTask(
@@ -82,60 +75,69 @@ public class ResetEraFlagTask implements Runnable {
     public void run() {
         log.info("Reset ERA flag task started (dryRun={})", dryRun);
         String adminUserToken = adminUserService.getAdminUserToken();
-        String[] caseTypeIds = caseTypeIdsString.split(",");
 
-        Arrays.stream(caseTypeIds).forEach(rawCaseTypeId -> {
-            String caseTypeId = rawCaseTypeId.strip();
-            lastCaseId = INITIAL_CASE_ID;
-            List<SubmitEvent> cases;
-            try {
-                do {
-                    log.info("{} - Reset ERA flag task - Searching for cases", caseTypeId);
-                    String query = buildQuery();
-                    cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
-                    if (CollectionUtils.isEmpty(cases)) {
-                        log.info("{} - Reset ERA flag task - No cases found", caseTypeId);
-                        break;
-                    }
-                    setLastCaseId(cases);
-                    log.info("{} - Reset ERA flag task - Retrieved {} cases", caseTypeId, cases.size());
-                    processCases(cases, caseTypeId, adminUserToken);
-                } while (CollectionUtils.isNotEmpty(cases));
-            } catch (IOException ex) {
-                log.error("IO error while searching cases for caseType {}: {}", caseTypeId, ex.getMessage(), ex);
+        for (String rawCaseTypeId : caseTypeIdsString.split(",")) {
+            String caseTypeId = rawCaseTypeId.trim();
+            if (!caseTypeId.isEmpty()) {
+                resetEraFlagsForCaseType(adminUserToken, caseTypeId);
             }
-        });
+        }
+
         log.info("Reset ERA flag task finished");
     }
 
-    /**
-     * Processes a batch of retrieved cases, resetting the ERA flag to No and submitting each case.
-     *
-     * @param cases the list of submit events returned from Elasticsearch
-     * @param caseTypeId the CCD case type ID
-     * @param adminUserToken the admin user auth token
-     */
+    public void resetEraFlagsForCaseType(String adminUserToken, String caseTypeId) {
+        String searchAfterReference = null;
+        while (true) {
+            try {
+                String query = buildSearchQuery(searchAfterReference);
+                log.info("Searching for ERA cases in case type {}", caseTypeId);
+                List<SubmitEvent> foundCases =
+                        ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
+
+                if (foundCases == null || foundCases.isEmpty()) {
+                    log.info("No matching ERA cases found for case type {}", caseTypeId);
+                    break;
+                }
+
+                log.info("Retrieved {} ERA cases to reset for case type {}", foundCases.size(), caseTypeId);
+                processCases(foundCases, caseTypeId, adminUserToken);
+
+                searchAfterReference = extractLastCaseReference(foundCases);
+                if (searchAfterReference == null) {
+                    break;
+                }
+            } catch (IOException ex) {
+                log.error("Failed querying CCD for case type {}: {}", caseTypeId, ex.getMessage(), ex);
+                break;
+            }
+        }
+    }
+
     public void processCases(List<SubmitEvent> cases, String caseTypeId, String adminUserToken) {
-        if (CollectionUtils.isEmpty(cases)) {
+        if (cases == null || cases.isEmpty()) {
             return;
         }
-        int updated = 0;
-        int failed = 0;
+
+        int successCount = 0;
+        int failureCount = 0;
         for (SubmitEvent submitEvent : cases) {
-            String caseId = findCaseId(submitEvent);
-            if (UNKNOWN_CASE_ID.equals(caseId)) {
-                log.warn("{} - Reset ERA flag task - Skipping unknown case ID", caseTypeId);
-                failed++;
+            if (submitEvent == null || submitEvent.getCaseId() == 0) {
+                log.warn("Skipping submit event with invalid or missing case ID in case type {}", caseTypeId);
+                failureCount++;
                 continue;
             }
+
+            String caseId = String.valueOf(submitEvent.getCaseId());
             if (processCase(adminUserToken, caseTypeId, caseId)) {
-                updated++;
+                successCount++;
             } else {
-                failed++;
+                failureCount++;
             }
         }
-        log.info("{} - Reset ERA flag task batch summary: total={}, updated={}, failed={}",
-                caseTypeId, cases.size(), updated, failed);
+
+        log.info("Reset ERA flag task batch for {}: total={}, updated={}, failed={}",
+                caseTypeId, cases.size(), successCount, failureCount);
     }
 
     public boolean processCase(String adminUserToken, String caseTypeId, String caseId) {
@@ -192,42 +194,32 @@ public class ResetEraFlagTask implements Runnable {
         return true;
     }
 
-    public static String findCaseId(SubmitEvent submitEvent) {
-        return ObjectUtils.isNotEmpty(submitEvent) && submitEvent.getCaseId() != 0
-                ? String.valueOf(submitEvent.getCaseId())
-                : UNKNOWN_CASE_ID;
-    }
-
-    public void setLastCaseId(List<SubmitEvent> cases) {
+    public static String extractLastCaseReference(List<SubmitEvent> cases) {
         if (cases == null || cases.isEmpty()) {
-            lastCaseId = INITIAL_CASE_ID;
-            return;
+            return null;
         }
 
-        for (int index = cases.size() - 1; index >= 0; index--) {
-            SubmitEvent submitEvent = cases.get(index);
-            String caseId = findCaseId(submitEvent);
-            if (!UNKNOWN_CASE_ID.equals(caseId)) {
-                lastCaseId = caseId;
-                return;
+        for (int idx = cases.size() - 1; idx >= 0; idx--) {
+            SubmitEvent submitEvent = cases.get(idx);
+            if (submitEvent != null && submitEvent.getCaseId() != 0) {
+                return String.valueOf(submitEvent.getCaseId());
             }
-            log.warn("Reset ERA flag task - Case ID is unknown for submit event {}", submitEvent.getCaseId());
         }
-        lastCaseId = INITIAL_CASE_ID;
+        return null;
     }
 
-    String buildQuery() {
+    String buildSearchQuery(String afterReference) {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .size(maxCases)
+                .sort("reference.keyword", SortOrder.ASC)
                 .query(new BoolQueryBuilder()
                         .must(new BoolQueryBuilder()
                                 .should(new TermQueryBuilder("data.additionalCaseInfo.era", YES))
                                 .should(new TermQueryBuilder("data.additionalCaseInfo.era.keyword", YES))
-                                .minimumShouldMatch(1))
-                ).sort("reference.keyword", SortOrder.ASC);
+                                .minimumShouldMatch(1)));
 
-        if (StringUtils.isNotBlank(lastCaseId) && !INITIAL_CASE_ID.equals(lastCaseId)) {
-            searchSourceBuilder.searchAfter(new Object[] {lastCaseId});
+        if (StringUtils.isNotBlank(afterReference)) {
+            searchSourceBuilder.searchAfter(new Object[] {afterReference});
         }
         return searchSourceBuilder.toString();
     }

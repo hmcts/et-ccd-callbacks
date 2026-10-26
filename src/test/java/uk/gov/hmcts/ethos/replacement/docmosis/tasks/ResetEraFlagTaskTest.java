@@ -12,15 +12,16 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.types.AdditionalCaseInfoType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,7 +43,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 class ResetEraFlagTaskTest {
 
     private static final String ADMIN_TOKEN = "test-admin-token";
-    private static final String S2S_TOKEN = "test-s2s-token";
     private static final String CASE_ID = "1620473176786991";
     private static final String CASE_ID_2 = "1620473176786992";
     private static final String FIX_CASE_API = "fixCaseAPI";
@@ -53,12 +53,6 @@ class ResetEraFlagTaskTest {
     @Mock
     private CcdClient ccdClient;
 
-    @Mock
-    private CoreCaseDataApi coreCaseDataApi;
-
-    @Mock
-    private AuthTokenGenerator authTokenGenerator;
-
     @Captor
     private ArgumentCaptor<CaseData> caseDataCaptor;
 
@@ -66,30 +60,29 @@ class ResetEraFlagTaskTest {
 
     @BeforeEach
     void setUp() {
-        task = new ResetEraFlagTask(adminUserService, ccdClient, coreCaseDataApi, authTokenGenerator);
+        task = new ResetEraFlagTask(adminUserService, ccdClient);
         lenient().when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
-        lenient().when(authTokenGenerator.generate()).thenReturn(S2S_TOKEN);
     }
 
     @Test
-    void run_doesNothingWhenCaseIdsIsEmptyOrNull() throws IOException {
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", null);
-        task.run();
-        verify(coreCaseDataApi, never()).getCase(anyString(), anyString(), anyString());
+    void run_doesNothingWhenNoCasesFound() throws IOException {
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), anyString(), anyString()))
+                .thenReturn(Collections.emptyList());
 
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", "");
         task.run();
-        verify(coreCaseDataApi, never()).getCase(anyString(), anyString(), anyString());
 
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", " , ");
-        task.run();
-        verify(coreCaseDataApi, never()).getCase(anyString(), anyString(), anyString());
+        verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
+        verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
     }
 
     @Test
-    void run_resetsEraFlagAndSubmitsCase_whenCaseHadEraYes() throws IOException {
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", CASE_ID);
-        mockCoreCaseDataApi(CASE_ID, ENGLANDWALES_CASE_TYPE_ID);
+    void run_resetsEraFlagAndSubmitsCase_whenCaseFound() throws IOException {
+        SubmitEvent submitEvent = buildSubmitEvent(Long.parseLong(CASE_ID));
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), anyString()))
+                .thenReturn(List.of(submitEvent))
+                .thenReturn(Collections.emptyList());
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID), anyString()))
+                .thenReturn(Collections.emptyList());
 
         CaseData caseData = new CaseData();
         AdditionalCaseInfoType additionalCaseInfoType = new AdditionalCaseInfoType();
@@ -103,7 +96,6 @@ class ResetEraFlagTaskTest {
 
         task.run();
 
-        verify(coreCaseDataApi).getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID);
         verify(ccdClient).submitEventForCase(eq(ADMIN_TOKEN), caseDataCaptor.capture(),
                 eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT), eq(ccdRequest), eq(CASE_ID));
 
@@ -117,8 +109,12 @@ class ResetEraFlagTaskTest {
 
     @Test
     void run_createsAdditionalCaseInfoWhenNull_andResetsEra() throws IOException {
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", CASE_ID);
-        mockCoreCaseDataApi(CASE_ID, ENGLANDWALES_CASE_TYPE_ID);
+        SubmitEvent submitEvent = buildSubmitEvent(Long.parseLong(CASE_ID));
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), anyString()))
+                .thenReturn(List.of(submitEvent))
+                .thenReturn(Collections.emptyList());
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID), anyString()))
+                .thenReturn(Collections.emptyList());
 
         CaseData caseData = new CaseData();
         caseData.setAdditionalCaseInfoType(null);
@@ -138,9 +134,13 @@ class ResetEraFlagTaskTest {
     }
 
     @Test
-    void run_resolvesScotlandCaseType_andSubmitsSuccessfully() throws IOException {
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", CASE_ID);
-        mockCoreCaseDataApi(CASE_ID, SCOTLAND_CASE_TYPE_ID);
+    void run_processesScotlandCases_andSubmitsSuccessfully() throws IOException {
+        SubmitEvent submitEvent = buildSubmitEvent(Long.parseLong(CASE_ID));
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), anyString()))
+                .thenReturn(Collections.emptyList());
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID), anyString()))
+                .thenReturn(List.of(submitEvent))
+                .thenReturn(Collections.emptyList());
 
         CaseData caseData = new CaseData();
         AdditionalCaseInfoType additionalCaseInfoType = new AdditionalCaseInfoType();
@@ -161,9 +161,14 @@ class ResetEraFlagTaskTest {
 
     @Test
     void run_doesNotSubmitWhenDryRunIsTrue() throws IOException {
-        task = new ResetEraFlagTask(adminUserService, ccdClient, coreCaseDataApi, authTokenGenerator,
-                CASE_ID, true);
-        mockCoreCaseDataApi(CASE_ID, ENGLANDWALES_CASE_TYPE_ID);
+        task = new ResetEraFlagTask(adminUserService, ccdClient, true);
+
+        SubmitEvent submitEvent = buildSubmitEvent(Long.parseLong(CASE_ID));
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), anyString()))
+                .thenReturn(List.of(submitEvent))
+                .thenReturn(Collections.emptyList());
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID), anyString()))
+                .thenReturn(Collections.emptyList());
 
         CaseData caseData = new CaseData();
         AdditionalCaseInfoType additionalCaseInfoType = new AdditionalCaseInfoType();
@@ -176,32 +181,24 @@ class ResetEraFlagTaskTest {
 
         task.run();
 
-        verify(coreCaseDataApi).getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID);
+        verify(ccdClient).startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API);
         verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
     }
 
     @Test
-    void run_skipsWhenCoreCaseDataApiReturnsNullOrBlankCaseType() throws IOException {
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", CASE_ID);
-        when(coreCaseDataApi.getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID)).thenReturn(null);
-
-        task.run();
-
-        verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
-
-        mockCoreCaseDataApi(CASE_ID, "   ");
-        task.run();
-
-        verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
-    }
-
-    @Test
     void run_continuesProcessingWhenOneCaseFails() throws IOException {
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", CASE_ID + "," + CASE_ID_2);
-        when(coreCaseDataApi.getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID))
+        SubmitEvent submitEvent1 = buildSubmitEvent(Long.parseLong(CASE_ID));
+        SubmitEvent submitEvent2 = buildSubmitEvent(Long.parseLong(CASE_ID_2));
+
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), anyString()))
+                .thenReturn(List.of(submitEvent1, submitEvent2))
+                .thenReturn(Collections.emptyList());
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID), anyString()))
+                .thenReturn(Collections.emptyList());
+
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API))
                 .thenThrow(new RuntimeException("CCD failure"));
 
-        mockCoreCaseDataApi(CASE_ID_2, ENGLANDWALES_CASE_TYPE_ID);
         CaseData caseData2 = new CaseData();
         CCDRequest ccdRequest2 = buildCcdRequest(caseData2, ENGLANDWALES_CASE_TYPE_ID);
         when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID_2, FIX_CASE_API))
@@ -214,9 +211,26 @@ class ResetEraFlagTaskTest {
     }
 
     @Test
+    void run_handlesSearchIOExceptionGracefully() throws IOException {
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), anyString()))
+                .thenThrow(new IOException("Elasticsearch connection failed"));
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID), anyString()))
+                .thenReturn(Collections.emptyList());
+
+        task.run();
+
+        verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
+    }
+
+    @Test
     void run_skipsWhenCcdRequestOrCaseDetailsOrCaseDataIsNull() throws IOException {
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", CASE_ID);
-        mockCoreCaseDataApi(CASE_ID, ENGLANDWALES_CASE_TYPE_ID);
+        SubmitEvent submitEvent = buildSubmitEvent(Long.parseLong(CASE_ID));
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), anyString()))
+                .thenReturn(List.of(submitEvent))
+                .thenReturn(Collections.emptyList());
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID), anyString()))
+                .thenReturn(Collections.emptyList());
+
         when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API))
                 .thenReturn(null);
 
@@ -227,8 +241,13 @@ class ResetEraFlagTaskTest {
 
     @Test
     void run_skipsWhenCaseDataIsNull() throws IOException {
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", CASE_ID);
-        mockCoreCaseDataApi(CASE_ID, ENGLANDWALES_CASE_TYPE_ID);
+        SubmitEvent submitEvent = buildSubmitEvent(Long.parseLong(CASE_ID));
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), anyString()))
+                .thenReturn(List.of(submitEvent))
+                .thenReturn(Collections.emptyList());
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID), anyString()))
+                .thenReturn(Collections.emptyList());
+
         CCDRequest ccdRequest = new CCDRequest();
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
@@ -244,15 +263,14 @@ class ResetEraFlagTaskTest {
     }
 
     @Test
-    void processCases_handlesBlankCaseIdInList() {
-        task.processCases(List.of("   ", ""));
-        verify(coreCaseDataApi, never()).getCase(anyString(), anyString(), anyString());
-    }
-
-    @Test
     void run_usesDefaultEmploymentJurisdiction_whenCaseDetailsJurisdictionIsNull() throws IOException {
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", CASE_ID);
-        mockCoreCaseDataApi(CASE_ID, ENGLANDWALES_CASE_TYPE_ID);
+        SubmitEvent submitEvent = buildSubmitEvent(Long.parseLong(CASE_ID));
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), anyString()))
+                .thenReturn(List.of(submitEvent))
+                .thenReturn(Collections.emptyList());
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID), anyString()))
+                .thenReturn(Collections.emptyList());
+
         CaseData caseData = new CaseData();
         CCDRequest ccdRequest = buildCcdRequest(caseData, ENGLANDWALES_CASE_TYPE_ID);
         ccdRequest.getCaseDetails().setJurisdiction(null);
@@ -268,21 +286,80 @@ class ResetEraFlagTaskTest {
     }
 
     @Test
-    void parseCaseIds_trimsAndRemovesBlanks() {
-        List<String> result = ResetEraFlagTask.parseCaseIds(" " + CASE_ID + " ,, " + CASE_ID_2 + " ");
-        assertEquals(List.of(CASE_ID, CASE_ID_2), result);
-
-        assertTrue(ResetEraFlagTask.parseCaseIds(null).isEmpty());
-        assertTrue(ResetEraFlagTask.parseCaseIds("").isEmpty());
-        assertTrue(ResetEraFlagTask.parseCaseIds(" , ").isEmpty());
+    void processCase_handlesBlankCaseId() {
+        assertFalse(task.processCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "   "));
+        assertFalse(task.processCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, null));
     }
 
-    private void mockCoreCaseDataApi(String caseId, String caseTypeId) {
-        uk.gov.hmcts.reform.ccd.client.model.CaseDetails details =
-                uk.gov.hmcts.reform.ccd.client.model.CaseDetails.builder()
-                        .caseTypeId(caseTypeId)
-                        .build();
-        when(coreCaseDataApi.getCase(ADMIN_TOKEN, S2S_TOKEN, caseId)).thenReturn(details);
+    @Test
+    void processCases_skipsUnknownCaseId() throws IOException {
+        SubmitEvent unknownEvent = new SubmitEvent();
+        unknownEvent.setCaseId(0);
+
+        task.processCases(List.of(unknownEvent), ENGLANDWALES_CASE_TYPE_ID, ADMIN_TOKEN);
+
+        verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void processCases_handlesEmptyList() throws IOException {
+        task.processCases(Collections.emptyList(), ENGLANDWALES_CASE_TYPE_ID, ADMIN_TOKEN);
+        verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void findCaseId_returnsExpectedId() {
+        SubmitEvent submitEvent = new SubmitEvent();
+        submitEvent.setCaseId(123_456_789L);
+        assertEquals("123456789", ResetEraFlagTask.findCaseId(submitEvent));
+
+        SubmitEvent zeroEvent = new SubmitEvent();
+        zeroEvent.setCaseId(0);
+        assertEquals("<unknown>", ResetEraFlagTask.findCaseId(zeroEvent));
+
+        assertEquals("<unknown>", ResetEraFlagTask.findCaseId(null));
+    }
+
+    @Test
+    void setLastCaseId_updatesLastCaseIdCorrectly() {
+        SubmitEvent event1 = buildSubmitEvent(1111L);
+        SubmitEvent event2 = buildSubmitEvent(2222L);
+
+        task.setLastCaseId(List.of(event1, event2));
+        String lastCaseId = (String) ReflectionTestUtils.getField(task, "lastCaseId");
+        assertEquals("2222", lastCaseId);
+
+        SubmitEvent eventZero = buildSubmitEvent(0);
+        task.setLastCaseId(List.of(event1, eventZero));
+        lastCaseId = (String) ReflectionTestUtils.getField(task, "lastCaseId");
+        assertEquals("1111", lastCaseId);
+
+        task.setLastCaseId(Collections.emptyList());
+        lastCaseId = (String) ReflectionTestUtils.getField(task, "lastCaseId");
+        assertEquals("0", lastCaseId);
+
+        task.setLastCaseId(null);
+        lastCaseId = (String) ReflectionTestUtils.getField(task, "lastCaseId");
+        assertEquals("0", lastCaseId);
+    }
+
+    @Test
+    void buildQuery_buildsElasticsearchQueryWithSearchAfter() {
+        String query = task.buildQuery();
+        assertTrue(query.contains("data.additionalCaseInfo.era"));
+        assertTrue(query.contains("reference.keyword"));
+        assertFalse(query.contains("search_after"));
+
+        ReflectionTestUtils.setField(task, "lastCaseId", CASE_ID);
+        String queryWithSearchAfter = task.buildQuery();
+        assertTrue(queryWithSearchAfter.contains("search_after"));
+        assertTrue(queryWithSearchAfter.contains(CASE_ID));
+    }
+
+    private SubmitEvent buildSubmitEvent(long caseId) {
+        SubmitEvent submitEvent = new SubmitEvent();
+        submitEvent.setCaseId(caseId);
+        return submitEvent;
     }
 
     private CCDRequest buildCcdRequest(CaseData caseData, String caseTypeId) {

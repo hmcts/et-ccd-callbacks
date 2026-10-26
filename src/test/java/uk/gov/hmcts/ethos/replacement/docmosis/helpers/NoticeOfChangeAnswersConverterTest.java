@@ -39,6 +39,20 @@ class NoticeOfChangeAnswersConverterTest {
 
         assertThat(noticeOfChangeAnswersConverter.generateForSubmission(respondentSumTypeItem, claimantIndType))
             .isEqualTo(expectedNocAnswer);
+    }
 
+    @Test
+    void shouldHandleNullClaimantAndRespondent() {
+        NoticeOfChangeAnswers nocAnswer = noticeOfChangeAnswersConverter.generateForSubmission(null, null);
+        assertThat(nocAnswer).isNotNull();
+        assertThat(nocAnswer.getRespondentName()).isNull();
+        assertThat(nocAnswer.getClaimantFirstName()).isNull();
+        assertThat(nocAnswer.getClaimantLastName()).isNull();
+
+        RespondentSumTypeItem respondentWithoutValue = new RespondentSumTypeItem();
+        NoticeOfChangeAnswers nocAnswer2 = noticeOfChangeAnswersConverter
+                .generateForSubmission(respondentWithoutValue, null);
+        assertThat(nocAnswer2).isNotNull();
+        assertThat(nocAnswer2.getRespondentName()).isNull();
     }
 }

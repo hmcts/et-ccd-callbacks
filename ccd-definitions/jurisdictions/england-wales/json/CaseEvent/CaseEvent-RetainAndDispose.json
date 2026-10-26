@@ -123,5 +123,32 @@
     "ShowEventNotes": "N",
     "ShowSummary": "N",
     "SignificantEvent": "Yes"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "MarkForDisposal",
+    "Name": "Mark for disposal",
+    "Description": "Mark an expired draft case for disposal",
+    "DisplayOrder": 1001,
+    "PreConditionState(s)": "AWAITING_SUBMISSION_TO_HMCTS;Delete",
+    "PostConditionState": "PendingDisposal",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "SignificantEvent": "Yes"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "ConfirmDisposal",
+    "Name": "Confirm disposal",
+    "Description": "Set the disposal TTL after verifying the case is readable",
+    "DisplayOrder": 1002,
+    "PreConditionState(s)": "PendingDisposal",
+    "PostConditionState": "PendingDisposal",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "SignificantEvent": "Yes",
+    "TTLIncrement": "0"
   }
 ]

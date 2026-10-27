@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from "@playwright/test";
-import { BasePage } from "./basePage";
-import acasCertData from '../../resources/payload/acas-content.json';
+import { BasePage } from "./basePage.js";
+import acasCertData from '../../resources/payload/acas-content.json' with { type: 'json' };
 
 export class SearchAcasPage extends BasePage {
   private readonly acasCertificateTextBox: Locator;

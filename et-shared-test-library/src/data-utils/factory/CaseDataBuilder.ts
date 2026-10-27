@@ -1,7 +1,6 @@
-import { ReplacementAction } from '../../types/replacement-action';
-import { ccdApi } from '../../fixtures/common.fixture';
-import { CaseTypeLocation } from '../../config/case-data';
-import { users } from '../../config/config.dynamic';
+import { ReplacementAction } from '../../types/index.js';
+import { ccdApi } from '../../fixtures/index.js';
+import { CaseTypeLocation, users } from '../../config/index.js';
 
 export class CaseDataBuilder {
   private email: string;

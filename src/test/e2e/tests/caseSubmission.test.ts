@@ -1,18 +1,21 @@
 import { test } from '../fixtures/et.test.fixture.ts';
-import userDetailsData from '@hmcts/et-shared-test-library/resources/payload/user-details.json';
 import {
   CaseTypeLocation, config,
   createCaseViaCitizenUI,
-  Events, partiallyCreateCaseViaCitizenUI,
-  users,
-  vetAndAcceptCitizenCase
+  Events, partiallyCreateCaseViaCitizenUI, resolveResourceJson,
+  users, vetAndAcceptCitizenCase
 } from "@hmcts/et-shared-test-library";
 
 let caseId: string;
 let caseNumber: string;
+let userDetailsData: any;
 
 test.describe.serial('Case creation in Citizen UI',
   () => {
+
+  test.beforeAll(async () => {
+    userDetailsData = resolveResourceJson('resources/payload/user-details.json');
+  });
 
   test(
     'Create a claim for still working for organisation, submit and process within manage cases',

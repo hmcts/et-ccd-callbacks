@@ -1,14 +1,25 @@
 import { test } from '../../fixtures/et.test.fixture.ts';
-import {CaseTypeLocation, CaseworkerCaseFactory, Events, users} from "@hmcts/et-shared-test-library";
-import fileUploadData from '@hmcts/et-shared-test-library/resources/payload/file-upload-content.json';
+import {
+  CaseTypeLocation,
+  CaseworkerCaseFactory,
+  Events,
+  resolveResourceJson,
+  users
+} from "@hmcts/et-shared-test-library";
 
 let caseNumber: string;
 let caseId: string;
+let fileUploadData: any;
 
 test.describe('Scotland Case Initial Consideration', () => {
   test.use({
     storageState: users.etCaseWorker.sessionFile,
   })
+  
+  test.beforeAll(async () => {
+    fileUploadData = resolveResourceJson('resources/payload/file-upload-content.json');
+  })
+
   test.beforeEach(async ({ manageCaseDashboardPage, loginPage }) => {
     ({ caseId, caseNumber } = await CaseworkerCaseFactory.createScotlandAndAcceptCase());
     await manageCaseDashboardPage.visit();

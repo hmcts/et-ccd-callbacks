@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from "@playwright/test";
-import { BasePage } from "./basePage";
-import letterPageData from '../../resources/payload/letter-content.json';
+import { BasePage } from "./basePage.js";
+import letterPageData from '../../resources/payload/letter-content.json' with { type: 'json' };
 
 export class LettersPage extends BasePage {
   private readonly part1DocsEle: Locator;

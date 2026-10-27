@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { LoginPage } from '../loginPage';
-import { config, UserCredentials } from '../../config';
+import { LoginPage } from '../loginPage.js';
+import { config, UserCredentials } from '../../config/index.js';
 
 export class CitizenHubLoginPage extends LoginPage {
   private readonly syaLandingPageTitle: Locator;
@@ -61,7 +61,7 @@ export class CitizenHubLoginPage extends LoginPage {
     await this.page.waitForLoadState('load');
     await this.processLogin(user, config.etSyaUiUrl);
     //TODO remove url check to landing page, as UI will be logged as soon as user is created.
-    const url = this.page.url();
+    const url = this.page.url() ?? '';
     if (url.includes('claimant-applications')) {
       await this.page.waitForURL(`${claimantUri}claimant-applications**`, {timeout: 5000});
     } else {

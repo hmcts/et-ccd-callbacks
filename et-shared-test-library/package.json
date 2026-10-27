@@ -18,6 +18,14 @@
       "types": "./dist/config/index.d.ts",
       "default": "./dist/config/index.js"
     },
+    "./config/global/global-setup": {
+      "types": "./dist/config/global/global-setup.d.ts",
+      "default": "./dist/config/global/global-setup.js"
+    },
+    "./config/global/global-teardown": {
+      "types": "./dist/config/global/global-teardown.d.ts",
+      "default": "./dist/config/global/global-teardown.js"
+    },
     "./fixtures/common": {
       "types": "./dist/fixtures/common.fixture.d.ts",
       "default": "./dist/fixtures/common.fixture.js"
@@ -38,7 +46,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.11.1"
   },
   "type": "module",
   "dependencies": {

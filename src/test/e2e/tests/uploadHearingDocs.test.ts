@@ -1,7 +1,7 @@
 import { test } from '../fixtures/et.test.fixture.ts';
 import {
   CaseDetailsPage, CaseDetailsValues, CaseTypeLocation,
-  CaseworkerCaseFactory, DateUtilComponent, Events, ListHearingPage,
+  CaseworkerCaseFactory, config, DateUtilComponent, Events, ListHearingPage,
   LoginPage,
   ManageCaseDashboardPage,
   users

@@ -1,5 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { BasePage } from '../basePage';
+import { BasePage } from '../basePage.js';
 
 export class Et1ClaimsListPage extends BasePage {
   private readonly myEt1Claims: Locator;

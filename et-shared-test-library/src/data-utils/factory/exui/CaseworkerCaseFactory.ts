@@ -1,7 +1,7 @@
-import { CaseDataBuilder } from '../CaseDataBuilder';
-import { CaseTypeLocation, Events, PayloadPath } from '../../../config/case-data';
-import { CaseEventApi } from '../../api/CaseEventApi';
-import { ReplacementAction } from '../../../types/replacement-action';
+import { CaseDataBuilder } from '../CaseDataBuilder.js';
+import { CaseTypeLocation, Events, PayloadPath } from '../../../config/index.js';
+import { CaseEventApi } from '../../api/CaseEventApi.js';
+import { ReplacementAction } from '../../../types/index.js';
 
 export class CaseworkerCaseFactory {
 

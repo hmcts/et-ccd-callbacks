@@ -1,6 +1,6 @@
 import { expect, Page, Locator } from '@playwright/test';
-import { LoginPage } from '../loginPage';
-import { config, UserCredentials } from '../../config';
+import { LoginPage } from '../loginPage.js';
+import { config, UserCredentials } from '../../config/index.js';
 
 export class ET3LoginPage extends LoginPage {
   private readonly returnToExistingResponse: Locator;

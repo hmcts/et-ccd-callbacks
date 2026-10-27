@@ -1,6 +1,6 @@
 import { expect, Page, Locator } from '@playwright/test';
-import { BasePage } from "../basePage";
-import {resolveResourcePath} from "../../data-utils/resourcePath";
+import { BasePage } from "../basePage.js";
+import {resolveResourcePath} from "../../data-utils/resourceFilePathData.js";
 
 export class RespondentCaseOverviewPage extends BasePage {
   private readonly et1FormLink: Locator;

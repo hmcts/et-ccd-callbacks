@@ -1,9 +1,17 @@
 import { test } from "../fixtures/et.test.fixture.ts";
-import letterPageData from '@hmcts/et-shared-test-library/resources/payload/letter-content.json';
-import {CaseTypeLocation, CaseworkerCaseFactory, DateUtilComponent, Events, users} from "@hmcts/et-shared-test-library";
+import {
+  CaseTypeLocation,
+  CaseworkerCaseFactory,
+  DateUtilComponent,
+  Events,
+  resolveResourceJson,
+  users
+} from "@hmcts/et-shared-test-library";
 
 let caseNumber: string;
 let caseId: string;
+const letterPageData = resolveResourceJson('resources/payload/letter-content.json');
+
 test.describe('Generate Letters', () => {
   test.use({
     storageState: users.etCaseWorker.sessionFile,

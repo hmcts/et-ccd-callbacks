@@ -2,8 +2,9 @@ import lockfile from 'proper-lockfile';
 import fs from 'fs-extra';
 import path from 'path';
 
-const CACHE_PATH = path.resolve(__dirname, '../../token-cache.json');
-const TEST_USERS_PATH = path.resolve(__dirname, '../../.tmp/test-users.json');
+const TEMP_DIR = './.tmp';
+const CACHE_FILE_NAME = 'token-cache.json';
+const TEST_USERS_FILE_NAME = 'test-users.json';
 
 export type CachedToken = {
   token: string;
@@ -11,13 +12,38 @@ export type CachedToken = {
   userId: string;
 };
 
+export async function writeCache(cache: Map<string, CachedToken>): Promise<void> {
+  let release: (() => Promise<void>) | undefined;
+  const cachePath = path.join(TEMP_DIR, CACHE_FILE_NAME);
+  if (!fs.existsSync(TEMP_DIR)) {
+    fs.mkdirSync(TEMP_DIR);
+  }
+  try {
+    release = await lockfile.lock(cachePath, { retries: 5, realpath: false });
+    const obj = Object.fromEntries(cache);
+    await fs.writeJson(cachePath, obj, { spaces: 2 });
+  } catch (err) {
+    console.error('Error writing token cache:', err);
+  } finally {
+    if (release) {
+      await release().catch(err => {
+        console.error('Error releasing lock after write:', err);
+      });
+    }
+  }
+}
+
 export async function readCache(): Promise<Map<string, CachedToken>> {
   let release: (() => Promise<void>) | undefined;
+  const cachePath = path.join(TEMP_DIR, CACHE_FILE_NAME);
+  if (!fs.existsSync(TEMP_DIR)) {
+    fs.mkdirSync(TEMP_DIR);
+  }
   try {
-    release = await lockfile.lock(CACHE_PATH, { retries: 5, realpath: false });
-    const exists = await fs.pathExists(CACHE_PATH);
+    release = await lockfile.lock(cachePath, { retries: 5, realpath: false });
+    const exists = await fs.pathExists(cachePath);
     if (!exists) return new Map();
-    const data = await fs.readJson(CACHE_PATH);
+    const data = await fs.readJson(cachePath);
     return new Map(Object.entries(data));
   } catch (err) {
     console.error('Error reading token cache:', err);
@@ -32,30 +58,14 @@ export async function readCache(): Promise<Map<string, CachedToken>> {
   }
 }
 
-export async function writeCache(cache: Map<string, CachedToken>): Promise<void> {
-  let release: (() => Promise<void>) | undefined;
-  try {
-    release = await lockfile.lock(CACHE_PATH, { retries: 5, realpath: false });
-    const obj = Object.fromEntries(cache);
-    await fs.writeJson(CACHE_PATH, obj, { spaces: 2 });
-  } catch (err) {
-    console.error('Error writing token cache:', err);
-  } finally {
-    if (release) {
-      await release().catch(err => {
-        console.error('Error releasing lock after write:', err);
-      });
-    }
-  }
-}
-
 export async function deleteCacheFile(): Promise<void> {
   let release: (() => Promise<void>) | undefined;
+  const cachePath = path.join(TEMP_DIR, CACHE_FILE_NAME);
   try {
-    release = await lockfile.lock(CACHE_PATH, { retries: 5, realpath: false });
-    const exists = await fs.pathExists(CACHE_PATH);
+    release = await lockfile.lock(cachePath, { retries: 5, realpath: false });
+    const exists = await fs.pathExists(cachePath);
     if (exists) {
-      await fs.remove(CACHE_PATH);
+      await fs.remove(cachePath);
     }
   } catch (err) {
     console.error('Error deleting token cache:', err);
@@ -70,11 +80,12 @@ export async function deleteCacheFile(): Promise<void> {
 
 export async function deleteUserCredFile(): Promise<void> {
   let release: (() => Promise<void>) | undefined;
+  const userFilePath = path.join(TEMP_DIR, TEST_USERS_FILE_NAME);
   try {
-    release = await lockfile.lock(TEST_USERS_PATH, { retries: 5, realpath: false });
-    const exists = await fs.pathExists(TEST_USERS_PATH);
+    release = await lockfile.lock(userFilePath, { retries: 5, realpath: false });
+    const exists = await fs.pathExists(userFilePath);
     if (exists) {
-      await fs.remove(TEST_USERS_PATH);
+      await fs.remove(userFilePath);
     }
   } catch (err) {
     console.error('Error deleting test users cache:', err);
@@ -88,7 +99,7 @@ export async function deleteUserCredFile(): Promise<void> {
 }
 
 export function getDynamicUser(key: string) {
-  const tmpFile = path.resolve(TEST_USERS_PATH);
+  const tmpFile = path.join(TEMP_DIR, TEST_USERS_FILE_NAME);
   if (fs.existsSync(tmpFile)) {
     try {
       const users = JSON.parse(fs.readFileSync(tmpFile, 'utf-8'));
@@ -105,7 +116,7 @@ export function getDynamicUser(key: string) {
  * Call this in global teardown to ensure a clean state.
  */
 export async function deleteAllSessionFiles(): Promise<void> {
-  const sessionsDir = path.resolve(__dirname, '../../.sessions');
+  const sessionsDir = './.sessions';
   try {
     if (await fs.pathExists(sessionsDir)) {
       const files = await fs.readdir(sessionsDir);
@@ -114,7 +125,7 @@ export async function deleteAllSessionFiles(): Promise<void> {
         await fs.remove(filePath);
       }
       // Remove the .sessions directory itself
-      await fs.rmdir(sessionsDir);
+      fs.rmdir(sessionsDir);
     }
   } catch (err) {
     console.error('Error deleting session files:', err);

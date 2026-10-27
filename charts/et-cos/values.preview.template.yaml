@@ -112,7 +112,7 @@ et-syr:
   enabled: true
   nodejs:
     imagePullPolicy: Always
-    image: hmctsprod.azurecr.io/et/syr:pr-1040-3f4c4f5-20261026174725 #{"$imagepolicy": "flux-system:ithc-et-syr"}
+    image: hmctsprod.azurecr.io/et/syr:pr-1040-eaf60a8-20261027093215 #{"$imagepolicy": "flux-system:ithc-et-syr"}
     releaseNameOverride: ${SERVICE_NAME}-et-syr
     ingressHost: et-syr-${SERVICE_FQDN}
     devcpuRequests: 10m

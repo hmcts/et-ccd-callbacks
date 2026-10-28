@@ -191,6 +191,9 @@ public class MultiplesSendNotificationService {
         sendNotificationType.setSendNotificationRequestMadeBy(multipleData.getSendNotificationRequestMadeBy());
         sendNotificationType.setSendNotificationEccQuestion(multipleData.getSendNotificationEccQuestion());
         sendNotificationType.setSendNotificationWhoMadeJudgement(multipleData.getSendNotificationWhoMadeJudgement());
+        sendNotificationType.setSendNotificationGroupClaims(multipleData.getSendNotificationGroupClaims());
+        sendNotificationType.setSendNotificationGroupClaimsMadeBy(multipleData.getSendNotificationGroupClaimsMadeBy());
+        sendNotificationType.setSendNotificationFullName3(multipleData.getSendNotificationFullName3());
 
         // Multiple sender indicator
         sendNotificationType.setNotificationSentFrom(multipleData.getMultipleReference());
@@ -233,6 +236,9 @@ public class MultiplesSendNotificationService {
         multipleData.setSendNotificationRequestMadeBy(null);
         multipleData.setSendNotificationEccQuestion(null);
         multipleData.setSendNotificationWhoCaseOrder(null);
+        multipleData.setSendNotificationGroupClaims(null);
+        multipleData.setSendNotificationGroupClaimsMadeBy(null);
+        multipleData.setSendNotificationFullName3(null);
         multipleData.setSendNotificationNotifyLeadCase(null);
         multipleData.setSendNotificationNotifyAll(null);
         multipleData.setSendNotificationNotifySelected(null);

@@ -60,6 +60,12 @@ public class SendNotificationType {
     private String sendNotificationEccQuestion;
     @JsonProperty("sendNotificationWhoMadeJudgement")
     private String sendNotificationWhoMadeJudgement;
+    @JsonProperty("sendNotificationGroupClaims")
+    private String sendNotificationGroupClaims;
+    @JsonProperty("sendNotificationGroupClaimsMadeBy")
+    private String sendNotificationGroupClaimsMadeBy;
+    @JsonProperty("sendNotificationFullName3")
+    private String sendNotificationFullName3;
     @JsonProperty("respondCollection")
     private List<PseResponseTypeItem> respondCollection;
     @JsonProperty("respondStoredCollection")

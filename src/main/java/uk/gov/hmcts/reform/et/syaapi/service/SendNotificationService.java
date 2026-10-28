@@ -32,6 +32,7 @@ import java.util.UUID;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.GROUP_CLAIMS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED;
@@ -65,7 +66,10 @@ public class SendNotificationService {
         List<SendNotificationTypeItem> notifications = caseData.getSendNotificationCollection();
         for (SendNotificationTypeItem item : notifications) {
             if (item.getId().equals(request.getSendNotificationId())) {
-                if (item.getValue().getNotificationState().equals(NOT_VIEWED_YET)) {
+                boolean isGroupClaims = CollectionUtils.isNotEmpty(item.getValue().getSendNotificationSubject())
+                    && item.getValue().getSendNotificationSubject().contains(GROUP_CLAIMS);
+
+                if (NOT_VIEWED_YET.equals(item.getValue().getNotificationState()) || isGroupClaims) {
                     item.getValue().setNotificationState(VIEWED);
                 }
                 setTribunalResponsesAsViewed(item.getValue().getRespondNotificationTypeCollection());

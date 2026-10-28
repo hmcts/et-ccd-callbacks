@@ -188,7 +188,6 @@ public class ResetEraFlagTask implements Runnable {
                 .orElseGet(AdditionalCaseInfoType::new);
         additionalCaseInfo.setEra(NO);
         caseData.setAdditionalCaseInfoType(additionalCaseInfo);
-        log.info(caseData.getAdditionalCaseInfoType().toString());
         FlagsImageHelper.buildFlagsImageFileName(caseTypeId, caseData);
         caseData.setStateAPI(null);
 

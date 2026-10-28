@@ -95,7 +95,8 @@ class ResetEraFlagTaskTest {
         caseData.setStateAPI("Accepted");
 
         CCDRequest ccdRequest = buildCcdRequest(caseData, ENGLANDWALES_CASE_TYPE_ID);
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, AMEND_CASE_DETAILS))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID,
+            AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest);
 
         task.run();
@@ -122,7 +123,8 @@ class ResetEraFlagTaskTest {
         caseData.setAdditionalCaseInfoType(null);
 
         CCDRequest ccdRequest = buildCcdRequest(caseData, ENGLANDWALES_CASE_TYPE_ID);
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, AMEND_CASE_DETAILS))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID,
+            AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest);
 
         task.run();
@@ -175,12 +177,14 @@ class ResetEraFlagTaskTest {
         caseData.setAdditionalCaseInfoType(additionalCaseInfoType);
 
         CCDRequest ccdRequest = buildCcdRequest(caseData, ENGLANDWALES_CASE_TYPE_ID);
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, AMEND_CASE_DETAILS))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID,
+            AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest);
 
         task.run();
 
-        verify(ccdClient).startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, AMEND_CASE_DETAILS);
+        verify(ccdClient).startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID,
+            AMEND_CASE_DETAILS);
         verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
     }
 
@@ -191,12 +195,14 @@ class ResetEraFlagTaskTest {
                 .thenReturn(List.of(Long.parseLong(CASE_ID), Long.parseLong(CASE_ID_2)))
                 .thenReturn(Collections.emptyList());
 
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, AMEND_CASE_DETAILS))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID,
+            AMEND_CASE_DETAILS))
                 .thenThrow(new RuntimeException("CCD failure"));
 
         CaseData caseData2 = new CaseData();
         CCDRequest ccdRequest2 = buildCcdRequest(caseData2, ENGLANDWALES_CASE_TYPE_ID);
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID_2, AMEND_CASE_DETAILS))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID_2,
+            AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest2);
 
         task.run();
@@ -223,7 +229,8 @@ class ResetEraFlagTaskTest {
                 .thenReturn(List.of(Long.parseLong(CASE_ID)))
                 .thenReturn(Collections.emptyList());
 
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, AMEND_CASE_DETAILS))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID,
+            AMEND_CASE_DETAILS))
                 .thenReturn(null);
 
         task.run();
@@ -244,7 +251,8 @@ class ResetEraFlagTaskTest {
         caseDetails.setCaseData(null);
         ccdRequest.setCaseDetails(caseDetails);
 
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, AMEND_CASE_DETAILS))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID,
+            AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest);
 
         task.run();
@@ -263,7 +271,8 @@ class ResetEraFlagTaskTest {
         CCDRequest ccdRequest = buildCcdRequest(caseData, ENGLANDWALES_CASE_TYPE_ID);
         ccdRequest.getCaseDetails().setJurisdiction(null);
 
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, AMEND_CASE_DETAILS))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID,
+            AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest);
 
         task.run();

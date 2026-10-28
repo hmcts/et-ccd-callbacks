@@ -460,5 +460,17 @@
     "CaseStateID": "Rejected",
     "UserRole": "GS_profile",
     "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseStateID": "Closed",
+    "UserRole": "caseworker-caa",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseStateID": "Rejected",
+    "UserRole": "caseworker-caa",
+    "CRUD": "CRUD"
   }
 ]

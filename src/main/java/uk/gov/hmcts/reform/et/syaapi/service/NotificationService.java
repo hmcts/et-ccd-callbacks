@@ -44,6 +44,8 @@ import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_A
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.CASE_ID_NOT_FOUND;
+import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ET1;
+import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ET3;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.FILE_NOT_EXISTS;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.HEARING_DOCUMENTS_PATH;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.MULTIPLE_ID_NOT_FOUND;
@@ -1292,6 +1294,27 @@ public class NotificationService {
             );
         } catch (NotificationClientException ne) {
             throw new NotificationException(ne);
+        }
+    }
+
+    public void sendUserInsightsEmail(String email, String name, String source) {
+
+        try {
+            Map<String, Object> parameters = new ConcurrentHashMap<>();
+            parameters.put("name", name);
+            String templateId = switch (source) {
+                case ET1 -> notificationsProperties.getClaimantUserInsightTemplateId();
+                case ET3 -> notificationsProperties.getRespondentUserInsightTemplateId();
+                default -> throw new IllegalArgumentException("Invalid source: " + source);
+            };
+            notificationClient.sendEmail(
+                templateId,
+                email,
+                parameters,
+                UUID.randomUUID().toString()
+            );
+        } catch (NotificationClientException | RuntimeException e) {
+            log.error("Failed to send user insights email; source={}", source, e);
         }
     }
 }

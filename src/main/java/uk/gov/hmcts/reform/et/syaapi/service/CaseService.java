@@ -73,6 +73,7 @@ import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.APP_
 import static uk.gov.hmcts.reform.et.syaapi.constants.DocumentCategoryConstants.CASE_MANAGEMENT_DOC_CATEGORY;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.DEFAULT_TRIBUNAL_OFFICE;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ENGLAND_CASE_TYPE;
+import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ET1;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.JURISDICTION_ID;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SCOTLAND_CASE_TYPE;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.UNASSIGNED_OFFICE;
@@ -272,6 +273,7 @@ public class CaseService {
         if (MULTIPLE_CASE_TYPE.equals(caseDetails.getData().get(CASE_TYPE))) {
             triggerMultipleCreation(authorization, caseDetails);
         }
+        sendUserInsightEmail(caseDetails);
 
         return caseDetails;
     }
@@ -333,6 +335,22 @@ public class CaseService {
                 .build();
         createUpdatesBusSender.sendSingleMessage(msg, errors);
         errors.forEach(e -> log.error("Error queuing multiple creation message: {}", e));
+    }
+  
+    private void sendUserInsightEmail(CaseDetails caseDetails) {
+        try {
+            CaseData submittedCaseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(
+                caseDetails.getData()
+            );
+            notificationService.sendUserInsightsEmail(
+                submittedCaseData.getClaimantType().getClaimantEmailAddress(),
+                submittedCaseData.getClaimant(),
+                ET1
+            );
+        } catch (Exception e) {
+            log.error("Failed to send ET1 user insights email", e);
+        }
+
     }
 
     private List<DocumentTypeItem> uploadAllDocuments(String authorization,

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -68,6 +69,8 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -572,6 +575,27 @@ class CaseServiceTest {
         ReflectionTestUtils.invokeMethod(caseService, "triggerMultipleCreation", TEST_SERVICE_AUTH_TOKEN, caseDetails);
 
         verify(createUpdatesBusSender, never()).sendSingleMessage(any(CreateUpdatesMsg.class), anyList());
+    }
+                                    
+    void submitCaseSendsUserInsightsEmailLast() {
+        caseService.submitCase(TEST_SERVICE_AUTH_TOKEN, caseTestData.getCaseRequest());
+        CaseData submittedCaseData = convertCaseDataMapToCaseDataObject(caseTestData.getExpectedDetails().getData());
+
+        InOrder notificationOrder = inOrder(notificationService);
+        notificationOrder.verify(notificationService).sendSubmitCaseConfirmationEmail(any(), any(), any(), any());
+        notificationOrder.verify(notificationService).sendUserInsightsEmail(
+            eq(submittedCaseData.getClaimantType().getClaimantEmailAddress()),
+            eq(submittedCaseData.getClaimant()),
+            eq("ET1")
+        );
+    }
+
+    @Test
+    void submitCaseContinuesWhenUserInsightsEmailFails() {
+        doThrow(new RuntimeException("Gov Notify unavailable")).when(notificationService)
+            .sendUserInsightsEmail(anyString(), anyString(), anyString());
+
+        assertDoesNotThrow(() -> caseService.submitCase(TEST_SERVICE_AUTH_TOKEN, caseTestData.getCaseRequest()));
     }
 
     private DocumentTypeItem createDocumentTypeItem() {

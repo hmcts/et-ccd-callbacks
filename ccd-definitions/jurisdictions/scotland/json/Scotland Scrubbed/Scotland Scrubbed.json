@@ -3462,93 +3462,111 @@
   },
   {
     "ID": "fl_Part_10",
+    "ListElementCode": "92.1",
+    "ListElement": "92.1 – Judgment following summary reasons",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "92.2",
+    "ListElement": "92.2 – Cover letter for written summary reasons",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "92.3",
+    "ListElement": "92.3 – Cover letter for written full reasons",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_10",
     "ListElementCode": "92.A",
     "ListElement": "92A Judgment template",
-    "DisplayOrder": 2
+    "DisplayOrder": 5
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "92.B",
     "ListElement": "92B Recoupment annex monetary award",
-    "DisplayOrder": 3
+    "DisplayOrder": 6
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "92.C",
     "ListElement": "92C Recoupment annex protective award",
-    "DisplayOrder": 4
+    "DisplayOrder": 7
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "92.D",
     "ListElement": "92D Recoupment notice Reg 4 monetary award",
-    "DisplayOrder": 5
+    "DisplayOrder": 8
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "92.E",
     "ListElement": "92E Recoupment notice Reg 5 protective award",
-    "DisplayOrder": 6
+    "DisplayOrder": 9
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "93",
     "ListElement": "93 Cover letter for reasons",
-    "DisplayOrder": 7
+    "DisplayOrder": 10
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "93.A",
     "ListElement": "93A Written reasons refused as late",
-    "DisplayOrder": 8
+    "DisplayOrder": 11
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "93.B",
     "ListElement": "93B Written reasons allowed although late",
-    "DisplayOrder": 9
+    "DisplayOrder": 12
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "94",
     "ListElement": "94 Cover letter for Note from PH",
-    "DisplayOrder": 10
+    "DisplayOrder": 13
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "95",
     "ListElement": "95 Certificate of correction",
-    "DisplayOrder": 11
+    "DisplayOrder": 14
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "96",
     "ListElement": "96 Cover letter for certificate of correction",
-    "DisplayOrder": 12
+    "DisplayOrder": 15
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "97",
     "ListElement": "97 Interests on Awards claim lodged before 29/7/13",
-    "DisplayOrder": 13
+    "DisplayOrder": 16
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "97.A",
     "ListElement": "97A Interests on all awards claim lodged after 29/7/13",
-    "DisplayOrder": 14
+    "DisplayOrder": 17
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "98",
     "ListElement": "98 Interest on awards (discrimination) lodged before 29/7/13",
-    "DisplayOrder": 15
+    "DisplayOrder": 18
   },
   {
     "ID": "fl_Part_10",
     "ListElementCode": "224",
     "ListElement": "224 Financial Penalty - Annex to the Judgment",
-    "DisplayOrder": 16
+    "DisplayOrder": 19
   },
   {
     "ID": "fl_Part_11",
@@ -3909,6 +3927,12 @@
     "ListElementCode": "226",
     "ListElement": "226 Serve Afresh Respondent",
     "DisplayOrder": 50
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "227",
+    "ListElement": "227 General Status Enquiry",
+    "DisplayOrder": 51
   },
   {
     "ID": "fl_Part_14",

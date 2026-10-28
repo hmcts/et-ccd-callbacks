@@ -152,7 +152,7 @@ export class CaseDetailsPage extends BasePage {
    */
   private async getVisibleTabContent(content: string, position: number = 0, exact: boolean = true): Promise<Locator> {
     // active tab area
-    const activeTabContent = this.page.locator('mat-tab-body.mat-tab-body-active .mat-tab-body-content');
+    const activeTabContent = this.page.locator('mat-tab-body.mat-mdc-tab-body-active[aria-hidden="false"]');
     await expect(activeTabContent).toBeVisible();
 
     const locator = activeTabContent.getByText(content, { exact });
@@ -256,7 +256,9 @@ export class CaseDetailsPage extends BasePage {
     const tabNames: string[] = [];
 
     for (let i = 0; i < totalTabs; i++) {
-      const name = (await tabs.nth(i).locator(':scope > div').innerText()).replace(/\s+/g, ' ').trim();
+      const name = ((await tabs.nth(i).textContent()) ?? '')
+        .replace(/\s+/g, ' ')
+        .trim();
       tabNames.push(name);
     }
 

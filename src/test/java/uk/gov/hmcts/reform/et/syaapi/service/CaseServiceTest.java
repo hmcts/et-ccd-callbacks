@@ -576,7 +576,8 @@ class CaseServiceTest {
 
         verify(createUpdatesBusSender, never()).sendSingleMessage(any(CreateUpdatesMsg.class), anyList());
     }
-                                    
+
+    @Test
     void submitCaseSendsUserInsightsEmailLast() {
         caseService.submitCase(TEST_SERVICE_AUTH_TOKEN, caseTestData.getCaseRequest());
         CaseData submittedCaseData = convertCaseDataMapToCaseDataObject(caseTestData.getExpectedDetails().getData());

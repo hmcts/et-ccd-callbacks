@@ -7,11 +7,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.types.AdditionalCaseInfoType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 
@@ -23,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -44,7 +45,7 @@ class ResetEraFlagTaskTest {
     private static final String ADMIN_TOKEN = "test-admin-token";
     private static final String CASE_ID = "1620473176786991";
     private static final String CASE_ID_2 = "1620473176786992";
-    private static final String FIX_CASE_API = "fixCaseAPI";
+    private static final String AMEND_CASE_DETAILS = "amendCaseDetails";
 
     @Mock
     private AdminUserService adminUserService;
@@ -52,21 +53,27 @@ class ResetEraFlagTaskTest {
     @Mock
     private CcdClient ccdClient;
 
+    @Mock
+    private NamedParameterJdbcTemplate jdbcTemplate;
+
     @Captor
     private ArgumentCaptor<CaseData> caseDataCaptor;
+
+    @Captor
+    private ArgumentCaptor<MapSqlParameterSource> paramCaptor;
 
     private ResetEraFlagTask task;
 
     @BeforeEach
     void setUp() {
-        task = new ResetEraFlagTask(adminUserService, ccdClient);
+        task = new ResetEraFlagTask(adminUserService, ccdClient, jdbcTemplate);
         lenient().when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
     }
 
     @Test
     void run_doesNothingWhenNoCasesFound() throws IOException {
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), anyString(), anyString()))
-                .thenReturn(Collections.emptyList());
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class))).thenReturn(Collections.emptyList());
 
         task.run();
 
@@ -76,11 +83,9 @@ class ResetEraFlagTaskTest {
 
     @Test
     void run_resetsEraFlagAndSubmitsCase_whenCaseFound() throws IOException {
-        SubmitEvent submitEvent = buildSubmitEvent(Long.parseLong(CASE_ID));
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), anyString()))
-                .thenReturn(List.of(submitEvent))
-                .thenReturn(Collections.emptyList());
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID), anyString()))
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class)))
+                .thenReturn(List.of(Long.parseLong(CASE_ID)))
                 .thenReturn(Collections.emptyList());
 
         CaseData caseData = new CaseData();
@@ -90,7 +95,7 @@ class ResetEraFlagTaskTest {
         caseData.setStateAPI("Accepted");
 
         CCDRequest ccdRequest = buildCcdRequest(caseData, ENGLANDWALES_CASE_TYPE_ID);
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest);
 
         task.run();
@@ -108,18 +113,16 @@ class ResetEraFlagTaskTest {
 
     @Test
     void run_createsAdditionalCaseInfoWhenNull_andResetsEra() throws IOException {
-        SubmitEvent submitEvent = buildSubmitEvent(Long.parseLong(CASE_ID));
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), anyString()))
-                .thenReturn(List.of(submitEvent))
-                .thenReturn(Collections.emptyList());
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID), anyString()))
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class)))
+                .thenReturn(List.of(Long.parseLong(CASE_ID)))
                 .thenReturn(Collections.emptyList());
 
         CaseData caseData = new CaseData();
         caseData.setAdditionalCaseInfoType(null);
 
         CCDRequest ccdRequest = buildCcdRequest(caseData, ENGLANDWALES_CASE_TYPE_ID);
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest);
 
         task.run();
@@ -134,11 +137,10 @@ class ResetEraFlagTaskTest {
 
     @Test
     void run_processesScotlandCases_andSubmitsSuccessfully() throws IOException {
-        SubmitEvent submitEvent = buildSubmitEvent(Long.parseLong(CASE_ID));
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), anyString()))
-                .thenReturn(Collections.emptyList());
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID), anyString()))
-                .thenReturn(List.of(submitEvent))
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class)))
+                .thenReturn(Collections.emptyList())
+                .thenReturn(List.of(Long.parseLong(CASE_ID)))
                 .thenReturn(Collections.emptyList());
 
         CaseData caseData = new CaseData();
@@ -147,7 +149,7 @@ class ResetEraFlagTaskTest {
         caseData.setAdditionalCaseInfoType(additionalCaseInfoType);
 
         CCDRequest ccdRequest = buildCcdRequest(caseData, SCOTLAND_CASE_TYPE_ID);
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, SCOTLAND_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, SCOTLAND_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest);
 
         task.run();
@@ -160,13 +162,11 @@ class ResetEraFlagTaskTest {
 
     @Test
     void run_doesNotSubmitWhenDryRunIsTrue() throws IOException {
-        task = new ResetEraFlagTask(adminUserService, ccdClient, true);
+        task = new ResetEraFlagTask(adminUserService, ccdClient, jdbcTemplate, true);
 
-        SubmitEvent submitEvent = buildSubmitEvent(Long.parseLong(CASE_ID));
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), anyString()))
-                .thenReturn(List.of(submitEvent))
-                .thenReturn(Collections.emptyList());
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID), anyString()))
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class)))
+                .thenReturn(List.of(Long.parseLong(CASE_ID)))
                 .thenReturn(Collections.emptyList());
 
         CaseData caseData = new CaseData();
@@ -175,32 +175,28 @@ class ResetEraFlagTaskTest {
         caseData.setAdditionalCaseInfoType(additionalCaseInfoType);
 
         CCDRequest ccdRequest = buildCcdRequest(caseData, ENGLANDWALES_CASE_TYPE_ID);
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest);
 
         task.run();
 
-        verify(ccdClient).startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API);
+        verify(ccdClient).startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, AMEND_CASE_DETAILS);
         verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
     }
 
     @Test
     void run_continuesProcessingWhenOneCaseFails() throws IOException {
-        SubmitEvent submitEvent1 = buildSubmitEvent(Long.parseLong(CASE_ID));
-        SubmitEvent submitEvent2 = buildSubmitEvent(Long.parseLong(CASE_ID_2));
-
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), anyString()))
-                .thenReturn(List.of(submitEvent1, submitEvent2))
-                .thenReturn(Collections.emptyList());
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID), anyString()))
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class)))
+                .thenReturn(List.of(Long.parseLong(CASE_ID), Long.parseLong(CASE_ID_2)))
                 .thenReturn(Collections.emptyList());
 
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, AMEND_CASE_DETAILS))
                 .thenThrow(new RuntimeException("CCD failure"));
 
         CaseData caseData2 = new CaseData();
         CCDRequest ccdRequest2 = buildCcdRequest(caseData2, ENGLANDWALES_CASE_TYPE_ID);
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID_2, FIX_CASE_API))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID_2, AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest2);
 
         task.run();
@@ -210,11 +206,10 @@ class ResetEraFlagTaskTest {
     }
 
     @Test
-    void run_handlesSearchIOExceptionGracefully() throws IOException {
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), anyString()))
-                .thenThrow(new IOException("Elasticsearch connection failed"));
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID), anyString()))
-                .thenReturn(Collections.emptyList());
+    void run_handlesDatabaseExceptionGracefully() throws IOException {
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class)))
+                .thenThrow(new DataAccessResourceFailureException("DB connection failed"));
 
         task.run();
 
@@ -223,14 +218,12 @@ class ResetEraFlagTaskTest {
 
     @Test
     void run_skipsWhenCcdRequestOrCaseDetailsOrCaseDataIsNull() throws IOException {
-        SubmitEvent submitEvent = buildSubmitEvent(Long.parseLong(CASE_ID));
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), anyString()))
-                .thenReturn(List.of(submitEvent))
-                .thenReturn(Collections.emptyList());
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID), anyString()))
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class)))
+                .thenReturn(List.of(Long.parseLong(CASE_ID)))
                 .thenReturn(Collections.emptyList());
 
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, AMEND_CASE_DETAILS))
                 .thenReturn(null);
 
         task.run();
@@ -240,11 +233,9 @@ class ResetEraFlagTaskTest {
 
     @Test
     void run_skipsWhenCaseDataIsNull() throws IOException {
-        SubmitEvent submitEvent = buildSubmitEvent(Long.parseLong(CASE_ID));
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), anyString()))
-                .thenReturn(List.of(submitEvent))
-                .thenReturn(Collections.emptyList());
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID), anyString()))
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class)))
+                .thenReturn(List.of(Long.parseLong(CASE_ID)))
                 .thenReturn(Collections.emptyList());
 
         CCDRequest ccdRequest = new CCDRequest();
@@ -253,7 +244,7 @@ class ResetEraFlagTaskTest {
         caseDetails.setCaseData(null);
         ccdRequest.setCaseDetails(caseDetails);
 
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest);
 
         task.run();
@@ -263,18 +254,16 @@ class ResetEraFlagTaskTest {
 
     @Test
     void run_usesDefaultEmploymentJurisdiction_whenCaseDetailsJurisdictionIsNull() throws IOException {
-        SubmitEvent submitEvent = buildSubmitEvent(Long.parseLong(CASE_ID));
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), anyString()))
-                .thenReturn(List.of(submitEvent))
-                .thenReturn(Collections.emptyList());
-        when(ccdClient.buildAndGetElasticSearchRequest(eq(ADMIN_TOKEN), eq(SCOTLAND_CASE_TYPE_ID), anyString()))
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class)))
+                .thenReturn(List.of(Long.parseLong(CASE_ID)))
                 .thenReturn(Collections.emptyList());
 
         CaseData caseData = new CaseData();
         CCDRequest ccdRequest = buildCcdRequest(caseData, ENGLANDWALES_CASE_TYPE_ID);
         ccdRequest.getCaseDetails().setJurisdiction(null);
 
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest);
 
         task.run();
@@ -285,6 +274,48 @@ class ResetEraFlagTaskTest {
     }
 
     @Test
+    void run_paginatesWhenBatchIsFull() throws IOException {
+        task = new ResetEraFlagTask(adminUserService, ccdClient, jdbcTemplate, ENGLANDWALES_CASE_TYPE_ID, 2, false);
+
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), paramCaptor.capture(), eq(Long.class)))
+                .thenReturn(List.of(1_001L, 1_002L))
+                .thenReturn(List.of(1_003L));
+
+        CaseData caseData = new CaseData();
+        AdditionalCaseInfoType additionalCaseInfoType = new AdditionalCaseInfoType();
+        additionalCaseInfoType.setEra(YES);
+        caseData.setAdditionalCaseInfoType(additionalCaseInfoType);
+        CCDRequest ccdRequest = buildCcdRequest(caseData, ENGLANDWALES_CASE_TYPE_ID);
+
+        when(ccdClient.startEventForCase(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT),
+                anyString(), eq(AMEND_CASE_DETAILS))).thenReturn(ccdRequest);
+
+        task.run();
+
+        verify(ccdClient, times(3)).submitEventForCase(eq(ADMIN_TOKEN), any(CaseData.class),
+                eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT), eq(ccdRequest), anyString());
+
+        List<MapSqlParameterSource> capturedParams = paramCaptor.getAllValues();
+        assertEquals(2, capturedParams.size());
+        assertEquals(0L, capturedParams.get(0).getValue("afterReference"));
+        assertEquals(1_002L, capturedParams.get(1).getValue("afterReference"));
+    }
+
+    @Test
+    void findCasesForCaseType_queriesWithCorrectParameters() {
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), paramCaptor.capture(), eq(Long.class)))
+                .thenReturn(List.of(Long.parseLong(CASE_ID)));
+
+        List<Long> result = task.findCasesForCaseType(ENGLANDWALES_CASE_TYPE_ID, 100L);
+
+        assertEquals(List.of(Long.parseLong(CASE_ID)), result);
+        MapSqlParameterSource params = paramCaptor.getValue();
+        assertEquals(ENGLANDWALES_CASE_TYPE_ID, params.getValue("caseTypeId"));
+        assertEquals(100L, params.getValue("afterReference"));
+        assertEquals(500, params.getValue("maxCases"));
+    }
+
+    @Test
     void processCase_handlesBlankCaseId() {
         assertFalse(task.processCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "   "));
         assertFalse(task.processCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, null));
@@ -292,10 +323,7 @@ class ResetEraFlagTaskTest {
 
     @Test
     void processCases_skipsInvalidCaseId() throws IOException {
-        SubmitEvent zeroEvent = new SubmitEvent();
-        zeroEvent.setCaseId(0);
-
-        task.processCases(List.of(zeroEvent), ENGLANDWALES_CASE_TYPE_ID, ADMIN_TOKEN);
+        task.processCases(List.of(0L, -1L), ENGLANDWALES_CASE_TYPE_ID, ADMIN_TOKEN);
 
         verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
     }
@@ -303,39 +331,9 @@ class ResetEraFlagTaskTest {
     @Test
     void processCases_handlesEmptyList() throws IOException {
         task.processCases(Collections.emptyList(), ENGLANDWALES_CASE_TYPE_ID, ADMIN_TOKEN);
+        task.processCases(null, ENGLANDWALES_CASE_TYPE_ID, ADMIN_TOKEN);
+
         verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
-    }
-
-    @Test
-    void extractLastCaseReference_returnsExpectedId() {
-        SubmitEvent event1 = buildSubmitEvent(1_111L);
-        SubmitEvent event2 = buildSubmitEvent(2_222L);
-        assertEquals("2222", ResetEraFlagTask.extractLastCaseReference(List.of(event1, event2)));
-
-        SubmitEvent zeroEvent = new SubmitEvent();
-        zeroEvent.setCaseId(0);
-        assertEquals("1111", ResetEraFlagTask.extractLastCaseReference(List.of(event1, zeroEvent)));
-
-        assertNull(ResetEraFlagTask.extractLastCaseReference(Collections.emptyList()));
-        assertNull(ResetEraFlagTask.extractLastCaseReference(null));
-    }
-
-    @Test
-    void buildSearchQuery_buildsElasticsearchQueryWithSearchAfter() {
-        String query = task.buildSearchQuery(null);
-        assertTrue(query.contains("data.additionalCaseInfo.era"));
-        assertTrue(query.contains("reference.keyword"));
-        assertFalse(query.contains("search_after"));
-
-        String queryWithSearchAfter = task.buildSearchQuery(CASE_ID);
-        assertTrue(queryWithSearchAfter.contains("search_after"));
-        assertTrue(queryWithSearchAfter.contains(CASE_ID));
-    }
-
-    private SubmitEvent buildSubmitEvent(long caseId) {
-        SubmitEvent submitEvent = new SubmitEvent();
-        submitEvent.setCaseId(caseId);
-        return submitEvent;
     }
 
     private CCDRequest buildCcdRequest(CaseData caseData, String caseTypeId) {

@@ -461,18 +461,6 @@ xui-mo-webapp:
       RD_PROFESSIONAL_API_SERVICE: http://rd-professional-api-aat.service.core-compute-aat.internal
       MANAGE_CASE_LINK: https://xui-${SERVICE_FQDN}
       MANAGE_ORG_LINK: https://xui-ao-webapp-${SERVICE_FQDN}
-    keyVaults:
-      rpx:
-        secrets:
-          - mo-s2s-client-secret
-          - xui-oauth2-token
-          - appinsights-connection-string-mo
-          - google-analytics-key
-          - mo-webapp-managed-redis-connection-string
-          - launch-darkly-client-id
-          - system-user-name
-          - system-user-password
-          - mo-session-secret
 
 xui-ao-webapp:
   enabled: true

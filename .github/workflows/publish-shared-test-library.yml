@@ -38,10 +38,21 @@ jobs:
       - name: Build package
         run: yarn build
 
-      - name: Verify package contents
-        run: npm pack --dry-run
+      - name: Enforce unique package version on npm
+        run: |
+          PKG_NAME=$(node -p "require('./package.json').name")
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          
+          echo "Checking uniqueness for ${PKG_NAME}@${PKG_VERSION}"
+          
+          if npm view "${PKG_NAME}@${PKG_VERSION}" version --registry=https://registry.npmjs.org/ >/dev/null 2>&1; then
+            echo "::error::${PKG_NAME}@${PKG_VERSION} already exists on npm. Please bump the version."
+            exit 1
+          fi
+          
+          echo "✅ Version ${PKG_VERSION} is available for publishing."
 
-      - name: Validate npm publish (dry run)
+      - name: Publish (OIDC)
         run: |
           export NPM_CONFIG_USERCONFIG="$RUNNER_TEMP/npmrc-noauth"
           printf "registry=https://registry.npmjs.org/\n" > "$NPM_CONFIG_USERCONFIG"
@@ -50,4 +61,4 @@ jobs:
           npm config delete //registry.npmjs.org/:_authToken || true
           npm config delete _authToken || true
 
-          npm publish --dry-run --access public
+          npm publish --access public --tag beta

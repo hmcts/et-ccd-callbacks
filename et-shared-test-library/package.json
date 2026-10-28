@@ -1,6 +1,6 @@
 {
   "name": "@hmcts/et-shared-test-library",
-  "version": "1.0.0",
+  "version": "1.0.0-beta.1",
   "description": "Employment Tribunal Shared TypeScript Playwright test utilities for cross-repo reuse.",
   "license": "MIT",
   "main": "dist/index.js",

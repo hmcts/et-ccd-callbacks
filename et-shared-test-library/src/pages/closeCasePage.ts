@@ -8,7 +8,7 @@ export class CloseCasePage extends BasePage {
   constructor(page: import('@playwright/test').Page) {
     super(page);
     this.clerkResponsibleDropdown = page.locator('#clerkResponsible');
-    this.caseDetailsTab = page.getByRole('tab', { name: 'Case Details' }).locator('div');
+    this.caseDetailsTab = page.getByRole('tab', { name: 'Case Details' });
   }
 
   async closeCase() {
@@ -16,6 +16,6 @@ export class CloseCasePage extends BasePage {
     await this.clickContinue();
     await expect(this.page.getByText('Check your answers')).toBeVisible();
     await this.clickSubmitButton();
-    await expect(this.caseDetailsTab).toContainText('Case Details');
+    await expect(this.caseDetailsTab).toBeVisible();
   }
 }

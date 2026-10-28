@@ -28,7 +28,7 @@ export class CaseDetailsPage extends BasePage {
     await this.page.locator('text=Check your answers').waitFor({ state: 'visible' });
     await this.clickSubmitButton();
 
-    await expect(this.page.getByRole('tab', { name: 'Case Details' }).locator('div')).toContainText('Case Details');
+    await expect(this.page.getByRole('tab', { name: 'Case Details' })).toBeVisible();
     await expect(this.page.getByText('SPEAK TO VP', { exact: true })).toBeVisible();
   }
 
@@ -129,10 +129,6 @@ export class CaseDetailsPage extends BasePage {
       const tabItem = this.page.getByText(excluded, { exact: true }); // Locate the element directly
       await expect(tabItem).not.toBeVisible(); // Assert that it is not visible
     }
-  }
-
-  private getTabHeader(tabName: string): Locator {
-    return this.page.getByRole('tab', { name: tabName, exact: true });
   }
 
   /**

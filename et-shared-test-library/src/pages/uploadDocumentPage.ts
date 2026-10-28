@@ -9,7 +9,7 @@ export class UploadDocumentPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    this.addNewButtonBottom = page.locator('//button[@class="button write-collection-add-item__bottom ng-star-inserted"]');
+    this.addNewButtonBottom = page.locator('//button[@class="button write-collection-add-item__bottom"]');
     this.createDcfLink = page.locator('//a[contains(.,"Create, Upload or Remove DCF")]');
     this.createDcfRadio = page.locator('#uploadOrRemoveDcf-Create');
   }

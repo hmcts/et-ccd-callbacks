@@ -1,5 +1,45 @@
 [
   {
+    "ID": "sendNotificationGroupClaimsWA",
+    "CaseEventID": "sendNotification",
+    "CaseFieldID": "sendNotificationCollection",
+    "ListElementCode": "number",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "sendNotificationGroupClaimsWA",
+    "CaseEventID": "sendNotification",
+    "CaseFieldID": "sendNotificationCollection",
+    "ListElementCode": "date",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "sendNotificationGroupClaimsWA",
+    "CaseEventID": "sendNotification",
+    "CaseFieldID": "sendNotificationCollection",
+    "ListElementCode": "sendNotificationSubject",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "sendNotificationGroupClaimsWA",
+    "CaseEventID": "sendNotification",
+    "CaseFieldID": "sendNotificationCollection",
+    "ListElementCode": "sendNotificationGroupClaims",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
     "ID": "ReferralDetails",
     "CaseEventID": "createReferral",
     "CaseFieldID": "referralCollection",

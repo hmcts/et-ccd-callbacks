@@ -109,16 +109,17 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 
 // The Gradle functional task runs the Playwright UI suite alongside the API functional
 // tests (see awaitUiFunctional in build.gradle) and records its exit code. UI failures
-// keep marking the build unstable rather than failing it.
+// mark the stage unstable rather than failing the build or marking the overall pipeline unstable.
 def reportUiFunctionalResult() {
-  def exitCodeFile = 'build/ui-functional/exit-code'
-  if (!fileExists(exitCodeFile)) {
-    unstable(message: "${env.STAGE_NAME} is unstable: the UI functional tests did not run")
-    return
-  }
-  def exitCode = readFile(exitCodeFile).trim()
-  if (exitCode != '0') {
-    unstable(message: "${env.STAGE_NAME} is unstable: Playwright exited with status ${exitCode}")
+  catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+    def exitCodeFile = 'build/ui-functional/exit-code'
+    if (!fileExists(exitCodeFile)) {
+      error("${env.STAGE_NAME} is unstable: the UI functional tests did not run")
+    }
+    def exitCode = readFile(exitCodeFile).trim()
+    if (exitCode != '0') {
+      error("${env.STAGE_NAME} is unstable: Playwright exited with status ${exitCode}")
+    }
   }
 }
 

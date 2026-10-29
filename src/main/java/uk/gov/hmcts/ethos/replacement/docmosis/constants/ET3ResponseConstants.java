@@ -18,6 +18,7 @@ public final class ET3ResponseConstants {
     // TODO: https://tools.hmcts.net/jira/browse/RET-5960
     public static final String ERROR_ORGANISATION_DETAILS_NOT_FOUND = "Organisation details not found";
     public static final String REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS = "Use MyHMCTS details";
+    public static final String REPRESENTATIVE_CONTACT_CHANGE_OPTION_AMEND = "Amend contact details";
     public static final String SECTION_COMPLETE_BODY = """
         You may want to complete the rest of the ET3 Form using the links below:\
         <br><a href="/cases/case-details/%s/trigger/et3Response/et3Response1">ET3 - Respondent Details</a>\

@@ -112,7 +112,7 @@ class InitialConsiderationServiceTest {
     private static final LocalDate SECOND_FUTURE_HEARING_DATE = TODAY.plusDays(9);
     private static final DateTimeFormatter HEARING_DATE_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private static final DateTimeFormatter HEARING_DATE_DISPLAY_FORMATTER =
-            DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT);
+            DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT, Locale.UK);
     private static final String GIVE_DETAILS = "Give Details:";
 
     private static final String EXPECTED_HEARING_DETAILS_STRING = """

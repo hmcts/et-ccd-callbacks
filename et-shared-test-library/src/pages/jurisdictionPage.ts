@@ -26,12 +26,12 @@ export class JurisdictionPage extends BasePage {
   async addJurisdictionCodeAndSubmit(jurisdictionCode:string, judgmentOutcome:string, position: number = 1) {
     await this.addJurisdiction(jurisdictionCode, judgmentOutcome, position);
     await this.clickSubmitButton();
-    await expect(this.page.getByRole('tab', { name: 'Case Details' }).locator('div')).toContainText('Case Details');
+    await expect(this.page.getByRole('tab', { name: 'Case Details' })).toBeVisible();
   }
 
   async closeJurisdictionCode() {
     await this.page.locator('#jurCodesCollection_0_judgmentOutcome').selectOption({ label: 'Input in error' });
     await this.clickSubmitButton();
-    await expect(this.page.getByRole('tab', { name: 'Case Details' }).locator('div')).toContainText('Case Details');
+    await expect(this.page.getByRole('tab', { name: 'Case Details' })).toBeVisible();
   }
 }

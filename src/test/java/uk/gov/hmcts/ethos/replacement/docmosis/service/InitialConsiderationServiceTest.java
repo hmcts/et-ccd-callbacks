@@ -100,6 +100,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsidera
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET1_IC;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET3_IC;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CASE_DETAILS_URL_PARTIAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.NOT_AVAILABLE_FOR_VIDEO_HEARINGS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.REFERRALS_PAGE_FRAGMENT_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
@@ -111,7 +112,7 @@ class InitialConsiderationServiceTest {
     private static final LocalDate SECOND_FUTURE_HEARING_DATE = TODAY.plusDays(9);
     private static final DateTimeFormatter HEARING_DATE_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private static final DateTimeFormatter HEARING_DATE_DISPLAY_FORMATTER =
-            DateTimeFormatter.ofPattern("d MMM uuuu", Locale.UK);
+            DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT, Locale.UK);
     private static final String GIVE_DETAILS = "Give Details:";
 
     private static final String EXPECTED_HEARING_DETAILS_STRING = """

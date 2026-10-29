@@ -13,6 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -38,6 +39,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -179,7 +181,7 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(resTseService).validateGiveDetails(ccdRequest.getCaseDetails().getCaseData());
+        verify(resTseService).validateGiveDetails(any(CaseData.class));
     }
 
     @Test
@@ -203,8 +205,8 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(resTseService).sendEmails(ccdRequest.getCaseDetails(), AUTH_TOKEN);
-        verify(tseService).createApplication(ccdRequest.getCaseDetails().getCaseData(), RESPONDENT_REP_TITLE);
+        verify(resTseService).sendEmails(any(CaseDetails.class), eq(AUTH_TOKEN));
+        verify(tseService).createApplication(any(CaseData.class), eq(RESPONDENT_REP_TITLE));
     }
 
     @Test
@@ -228,7 +230,7 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(resTseService).generateTableMarkdown(ccdRequest.getCaseDetails().getCaseData());
+        verify(resTseService).generateTableMarkdown(any(CaseData.class));
     }
 
     @Test

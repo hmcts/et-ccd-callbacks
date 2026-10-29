@@ -209,6 +209,7 @@ ccd:
         DEFINITION_STORE_HOST: https://ccd-definition-store-${SERVICE_FQDN}
         USER_PROFILE_HOST: https://ccd-user-profile-api-${SERVICE_FQDN}
         ROLE_ASSIGNMENT_URL: https://am-role-assignment-${SERVICE_FQDN}
+        OIDC_ALLOWED_ISSUERS: "https://idam-web-public.aat.platform.hmcts.net/o,https://hmcts-access.aat.platform.hmcts.net/o,https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts"
         # Start small in preview but allow the pool to grow to the service default under load.
         DATA_STORE_DB_MIN_IDLE: 1
         DATA_STORE_DB_IDLE_TIMEOUT: 60000
@@ -300,6 +301,9 @@ ccd:
       environment:
         IDAM_ADMIN_WEB_SERVICE_KEY: ${ADMIN_S2S_KEY}
         IDAM_OAUTH2_AW_CLIENT_SECRET: ${ADMIN_WEB_IDAM_SECRET}
+        IDAM_WEB_PUBLIC_URL: https://idam-web-public.aat.platform.hmcts.net
+        IDAM_HMCTS_ACCESS_URL: https://hmcts-access.aat.platform.hmcts.net
+        IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
         # A JSON array of cookie signing keys, required by admin-web since CME-908.
         SESSION_KEYS: '${ADMIN_WEB_SESSION_KEYS}'
 
@@ -320,6 +324,8 @@ ccd:
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
         PROXY_PRINT_SERVICE: http://ccd-case-print-service-${SERVICE_FQDN}
         ADDRESS_LOOKUP_TOKEN: ${ADDRESS_LOOKUP_TOKEN}
+        IDAM_WEB_PUBLIC_URL: https://idam-web-public.aat.platform.hmcts.net
+        IDAM_HMCTS_ACCESS_URL: https://hmcts-access.aat.platform.hmcts.net
       ingressHost: gateway-${SERVICE_FQDN}
       ingressIP: ${INGRESS_IP}
 

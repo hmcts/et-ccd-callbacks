@@ -1,5 +1,5 @@
 import {expect, Locator, Page} from '@playwright/test';
-import { Table } from '../../types';
+import { Table } from '../../types/index.js';
 
 export class CheckYourAnswersPage {
   private readonly page: Page;

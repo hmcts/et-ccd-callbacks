@@ -40,3 +40,8 @@ export function resolveResourcePath(resourcePath: string): string {
   // deterministic fallback to package path
   return candidates[2];
 }
+
+export function resolveResourceJson(resourcePath: string){
+  const resolvedPath = resolveResourcePath(resourcePath);
+  return JSON.parse(require('fs').readFileSync(resolvedPath, 'utf8'));
+}

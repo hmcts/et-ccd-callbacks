@@ -1,6 +1,6 @@
-import { BasePage } from './basePage';
+import { BasePage } from './basePage.js';
 import { expect, Locator, Page } from '@playwright/test';
-import { DateUtilComponent } from "../data-utils";
+import { DateUtilComponent } from "../data-utils/index.js";
 
 export class AllocateHearingPage extends BasePage {
   private readonly hearingDropDown: Locator;

@@ -1,17 +1,17 @@
 import { test } from '../fixtures/et.test.fixture.ts';
-import userDetailsData from '@et-shared-test-library/core/resources/payload/user-details.json';
 import {Page} from "@playwright/test";
 import {
   AddressDetails, AmendContactDetailsLrPage,
   CaseDetailsPage, CaseDetailsValues, CaseEventApi, CaseTypeLocation, CheckYourAnswersPage,
   CitizenClaimantFactory, config, createCaseViaCitizenUI, Events,
   LoginPage,
-  ManageCaseDashboardPage, NocPage, RespondentRepPage,
+  ManageCaseDashboardPage, NocPage, resolveResourceJson, RespondentRepPage,
   users
-} from "@et-shared-test-library/core";
+} from "@hmcts/et-shared-test-library";
 
 let caseId: string;
 let caseNumber: string;
+let userDetailsData: any;
 
 test.describe( 'Legal Rep updates update contact to colleagues in his org', () => {
   let caseWorkerBrowserPage: Page;
@@ -22,6 +22,10 @@ test.describe( 'Legal Rep updates update contact to colleagues in his org', () =
   test.use({
     storageState: users.etLegalRepresentative.sessionFile,
   })
+
+  test.beforeAll(async () => {
+    userDetailsData = resolveResourceJson('resources/payload/user-details.json');
+  });
 
   test.beforeEach(async ({manageCaseDashboardPage, loginPage, browserUtils}) => {
     caseId = await CitizenClaimantFactory.createAndSubmitClaim(CaseTypeLocation.EnglandAndWales);

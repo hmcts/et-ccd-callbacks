@@ -1,7 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { BasePage } from './basePage';
-import { ReferralOption } from '../config';
-import {resolveResourcePath} from "../data-utils/resourcePath";
+import { BasePage } from './basePage.js';
+import { ReferralOption } from '../config/index.js';
+import {resolveResourcePath} from "../data-utils/resourceFilePathData.js";
 
 export class ReferralPage extends BasePage {
   private readonly judgeReferralOption: Locator;

@@ -1,8 +1,8 @@
 import { ReplacementAction } from '../../types';
-import { ccdApi } from '../../fixtures';
-import { CaseTypeLocation, Events, PayloadPath } from '../../config';
-import { DateUtilComponent } from '../DateUtilComponent';
-import { users } from '../../config';
+import { ccdApi } from '../../fixtures/index.js';
+import { CaseTypeLocation, Events, PayloadPath } from '../../config/index.js';
+import { DateUtilComponent } from '../DateUtilComponent.js';
+import { users } from '../../config/index.js';
 
 export class CaseEventApi {
   /**

@@ -1,6 +1,6 @@
-import { BasePage } from "./basePage";
+import { BasePage } from "./basePage.js";
 import { expect, Locator, Page } from "@playwright/test";
-import { Events } from '../config';
+import { Events } from '../config/index.js';
 
 export class Et1CreateDraftClaim extends BasePage {
   private readonly et1Postcode: Locator;

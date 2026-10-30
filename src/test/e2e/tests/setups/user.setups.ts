@@ -1,5 +1,5 @@
 import {test} from "../../fixtures/et.test.fixture.ts";
-import {CookieUtils, users} from "@et-shared-test-library/core";
+import {CookieUtils, users} from "@hmcts/et-shared-test-library";
 
 // Each test signs in a different user and writes its own session file, so they run in parallel.
 test.describe("set up user context", () => {

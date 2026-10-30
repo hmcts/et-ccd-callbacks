@@ -1,16 +1,16 @@
 import { test } from '../fixtures/et.test.fixture.ts';
-import userDetailsData from '@et-shared-test-library/core/resources/payload/user-details.json';
 import {
   CaseDetailsPage,
   CaseEventApi, CaseTypeLocation,
   ClaimantDetailsPage, Events,
   LoginPage,
-  ManageCaseDashboardPage, NocPage, RespondentDetailsPage,
+  ManageCaseDashboardPage, NocPage, resolveResourceJson, RespondentDetailsPage,
   users
-} from "@et-shared-test-library/core";
+} from "@hmcts/et-shared-test-library";
 
 let caseNumber: string;
 let caseId: string;
+const userDetailsData = resolveResourceJson('resources/payload/user-details.json');
 
 test.describe('Legal Representative submits a case and perform various events', () => {
   test.use({

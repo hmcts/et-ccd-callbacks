@@ -1,11 +1,11 @@
 import { test } from '../fixtures/et.test.fixture.ts';
 import {
   CaseDetailsPage, CaseDetailsValues, CaseTypeLocation,
-  CaseworkerCaseFactory, DateUtilComponent, Events, ListHearingPage,
+  CaseworkerCaseFactory, config, DateUtilComponent, Events, ListHearingPage,
   LoginPage,
   ManageCaseDashboardPage,
   users
-} from "@et-shared-test-library/core";
+} from "@hmcts/et-shared-test-library";
 
 let caseId: string;
 let caseNumber: string;

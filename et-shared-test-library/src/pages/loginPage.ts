@@ -1,8 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { BasePage } from './basePage';
-import { UserCredentials } from '../config';
-import { CookieUtils } from '../data-utils';
-import { staticConfig } from '../config';
+import { BasePage } from './basePage.js';
+import { UserCredentials, staticConfig } from '../config/index.js';
+import { CookieUtils } from '../data-utils/index.js';
 
 const aatUrl = staticConfig.manageCaseBaseUrl;
 

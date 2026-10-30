@@ -1,7 +1,7 @@
 import { test } from '../fixtures/et.test.fixture.ts';
-import userDetailsData from '@et-shared-test-library/core/resources/payload/user-details.json';
-import {config, createCaseViaCitizenUI, users} from "@et-shared-test-library/core";
+import {config, createCaseViaCitizenUI, resolveResourceJson, users} from "@hmcts/et-shared-test-library";
 
+const userDetailsData = resolveResourceJson('resources/payload/user-details.json');
 test.describe('non-HMCTS claimant legal representative Case creation in Citizen UI', () => {
 
   test.skip();

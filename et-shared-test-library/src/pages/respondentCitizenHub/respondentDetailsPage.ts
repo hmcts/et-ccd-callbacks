@@ -1,8 +1,8 @@
-import { BasePage } from "../basePage";
-import respPageData from '../../../resources/payload/respondent-page-content.json';
-import {DateUtilComponent} from '../../data-utils';
+import { BasePage } from "../basePage.js";
+import respPageData from '../../../resources/payload/respondent-page-content.json' with { type: 'json' };
+import {DateUtilComponent} from '../../data-utils/index.js';
 import { expect, Locator, Page } from '@playwright/test';
-import {resolveResourcePath} from "../../data-utils/resourcePath";
+import {resolveResourcePath} from "../../data-utils/resourceFilePathData.js";
 
 export class RespondentDetailsPage extends BasePage {
   private readonly respondentReceivedDateField: Locator;

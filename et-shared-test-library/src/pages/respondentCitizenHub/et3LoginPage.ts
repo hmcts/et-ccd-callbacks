@@ -13,6 +13,7 @@ export class ET3LoginPage extends LoginPage {
   private readonly claimantLastName: Locator;
   private readonly appointLegalRepLink: Locator;
   private readonly errorMessage = (text: string): Locator => this.page.getByText(text).first();
+  private readonly etSubmittedResponseRadio: Locator;
   private readonly etAccountRadio: Locator;
   private readonly signInOptionLink: Locator;
 
@@ -27,7 +28,8 @@ export class ET3LoginPage extends LoginPage {
     this.claimantFirstName = page.locator('#claimantFirstName');
     this.claimantLastName = page.locator('#claimantLastName');
     this.appointLegalRepLink = page.locator('[href="/appoint-legal-representative"]');
-    this.etAccountRadio = page.locator(`#return_number_or_account-2`);
+    this.etSubmittedResponseRadio = page.locator(`#return_to_existing-2`);
+    this.etAccountRadio=page.locator('#submitted_claim_option');
     this.signInOptionLink = page.locator('//a[@href="/enter-email"]');
   }
 
@@ -36,6 +38,7 @@ export class ET3LoginPage extends LoginPage {
     await expect(this.page.locator('h1')).toHaveText(/Introduction/);
     await this.returnToExistingResponse.click();
     await this.page.waitForTimeout(1000);
+    await this.etSubmittedResponseRadio.click();
     await this.etAccountRadio.click();
     await this.clickContinue();
 

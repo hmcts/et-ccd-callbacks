@@ -4,6 +4,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.service.notify.NotificationClient;
 
 import static org.mockito.Mockito.mock;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 
 public class EmailUtils extends EmailService {
     public EmailUtils() {
@@ -23,6 +24,15 @@ public class EmailUtils extends EmailService {
     @Override
     public String getSyrCaseLink(String caseId, String respondentId) {
         return "syrUrl" + caseId + "/" + respondentId;
+    }
+
+    @Override
+    public String getRespondentCitizenCaseLink(String caseId, String respondentId, boolean welsh) {
+        String link = "syrUrl/case-details/" + caseId + "/" + respondentId;
+        if (welsh) {
+            return link + WELSH_LANGUAGE_PARAM;
+        }
+        return link;
     }
 
     @Override

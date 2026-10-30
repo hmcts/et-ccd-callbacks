@@ -32,9 +32,7 @@ test.describe('ECC', () => {
     await jurisdictionPage.addJurisdiction('ECC', 'Not allocated', 2);
     await jurisdictionPage.clickSubmitButton();
 
-    await expect(jurisdictionPage.page.getByRole('tab', { name: 'Case Details' }).locator('div')).toContainText(
-      'Case Details',
-    );
+    await expect(jurisdictionPage.page.getByRole('tab', { name: 'Case Details' })).toBeVisible();
     await expect(jurisdictionPage.page.getByText('ECC', { exact: true })).toBeVisible();
   });
 

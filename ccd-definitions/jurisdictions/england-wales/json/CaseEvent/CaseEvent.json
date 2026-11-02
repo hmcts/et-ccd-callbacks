@@ -10,10 +10,7 @@
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "N",
-    "EventEnablingCondition": "caseType=\"dummy\"",
-    "CallBackURLAboutToStartEvent": "",
-    "CallBackURLAboutToSubmitEvent": "",
-    "CallBackURLSubmittedEvent": ""
+    "EventEnablingCondition": "caseType=\"dummy\""
   },
   {
     "CaseTypeID": "ET_EnglandWales",
@@ -568,10 +565,7 @@
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "N",
-    "EventEnablingCondition": "caseType=\"dummy\"",
-    "CallBackURLAboutToStartEvent": "",
-    "CallBackURLAboutToSubmitEvent": "",
-    "CallBackURLSubmittedEvent": ""
+    "EventEnablingCondition": "caseType=\"dummy\""
   },
   {
     "CaseTypeID": "ET_EnglandWales",
@@ -778,10 +772,7 @@
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "N",
-    "EventEnablingCondition": "caseType=\"Dummy\"",
-    "CallBackURLAboutToStartEvent": "",
-    "CallBackURLAboutToSubmitEvent": "",
-    "CallBackURLSubmittedEvent": ""
+    "EventEnablingCondition": "caseType=\"Dummy\""
   },
   {
     "CaseTypeID": "ET_EnglandWales_Listings",

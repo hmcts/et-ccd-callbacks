@@ -23,7 +23,7 @@ export abstract class BasePage {
     this.closeAndReturnButton = this.page.getByRole('button', { name: 'Close and Return to case' });
     this.applyFilterButton = this.page.getByRole('button', { name: 'Apply filter' });
     this.addNewBtn = page.getByRole('button', { name: 'Add new' });
-    this.newHearingBtn = '#hearingCollection > div > button.button.write-collection-add-item__bottom.ng-star-inserted';
+    this.newHearingBtn = '#hearingCollection > div > button.button.write-collection-add-item__bottom';
     this.newUploadDocBtn = page.locator('//*[@id="documentCollection"]/div/button[2]');
     this.continueButton = page.getByRole('button', { name: 'Continue' });
     this.submitButton = page.getByRole('button', { name: 'Submit' });

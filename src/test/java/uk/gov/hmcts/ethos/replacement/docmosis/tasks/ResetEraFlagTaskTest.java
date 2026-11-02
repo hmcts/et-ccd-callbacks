@@ -7,23 +7,24 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.AdditionalCaseInfoType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -42,10 +43,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 class ResetEraFlagTaskTest {
 
     private static final String ADMIN_TOKEN = "test-admin-token";
-    private static final String S2S_TOKEN = "test-s2s-token";
     private static final String CASE_ID = "1620473176786991";
     private static final String CASE_ID_2 = "1620473176786992";
-    private static final String FIX_CASE_API = "fixCaseAPI";
+    private static final String AMEND_CASE_DETAILS = "amendCaseDetails";
 
     @Mock
     private AdminUserService adminUserService;
@@ -54,42 +54,39 @@ class ResetEraFlagTaskTest {
     private CcdClient ccdClient;
 
     @Mock
-    private CoreCaseDataApi coreCaseDataApi;
-
-    @Mock
-    private AuthTokenGenerator authTokenGenerator;
+    private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Captor
     private ArgumentCaptor<CaseData> caseDataCaptor;
+
+    @Captor
+    private ArgumentCaptor<MapSqlParameterSource> paramCaptor;
 
     private ResetEraFlagTask task;
 
     @BeforeEach
     void setUp() {
-        task = new ResetEraFlagTask(adminUserService, ccdClient, coreCaseDataApi, authTokenGenerator);
+        task = new ResetEraFlagTask(adminUserService, ccdClient, jdbcTemplate);
         lenient().when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
-        lenient().when(authTokenGenerator.generate()).thenReturn(S2S_TOKEN);
     }
 
     @Test
-    void run_doesNothingWhenCaseIdsIsEmptyOrNull() throws IOException {
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", null);
-        task.run();
-        verify(coreCaseDataApi, never()).getCase(anyString(), anyString(), anyString());
+    void run_doesNothingWhenNoCasesFound() throws IOException {
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class))).thenReturn(Collections.emptyList());
 
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", "");
         task.run();
-        verify(coreCaseDataApi, never()).getCase(anyString(), anyString(), anyString());
 
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", " , ");
-        task.run();
-        verify(coreCaseDataApi, never()).getCase(anyString(), anyString(), anyString());
+        verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
+        verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
     }
 
     @Test
-    void run_resetsEraFlagAndSubmitsCase_whenCaseHadEraYes() throws IOException {
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", CASE_ID);
-        mockCoreCaseDataApi(CASE_ID, ENGLANDWALES_CASE_TYPE_ID);
+    void run_resetsEraFlagAndSubmitsCase_whenCaseFound() throws IOException {
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class)))
+                .thenReturn(List.of(Long.parseLong(CASE_ID)))
+                .thenReturn(Collections.emptyList());
 
         CaseData caseData = new CaseData();
         AdditionalCaseInfoType additionalCaseInfoType = new AdditionalCaseInfoType();
@@ -98,12 +95,12 @@ class ResetEraFlagTaskTest {
         caseData.setStateAPI("Accepted");
 
         CCDRequest ccdRequest = buildCcdRequest(caseData, ENGLANDWALES_CASE_TYPE_ID);
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID,
+            AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest);
 
         task.run();
 
-        verify(coreCaseDataApi).getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID);
         verify(ccdClient).submitEventForCase(eq(ADMIN_TOKEN), caseDataCaptor.capture(),
                 eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT), eq(ccdRequest), eq(CASE_ID));
 
@@ -117,14 +114,17 @@ class ResetEraFlagTaskTest {
 
     @Test
     void run_createsAdditionalCaseInfoWhenNull_andResetsEra() throws IOException {
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", CASE_ID);
-        mockCoreCaseDataApi(CASE_ID, ENGLANDWALES_CASE_TYPE_ID);
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class)))
+                .thenReturn(List.of(Long.parseLong(CASE_ID)))
+                .thenReturn(Collections.emptyList());
 
         CaseData caseData = new CaseData();
         caseData.setAdditionalCaseInfoType(null);
 
         CCDRequest ccdRequest = buildCcdRequest(caseData, ENGLANDWALES_CASE_TYPE_ID);
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID,
+            AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest);
 
         task.run();
@@ -138,9 +138,12 @@ class ResetEraFlagTaskTest {
     }
 
     @Test
-    void run_resolvesScotlandCaseType_andSubmitsSuccessfully() throws IOException {
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", CASE_ID);
-        mockCoreCaseDataApi(CASE_ID, SCOTLAND_CASE_TYPE_ID);
+    void run_processesScotlandCases_andSubmitsSuccessfully() throws IOException {
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class)))
+                .thenReturn(Collections.emptyList())
+                .thenReturn(List.of(Long.parseLong(CASE_ID)))
+                .thenReturn(Collections.emptyList());
 
         CaseData caseData = new CaseData();
         AdditionalCaseInfoType additionalCaseInfoType = new AdditionalCaseInfoType();
@@ -148,7 +151,7 @@ class ResetEraFlagTaskTest {
         caseData.setAdditionalCaseInfoType(additionalCaseInfoType);
 
         CCDRequest ccdRequest = buildCcdRequest(caseData, SCOTLAND_CASE_TYPE_ID);
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, SCOTLAND_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, SCOTLAND_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest);
 
         task.run();
@@ -161,9 +164,12 @@ class ResetEraFlagTaskTest {
 
     @Test
     void run_doesNotSubmitWhenDryRunIsTrue() throws IOException {
-        task = new ResetEraFlagTask(adminUserService, ccdClient, coreCaseDataApi, authTokenGenerator,
-                CASE_ID, true);
-        mockCoreCaseDataApi(CASE_ID, ENGLANDWALES_CASE_TYPE_ID);
+        task = new ResetEraFlagTask(adminUserService, ccdClient, jdbcTemplate, true);
+
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class)))
+                .thenReturn(List.of(Long.parseLong(CASE_ID)))
+                .thenReturn(Collections.emptyList());
 
         CaseData caseData = new CaseData();
         AdditionalCaseInfoType additionalCaseInfoType = new AdditionalCaseInfoType();
@@ -171,40 +177,32 @@ class ResetEraFlagTaskTest {
         caseData.setAdditionalCaseInfoType(additionalCaseInfoType);
 
         CCDRequest ccdRequest = buildCcdRequest(caseData, ENGLANDWALES_CASE_TYPE_ID);
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID,
+            AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest);
 
         task.run();
 
-        verify(coreCaseDataApi).getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID);
+        verify(ccdClient).startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID,
+            AMEND_CASE_DETAILS);
         verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
     }
 
     @Test
-    void run_skipsWhenCoreCaseDataApiReturnsNullOrBlankCaseType() throws IOException {
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", CASE_ID);
-        when(coreCaseDataApi.getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID)).thenReturn(null);
-
-        task.run();
-
-        verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
-
-        mockCoreCaseDataApi(CASE_ID, "   ");
-        task.run();
-
-        verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
-    }
-
-    @Test
     void run_continuesProcessingWhenOneCaseFails() throws IOException {
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", CASE_ID + "," + CASE_ID_2);
-        when(coreCaseDataApi.getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID))
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class)))
+                .thenReturn(List.of(Long.parseLong(CASE_ID), Long.parseLong(CASE_ID_2)))
+                .thenReturn(Collections.emptyList());
+
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID,
+            AMEND_CASE_DETAILS))
                 .thenThrow(new RuntimeException("CCD failure"));
 
-        mockCoreCaseDataApi(CASE_ID_2, ENGLANDWALES_CASE_TYPE_ID);
         CaseData caseData2 = new CaseData();
         CCDRequest ccdRequest2 = buildCcdRequest(caseData2, ENGLANDWALES_CASE_TYPE_ID);
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID_2, FIX_CASE_API))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID_2,
+            AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest2);
 
         task.run();
@@ -214,10 +212,25 @@ class ResetEraFlagTaskTest {
     }
 
     @Test
+    void run_handlesDatabaseExceptionGracefully() throws IOException {
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class)))
+                .thenThrow(new DataAccessResourceFailureException("DB connection failed"));
+
+        task.run();
+
+        verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
+    }
+
+    @Test
     void run_skipsWhenCcdRequestOrCaseDetailsOrCaseDataIsNull() throws IOException {
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", CASE_ID);
-        mockCoreCaseDataApi(CASE_ID, ENGLANDWALES_CASE_TYPE_ID);
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API))
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class)))
+                .thenReturn(List.of(Long.parseLong(CASE_ID)))
+                .thenReturn(Collections.emptyList());
+
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID,
+            AMEND_CASE_DETAILS))
                 .thenReturn(null);
 
         task.run();
@@ -227,15 +240,19 @@ class ResetEraFlagTaskTest {
 
     @Test
     void run_skipsWhenCaseDataIsNull() throws IOException {
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", CASE_ID);
-        mockCoreCaseDataApi(CASE_ID, ENGLANDWALES_CASE_TYPE_ID);
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class)))
+                .thenReturn(List.of(Long.parseLong(CASE_ID)))
+                .thenReturn(Collections.emptyList());
+
         CCDRequest ccdRequest = new CCDRequest();
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseData(null);
         ccdRequest.setCaseDetails(caseDetails);
 
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID,
+            AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest);
 
         task.run();
@@ -244,20 +261,18 @@ class ResetEraFlagTaskTest {
     }
 
     @Test
-    void processCases_handlesBlankCaseIdInList() {
-        task.processCases(List.of("   ", ""));
-        verify(coreCaseDataApi, never()).getCase(anyString(), anyString(), anyString());
-    }
-
-    @Test
     void run_usesDefaultEmploymentJurisdiction_whenCaseDetailsJurisdictionIsNull() throws IOException {
-        ReflectionTestUtils.setField(task, "caseIdsToUpdate", CASE_ID);
-        mockCoreCaseDataApi(CASE_ID, ENGLANDWALES_CASE_TYPE_ID);
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), any(MapSqlParameterSource.class),
+                eq(Long.class)))
+                .thenReturn(List.of(Long.parseLong(CASE_ID)))
+                .thenReturn(Collections.emptyList());
+
         CaseData caseData = new CaseData();
         CCDRequest ccdRequest = buildCcdRequest(caseData, ENGLANDWALES_CASE_TYPE_ID);
         ccdRequest.getCaseDetails().setJurisdiction(null);
 
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, FIX_CASE_API))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID,
+            AMEND_CASE_DETAILS))
                 .thenReturn(ccdRequest);
 
         task.run();
@@ -268,21 +283,66 @@ class ResetEraFlagTaskTest {
     }
 
     @Test
-    void parseCaseIds_trimsAndRemovesBlanks() {
-        List<String> result = ResetEraFlagTask.parseCaseIds(" " + CASE_ID + " ,, " + CASE_ID_2 + " ");
-        assertEquals(List.of(CASE_ID, CASE_ID_2), result);
+    void run_paginatesWhenBatchIsFull() throws IOException {
+        task = new ResetEraFlagTask(adminUserService, ccdClient, jdbcTemplate, ENGLANDWALES_CASE_TYPE_ID, 2, false);
 
-        assertTrue(ResetEraFlagTask.parseCaseIds(null).isEmpty());
-        assertTrue(ResetEraFlagTask.parseCaseIds("").isEmpty());
-        assertTrue(ResetEraFlagTask.parseCaseIds(" , ").isEmpty());
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), paramCaptor.capture(), eq(Long.class)))
+                .thenReturn(List.of(1_001L, 1_002L))
+                .thenReturn(List.of(1_003L));
+
+        CaseData caseData = new CaseData();
+        AdditionalCaseInfoType additionalCaseInfoType = new AdditionalCaseInfoType();
+        additionalCaseInfoType.setEra(YES);
+        caseData.setAdditionalCaseInfoType(additionalCaseInfoType);
+        CCDRequest ccdRequest = buildCcdRequest(caseData, ENGLANDWALES_CASE_TYPE_ID);
+
+        when(ccdClient.startEventForCase(eq(ADMIN_TOKEN), eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT),
+                anyString(), eq(AMEND_CASE_DETAILS))).thenReturn(ccdRequest);
+
+        task.run();
+
+        verify(ccdClient, times(3)).submitEventForCase(eq(ADMIN_TOKEN), any(CaseData.class),
+                eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT), eq(ccdRequest), anyString());
+
+        List<MapSqlParameterSource> capturedParams = paramCaptor.getAllValues();
+        assertEquals(2, capturedParams.size());
+        assertEquals(0L, capturedParams.get(0).getValue("afterReference"));
+        assertEquals(1_002L, capturedParams.get(1).getValue("afterReference"));
     }
 
-    private void mockCoreCaseDataApi(String caseId, String caseTypeId) {
-        uk.gov.hmcts.reform.ccd.client.model.CaseDetails details =
-                uk.gov.hmcts.reform.ccd.client.model.CaseDetails.builder()
-                        .caseTypeId(caseTypeId)
-                        .build();
-        when(coreCaseDataApi.getCase(ADMIN_TOKEN, S2S_TOKEN, caseId)).thenReturn(details);
+    @Test
+    void findCasesForCaseType_queriesWithCorrectParameters() {
+        when(jdbcTemplate.queryForList(eq(ResetEraFlagTask.FIND_ERA_CASES), paramCaptor.capture(), eq(Long.class)))
+                .thenReturn(List.of(Long.parseLong(CASE_ID)));
+
+        List<Long> result = task.findCasesForCaseType(ENGLANDWALES_CASE_TYPE_ID, 100L);
+
+        assertEquals(List.of(Long.parseLong(CASE_ID)), result);
+        MapSqlParameterSource params = paramCaptor.getValue();
+        assertEquals(ENGLANDWALES_CASE_TYPE_ID, params.getValue("caseTypeId"));
+        assertEquals(100L, params.getValue("afterReference"));
+        assertEquals(500, params.getValue("maxCases"));
+    }
+
+    @Test
+    void processCase_handlesBlankCaseId() {
+        assertFalse(task.processCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "   "));
+        assertFalse(task.processCase(ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, null));
+    }
+
+    @Test
+    void processCases_skipsInvalidCaseId() throws IOException {
+        task.processCases(List.of(0L, -1L), ENGLANDWALES_CASE_TYPE_ID, ADMIN_TOKEN);
+
+        verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void processCases_handlesEmptyList() throws IOException {
+        task.processCases(Collections.emptyList(), ENGLANDWALES_CASE_TYPE_ID, ADMIN_TOKEN);
+        task.processCases(null, ENGLANDWALES_CASE_TYPE_ID, ADMIN_TOKEN);
+
+        verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
     }
 
     private CCDRequest buildCcdRequest(CaseData caseData, String caseTypeId) {

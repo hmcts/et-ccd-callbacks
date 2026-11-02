@@ -14,10 +14,15 @@ public class NoticeOfChangeAnswersConverter {
      */
     public NoticeOfChangeAnswers generateForSubmission(RespondentSumTypeItem respondent,
                                                        ClaimantIndType claimant) {
+        String respondentName = respondent != null && respondent.getValue() != null
+                ? respondent.getValue().getRespondentName() : null;
+        String claimantFirstName = claimant != null ? claimant.getClaimantFirstNames() : null;
+        String claimantLastName = claimant != null ? claimant.getClaimantLastName() : null;
+
         return NoticeOfChangeAnswers.builder()
-                .respondentName(respondent.getValue().getRespondentName())
-                .claimantFirstName(claimant.getClaimantFirstNames())
-                .claimantLastName(claimant.getClaimantLastName())
+                .respondentName(respondentName)
+                .claimantFirstName(claimantFirstName)
+                .claimantLastName(claimantLastName)
                 .build();
     }
 }

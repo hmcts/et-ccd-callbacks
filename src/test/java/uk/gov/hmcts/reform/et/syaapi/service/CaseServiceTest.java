@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.et.syaapi.service;
 
+import feign.FeignException;
+import feign.Request;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -48,6 +51,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.service.notify.SendEmailResponse;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,6 +69,8 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -77,6 +83,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.reform.et.syaapi.constants.DocumentCategoryConstants.ET1_PDF_DOC_CATEGORY;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.DRAFT_EVENT_TYPE;
@@ -570,6 +577,28 @@ class CaseServiceTest {
         verify(createUpdatesBusSender, never()).sendSingleMessage(any(CreateUpdatesMsg.class), anyList());
     }
 
+    @Test
+    void submitCaseSendsUserInsightsEmailLast() {
+        caseService.submitCase(TEST_SERVICE_AUTH_TOKEN, caseTestData.getCaseRequest());
+        CaseData submittedCaseData = convertCaseDataMapToCaseDataObject(caseTestData.getExpectedDetails().getData());
+
+        InOrder notificationOrder = inOrder(notificationService);
+        notificationOrder.verify(notificationService).sendSubmitCaseConfirmationEmail(any(), any(), any(), any());
+        notificationOrder.verify(notificationService).sendUserInsightsEmail(
+            eq(submittedCaseData.getClaimantType().getClaimantEmailAddress()),
+            eq(submittedCaseData.getClaimant()),
+            eq("ET1")
+        );
+    }
+
+    @Test
+    void submitCaseContinuesWhenUserInsightsEmailFails() {
+        doThrow(new RuntimeException("Gov Notify unavailable")).when(notificationService)
+            .sendUserInsightsEmail(anyString(), anyString(), anyString());
+
+        assertDoesNotThrow(() -> caseService.submitCase(TEST_SERVICE_AUTH_TOKEN, caseTestData.getCaseRequest()));
+    }
+
     private DocumentTypeItem createDocumentTypeItem() {
         UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
         uploadedDocumentType.setDocumentFilename("filename");
@@ -760,6 +789,64 @@ class CaseServiceTest {
             verify(ccdApiClient, times(1)).getCase(any(), any(), any());
 
         }
+    }
+
+    @Test
+    void submitCaseReturnsAlreadySubmittedCaseWhenStartIsRejected() throws CaseDocumentException {
+        FeignException.UnprocessableEntity startRejected = unprocessableEntity();
+        when(ccdApiClient.startEventForCitizen(any(), any(), any(), any(), any(), any(), any()))
+            .thenThrow(startRejected);
+        CaseDetails submittedCase = CaseDetails.builder()
+            .id(Long.valueOf(caseTestData.getCaseRequest().getCaseId()))
+            .state(SUBMITTED_STATE)
+            .build();
+        when(ccdApiClient.getCase(TEST_SERVICE_AUTH_TOKEN, TEST_SERVICE_AUTH_TOKEN,
+                                  caseTestData.getCaseRequest().getCaseId())).thenReturn(submittedCase);
+
+        CaseDetails result = caseService.submitCase(TEST_SERVICE_AUTH_TOKEN, caseTestData.getCaseRequest());
+
+        assertThat(result).isSameAs(submittedCase);
+        verify(ccdApiClient, never()).submitEventForCitizen(any(), any(), any(), any(), any(), any(), anyBoolean(),
+                                                            any());
+        // The first submission has already sent the confirmation and uploaded the documents
+        verify(notificationService, never()).sendSubmitCaseConfirmationEmail(any(), any(), any(), any());
+        verify(caseDocumentService, never()).uploadAllDocuments(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void submitCaseRethrowsStartRejectionWhenCaseIsNotSubmitted() {
+        FeignException.UnprocessableEntity startRejected = unprocessableEntity();
+        when(ccdApiClient.startEventForCitizen(any(), any(), any(), any(), any(), any(), any()))
+            .thenThrow(startRejected);
+        when(ccdApiClient.getCase(TEST_SERVICE_AUTH_TOKEN, TEST_SERVICE_AUTH_TOKEN,
+                                  caseTestData.getCaseRequest().getCaseId()))
+            .thenReturn(CaseDetails.builder().state("AWAITING_SUBMISSION_TO_HMCTS").build());
+
+        FeignException thrown = assertThrows(FeignException.class, () ->
+            caseService.submitCase(TEST_SERVICE_AUTH_TOKEN, caseTestData.getCaseRequest()));
+
+        assertThat(thrown).isSameAs(startRejected);
+    }
+
+    @Test
+    void submitCaseRethrowsStartRejectionWhenCaseLookupFails() {
+        FeignException.UnprocessableEntity startRejected = unprocessableEntity();
+        when(ccdApiClient.startEventForCitizen(any(), any(), any(), any(), any(), any(), any()))
+            .thenThrow(startRejected);
+        RuntimeException lookupFailure = new RuntimeException("Lookup failed");
+        when(ccdApiClient.getCase(any(), any(), any())).thenThrow(lookupFailure);
+
+        FeignException thrown = assertThrows(FeignException.class, () ->
+            caseService.submitCase(TEST_SERVICE_AUTH_TOKEN, caseTestData.getCaseRequest()));
+
+        assertThat(thrown).isSameAs(startRejected);
+        assertThat(thrown.getSuppressed()).containsExactly(lookupFailure);
+    }
+
+    private static FeignException.UnprocessableEntity unprocessableEntity() {
+        Request request = Request.create(Request.HttpMethod.GET, "/event-triggers/SUBMIT_CASE_DRAFT", Map.of(),
+                                         null, StandardCharsets.UTF_8, null);
+        return new FeignException.UnprocessableEntity("Unprocessable Entity", request, null, null);
     }
 
     private List<JurCodesTypeItem> mockJurCodesTypeItems() {

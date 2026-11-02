@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -35,6 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -231,6 +234,34 @@ class ET3ServiceTest {
         assertThat(actualRespondent).isEqualTo(expectedRespondent);
         verify(notificationService, times(1))
             .sendEt3ConfirmationEmail(anyString(), any(), anyString());
+        InOrder notificationOrder = inOrder(notificationService);
+        notificationOrder.verify(notificationService).sendEt3ConfirmationEmail(anyString(), any(), anyString());
+        notificationOrder.verify(notificationService).sendUserInsightsEmail(
+            eq(et3Request.getRespondent().getValue().getResponseRespondentEmail()),
+            eq(et3Request.getRespondent().getValue().getRespondentName()),
+            eq("ET3")
+        );
+    }
+
+    @Test
+    void theModifyEt3DataForSubmitContinuesWhenUserInsightsEmailFails() {
+        Et3Request et3Request = new CaseTestData().getEt3Request();
+        et3Request.setRequestType(MODIFICATION_TYPE_SUBMIT);
+        StartEventResponse startEventResponse = new CaseTestData().getStartEventResponse();
+        startEventResponse.setCaseDetails(new CaseTestData().getCaseDetails());
+        when(caseService.startUpdate(TestConstants.TEST_SERVICE_AUTH_TOKEN,
+                                     et3Request.getCaseSubmissionReference(),
+                                     et3Request.getCaseTypeId(),
+                                     SUBMIT_ET3_FORM)).thenReturn(startEventResponse);
+        when(caseService.submitUpdate(eq(TestConstants.TEST_SERVICE_AUTH_TOKEN),
+                                      eq(startEventResponse.getCaseDetails().getId().toString()),
+                                      any(),
+                                      eq(startEventResponse.getCaseDetails().getCaseTypeId())))
+            .thenReturn(new CaseTestData().getCaseDetailsWithCaseData());
+        doThrow(new RuntimeException("Gov Notify unavailable")).when(notificationService)
+            .sendUserInsightsEmail(anyString(), anyString(), anyString());
+
+        assertDoesNotThrow(() -> et3Service.modifyEt3Data(TestConstants.TEST_SERVICE_AUTH_TOKEN, et3Request));
     }
 
     @Test

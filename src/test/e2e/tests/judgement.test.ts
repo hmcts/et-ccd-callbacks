@@ -1,11 +1,12 @@
-import { test  } from '../fixtures/common.fixture';
-import { CaseTypeLocation, Events } from '../config/case-data.ts';
-import { CaseworkerCaseFactory } from '../data-utils/factory/exui/CaseworkerCaseFactory.ts';
-import { users } from '../config/config.dynamic.ts';
-import LoginPage from '../pages/loginPage.ts';
-import { ManageCaseDashboardPage } from '../pages/ManageCaseDashboardPage.ts';
-import CaseDetailsPage from '../pages/caseDetailsPage.ts';
-import IssueJudgementPage from '../pages/events/issueJudgementPage.ts';
+import { test  } from '../fixtures/et.test.fixture.ts';
+import {
+  CaseDetailsPage,
+  CaseTypeLocation,
+  CaseworkerCaseFactory, Events, IssueJudgementPage,
+  LoginPage,
+  ManageCaseDashboardPage,
+  users
+} from "@et-shared-test-library/core";
 
 test.describe('Judgement tests', () => {
   test.use({

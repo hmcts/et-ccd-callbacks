@@ -10,6 +10,7 @@ import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
@@ -29,15 +30,19 @@ import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.applications.TseService;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -168,6 +173,88 @@ class TornadoServiceTest {
                 caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), new MultipleData());
 
         verifyDocumentInfo(documentInfo);
+    }
+
+    @Test
+    void joinsTheGlasgowStreetOntoTheLetterPayloadOnly() throws IOException {
+        mockConnectionSuccess();
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        mockConnection.setOutputStream(output);
+        when(defaultValuesReaderService.getDefaultValues("Glasgow")).thenReturn(DefaultValues.builder()
+                .tribunalCorrespondenceAddressLine3("Glasgow Tribunals Centre")
+                .tribunalCorrespondenceAddressLine4("3 Atlantic Quay, 20 York Street")
+                .build());
+        CaseData caseData = glasgowCase("Glasgow Tribunals Centre");
+
+        tornadoService.documentGeneration(AUTH_TOKEN, caseData, SCOTLAND_CASE_TYPE_ID, null, null, null);
+
+        assertThat(output.toString(StandardCharsets.UTF_8),
+                containsString("Glasgow Tribunals Centre\\n3 Atlantic Quay, 20 York Street"));
+        assertEquals("Glasgow Tribunals Centre",
+                caseData.getTribunalCorrespondenceAddress().getAddressLine3());
+    }
+
+    @Test
+    void joinsTheAllocatedOfficeStreetOntoTheLetter() throws IOException {
+        mockConnectionSuccess();
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        mockConnection.setOutputStream(output);
+        when(defaultValuesReaderService.getDefaultValues("Glasgow")).thenReturn(DefaultValues.builder()
+                .tribunalCorrespondenceAddressLine3("Glasgow Tribunals Centre")
+                .tribunalCorrespondenceAddressLine4("3 Atlantic Quay, 20 York Street")
+                .build());
+        CaseData caseData = glasgowCase("Glasgow Tribunals Centre");
+        caseData.setAllocatedOffice("Glasgow");
+        CorrespondenceScotType correspondenceScotType = new CorrespondenceScotType();
+        correspondenceScotType.setTopLevelScotDocuments("test-template");
+        correspondenceScotType.setLetterAddress(LETTER_ADDRESS_ALLOCATED_OFFICE);
+        caseData.setCorrespondenceScotType(correspondenceScotType);
+
+        tornadoService.documentGeneration(AUTH_TOKEN, caseData, SCOTLAND_CASE_TYPE_ID,
+                null, correspondenceScotType, null);
+
+        assertThat(output.toString(StandardCharsets.UTF_8),
+                containsString("Glasgow Tribunals Centre\\n3 Atlantic Quay, 20 York Street"));
+    }
+
+    @Test
+    void leavesAnEditedAddressLineWithoutTheOfficeStreet() throws IOException {
+        mockConnectionSuccess();
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        mockConnection.setOutputStream(output);
+        when(defaultValuesReaderService.getDefaultValues("Glasgow")).thenReturn(DefaultValues.builder()
+                .tribunalCorrespondenceAddressLine3("Glasgow Tribunals Centre")
+                .tribunalCorrespondenceAddressLine4("3 Atlantic Quay, 20 York Street")
+                .build());
+        CaseData caseData = glasgowCase("Edited line");
+
+        tornadoService.documentGeneration(AUTH_TOKEN, caseData, SCOTLAND_CASE_TYPE_ID, null, null, null);
+
+        String payload = output.toString(StandardCharsets.UTF_8);
+        assertThat(payload, containsString("Edited line"));
+        assertThat(payload, not(containsString("3 Atlantic Quay")));
+    }
+
+    @Test
+    void skipsTheStreetLookupWhenTheOfficeOrAddressIsMissing() throws IOException {
+        mockConnectionSuccess();
+        CaseData noOffice = new CaseData();
+        noOffice.setTribunalCorrespondenceAddress(new Address());
+        verifyDocumentInfo(tornadoService.documentGeneration(AUTH_TOKEN, noOffice, SCOTLAND_CASE_TYPE_ID,
+                null, null, null));
+
+        when(defaultValuesReaderService.getDefaultValues("Glasgow")).thenReturn(null);
+        verifyDocumentInfo(tornadoService.documentGeneration(AUTH_TOKEN, glasgowCase("Glasgow Tribunals Centre"),
+                SCOTLAND_CASE_TYPE_ID, null, null, null));
+    }
+
+    private CaseData glasgowCase(String addressLine3) {
+        Address address = new Address();
+        address.setAddressLine3(addressLine3);
+        CaseData caseData = new CaseData();
+        caseData.setManagingOffice("Glasgow");
+        caseData.setTribunalCorrespondenceAddress(address);
+        return caseData;
     }
 
     @Test

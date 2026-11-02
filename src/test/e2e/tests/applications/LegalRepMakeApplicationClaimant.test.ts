@@ -1,16 +1,12 @@
-import { cuiApi, test } from '../../fixtures/common.fixture.ts';
-import { CaseTypeLocation } from '../../config/case-data.ts';
-import { CaseEventApi } from '../../data-utils/api/CaseEventApi.ts';
-import DateUtilComponent from '../../data-utils/DateUtilComponent.ts';
-import { users } from '../../config/config.dynamic.ts';
-import { ManageCaseDashboardPage } from '../../pages/ManageCaseDashboardPage.ts';
-import LoginPage from '../../pages/loginPage.ts';
-import CaseDetailsPage from '../../pages/caseDetailsPage.ts';
-import { ApplicationTabPage } from '../../pages/applicationTabPage.ts';
-import { CheckYourAnswersPage } from '../../pages/helpers/CheckYourAnswersPage.ts';
-import { LegalRepCaseFactory } from '../../data-utils/factory/exui/LegalRepCaseFactory.ts';
-import Et3LoginPage from '../../pages/respondentCitizenHub/et3LoginPage.ts';
-import ResClaimantsApplicationsPage from '../../pages/respondentCitizenHub/resClaimantsApplicationsPage.ts';
+import { test } from '../../fixtures/et.test.fixture.ts';
+import {
+  ApplicationTabPage,
+  CaseDetailsPage, CaseEventApi, CaseTypeLocation, CheckYourAnswersPage,
+  cuiApi, DateUtilComponent,
+  ET3LoginPage, LegalRepCaseFactory, LoginPage,
+  ManageCaseDashboardPage,
+  ResClaimantsApplicationsPage, users
+} from "@et-shared-test-library/core";
 
 let caseId: string;
 let caseNumber: string;
@@ -21,7 +17,7 @@ test.describe('LR Make an application and view Recorded Decision for respondent 
   test.use({
     storageState: users.etLegalRepresentative.sessionFile,
   })
-  let et3LoginPage: Et3LoginPage;
+  let et3LoginPage: ET3LoginPage;
   let resClaimantsApplicationPage: ResClaimantsApplicationsPage;
   let manageCaseDashboardPageCW: ManageCaseDashboardPage;
   let loginPageCW: LoginPage;
@@ -61,7 +57,7 @@ test.describe('LR Make an application and view Recorded Decision for respondent 
 
     // load browser context for Respondent
     const respondentBrowserPage = await browserUtils.openNewBrowserContext(users.etRespondent.sessionFile);
-    et3LoginPage = new Et3LoginPage(respondentBrowserPage);
+    et3LoginPage = new ET3LoginPage(respondentBrowserPage);
     resClaimantsApplicationPage = new ResClaimantsApplicationsPage(respondentBrowserPage);
   });
 

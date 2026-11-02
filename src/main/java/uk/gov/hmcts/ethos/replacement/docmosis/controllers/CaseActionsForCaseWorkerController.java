@@ -39,6 +39,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmploymentRightsActService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
@@ -69,6 +70,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_ST
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper.buildFlagsImageFileName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.removeSpacesFromPartyNames;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.updatePositionTypeToClosed;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.JurisdictionCodeHelper.populateJurCodesCollectionIds;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -82,8 +84,9 @@ public class CaseActionsForCaseWorkerController {
     public static final String ACCESSED_SUCCESSFULLY = "Accessed successfully";
     public static final String BAD_REQUEST = "Bad Request";
     public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
-    private static final List<String> SUBMISSION_EVENTS = List.of(SUBMIT_CASE_DRAFT, "initiateCase", "submitEt1Draft");
     public static final String CREATE_ECM_CASE = "createEcmCase";
+    private static final List<String> SUBMISSION_EVENTS = List.of(SUBMIT_CASE_DRAFT, "initiateCase", "submitEt1Draft",
+            CREATE_ECM_CASE);
 
     private final CaseCloseValidator caseCloseValidator;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
@@ -106,6 +109,7 @@ public class CaseActionsForCaseWorkerController {
     private final CaseManagementLocationService caseManagementLocationService;
     private final Et1SubmissionService et1SubmissionService;
     private final NocRespondentHelper nocRespondentHelper;
+    private final EmploymentRightsActService employmentRightsActService;
     private final ClaimantEmailService claimantEmailService;
 
     @PostMapping(value = "/preDefaultValues", consumes = APPLICATION_JSON_VALUE)
@@ -149,6 +153,7 @@ public class CaseActionsForCaseWorkerController {
         List<String> errors = getValidationDate(ccdRequest.getEventId(), caseDetails);
 
         if (errors.isEmpty()) {
+            employmentRightsActService.setEraFlagByReceiptDate(caseData);
             defaultValuesReaderService.setSubmissionReference(caseDetails);
             DefaultValues defaultValues = getPostDefaultValues(caseDetails);
             defaultValuesReaderService.setCaseData(caseData, defaultValues);
@@ -239,7 +244,7 @@ public class CaseActionsForCaseWorkerController {
 
         et1VettingService.populateHearingVenue(caseData);
         et1VettingService.populateSuggestedHearingVenues(caseData);
-
+        employmentRightsActService.setEraFlagByReceiptDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -278,6 +283,7 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
             caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
             caseManagementForCaseWorkerService.setNextListedDate(caseData);
+            employmentRightsActService.setEraFlagByReceiptDate(caseData);
             buildFlagsImageFileName(ccdRequest.getCaseDetails());
             UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
             UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
@@ -635,6 +641,7 @@ public class CaseActionsForCaseWorkerController {
         log.info("AMEND JURISDICTION ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        populateJurCodesCollectionIds(caseData);
         conciliationTrackService.populateConciliationTrackForJurisdiction(caseData);
         buildFlagsImageFileName(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
         return getCallbackRespEntityNoErrors(caseData);

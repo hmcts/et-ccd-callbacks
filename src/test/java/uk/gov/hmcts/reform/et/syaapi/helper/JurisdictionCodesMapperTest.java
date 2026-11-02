@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.et.syaapi.constants.ClaimTypesConstants;
 import uk.gov.hmcts.reform.et.syaapi.constants.JurisdictionCodesConstants;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,9 +36,10 @@ class JurisdictionCodesMapperTest {
         List<JurCodesTypeItem> items = jurisdictionCodesMapper.mapToJurCodes(mockCaseDataWithTypesOfClaims());
         List<String> plainCodes = items.stream()
             .map(it -> it.getValue().getJuridictionCodesList())
-            .collect(Collectors.toList());
+            .toList();
 
-        assertThat(items).hasAtLeastOneElementOfType(JurCodesTypeItem.class);
+        assertThat(items).hasAtLeastOneElementOfType(JurCodesTypeItem.class)
+            .allSatisfy(item -> assertThat(item.getId()).isNotBlank());
         assertThat(plainCodes).containsAll(expectedCodes);
     }
 

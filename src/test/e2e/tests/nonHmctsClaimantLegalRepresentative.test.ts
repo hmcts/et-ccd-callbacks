@@ -1,8 +1,6 @@
-import { test } from '../fixtures/common.fixture';
-import { CaseTypeLocation, Events } from '../config/case-data.ts';
-import { config, users } from '../config/config.dynamic.ts';
-import userDetailsData from '../resources/payload/user-details.json';
-import { createCaseViaCitizenUI, vetAndAcceptCitizenCase } from '../pages/helpers/CuiCaseCreationHelper.ts';
+import { test } from '../fixtures/et.test.fixture.ts';
+import userDetailsData from '@et-shared-test-library/core/resources/payload/user-details.json';
+import {config, createCaseViaCitizenUI, users} from "@et-shared-test-library/core";
 
 test.describe('non-HMCTS claimant legal representative Case creation in Citizen UI', () => {
 
@@ -15,8 +13,6 @@ test.describe('non-HMCTS claimant legal representative Case creation in Citizen 
     async ({
              page,
              loginPage,
-             et1VettingPage,
-             et1CaseServingPage,
              citizenPreLoginPage,
              citizenPostLoginPage,
              personalDetailsPage,
@@ -24,9 +20,6 @@ test.describe('non-HMCTS claimant legal representative Case creation in Citizen 
              claimDetailsPage,
              submitClaimPage, caseDetailsPage, singleOrMultipleClaimPage, manageCaseDashboardPage
            }) => {
-
-
-
 
       const submissionReference = await createCaseViaCitizenUI(
         page,
@@ -46,7 +39,6 @@ test.describe('non-HMCTS claimant legal representative Case creation in Citizen 
             userDetailsData.firstLineOfAddress,
           ),
       );
-
     },
   );
 
@@ -59,8 +51,6 @@ test.describe('non-HMCTS claimant legal representative Case creation in Citizen 
     async ({
              page,
              loginPage,
-             et1VettingPage,
-             et1CaseServingPage,
              citizenPreLoginPage,
              citizenPostLoginPage,
              personalDetailsPage,
@@ -68,9 +58,6 @@ test.describe('non-HMCTS claimant legal representative Case creation in Citizen 
              claimDetailsPage,
              submitClaimPage, caseDetailsPage, singleOrMultipleClaimPage, manageCaseDashboardPage
            }) => {
-
-
-
 
       const submissionReference = await createCaseViaCitizenUI(
         page,
@@ -90,7 +77,6 @@ test.describe('non-HMCTS claimant legal representative Case creation in Citizen 
             userDetailsData.firstLineOfAddress,
           ),
       );
-
     },
   );
 
@@ -102,8 +88,6 @@ test.describe('non-HMCTS claimant legal representative Case creation in Citizen 
     async ({
              page,
              loginPage,
-             et1VettingPage,
-             et1CaseServingPage,
              citizenPreLoginPage,
              citizenPostLoginPage,
              personalDetailsPage,
@@ -111,9 +95,6 @@ test.describe('non-HMCTS claimant legal representative Case creation in Citizen 
              claimDetailsPage,
              submitClaimPage, caseDetailsPage, singleOrMultipleClaimPage, manageCaseDashboardPage
            }) => {
-
-
-
 
       const submissionReference = await createCaseViaCitizenUI(
         page,
@@ -133,7 +114,6 @@ test.describe('non-HMCTS claimant legal representative Case creation in Citizen 
             userDetailsData.firstLineOfAddress,
           ),
       );
-
     },
   );
 
@@ -145,8 +125,6 @@ test.describe('non-HMCTS claimant legal representative Case creation in Citizen 
     async ({
              page,
              loginPage,
-             et1VettingPage,
-             et1CaseServingPage,
              citizenPreLoginPage,
              citizenPostLoginPage,
              personalDetailsPage,
@@ -154,9 +132,6 @@ test.describe('non-HMCTS claimant legal representative Case creation in Citizen 
              claimDetailsPage,
              submitClaimPage, caseDetailsPage, singleOrMultipleClaimPage, manageCaseDashboardPage
            }) => {
-
-
-
 
       const submissionReference = await createCaseViaCitizenUI(
         page,
@@ -176,10 +151,8 @@ test.describe('non-HMCTS claimant legal representative Case creation in Citizen 
             userDetailsData.firstLineOfAddress,
           ),
       );
-
     },
   );
-
 
   test(
     'Create a claim as a claimant representative with multiple respondent and multiple ACAS, submit and process within manage cases',
@@ -189,8 +162,6 @@ test.describe('non-HMCTS claimant legal representative Case creation in Citizen 
     async ({
              page,
              loginPage,
-             et1VettingPage,
-             et1CaseServingPage,
              citizenPreLoginPage,
              citizenPostLoginPage,
              personalDetailsPage,
@@ -198,9 +169,6 @@ test.describe('non-HMCTS claimant legal representative Case creation in Citizen 
              claimDetailsPage,
              submitClaimPage, caseDetailsPage, singleOrMultipleClaimPage, manageCaseDashboardPage
            }) => {
-
-
-
 
       const submissionReference = await createCaseViaCitizenUI(
         page,
@@ -220,11 +188,8 @@ test.describe('non-HMCTS claimant legal representative Case creation in Citizen 
             userDetailsData.firstLineOfAddress,
           ),
       );
-
     },
   );
-
-
 });
 
 

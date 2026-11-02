@@ -1,18 +1,14 @@
-import { test } from '../../fixtures/common.fixture.ts';
-import { CitizenClaimantFactory } from '../../data-utils/factory/citizen/ClaimantCitizenFactory.ts';
-import { CaseDetailsValues, CaseTypeLocation } from '../../config/case-data.ts';
-import { CaseEventApi } from '../../data-utils/api/CaseEventApi.ts';
-import { users } from '../../config/config.dynamic.ts';
-import CitizenHubLoginPage from '../../pages/claimantCitizenHub/CitizenHubLoginPage.ts';
-import CitizenHubPage from '../../pages/claimantCitizenHub/CitizenHubPage.ts';
-import ContactTheTribunalPage from '../../pages/claimantCitizenHub/ContactTheTribunalPage.ts';
-import { ManageCaseDashboardPage } from '../../pages/ManageCaseDashboardPage.ts';
-import LoginPage from '../../pages/loginPage.ts';
-import CaseDetailsPage from '../../pages/caseDetailsPage.ts';
-import { ApplicationTabPage } from '../../pages/applicationTabPage.ts';
-import Et3LoginPage from '../../pages/respondentCitizenHub/et3LoginPage.ts';
-import ResClaimantsApplicationsPage from '../../pages/respondentCitizenHub/resClaimantsApplicationsPage.ts';
-import RespondentCaseOverviewPage from '../../pages/respondentCitizenHub/respondentCaseOverviewPage.ts';
+import { test } from '../../fixtures/et.test.fixture.ts';
+import {
+  ApplicationTabPage,
+  CaseDetailsPage,
+  CaseDetailsValues,
+  CaseEventApi,
+  CaseTypeLocation,
+  CitizenClaimantFactory, CitizenHubLoginPage, CitizenHubPage, ContactTheTribunalPage, ET3LoginPage,
+  LoginPage, ManageCaseDashboardPage, ResClaimantsApplicationsPage, RespondentCaseOverviewPage,
+  users
+} from "@et-shared-test-library/core";
 
 test.describe('Citizen applications', () => {
   let caseId: string;
@@ -106,7 +102,7 @@ test.describe.serial('Claimant applications with correspondence No - Caseworker 
     ({caseId, caseNumber} = await CaseEventApi.caseWorkerDoesEt1VettingAndAcceptCaseEngland(caseId));
 
     const respondentBrowserPage = await browserUtils.openNewBrowserContext(users.etRespondent.sessionFile);
-    const et3LoginPage = new Et3LoginPage(respondentBrowserPage);
+    const et3LoginPage = new ET3LoginPage(respondentBrowserPage);
     await et3LoginPage.processRespondentLogin(users.etRespondent);
     await et3LoginPage.replyToNewClaim(
       caseId,
@@ -192,7 +188,7 @@ test.describe.serial('Citizen with 2 respondent case applications', () => {
     ({caseId, caseNumber} = await CaseEventApi.caseWorkerDoesEt1VettingAndAcceptCaseEngland(caseId));
 
     const respondent1BrowserPage = await browserUtils.openNewBrowserContext(users.etRespondent.sessionFile);
-    const et3LoginPage1 = new Et3LoginPage(respondent1BrowserPage);
+    const et3LoginPage1 = new ET3LoginPage(respondent1BrowserPage);
     await et3LoginPage1.processRespondentLogin(users.etRespondent);
     await et3LoginPage1.replyToNewClaim(
       caseId,
@@ -204,7 +200,7 @@ test.describe.serial('Citizen with 2 respondent case applications', () => {
     await respondent1BrowserPage.close();
 
     const respondent2BrowserPage = await browserUtils.openNewBrowserContext(users.etRespondent2.sessionFile);
-    const et3LoginPage2 = new Et3LoginPage(respondent2BrowserPage);
+    const et3LoginPage2 = new ET3LoginPage(respondent2BrowserPage);
     await et3LoginPage2.processRespondentLogin(users.etRespondent2);
     await et3LoginPage2.replyToNewClaim(
       caseId,
@@ -250,7 +246,7 @@ test.describe.serial('Citizen with 2 respondent case applications', () => {
 
   test('Respondent 1 responds to claimant application', async ({ browserUtils }) => {
     const respondent1BrowserPage = await browserUtils.openNewBrowserContext(users.etRespondent.sessionFile);
-    const et3LoginPage1 = new Et3LoginPage(respondent1BrowserPage);
+    const et3LoginPage1 = new ET3LoginPage(respondent1BrowserPage);
     const resClaimantsApplicationsPage1 = new ResClaimantsApplicationsPage(respondent1BrowserPage);
 
     await et3LoginPage1.processRespondentLoginForExistingCase(users.etRespondent, caseNumber);
@@ -307,7 +303,7 @@ test.describe.serial('Citizen with 2 respondent case applications', () => {
 
   test('Respondent 2 cannot view respondent 1 or claimant responses', async ({ browserUtils }) => {
     const respondent2BrowserPage = await browserUtils.openNewBrowserContext(users.etRespondent2.sessionFile);
-    const et3LoginPage2 = new Et3LoginPage(respondent2BrowserPage);
+    const et3LoginPage2 = new ET3LoginPage(respondent2BrowserPage);
     const resClaimantsApplicationsPage2 = new ResClaimantsApplicationsPage(respondent2BrowserPage);
 
     await et3LoginPage2.processRespondentLoginForExistingCase(users.etRespondent2, caseNumber);

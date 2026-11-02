@@ -1,10 +1,11 @@
-import { cuiApi, test } from '../fixtures/common.fixture';
-import { CitizenClaimantFactory } from '../data-utils/factory/citizen/ClaimantCitizenFactory.ts';
-import { CaseTypeLocation } from '../config/case-data.ts';
-import { users } from '../config/config.dynamic.ts';
-import { IdamApi } from '../data-utils/api/IdamApi.ts';
-import CitizenHubLoginPage from '../pages/claimantCitizenHub/CitizenHubLoginPage.ts';
-import { Et1ClaimsListPage } from '../pages/claimantCitizenHub/et1ClaimsListPage.ts';
+import {
+  CaseTypeLocation,
+  CitizenClaimantFactory, CitizenHubLoginPage,
+  cuiApi,
+  Et1ClaimsListPage,
+  users
+} from "@et-shared-test-library/core";
+import {test} from "../fixtures/et.test.fixture.ts";
 
 test.describe('Claimant navigate back to Case list', () => {
   let caseNumber: string;
@@ -15,7 +16,7 @@ test.describe('Claimant navigate back to Case list', () => {
   })
 
   test('Claimant can navigate to Case list and Citizen varifies legal representative details',
-    async ({ page,
+    async ({
              citizenHubPage,
              citizenHubLoginPage,
               et1ClaimsListPage

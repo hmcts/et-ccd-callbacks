@@ -27,8 +27,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 
 @ExtendWith(SpringExtension.class)
@@ -67,16 +69,46 @@ class TseAdmCloseServiceTest {
         caseData.setTseAdminCloseApplicationTable("| | |\r\n|--|--|\r\n|%s application | %s|\r\n");
         caseData.setTseAdminCloseApplicationText("General notes");
 
-        tseAdmCloseService.aboutToSubmitCloseApplication(caseData);
+        tseAdmCloseService.aboutToSubmitCloseApplication(caseData, ENGLANDWALES_CASE_TYPE_ID);
 
         assertThat(caseData.getGenericTseApplicationCollection().getFirst().getValue().getStatus())
             .isEqualTo(CLOSED_STATE);
+        assertThat(caseData.getGenericTseApplicationCollection().getFirst().getValue().getCloseApplicationNotes())
+            .isEqualTo("General notes");
+        assertThat(caseData.getGenericTseApplicationCollection().getFirst().getValue().getCloseApplicationNote())
+            .isNull();
         assertThat(caseData.getTseAdminSelectApplication())
             .isNull();
         assertThat(caseData.getTseAdminCloseApplicationTable())
             .isNull();
         assertThat(caseData.getTseAdminCloseApplicationText())
             .isNull();
+    }
+
+    @Test
+    void updateStatusToCloseForScotland() {
+        caseData.setGenericTseApplicationCollection(
+            List.of(GenericTseApplicationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(TseApplicationBuilder.builder()
+                    .withNumber("1")
+                    .withType(TSE_APP_AMEND_RESPONSE)
+                    .withStatus(OPEN_STATE)
+                    .build())
+                .build())
+        );
+
+        caseData.setTseAdminSelectApplication(
+            DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
+        caseData.setTseAdminCloseApplicationText("General notes");
+
+        tseAdmCloseService.aboutToSubmitCloseApplication(caseData, SCOTLAND_CASE_TYPE_ID);
+
+        GenericTseApplicationType application =
+            caseData.getGenericTseApplicationCollection().getFirst().getValue();
+        assertThat(application.getStatus()).isEqualTo(CLOSED_STATE);
+        assertThat(application.getCloseApplicationNote()).isEqualTo("General notes");
+        assertThat(application.getCloseApplicationNotes()).isNull();
     }
 
     @Test

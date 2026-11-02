@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.config;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,18 +8,27 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.interceptors.RequestInterceptor;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.UnAuthorisedServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.reform.authorisation.validators.AuthTokenValidator;
 
+import java.net.URI;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SERVICE_AUTHORIZATION;
 
 class RequestInterceptorTest {
@@ -30,6 +40,7 @@ class RequestInterceptorTest {
     private AuthTokenValidator tokenValidator;
 
     private RequestInterceptor requestInterceptor;
+    private MockMvc mockMvc;
 
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
@@ -38,6 +49,9 @@ class RequestInterceptorTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         requestInterceptor = new RequestInterceptor(verifyTokenService, tokenValidator);
+        mockMvc = MockMvcBuilders.standaloneSetup(new PersistenceController())
+            .addInterceptors(requestInterceptor)
+            .build();
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
     }
@@ -68,25 +82,55 @@ class RequestInterceptorTest {
         when(verifyTokenService.verifyTokenSignature(anyString())).thenReturn(true);
         when(tokenValidator.getServiceName("Bearer test-service-token")).thenReturn("ccd_data");
 
-        request.setRequestURI("/ccd-persistence/cases");
-        request.addHeader(AUTHORIZATION, "Bearer user-token");
-        request.addHeader(SERVICE_AUTHORIZATION, "test-service-token");
+        mockMvc.perform(MockMvcRequestBuilders.post(URI.create("/ccd-persistence/cases"))
+                .header(AUTHORIZATION, "Bearer user-token")
+                .header(SERVICE_AUTHORIZATION, "test-service-token"))
+            .andExpect(status().isOk());
+    }
 
-        boolean result = requestInterceptor.preHandle(request, response, new Object());
+    @Test
+    void preHandle_EncodedCcdPersistencePathWithAuthorizedService_ReturnsTrue() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(anyString())).thenReturn(true);
+        when(tokenValidator.getServiceName("Bearer test-service-token")).thenReturn("ccd_data");
 
-        assertTrue(result);
+        mockMvc.perform(MockMvcRequestBuilders.post(URI.create("/%63cd-persistence/cases"))
+                .header(AUTHORIZATION, "Bearer user-token")
+                .header(SERVICE_AUTHORIZATION, "test-service-token"))
+            .andExpect(status().isOk());
     }
 
     @Test
     void preHandle_CcdPersistencePathWithoutAuthorizedService_ThrowsException() {
         when(verifyTokenService.verifyTokenSignature(anyString())).thenReturn(true);
-        request.setRequestURI("/ccd-persistence/cases");
-        request.addHeader(AUTHORIZATION, "Bearer user-token");
-        request.addHeader(SERVICE_AUTHORIZATION, "");
 
-        UnAuthorisedServiceException exception = assertThrows(UnAuthorisedServiceException.class,
-            () -> requestInterceptor.preHandle(request, response, new Object()));
+        assertPersistenceRequestRejected("/ccd-persistence/cases", "");
+    }
 
-        assertEquals("Service not authorised to access ccd-persistence endpoints", exception.getMessage());
+    @Test
+    void preHandle_EncodedCcdPersistencePathWithoutAuthorizedService_ThrowsException() {
+        when(verifyTokenService.verifyTokenSignature(anyString())).thenReturn(true);
+        when(tokenValidator.getServiceName("Bearer test-service-token")).thenReturn("test_service");
+
+        assertPersistenceRequestRejected("/%63cd-persistence/cases", "test-service-token");
+    }
+
+    private void assertPersistenceRequestRejected(String path, String serviceToken) {
+        ServletException exception = assertThrows(ServletException.class,
+            () -> mockMvc.perform(MockMvcRequestBuilders.post(URI.create(path))
+                .header(AUTHORIZATION, "Bearer user-token")
+                .header(SERVICE_AUTHORIZATION, serviceToken)));
+
+        UnAuthorisedServiceException cause = assertInstanceOf(
+            UnAuthorisedServiceException.class, exception.getCause());
+        assertEquals("Service not authorised to access ccd-persistence endpoints",
+            cause.getMessage());
+    }
+
+    @RestController
+    static class PersistenceController {
+        @PostMapping("/ccd-persistence/cases")
+        void createCase() {
+            // The interceptor must reject the request before this handler runs.
+        }
     }
 }

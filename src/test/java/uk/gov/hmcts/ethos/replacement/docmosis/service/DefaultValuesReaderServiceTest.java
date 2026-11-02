@@ -21,6 +21,7 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.CaseDefaultValuesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
@@ -60,6 +61,7 @@ class DefaultValuesReaderServiceTest {
         contactDetails.setAddress1("TestAddress1");
         contactDetails.setAddress2("TestAddress2");
         contactDetails.setAddress3("TestAddress3");
+        contactDetails.setAddress4("TestAddress4");
         contactDetails.setTown("TestTown");
         contactDetails.setPostcode("TestPostcode");
         contactDetails.setTelephone("TestTelephone");
@@ -84,6 +86,7 @@ class DefaultValuesReaderServiceTest {
         assertEquals("TestAddress1", defaultValues.getTribunalCorrespondenceAddressLine1());
         assertEquals("TestAddress2", defaultValues.getTribunalCorrespondenceAddressLine2());
         assertEquals("TestAddress3", defaultValues.getTribunalCorrespondenceAddressLine3());
+        assertEquals("TestAddress4", defaultValues.getTribunalCorrespondenceAddressLine4());
         assertEquals("TestTown", defaultValues.getTribunalCorrespondenceTown());
         assertEquals("TestPostcode", defaultValues.getTribunalCorrespondencePostCode());
         assertEquals("TestTelephone", defaultValues.getTribunalCorrespondenceTelephone());
@@ -171,6 +174,28 @@ class DefaultValuesReaderServiceTest {
         assertEquals("TestDX", caseData.getTribunalCorrespondenceDX());
         assertEquals("TestEmail", caseData.getTribunalCorrespondenceEmail());
         assertNull(caseData.getClaimantWorkAddress());
+    }
+
+    @Test
+    void addressLine4StaysOffTheSavedAddressAndJoinsOnTheLetter() {
+        DefaultValues withStreet = createDefaultValues();
+        withStreet.setTribunalCorrespondenceAddressLine4("3 Atlantic Quay, 20 York Street");
+        CaseData caseData = new CaseData();
+
+        defaultValuesReaderService.setCaseData(caseData, withStreet);
+
+        assertEquals("TestAddress3", caseData.getTribunalCorrespondenceAddress().getAddressLine3());
+        assertEquals("TestAddress3\n3 Atlantic Quay, 20 York Street",
+                DocumentHelper.letterAddressLine3(withStreet.getTribunalCorrespondenceAddressLine3(),
+                        withStreet.getTribunalCorrespondenceAddressLine4()));
+        assertEquals("Glasgow Tribunals Centre",
+                DocumentHelper.letterAddressLine3("Glasgow Tribunals Centre", ""));
+        assertEquals("3 Atlantic Quay, 20 York Street",
+                DocumentHelper.letterAddressLine3(null, "3 Atlantic Quay, 20 York Street"));
+        assertEquals("Glasgow Tribunals Centre\n3 Atlantic Quay, 20 York Street",
+                DocumentHelper.letterAddressLine3(
+                        "Glasgow Tribunals Centre\\n3 Atlantic Quay, 20 York Street",
+                        "3 Atlantic Quay, 20 York Street"));
     }
 
     @Test

@@ -1,8 +1,6 @@
-import { test } from '../fixtures/common.fixture';
-import { config, users } from '../config/config.dynamic.ts';
-import userDetailsData from '../resources/payload/user-details.json';
-import { createCaseViaCitizenUI, vetAndAcceptCitizenCase } from '../pages/helpers/CuiCaseCreationHelper.ts';
-import { CaseTypeLocation, Events } from '../config/case-data.ts';
+import { test } from '../fixtures/et.test.fixture.ts';
+import userDetailsData from '@et-shared-test-library/core/resources/payload/user-details.json';
+import {config, createCaseViaCitizenUI, users} from "@et-shared-test-library/core";
 
 test.describe('Group Claim Case creation in Citizen UI', () => {
 

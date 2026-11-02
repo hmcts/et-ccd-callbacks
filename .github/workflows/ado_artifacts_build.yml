@@ -30,9 +30,49 @@ jobs:
           java-version: 21
           cache: 'gradle'
 
+      # Only publish when something that ends up in the et-shared artifact has changed.
+      # Every published version counts towards the feed's 5000-version limit per package.
+      - name: Detect et-shared changes
+        id: changes
+        run: |
+          ET_SHARED_PATHS=(
+            et-shared
+            build.gradle
+            settings.gradle
+            gradle
+            gradlew
+            .github/workflows/ado_artifacts_build.yml
+          )
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual dispatch - publishing"
+            echo "publish=true" >> $GITHUB_OUTPUT
+            exit 0
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+            HEAD="${{ github.event.pull_request.head.sha }}"
+            RANGE="${BASE}...${HEAD}"
+          else
+            BASE=$(git describe --tags --abbrev=0 --match '1.0.*' 2>/dev/null || true)
+            if [ -z "$BASE" ]; then
+              echo "No previous release tag found - publishing"
+              echo "publish=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            RANGE="${BASE}..HEAD"
+          fi
+          if git diff --quiet "$RANGE" -- "${ET_SHARED_PATHS[@]}"; then
+            echo "No et-shared changes in $RANGE - skipping publish"
+            echo "publish=false" >> $GITHUB_OUTPUT
+          else
+            echo "et-shared changes in $RANGE:"
+            git diff --name-only "$RANGE" -- "${ET_SHARED_PATHS[@]}"
+            echo "publish=true" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
+
       - name: Get version from tags
         id: get_version
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: steps.changes.outputs.publish == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
           LATEST_TAG=$(git describe --tags --abbrev=0 --match '1.0.*' || echo '1.0.0')
           NEXT_PATCH=$(echo "$LATEST_TAG" | awk -F. '{ print $3+1 }')
@@ -47,6 +87,7 @@ jobs:
 
       - name: Set Release Version
         id: set_release_version
+        if: steps.changes.outputs.publish == 'true'
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             RELEASE_VERSION="${{ github.event.inputs.release_version }}"
@@ -78,6 +119,7 @@ jobs:
         shell: bash
 
       - name: Publish to Azure DevOps Artifacts
+        if: steps.changes.outputs.publish == 'true'
         run: |
           ./gradlew :et-shared:publish
         env:
@@ -87,7 +129,7 @@ jobs:
         shell: bash
 
       - name: Comment Release Version
-        if: github.event_name == 'pull_request'
+        if: steps.changes.outputs.publish == 'true' && github.event_name == 'pull_request'
         run: |
           gh pr comment ${{ github.event.pull_request.number }} --body "Release version for latest commit is: ${{ steps.set_release_version.outputs.release_version }}"
         env:

@@ -92,9 +92,29 @@ withNightlyPipeline(type, product, component) {
     }
 
     afterAlways('DependencyCheckNightly') {
+        stage('Prepare JS deps') {
+            yarnBuilder.yarn('install')
+            yarnBuilder.yarn('build:shared')
+        }
+        stage('Smoke test') {
+            try {
+                yarnBuilder.yarn('test:smoke')
+            } catch (Error) {
+                unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+            } finally {
+                publishHTML([
+                        allowMissing         : true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll              : true,
+                        reportDir            : 'playwright-report',
+                        reportFiles          : 'index.html',
+                        reportName           : 'ET Smoke Test Report'
+                ])
+                steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
+            }
+        }
          stage('Accessibility tests') {
             try {
-                yarnBuilder.yarn('install')
                 yarnBuilder.yarn('test:accessibility')
             } catch (Error) {
                 unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
@@ -110,9 +130,9 @@ withNightlyPipeline(type, product, component) {
             steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
             }
         }
-        stage('Smoke test') {
+         stage('Cross browser test - Chromium') {
             try {
-                yarnBuilder.yarn('test:smoke')
+                yarnBuilder.yarn('test:functional-chromium')
             } catch (Error) {
                 unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
             } finally {
@@ -122,11 +142,45 @@ withNightlyPipeline(type, product, component) {
                     keepAll              : true,
                     reportDir            : 'playwright-report',
                     reportFiles          : 'index.html',
-                    reportName           : 'ET Smoke Test Report'
+                    reportName           : 'ET crossbrowser- chromium Test Report'
             ])
             steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
             }
          }
+         stage('Cross browser test - Webkit') {
+            try {
+                yarnBuilder.yarn('test:functional-webkit')
+            } catch (Error) {
+                unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+            } finally {
+                publishHTML([
+                    allowMissing         : true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll              : true,
+                    reportDir            : 'playwright-report',
+                    reportFiles          : 'index.html',
+                    reportName           : 'ET crossbrowser- webkit Test Report'
+            ])
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
+            }
+         }
+            stage('Cross browser test - Firefox') {
+                try {
+                    yarnBuilder.yarn('test:functional-firefox')
+                } catch (Error) {
+                    unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+                } finally {
+                    publishHTML([
+                        allowMissing         : true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll              : true,
+                        reportDir            : 'playwright-report',
+                        reportFiles          : 'index.html',
+                        reportName           : 'ET crossbrowser- firefox Test Report'
+                ])
+                steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
+                }
+            }
          stage('Full functional test- UI') {
             try {
                 yarnBuilder.yarn('test:full-functional-chromium')

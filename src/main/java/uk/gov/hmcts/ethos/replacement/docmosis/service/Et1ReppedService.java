@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.dwp.regex.InvalidPostcodeException;
@@ -60,8 +61,12 @@ public class Et1ReppedService {
     private final AdminUserService adminUserService;
     private final Et1SubmissionService et1SubmissionService;
     private final MyHmctsService myHmctsService;
+    private final FeatureToggleService featureToggleService;
 
-    private static final String ET1_EN_PDF = "ET1_0224.pdf";
+    @Value("${pdf.english}")
+    private String et1EnPdf;
+    @Value("${pdf.era.english}")
+    private String et1EnEraPdf;
     private final List<TribunalOffice> liveTribunalOffices = List.of(TribunalOffice.LEEDS,
             TribunalOffice.MIDLANDS_EAST, TribunalOffice.BRISTOL, TribunalOffice.LONDON_CENTRAL,
             TribunalOffice.LONDON_SOUTH, TribunalOffice.LONDON_EAST, TribunalOffice.MANCHESTER,
@@ -137,7 +142,8 @@ public class Et1ReppedService {
             CaseData caseData = caseDetails.getCaseData();
             caseData.setManagingOffice(null);
             caseData.setReceiptDate(null);
-            DocumentInfo documentInfo = et1SubmissionService.createEt1(caseDetails, userToken, ET1_EN_PDF);
+            String et1Source = featureToggleService.isEraOctober2026Enabled() ? et1EnEraPdf : et1EnPdf;
+            DocumentInfo documentInfo = et1SubmissionService.createEt1(caseDetails, userToken, et1Source);
             documentInfo.setMarkUp(documentInfo.getMarkUp().replace("Document",
                     "Draft ET1 - " + caseDetails.getCaseId() + " (opens in a new tab)"));
             caseData.setDocMarkUp(documentInfo.getMarkUp());
@@ -281,9 +287,9 @@ public class Et1ReppedService {
      * <ol>
      *   <li>Validates the input {@code caseData} to ensure it's not null and has the required structure.</li>
      *   <li>Retrieves the organisation address associated with the user token via the {@code myHmctsService}.</li>
-     *   <li>Converts the retrieved {@link OrganisationAddress} to a generic address format using
-     *   {@link AddressUtils#mapOrganisationAddressToAddress(OrganisationAddress)}.</li>
-     *   <li>Sets this address as the representative address for the claimant in the {@code caseData}.</li>
+     *   <li>Converts the retrieved {@link OrganisationAddress} to a generic address format and sets the
+     *   shared MyHMCTS Check your answers text via {@link AddressUtils#applyMyHmctsOrganisationAddress}.</li>
+     *   <li>Stores the mapped address on the claimant representative.</li>
      * </ol>
      *
      * @param userToken the authentication token of the currently authenticated user, used to retrieve organisation
@@ -298,8 +304,7 @@ public class Et1ReppedService {
         checkCaseData(caseData);
         OrganisationAddress organisationAddress = myHmctsService.getUserOrganisationAddress(userToken);
         caseData.getRepresentativeClaimantType().setRepresentativeAddress(
-                AddressUtils.mapOrganisationAddressToAddress(organisationAddress));
-        caseData.setMyHmctsAddressText(AddressUtils.getOrganisationAddressAsText(organisationAddress));
+                AddressUtils.applyMyHmctsOrganisationAddress(caseData, organisationAddress));
     }
 
     /**

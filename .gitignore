@@ -83,3 +83,4 @@ bin/
 /src/test/.tmp
 src/test/token-cache.json
 /test-results
+/et-shared/bin/

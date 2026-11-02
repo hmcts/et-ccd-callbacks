@@ -123,17 +123,27 @@ yarn generate-excel-cftlib
 ```
 
 ### Import CCD definitions manually
-The CCD definition locations must have been configured as in the previous section and the version 
-of the definitions to be imported must have been generated. 
+To import directly from the JSON definitions and their spreadsheet templates, execute:
+
+```bash
+./bin/import-json-ccd-definition.sh [e|s|a|all]
+```
+
+The JSON import defaults to the local CFTLib service URLs. They can be overridden with
+`ET_COS_URL`, `CCD_DEF_BASE_URL`, `CCD_DEF_URL`, and `CCD_DEF_AAC_URL`.
+
+To import a generated XLSX definition, the definition locations must have been configured as in the
+previous section and the version of the definitions to be imported must have been generated.
 
 Execute the following
 ```bash
-./bin/import-ccd-definition.sh [e|s|a]
+./bin/import-ccd-definition.sh [e|s|a|all]
 ```
 The argument should be:
 * `e` for importing England/Wales
 * `s` for importing Scotland
 * `a` for importing ECM Admin
+* `all` for importing all three definitions
 
 ### Configure CCD definitions not to be automatically imported
 It is possible to configure the bootWithCCD task not to automatically import CCD definitions.

@@ -49,6 +49,8 @@ public class Et1VettingData {
     private String et1VettingAcasCertExemptYesOrNo6;
     @JsonProperty("et1VettingAcasCertGeneralNote")
     private String et1VettingAcasCertGeneralNote;
+    @JsonProperty("et1VettingEra")
+    private String et1VettingEra;
 
     //ET1 Vetting -  Substantive Defects
     @JsonProperty("substantiveDefectsList")

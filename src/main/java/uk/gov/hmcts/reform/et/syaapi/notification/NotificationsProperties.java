@@ -239,4 +239,12 @@ public class NotificationsProperties {
     @Value("${notifications.tse.respondentResponseNo}")
     @NotBlank
     private String tseRespondentResponseNoTemplateId;
+
+    @Value("${notifications.userInsights.claimantUserInsightTemplateId}")
+    @NotBlank
+    private String claimantUserInsightTemplateId;
+
+    @Value("${notifications.userInsights.respondentUserInsightTemplateId}")
+    @NotBlank
+    private String respondentUserInsightTemplateId;
 }

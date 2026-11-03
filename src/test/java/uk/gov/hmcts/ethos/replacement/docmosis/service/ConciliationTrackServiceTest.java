@@ -150,6 +150,37 @@ class ConciliationTrackServiceTest {
     }
 
     @Test
+    void populateConciliationTrack_IgnoresInputInErrorCodes() {
+        CaseData caseData = baseCaseDetails.getCaseData();
+        List<JurCodesTypeItem> jurCodesTypeItems = getJurCodesTypeItems("DAG", "FWS", "BOC"); // OP ST SH
+        jurCodesTypeItems.get(0).getValue().setJudgmentOutcome("Input in error");
+        jurCodesTypeItems.get(1).getValue().setJudgmentOutcome("Input in error");
+        caseData.setJurCodesCollection(jurCodesTypeItems);
+        conciliationTrackService.populateConciliationTrackForJurisdiction(caseData);
+        Assertions.assertEquals(CONCILIATION_TRACK_FAST_TRACK, caseData.getConciliationTrack());
+    }
+
+    @Test
+    void populateConciliationTrack_AllInputInError_ReturnNull() {
+        CaseData caseData = baseCaseDetails.getCaseData();
+        List<JurCodesTypeItem> jurCodesTypeItems = getJurCodesTypeItems("DAG", "FWS");
+        jurCodesTypeItems.forEach(item -> item.getValue().setJudgmentOutcome("Input in error"));
+        caseData.setJurCodesCollection(jurCodesTypeItems);
+        conciliationTrackService.populateConciliationTrackForJurisdiction(caseData);
+        Assertions.assertNull(caseData.getConciliationTrack());
+    }
+
+    @Test
+    void populateConciliationTrack_OtherOutcomeStillCounted() {
+        CaseData caseData = baseCaseDetails.getCaseData();
+        List<JurCodesTypeItem> jurCodesTypeItems = getJurCodesTypeItems("DAG", "BOC"); // OP SH
+        jurCodesTypeItems.get(0).getValue().setJudgmentOutcome("Withdrawn or private settlement");
+        caseData.setJurCodesCollection(jurCodesTypeItems);
+        conciliationTrackService.populateConciliationTrackForJurisdiction(caseData);
+        Assertions.assertEquals(CONCILIATION_TRACK_OPEN_TRACK, caseData.getConciliationTrack());
+    }
+
+    @Test
     void populateConciliationTrack_NoJurCode_ReturnNull() {
         CaseData caseData = baseCaseDetails.getCaseData();
         List<JurCodesTypeItem> jurCodesTypeItems = getJurCodesTypeItems();

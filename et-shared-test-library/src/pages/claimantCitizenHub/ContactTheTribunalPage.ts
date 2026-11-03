@@ -145,7 +145,6 @@ export class ContactTheTribunalPage extends BasePage {
   }
 
   async assertApplicationSentSuccessPageIsDisplayed() {
-    await this.page.waitForLoadState('load');
     const applicationSentSuccessPageTitle = this.page.getByRole('heading', {name: 'You have sent your application to the tribunal'});
     await expect(applicationSentSuccessPageTitle).toBeVisible();
   }

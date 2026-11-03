@@ -28,7 +28,7 @@ export class CaseDetailsPage extends BasePage {
     await this.page.locator('text=Check your answers').waitFor({ state: 'visible' });
     await this.clickSubmitButton();
 
-    await expect(this.page.getByRole('tab', { name: 'Case Details' }).locator('div')).toContainText('Case Details');
+    await expect(this.page.getByRole('tab', { name: 'Case Details' })).toBeVisible();
     await expect(this.page.getByText('SPEAK TO VP', { exact: true })).toBeVisible();
   }
 
@@ -131,10 +131,6 @@ export class CaseDetailsPage extends BasePage {
     }
   }
 
-  private getTabHeader(tabName: string): Locator {
-    return this.page.getByRole('tab', { name: tabName, exact: true });
-  }
-
   /**
    * Returns the `Locator` for the nth visible element matching the given text content.
    *
@@ -152,7 +148,7 @@ export class CaseDetailsPage extends BasePage {
    */
   private async getVisibleTabContent(content: string, position: number = 0, exact: boolean = true): Promise<Locator> {
     // active tab area
-    const activeTabContent = this.page.locator('mat-tab-body.mat-tab-body-active .mat-tab-body-content');
+    const activeTabContent = this.page.locator('mat-tab-body.mat-mdc-tab-body-active[aria-hidden="false"]');
     await expect(activeTabContent).toBeVisible();
 
     const locator = activeTabContent.getByText(content, { exact });
@@ -187,10 +183,10 @@ export class CaseDetailsPage extends BasePage {
   ) {
     const heading = this.page.getByRole('heading', { name: 'Case file', level: 2 });
     if (!(await heading.isVisible())) {
-      let paginationBeforeButton = this.page.locator('button.mat-tab-header-pagination-before[aria-hidden="true"]:not([disabled])');
+      let paginationBeforeButton = this.page.locator('.mat-mdc-tab-header-pagination.mat-mdc-tab-header-pagination-before:not(.mat-mdc-tab-header-pagination-disabled)')
       while (await paginationBeforeButton.count() > 0) {
         await paginationBeforeButton.click();
-        paginationBeforeButton = this.page.locator('button.mat-tab-header-pagination-before[aria-hidden="true"]:not([disabled])');
+        paginationBeforeButton = this.page.locator('.mat-mdc-tab-header-pagination.mat-mdc-tab-header-pagination-before:not(.mat-mdc-tab-header-pagination-disabled)')
       }
       const caseFileViewButton = this.page.getByRole('tab', { name: 'Case File View', exact: false });
       await caseFileViewButton.click();
@@ -248,28 +244,51 @@ export class CaseDetailsPage extends BasePage {
 
   async navigateToTab(tabName: string): Promise<void> {
     await this.page.waitForLoadState('load', { timeout: 5000 });
+    await this.page.waitForTimeout(2500); // Allow time for tab headers to render
 
     const tabs = this.page.locator("//div[@role='tab']");
-    await tabs.first().waitFor({ state: 'attached', timeout: 5000 });
+    let totalTabs = await tabs.count();
+    const getTabNames = async(): Promise<string[]> => {
+      await tabs.first().waitFor({ state: 'attached', timeout: 5000 });
 
-    const totalTabs = await tabs.count();
-    const tabNames: string[] = [];
+      totalTabs = await tabs.count();
+      const tabNames: string[] = [];
 
-    for (let i = 0; i < totalTabs; i++) {
-      const name = (await tabs.nth(i).locator(':scope > div').innerText()).replace(/\s+/g, ' ').trim();
-      tabNames.push(name);
+      for (let i = 0; i < totalTabs; i++) {
+        const name = ((await tabs.nth(i).textContent()) ?? '')
+          .replace(/\s+/g, ' ')
+          .trim();
+        tabNames.push(name);
+      }
+
+      return tabNames;
     }
 
-    const targetIndex = tabNames.indexOf(tabName);
+    let tabNames = await getTabNames();
+
+    let targetIndex = tabNames.indexOf(tabName);
     if (targetIndex === -1) {
       throw new Error(`Tab \"${tabName}\" not found in tab list: [${tabNames.join(', ')}]`);
     }
 
     const tryClickTargetTab = async(): Promise<boolean> => {
       try {
-        const targetTab = tabs.nth(targetIndex);
+        let targetTab = tabs.nth(targetIndex);
+
+        if ((await targetTab.textContent())?.trim() !== tabName) {
+          tabNames = await getTabNames();
+          targetIndex = tabNames.indexOf(tabName);
+          expect(
+            targetIndex,
+            `Expected tab "${tabName}" to be present after reloading tab names. Current tabs: [${tabNames.join(', ')}]`
+          ).toBeGreaterThanOrEqual(0);
+          // Update the targetTab locator to the new index after reloading tab names
+          targetTab = tabs.nth(targetIndex);
+        }
+
         await targetTab.click({ trial: true, timeout: 2000 });
         await targetTab.click();
+        await expect(targetTab).toHaveAttribute('aria-selected', 'true');
         console.log('Clicked on tab: ' + tabName);
         return true;
       } catch {
@@ -294,7 +313,9 @@ export class CaseDetailsPage extends BasePage {
     };
 
     const paginateAndClick = async(direction: 'before' | 'after'): Promise<boolean> => {
-      const paginationButton = this.page.locator(`button.mat-tab-header-pagination-${direction}:not([disabled])`);
+      const paginationButton = this.page.locator(
+        `.mat-mdc-tab-header-pagination.mat-mdc-tab-header-pagination-${direction}:not(.mat-mdc-tab-header-pagination-disabled)`
+      );
 
       for (let step = 0; step < totalTabs; step++) {
         if (await tryClickTargetTab()) {

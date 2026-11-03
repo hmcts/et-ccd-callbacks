@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.ccd.sdk.External;
 import uk.gov.hmcts.et.common.model.bulk.items.CaseIdTypeItem;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicMultiSelectListType;
@@ -39,6 +40,10 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class MultipleData extends BaseCaseData {
+
+    @External
+    @JsonProperty("multipleCasesMarkdown")
+    private String multipleCasesMarkdown;
 
     @JsonProperty("caseIdCollection")
     private List<CaseIdTypeItem> caseIdCollection;

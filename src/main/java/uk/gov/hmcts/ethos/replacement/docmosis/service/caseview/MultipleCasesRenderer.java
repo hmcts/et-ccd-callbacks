@@ -28,6 +28,7 @@ public class MultipleCasesRenderer {
                cd.data->> 'leadClaimant' AS lead_claimant
         FROM ccd.case_data cd
         WHERE cd.data ->> 'multipleReference' = :multipleReference
+          AND cd.data ->> 'caseType' = 'Multiple'
           AND cd.case_type_id = REPLACE(
                 (SELECT current_case.case_type_id
                  FROM ccd.case_data current_case
@@ -35,9 +36,16 @@ public class MultipleCasesRenderer {
                 '_Multiple',
                 ''
               )
-        ORDER BY cd.data->> 'leadClaimant' DESC, 
-            (string_to_array(cd.data ->> 'ethosCaseReference', '/'))[2]::INT,
-            (string_to_array(cd.data ->> 'ethosCaseReference', '/'))[1]::BIGINT
+        ORDER BY cd.data ->> 'leadClaimant' DESC NULLS LAST,
+            CASE
+                WHEN cd.data ->> 'ethosCaseReference' ~ '^[0-9]+/[0-9]+$'
+                THEN (string_to_array(cd.data ->> 'ethosCaseReference', '/'))[2]::INT
+            END NULLS LAST,
+            CASE
+                WHEN cd.data ->> 'ethosCaseReference' ~ '^[0-9]+/[0-9]+$'
+                THEN (string_to_array(cd.data ->> 'ethosCaseReference', '/'))[1]::BIGINT
+            END NULLS LAST,
+            cd.reference
         """;
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
@@ -70,7 +78,7 @@ public class MultipleCasesRenderer {
     private static Template compileTemplate() {
         try {
             String source = new ClassPathResource(TEMPLATE_PATH).getContentAsString(StandardCharsets.UTF_8);
-            return Mustache.compiler().compile(source.replaceAll("\\R\\s*", ""));
+            return Mustache.compiler().nullValue("").compile(source.replaceAll("\\R\\s*", ""));
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to load " + TEMPLATE_PATH, exception);
         }

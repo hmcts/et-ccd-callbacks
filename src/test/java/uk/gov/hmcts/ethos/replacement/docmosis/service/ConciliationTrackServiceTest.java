@@ -134,6 +134,22 @@ class ConciliationTrackServiceTest {
     }
 
     @Test
+    void populateConciliationTrack_Sxh_ReturnOp() {
+        CaseData caseData = baseCaseDetails.getCaseData();
+        caseData.setJurCodesCollection(getJurCodesTypeItems("SXH", "TUA", "TUD")); // OP ST ST
+        conciliationTrackService.populateConciliationTrackForJurisdiction(caseData);
+        Assertions.assertEquals(CONCILIATION_TRACK_OPEN_TRACK, caseData.getConciliationTrack());
+    }
+
+    @Test
+    void populateConciliationTrack_TuaTud_ReturnSt() {
+        CaseData caseData = baseCaseDetails.getCaseData();
+        caseData.setJurCodesCollection(getJurCodesTypeItems("TUA", "TUD", "BOC")); // ST ST SH
+        conciliationTrackService.populateConciliationTrackForJurisdiction(caseData);
+        Assertions.assertEquals(CONCILIATION_TRACK_STANDARD_TRACK, caseData.getConciliationTrack());
+    }
+
+    @Test
     void populateConciliationTrack_NoJurCode_ReturnNull() {
         CaseData caseData = baseCaseDetails.getCaseData();
         List<JurCodesTypeItem> jurCodesTypeItems = getJurCodesTypeItems();

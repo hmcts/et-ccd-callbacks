@@ -1,4 +1,4 @@
-import { BasePage } from '../basePage';
+import { BasePage } from '../basePage.js';
 import { expect } from '@playwright/test';
 
 export class CUIPostLoginPages extends BasePage {

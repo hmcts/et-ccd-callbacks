@@ -1,8 +1,8 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { CaseDetailsValues } from '../../config';
-import { TableRowItem } from '../../types';
-import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage';
-import { Et3DetailsPage } from './Et3DetailsPage';
+import { CaseDetailsValues } from '../../config/index.js';
+import { TableRowItem } from '../../types/index.js';
+import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage.js';
+import { Et3DetailsPage } from './Et3DetailsPage.js';
 
 export class Et3RespondentDetailsPage extends Et3DetailsPage {
 

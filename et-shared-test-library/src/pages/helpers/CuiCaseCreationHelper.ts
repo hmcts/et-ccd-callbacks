@@ -1,20 +1,19 @@
 import { Page } from '@playwright/test';
-import { CUIPreLoginPage } from '../claimantCitizenHub/CUIPreLoginPage';
-import { CUIPostLoginPages } from '../claimantCitizenHub/CUIPostLoginPages';
-import { PersonalDetailsPage } from '../claimantCitizenHub/personalDetailsPage';
-import { EmploymentAndRespDetailsPage } from '../claimantCitizenHub/employmentAndRespDetailsPage';
-import { ClaimDetailsPage } from '../claimantCitizenHub/claimDetailsPage';
-import { SubmitClaimPage } from '../claimantCitizenHub/submitClaimPage';
-import userDetailsData from '../../../resources/payload/user-details.json';
-import { LoginPage } from '../loginPage';
-import { Et1VettingPages } from '../et1VettingPages';
-import { Et1CaseServingPage } from '../et1CaseServingPage';
-import { ManageCaseDashboardPage } from '../ManageCaseDashboardPage';
-import { CaseDetailsValues, CaseTypeLocation, Events } from '../../config';
-import { CaseDetailsPage } from '../caseDetailsPage';
-import {DateUtilComponent} from '../../data-utils';
-import { config, UserCredentials } from '../../config';
-import { SingleOrMultipleClaimPage } from '../claimantCitizenHub/singleOrMultipleClaimPage';
+import { CUIPreLoginPage } from '../claimantCitizenHub/CUIPreLoginPage.js';
+import { CUIPostLoginPages } from '../claimantCitizenHub/CUIPostLoginPages.js';
+import { PersonalDetailsPage } from '../claimantCitizenHub/personalDetailsPage.js';
+import { EmploymentAndRespDetailsPage } from '../claimantCitizenHub/employmentAndRespDetailsPage.js';
+import { ClaimDetailsPage } from '../claimantCitizenHub/claimDetailsPage.js';
+import { SubmitClaimPage } from '../claimantCitizenHub/submitClaimPage.js';
+import userDetailsData from '../../../resources/payload/user-details.json' with { type: 'json'};
+import { LoginPage } from '../loginPage.js';
+import { Et1VettingPages } from '../et1VettingPages.js';
+import { Et1CaseServingPage } from '../et1CaseServingPage.js';
+import { ManageCaseDashboardPage } from '../ManageCaseDashboardPage.js';
+import { CaseDetailsValues, CaseTypeLocation, Events,  config, UserCredentials } from '../../config/index.js';
+import { CaseDetailsPage } from '../caseDetailsPage.js';
+import {DateUtilComponent} from '../../data-utils/index.js';
+import { SingleOrMultipleClaimPage } from '../claimantCitizenHub/singleOrMultipleClaimPage.js';
 
 export async function createCaseViaCitizenUI(
   page: Page,

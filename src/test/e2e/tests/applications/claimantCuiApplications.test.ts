@@ -8,7 +8,7 @@ import {
   CitizenClaimantFactory, CitizenHubLoginPage, CitizenHubPage, ContactTheTribunalPage, ET3LoginPage,
   LoginPage, ManageCaseDashboardPage, ResClaimantsApplicationsPage, RespondentCaseOverviewPage,
   users
-} from "@et-shared-test-library/core";
+} from "@hmcts/et-shared-test-library";
 
 test.describe('Citizen applications', () => {
   let caseId: string;

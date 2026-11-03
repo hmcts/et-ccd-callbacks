@@ -1,5 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { BasePage } from './basePage';
+import { BasePage } from './basePage.js';
 
 export class ReinstateCasePage extends BasePage {
   private readonly positionType: Locator;

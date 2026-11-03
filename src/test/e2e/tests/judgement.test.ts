@@ -6,7 +6,7 @@ import {
   LoginPage,
   ManageCaseDashboardPage,
   users
-} from "@et-shared-test-library/core";
+} from "@hmcts/et-shared-test-library";
 
 test.describe('Judgement tests', () => {
   test.use({

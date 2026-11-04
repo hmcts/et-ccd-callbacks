@@ -13,7 +13,7 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRemoveRepLandingPageSharedLabel",
+    "CaseFieldID": "nocRemoveRepLandingPageMultipleRepLabel",
     "AccessControl": [
       {
         "UserRoles": [
@@ -37,7 +37,7 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRemoveRepRemoveLabelSelf",
+    "CaseFieldID": "nocRemoveRepSelfRemovalLabel",
     "AccessControl": [
       {
         "UserRoles": [
@@ -49,7 +49,7 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRemoveRepRemoveSelfConfirm",
+    "CaseFieldID": "nocRemoveRepSelfConfirm",
     "AccessControl": [
       {
         "UserRoles": [
@@ -61,7 +61,7 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRemoveRepRemoveLabelOrg",
+    "CaseFieldID": "nocRemoveRepOrgRemovalLabel",
     "AccessControl": [
       {
         "UserRoles": [
@@ -85,7 +85,7 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRemoveRepRemoveOrgConfirm1",
+    "CaseFieldID": "nocRemoveRepOrgConfirmation1",
     "AccessControl": [
       {
         "UserRoles": [
@@ -97,7 +97,7 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRemoveRepRemoveOrgConfirm2",
+    "CaseFieldID": "nocRemoveRepOrgConfirmation2",
     "AccessControl": [
       {
         "UserRoles": [

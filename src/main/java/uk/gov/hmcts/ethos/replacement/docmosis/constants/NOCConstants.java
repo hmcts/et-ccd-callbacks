@@ -27,6 +27,8 @@ public final class NOCConstants {
             "Representative not found for case ID %s.";
     public static final String EXCEPTION_REPRESENTATIVE_NOT_FOUND_BY_TOKEN =
             "Representative not found by token for case ID %s.";
+    public static final String EXCEPTION_REMAINING_REPRESENTATIVE_NOT_FOUND =
+            "Remaining representative not found for case ID %s.";
     public static final String EXCEPTION_REPRESENTATIVE_ID_NOT_FOUND =
             "Representative ID not found for case ID %s.";
     public static final String EXCEPTION_REPRESENTATIVE_DETAILS_NOT_EXIST =

@@ -20,7 +20,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputExceptio
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.UserUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RepresentativeUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,8 +35,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EVENT_UPDATE_CASE_SUBMITTED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REMAINING_REPRESENTATIVE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_NOT_FOUND_BY_TOKEN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_YOURSELF;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_LEAD;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +47,7 @@ public class NocCcdService {
     private final CcdClient ccdClient;
     private final UserIdamService userIdamService;
     private final AdminUserService adminUserService;
+    private final UserService userService;
 
     public Optional<AuditEvent> getLatestAuditEventByName(String authToken, String caseId, String eventName)
         throws IOException {
@@ -133,32 +140,6 @@ public class NocCcdService {
         }
         return findCaseUserAssignmentsByCaseId(caseId).stream()
                 .filter(Objects::nonNull)
-                .filter(assignment -> role.equals(assignment.getCaseRole()))
-                .collect(Collectors.toCollection(ArrayList::new));
-    }
-
-    /**
-     * Retrieves case user assignments for the specified case that match both
-     * the given IDAM user ID and case role.
-     *
-     * <p>If {@code caseId}, {@code idamId}, or {@code role} is blank, or if no
-     * matching assignments are found, an empty mutable list is returned.</p>
-     *
-     * @param caseId the identifier of the case
-     * @param idamId the IDAM user identifier to filter assignments by
-     * @param role the case role to filter assignments by
-     * @return a mutable list of matching {@link CaseUserAssignment} objects,
-     *         or an empty mutable list if none are found
-     */
-    public List<CaseUserAssignment> findCaseUserAssignmentsByCaseIdIdamIdAndRole(String caseId,
-                                                                                 String idamId,
-                                                                                 String role) {
-        if (StringUtils.isAnyBlank(caseId, idamId, role)) {
-            return new ArrayList<>();
-        }
-        return findCaseUserAssignmentsByCaseId(caseId).stream()
-                .filter(Objects::nonNull)
-                .filter(assignment -> idamId.equals(assignment.getUserId()))
                 .filter(assignment -> role.equals(assignment.getCaseRole()))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
@@ -293,14 +274,89 @@ public class NocCcdService {
             throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
                     caseDetails.getCaseId(), NocRemoveClaimantRepresentationService.class.getSimpleName(), methodName);
         }
-        List<CaseUserAssignment> caseUserAssignments = findCaseUserAssignmentsByCaseIdIdamIdAndRole(
-                caseDetails.getCaseId(), userDetails.getUid(),
-                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
-        if (CollectionUtils.isEmpty(caseUserAssignments)) {
+        List<CaseUserAssignment> caseUserAssignments = findCaseUserAssignmentsByCaseIdAndRole(
+                caseDetails.getCaseId(), ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        List<CaseUserAssignment> userAssignments = RepresentativeUtils.findCaseUserAssignmentsByIdamId(
+                caseUserAssignments, userDetails.getUid());
+        if (CollectionUtils.isEmpty(userAssignments)) {
             return;
         }
+        reassignLeadClaimantRepresentative(caseDetails, caseUserAssignments, userDetails);
         CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder().caseUserAssignments(
-                caseUserAssignments).build();
+                userAssignments).build();
         revokeCaseAssignments(adminUserService.getAdminUserToken(), caseUserAssignmentData);
+    }
+
+    /**
+     * Reassigns the lead claimant representative to the first remaining representative.
+     *
+     * <p>Reassignment is performed only when the case's NOC representative type is
+     * {@code NOC_REPRESENTATIVE_TYPE_LEAD}. Otherwise, this method returns without
+     * making changes.</p>
+     *
+     * <p>Excludes the specified user's assignment when selecting a replacement,
+     * retrieves the remaining representative's user details from IDAM, and updates
+     * the claimant representative's IDAM ID, email address, and full name in the
+     * case data.</p>
+     *
+     * @param caseDetails the case details containing the claimant representative
+     *                    information to update
+     * @param caseUserAssignments the assignments used to find a remaining claimant
+     *                            representative; may be {@code null} or empty
+     * @param userDetails the user whose assignment is excluded when selecting
+     *                    a replacement
+     * @throws GenericServiceException if reassignment is required but no remaining
+     *                                 representative is found, including when the
+     *                                 assignment list is null or empty
+     */
+    public void reassignLeadClaimantRepresentative(CaseDetails caseDetails,
+                                                   List<CaseUserAssignment> caseUserAssignments,
+                                                   UserDetails userDetails) throws GenericServiceException {
+        if (!Strings.CS.equals(NOC_REPRESENTATIVE_TYPE_LEAD, caseDetails.getCaseData().getNocRepresentativeType())) {
+            return;
+        }
+        UserDetails remainingRepresentative = findRemainingClaimantRepresentative(caseUserAssignments, userDetails);
+        if (remainingRepresentative == null) {
+            String exceptionMessage = String.format(EXCEPTION_REMAINING_REPRESENTATIVE_NOT_FOUND,
+                    caseDetails.getCaseId());
+            final String methodName = "reassignLeadClaimantRepresentative";
+            throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
+                    caseDetails.getCaseId(), NocRemoveClaimantRepresentationService.class.getSimpleName(),
+                    methodName);
+        }
+        caseDetails.getCaseData().getRepresentativeClaimantType().setIdamId(remainingRepresentative.getUid());
+        caseDetails.getCaseData().getRepresentativeClaimantType().setRepresentativeEmailAddress(
+                remainingRepresentative.getEmail());
+        caseDetails.getCaseData().getRepresentativeClaimantType().setNameOfRepresentative(
+                UserUtils.getFullName(remainingRepresentative));
+    }
+
+    /**
+     * Finds the user details of the first remaining claimant representative after
+     * excluding the existing user's assignment by UID.
+     *
+     * <p>If a remaining assignment is found, retrieves the corresponding user
+     * details from IDAM. Returns {@code null} if the assignment list is null or
+     * empty, or if no assignment remains after excluding the existing user.</p>
+     *
+     * @param caseUserAssignments the case user assignments; may be {@code null} or empty
+     * @param existingUserDetails the user whose assignment is to be excluded;
+     *                            must not be {@code null} when the assignment list is non-empty
+     * @return the user details for the first remaining assignment, or {@code null}
+     *         if the assignment list is null or empty, or no assignment remains
+     * @throws NullPointerException if {@code existingUserDetails} is {@code null}
+     *                              and the assignment list is non-empty
+     */
+    public UserDetails findRemainingClaimantRepresentative(List<CaseUserAssignment> caseUserAssignments,
+                                                           UserDetails existingUserDetails) {
+        if (CollectionUtils.isEmpty(caseUserAssignments)) {
+            return null;
+        }
+        CaseUserAssignment caseUserAssignment = ClaimantRepresentativeUtils
+                .removeUserAssignmentAndGetFirstRemainingAssignment(caseUserAssignments, existingUserDetails.getUid());
+        if (caseUserAssignment == null) {
+            return null;
+        }
+        return userService.findUserDetailsByIdamId(caseUserAssignment.getUserId());
     }
 }

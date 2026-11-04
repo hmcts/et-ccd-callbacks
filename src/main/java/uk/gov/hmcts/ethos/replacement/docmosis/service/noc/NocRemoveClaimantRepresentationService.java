@@ -13,7 +13,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.UserUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 
 import java.util.List;
@@ -23,7 +22,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXC
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_CASE_SHARING_STATUS_NOT_SHARED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_CASE_SHARING_STATUS_SHARED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_YOURSELF;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_LEAD;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_SHARED;
 
@@ -69,48 +67,32 @@ public class NocRemoveClaimantRepresentationService {
         }
 
         UserDetails userDetails = userService.getValidatedUserDetails(userToken, caseDetails.getCaseId());
-        boolean isLeadRepresentative = UserUtils.isLeadClaimantRepresentative(userDetails,
-                caseDetails.getCaseData().getRepresentativeClaimantType());
+        boolean isLeadRepresentative = ClaimantRepresentativeUtils.isLeadRepresentative(userDetails,
+                caseDetails.getCaseData());
         caseDetails.getCaseData().setNocRepresentativeType(isLeadRepresentative
                 ? NOC_REPRESENTATIVE_TYPE_LEAD : NOC_REPRESENTATIVE_TYPE_SHARED);
-        boolean hasSharedRepresentative = hasSharedRepresentative(caseDetails, userDetails);
+        boolean hasSharedRepresentative = hasRemainingClaimantRepresentative(caseDetails, userDetails);
         caseDetails.getCaseData().setNocCaseSharingStatus(hasSharedRepresentative
                 ? NOC_CASE_SHARING_STATUS_SHARED : NOC_CASE_SHARING_STATUS_NOT_SHARED);
-        caseDetails.getCaseData().setNocRemoveOption(!isLeadRepresentative ? NOC_REMOVE_OPTION_YOURSELF : null);
     }
 
     /**
-     * Finds user details for the first remaining claimant representative after
-     * removing the supplied user's first matching assignment from the retrieved list.
+     * Checks whether the case has another claimant representative besides the specified user.
      *
-     * <p>Only assignments with the claimant solicitor role are considered.
-     * The retrieved assignment list is modified. If duplicate assignments exist,
-     * the returned details may belong to the supplied user.
+     * <p>Retrieves the case's claimant solicitor assignments and looks up the user
+     * details for the first remaining assignment after excluding the specified
+     * user's assignment.</p>
      *
-     * @param caseDetails the case whose claimant representative assignments are searched
-     * @param userDetails the user whose first matching assignment is removed from
-     *                    the retrieved list
-     * @return the first remaining representative's user details, or {@code null}
-     *         if no claimant solicitor assignments exist, no matching assignment
-     *         is found for the supplied user, no assignments remain after removal,
+     * @param caseDetails the case whose claimant representatives are checked
+     * @param userDetails the user whose assignment is excluded from the check
+     * @return {@code true} if user details are found for the first remaining
+     *         claimant representative; {@code false} if no assignment remains
      *         or the user details lookup returns {@code null}
      */
-    public UserDetails findOtherClaimantRepresentative(CaseDetails caseDetails, UserDetails userDetails) {
+    public boolean hasRemainingClaimantRepresentative(CaseDetails caseDetails, UserDetails userDetails) {
         List<CaseUserAssignment> caseUserAssignments = nocCcdService.findCaseUserAssignmentsByCaseIdAndRole(
                 caseDetails.getCaseId(), ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
-        if (caseUserAssignments.isEmpty()) {
-            return null;
-        }
-        CaseUserAssignment caseUserAssignment = ClaimantRepresentativeUtils
-                .removeUserAssignmentAndGetFirstRemainingAssignment(caseUserAssignments, userDetails.getUid());
-        if (caseUserAssignment == null) {
-            return null;
-        }
-        return userService.findUserDetailsByIdamId(caseUserAssignment.getUserId());
-    }
-
-    public boolean hasSharedRepresentative(CaseDetails caseDetails, UserDetails userDetails) {
-        return findOtherClaimantRepresentative(caseDetails, userDetails) != null;
+        return nocCcdService.findRemainingClaimantRepresentative(caseUserAssignments, userDetails) != null;
     }
 
     /**

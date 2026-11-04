@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -32,9 +33,11 @@ final class ClaimantRepresentativeUtilsTest {
 
     private static final String SUBMISSION_REFERENCE = "1234567890123456";
     private static final String CLAIMANT_EMAIL_ADDRESS = "claimant@email.com";
-    private static final String CLAIMANT_REPRESENTATIVE_EMAIL_ADDRESS = "claimantrep@email.com";
-    private static final String ORGANISATION_ID_1 = "dummy12_organisation34_id56";
-    private static final String ORGANISATION_ID_2 = "dummy65_organisation43_id21";
+    private static final String CLAIMANT_REPRESENTATIVE_EMAIL_ADDRESS = "claimantrep@hmcts.com";
+    private static final String USER_EMAIL_ADDRESS = "dummyUser@hmcts.com";
+    private static final String USER_IDAM_ID = "84ac5b15-f28a-40fe-a5f4-c7127366fb43";
+    private static final String ORGANISATION_ID_1 = "84ac5b15-f28a-40fe-a5f4-c7127366fb41";
+    private static final String ORGANISATION_ID_2 = "84ac5b15-f28a-40fe-a5f4-c7127366fb42";
     private static final String RESPONDENT_REPRESENTATIVE_ID = "respondentRepresentativeId";
     private static final String CLAIMANT_REPRESENTATIVE_ID = "claimantRepresentativeId";
     private static final String CLAIMANT_REPRESENTATIVE_IDAM_ID_1 = "claimantRepresentativeIdamId1";
@@ -414,5 +417,36 @@ final class ClaimantRepresentativeUtilsTest {
         caseUserAssignments.addAll(Arrays.asList(caseUserAssignment1, caseUserAssignment2));
         assertThat(ClaimantRepresentativeUtils.removeUserAssignmentAndGetFirstRemainingAssignment(caseUserAssignments,
                 CLAIMANT_REPRESENTATIVE_IDAM_ID_1)).isEqualTo(caseUserAssignment2);
+    }
+
+    @Test
+    void theIsUserLeadClaimantRepresentative() {
+        // when user details is empty should return false
+        CaseData caseData = new CaseData();
+        assertThat(ClaimantRepresentativeUtils.isLeadRepresentative(null, caseData)).isFalse();
+        // when case data is empty should return false
+        UserDetails userDetails = new UserDetails();
+        assertThat(ClaimantRepresentativeUtils.isLeadRepresentative(userDetails, null)).isFalse();
+        // when case data has no claimant representative should return false
+        assertThat(ClaimantRepresentativeUtils.isLeadRepresentative(userDetails, caseData)).isFalse();
+        // when both user email and user id are empty should return false
+        caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().build());
+        assertThat(ClaimantRepresentativeUtils.isLeadRepresentative(userDetails, caseData)).isFalse();
+        // when user representative does not have both email and idam id should return false
+        userDetails.setEmail(USER_EMAIL_ADDRESS);
+        assertThat(ClaimantRepresentativeUtils.isLeadRepresentative(userDetails, caseData)).isFalse();
+        // when user email does not match with claimant representative's email should return false
+        caseData.getRepresentativeClaimantType().setRepresentativeEmailAddress(CLAIMANT_REPRESENTATIVE_EMAIL_ADDRESS);
+        assertThat(ClaimantRepresentativeUtils.isLeadRepresentative(userDetails, caseData)).isFalse();
+        // when user idam id does not match with claimant representative's idam id should return false
+        userDetails.setUid(USER_IDAM_ID);
+        caseData.getRepresentativeClaimantType().setIdamId(CLAIMANT_REPRESENTATIVE_IDAM_ID_1);
+        assertThat(ClaimantRepresentativeUtils.isLeadRepresentative(userDetails, caseData)).isFalse();
+        // when user idam id and claimant representative's idam id match should return true
+        userDetails.setUid(CLAIMANT_REPRESENTATIVE_IDAM_ID_1);
+        assertThat(ClaimantRepresentativeUtils.isLeadRepresentative(userDetails, caseData)).isTrue();
+        // when user email and claimant representative's email match should return true
+        userDetails.setEmail(CLAIMANT_REPRESENTATIVE_EMAIL_ADDRESS);
+        assertThat(ClaimantRepresentativeUtils.isLeadRepresentative(userDetails, caseData)).isTrue();
     }
 }

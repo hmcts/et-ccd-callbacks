@@ -2,11 +2,11 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
-import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_INVALID_USER_TOKEN;
 
@@ -46,10 +46,22 @@ public final class UserUtils {
                 && !StringUtils.isBlank(userDetails.getEmail());
     }
 
-    public static boolean isLeadClaimantRepresentative(UserDetails userDetails,
-                                                       RepresentedTypeC claimantRepresentative) {
-        return hasRequiredUserDetails(userDetails)
-                && ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(claimantRepresentative)
-                && Strings.CI.equals(userDetails.getEmail(), claimantRepresentative.getRepresentativeEmailAddress());
+    /**
+     * Returns the user's full name by joining their first and last names with a single space.
+     *
+     * <p>Null and empty names are omitted. If only one name is present, it is
+     * returned without adding a space. If both names are null or empty, an empty
+     * string is returned.</p>
+     *
+     * @param userDetails the user details containing the first and last names;
+     *                    must not be {@code null}
+     * @return the combined name, the single available name, or {@code ""}
+     *         if both names are null or empty
+     * @throws NullPointerException if {@code userDetails} is {@code null}
+     */
+    public static String getFullName(UserDetails userDetails) {
+        return Stream.of(userDetails.getFirstName(), userDetails.getLastName())
+                .filter(name -> name != null && !name.isEmpty())
+                .collect(Collectors.joining(StringUtils.SPACE));
     }
 }

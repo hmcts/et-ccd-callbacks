@@ -24,7 +24,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseEventID": "nocRemoveRepClaimant",
-    "CaseFieldID": "nocRemoveRepLandingPageSharedLabel",
+    "CaseFieldID": "nocRemoveRepLandingPageMultipleRepLabel",
     "DisplayContext": "READONLY",
     "PageID": 1,
     "PageDisplayOrder": 1,
@@ -35,7 +35,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseEventID": "nocRemoveRepClaimant",
-    "CaseFieldID": "nocRemoveRepRemoveLabelSelf",
+    "CaseFieldID": "nocRemoveRepSelfRemovalLabel",
     "DisplayContext": "READONLY",
     "PageID": 2,
     "PageDisplayOrder": 2,
@@ -46,7 +46,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseEventID": "nocRemoveRepClaimant",
-    "CaseFieldID": "nocRemoveRepRemoveSelfConfirm",
+    "CaseFieldID": "nocRemoveRepSelfConfirm",
     "DisplayContext": "MANDATORY",
     "PageID": 2,
     "PageDisplayOrder": 2,
@@ -57,7 +57,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseEventID": "nocRemoveRepClaimant",
-    "CaseFieldID": "nocRemoveRepRemoveLabelOrg",
+    "CaseFieldID": "nocRemoveRepOrgRemovalLabel",
     "DisplayContext": "READONLY",
     "PageID": 2,
     "PageDisplayOrder": 2,
@@ -79,7 +79,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseEventID": "nocRemoveRepClaimant",
-    "CaseFieldID": "nocRemoveRepRemoveOrgConfirm1",
+    "CaseFieldID": "nocRemoveRepOrgConfirmation1",
     "DisplayContext": "MANDATORY",
     "PageID": 2,
     "PageDisplayOrder": 2,
@@ -90,7 +90,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseEventID": "nocRemoveRepClaimant",
-    "CaseFieldID": "nocRemoveRepRemoveOrgConfirm2",
+    "CaseFieldID": "nocRemoveRepOrgConfirmation2",
     "DisplayContext": "MANDATORY",
     "PageID": 2,
     "PageDisplayOrder": 2,

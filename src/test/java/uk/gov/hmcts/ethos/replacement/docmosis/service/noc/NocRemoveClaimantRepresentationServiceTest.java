@@ -115,51 +115,31 @@ class NocRemoveClaimantRepresentationServiceTest {
         when(nocCcdService.findCaseUserAssignmentsByCaseIdAndRole(caseDetails.getCaseId(),
                 ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(caseUserAssignments);
         when(userService.getValidatedUserDetails(DUMMY_USER_TOKEN, CASE_ID)).thenReturn(userDetails2);
-        when(userService.findUserDetailsByIdamId(CLAIMANT_REPRESENTATIVE_IDAM_ID_1)).thenReturn(userDetails1);
+        when(nocCcdService.findRemainingClaimantRepresentative(caseUserAssignments, userDetails2))
+                .thenReturn(userDetails1);
         nocRemoveClaimantRepresentationService.populateNocRemovalDetails(DUMMY_USER_TOKEN, caseDetails);
         assertThat(caseDetails.getCaseData().getNocRepresentativeType()).isEqualTo(NOC_REPRESENTATIVE_TYPE_SHARED);
         assertThat(caseDetails.getCaseData().getNocCaseSharingStatus()).isEqualTo(NOC_CASE_SHARING_STATUS_SHARED);
-        assertThat(caseDetails.getCaseData().getNocRemoveOption()).isEqualTo(NOC_REMOVE_OPTION_YOURSELF);
+        assertThat(caseDetails.getCaseData().getNocRemoveOption()).isNull();
     }
 
     @Test
-    void theFindOtherClaimantRepresentative() {
-        // when no claimant representative found should return null
-        when(nocCcdService.findCaseUserAssignmentsByCaseIdAndRole(caseDetails.getCaseId(),
-                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(List.of());
-        assertThat(nocRemoveClaimantRepresentationService.findOtherClaimantRepresentative(caseDetails, userDetails1))
-                .isNull();
-        // when no other claimant representative found should return null
-
-        List<CaseUserAssignment> caseUserAssignments = new ArrayList<>(Collections.singletonList(caseUserAssignment1));
-        when(nocCcdService.findCaseUserAssignmentsByCaseIdAndRole(caseDetails.getCaseId(),
-                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(caseUserAssignments);
-        assertThat(nocRemoveClaimantRepresentationService.findOtherClaimantRepresentative(caseDetails, userDetails1))
-                .isNull();
-        // when other claimant representative found should return user details of the other representative
-        caseUserAssignments = new ArrayList<>(Arrays.asList(caseUserAssignment1,
-                caseUserAssignment2));
-        when(nocCcdService.findCaseUserAssignmentsByCaseIdAndRole(caseDetails.getCaseId(),
-                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(caseUserAssignments);
-
-        when(userService.findUserDetailsByIdamId(CLAIMANT_REPRESENTATIVE_IDAM_ID_2)).thenReturn(userDetails2);
-        assertThat(nocRemoveClaimantRepresentationService.findOtherClaimantRepresentative(caseDetails, userDetails1))
-                .isEqualTo(userDetails2);
-    }
-
-    @Test
-    void theHasSharedRepresentative() {
+    @SneakyThrows
+    void theHasRemainingClaimantRepresentative() {
         // when not able to find any shared representative should return false
         List<CaseUserAssignment> caseUserAssignments = new ArrayList<>(Collections.singletonList(caseUserAssignment1));
         when(nocCcdService.findCaseUserAssignmentsByCaseIdAndRole(caseDetails.getCaseId(),
                 ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(caseUserAssignments);
-        assertThat(nocRemoveClaimantRepresentationService.hasSharedRepresentative(caseDetails, userDetails1)).isFalse();
+        assertThat(nocRemoveClaimantRepresentationService.hasRemainingClaimantRepresentative(caseDetails, userDetails1))
+                .isFalse();
         // when other claimant representative found should return true
         caseUserAssignments = new ArrayList<>(Arrays.asList(caseUserAssignment1, caseUserAssignment2));
         when(nocCcdService.findCaseUserAssignmentsByCaseIdAndRole(caseDetails.getCaseId(),
                 ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(caseUserAssignments);
-        when(userService.findUserDetailsByIdamId(CLAIMANT_REPRESENTATIVE_IDAM_ID_2)).thenReturn(userDetails2);
-        assertThat(nocRemoveClaimantRepresentationService.hasSharedRepresentative(caseDetails, userDetails1)).isTrue();
+        when(nocCcdService.findRemainingClaimantRepresentative(caseUserAssignments, userDetails1))
+                .thenReturn(userDetails2);
+        assertThat(nocRemoveClaimantRepresentationService.hasRemainingClaimantRepresentative(caseDetails, userDetails1))
+                .isTrue();
     }
 
     @Test

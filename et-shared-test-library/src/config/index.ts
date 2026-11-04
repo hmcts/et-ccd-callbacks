@@ -5,19 +5,19 @@ export {
   Events,
   type ReferralOption,
   type CaseEvent,
-} from "./case-data";
+} from "./case-data.js";
 export {
   type UserCredentials,
   users,
   config
-} from "./config.dynamic";
+} from "./config.dynamic.js";
 export {
   staticUsers,
   staticConfig
-} from "./config.static";
+} from "./config.static.js";
 export {
   globalSetup
-} from "./global/global-setup";
+} from "./global/global-setup.js";
 export {
   globalTeardown
-} from "./global/global-teardown";
+} from "./global/global-teardown.js";

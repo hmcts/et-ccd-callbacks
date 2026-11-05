@@ -25,6 +25,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.PostDefaultValuesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 
@@ -75,13 +76,13 @@ class Et1ReppedSubmitClaimDefaultValuesTest {
     private SingleReferenceService singleReferenceService;
 
     @InjectMocks
-    private CaseActionsForCaseWorkerController caseActionsForCaseWorkerController;
+    private PostDefaultValuesService postDefaultValuesService;
 
     private Et1ReppedController et1ReppedController;
 
     @BeforeEach
     void setUp() {
-        et1ReppedController = new Et1ReppedController(caseActionsForCaseWorkerController,
+        et1ReppedController = new Et1ReppedController(postDefaultValuesService,
             caseManagementForCaseWorkerService, et1ReppedService, featureToggleService, et1SubmissionService,
             nocRespondentRepresentativeService);
 

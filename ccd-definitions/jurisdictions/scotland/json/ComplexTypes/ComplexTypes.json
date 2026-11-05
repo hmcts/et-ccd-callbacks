@@ -2454,6 +2454,15 @@
   },
   {
     "ID": "Jurisdiction",
+    "ListElementCode": "jurisdictionCodeSXH",
+    "FieldType": "Label",
+    "ElementLabel": "Sexual harassment by unwanted conduct of a sexual nature or because of rejection of such conduct",
+    "FieldShowCondition": "juridictionCodesList = \"SXH\"",
+    "RetainHiddenValue": "Yes",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Jurisdiction",
     "ListElementCode": "jurisdictionCodeBOC",
     "FieldType": "Label",
     "ElementLabel": "Claim of an employee for breach of contract of employment",
@@ -2800,6 +2809,24 @@
     "FieldType": "Label",
     "ElementLabel": "Suffer a detriment and/or dismissal for requesting time to train. Failure of employer to follow correct procedures/reject request based on incorrect facts",
     "FieldShowCondition": "juridictionCodesList = \"TT\"",
+    "RetainHiddenValue": "Yes",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Jurisdiction",
+    "ListElementCode": "jurisdictionCodeTUA",
+    "FieldType": "Label",
+    "ElementLabel": "Suffered a detriment as a result of union membership or activities, or taking part in protected industrial action",
+    "FieldShowCondition": "juridictionCodesList = \"TUA\"",
+    "RetainHiddenValue": "Yes",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Jurisdiction",
+    "ListElementCode": "jurisdictionCodeTUD",
+    "FieldType": "Label",
+    "ElementLabel": "Unfair dismissal for having taken part in protected industrial action",
+    "FieldShowCondition": "juridictionCodesList = \"TUD\"",
     "RetainHiddenValue": "Yes",
     "SecurityClassification": "Public"
   },
@@ -8217,8 +8244,7 @@
     "FieldType": "Text",
     "ElementLabel": "Respondent id",
     "SecurityClassification": "Public"
-  }
-,
+  },
   {
     "ID": "caseNote",
     "ListElementCode": "title",

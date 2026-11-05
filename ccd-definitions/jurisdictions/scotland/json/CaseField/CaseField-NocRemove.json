@@ -17,8 +17,16 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "ID": "nocRemoveRepLandingPageMultipleRepLabel",
-    "Label": "This will remove you from the case. You will no longer represent the client.",
+    "ID": "nocRemoveLeadMultiRepsLandingPageLabel",
+    "Label": "This will remove you or your organisation from the case. You will no longer represent the client.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "nocRemoveLeadSingleRepLandingPageLabel",
+    "Label": "This will remove you and your organisation from the case. You will no longer represent the client.",
     "FieldType": "Label",
     "SecurityClassification": "Public",
     "Searchable": "N"

@@ -1,7 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { CitizenHubPage } from './CitizenHubPage';
-import userDetailsData from '../../../resources/payload/user-details.json';
-
+import { CitizenHubPage } from './CitizenHubPage.js';
+import userDetailsData from '../../../resources/payload/user-details.json' with { type: 'json' };
 
 export class PersonalDetailsPage extends CitizenHubPage {
 

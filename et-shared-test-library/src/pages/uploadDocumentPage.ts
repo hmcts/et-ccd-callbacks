@@ -1,6 +1,6 @@
-import { BasePage } from './basePage';
+import { BasePage } from './basePage.js';
 import { expect, Locator, Page } from '@playwright/test';
-import {resolveResourcePath} from "../data-utils/resourcePath";
+import {resolveResourcePath} from "../data-utils/resourceFilePathData.js";
 
 export class UploadDocumentPage extends BasePage {
   private readonly addNewButtonBottom: Locator;

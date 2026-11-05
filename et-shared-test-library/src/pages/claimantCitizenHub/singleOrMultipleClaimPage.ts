@@ -1,5 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { CitizenHubPage } from './CitizenHubPage';
+import { CitizenHubPage } from './CitizenHubPage.js';
 export class SingleOrMultipleClaimPage extends CitizenHubPage{
 
   private readonly singleOrMultipleClaim: Locator;

@@ -90,11 +90,22 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepRemoveOrgLabelClaimant",
+    "DisplayContext": "READONLY",
+    "PageID": 3,
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 2,
+    "FieldShowCondition": "nocRemoveOption=\"your organisation\" OR (nocRepresentativeType=\"leadRepresentative\" AND nocCaseSharingStatus=\"notShared\")",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
     "CaseFieldID": "nocRemoveRepOrgConfirmation1",
     "DisplayContext": "MANDATORY",
     "PageID": 3,
     "PageDisplayOrder": 3,
-    "PageFieldDisplayOrder": 2,
+    "PageFieldDisplayOrder": 3,
     "FieldShowCondition": "nocRemoveOption=\"your organisation\" OR (nocRepresentativeType=\"leadRepresentative\" AND nocCaseSharingStatus=\"notShared\")",
     "ShowSummaryChangeOption": "N"
   },
@@ -105,7 +116,7 @@
     "DisplayContext": "MANDATORY",
     "PageID": 3,
     "PageDisplayOrder": 3,
-    "PageFieldDisplayOrder": 3,
+    "PageFieldDisplayOrder": 4,
     "FieldShowCondition": "nocRemoveOption=\"your organisation\" OR (nocRepresentativeType=\"leadRepresentative\" AND nocCaseSharingStatus=\"notShared\")",
     "ShowSummaryChangeOption": "N"
   }

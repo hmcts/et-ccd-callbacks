@@ -1,6 +1,6 @@
 [
   {
-    "CaseTypeID": "ET_EnglandWales",
+    "CaseTypeID": "ET_Scotland",
     "CaseEventID": "nocRemoveRepClaimant",
     "CaseFieldID": "nocCaseSharingStatus",
     "DisplayContext": "READONLY",
@@ -11,7 +11,7 @@
     "ShowSummaryChangeOption": "N"
   },
   {
-    "CaseTypeID": "ET_EnglandWales",
+    "CaseTypeID": "ET_Scotland",
     "CaseEventID": "nocRemoveRepClaimant",
     "CaseFieldID": "nocRepresentativeType",
     "DisplayContext": "READONLY",
@@ -22,7 +22,7 @@
     "ShowSummaryChangeOption": "N"
   },
   {
-    "CaseTypeID": "ET_EnglandWales",
+    "CaseTypeID": "ET_Scotland",
     "CaseEventID": "nocRemoveRepClaimant",
     "CaseFieldID": "nocRemoveLeadMultiRepsLandingPageLabel",
     "DisplayContext": "READONLY",

@@ -1,10 +1,13 @@
-import { test } from '../fixtures/common.fixture';
+import { test } from '../fixtures/et.test.fixture.ts';
 import { expect } from '@playwright/test';
-import { CitizenClaimantFactory } from '../data-utils/factory/citizen/ClaimantCitizenFactory.ts';
-import { CaseTypeLocation, Events } from '../config/case-data.ts';
-import { config, users } from '../config/config.dynamic.ts';
-import CitizenHubPage from '../pages/claimantCitizenHub/CitizenHubPage.ts';
-import CitizenHubLoginPage from '../pages/claimantCitizenHub/CitizenHubLoginPage.ts';
+import {
+  CaseTypeLocation,
+  CitizenClaimantFactory,
+  CitizenHubLoginPage, CitizenHubPage,
+  config,
+  Events,
+  users
+} from "@hmcts/et-shared-test-library";
 
 let subRef: any;
 let caseNumber: any;
@@ -29,9 +32,7 @@ test.describe('ECC', () => {
     await jurisdictionPage.addJurisdiction('ECC', 'Not allocated', 2);
     await jurisdictionPage.clickSubmitButton();
 
-    await expect(jurisdictionPage.page.getByRole('tab', { name: 'Case Details' }).locator('div')).toContainText(
-      'Case Details',
-    );
+    await expect(jurisdictionPage.page.getByRole('tab', { name: 'Case Details' })).toBeVisible();
     await expect(jurisdictionPage.page.getByText('ECC', { exact: true })).toBeVisible();
   });
 

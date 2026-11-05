@@ -1,22 +1,17 @@
-import { test } from '../fixtures/common.fixture.ts';
-import { config, users } from '../config/config.dynamic.ts';
-import { CitizenClaimantFactory } from '../data-utils/factory/citizen/ClaimantCitizenFactory.ts';
-import { CaseDetailsValues, CaseTypeLocation, Events } from '../config/case-data.ts';
-import { CaseEventApi } from '../data-utils/api/CaseEventApi.ts';
-import { AddressDetails } from '../types/address.ts';
-import LoginPage from '../pages/loginPage.ts';
-import { ManageCaseDashboardPage } from '../pages/ManageCaseDashboardPage.ts';
-import { Page } from '@playwright/test';
-import CaseDetailsPage from '../pages/caseDetailsPage.ts';
-import { createCaseViaCitizenUI } from '../pages/helpers/CuiCaseCreationHelper.ts';
-import userDetailsData from '../resources/payload/user-details.json';
-import { NocPage } from '../pages/legalRepresentative/NocPage.ts';
-import RespondentRepPage from '../pages/respondentCitizenHub/respondentRepPage.ts';
-import AmendContactDetailsLrPage from '../pages/events/AmendContactDetailsLrPage.ts';
-import { CheckYourAnswersPage } from '../pages/helpers/CheckYourAnswersPage.ts';
+import { test } from '../fixtures/et.test.fixture.ts';
+import {Page} from "@playwright/test";
+import {
+  AddressDetails, AmendContactDetailsLrPage,
+  CaseDetailsPage, CaseDetailsValues, CaseEventApi, CaseTypeLocation, CheckYourAnswersPage,
+  CitizenClaimantFactory, config, createCaseViaCitizenUI, Events,
+  LoginPage,
+  ManageCaseDashboardPage, NocPage, resolveResourceJson, RespondentRepPage,
+  users
+} from "@hmcts/et-shared-test-library";
 
 let caseId: string;
 let caseNumber: string;
+let userDetailsData: any;
 
 test.describe( 'Legal Rep updates update contact to colleagues in his org', () => {
   let caseWorkerBrowserPage: Page;
@@ -27,6 +22,10 @@ test.describe( 'Legal Rep updates update contact to colleagues in his org', () =
   test.use({
     storageState: users.etLegalRepresentative.sessionFile,
   })
+
+  test.beforeAll(async () => {
+    userDetailsData = resolveResourceJson('resources/payload/user-details.json');
+  });
 
   test.beforeEach(async ({manageCaseDashboardPage, loginPage, browserUtils}) => {
     caseId = await CitizenClaimantFactory.createAndSubmitClaim(CaseTypeLocation.EnglandAndWales);

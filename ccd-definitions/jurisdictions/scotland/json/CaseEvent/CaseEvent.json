@@ -26,10 +26,7 @@
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "N",
-    "EventEnablingCondition": "caseType=\"dummy\"",
-    "CallBackURLAboutToStartEvent": "",
-    "CallBackURLAboutToSubmitEvent": "",
-    "CallBackURLSubmittedEvent": ""
+    "EventEnablingCondition": "caseType=\"dummy\""
   },
   {
     "CaseTypeID": "ET_Scotland",
@@ -959,10 +956,7 @@
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "N",
-    "EventEnablingCondition": "caseType=\"dummy\"",
-    "CallBackURLAboutToStartEvent": "",
-    "CallBackURLAboutToSubmitEvent": "",
-    "CallBackURLSubmittedEvent": ""
+    "EventEnablingCondition": "caseType=\"dummy\""
   },
   {
     "CaseTypeID": "ET_Scotland",
@@ -1115,19 +1109,18 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "ID": "updateInitialConsiderationDocument",
-    "Name": "Regenerate IC doc",
-    "Description": "Regenerate the Initial Consideration PDF. Completed by and date are kept.",
-    "DisplayOrder": 45,
-    "PreConditionState(s)": "*",
+    "ID": "updateRespondentEmail",
+    "Name": "Update respondent email",
+    "Description": "Update respondent email and grant or reassign respondent portal access",
+    "DisplayOrder": 15,
+    "PreConditionState(s)": "Accepted;Rejected;Closed;Submitted;Vetted",
     "PostConditionState": "*",
-    "EventEnablingCondition": "icCompletedBy !=\"\"",
-    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/updateInitialConsiderationDocument",
-    "CallBackURLSubmittedEvent": "${ET_COS_URL}/completeUpdateInitialConsiderationDocument",
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/updateRespondentEmail/aboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/updateRespondentEmail/aboutToSubmit",
+    "CallBackURLSubmittedEvent": "",
+    "EventEnablingCondition": "managingOffice !=\"Unassigned\"",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
-    "EndButtonLabel": "Update IC doc",
-    "ShowSummary": "Y",
-    "Publish": "N"
+    "ShowSummary": "Y"
   }
 ]

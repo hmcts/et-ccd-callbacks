@@ -1,7 +1,7 @@
-import { BasePage } from "../basePage";
+import { BasePage } from "../basePage.js";
 import { expect, Locator, Page } from '@playwright/test';
-import { config } from '../../config';
-import {resolveResourcePath} from "../../data-utils/resourcePath";
+import { config } from '../../config/index.js';
+import {resolveResourcePath} from "../../data-utils/resourceFilePathData.js";
 
 export class CitizenHubPage extends BasePage {
   private readonly caseOverviewPageTitle: Locator;

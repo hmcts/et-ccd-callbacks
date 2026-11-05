@@ -1,10 +1,9 @@
 import { expect, Locator, Page } from "@playwright/test";
-import { BasePage } from "./basePage";
-import path from "path";
-import icPageData from '../../resources/payload/ic-page-content.json';
-import respPageData from '../../resources/payload/respondent-page-content.json';
-import { Events } from '../config';
-import {resolveResourcePath} from "../data-utils/resourcePath";
+import { BasePage } from "./basePage.js";
+import icPageData from '../../resources/payload/ic-page-content.json' with { type: 'json' };
+import respPageData from '../../resources/payload/respondent-page-content.json' with { type: 'json' };
+import { Events } from '../config/index.js';
+import {resolveResourcePath} from "../data-utils/resourceFilePathData.js";
 
 export class ICUploadDocPage extends BasePage {
     private readonly respNameEle: Locator;

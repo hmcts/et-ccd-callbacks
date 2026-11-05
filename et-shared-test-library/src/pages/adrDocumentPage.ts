@@ -1,6 +1,6 @@
-import { BasePage } from "./basePage";
+import { BasePage } from "./basePage.js";
 import { Locator } from '@playwright/test';
-import {resolveResourcePath} from "../data-utils/resourcePath";
+import {resolveResourcePath} from "../data-utils/resourceFilePathData.js";
 
 export class AdrDocumentPage extends BasePage {
     private readonly uploadInput: Locator;

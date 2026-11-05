@@ -5,7 +5,7 @@ import {
     LoginPage,
     ManageCaseDashboardPage, ReferralPage,
     users
-} from "@et-shared-test-library/core";
+} from "@hmcts/et-shared-test-library";
 
 let caseId: string;
 let caseNumber: string;

@@ -1,8 +1,8 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { BasePage } from './basePage';
+import { BasePage } from './basePage.js';
 import { AxeUtils } from '@hmcts/playwright-common';
-import { CheckYourAnswersPage } from './helpers/CheckYourAnswersPage';
-import {resolveResourcePath} from "../data-utils/resourcePath";
+import { CheckYourAnswersPage } from './helpers/CheckYourAnswersPage.js';
+import {resolveResourcePath} from "../data-utils/resourceFilePathData.js";
 
 export class ApplicationTabPage extends BasePage {
 
@@ -77,7 +77,7 @@ export class ApplicationTabPage extends BasePage {
     await this.page.waitForLoadState('load');
     await expect(this.selectAnApplicationTitle).toBeVisible();
     await expect(this.applicationTypeDropdown).toBeVisible();
-    const url = this.page.url();
+    const url = this.page.url() || '';
     if (url.includes('claimantTSE1')) {
       await this.assertDropDownOptionsAreVisible([
         'Amend claim',

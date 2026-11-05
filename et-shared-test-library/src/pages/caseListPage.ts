@@ -1,7 +1,7 @@
-import { BasePage } from './basePage';
+import { BasePage } from './basePage.js';
 import { expect, Locator, Page } from '@playwright/test';
-import { DateUtilComponent } from '../data-utils';
-import { users } from '../config';
+import { DateUtilComponent } from '../data-utils/index.js';
+import { users } from '../config/index.js';
 
 export class CaseListPage extends BasePage {
   private readonly caseListLink: Locator;

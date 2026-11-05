@@ -1,5 +1,5 @@
 import { test } from '../fixtures/et.test.fixture.ts';
-import {CaseTypeLocation, CaseworkerCaseFactory, Events, users} from "@et-shared-test-library/core";
+import {CaseTypeLocation, CaseworkerCaseFactory, Events, users} from "@hmcts/et-shared-test-library";
 
 let caseNumber: string;
 let caseId: string;

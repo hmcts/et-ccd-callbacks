@@ -1,5 +1,5 @@
 import { expect, Page } from '@playwright/test';
-import { BasePage } from "../basePage";
+import { BasePage } from "../basePage.js";
 
 export class IssueJudgementPage extends BasePage {
 

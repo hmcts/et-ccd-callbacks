@@ -6,7 +6,7 @@ import {
   LoginPage,
   ManageCaseDashboardPage, ManageCaseFlagPage,
   ManageSupportPage, NocPage, RequestSupportPage, users
-} from "@et-shared-test-library/core";
+} from "@hmcts/et-shared-test-library";
 
 let caseNumber: string;
 let caseId: string;

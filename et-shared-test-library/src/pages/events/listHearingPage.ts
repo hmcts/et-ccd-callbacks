@@ -1,6 +1,6 @@
-import { DateUtilComponent } from '../../data-utils';
+import { DateUtilComponent } from '../../data-utils/index.js';
 import { expect } from '@playwright/test';
-import { BaseEventPage } from './BaseEventPage';
+import { BaseEventPage } from './BaseEventPage.js';
 
 export class ListHearingPage extends BaseEventPage {
 

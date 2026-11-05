@@ -1,8 +1,8 @@
 import * as OTPAuth from 'totp-generator';
-import {axiosRequest} from './ApiHelper';
-import {readCache, writeCache} from '../CachingHelper';
+import {axiosRequest} from './ApiHelper.js';
+import {readCache, writeCache} from '../CachingHelper.js';
 import querystring from 'querystring';
-import { staticConfig } from '../../config';
+import { staticConfig } from '../../config/index.js';
 
 const env = process.env.RUNNING_ENV && process.env.RUNNING_ENV.startsWith('pr-') ? 'aat' : (process.env.RUNNING_ENV || 'aat');
 const idamBaseUrl = staticConfig.idamUrl;

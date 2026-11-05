@@ -79,6 +79,9 @@ public enum JurisdictionCode {
     TPE("Suffer less favourable treatment and/or dismissal as a temp. employee than a full time employee"),
     TT("Suffer a detriment and/or dismissal for requesting time to train. Failure of employer to follow "
         + "correct procedures/reject request based on incorrect facts"),
+    TUA("Suffered a detriment as a result of union membership or activities, or taking part in protected "
+        + "industrial action"),
+    TUD("Unfair dismissal for having taken part in protected industrial action"),
     TUE("Suffer discrimination in obtaining employment due to membership or non-membership of a trade union;"
         + " or refused employment or suffered a detriment for a reason related to a blacklist"),
     TUI("Suffer an inducement relating to union membership, activities or collective bargaining"),
@@ -114,6 +117,7 @@ public enum JurisdictionCode {
             + "grounds of race or ethnic origin"),
     SXD("Discrimination, including indirect discrimination, discrimination based on association or perception, "
             + "or harassment on grounds of sex, marriage and civil partnership"),
+    SXH("Sexual harassment by unwanted conduct of a sexual nature or because of rejection of such conduct"),
     DSO("Discrimination, including indirect discrimination, discrimination based on association or perception or "
             + "harassment on grounds of sexual orientation"),
     MAT("Suffer a detriment and/or dismissal on grounds of pregnancy, childbirth or maternity "),

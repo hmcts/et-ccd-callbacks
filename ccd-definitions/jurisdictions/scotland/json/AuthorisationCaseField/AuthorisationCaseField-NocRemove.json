@@ -37,6 +37,30 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "nocCaseSharingStatus",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "nocRepresentativeType",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "nocRemoveRepSelfRemovalLabel",
     "AccessControl": [
       {

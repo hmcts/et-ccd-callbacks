@@ -2,23 +2,23 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseEventID": "nocRemoveRepClaimant",
-    "CaseFieldID": "nocRemoveOption",
-    "DisplayContext": "MANDATORY",
+    "CaseFieldID": "nocCaseSharingStatus",
+    "DisplayContext": "READONLY",
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
-    "FieldShowCondition": "nocRemoveRepLandingPageLeadLabel=\"DUMMY\"",
+    "FieldShowCondition": "nocRemoveRepLandingPageMultipleRepLabel=\"DUMMY\"",
     "ShowSummaryChangeOption": "N"
   },
   {
     "CaseTypeID": "ET_Scotland",
     "CaseEventID": "nocRemoveRepClaimant",
-    "CaseFieldID": "nocRemoveRepLandingPageLeadLabel",
+    "CaseFieldID": "nocRepresentativeType",
     "DisplayContext": "READONLY",
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
-    "FieldShowCondition": "nocRemoveOption=\"your organisation\"",
+    "FieldShowCondition": "nocRemoveRepLandingPageMultipleRepLabel=\"DUMMY\"",
     "ShowSummaryChangeOption": "N"
   },
   {
@@ -29,7 +29,18 @@
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
-    "FieldShowCondition": "nocRemoveOption!=\"your organisation\"",
+    "FieldShowCondition": "nocRepresentativeType=\"leadRepresentative\" AND nocCaseSharingStatus=\"shared\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveOption",
+    "DisplayContext": "MANDATORY",
+    "PageID": 2,
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "FieldShowCondition": "nocRepresentativeType=\"leadRepresentative\" AND nocCaseSharingStatus=\"shared\"",
     "ShowSummaryChangeOption": "N"
   },
   {
@@ -37,10 +48,10 @@
     "CaseEventID": "nocRemoveRepClaimant",
     "CaseFieldID": "nocRemoveRepSelfRemovalLabel",
     "DisplayContext": "READONLY",
-    "PageID": 2,
-    "PageDisplayOrder": 2,
+    "PageID": 3,
+    "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 1,
-    "FieldShowCondition": "nocRemoveOption!=\"your organisation\"",
+    "FieldShowCondition": "nocRemoveOption=\"yourself\"",
     "ShowSummaryChangeOption": "N"
   },
   {
@@ -48,10 +59,10 @@
     "CaseEventID": "nocRemoveRepClaimant",
     "CaseFieldID": "nocRemoveRepSelfConfirm",
     "DisplayContext": "MANDATORY",
-    "PageID": 2,
-    "PageDisplayOrder": 2,
+    "PageID": 3,
+    "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 2,
-    "FieldShowCondition": "nocRemoveOption!=\"your organisation\"",
+    "FieldShowCondition": "nocRemoveOption=\"yourself\"",
     "ShowSummaryChangeOption": "N"
   },
   {
@@ -59,20 +70,9 @@
     "CaseEventID": "nocRemoveRepClaimant",
     "CaseFieldID": "nocRemoveRepOrgRemovalLabel",
     "DisplayContext": "READONLY",
-    "PageID": 2,
-    "PageDisplayOrder": 2,
+    "PageID": 3,
+    "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 1,
-    "FieldShowCondition": "nocRemoveOption=\"your organisation\"",
-    "ShowSummaryChangeOption": "N"
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
-    "CaseEventID": "nocRemoveRepClaimant",
-    "CaseFieldID": "nocRemoveRepRemoveOrgLabelClaimant",
-    "DisplayContext": "READONLY",
-    "PageID": 2,
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 2,
     "FieldShowCondition": "nocRemoveOption=\"your organisation\"",
     "ShowSummaryChangeOption": "N"
   },
@@ -81,9 +81,9 @@
     "CaseEventID": "nocRemoveRepClaimant",
     "CaseFieldID": "nocRemoveRepOrgConfirmation1",
     "DisplayContext": "MANDATORY",
-    "PageID": 2,
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 3,
+    "PageID": 3,
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 2,
     "FieldShowCondition": "nocRemoveOption=\"your organisation\"",
     "ShowSummaryChangeOption": "N"
   },
@@ -92,9 +92,9 @@
     "CaseEventID": "nocRemoveRepClaimant",
     "CaseFieldID": "nocRemoveRepOrgConfirmation2",
     "DisplayContext": "MANDATORY",
-    "PageID": 2,
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 4,
+    "PageID": 3,
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 3,
     "FieldShowCondition": "nocRemoveOption=\"your organisation\"",
     "ShowSummaryChangeOption": "N"
   }

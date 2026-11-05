@@ -37,6 +37,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.STAGE_ABOUT_TO_START;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.STAGE_ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_CASE_SHARING_STATUS_NOT_SHARED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_CASE_SHARING_STATUS_SHARED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
@@ -97,30 +99,58 @@ class NocRemoveClaimantRepresentationServiceTest {
 
     @Test
     @SneakyThrows
-    void theSetNocRemoveOption() {
+    void thePopulateNocRemovalDetails() {
         // when case details are not valid should throw generic service exception
         GenericServiceException gse = assertThrows(GenericServiceException.class,
-                () -> nocRemoveClaimantRepresentationService.populateNocRemovalDetails(DUMMY_USER_TOKEN, null));
+                () -> nocRemoveClaimantRepresentationService.populateNocRemovalDetails(DUMMY_USER_TOKEN, null,
+                        STAGE_ABOUT_TO_START));
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_INVALID_CASE_DETAILS);
-        // when representative is lead representative, should set nocRepresentativeType to lead
-        when(userService.getValidatedUserDetails(DUMMY_USER_TOKEN, CASE_ID)).thenReturn(userDetails1);
-        nocRemoveClaimantRepresentationService.populateNocRemovalDetails(DUMMY_USER_TOKEN, caseDetails);
+        // when representative is lead representative, and case not shared should set nocRepresentativeType to lead and
+        // nocCaseSharingStatus to not shared and nocRemoveOption to organisation
+        when(userService.fetchAndValidateUserDetails(DUMMY_USER_TOKEN, CASE_ID)).thenReturn(userDetails1);
+        nocRemoveClaimantRepresentationService.populateNocRemovalDetails(DUMMY_USER_TOKEN, caseDetails,
+                STAGE_ABOUT_TO_START);
         assertThat(caseDetails.getCaseData().getNocRepresentativeType()).isEqualTo(NOC_REPRESENTATIVE_TYPE_LEAD);
         assertThat(caseDetails.getCaseData().getNocCaseSharingStatus()).isEqualTo(NOC_CASE_SHARING_STATUS_NOT_SHARED);
-        assertThat(caseDetails.getCaseData().getNocRemoveOption()).isNull();
-        // when representative is not lead representative and a shared case should set nocRepresentativeType to lead,
-        // nocCaseSharingStatus to shared and nocRemoveOption to yourself
+        assertThat(caseDetails.getCaseData().getNocRemoveOption()).isEqualTo(NOC_REMOVE_OPTION_ORGANISATION);
+        // when representative is lead representative, and case shared and stage is about to submit should set
+        // nocRepresentativeType to lead, nocCaseSharingStatus to shared and should not update nocRemoveOption
         List<CaseUserAssignment> caseUserAssignments = new ArrayList<>(Arrays.asList(caseUserAssignment1,
                 caseUserAssignment2));
         when(nocCcdService.findCaseUserAssignmentsByCaseIdAndRole(caseDetails.getCaseId(),
                 ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(caseUserAssignments);
-        when(userService.getValidatedUserDetails(DUMMY_USER_TOKEN, CASE_ID)).thenReturn(userDetails2);
-        when(nocCcdService.findRemainingClaimantRepresentative(caseUserAssignments, userDetails2))
-                .thenReturn(userDetails1);
-        nocRemoveClaimantRepresentationService.populateNocRemovalDetails(DUMMY_USER_TOKEN, caseDetails);
-        assertThat(caseDetails.getCaseData().getNocRepresentativeType()).isEqualTo(NOC_REPRESENTATIVE_TYPE_SHARED);
+        when(userService.fetchAndValidateUserDetails(DUMMY_USER_TOKEN, CASE_ID)).thenReturn(userDetails1);
+        when(nocCcdService.findRemainingClaimantRepresentative(caseUserAssignments, userDetails1))
+                .thenReturn(userDetails2);
+        nocRemoveClaimantRepresentationService.populateNocRemovalDetails(DUMMY_USER_TOKEN, caseDetails,
+                STAGE_ABOUT_TO_SUBMIT);
+        assertThat(caseDetails.getCaseData().getNocRepresentativeType()).isEqualTo(NOC_REPRESENTATIVE_TYPE_LEAD);
+        assertThat(caseDetails.getCaseData().getNocCaseSharingStatus()).isEqualTo(NOC_CASE_SHARING_STATUS_SHARED);
+        assertThat(caseDetails.getCaseData().getNocRemoveOption()).isEqualTo(NOC_REMOVE_OPTION_ORGANISATION);
+        // when representative is lead representative, and case shared and stage is about to start should set
+        // nocRepresentativeType to lead, nocCaseSharingStatus to shared and should update nocRemoveOption to null
+        caseUserAssignments = new ArrayList<>(Arrays.asList(caseUserAssignment1,
+                caseUserAssignment2));
+        when(nocCcdService.findCaseUserAssignmentsByCaseIdAndRole(caseDetails.getCaseId(),
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(caseUserAssignments);
+        nocRemoveClaimantRepresentationService.populateNocRemovalDetails(DUMMY_USER_TOKEN, caseDetails,
+                STAGE_ABOUT_TO_START);
+        assertThat(caseDetails.getCaseData().getNocRepresentativeType()).isEqualTo(NOC_REPRESENTATIVE_TYPE_LEAD);
         assertThat(caseDetails.getCaseData().getNocCaseSharingStatus()).isEqualTo(NOC_CASE_SHARING_STATUS_SHARED);
         assertThat(caseDetails.getCaseData().getNocRemoveOption()).isNull();
+        // when representative is not lead representative and a shared case should set nocRepresentativeType to lead,
+        // nocCaseSharingStatus to shared and nocRemoveOption to yourself
+        caseUserAssignments = new ArrayList<>(Arrays.asList(caseUserAssignment1, caseUserAssignment2));
+        when(nocCcdService.findCaseUserAssignmentsByCaseIdAndRole(caseDetails.getCaseId(),
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(caseUserAssignments);
+        when(userService.fetchAndValidateUserDetails(DUMMY_USER_TOKEN, CASE_ID)).thenReturn(userDetails2);
+        when(nocCcdService.findRemainingClaimantRepresentative(caseUserAssignments, userDetails2))
+                .thenReturn(userDetails1);
+        nocRemoveClaimantRepresentationService.populateNocRemovalDetails(DUMMY_USER_TOKEN, caseDetails,
+                STAGE_ABOUT_TO_START);
+        assertThat(caseDetails.getCaseData().getNocRepresentativeType()).isEqualTo(NOC_REPRESENTATIVE_TYPE_SHARED);
+        assertThat(caseDetails.getCaseData().getNocCaseSharingStatus()).isEqualTo(NOC_CASE_SHARING_STATUS_SHARED);
+        assertThat(caseDetails.getCaseData().getNocRemoveOption()).isEqualTo(NOC_REMOVE_OPTION_YOURSELF);
     }
 
     @Test

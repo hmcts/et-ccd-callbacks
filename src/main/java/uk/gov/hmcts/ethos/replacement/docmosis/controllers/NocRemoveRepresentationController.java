@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.STAGE_ABOUT_TO_START;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.STAGE_ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
 
 @Slf4j
@@ -49,7 +51,8 @@ public class NocRemoveRepresentationController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         List<String> errors = new ArrayList<>();
         try {
-            nocRemoveClaimantRepresentationService.populateNocRemovalDetails(userToken, caseDetails);
+            nocRemoveClaimantRepresentationService.populateNocRemovalDetails(userToken, caseDetails,
+                    STAGE_ABOUT_TO_START);
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
         }
@@ -72,7 +75,8 @@ public class NocRemoveRepresentationController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         List<String> errors = new ArrayList<>();
         try {
-            nocRemoveClaimantRepresentationService.populateNocRemovalDetails(userToken, caseDetails);
+            nocRemoveClaimantRepresentationService.populateNocRemovalDetails(userToken, caseDetails,
+                    STAGE_ABOUT_TO_SUBMIT);
             nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(userToken, caseDetails);
             caseDetails.getCaseData().setNocRemoveOption(null);
         } catch (GenericServiceException gse) {

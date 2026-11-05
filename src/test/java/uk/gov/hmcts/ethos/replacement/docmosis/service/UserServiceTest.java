@@ -38,21 +38,21 @@ class UserServiceTest {
 
     @Test
     @SneakyThrows
-    void theGetValidatedUserDetails() {
+    void theFetchAndValidateUserDetails() {
         // when user idam service returns empty user details should throw GenericServiceException
         when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(null);
         GenericServiceException gse = assertThrows(GenericServiceException.class, () ->
-                userService.getValidatedUserDetails(USER_TOKEN, SUBMISSION_REFERENCE));
+                userService.fetchAndValidateUserDetails(USER_TOKEN, SUBMISSION_REFERENCE));
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_USER_NOT_FOUND);
         // when user idam service returns user details without user id should throw GenericServiceException
         UserDetails userDetails = new UserDetails();
         when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(userDetails);
         gse = assertThrows(GenericServiceException.class, () ->
-                userService.getValidatedUserDetails(USER_TOKEN, SUBMISSION_REFERENCE));
+                userService.fetchAndValidateUserDetails(USER_TOKEN, SUBMISSION_REFERENCE));
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_USER_ID_NOT_FOUND);
         // when user idam service returns correct user details should return the same user details
         userDetails.setUid(USER_ID);
-        assertThat(userService.getValidatedUserDetails(USER_TOKEN, SUBMISSION_REFERENCE))
+        assertThat(userService.fetchAndValidateUserDetails(USER_TOKEN, SUBMISSION_REFERENCE))
                 .isEqualTo(userDetails);
     }
 
@@ -70,5 +70,20 @@ class UserServiceTest {
         userDetails.setUid(USER_ID);
         when(userIdamService.getUserDetailsById(ADMIN_USER_TOKEN, USER_ID)).thenReturn(userDetails);
         assertThat(userService.findUserDetailsByIdamId(USER_ID)).isEqualTo(userDetails);
+    }
+
+    @Test
+    void theFindUserDetailsByToken() {
+        // when user idam service returns empty user details should return null
+        when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(null);
+        assertThat(userService.findUserDetailsByToken(USER_TOKEN)).isNull();
+        // when user idam service returns user details without user id should return null
+        UserDetails userDetails = new UserDetails();
+        when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(userDetails);
+        assertThat(userService.findUserDetailsByToken(USER_TOKEN)).isNull();
+        // when user idam service returns correct user details should return the same user details
+        userDetails.setUid(USER_ID);
+        when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(userDetails);
+        assertThat(userService.findUserDetailsByToken(USER_TOKEN)).isEqualTo(userDetails);
     }
 }

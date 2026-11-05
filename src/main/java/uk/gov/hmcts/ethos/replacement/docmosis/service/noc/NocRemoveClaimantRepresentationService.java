@@ -18,10 +18,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeU
 import java.util.List;
 
 import static uk.gov.hmcts.et.common.model.hmc.ValidationError.INVALID_CASE_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.STAGE_ABOUT_TO_START;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_CASE_SHARING_STATUS_NOT_SHARED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_CASE_SHARING_STATUS_SHARED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_YOURSELF;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_LEAD;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_SHARED;
 
@@ -55,7 +57,8 @@ public class NocRemoveClaimantRepresentationService {
      * @param caseDetails the case details whose NOC removal fields are updated
      * @throws GenericServiceException if the supplied case details are invalid
      */
-    public void populateNocRemovalDetails(String userToken, CaseDetails caseDetails) throws GenericServiceException {
+    public void populateNocRemovalDetails(String userToken, CaseDetails caseDetails, String stage)
+            throws GenericServiceException {
         final String methodName = "populateNocRemovalDetails";
         if (!CaseDataUtils.areCaseDetailsValid(caseDetails)) {
             throw new GenericServiceException(INVALID_CASE_DETAILS,
@@ -65,8 +68,7 @@ public class NocRemoveClaimantRepresentationService {
                     NocRemoveClaimantRepresentationService.class.getSimpleName(),
                     methodName);
         }
-
-        UserDetails userDetails = userService.getValidatedUserDetails(userToken, caseDetails.getCaseId());
+        UserDetails userDetails = userService.fetchAndValidateUserDetails(userToken, caseDetails.getCaseId());
         boolean isLeadRepresentative = ClaimantRepresentativeUtils.isLeadRepresentative(userDetails,
                 caseDetails.getCaseData());
         caseDetails.getCaseData().setNocRepresentativeType(isLeadRepresentative
@@ -74,6 +76,15 @@ public class NocRemoveClaimantRepresentationService {
         boolean hasSharedRepresentative = hasRemainingClaimantRepresentative(caseDetails, userDetails);
         caseDetails.getCaseData().setNocCaseSharingStatus(hasSharedRepresentative
                 ? NOC_CASE_SHARING_STATUS_SHARED : NOC_CASE_SHARING_STATUS_NOT_SHARED);
+        if (STAGE_ABOUT_TO_START.equals(stage)) {
+            caseDetails.getCaseData().setNocRemoveOption(null);
+        }
+        if (isLeadRepresentative && !hasSharedRepresentative) {
+            caseDetails.getCaseData().setNocRemoveOption(NOC_REMOVE_OPTION_ORGANISATION);
+        }
+        if (!isLeadRepresentative) {
+            caseDetails.getCaseData().setNocRemoveOption(NOC_REMOVE_OPTION_YOURSELF);
+        }
     }
 
     /**

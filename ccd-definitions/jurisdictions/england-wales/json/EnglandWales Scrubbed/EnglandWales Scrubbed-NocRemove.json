@@ -7,7 +7,7 @@
   },
   {
     "ID": "frl_NocRemoveOption",
-    "ListElementCode": "yourOrganisation",
+    "ListElementCode": "your organisation",
     "ListElement": "your organisation (This will remove all representatives from your organisation. Your organisation will no longer represent the client)",
     "DisplayOrder": 1
   },

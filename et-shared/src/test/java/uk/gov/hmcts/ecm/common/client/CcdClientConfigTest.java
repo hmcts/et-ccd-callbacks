@@ -29,6 +29,13 @@ class CcdClientConfigTest {
     }
 
     @Test
+    void buildStartMultipleCaseCreationUrl() {
+        String uri = ccdClientConfig.buildStartMultipleCaseCreationUrl("1123", "TRIBUNALS", "TRIB_03");
+        assertEquals("https://localhost:4452/caseworkers/1123/jurisdictions/TRIBUNALS/case-types/TRIB_03/event-triggers/"
+                + "initiateMultipleCase/token?ignore-warning=true", uri);
+    }
+
+    @Test
     void buildStartCaseTransferUrl() {
         String uri = ccdClientConfig.buildStartCaseTransferUrl("1123", "TRIBUNALS", "TRIB_03",
                 "223");

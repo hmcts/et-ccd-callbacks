@@ -111,6 +111,18 @@ public final class HearingsHelper {
         return errors;
     }
 
+    /**
+     * Sets whether Initial Consideration should treat the case as already listed, from the hearing
+     * collection as it is now. A hearing counts only when a day is Listed and the date is after today.
+     */
+    public static void refreshEtICHearingAlreadyListed(CaseData caseData) {
+        if (caseData == null) {
+            return;
+        }
+        HearingType earliestListedHearing = getEarliestListedHearingType(caseData.getHearingCollection());
+        caseData.setEtICHearingAlreadyListed(earliestListedHearing == null ? NO : YES);
+    }
+
     public static void setEtInitialConsiderationListedHearingType(CaseData caseData) {
 
         if (caseData == null) {

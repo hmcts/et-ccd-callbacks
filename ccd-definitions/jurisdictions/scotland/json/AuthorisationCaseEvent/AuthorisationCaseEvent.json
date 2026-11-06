@@ -2100,12 +2100,6 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "UPDATE_NOTIFICATION_STATE",
-    "UserRole": "citizen",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
     "CaseEventID": "migrateCase",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRU"

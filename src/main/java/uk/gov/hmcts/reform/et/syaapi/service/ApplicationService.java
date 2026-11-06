@@ -62,6 +62,7 @@ public class ApplicationService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final FeatureToggleService featureToggleService;
     private final PdfUploadService pdfUploadService;
+    private final NotificationViewService notificationViewService;
 
     /**
      * Get the next application number for the case.
@@ -212,37 +213,27 @@ public class ApplicationService {
      * @return the associated {@link CaseDetails} for the ID provided in request
      */
     public CaseDetails updateTribunalResponseAsViewed(String authorization, TribunalResponseViewedRequest request) {
-        StartEventResponse startEventResponse = caseService.startUpdate(
+        return notificationViewService.recordViews(
             authorization,
             request.getCaseId(),
             request.getCaseTypeId(),
-            CaseEvent.UPDATE_NOTIFICATION_STATE
-        );
+            caseData -> {
+                GenericTseApplicationTypeItem selectedApplication = TseApplicationHelper.getSelectedApplication(
+                    caseData.getGenericTseApplicationCollection(),
+                    request.getAppId()
+                );
 
-        CaseData caseData = EmployeeObjectMapper
-            .convertCaseDataMapToCaseDataObject(startEventResponse.getCaseDetails().getData());
+                TseRespondTypeItem responseToUpdate = TseApplicationHelper.findResponse(
+                    selectedApplication,
+                    request.getResponseId()
+                );
 
-        GenericTseApplicationTypeItem selectedApplication = TseApplicationHelper.getSelectedApplication(
-            caseData.getGenericTseApplicationCollection(),
-            request.getAppId()
-        );
+                if (responseToUpdate == null) {
+                    throw new IllegalArgumentException("Response id is invalid");
+                }
 
-        TseRespondTypeItem responseToUpdate = TseApplicationHelper.findResponse(
-            selectedApplication,
-            request.getResponseId()
-        );
-
-        if (responseToUpdate == null) {
-            throw new IllegalArgumentException("Response id is invalid");
-        }
-
-        responseToUpdate.getValue().setViewedByClaimant(YES);
-
-        return caseService.submitUpdate(
-            authorization,
-            request.getCaseId(),
-            caseDetailsConverter.caseDataContent(startEventResponse, caseData),
-            request.getCaseTypeId()
+                responseToUpdate.getValue().setViewedByClaimant(YES);
+            }
         );
     }
 

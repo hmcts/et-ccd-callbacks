@@ -50,22 +50,25 @@ public class SendNotificationService {
     private final NotificationPseService notificationPseService;
     private final FeatureToggleService featureToggleService;
     private final IdamClient idamClient;
+    private final NotificationViewService notificationViewService;
 
     public CaseDetails updateSendNotificationState(String authorization, SendNotificationStateUpdateRequest request) {
-        StartEventResponse startEventResponse = caseService.startUpdate(
+        return notificationViewService.recordViews(
             authorization,
             request.getCaseId(),
             request.getCaseTypeId(),
-            CaseEvent.UPDATE_NOTIFICATION_STATE
+            caseData -> markNotificationViewed(caseData, request.getSendNotificationId())
         );
+    }
 
-        CaseData caseData = EmployeeObjectMapper
-            .convertCaseDataMapToCaseDataObject(startEventResponse.getCaseDetails().getData());
-
+    private void markNotificationViewed(CaseData caseData, String sendNotificationId) {
         List<SendNotificationTypeItem> notifications = caseData.getSendNotificationCollection();
+        if (notifications == null) {
+            return;
+        }
         for (SendNotificationTypeItem item : notifications) {
-            if (item.getId().equals(request.getSendNotificationId())) {
-                if (item.getValue().getNotificationState().equals(NOT_VIEWED_YET)) {
+            if (item.getId().equals(sendNotificationId)) {
+                if (NOT_VIEWED_YET.equals(item.getValue().getNotificationState())) {
                     item.getValue().setNotificationState(VIEWED);
                 }
                 setTribunalResponsesAsViewed(item.getValue().getRespondNotificationTypeCollection());
@@ -73,15 +76,6 @@ public class SendNotificationService {
                 break;
             }
         }
-
-        CaseDataContent content = caseDetailsConverter.caseDataContent(startEventResponse, caseData);
-
-        return caseService.submitUpdate(
-            authorization,
-            request.getCaseId(),
-            content,
-            request.getCaseTypeId()
-        );
     }
 
     private void setTribunalResponsesAsViewed(List<GenericTypeItem<RespondNotificationType>> responses) {

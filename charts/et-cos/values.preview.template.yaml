@@ -64,6 +64,8 @@ java:
           alias: ET_COS_SYSTEM_USER
         - name: cos-system-user-password
           alias: ET_COS_SYSTEM_USER_PASSWORD
+        - name: cos-system-user-id
+          alias: ET_COS_SYSTEM_USER_ID
         - name: idam-client-secret
           alias: IDAM_CLIENT_SECRET
         - name: acas-idam-client-secret

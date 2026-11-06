@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -45,6 +46,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.PostDefaultValuesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
@@ -88,6 +90,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CaseActionsForCaseWorkerController.class, JsonMapper.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
+@Import(PostDefaultValuesService.class)
 class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     private static final String PRE_DEFAULT_VALUES_URL = "/preDefaultValues";

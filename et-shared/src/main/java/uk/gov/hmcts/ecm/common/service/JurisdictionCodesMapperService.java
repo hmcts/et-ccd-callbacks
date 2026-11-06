@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Maps types of claims values {@link ClaimTypesConstants} to jurisdiction codes {@link JurisdictionCodesConstants}.
@@ -90,6 +91,7 @@ public class JurisdictionCodesMapperService {
 
     private JurCodesTypeItem toJurCodesTypeItem(String jurCodeValue) {
         JurCodesTypeItem item = new JurCodesTypeItem();
+        item.setId(UUID.randomUUID().toString());
         JurCodesType type = new JurCodesType();
         type.setJuridictionCodesList(jurCodeValue);
         item.setValue(type);

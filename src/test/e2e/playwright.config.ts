@@ -10,7 +10,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 6 : undefined,
   reporter: process.env.CI ? [["html"], ["list"]] : [["list"]],
-  timeout: 4 * 60 * 1000,
+  timeout: 5 * 60 * 1000,
   globalSetup: './config/global/global-setup',
   globalTeardown: './config/global/global-teardown',
   expect: {
@@ -27,9 +27,11 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'setup',
+      name: 'setup-chromium',
       testMatch: /user\.setups\.ts/,
-      workers: 1
+      use: { ...devices['Desktop Chrome'] },
+      // Logins are independent; cap concurrency to keep the load on IDAM modest.
+      workers: 4
     },
     {
       name: 'chromium',
@@ -37,19 +39,31 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         viewport: { width: 1920, height: 1080 },
       },
-      dependencies: ["setup"]
+      dependencies: ["setup-chromium"]
     },
-
+    {
+      name: 'setup-fire-fox',
+      testMatch: /user\.setups\.ts/,
+      use: { ...devices['Desktop Firefox'] },
+      // Logins are independent; cap concurrency to keep the load on IDAM modest.
+      workers: 4
+    },
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
-      dependencies: ["setup"]
+      dependencies: ["setup-fire-fox"]
     },
-
+    {
+      name: 'setup-webkit',
+      testMatch: /user\.setups\.ts/,
+      use: { ...devices['Desktop Safari'] },
+      // Logins are independent; cap concurrency to keep the load on IDAM modest.
+      workers: 4
+    },
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
-      dependencies: ["setup"]
+      dependencies: ["setup-webkit"]
     },
   ],
 });

@@ -2413,6 +2413,13 @@
           "caseworker-employment-api"
         ],
         "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment",
+          "caseworker-employment-englandwales"
+        ],
+        "CRUD": "R"
       }
     ]
   },
@@ -2449,6 +2456,24 @@
   {
     "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "updateClaimantEmail",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "updateRespondentEmail",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "updateRespondentEmail",
+    "UserRole": "caseworker-employment-englandwales",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "updateRespondentEmail",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
   }

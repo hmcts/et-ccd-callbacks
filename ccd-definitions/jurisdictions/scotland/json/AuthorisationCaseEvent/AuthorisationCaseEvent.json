@@ -2352,6 +2352,13 @@
           "caseworker-employment-api"
         ],
         "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment",
+          "caseworker-employment-scotland"
+        ],
+        "CRUD": "R"
       }
     ]
   },
@@ -2409,6 +2416,24 @@
   {
     "CaseTypeId": "ET_Scotland",
     "CaseEventID": "updateClaimantEmail",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "updateRespondentEmail",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "updateRespondentEmail",
+    "UserRole": "caseworker-employment-scotland",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "updateRespondentEmail",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
   }

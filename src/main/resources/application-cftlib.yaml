@@ -67,3 +67,8 @@ wa:
     url: ${CASE_EVENT_HANDLER_SERVICE_URL:http://localhost:8088}
     find-problem-messages-task:
       interval: ${WA_CASE_EVENT_HANDLER_FIND_PROBLEM_MESSAGES_TASK_INTERVAL:60000}
+
+logging:
+  level:
+    root: INFO
+    uk.gov.hmcts.ethos: INFO

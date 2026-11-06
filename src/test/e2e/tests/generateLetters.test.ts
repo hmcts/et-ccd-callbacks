@@ -1,12 +1,17 @@
-import { test } from "../fixtures/common.fixture";
-import dateUtilComponent from '../data-utils/DateUtilComponent';
-import { CaseTypeLocation, Events } from '../config/case-data';
-import { CaseworkerCaseFactory } from '../data-utils/factory/exui/CaseworkerCaseFactory.ts';
-import letterPageData from '../resources/payload/letter-content.json';
-import { users } from '../config/config.dynamic.ts';
+import { test } from "../fixtures/et.test.fixture.ts";
+import {
+  CaseTypeLocation,
+  CaseworkerCaseFactory,
+  DateUtilComponent,
+  Events,
+  resolveResourceJson,
+  users
+} from "@hmcts/et-shared-test-library";
 
 let caseNumber: string;
 let caseId: string;
+const letterPageData = resolveResourceJson('resources/payload/letter-content.json');
+
 test.describe('Generate Letters', () => {
   test.use({
     storageState: users.etCaseWorker.sessionFile,
@@ -27,11 +32,22 @@ test.describe('Generate Letters', () => {
       await caseDetailsPage.selectNextEvent(Events.letters);
       await lettersPage.generateShortTrackLetter();
 
-      await caseListPage.verifyCaseDetailsOnTab(letterPageData.claimLabel, dateUtilComponent.formatTodaysDate(new Date()));
-      await caseListPage.verifyCaseDetailsOnTab(letterPageData.et3DueDateLabel, dateUtilComponent.addDaysAndMonths(28));
-
-      await caseDetailsPage.navigateToTab("BF Actions");
-      await caseListPage.verifyBFActionsTab('Description', 'Other action');
+      await caseDetailsPage.assertTabData([
+        {
+          tabName: 'Case Details',
+          tabContent:[
+            { tabItem: letterPageData.claimLabel, value: DateUtilComponent.formatTodaysDate(new Date()) },
+            { tabItem: letterPageData.et3DueDateLabel, value: DateUtilComponent.addDaysAndMonths(28) }
+          ]
+        },
+        {
+          tabName: 'BF Actions',
+          tabContent: [
+            { tabItem: DateUtilComponent.addDaysAndMonths(29), value: '', clickable: true },
+            { tabItem: 'Description', value: 'Other action' },
+          ]
+        }
+      ])
 
       // RET-5793 Validate initial consideration hearing details
       await caseDetailsPage.selectNextEvent(Events.initialConsideration);

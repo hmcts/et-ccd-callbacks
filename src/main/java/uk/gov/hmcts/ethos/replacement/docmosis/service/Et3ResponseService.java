@@ -43,9 +43,12 @@ public class Et3ResponseService {
     private final DocumentManagementService documentManagementService;
     private final PdfBoxService pdfBoxService;
     private final MyHmctsService myHmctsService;
+    private final FeatureToggleService featureToggleService;
 
     @Value("${pdf.et3form}")
     private String et3FormTemplate;
+    @Value("${pdf.era.et3form}")
+    private String et3FormEraTemplate;
 
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
 
@@ -66,9 +69,9 @@ public class Et3ResponseService {
                 OrganisationAddress organisationAddress = myHmctsService.getUserOrganisationAddress(userToken);
                 representative.setRepresentativeAddress(mapOrganisationAddressToAddress(organisationAddress));
             }
-
+            String et3Form = featureToggleService.isEraOctober2026Enabled() ? et3FormEraTemplate : et3FormTemplate;
             return pdfBoxService.generatePdfDocumentInfo(
-                    caseData, userToken, caseTypeId, ET3_RESPONSE_PDF_FILE_NAME, et3FormTemplate, event);
+                    caseData, userToken, caseTypeId, ET3_RESPONSE_PDF_FILE_NAME, et3Form, event);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }

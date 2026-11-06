@@ -636,8 +636,8 @@ public class ExcelActionsController {
             fileLocationSelectionService.initialiseFileLocation(multipleData);
         } else if (SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId)) {
             scotlandFileLocationSelectionService.initialiseFileLocation(multipleData);
-            clerkService.initialiseClerkResponsible(multipleData);
         }
+        clerkService.initialiseClerkResponsible(multipleData);
 
         return getMultipleCallbackRespEntity(Collections.emptyList(), multipleRequest.getCaseDetails());
     }

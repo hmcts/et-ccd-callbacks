@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ecm.common.service.pdf.et3;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.ecm.common.service.utils.ResourceLoader;
@@ -101,7 +102,7 @@ class ET3FormRespondentMapperTest {
         RespondentSumType respondentSumType = caseData.getRespondentCollection().stream()
                 .filter(r -> caseData.getSubmitEt3Respondent()
                         .getSelectedLabel().equals(r.getValue().getRespondentName()))
-                .toList().get(0).getValue();
+                .toList().getFirst().getValue();
         RespondentSumType respondentSumTypeTitleMr = cloneObject(respondentSumType, RespondentSumType.class);
         respondentSumTypeTitleMr
                 .setEt3ResponseRespondentPreferredTitle(
@@ -124,6 +125,24 @@ class ET3FormRespondentMapperTest {
                         ET3FormTestConstants.TEST_CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_OTHER);
         return Stream.of(respondentSumType, respondentSumTypeTitleMr, respondentSumTypeTitleMrs,
                 respondentSumTypeTitleMs, respondentSumTypeTitleMiss, respondentSumTypeTitleOther);
+    }
+
+    @Test
+    void testMapRespondentHearingPanelPreferences() {
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentHearingPanelPreference("Judge");
+        respondentSumType.setRespondentHearingPanelPreferenceReason("Legal arguments");
+
+        mapRespondent(respondentSumType, pdfFields);
+
+        assertThat(pdfFields.get(ET3FormConstants.CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_PANEL_JUDGE))
+                .contains(ET3FormConstants.YES_CAPITALISED);
+        assertThat(pdfFields.get(ET3FormConstants.CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_PANEL_PANEL))
+                .contains(ET3FormConstants.OFF_CAPITALISED);
+        assertThat(pdfFields.get(ET3FormConstants.CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_PANEL_NO_PREFERENCE))
+                .contains(ET3FormConstants.OFF_CAPITALISED);
+        assertThat(pdfFields.get(ET3FormConstants.TXT_PDF_RESPONDENT_FIELD_HEARING_PANEL_REASONS))
+                .contains("Legal arguments");
     }
 
 }

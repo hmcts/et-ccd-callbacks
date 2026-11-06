@@ -69,6 +69,13 @@ ccd:
   decentralised-runtime:
     cdam-attach:
       enabled: ${CCD_DECENTRALISED_RUNTIME_CDAM_ATTACH_ENABLED:true}
+    # Recorded as proxied_by on in-process system events (SystemEventExecutor), e.g. citizen notification views.
+    # The id is the IDAM user id of ET_COS_SYSTEM_USER.
+    system-user:
+      id: ${ET_COS_SYSTEM_USER_ID}
+      username: ${ET_COS_SYSTEM_USER}
+      first-name: ${ET_COS_SYSTEM_USER_FIRST_NAME:Employment Tribunals}
+      last-name: ${ET_COS_SYSTEM_USER_LAST_NAME:System}
     retain-and-dispose:
       # https://github.com/hmcts/dtsse-ccd-config-generator/blob/master/docs/retain-and-dispose.md
       mode: ${ET_RETAIN_AND_DISPOSE_MODE:off}

@@ -870,6 +870,7 @@ bootWithCCD {
     environment 'ET_COS_URL', System.getenv('ET_COS_URL') ?: 'http://localhost:8081'
     environment 'ET_COS_SYSTEM_USER', System.getenv('ET_COS_SYSTEM_USER') ?: 'admin@hmcts.net'
     environment 'ET_COS_SYSTEM_USER_PASSWORD', System.getenv('ET_COS_SYSTEM_USER_PASSWORD') ?: 'Password'
+    environment 'ET_COS_SYSTEM_USER_ID', System.getenv('ET_COS_SYSTEM_USER_ID') ?: 'et-cos-system-user'
     environment 'CFTLIB_IMPORT_CCD_DEFS_ON_BOOT', System.getenv('CFTLIB_IMPORT_CCD_DEFS_ON_BOOT') ?: 'true'
     // et-ccd-callbacks
     //environment 'SERVICEBUS_FAKE', 'true'*
@@ -907,6 +908,7 @@ cftlibTest {
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_gateway,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,ccd_case_document_am_api,am_role_assignment_service,ecm_consumer,et_cos,wa_workflow_api,wa_task_management_api,wa_task_monitor,wa_case_event_handler,em_ccd_orchestrator,em_stitching_api,wa_task_configuration_api'
     environment 'ET_COS_SYSTEM_USER', 'admin@hmcts.net'
     environment 'ET_COS_SYSTEM_USER_PASSWORD', 'password'
+    environment 'ET_COS_SYSTEM_USER_ID', 'et-cos-system-user'
     environment 'ET_RETAIN_AND_DISPOSE_MODE', 'live'
     environment 'ET_RETAIN_AND_DISPOSE_CRON', '*/2 * * * * *'
     environment 'SPRING_APPLICATION_JSON', groovy.json.JsonOutput.toJson([
@@ -943,6 +945,7 @@ tasks.named('dumpCCDDefinitions') {
     environment 'ET_COS_URL', System.getenv('ET_COS_URL') ?: 'http://localhost:8081'
     environment 'ET_COS_SYSTEM_USER', System.getenv('ET_COS_SYSTEM_USER') ?: 'admin@hmcts.net'
     environment 'ET_COS_SYSTEM_USER_PASSWORD', System.getenv('ET_COS_SYSTEM_USER_PASSWORD') ?: 'Password'
+    environment 'ET_COS_SYSTEM_USER_ID', System.getenv('ET_COS_SYSTEM_USER_ID') ?: 'et-cos-system-user'
     environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
 }
 

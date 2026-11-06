@@ -18,11 +18,14 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent;
 import uk.gov.hmcts.reform.et.syaapi.helper.CaseDetailsConverter;
+import uk.gov.hmcts.reform.et.syaapi.helper.EmployeeObjectMapper;
 import uk.gov.hmcts.reform.et.syaapi.helper.TseApplicationHelper;
 import uk.gov.hmcts.reform.et.syaapi.model.TestData;
 import uk.gov.hmcts.reform.et.syaapi.models.ChangeApplicationStatusRequest;
@@ -32,6 +35,7 @@ import uk.gov.hmcts.reform.et.syaapi.service.NotificationService.CoreEmailDetail
 import uk.gov.hmcts.reform.et.syaapi.service.pdf.PdfUploadService;
 import uk.gov.service.notify.NotificationClientException;
 
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,6 +45,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -74,6 +79,8 @@ class ApplicationServiceTest {
     private FeatureToggleService featureToggleService;
     @MockitoBean
     private PdfUploadService pdfUploadService;
+    @MockitoBean
+    private NotificationViewService notificationViewService;
 
     private final TestData testData;
 
@@ -89,6 +96,7 @@ class ApplicationServiceTest {
         caseDetailsConverter = mock(CaseDetailsConverter.class);
         featureToggleService = mock(FeatureToggleService.class);
         pdfUploadService = mock(PdfUploadService.class);
+        notificationViewService = mock(NotificationViewService.class);
 
         applicationService = new ApplicationService(
             caseService,
@@ -96,7 +104,8 @@ class ApplicationServiceTest {
             caseDocumentService,
             caseDetailsConverter,
             featureToggleService,
-            pdfUploadService);
+            pdfUploadService,
+            notificationViewService);
 
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         when(pdfUploadService.convertClaimantTseIntoMultipartFile(any(), any(), any()))
@@ -358,35 +367,51 @@ class ApplicationServiceTest {
         }
 
         @Test
-        void shouldFindAndUpdateCase() {
-            applicationService.updateTribunalResponseAsViewed(
-                TEST_SERVICE_AUTH_TOKEN,
-                testData.getResponseViewedRequest()
-            );
+        void shouldMarkTheTribunalResponseViewed() {
+            TribunalResponseViewedRequest request = testData.getResponseViewedRequest();
+            CaseData caseData = caseAsSeenByClaimant();
 
-            verify(caseDetailsConverter, times(1)).caseDataContent(
-                any(),
-                any()
-            );
-            verify(caseService, times(1)).submitUpdate(
-                any(),
-                any(),
-                any(),
-                any()
-            );
+            markViewed(request).accept(caseData);
+
+            TseRespondTypeItem response = TseApplicationHelper.findResponse(
+                TseApplicationHelper.getSelectedApplication(
+                    caseData.getGenericTseApplicationCollection(), request.getAppId()),
+                request.getResponseId());
+            assertThat(response.getValue().getViewedByClaimant()).isEqualTo(YES);
+            verify(caseService, never()).submitUpdate(any(), any(), any(), any());
         }
 
         @Test
         void shouldNotUpdateCaseAndThrowException() {
             TribunalResponseViewedRequest testRequest = testData.getResponseViewedRequest();
             testRequest.setResponseId("778");
+            Consumer<CaseData> markViewed = markViewed(testRequest);
+            CaseData caseData = caseAsSeenByClaimant();
 
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                applicationService.updateTribunalResponseAsViewed(
-                    TEST_SERVICE_AUTH_TOKEN,
-                    testRequest
-                ));
+                markViewed.accept(caseData));
             assertThat(exception.getMessage()).isEqualTo("Response id is invalid");
+        }
+
+        private Consumer<CaseData> markViewed(TribunalResponseViewedRequest request) {
+            CaseDetails expected = testData.getCaseDetailsWithData();
+            when(notificationViewService.recordViews(
+                eq(TEST_SERVICE_AUTH_TOKEN), eq(request.getCaseId()), eq(request.getCaseTypeId()), any()))
+                .thenReturn(expected);
+
+            assertThat(applicationService.updateTribunalResponseAsViewed(TEST_SERVICE_AUTH_TOKEN, request))
+                .isSameAs(expected);
+
+            ArgumentCaptor<Consumer<CaseData>> markViewed = ArgumentCaptor.captor();
+            verify(notificationViewService).recordViews(
+                eq(TEST_SERVICE_AUTH_TOKEN), eq(request.getCaseId()), eq(request.getCaseTypeId()),
+                markViewed.capture());
+            return markViewed.getValue();
+        }
+
+        private CaseData caseAsSeenByClaimant() {
+            return EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(
+                testData.getUpdateCaseEventResponse().getCaseDetails().getData());
         }
 
         @ParameterizedTest

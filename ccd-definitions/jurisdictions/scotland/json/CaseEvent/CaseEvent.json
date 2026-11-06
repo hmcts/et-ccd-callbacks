@@ -947,19 +947,6 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "ID": "UPDATE_NOTIFICATION_STATE",
-    "Name": "Respond to a notification",
-    "Description": "Respond to a notification",
-    "DisplayOrder": 71,
-    "PreConditionState(s)": "*",
-    "PostConditionState": "*",
-    "SecurityClassification": "Public",
-    "ShowEventNotes": "N",
-    "ShowSummary": "N",
-    "EventEnablingCondition": "caseType=\"dummy\""
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
     "ID": "refreshSharedUsers",
     "Name": "Refresh Shared Users",
     "Description": "Refresh Shared Users",

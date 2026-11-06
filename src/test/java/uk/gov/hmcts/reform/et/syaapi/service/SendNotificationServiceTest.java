@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.et.syaapi.helper.CaseDetailsConverter;
+import uk.gov.hmcts.reform.et.syaapi.helper.EmployeeObjectMapper;
 import uk.gov.hmcts.reform.et.syaapi.model.TestData;
 import uk.gov.hmcts.reform.et.syaapi.models.SendNotificationAddResponseRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.SendNotificationStateUpdateRequest;
@@ -28,6 +29,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
@@ -42,7 +45,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.VIEWED;
 import static uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent.UPDATE_NOTIFICATION_RESPONSE;
-import static uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent.UPDATE_NOTIFICATION_STATE;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.NO;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_SERVICE_AUTH_TOKEN;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.YES;
@@ -70,6 +72,8 @@ class SendNotificationServiceTest {
     private FeatureToggleService featureToggleService;
     @Mock
     IdamClient idamClient;
+    @Mock
+    private NotificationViewService notificationViewService;
     @InjectMocks
     private SendNotificationService sendNotificationService;
 
@@ -83,18 +87,7 @@ class SendNotificationServiceTest {
         SendNotificationStateUpdateRequest request = testData.getSendNotificationStateUpdateRequest();
 
         StartEventResponse updateCaseEventResponse = testData.getUpdateCaseEventResponseWithClaimantResponse();
-        when(caseService.startUpdate(
-            TEST_SERVICE_AUTH_TOKEN,
-            request.getCaseId(),
-            request.getCaseTypeId(),
-            UPDATE_NOTIFICATION_STATE
-        )).thenReturn(updateCaseEventResponse);
-
-        sendNotificationService.updateSendNotificationState(TEST_SERVICE_AUTH_TOKEN, request);
-
-        ArgumentCaptor<CaseData> argumentCaptor = ArgumentCaptor.forClass(CaseData.class);
-        verify(caseDetailsConverter).caseDataContent(any(), argumentCaptor.capture());
-        CaseData data = argumentCaptor.getValue();
+        CaseData data = updateSendNotificationState(request, updateCaseEventResponse);
 
         List<PseResponseTypeItem> pseResponseItems = List.of(PseResponseTypeItem.builder().id(ID).value(
             PseResponseType.builder()
@@ -142,18 +135,7 @@ class SendNotificationServiceTest {
         SendNotificationStateUpdateRequest request = testData.getSendNotificationStateUpdateRequest();
 
         StartEventResponse updateCaseEventResponse = updateCaseEventResponseNoNotificationResponses();
-        when(caseService.startUpdate(
-            TEST_SERVICE_AUTH_TOKEN,
-            request.getCaseId(),
-            request.getCaseTypeId(),
-            UPDATE_NOTIFICATION_STATE
-        )).thenReturn(updateCaseEventResponse);
-
-        sendNotificationService.updateSendNotificationState(TEST_SERVICE_AUTH_TOKEN, request);
-
-        ArgumentCaptor<CaseData> argumentCaptor = ArgumentCaptor.forClass(CaseData.class);
-        verify(caseDetailsConverter).caseDataContent(any(), argumentCaptor.capture());
-        CaseData data = argumentCaptor.getValue();
+        CaseData data = updateSendNotificationState(request, updateCaseEventResponse);
 
         List<SendNotificationTypeItem> items = List.of(
             SendNotificationTypeItem.builder()
@@ -172,18 +154,7 @@ class SendNotificationServiceTest {
         request.setSendNotificationId("222");
 
         StartEventResponse updateCaseEventResponse = updateCaseEventResponseNoNotificationResponses();
-        when(caseService.startUpdate(
-            TEST_SERVICE_AUTH_TOKEN,
-            request.getCaseId(),
-            request.getCaseTypeId(),
-            UPDATE_NOTIFICATION_STATE
-        )).thenReturn(updateCaseEventResponse);
-
-        sendNotificationService.updateSendNotificationState(TEST_SERVICE_AUTH_TOKEN, request);
-
-        ArgumentCaptor<CaseData> argumentCaptor = ArgumentCaptor.forClass(CaseData.class);
-        verify(caseDetailsConverter).caseDataContent(any(), argumentCaptor.capture());
-        CaseData data = argumentCaptor.getValue();
+        CaseData data = updateSendNotificationState(request, updateCaseEventResponse);
 
         List<SendNotificationTypeItem> items = List.of(
             SendNotificationTypeItem.builder()
@@ -201,18 +172,7 @@ class SendNotificationServiceTest {
         SendNotificationStateUpdateRequest request = testData.getSendNotificationStateUpdateRequest();
 
         StartEventResponse updateCaseEventResponse = updateCaseEventResponseSubmittedNotificationNoResponses();
-        when(caseService.startUpdate(
-            TEST_SERVICE_AUTH_TOKEN,
-            request.getCaseId(),
-            request.getCaseTypeId(),
-            UPDATE_NOTIFICATION_STATE
-        )).thenReturn(updateCaseEventResponse);
-
-        sendNotificationService.updateSendNotificationState(TEST_SERVICE_AUTH_TOKEN, request);
-
-        ArgumentCaptor<CaseData> argumentCaptor = ArgumentCaptor.forClass(CaseData.class);
-        verify(caseDetailsConverter).caseDataContent(any(), argumentCaptor.capture());
-        CaseData data = argumentCaptor.getValue();
+        CaseData data = updateSendNotificationState(request, updateCaseEventResponse);
 
         List<SendNotificationTypeItem> items = List.of(
             SendNotificationTypeItem.builder()
@@ -424,5 +384,18 @@ class SendNotificationServiceTest {
         Object notifications = startEventResponse1.getCaseDetails().getData().get("sendNotificationCollection");
         ((List<LinkedHashMap<String, LinkedHashMap<String, Object>>>) notifications).getFirst().get("value")
             .put("sendNotificationSubject", notificationSubject);
+    }
+
+    private CaseData updateSendNotificationState(SendNotificationStateUpdateRequest request,
+                                                 StartEventResponse caseAsSeenByClaimant) {
+        sendNotificationService.updateSendNotificationState(TEST_SERVICE_AUTH_TOKEN, request);
+
+        ArgumentCaptor<Consumer<CaseData>> markViewed = ArgumentCaptor.captor();
+        verify(notificationViewService).recordViews(
+            eq(TEST_SERVICE_AUTH_TOKEN), eq(request.getCaseId()), eq(request.getCaseTypeId()), markViewed.capture());
+        CaseData data = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(
+            caseAsSeenByClaimant.getCaseDetails().getData());
+        markViewed.getValue().accept(data);
+        return data;
     }
 }

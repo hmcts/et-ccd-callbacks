@@ -43,7 +43,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_DATA_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_AMEND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_PHONE_NUMBER_FORMAT_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator.INVALID_PHONE_NUMBER_UK_FORMAT_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({AmendRepresentativeContactController.class, JsonMapper.class})
@@ -53,6 +56,8 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
     private static final String ABOUT_TO_START = "/amendRepresentativeContact/aboutToStart";
     private static final String ABOUT_TO_SUBMIT = "/amendRepresentativeContact/aboutToSubmit";
     private static final String MID_EVENT = "/amendRepresentativeContact/midEvent";
+    private static final String MID_VALIDATE_PHONE_NUMBER = "/amendRepresentativeContact/midValidatePhoneNumber";
+    private static final String INVALID_PHONE_NUMBER = "Via representative";
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -236,5 +241,75 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("$.errors.size()", is(LoggerTestUtils.INTEGER_ONE)))
                 .andExpect(jsonPath("$.errors[0]", is(ERROR_CASE_DATA_NOT_FOUND)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void theAboutToSubmitRepresentativeContactDetails_WithInvalidPhoneNumber() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_AMEND);
+        caseData.setRespRepPhoneNumber(INVALID_PHONE_NUMBER);
+        mvc.perform(post(ABOUT_TO_SUBMIT)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]", is(INVALID_PHONE_NUMBER_FORMAT_MESSAGE)))
+                .andExpect(jsonPath("$.errors[1]", is(INVALID_PHONE_NUMBER_UK_FORMAT_MESSAGE)));
+        verify(amendRepresentativeContactService, never())
+                .saveStagedContactDetails(anyString(), any(CaseData.class), anyString());
+    }
+
+    @Test
+    @SneakyThrows
+    void theAboutToSubmitRepresentativeContactDetails_MyHmctsOptionIgnoresStagedPhoneNumber() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS);
+        caseData.setRespRepPhoneNumber(INVALID_PHONE_NUMBER);
+        caseData.setEt3ResponsePhone(INVALID_PHONE_NUMBER);
+        mvc.perform(post(ABOUT_TO_SUBMIT)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors.size()", is(LoggerTestUtils.INTEGER_ZERO)));
+        verify(amendRepresentativeContactService)
+                .saveStagedContactDetails(anyString(), any(CaseData.class), anyString());
+    }
+
+    @Test
+    @SneakyThrows
+    void theMidValidatePhoneNumber_WithValidPhoneNumber() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_AMEND);
+        caseData.setRespRepPhoneNumber("07700 900123");
+        caseData.setEt3ResponsePhone(INVALID_PHONE_NUMBER);
+        mvc.perform(post(MID_VALIDATE_PHONE_NUMBER)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors.size()", is(LoggerTestUtils.INTEGER_ZERO)));
+    }
+
+    @Test
+    @SneakyThrows
+    void theMidValidatePhoneNumber_WithInvalidPhoneNumber() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_AMEND);
+        caseData.setRespRepPhoneNumber(INVALID_PHONE_NUMBER);
+        mvc.perform(post(MID_VALIDATE_PHONE_NUMBER)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors[0]", is(INVALID_PHONE_NUMBER_FORMAT_MESSAGE)))
+                .andExpect(jsonPath("$.errors[1]", is(INVALID_PHONE_NUMBER_UK_FORMAT_MESSAGE)));
     }
 }

@@ -4,7 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.webjars.NotFoundException;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
@@ -390,5 +392,100 @@ public final class ClaimantRepresentativeUtils {
         RepresentedTypeC representative =  caseData.getRepresentativeClaimantType();
         caseData.setEt3ResponseAddress(representative.getRepresentativeAddress());
         caseData.setEt3ResponsePhone(representative.getRepresentativePhoneNumber());
+    }
+
+    /**
+     * Checks whether the claimant representative details required for processing are present.
+     *
+     * <p>The representative is considered complete when the representative details exist
+     * and email address are non-blank.</p>
+     *
+     * @param claimantRepresentative the claimant representative details to check
+     * @return {@code true} if the required claimant representative details are present;
+     *         {@code false} otherwise
+     */
+    public static boolean hasRequiredClaimantRepresentativeDetails(RepresentedTypeC claimantRepresentative) {
+        return ObjectUtils.isNotEmpty(claimantRepresentative)
+                && StringUtils.isNotBlank(claimantRepresentative.getRepresentativeEmailAddress());
+    }
+
+    /**
+     * Finds the first case user assignment whose user ID matches the given IDAM ID.
+     *
+     * @param caseUserAssignments the list of case user assignments to search;
+     *                            may be {@code null} or empty
+     * @param idamId the IDAM ID to match against {@link CaseUserAssignment#getUserId()}
+     * @return the first matching assignment, or {@code null} if the list is
+     *         {@code null} or empty, {@code idamId} is {@code null} or blank,
+     *         or no matching assignment is found
+     */
+    public static CaseUserAssignment findCaseUserAssignmentByIdamId(
+            List<CaseUserAssignment> caseUserAssignments, String idamId) {
+        if (CollectionUtils.isEmpty(caseUserAssignments) || StringUtils.isBlank(idamId)) {
+            return null;
+        }
+        return caseUserAssignments.stream()
+                .filter(assignment -> idamId.equals(assignment.getUserId()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Removes the first case user assignment matching the given IDAM ID and
+     * returns the first remaining assignment.
+     *
+     * <p>This method modifies the supplied list when a match is found.
+     * If no match is found, the list is left unchanged.
+     * The returned assignment may belong to the same user.
+     *
+     * @param caseUserAssignments the list of case user assignments; may be
+     *                            {@code null} or empty, but must support removal
+     *                            when a matching assignment exists
+     * @param idamId the IDAM ID to match against {@link CaseUserAssignment#getUserId()};
+     *               may be {@code null} or blank
+     * @return the first remaining assignment after removal, or {@code null}
+     *         if the list is {@code null} or empty, {@code idamId} is {@code null}
+     *         or blank, no matching assignment is found, or no assignments remain
+     * @throws UnsupportedOperationException if a matching assignment is found
+     *                                       but the list does not support removal
+     */
+    public static CaseUserAssignment removeUserAssignmentAndGetFirstRemainingAssignment(
+            List<CaseUserAssignment> caseUserAssignments, String idamId) {
+        CaseUserAssignment caseUserAssignment = findCaseUserAssignmentByIdamId(caseUserAssignments, idamId);
+        if (caseUserAssignment == null) {
+            return null;
+        }
+        caseUserAssignments.remove(caseUserAssignment);
+        return CollectionUtils.isEmpty(caseUserAssignments)
+                ? null
+                : caseUserAssignments.getFirst();
+    }
+
+    /**
+     * Checks whether the given user is the lead representative for the case.
+     *
+     * <p>The user matches if their email address matches the representative's
+     * email address, or their UID matches the representative's IDAM ID.
+     * Both values in a matching pair must be non-blank. All comparisons are
+     * case-insensitive.</p>
+     *
+     * @param userDetails the user details to check; may be {@code null}
+     * @param caseData the case data containing the claimant representative's
+     *                 details; may be {@code null}
+     * @return {@code true} if either pair of non-blank values matches;
+     *         {@code false} if the user details, case data, or claimant
+     *         representative details are {@code null}, or neither pair matches
+     */
+    public static boolean isLeadRepresentative(UserDetails userDetails, CaseData caseData) {
+        return userDetails != null
+                && caseData != null
+                && caseData.getRepresentativeClaimantType() != null
+                && (StringUtils.isNotBlank(userDetails.getEmail())
+                && StringUtils.isNotBlank(caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress())
+                && Strings.CI.equals(userDetails.getEmail(),
+                caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress())
+                || StringUtils.isNotBlank(caseData.getRepresentativeClaimantType().getIdamId())
+                && StringUtils.isNotBlank(userDetails.getUid())
+                && Strings.CI.equals(userDetails.getUid(), caseData.getRepresentativeClaimantType().getIdamId()));
     }
 }

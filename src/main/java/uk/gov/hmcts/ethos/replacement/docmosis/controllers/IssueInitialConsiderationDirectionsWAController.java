@@ -16,9 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -33,8 +31,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class IssueInitialConsiderationDirectionsWAController {
 
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
-    private final VerifyTokenService verifyTokenService;
-    private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String COMPLETE_IICD_HDR =
             "<h1>Issue Initial Consideration Directions for Work Allocation complete</h1>";
 
@@ -49,11 +45,6 @@ public class IssueInitialConsiderationDirectionsWAController {
                                                                          String userToken) {
         log.info("START OF ISSUE INITIAL CONSIDERATION DIRECTIONS FOR WORK ALLOCATION ---> {}",
                 ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         return getCallbackRespEntityNoErrors(caseData);
@@ -77,11 +68,6 @@ public class IssueInitialConsiderationDirectionsWAController {
         log.info("ISSUE INITIAL CONSIDERATION DIRECTIONS FOR WORK ALLOCATION ABOUT TO SUBMIT ---> {}",
                 ccdRequest.getCaseDetails().getCaseId());
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
@@ -98,11 +84,6 @@ public class IssueInitialConsiderationDirectionsWAController {
                                                                             String userToken) {
         log.info("Issue Initial Consideration Directions WA complete requested for case reference ---> {}",
                 ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setIcEt1VettingIssuesDetail(null);

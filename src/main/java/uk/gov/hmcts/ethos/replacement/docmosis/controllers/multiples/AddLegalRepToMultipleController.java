@@ -19,7 +19,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
 import java.io.IOException;
@@ -39,11 +38,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 public class AddLegalRepToMultipleController {
 
-    private final VerifyTokenService verifyTokenService;
     private final MultipleReferenceService multipleReferenceService;
     private final UserIdamService userService;
 
-    private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String ADD_USER_COMPLETE =
             "<h1>You have been added to the Multiple for the case: %s</h1>";
 

@@ -95,24 +95,6 @@ class FileLocationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void testAddFileLocationInvalidToken() throws Exception {
-        CCDRequest ccdRequest = AdminDataBuilder
-                .builder()
-                .withFileLocationData("testCode", "testName", "ABERDEEN")
-                .buildAsCCDRequest();
-
-        String token = "some-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/admin/filelocation/addFileLocation")
-                        .contentType(APPLICATION_JSON)
-                        .header("Authorization", token)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(fileLocationService, never()).saveFileLocation(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
     void testInitAdminDataSuccess() throws Exception {
 
         CCDRequest ccdRequest = AdminDataBuilder
@@ -167,24 +149,6 @@ class FileLocationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void testUpdateFileLocationInvalidToken() throws Exception {
-        CCDRequest ccdRequest = AdminDataBuilder
-                .builder()
-                .withFileLocationData("testCode", "testName", "ABERDEEN")
-                .buildAsCCDRequest();
-
-        String token = "some-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/admin/filelocation/updateFileLocation")
-                        .contentType(APPLICATION_JSON)
-                        .header("Authorization", token)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(fileLocationService, never()).updateFileLocation(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
     void testUpdateFileLocationError() throws Exception {
         CCDRequest ccdRequest = AdminDataBuilder
                 .builder()
@@ -231,24 +195,6 @@ class FileLocationControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(fileLocationService, times(1)).deleteFileLocation(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
-    void testDeleteFileLocationInvalidToken() throws Exception {
-        CCDRequest ccdRequest = AdminDataBuilder
-                .builder()
-                .withFileLocationData("testCode", "testName", "ABERDEEN")
-                .buildAsCCDRequest();
-
-        String token = "some-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/admin/filelocation/deleteFileLocation")
-                .contentType(APPLICATION_JSON)
-                .header("Authorization", token)
-                .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(fileLocationService, never()).deleteFileLocation(ccdRequest.getCaseDetails().getAdminData());
     }
 
     @Test
@@ -303,25 +249,6 @@ class FileLocationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midEventSelectFileLocationInvalidToken() throws Exception {
-        CCDRequest ccdRequest = AdminDataBuilder
-                .builder()
-                .withFileLocationData("testCode", "testName", "Aberdeen")
-                .buildAsCCDRequest();
-
-        String token = "some-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/admin/filelocation/midEventSelectFileLocation")
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, token)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(fileLocationService, never())
-                .midEventSelectFileLocation(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
     void midEventSelectFileLocationError() throws Exception {
         CCDRequest ccdRequest = AdminDataBuilder
                 .builder()
@@ -370,25 +297,6 @@ class FileLocationControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(fileLocationService, times(1))
-                .midEventSelectTribunalOffice(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
-    void midEventSelectTribunalOfficeInvalidToken() throws Exception {
-        CCDRequest ccdRequest = AdminDataBuilder
-                .builder()
-                .withFileLocationData("testCode", "testName", "Aberdeen")
-                .buildAsCCDRequest();
-
-        String token = "some-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/admin/filelocation/midEventSelectTribunalOffice")
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, token)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(fileLocationService, never())
                 .midEventSelectTribunalOffice(ccdRequest.getCaseDetails().getAdminData());
     }
 

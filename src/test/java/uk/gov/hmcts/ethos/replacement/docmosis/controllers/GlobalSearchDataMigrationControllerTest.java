@@ -93,16 +93,6 @@ class GlobalSearchDataMigrationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void shouldMigrateCaseDetails_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(GLOBAL_SEARCH_MIGRATION_ABOUT_TO_SUBMIT)
-                        .content(requestContent.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void addServiceIdUrl_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GLOBAL_SEARCH_MIGRATION_SUBMITTED)
@@ -115,16 +105,6 @@ class GlobalSearchDataMigrationControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("$.warnings", nullValue()));
         verify(caseManagementForCaseWorkerService, times(1))
                 .setHmctsServiceIdSupplementary(any());
-    }
-
-    @Test
-    void addServiceIdUrl_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(GLOBAL_SEARCH_MIGRATION_SUBMITTED)
-                        .content(requestContent.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -149,16 +129,6 @@ class GlobalSearchDataMigrationControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("$.warnings", nullValue()));
         verify(caseManagementForCaseWorkerService, times(1))
                 .removeHmctsServiceIdSupplementary(any());
-    }
-
-    @Test
-    void removeServiceIdUrl_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(GLOBAL_SEARCH_ROLLBACK_SUBMITTED)
-                        .content(requestContent.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 
     @Test

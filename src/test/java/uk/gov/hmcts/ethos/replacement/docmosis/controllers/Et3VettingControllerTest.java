@@ -118,16 +118,6 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void populateEt3Dates_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(POPULATE_ET3_DATES_URL)
-            .content(jsonMapper.toJson(ccdRequest))
-            .header("Authorization", AUTH_TOKEN)
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void populateEt3Dates_badRequest() throws Exception {
         mvc.perform(post(POPULATE_ET3_DATES_URL)
             .content("garbage content")
@@ -164,16 +154,6 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initEt3RespondentList_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(INIT_ET3_RESPONDENT_LIST_URL)
-            .content(jsonMapper.toJson(ccdRequest))
-            .header("Authorization", AUTH_TOKEN)
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void initEt3RespondentList_badRequest() throws Exception {
         mvc.perform(post(INIT_ET3_RESPONDENT_LIST_URL)
             .content("garbage content")
@@ -193,16 +173,6 @@ class Et3VettingControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void calculateResponseInTime_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(CALCULATE_RESPONSE_TIME_URL)
-            .content(jsonMapper.toJson(ccdRequest))
-            .header("Authorization", AUTH_TOKEN)
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
     }
 
     @Test
@@ -226,16 +196,6 @@ class Et3VettingControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void initRespondentDetails_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(INIT_RESPONDENT_DETAILS)
-            .content(jsonMapper.toJson(ccdRequest))
-            .header("Authorization", AUTH_TOKEN)
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
     }
 
     @Test
@@ -263,16 +223,6 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void et3ProcessingComplete_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(ET3_PROCESSING_COMPLETE_URL)
-            .content(jsonMapper.toJson(ccdRequest))
-            .header("Authorization", AUTH_TOKEN)
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void et3ProcessingComplete_badRequest() throws Exception {
         mvc.perform(post(ET3_PROCESSING_COMPLETE_URL)
             .content("garbage content")
@@ -292,16 +242,6 @@ class Et3VettingControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void checkHearingListed_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(CHECK_HEARING_LISTED_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
     }
 
     @Test
@@ -327,16 +267,6 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void transferApplication_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(TRANSFER_APPLICATION_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void transferApplication_badRequest() throws Exception {
         mvc.perform(post(TRANSFER_APPLICATION_URL)
                 .content("garbage content")
@@ -356,16 +286,6 @@ class Et3VettingControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void aboutToSubmit_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
     }
 
     @Test

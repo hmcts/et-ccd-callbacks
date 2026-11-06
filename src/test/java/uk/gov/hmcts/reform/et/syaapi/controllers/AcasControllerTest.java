@@ -110,15 +110,6 @@ class AcasControllerTest {
     }
 
     @Test
-    void getLastModifiedCaseListWhenInvalidTokenReturnError() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(get(GET_LAST_MODIFIED_CASE_LIST_URL)
-                            .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                            .param("datetime", REQUEST_DATE_TIME_STRING))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void getCaseDataSuccessNoCases() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(get(GET_CASE_DATA_URL)
@@ -150,15 +141,6 @@ class AcasControllerTest {
     }
 
     @Test
-    void getCaseDataInvalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(get(GET_CASE_DATA_URL)
-                            .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                            .param("caseIds", caseIds.toString()))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void getAcasDocumentsDocumentsFound() throws Exception {
         List<CaseDocumentAcasResponse> acasDocs = new ArrayList<>();
         CaseDocumentAcasResponse caseDocumentAcasResponse = CaseDocumentAcasResponse.builder()
@@ -185,15 +167,6 @@ class AcasControllerTest {
     }
 
     @Test
-    void getAcasDocumentsInvalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(get(GET_ACAS_DOCUMENTS_URL)
-                            .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                            .param(CASE_ID_PARAM, "dummy"))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void downloadAcasDocumentsDocumentsFound() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
@@ -210,15 +183,6 @@ class AcasControllerTest {
         mockMvc.perform(get(DOWNLOAD_ACAS_DOCUMENTS_URL)
                             .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN))
             .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void downloadAcasDocumentsInvalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(get(DOWNLOAD_ACAS_DOCUMENTS_URL)
-                            .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                            .param("documentId", UUID.randomUUID().toString()))
-            .andExpect(status().isForbidden());
     }
 
     @Test

@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService;
 
 import java.util.List;
@@ -29,7 +27,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 public class CourtWorkerController {
 
-    private final VerifyTokenService verifyTokenService;
     private final CourtWorkerService courtWorkerService;
 
     @PostMapping(value = "/initAddCourtWorker", consumes = APPLICATION_JSON_VALUE)
@@ -44,10 +41,6 @@ public class CourtWorkerController {
             @RequestBody CCDRequest ccdRequest) {
 
         log.info("/initAddCourtWorker");
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         courtWorkerService.initAddCourtWorker(adminData);
@@ -68,10 +61,6 @@ public class CourtWorkerController {
 
         log.info("/addCourtWorker");
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
-
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = courtWorkerService.addCourtWorker(adminData);
 
@@ -89,10 +78,6 @@ public class CourtWorkerController {
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
-
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = courtWorkerService.getCourtWorkerMidEventSelectOffice(adminData);
 
@@ -109,10 +94,6 @@ public class CourtWorkerController {
     public ResponseEntity<CCDCallbackResponse> updateCourtWorkerMidEventSelectCourtWorker(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = courtWorkerService.getCourtWorkerMidEventSelectCourtWorker(adminData);
@@ -132,10 +113,6 @@ public class CourtWorkerController {
             @RequestBody CCDRequest ccdRequest) {
 
         log.info("/updateCourtWorker");
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = courtWorkerService.updateCourtWorker(adminData);
@@ -173,10 +150,6 @@ public class CourtWorkerController {
             @RequestBody CCDRequest ccdRequest) {
 
         log.info("/deleteCourtWorker");
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = courtWorkerService.deleteCourtWorker(adminData);

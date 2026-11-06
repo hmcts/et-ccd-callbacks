@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,23 +15,17 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 /**
  * REST controller for the HearingUnavailability event.
  */
-@Slf4j
 @RequestMapping("/hearingUnavailability")
 @RestController
 @RequiredArgsConstructor
 public class HearingUnavailabilityController {
-
-    private static final String INVALID_TOKEN = "Invalid Token {}";
-    private final VerifyTokenService verifyTokenService;
 
     /**
      * Hearing Unavailability about to submit.
@@ -54,11 +47,6 @@ public class HearingUnavailabilityController {
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setPartySelection(null);
@@ -82,11 +70,6 @@ public class HearingUnavailabilityController {
     public ResponseEntity<CCDCallbackResponse> submitted(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         String header = "<h1>Unavailability dates added</h1>";
 

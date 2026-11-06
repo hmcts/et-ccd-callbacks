@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,25 +16,20 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.TseViewApplicationHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.applications.TseService;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 /**
  * REST controller for the "View open or closed applications" event.
  */
-@Slf4j
 @RequestMapping("/viewRespondentTSEApplications")
 @RestController
 @RequiredArgsConstructor
 public class TseViewApplicationsController {
 
-    private final VerifyTokenService verifyTokenService;
     private final TseService tseService;
-    private static final String INVALID_TOKEN = "Invalid Token {}";
     
     /**
      * Resets the dynamic list for select an application to view either an open or closed application.
@@ -59,10 +53,6 @@ public class TseViewApplicationsController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setTseViewApplicationSelect(null);
         return getCallbackRespEntityNoErrors(caseData);
@@ -93,11 +83,6 @@ public class TseViewApplicationsController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setTseViewApplicationSelect(
                 TseViewApplicationHelper.populateOpenOrClosedApplications(caseData, false));
@@ -118,10 +103,6 @@ public class TseViewApplicationsController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setTseApplicationSummaryAndResponsesMarkup(
             tseService.formatViewApplication(caseData, userToken, true)

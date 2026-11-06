@@ -223,56 +223,6 @@ class MultipleDocGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void printScheduleForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(PRINT_SCHEDULE_URL)
-                .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void printLetterForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(PRINT_LETTER_URL)
-                .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void printDocumentConfirmationForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(PRINT_DOCUMENT_CONFIRMATION_URL)
-                .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void midSelectedAddressLabelsMultipleForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(MID_SELECTED_ADDRESS_LABELS_MULTIPLE_URL)
-                .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void midValidateAddressLabelsMultipleForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(MID_VALIDATE_ADDRESS_LABELS_MULTIPLE_URL)
-                .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void dynamicMultipleLetters() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_MULTIPLE_LETTERS)
@@ -283,15 +233,5 @@ class MultipleDocGenerationControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void dynamicMultipleLettersForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DYNAMIC_MULTIPLE_LETTERS)
-                .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 }

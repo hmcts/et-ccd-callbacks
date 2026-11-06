@@ -75,14 +75,4 @@ class PreAcceptanceCaseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
-
-    @Test
-    void preAcceptanceCaseAboutToSubmitTokenFailed() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(ABOUT_TO_SUBMIT)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
 }

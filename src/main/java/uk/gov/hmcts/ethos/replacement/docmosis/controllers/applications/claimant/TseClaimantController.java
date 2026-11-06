@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,25 +15,20 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.applications.TseService;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
 
-@Slf4j
 @RestController
 @RequestMapping("/tseClaimant")
 @RequiredArgsConstructor
 public class TseClaimantController {
 
-    private final VerifyTokenService verifyTokenService;
     private final TseService tseService;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
-    private static final String INVALID_TOKEN = "Invalid Token {}";
 
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
@@ -49,11 +43,6 @@ public class TseClaimantController {
     public ResponseEntity<CCDCallbackResponse> aboutToSubmitRespondentTSE(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
 
         if (caseDetails.getCaseData().getClaimantTse() != null) {

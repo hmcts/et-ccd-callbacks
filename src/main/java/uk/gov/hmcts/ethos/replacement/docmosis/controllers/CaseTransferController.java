@@ -21,7 +21,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferDifferentCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferOfficeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferSameCountryService;
@@ -30,7 +29,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransfer
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
@@ -41,9 +39,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class CaseTransferController {
 
     private static final String LOG_MESSAGE = "{} received notification request for case reference : {}";
-    private static final String INVALID_TOKEN = "Invalid Token {}";
 
-    private final VerifyTokenService verifyTokenService;
     private final CaseTransferSameCountryService caseTransferSameCountryService;
     private final CaseTransferDifferentCountryService caseTransferDifferentCountryService;
     private final CaseTransferToEcmService caseTransferToEcmService;
@@ -51,14 +47,12 @@ public class CaseTransferController {
     private final CaseManagementLocationService caseManagementLocationService;
     private final FeatureToggleService featureToggleService;
 
-    public CaseTransferController(VerifyTokenService verifyTokenService,
-                                  CaseTransferSameCountryService caseTransferSameCountryService,
+    public CaseTransferController(CaseTransferSameCountryService caseTransferSameCountryService,
                                   CaseTransferDifferentCountryService caseTransferDifferentCountryService,
                                   CaseTransferToEcmService caseTransferToEcmService,
                                   DefaultValuesReaderService defaultValuesReaderService,
                                   CaseManagementLocationService caseManagementLocationService,
                                   FeatureToggleService featureToggleService) {
-        this.verifyTokenService = verifyTokenService;
         this.caseTransferSameCountryService = caseTransferSameCountryService;
         this.caseTransferDifferentCountryService = caseTransferDifferentCountryService;
         this.caseTransferToEcmService = caseTransferToEcmService;
@@ -82,11 +76,6 @@ public class CaseTransferController {
             @RequestHeader("Authorization") String userToken) {
         log.info(LOG_MESSAGE, "CASE TRANSFER INIT TRANSFER TO SCOTLAND ---> ", ccdRequest.getCaseDetails().getCaseId());
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         CaseTransferOfficeService.populateTransferToScotlandOfficeOptions(caseData);
 
@@ -109,11 +98,6 @@ public class CaseTransferController {
         log.info(LOG_MESSAGE, "CASE TRANSFER INIT TRANSFER TO ENGLAND/WALES---> ",
                 ccdRequest.getCaseDetails().getCaseId());
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         CaseTransferOfficeService.populateTransferToEnglandWalesOfficeOptions(caseData);
 
@@ -134,11 +118,6 @@ public class CaseTransferController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
         log.info(LOG_MESSAGE, "CASE TRANSFER SAME COUNTRY ---> ", ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         List<String> errors = caseTransferSameCountryService.transferCase(ccdRequest.getCaseDetails(), userToken);
         ccdRequest.getCaseDetails().getCaseData().setSuggestedHearingVenues(null);
@@ -167,11 +146,6 @@ public class CaseTransferController {
         log.info(LOG_MESSAGE, "CASE TRANSFER SAME COUNTRY ECC LINKED CASE ---> ",
                 ccdRequest.getCaseDetails().getCaseId());
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         List<String> errors = caseTransferSameCountryService.updateEccLinkedCase(ccdRequest.getCaseDetails(),
             userToken);
         ccdRequest.getCaseDetails().getCaseData().setSuggestedHearingVenues(null);
@@ -194,11 +168,6 @@ public class CaseTransferController {
             @RequestHeader("Authorization") String userToken) {
         log.info(LOG_MESSAGE, "CASE TRANSFER DIFFERENT COUNTRY ---> ", ccdRequest.getCaseDetails().getCaseId());
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         List<String> errors = caseTransferDifferentCountryService.transferCase(ccdRequest.getCaseDetails(), userToken);
         ccdRequest.getCaseDetails().getCaseData().setSuggestedHearingVenues(null);
 
@@ -219,11 +188,6 @@ public class CaseTransferController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         List<String> errors = caseTransferToEcmService.createCaseTransferToEcm(ccdRequest.getCaseDetails(), userToken);
 
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
@@ -238,11 +202,6 @@ public class CaseTransferController {
     public ResponseEntity<CCDCallbackResponse> assignCase(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData =  ccdRequest.getCaseDetails().getCaseData();
         CaseTransferUtils.setCaseManagingOffice(caseData, ccdRequest.getCaseDetails().getCaseTypeId());

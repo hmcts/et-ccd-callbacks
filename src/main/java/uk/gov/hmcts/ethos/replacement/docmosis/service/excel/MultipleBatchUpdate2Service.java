@@ -410,7 +410,7 @@ public class MultipleBatchUpdate2Service {
                 throw new CaseCreationException(errorMessage);
             }
 
-            log.info("Http status received from CCD removeUserFromMultiple API; {}", response.getStatusCodeValue());
+            log.info("Http status received from CCD removeUserFromMultiple API; {}", response.getStatusCode().value());
         } catch (IOException | RestClientResponseException e) {
             throw (CaseCreationException)
                     new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage())).initCause(e);

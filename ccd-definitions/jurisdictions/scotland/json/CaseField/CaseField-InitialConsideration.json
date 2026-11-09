@@ -465,7 +465,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "ID": "etICHearingNotListedReferVP",
-    "Label": "Refer to VP as suitable for Judicial Mediation?",
+    "Label": "Is the case suitable now for judicial mediation?",
     "FieldType": "YesOrNo",
     "SecurityClassification": "Public",
     "Searchable": "N"
@@ -473,7 +473,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "ID": "etICHearingNotListedReferVPFurtherDetails",
-    "Label": "Further details",
+    "Label": "If yes, what is the estimated number of hearing days (including preliminary hearings)?",
     "FieldType": "Text",
     "SecurityClassification": "Public",
     "Searchable": "N"
@@ -481,7 +481,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "ID": "etICHearingListedReferVP",
-    "Label": "Refer to VP as suitable for Judicial Mediation?",
+    "Label": "Is the case suitable now for judicial mediation?",
     "FieldType": "YesOrNo",
     "SecurityClassification": "Public",
     "Searchable": "N"
@@ -489,7 +489,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "ID": "etICHearingListedReferVPFurtherDetails",
-    "Label": "Further details",
+    "Label": "If yes, what is the estimated number of hearing days (including preliminary hearings)?",
     "FieldType": "Text",
     "SecurityClassification": "Public",
     "Searchable": "N"

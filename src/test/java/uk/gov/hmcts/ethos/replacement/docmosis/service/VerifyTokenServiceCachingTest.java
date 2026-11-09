@@ -21,6 +21,7 @@ import java.util.Deque;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Checks that IDAM's signing keys are cached rather than fetched for every token.
@@ -76,6 +77,31 @@ class VerifyTokenServiceCachingTest {
         jwkSetSource.failWith(new KeySourceException("IDAM unavailable"));
 
         assertThat(verifyTokenService.verifyTokenSignature(bearerToken(currentKey))).isFalse();
+    }
+
+    @Test
+    void rejectsTokenWithoutKeyIdWithoutFetchingKeySet() throws JOSEException {
+        jwkSetSource.respondWith(new JWKSet(currentKey.toPublicJWK()));
+        SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.RS256),
+            new JWTClaimsSet.Builder().subject("user").build());
+        jwt.sign(new RSASSASigner(currentKey));
+
+        assertThat(verifyTokenService.verifyTokenSignature("Bearer " + jwt.serialize())).isFalse();
+        assertThat(jwkSetSource.calls).isZero();
+    }
+
+    @Test
+    void rejectsTokenWhoseKeyIdIsNotPublished() throws JOSEException {
+        jwkSetSource.respondWith(new JWKSet(currentKey.toPublicJWK()));
+
+        assertThat(verifyTokenService.verifyTokenSignature(bearerToken(rotatedKey))).isFalse();
+    }
+
+    @Test
+    void rejectsInvalidJwksUrl() {
+        assertThatThrownBy(() -> new VerifyTokenService("not a url"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Invalid IDAM JWKS URL");
     }
 
     private static String bearerToken(RSAKey signingKey) throws JOSEException {

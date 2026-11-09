@@ -43,6 +43,9 @@ jobs:
           cache: npm
       # Install npm dependencies
 
+      - name: build shared library
+        run: npm run build:shared
+
       - name: Install dependencies
         run: npm install --legacy-peer-deps --ignore-scripts
 

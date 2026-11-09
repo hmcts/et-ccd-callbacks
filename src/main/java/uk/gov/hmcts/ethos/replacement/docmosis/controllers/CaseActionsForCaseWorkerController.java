@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +19,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
@@ -40,18 +38,16 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmploymentRightsActService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.PostDefaultValuesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 
@@ -61,13 +57,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
-import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper.buildFlagsImageFileName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.removeSpacesFromPartyNames;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.updatePositionTypeToClosed;
@@ -81,20 +75,15 @@ public class CaseActionsForCaseWorkerController {
     private static final String TWO_HUNDRED = "200";
     private static final String FOUR_HUNDRED = "400";
     private static final String FIVE_HUNDRED = "500";
-    private static final String SUBMIT_CASE_DRAFT = "SUBMIT_CASE_DRAFT";
     public static final String ACCESSED_SUCCESSFULLY = "Accessed successfully";
     public static final String BAD_REQUEST = "Bad Request";
     public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
-    public static final String CREATE_ECM_CASE = "createEcmCase";
-    private static final List<String> SUBMISSION_EVENTS = List.of(SUBMIT_CASE_DRAFT, "initiateCase", "submitEt1Draft",
-            CREATE_ECM_CASE);
 
     private final CaseCloseValidator caseCloseValidator;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private final ConciliationTrackService conciliationTrackService;
     private final DefaultValuesReaderService defaultValuesReaderService;
     private final FixCaseApiService fixCaseApiService;
-    private final SingleReferenceService singleReferenceService;
     private final EventValidationService eventValidationService;
     private final SingleCaseMultipleMidEventValidationService singleCaseMultipleMidEventValidationService;
     private final AddSingleCaseToMultipleService addSingleCaseToMultipleService;
@@ -104,15 +93,14 @@ public class CaseActionsForCaseWorkerController {
     private final DepositOrderValidationService depositOrderValidationService;
     private final JudgmentValidationService judgmentValidationService;
     private final Et1VettingService et1VettingService;
-    private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
     private final FeatureToggleService featureToggleService;
     private final CaseFlagsService caseFlagsService;
     private final CaseManagementLocationService caseManagementLocationService;
-    private final Et1SubmissionService et1SubmissionService;
     private final NocRespondentHelper nocRespondentHelper;
     private final EmploymentRightsActService employmentRightsActService;
     private final ClaimantEmailService claimantEmailService;
     private final RespondentEmailService respondentEmailService;
+    private final PostDefaultValuesService postDefaultValuesService;
 
     @PostMapping(value = "/preDefaultValues", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update pre default values in a case.")
@@ -150,58 +138,8 @@ public class CaseActionsForCaseWorkerController {
             @RequestHeader(AUTHORIZATION) String userToken) {
         log.info("POST DEFAULT VALUES ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
-        CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        CaseData caseData = caseDetails.getCaseData();
-        List<String> errors = getValidationDate(ccdRequest.getEventId(), caseDetails);
-
-        if (errors.isEmpty()) {
-            employmentRightsActService.setEraFlagByReceiptDate(caseData);
-            defaultValuesReaderService.setSubmissionReference(caseDetails);
-            DefaultValues defaultValues = getPostDefaultValues(caseDetails);
-            defaultValuesReaderService.setCaseData(caseData, defaultValues);
-            caseManagementForCaseWorkerService.caseDataDefaults(caseData);
-            generateEthosCaseReference(caseData, ccdRequest);
-            buildFlagsImageFileName(ccdRequest.getCaseDetails());
-            caseData.setMultipleFlag(caseData.getEcmCaseType() != null
-                    && Constants.MULTIPLE_CASE_TYPE.equals(caseData.getEcmCaseType()) ? Constants.YES : Constants.NO);
-            caseData.setChangeOrganisationRequestField(null);
-            UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
-            UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
-            DocumentHelper.setDocumentNumbers(caseData);
-            //create NOC answers section only on case submission events
-            if (SUBMISSION_EVENTS.contains(defaultIfEmpty(ccdRequest.getEventId(), EMPTY_STRING))) {
-                caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
-            }
-            defaultValuesReaderService.setPositionAndOffice(caseDetails.getCaseTypeId(), caseData);
-
-            if (caseFlagsService.caseFlagsSetupRequired(caseData)) {
-                caseFlagsService.setupCaseFlags(caseData);
-            }
-
-            boolean hmcToggle = featureToggleService.isHmcEnabled();
-            log.info("HMC feature flag is {}", hmcToggle);
-            if (hmcToggle) {
-                caseManagementForCaseWorkerService.setPublicCaseName(caseData);
-                caseManagementLocationService.setCaseManagementLocationCode(caseData);
-            }
-
-            if (featureToggleService.citizenEt1Generation() && SUBMIT_CASE_DRAFT.equals(ccdRequest.getEventId())) {
-                caseDetails.setCaseData(caseData);
-                et1SubmissionService.createAndUploadEt1Docs(caseDetails, userToken);
-                et1SubmissionService.vexationCheck(caseDetails, userToken);
-            }
-        }
-
-        log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),
-                caseData.getEthosCaseReference());
-        return getCallbackRespEntityErrors(errors, caseData);
-    }
-
-    private List<String> getValidationDate(String eventId, CaseDetails caseDetails) {
-        if (!CREATE_ECM_CASE.equals(eventId)) {
-            return eventValidationService.validateReceiptDate(caseDetails);
-        }
-        return new ArrayList<>();
+        List<String> errors = postDefaultValuesService.applyPostDefaultValues(ccdRequest, userToken);
+        return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
     @PostMapping(value = "/addServiceId", consumes = APPLICATION_JSON_VALUE)
@@ -961,11 +899,4 @@ public class CaseActionsForCaseWorkerController {
         return defaultValuesReaderService.getDefaultValues(caseDetails.getCaseData().getManagingOffice());
     }
 
-    private void generateEthosCaseReference(CaseData caseData, CCDRequest ccdRequest) {
-        if (StringUtils.isBlank(caseData.getEthosCaseReference())) {
-            String reference = singleReferenceService.createReference(ccdRequest.getCaseDetails().getCaseTypeId());
-            log.info("Created reference {} for CCD case {}", reference, ccdRequest.getCaseDetails().getCaseId());
-            caseData.setEthosCaseReference(reference);
-        }
-    }
 }

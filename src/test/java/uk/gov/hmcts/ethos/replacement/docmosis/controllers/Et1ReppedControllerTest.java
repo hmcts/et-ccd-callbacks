@@ -41,6 +41,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.PostDefaultValuesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
@@ -149,7 +150,7 @@ class Et1ReppedControllerTest {
     @MockitoBean
     private Et1SubmissionService et1SubmissionService;
     @MockitoBean
-    private CaseActionsForCaseWorkerController caseActionsForCaseWorkerController;
+    private PostDefaultValuesService postDefaultValuesService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired

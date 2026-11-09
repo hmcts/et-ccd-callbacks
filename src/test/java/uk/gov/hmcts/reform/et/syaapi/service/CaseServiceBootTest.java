@@ -4,9 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration;
-import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -35,10 +32,10 @@ import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_SER
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.USER_ID;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = CaseService.class, properties = "spring.flyway.enabled=false")
-@EnableAutoConfiguration(exclude = {
-        FlywayAutoConfiguration.class,
-        DataSourceAutoConfiguration.class
+@SpringBootTest(classes = CaseService.class, properties = {
+    "spring.flyway.enabled=false",
+    "spring.autoconfigure.exclude=org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration,"
+        + "org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration"
 })
 class CaseServiceBootTest {
     @Autowired

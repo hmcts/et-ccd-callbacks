@@ -1,4 +1,8 @@
 spring:
+  http:
+    converters:
+      # mirrors src/main/resources/application.yaml
+      preferred-json-mapper: jackson2
   datasource:
     password: ${DB_PASSWORD}
     url: ${DB_URL}

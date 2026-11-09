@@ -65,7 +65,6 @@ public class PreHearingDepositController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<PreHearingDepositCallbackResponse> createPHRDeposit(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody PreHearingDepositRequest ccdRequest) {
         PreHearingDepositData preHearingDepositData = ccdRequest.getCaseDetails().getCaseData();
         return PreHearingDepositCallbackResponse.getCallbackRespEntityNoErrors(preHearingDepositData);

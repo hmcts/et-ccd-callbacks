@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -40,9 +39,7 @@ public class IssueInitialConsiderationDirectionsWAController {
         @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public ResponseEntity<CCDCallbackResponse> startInitialConsideration(@RequestBody CCDRequest ccdRequest,
-                                                                         @RequestHeader("Authorization")
-                                                                         String userToken) {
+    public ResponseEntity<CCDCallbackResponse> startInitialConsideration(@RequestBody CCDRequest ccdRequest) {
         log.info("START OF ISSUE INITIAL CONSIDERATION DIRECTIONS FOR WORK ALLOCATION ---> {}",
                 ccdRequest.getCaseDetails().getCaseId());
 
@@ -53,7 +50,6 @@ public class IssueInitialConsiderationDirectionsWAController {
     /**
      * About to Submit callback.
      * @param ccdRequest Holds the request and case data
-     * @param userToken Used for authorisation
      * @return caseData in ccdRequest
      */
     @PostMapping(value = "/submitIssueInitialConsiderationDirectionsWA", consumes = APPLICATION_JSON_VALUE)
@@ -62,9 +58,7 @@ public class IssueInitialConsiderationDirectionsWAController {
         @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public ResponseEntity<CCDCallbackResponse> submitInitialConsideration(@RequestBody CCDRequest ccdRequest,
-                                                                          @RequestHeader("Authorization")
-                                                                                  String userToken) {
+    public ResponseEntity<CCDCallbackResponse> submitInitialConsideration(@RequestBody CCDRequest ccdRequest) {
         log.info("ISSUE INITIAL CONSIDERATION DIRECTIONS FOR WORK ALLOCATION ABOUT TO SUBMIT ---> {}",
                 ccdRequest.getCaseDetails().getCaseId());
 
@@ -79,9 +73,7 @@ public class IssueInitialConsiderationDirectionsWAController {
         @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public ResponseEntity<CCDCallbackResponse> completeInitialConsideration(@RequestBody CCDRequest ccdRequest,
-                                                                            @RequestHeader("Authorization")
-                                                                            String userToken) {
+    public ResponseEntity<CCDCallbackResponse> completeInitialConsideration(@RequestBody CCDRequest ccdRequest) {
         log.info("Issue Initial Consideration Directions WA complete requested for case reference ---> {}",
                 ccdRequest.getCaseDetails().getCaseId());
 

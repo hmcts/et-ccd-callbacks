@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
@@ -48,7 +47,6 @@ public class FileLocationController {
      * Initializes AdminData to null values to not show any existing values for
      * both the creation and update of file locations.
      *
-     * @param  userToken        Used for authorization
      *
      * @param ccdRequest        AdminData which is a generic data type for most of the
      *                          methods which holds file location code, file location name
@@ -68,7 +66,6 @@ public class FileLocationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> initAdminData(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         fileLocationService.initAdminData(adminData);
@@ -84,7 +81,6 @@ public class FileLocationController {
      * One for the same file location code and Tribunal office
      * and one for the same file location name and Tribunal office
      *
-     * @param  userToken        Used for authorisation
      *
      * @param ccdRequest        AdminData which is a generic data type for most of the
      *                          methods which holds file location code, file location name
@@ -103,7 +99,6 @@ public class FileLocationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> addFileLocation(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
@@ -125,7 +120,6 @@ public class FileLocationController {
      * ERROR_FILE_LOCATION_NOT_FOUND_BY_TRIBUNAL_OFFICE defined as
      * "There is not any file location found in the %s office"
      *
-     * @param  userToken        Used for authorisation
      *
      * @param ccdRequest        AdminData which is a generic data type for most of the
      *                          methods which holds file location code, file location name
@@ -141,7 +135,6 @@ public class FileLocationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> midEventSelectTribunalOffice(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
@@ -159,7 +152,6 @@ public class FileLocationController {
      * ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE defined as
      * "There is not any file location found with the %s location code"
      *
-     * @param  userToken        Used for authorisation
      *
      * @param ccdRequest        AdminData which is a generic data type for most of the
      *                          methods which holds file location code, file location name
@@ -175,7 +167,6 @@ public class FileLocationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> midEventSelectFileLocation(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
@@ -194,7 +185,6 @@ public class FileLocationController {
      * ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE defined as
      * "There is not any file location found with the %s location code"
      *
-     * @param  userToken        Used for authorisation
      *
      * @param ccdRequest        AdminData which is a generic data type for most of the
      *                          methods which holds file location code, file location name
@@ -210,7 +200,6 @@ public class FileLocationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> updateFileLocation(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
@@ -229,7 +218,6 @@ public class FileLocationController {
      * ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE defined as
      * "There is not any file location found with the %s location code"
      *
-     * @param  userToken        Used for authorisation
      *
      * @param ccdRequest        AdminData which is a generic data type for most of the
      *                          methods which holds file location code, file location name
@@ -245,7 +233,6 @@ public class FileLocationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> deleteFileLocation(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();

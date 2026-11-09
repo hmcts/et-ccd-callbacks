@@ -165,8 +165,7 @@ public class ExcelActionsController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> amendMultipleAPI(
-            @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody MultipleRequest multipleRequest) {
         log.info("AMEND MULTIPLE API" + LOG_MESSAGE, multipleRequest.getCaseDetails().getCaseId());
 
         MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
@@ -334,8 +333,7 @@ public class ExcelActionsController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> subMultipleMidEventValidation(
-            @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody MultipleRequest multipleRequest) {
         log.info("SUB MULTIPLE MID EVENT VALIDATION" + LOG_MESSAGE, multipleRequest.getCaseDetails().getCaseId());
 
         List<String> errors = new ArrayList<>();
@@ -485,8 +483,7 @@ public class ExcelActionsController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> multipleMidBatch1Validation(
-            @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody MultipleRequest multipleRequest) {
         log.info("MULTIPLE MID BATCH 1 VALIDATION" + LOG_MESSAGE, multipleRequest.getCaseDetails().getCaseId());
 
         MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
@@ -507,8 +504,7 @@ public class ExcelActionsController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<ListingCallbackResponse> listingsDateRangeMidEventValidation(
-            @RequestBody ListingRequest listingRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody ListingRequest listingRequest) {
         log.info("LISTING DATE RANGE VALIDATION" + LOG_MESSAGE, listingRequest.getCaseDetails().getCaseId());
 
         ListingData caseData = listingRequest.getCaseDetails().getCaseData();
@@ -529,8 +525,7 @@ public class ExcelActionsController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> initialiseCloseMultiple(
-            @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody MultipleRequest multipleRequest) {
         String caseTypeId = multipleRequest.getCaseDetails().getCaseTypeId();
         MultipleData multipleData = multipleRequest.getCaseDetails().getCaseData();
         if (ENGLANDWALES_BULK_CASE_TYPE_ID.equals(caseTypeId)) {
@@ -586,8 +581,7 @@ public class ExcelActionsController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> updatePayloadMultiple(
-            @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody MultipleRequest multipleRequest) {
         log.info("UPDATE PAYLOAD MULTIPLE" + LOG_MESSAGE, multipleRequest.getCaseDetails().getCaseId());
 
         MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
@@ -637,8 +631,7 @@ public class ExcelActionsController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> dynamicListOfficesMultiple(
-            @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody MultipleRequest multipleRequest) {
         log.info("DYNAMIC LIST OFFICES MULTIPLE" + LOG_MESSAGE, multipleRequest.getCaseDetails().getCaseId());
 
         MultipleData multipleData = multipleRequest.getCaseDetails().getCaseData();

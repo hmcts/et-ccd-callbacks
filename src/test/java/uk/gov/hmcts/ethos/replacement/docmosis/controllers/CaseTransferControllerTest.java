@@ -396,7 +396,7 @@ class CaseTransferControllerTest extends BaseControllerTest {
                 defaultValuesReaderService, caseManagementLocationServiceMock, featureToggleServiceMock);
 
         // Act
-        ResponseEntity<?> response = controller.assignCase(ccdRequest, "token");
+        ResponseEntity<?> response = controller.assignCase(ccdRequest);
 
         // Assert
         assertEquals(200, response.getStatusCode().value());

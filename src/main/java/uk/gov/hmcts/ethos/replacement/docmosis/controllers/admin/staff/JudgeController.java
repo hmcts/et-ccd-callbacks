@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
@@ -38,7 +37,6 @@ public class JudgeController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> initAddJudge(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
@@ -50,7 +48,6 @@ public class JudgeController {
     /**
      * Called when user selects "Add Judge" event and specifies tribunal office and judge details.
      * Adds a new judge with the specified judge details into the ethos database.
-     * @param userToken token used for authorization
      * @param ccdRequest holds the request and case data
      * @return Callback response entity with case data and errors attached, if any.
      */
@@ -62,7 +59,6 @@ public class JudgeController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> addJudge(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
@@ -78,7 +74,6 @@ public class JudgeController {
     /**
      * Called when the user select tribunal office and goes to the next step.
      * Sets the list of judge names for the selected tribunal office.
-     * @param userToken token used for authorization
      * @param ccdRequest holds the request and case data
      * @return Callback response entity with case data and errors attached, if any.
      */
@@ -90,7 +85,6 @@ public class JudgeController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> updateJudgeMidEventSelectOffice(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
@@ -102,7 +96,6 @@ public class JudgeController {
     /**
      * Called when the user selects judge name and goes to the next step.
      * Populates the details of judge for the name selected.
-     * @param userToken token used for authorization
      * @param ccdRequest holds the request and case data
      * @return Callback response entity with case data and errors attached, if any.
      */
@@ -114,7 +107,6 @@ public class JudgeController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> updateJudgeMidEventSelectJudge(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         log.info("/updateJudgeMidEventSelectJudge");
@@ -128,7 +120,6 @@ public class JudgeController {
     /**
      * Called when user selects "Update Judge" event and specifies tribunal office and judge details.
      * Updates the specified judge details in the ethos database.
-     * @param userToken token used for authorization
      * @param ccdRequest holds the request and case data
      * @return Callback response entity with case data and errors attached, if any.
      */
@@ -140,7 +131,6 @@ public class JudgeController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> updateJudge(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
@@ -152,7 +142,6 @@ public class JudgeController {
     /**
      * Called when the user select tribunal office and goes to the next step.
      * Sets the list of judge names for the selected tribunal office.
-     * @param userToken token used for authorization
      * @param ccdRequest holds the request and case data
      * @return Callback response entity with case data and errors attached, if any.
      */
@@ -164,7 +153,6 @@ public class JudgeController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> deleteJudgeMidEventSelectOffice(
-        @RequestHeader("Authorization") String userToken,
         @RequestBody CCDRequest ccdRequest) {
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
@@ -176,7 +164,6 @@ public class JudgeController {
     /**
      * Called when the user selects judge name and goes to the next step.
      * Populates the details of judge for the name selected.
-     * @param userToken token used for authorization
      * @param ccdRequest holds the request and case data
      * @return Callback response entity with case data and errors attached, if any.
      */
@@ -188,7 +175,6 @@ public class JudgeController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> deleteJudgeMidEventSelectJudge(
-        @RequestHeader("Authorization") String userToken,
         @RequestBody CCDRequest ccdRequest) {
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
@@ -200,7 +186,6 @@ public class JudgeController {
     /**
      * Called when user selects "Delete Judge" event and specifies tribunal office and judge name.
      * Deletes the specified judge from database.
-     * @param userToken token used for authorization
      * @param ccdRequest holds the request and case data
      * @return Callback response entity with case data and errors attached, if any.
      */
@@ -212,7 +197,6 @@ public class JudgeController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> deleteJudge(
-        @RequestHeader("Authorization") String userToken,
         @RequestBody CCDRequest ccdRequest) {
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();

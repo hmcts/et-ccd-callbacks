@@ -104,8 +104,7 @@ public class MultipleDocGenerationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> printDocumentConfirmation(
-            @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody MultipleRequest multipleRequest) {
         log.info("PRINT DOCUMENT CONFIRMATION ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
 
         MultipleData multipleData = multipleRequest.getCaseDetails().getCaseData();
@@ -153,8 +152,7 @@ public class MultipleDocGenerationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> midValidateAddressLabelsMultiple(
-            @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody MultipleRequest multipleRequest) {
         log.info("MID VALIDATE ADDRESS LABELS MULTIPLE ---> "
                 + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
 

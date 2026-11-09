@@ -51,7 +51,6 @@ public class AddLegalRepToMultipleController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
     public ResponseEntity<CCDCallbackResponse> startAddLegalRepToMultiple(
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
         @RequestBody CCDRequest ccdRequest) {
 
         log.info("START OF ADD LEGAL REP TO MULTIPLE ---> {}", ccdRequest.getCaseDetails().getCaseId());
@@ -96,7 +95,6 @@ public class AddLegalRepToMultipleController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
     public ResponseEntity<CCDCallbackResponse> completeAddLegalRepToMultiple(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
             @RequestBody CCDRequest ccdRequest) {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         log.info("Issue Add Legal Rep to Multiple complete requested for case reference ---> {}",

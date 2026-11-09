@@ -67,8 +67,7 @@ public class ListingGenerationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<ListingCallbackResponse> listingCaseCreation(
-            @RequestBody ListingRequest listingRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody ListingRequest listingRequest) {
         log.info("LISTING CASE CREATION ---> " + LOG_MESSAGE + listingRequest.getCaseDetails().getCaseId());
 
         ListingData listingData = listingService.listingCaseCreation(listingRequest.getCaseDetails());
@@ -89,8 +88,7 @@ public class ListingGenerationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> listingSingleCases(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest) {
         log.info("LISTING SINGLE CASES ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         List<String> errors = new ArrayList<>();
@@ -183,8 +181,7 @@ public class ListingGenerationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> generateListingsDocSingleCasesConfirmation(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest) {
         log.info("GENERATE LISTINGS DOC SINGLE CASES CONFIRMATION ---> "
                 + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
@@ -202,8 +199,7 @@ public class ListingGenerationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<ListingCallbackResponse> initGenerateReport(
-            @RequestBody ListingRequest listingRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody ListingRequest listingRequest) {
         log.info("INIT GENERATE REPORT ---> " + LOG_MESSAGE + listingRequest.getCaseDetails().getCaseId());
 
         generateReportService.initGenerateReport(listingRequest.getCaseDetails());
@@ -337,8 +333,7 @@ public class ListingGenerationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<ListingCallbackResponse> generateHearingDocumentConfirmation(
-            @RequestBody ListingRequest listingRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody ListingRequest listingRequest) {
         log.info("GENERATE HEARING DOCUMENT CONFIRMATION ---> "
                 + LOG_MESSAGE + listingRequest.getCaseDetails().getCaseId());
 
@@ -357,8 +352,7 @@ public class ListingGenerationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> initPrintHearingLists(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest) {
         log.info("INIT PRINT HEARING LISTS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
@@ -375,8 +369,7 @@ public class ListingGenerationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<ListingCallbackResponse> dynamicListingVenue(
-            @RequestBody ListingRequest listingRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody ListingRequest listingRequest) {
         log.info("DYNAMIC LISTING VENUE LISTS ---> " + LOG_MESSAGE + listingRequest.getCaseDetails().getCaseId());
 
         String caseTypeId = listingRequest.getCaseDetails().getCaseTypeId();

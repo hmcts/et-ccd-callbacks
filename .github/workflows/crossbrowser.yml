@@ -39,15 +39,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
       # Install npm dependencies
 
       - name: build shared library
-        run: npm run build:shared
+        run: yarn run build:shared
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps --ignore-scripts
+        run: yarn install --legacy-peer-deps --ignore-scripts
 
       # Install Playwright browsers
 

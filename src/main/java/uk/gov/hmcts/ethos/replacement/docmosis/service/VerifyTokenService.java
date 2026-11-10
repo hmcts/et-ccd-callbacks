@@ -41,7 +41,6 @@ public class VerifyTokenService {
 
     private final JWSVerifierFactory jwsVerifierFactory;
     private final JWKSource<SecurityContext> jwkSource;
-    public static final String INVALID_TOKEN = "Invalid Token {}";
 
     /**
      * Fetches IDAM's signing keys at most once per cache period (five minutes), and again, rate limited, when a
@@ -112,9 +111,5 @@ public class VerifyTokenService {
             log.error("Invalid JWK key", e);
             throw new VerifyTokenServiceException("Invalid JWK", e);
         }
-    }
-
-    public boolean isTokenSignatureValid(String token) {
-        return verifyTokenSignature(token);
     }
 }

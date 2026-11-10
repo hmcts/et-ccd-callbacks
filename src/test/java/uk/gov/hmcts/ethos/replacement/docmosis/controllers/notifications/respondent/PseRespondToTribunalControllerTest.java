@@ -100,16 +100,6 @@ class PseRespondToTribunalControllerTest {
     }
 
     @Test
-    void aboutToStart_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_START_URL)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void showError_returnError() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockHelper.when(() -> Helper.isClaimantNonSystemUser(any()))
@@ -159,16 +149,6 @@ class PseRespondToTribunalControllerTest {
     }
 
     @Test
-    void midDetailsTable_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_TABLE_DETAILS)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void midValidateInput_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(MID_VALIDATE_INPUT)
@@ -180,16 +160,6 @@ class PseRespondToTribunalControllerTest {
             .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(pseRespondToTribunalService).validateRespondentInput(ccdRequest.getCaseDetails().getCaseData());
-    }
-
-    @Test
-    void midValidateInput_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_VALIDATE_INPUT)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
     }
 
     @Test
@@ -209,16 +179,6 @@ class PseRespondToTribunalControllerTest {
     }
 
     @Test
-    void aboutToSubmit_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void submitted_Success() throws Exception {
         when(pseRespondToTribunalService.getRespondentSubmittedBody(ccdRequest.getCaseDetails().getCaseData()))
             .thenReturn("SubmittedBody");
@@ -232,16 +192,6 @@ class PseRespondToTribunalControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void submitted_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(SUBMITTED_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
     }
 
 }

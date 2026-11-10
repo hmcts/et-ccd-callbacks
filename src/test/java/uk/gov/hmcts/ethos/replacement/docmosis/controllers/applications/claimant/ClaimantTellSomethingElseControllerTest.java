@@ -225,16 +225,6 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void displayClaimantApplicationsTable_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(DISPLAY_TABLE_URL)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void aboutToStart_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VIEW_APPLICATION_ABOUT_TO_START_URL)
@@ -245,16 +235,6 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void aboutToStart_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(VIEW_APPLICATION_ABOUT_TO_START_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -280,16 +260,6 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midPopulateChooseApplication_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_POPULATE_CHOOSE_APPLICATION_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void midPopulateChooseApplication_badRequest() throws Exception {
         mockMvc.perform(post(MID_POPULATE_CHOOSE_APPLICATION_URL)
                         .content("test content")
@@ -309,16 +279,6 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void midPopulateReply_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_POPULATE_SELECTED_APPLICATION)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 
     @Test

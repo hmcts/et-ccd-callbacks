@@ -26,6 +26,8 @@ import static org.mockito.Mockito.when;
 class EmailServiceTest {
     public static final String CITIZEN_HUB_URL = "https://et-sya.test.platform.hmcts.net/citizen-hub/";
     public static final String EXUI_URL = "https://manage-case.test.platform.hmcts.net/cases/case-details/";
+    private static final String SYR_HOST = "https://et-syr.test.platform.hmcts.net/";
+    private static final String SYR_CASE_DETAILS = "http://localhost:3003/case-details/";
 
     @InjectMocks
     private transient EmailService emailService;
@@ -66,6 +68,34 @@ class EmailServiceTest {
         emailService.sendEmail("templateId", "emailAddress", createPersonalisation());
 
         verify(emailClient, times(1)).sendEmail(anyString(), anyString(), anyMap(), anyString());
+    }
+
+    @Test
+    void getRespondentCitizenCaseLink_addsCaseDetailsPathWithoutLanguageQuery() {
+        ReflectionTestUtils.setField(emailService, "syrUrl", SYR_HOST);
+
+        assertThat(emailService.getRespondentCitizenCaseLink("1792404615243049",
+                "38eaac91-6908-4d87-af04-afba6788dda6", false))
+                .isEqualTo(SYR_HOST + "case-details/1792404615243049/"
+                        + "38eaac91-6908-4d87-af04-afba6788dda6");
+    }
+
+    @Test
+    void getRespondentCitizenCaseLink_appendsWelshLanguageParam() {
+        ReflectionTestUtils.setField(emailService, "syrUrl", SYR_HOST);
+
+        assertThat(emailService.getRespondentCitizenCaseLink("1792404615243049",
+                "38eaac91-6908-4d87-af04-afba6788dda6", true))
+                .isEqualTo(SYR_HOST + "case-details/1792404615243049/"
+                        + "38eaac91-6908-4d87-af04-afba6788dda6?lng=cy");
+    }
+
+    @Test
+    void getRespondentCitizenCaseLink_doesNotDuplicateCaseDetailsPath() {
+        ReflectionTestUtils.setField(emailService, "syrUrl", SYR_CASE_DETAILS);
+
+        assertThat(emailService.getRespondentCitizenCaseLink("1792404615243049", "respondent-1", false))
+                .isEqualTo(SYR_CASE_DETAILS + "1792404615243049/respondent-1");
     }
 
     @Test

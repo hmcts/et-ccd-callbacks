@@ -24,7 +24,6 @@ import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
@@ -44,16 +43,16 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmploymentRightsActService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.PostDefaultValuesService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskEventService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
@@ -69,21 +68,17 @@ import java.util.Set;
 
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
-import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_CREATE_FLAG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_MANAGE_FLAGS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_MANAGE_SUPPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_REQUEST_SUPPORT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_SUBMIT_CASE_DRAFT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_SUBMIT_ET3_FORM;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_UPDATE_CASE_SUBMITTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_UPDATE_ET3_FORM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper.buildFlagsImageFileName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.removeSpacesFromPartyNames;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.updatePositionTypeToClosed;
@@ -101,22 +96,16 @@ public class CaseActionsForCaseWorkerController {
     public static final String ACCESSED_SUCCESSFULLY = "Accessed successfully";
     public static final String BAD_REQUEST = "Bad Request";
     public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
-    private static final List<String> REVIEW_SUPPORT_TASK_EVENTS =
-            List.of(EVENT_SUBMIT_CASE_DRAFT, EVENT_UPDATE_CASE_SUBMITTED);
     private static final List<String> RESPONDENT_REVIEW_SUPPORT_TASK_EVENTS =
             List.of(EVENT_SUBMIT_ET3_FORM, EVENT_UPDATE_ET3_FORM);
     private static final List<String> NEW_FLAG_REVIEW_SUPPORT_TASK_EVENTS =
             List.of(EVENT_REQUEST_SUPPORT, EVENT_CREATE_FLAG);
-    public static final String CREATE_ECM_CASE = "createEcmCase";
-    private static final List<String> SUBMISSION_EVENTS = List.of(EVENT_SUBMIT_CASE_DRAFT, "initiateCase",
-            "submitEt1Draft", CREATE_ECM_CASE);
 
     private final CaseCloseValidator caseCloseValidator;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private final ConciliationTrackService conciliationTrackService;
     private final DefaultValuesReaderService defaultValuesReaderService;
     private final FixCaseApiService fixCaseApiService;
-    private final SingleReferenceService singleReferenceService;
     private final EventValidationService eventValidationService;
     private final SingleCaseMultipleMidEventValidationService singleCaseMultipleMidEventValidationService;
     private final AddSingleCaseToMultipleService addSingleCaseToMultipleService;
@@ -126,17 +115,18 @@ public class CaseActionsForCaseWorkerController {
     private final DepositOrderValidationService depositOrderValidationService;
     private final JudgmentValidationService judgmentValidationService;
     private final Et1VettingService et1VettingService;
-    private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
     private final FeatureToggleService featureToggleService;
     private final CaseFlagsService caseFlagsService;
     private final SupportTaskService supportTaskService;
     private final SupportTaskEventService supportTaskEventService;
     private final SupportTaskClientContextService supportTaskClientContextService;
     private final CaseManagementLocationService caseManagementLocationService;
-    private final Et1SubmissionService et1SubmissionService;
     private final NocRespondentHelper nocRespondentHelper;
+    private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
     private final EmploymentRightsActService employmentRightsActService;
     private final ClaimantEmailService claimantEmailService;
+    private final RespondentEmailService respondentEmailService;
+    private final PostDefaultValuesService postDefaultValuesService;
 
     @PostMapping(value = "/preDefaultValues", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update pre default values in a case.")
@@ -174,66 +164,8 @@ public class CaseActionsForCaseWorkerController {
             @RequestHeader(AUTHORIZATION) String userToken) {
         log.info("POST DEFAULT VALUES ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
-        CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        CaseData caseData = caseDetails.getCaseData();
-        List<String> errors = getValidationDate(ccdRequest.getEventId(), caseDetails);
-
-        if (errors.isEmpty()) {
-            employmentRightsActService.setEraFlagByReceiptDate(caseData);
-            defaultValuesReaderService.setSubmissionReference(caseDetails);
-            DefaultValues defaultValues = getPostDefaultValues(caseDetails);
-            defaultValuesReaderService.setCaseData(caseData, defaultValues);
-            caseManagementForCaseWorkerService.caseDataDefaults(caseData);
-            generateEthosCaseReference(caseData, ccdRequest);
-            buildFlagsImageFileName(ccdRequest.getCaseDetails());
-            caseData.setMultipleFlag(caseData.getEcmCaseType() != null
-                    && Constants.MULTIPLE_CASE_TYPE.equals(caseData.getEcmCaseType()) ? Constants.YES : Constants.NO);
-            caseData.setChangeOrganisationRequestField(null);
-            UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
-            UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
-            DocumentHelper.setDocumentNumbers(caseData);
-            //create NOC answers section only on case submission events
-            if (SUBMISSION_EVENTS.contains(defaultIfEmpty(ccdRequest.getEventId(), EMPTY_STRING))) {
-                caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
-            }
-            defaultValuesReaderService.setPositionAndOffice(caseDetails.getCaseTypeId(), caseData);
-
-            if (caseFlagsSetupRequired(caseDetails.getCaseTypeId(), caseData)) {
-                setupCaseFlags(caseDetails.getCaseTypeId(), caseData);
-            }
-
-            if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())
-                    && REVIEW_SUPPORT_TASK_EVENTS.contains(ccdRequest.getEventId())) {
-                caseManagementForCaseWorkerService.setNextListedDate(caseData);
-                CaseData caseDataBefore = ccdRequest.getCaseDetailsBefore() == null
-                        ? null
-                        : ccdRequest.getCaseDetailsBefore().getCaseData();
-                if (EVENT_SUBMIT_CASE_DRAFT.equals(ccdRequest.getEventId())) {
-                    supportTaskService.prepareReviewSupportTasks(caseData);
-                } else {
-                    supportTaskService.prepareUpdatedCaseReviewSupportTasks(caseData, caseDataBefore);
-                }
-                supportTaskService.prepareArrangeSupportTask(caseData, caseDataBefore);
-            }
-
-            boolean hmcToggle = featureToggleService.isHmcEnabled();
-            log.info("HMC feature flag is {}", hmcToggle);
-            if (hmcToggle) {
-                caseManagementForCaseWorkerService.setPublicCaseName(caseData);
-                caseManagementLocationService.setCaseManagementLocationCode(caseData);
-            }
-
-            if (featureToggleService.citizenEt1Generation()
-                    && EVENT_SUBMIT_CASE_DRAFT.equals(ccdRequest.getEventId())) {
-                caseDetails.setCaseData(caseData);
-                et1SubmissionService.createAndUploadEt1Docs(caseDetails, userToken);
-                et1SubmissionService.vexationCheck(caseDetails, userToken);
-            }
-        }
-
-        log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),
-                caseData.getEthosCaseReference());
-        return getCallbackRespEntityErrors(errors, caseData);
+        List<String> errors = postDefaultValuesService.applyPostDefaultValues(ccdRequest, userToken);
+        return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
     @PostMapping(value = "/supportTasks/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
@@ -357,13 +289,6 @@ public class CaseActionsForCaseWorkerController {
                 .headers(response.getHeaders())
                 .header(CLIENT_CONTEXT, updatedClientContext)
                 .body(response.getBody());
-    }
-
-    private List<String> getValidationDate(String eventId, CaseDetails caseDetails) {
-        if (!CREATE_ECM_CASE.equals(eventId)) {
-            return eventValidationService.validateReceiptDate(caseDetails);
-        }
-        return new ArrayList<>();
     }
 
     @PostMapping(value = "/addServiceId", consumes = APPLICATION_JSON_VALUE)
@@ -545,6 +470,42 @@ public class CaseActionsForCaseWorkerController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         return getCallbackRespEntityErrors(
                 claimantEmailService.prepareUpdate(ccdRequest.getCaseDetails(), userToken), caseData);
+    }
+
+    @PostMapping(value = "/updateRespondentEmail/aboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Initialise the respondent email update event.")
+    public ResponseEntity<CCDCallbackResponse> initialiseRespondentEmailUpdate(
+            @RequestBody CCDRequest ccdRequest) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        return getCallbackRespEntityErrors(respondentEmailService.initialise(caseData), caseData);
+    }
+
+    @PostMapping(value = "/updateRespondentEmail/select", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Display the selected respondent's current email address.")
+    public ResponseEntity<CCDCallbackResponse> selectRespondentForEmailUpdate(
+            @RequestBody CCDRequest ccdRequest) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        return getCallbackRespEntityErrors(respondentEmailService.populateCurrentEmail(caseData), caseData);
+    }
+
+    @PostMapping(value = "/updateRespondentEmail/validate", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Validate the respondent's new email address.")
+    public ResponseEntity<CCDCallbackResponse> validateRespondentEmailUpdate(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        return getCallbackRespEntityErrors(
+                respondentEmailService.validateNewEmail(caseData, userToken), caseData);
+    }
+
+    @PostMapping(value = "/updateRespondentEmail/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Update the selected respondent's email address and case access.")
+    public ResponseEntity<CCDCallbackResponse> updateRespondentEmail(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        return getCallbackRespEntityErrors(
+                respondentEmailService.prepareUpdate(ccdRequest.getCaseDetails(), userToken), caseData);
     }
 
     @PostMapping(value = "/amendRespondentDetails", consumes = APPLICATION_JSON_VALUE)
@@ -1112,25 +1073,11 @@ public class CaseActionsForCaseWorkerController {
         return defaultValuesReaderService.getDefaultValues(caseDetails.getCaseData().getManagingOffice());
     }
 
-    private boolean caseFlagsSetupRequired(String caseTypeId, CaseData caseData) {
-        return featureToggleService.isCaseFlagsV2Enabled(caseTypeId)
-                ? caseFlagsService.caseFlagsSetupRequired(caseData)
-                : caseFlagsService.legacyCaseFlagsSetupRequired(caseData);
-    }
-
     private void setupCaseFlags(String caseTypeId, CaseData caseData) {
         if (featureToggleService.isCaseFlagsV2Enabled(caseTypeId)) {
             caseFlagsService.setupCaseFlags(caseData);
         } else {
             caseFlagsService.setupLegacyCaseFlags(caseData);
-        }
-    }
-
-    private void generateEthosCaseReference(CaseData caseData, CCDRequest ccdRequest) {
-        if (StringUtils.isBlank(caseData.getEthosCaseReference())) {
-            String reference = singleReferenceService.createReference(ccdRequest.getCaseDetails().getCaseTypeId());
-            log.info("Created reference {} for CCD case {}", reference, ccdRequest.getCaseDetails().getCaseId());
-            caseData.setEthosCaseReference(reference);
         }
     }
 }

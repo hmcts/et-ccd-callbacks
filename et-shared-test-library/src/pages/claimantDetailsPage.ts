@@ -1,6 +1,6 @@
-import { BasePage } from "./basePage";
+import { BasePage } from "./basePage.js";
 import { Locator, Page, expect } from '@playwright/test';
-import respPageData from '../../resources/payload/respondent-page-content.json';
+import respPageData from '../../resources/payload/respondent-page-content.json' with { type: 'json' };
 
 export class ClaimantDetailsPage extends BasePage {
   private readonly firstName: Locator;

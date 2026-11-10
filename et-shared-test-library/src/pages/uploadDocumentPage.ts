@@ -1,6 +1,6 @@
-import { BasePage } from './basePage';
+import { BasePage } from './basePage.js';
 import { expect, Locator, Page } from '@playwright/test';
-import {resolveResourcePath} from "../data-utils/resourcePath";
+import {resolveResourcePath} from "../data-utils/resourceFilePathData.js";
 
 export class UploadDocumentPage extends BasePage {
   private readonly addNewButtonBottom: Locator;
@@ -9,7 +9,7 @@ export class UploadDocumentPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    this.addNewButtonBottom = page.locator('//button[@class="button write-collection-add-item__bottom ng-star-inserted"]');
+    this.addNewButtonBottom = page.locator('//button[@class="button write-collection-add-item__bottom"]');
     this.createDcfLink = page.locator('//a[contains(.,"Create, Upload or Remove DCF")]');
     this.createDcfRadio = page.locator('#uploadOrRemoveDcf-Create');
   }

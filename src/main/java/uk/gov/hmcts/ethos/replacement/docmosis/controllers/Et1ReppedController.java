@@ -29,6 +29,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWork
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.PostDefaultValuesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 
@@ -48,7 +49,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/et1Repped")
 public class Et1ReppedController {
     private static final String GENERATED_DOCUMENT_URL = "Please download the draft ET1 from : ";
-    private final CaseActionsForCaseWorkerController caseActionsForCaseWorkerController;
+    private final PostDefaultValuesService postDefaultValuesService;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private final Et1ReppedService et1ReppedService;
     private final FeatureToggleService featureToggleService;
@@ -512,7 +513,12 @@ public class Et1ReppedController {
         Et1ReppedHelper.setEt1SubmitData(caseData);
         et1ReppedService.addDefaultData(caseDetails.getCaseTypeId(), caseData);
         et1ReppedService.addClaimantRepresentativeDetails(caseData, userToken);
-        caseActionsForCaseWorkerController.postDefaultValues(ccdRequest, userToken);
+        List<String> errors = postDefaultValuesService.applyPostDefaultValues(ccdRequest, userToken);
+        // Default values may replace the case data instance, so read it back from the case details
+        caseData = caseDetails.getCaseData();
+        if (!errors.isEmpty()) {
+            return getCallbackRespEntityErrors(errors, caseData);
+        }
         if (featureToggleService.isEt1DocGenEnabled()) {
             caseData.setRequiresSubmissionDocuments(YES);
         } else {

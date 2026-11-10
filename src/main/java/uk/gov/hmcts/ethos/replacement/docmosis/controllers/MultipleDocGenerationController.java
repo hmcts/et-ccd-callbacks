@@ -19,7 +19,6 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.LabelsHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleDocGenerationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleLetterService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleScheduleService;
@@ -27,7 +26,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleScheduleSer
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getMultipleCallbackRespEntity;
@@ -40,12 +38,10 @@ public class MultipleDocGenerationController {
 
     private static final String LOG_MESSAGE = "received notification request for multiple reference : ";
     private static final String GENERATED_DOCUMENT_URL = "Please download the document from : ";
-    private static final String INVALID_TOKEN = "Invalid Token {}";
 
     private final MultipleScheduleService multipleScheduleService;
     private final MultipleLetterService multipleLetterService;
     private final MultipleDocGenerationService multipleDocGenerationService;
-    private final VerifyTokenService verifyTokenService;
 
     @PostMapping(value = "/printSchedule", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "generate a multiple schedule.")
@@ -62,11 +58,6 @@ public class MultipleDocGenerationController {
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
         log.info("PRINT SCHEDULE ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         List<String> errors = new ArrayList<>();
         MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
@@ -92,11 +83,6 @@ public class MultipleDocGenerationController {
             @RequestHeader("Authorization") String userToken) {
         log.info("PRINT LETTER ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         List<String> errors = new ArrayList<>();
         MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
@@ -118,14 +104,8 @@ public class MultipleDocGenerationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> printDocumentConfirmation(
-            @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody MultipleRequest multipleRequest) {
         log.info("PRINT DOCUMENT CONFIRMATION ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         MultipleData multipleData = multipleRequest.getCaseDetails().getCaseData();
 
@@ -152,11 +132,6 @@ public class MultipleDocGenerationController {
         log.info("MID SELECTED ADDRESS LABELS MULTIPLE ---> "
                 + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         List<String> errors = new ArrayList<>();
         MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
@@ -177,15 +152,9 @@ public class MultipleDocGenerationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> midValidateAddressLabelsMultiple(
-            @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody MultipleRequest multipleRequest) {
         log.info("MID VALIDATE ADDRESS LABELS MULTIPLE ---> "
                 + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         List<String> errors = LabelsHelper.midValidateAddressLabelsErrors(
                 multipleRequest.getCaseDetails().getCaseData().getAddressLabelsAttributesType(), MULTIPLE_CASE_TYPE);
@@ -208,11 +177,6 @@ public class MultipleDocGenerationController {
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
         log.info("DYNAMIC MULTIPLE LETTERS ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         List<String> errors = new ArrayList<>();
         MultipleDetails multipleDetails = multipleRequest.getCaseDetails();

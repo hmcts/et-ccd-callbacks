@@ -107,17 +107,6 @@ class CaseFlagsDataMigrationControllerTest {
 
     @Test
     @SneakyThrows
-    void shouldMigrateCaseFlags_tokenFail() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(CASE_FLAGS_DATA_MIGRATION)
-                        .content(requestContent.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
     void shouldUseLegacyMigrationWhenV2IsDisabledForCaseType() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(featureToggleService.isCaseFlagsV2Enabled("ET_EnglandWales")).thenReturn(false);
@@ -241,16 +230,5 @@ class CaseFlagsDataMigrationControllerTest {
 
         verify(caseFlagsService).rollbackLegacyCaseFlags(any(CaseData.class));
         verify(caseFlagsService, never()).rollbackCaseFlags(any(CaseData.class));
-    }
-
-    @Test
-    @SneakyThrows
-    void shouldRollbackCaseFlags_tokenFail() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(CASE_FLAGS_DATA_ROLLBACK)
-                        .content(requestContent.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 }

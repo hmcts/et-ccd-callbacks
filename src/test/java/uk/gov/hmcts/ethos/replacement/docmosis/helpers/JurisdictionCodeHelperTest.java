@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
@@ -56,5 +58,19 @@ class JurisdictionCodeHelperTest {
         JurisdictionCodeHelper.populateCodeNameAndDescriptionHtml(sb, null);
 
         assertThat(sb.toString()).contains("DAG");
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = {
+        "SXH|Sexual harassment by unwanted conduct of a sexual nature or because of rejection of such conduct",
+        "TUA|Suffered a detriment as a result of union membership or activities, or taking part in protected "
+            + "industrial action",
+        "TUD|Unfair dismissal for having taken part in protected industrial action"
+    })
+    void populateCodeNameAndDescriptionHtml_newJurisdictionCodes(String code, String description) {
+        StringBuilder sb = new StringBuilder();
+        JurisdictionCodeHelper.populateCodeNameAndDescriptionHtml(sb, code);
+
+        assertThat(sb.toString()).contains(code).contains(description);
     }
 }

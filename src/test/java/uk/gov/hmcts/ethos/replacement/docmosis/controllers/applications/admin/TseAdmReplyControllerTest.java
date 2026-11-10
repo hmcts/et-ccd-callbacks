@@ -85,19 +85,6 @@ class TseAdmReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midDetailsTable_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_DETAILS_TABLE)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-        verify(tseAdmReplyService, never()).initialTseAdmReplyTableMarkUp(
-                any(CaseData.class),
-                eq(AUTH_TOKEN));
-    }
-
-    @Test
     void midDetailsTable_badRequest() throws Exception {
         mockMvc.perform(post(MID_DETAILS_TABLE)
                         .content("garbage content")
@@ -121,18 +108,6 @@ class TseAdmReplyControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseAdmReplyService).validateInput(
-                any(CaseData.class));
-    }
-
-    @Test
-    void midValidateInput_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_VALIDATE_INPUT)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-        verify(tseAdmReplyService, never()).validateInput(
                 any(CaseData.class));
     }
 
@@ -167,22 +142,6 @@ class TseAdmReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-        verify(tseAdmReplyService, never()).saveTseAdmReplyDataFromCaseData(
-                any(CaseData.class));
-        verify(tseAdmReplyService, never()).sendNotifyEmailsToClaimant(
-            eq("4321"), any(CaseData.class), eq(AUTH_TOKEN));
-        verify(tseAdmReplyService, never()).clearTseAdmReplyDataFromCaseData(
-                any(CaseData.class));
-    }
-
-    @Test
     void aboutToSubmit_badRequest() throws Exception {
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content("garbage content")
@@ -208,16 +167,6 @@ class TseAdmReplyControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void submitted_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(SUBMITTED_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
     }
 
     @Test

@@ -73,23 +73,6 @@ class AllocateHearingControllerTest {
     }
 
     @Test
-    void testInitialiseHearingDynamicListInvalidToken() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder()
-                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
-                .build();
-        String token = "invalid-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/allocatehearing/initialiseHearings")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", token)
-                .content(jsonMapper.toJson(ccdRequest)))
-
-                .andExpect(status().isForbidden());
-        verify(allocateHearingService, never()).initialiseAllocateHearing(any(CaseData.class));
-    }
-
-    @Test
     void testHandleListingSelected() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
@@ -107,23 +90,6 @@ class AllocateHearingControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(allocateHearingService, times(1)).handleListingSelected(any(CaseData.class));
-    }
-
-    @Test
-    void testHandleListingSelectedInvalidToken() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder()
-                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
-                .build();
-        String token = "invalid-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/allocatehearing/handleListingSelected")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", token)
-                .content(jsonMapper.toJson(ccdRequest)))
-
-                .andExpect(status().isForbidden());
-        verify(allocateHearingService, never()).handleListingSelected(any(CaseData.class));
     }
 
     @Test
@@ -185,23 +151,6 @@ class AllocateHearingControllerTest {
     }
 
     @Test
-    void testPopulateRoomsInvalidToken() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder()
-                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
-                .build();
-        String token = "invalid-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/allocatehearing/populateRooms")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", token)
-                .content(jsonMapper.toJson(ccdRequest)))
-
-                .andExpect(status().isForbidden());
-        verify(allocateHearingService, never()).populateRooms(any(CaseData.class));
-    }
-
-    @Test
     void testAboutToSubmit_EnglandWales() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
@@ -241,23 +190,5 @@ class AllocateHearingControllerTest {
 
         verify(allocateHearingService, times(1)).updateSelectedHearing(any(CaseData.class));
         verify(scotlandAllocateHearingService, times(1)).updateCase(any(CaseData.class));
-    }
-
-    @Test
-    void testAboutToSubmitInvalidToken() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder()
-                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
-                .build();
-        String token = "invalid-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/allocatehearing/aboutToSubmit")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", token)
-                .content(jsonMapper.toJson(ccdRequest)))
-
-                .andExpect(status().isForbidden());
-        verify(allocateHearingService, never()).updateSelectedHearing(any(CaseData.class));
-        verify(allocateHearingService, never()).updateCase(any(CaseData.class));
     }
 }

@@ -5,18 +5,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService;
 
 import java.util.List;
@@ -29,7 +25,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 public class CourtWorkerController {
 
-    private final VerifyTokenService verifyTokenService;
     private final CourtWorkerService courtWorkerService;
 
     @PostMapping(value = "/initAddCourtWorker", consumes = APPLICATION_JSON_VALUE)
@@ -40,14 +35,9 @@ public class CourtWorkerController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> initAddCourtWorker(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         log.info("/initAddCourtWorker");
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         courtWorkerService.initAddCourtWorker(adminData);
@@ -63,14 +53,9 @@ public class CourtWorkerController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> addCourtWorker(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         log.info("/addCourtWorker");
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = courtWorkerService.addCourtWorker(adminData);
@@ -86,12 +71,7 @@ public class CourtWorkerController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> updateCourtWorkerMidEventSelectOffice(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = courtWorkerService.getCourtWorkerMidEventSelectOffice(adminData);
@@ -107,12 +87,7 @@ public class CourtWorkerController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> updateCourtWorkerMidEventSelectCourtWorker(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = courtWorkerService.getCourtWorkerMidEventSelectCourtWorker(adminData);
@@ -128,14 +103,9 @@ public class CourtWorkerController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> updateCourtWorker(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         log.info("/updateCourtWorker");
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = courtWorkerService.updateCourtWorker(adminData);
@@ -153,7 +123,6 @@ public class CourtWorkerController {
      * ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE defined as
      * "There is not any court worker found with the %s location code"
      *
-     * @param  userToken        Used for authorisation
      *
      * @param ccdRequest        AdminData which is a generic data type for most of the
      *                          methods which holds file location code, file location name
@@ -169,14 +138,9 @@ public class CourtWorkerController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> deleteCourtWorker(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         log.info("/deleteCourtWorker");
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = courtWorkerService.deleteCourtWorker(adminData);

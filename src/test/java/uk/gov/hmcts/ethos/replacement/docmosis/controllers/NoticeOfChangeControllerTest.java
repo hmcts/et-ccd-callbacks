@@ -98,7 +98,6 @@ class NoticeOfChangeControllerTest {
 
     @Test
     void handleAboutToSubmit_RespondentRep() throws Exception {
-        when(verifyTokenService.isTokenSignatureValid(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService
             .updateRespondentRepresentation(any())).thenReturn(caseData);
         when(ccdCaseAssignment.applyNoc(any(), any())).thenReturn(CCDCallbackResponse.builder()
@@ -140,7 +139,6 @@ class NoticeOfChangeControllerTest {
 
     @Test
     void nocSubmitted() throws Exception {
-        when(verifyTokenService.isTokenSignatureValid(AUTH_TOKEN)).thenReturn(true);
         doNothing().when(notificationService).sendNotificationOfChangeEmails(any(),
             any(), any(), eq(false));
 

@@ -118,16 +118,6 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStart_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_START_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void aboutToStart_badRequest() throws Exception {
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content("garbage content")
@@ -185,16 +175,6 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void validateGiveDetails_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(VALIDATE_GIVE_DETAILS)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void aboutToSubmitRespondentTSE_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
@@ -207,16 +187,6 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(resTseService).sendEmails(any(CaseDetails.class), eq(AUTH_TOKEN));
         verify(tseService).createApplication(any(CaseData.class), eq(RESPONDENT_REP_TITLE));
-    }
-
-    @Test
-    void aboutToSubmitRespondentTSE_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
     }
 
     @Test
@@ -234,16 +204,6 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void displayRespondentApplicationsTable_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(DISPLAY_TABLE_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void completeApplication_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(COMPLETE_APPLICATION_URL)
@@ -255,16 +215,6 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void completeApplication_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(COMPLETE_APPLICATION_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
     }
 
     private RespondentSumTypeItem createRespondentType() {

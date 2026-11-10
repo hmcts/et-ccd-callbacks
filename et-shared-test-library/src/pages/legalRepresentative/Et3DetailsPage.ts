@@ -1,7 +1,7 @@
-import { BasePage } from '../basePage';
+import { BasePage } from '../basePage.js';
 import { expect, Locator, Page } from '@playwright/test';
-import { CaseDetailsValues } from '../../config';
-import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage';
+import { CaseDetailsValues } from '../../config/index.js';
+import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage.js';
 
 export class Et3DetailsPage extends BasePage {
   private readonly et3EmploymentDetailsLink: Locator;

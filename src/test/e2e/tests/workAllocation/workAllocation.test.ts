@@ -7,7 +7,7 @@ import {
   LoginPage,
   ManageCaseDashboardPage, ReferralPage, RolesAndAccessPage,
   users
-} from "@et-shared-test-library/core";
+} from "@hmcts/et-shared-test-library";
 import {expect} from "@playwright/test";
 
 let caseNumber: string;

@@ -61,7 +61,7 @@ jobs:
 
       # Run Playwright tests
       - name: Run Playwright tests
-        run: npx playwright test --project=${{ matrix.browser }} --grep "@Smoke"
+        run: npx playwright test -c src/test/e2e/playwright.config.ts --project=${{ matrix.browser }} --grep "@Smoke"
 
         env:
           CI: true

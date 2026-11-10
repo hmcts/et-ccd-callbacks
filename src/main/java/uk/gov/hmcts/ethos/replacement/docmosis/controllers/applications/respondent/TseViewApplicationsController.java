@@ -35,7 +35,6 @@ public class TseViewApplicationsController {
      * Resets the dynamic list for select an application to view either an open or closed application.
      *
      * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
      * @return Callback response entity with case data attached.
      */
     @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
@@ -50,8 +49,7 @@ public class TseViewApplicationsController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> aboutToStart(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setTseViewApplicationSelect(null);
@@ -63,7 +61,6 @@ public class TseViewApplicationsController {
      * Called after 'view an application' is clicked and open or closed has been selected.
      *
      * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
      * @return Callback response entity with case data attached.
      */
 
@@ -80,8 +77,7 @@ public class TseViewApplicationsController {
     })
     public ResponseEntity<CCDCallbackResponse> populateChooseApplication(
 
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setTseViewApplicationSelect(

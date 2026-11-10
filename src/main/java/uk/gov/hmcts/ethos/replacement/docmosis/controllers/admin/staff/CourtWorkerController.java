@@ -5,11 +5,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
@@ -37,7 +35,6 @@ public class CourtWorkerController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> initAddCourtWorker(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         log.info("/initAddCourtWorker");
@@ -56,7 +53,6 @@ public class CourtWorkerController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> addCourtWorker(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         log.info("/addCourtWorker");
@@ -75,7 +71,6 @@ public class CourtWorkerController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> updateCourtWorkerMidEventSelectOffice(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
@@ -92,7 +87,6 @@ public class CourtWorkerController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> updateCourtWorkerMidEventSelectCourtWorker(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
@@ -109,7 +103,6 @@ public class CourtWorkerController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> updateCourtWorker(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         log.info("/updateCourtWorker");
@@ -130,7 +123,6 @@ public class CourtWorkerController {
      * ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE defined as
      * "There is not any court worker found with the %s location code"
      *
-     * @param  userToken        Used for authorisation
      *
      * @param ccdRequest        AdminData which is a generic data type for most of the
      *                          methods which holds file location code, file location name
@@ -146,7 +138,6 @@ public class CourtWorkerController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> deleteCourtWorker(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
         log.info("/deleteCourtWorker");

@@ -40,7 +40,6 @@ public class VenueImportController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> initImport(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         venueImportService.initImport(adminData);

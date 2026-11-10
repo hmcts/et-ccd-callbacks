@@ -67,8 +67,7 @@ public class AcasCertificateController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> confirmation(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest) {
         log.info(LOG_MESSAGE, "SHOW CERTIFICATE CONFIRMATION ---> ", ccdRequest.getCaseDetails().getCaseId());
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())

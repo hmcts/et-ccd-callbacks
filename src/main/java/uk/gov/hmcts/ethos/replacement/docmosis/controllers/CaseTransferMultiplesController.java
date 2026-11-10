@@ -54,8 +54,7 @@ public class CaseTransferMultiplesController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> initTransferToEnglandWales(
-            @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody MultipleRequest multipleRequest) {
         MultipleData multipleData = multipleRequest.getCaseDetails().getCaseData();
         CaseTransferOfficeService.populateTransferToEnglandWalesOfficeOptions(multipleData);
 
@@ -76,8 +75,7 @@ public class CaseTransferMultiplesController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> initTransferToScotland(
-            @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody MultipleRequest multipleRequest) {
         MultipleData multipleData = multipleRequest.getCaseDetails().getCaseData();
         CaseTransferOfficeService.populateTransferToScotlandOfficeOptions(multipleData);
 

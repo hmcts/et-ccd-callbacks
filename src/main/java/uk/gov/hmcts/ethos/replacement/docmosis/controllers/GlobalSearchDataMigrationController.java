@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -43,8 +42,7 @@ public class GlobalSearchDataMigrationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> addGlobalSearchFieldsInCaseData(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest) {
         log.info("Migrating existing case Id for global search ---> "
                 + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
@@ -71,8 +69,7 @@ public class GlobalSearchDataMigrationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> addServiceIdForGlobalSearchInCaseData(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) throws IOException {
+            @RequestBody CCDRequest ccdRequest) throws IOException {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
         return getCallbackRespEntityNoErrors(caseData);
@@ -88,8 +85,7 @@ public class GlobalSearchDataMigrationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> removeGlobalSearchFieldsFromCaseData(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest) {
         log.info("Migrating existing case Id by removing data of global search ---> "
                 + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
@@ -113,8 +109,7 @@ public class GlobalSearchDataMigrationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> removeServiceIdForGlobalSearchFromCaseData(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) throws IOException {
+            @RequestBody CCDRequest ccdRequest) throws IOException {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.removeHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
         return getCallbackRespEntityNoErrors(caseData);

@@ -72,8 +72,7 @@ public class CaseTransferController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> initTransferToScotland(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest) {
         log.info(LOG_MESSAGE, "CASE TRANSFER INIT TRANSFER TO SCOTLAND ---> ", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
@@ -93,8 +92,7 @@ public class CaseTransferController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> initTransferToEnglandWales(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest) {
         log.info(LOG_MESSAGE, "CASE TRANSFER INIT TRANSFER TO ENGLAND/WALES---> ",
                 ccdRequest.getCaseDetails().getCaseId());
 
@@ -200,8 +198,7 @@ public class CaseTransferController {
         @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     public ResponseEntity<CCDCallbackResponse> assignCase(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest) {
 
         CaseData caseData =  ccdRequest.getCaseDetails().getCaseData();
         CaseTransferUtils.setCaseManagingOffice(caseData, ccdRequest.getCaseDetails().getCaseTypeId());

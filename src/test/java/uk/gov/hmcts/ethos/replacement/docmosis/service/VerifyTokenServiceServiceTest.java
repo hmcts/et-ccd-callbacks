@@ -55,15 +55,10 @@ class VerifyTokenServiceServiceTest {
     }
 
     @Test
-    void verifyTokenSignature() {
-        assertThat(verifyTokenService.verifyTokenSignature(INVALID_USER_TOKEN)).isFalse();
-    }
-
-    @Test
     @SneakyThrows
-    void theIsTokenSignatureValid() {
+    void verifyTokenSignature() {
         // when token is invalid should return false and log invalid token error
-        assertThat(verifyTokenService.isTokenSignatureValid(INVALID_USER_TOKEN)).isFalse();
+        assertThat(verifyTokenService.verifyTokenSignature(INVALID_USER_TOKEN)).isFalse();
         LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_TWO, EXPECTED_ERROR_INVALID_TOKEN);
     }
 }

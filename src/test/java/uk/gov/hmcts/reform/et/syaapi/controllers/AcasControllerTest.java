@@ -36,6 +36,7 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -107,6 +108,20 @@ class AcasControllerTest {
         mockMvc.perform(get(GET_LAST_MODIFIED_CASE_LIST_URL)
                             .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN))
             .andExpect(status().isBadRequest());
+    }
+
+    /**
+     * Covers the citizen API interceptor rejecting a request before it reaches the controller. The callback
+     * controllers rely on the same pattern, which AddDocumentControllerTest covers for the other interceptor.
+     */
+    @Test
+    void getLastModifiedCaseListWhenInvalidTokenReturnError() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(get(GET_LAST_MODIFIED_CASE_LIST_URL)
+                            .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                            .param("datetime", REQUEST_DATE_TIME_STRING))
+            .andExpect(status().isForbidden());
+        verifyNoInteractions(acasCaseService);
     }
 
     @Test

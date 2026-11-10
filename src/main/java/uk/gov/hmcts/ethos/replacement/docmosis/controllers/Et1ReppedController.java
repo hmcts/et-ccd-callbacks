@@ -5,8 +5,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MimeTypeUtils;
@@ -29,6 +29,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PostDefaultValuesService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ai.Et1AiVettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 
@@ -43,7 +44,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/et1Repped")
 public class Et1ReppedController {
@@ -54,6 +54,34 @@ public class Et1ReppedController {
     private final FeatureToggleService featureToggleService;
     private final Et1SubmissionService et1SubmissionService;
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
+    private final Et1AiVettingService et1AiVettingService;
+
+    public Et1ReppedController(PostDefaultValuesService postDefaultValuesService,
+                               CaseManagementForCaseWorkerService caseManagementForCaseWorkerService,
+                               Et1ReppedService et1ReppedService,
+                               FeatureToggleService featureToggleService,
+                               Et1SubmissionService et1SubmissionService,
+                               NocRespondentRepresentativeService nocRespondentRepresentativeService) {
+        this(postDefaultValuesService, caseManagementForCaseWorkerService, et1ReppedService,
+                featureToggleService, et1SubmissionService, nocRespondentRepresentativeService, null);
+    }
+
+    @Autowired
+    public Et1ReppedController(PostDefaultValuesService postDefaultValuesService,
+                               CaseManagementForCaseWorkerService caseManagementForCaseWorkerService,
+                               Et1ReppedService et1ReppedService,
+                               FeatureToggleService featureToggleService,
+                               Et1SubmissionService et1SubmissionService,
+                               NocRespondentRepresentativeService nocRespondentRepresentativeService,
+                               @Autowired(required = false) Et1AiVettingService et1AiVettingService) {
+        this.postDefaultValuesService = postDefaultValuesService;
+        this.caseManagementForCaseWorkerService = caseManagementForCaseWorkerService;
+        this.et1ReppedService = et1ReppedService;
+        this.featureToggleService = featureToggleService;
+        this.et1SubmissionService = et1SubmissionService;
+        this.nocRespondentRepresentativeService = nocRespondentRepresentativeService;
+        this.et1AiVettingService = et1AiVettingService;
+    }
 
     /**
      * Callback to handle postcode validation for the ET1 Repped journey.
@@ -567,6 +595,9 @@ public class Et1ReppedController {
             @RequestHeader("Authorization") String userToken) throws IOException {
 
         caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
+        if (et1AiVettingService != null) {
+            et1AiVettingService.vetClaimInBackground(ccdRequest.getCaseDetails(), userToken);
+        }
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())

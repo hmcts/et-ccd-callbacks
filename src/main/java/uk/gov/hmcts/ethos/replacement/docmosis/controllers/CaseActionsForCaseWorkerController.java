@@ -159,6 +159,7 @@ public class CaseActionsForCaseWorkerController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
+        et1VettingService.triggerBackgroundAiVetting(ccdRequest.getCaseDetails(), userToken);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

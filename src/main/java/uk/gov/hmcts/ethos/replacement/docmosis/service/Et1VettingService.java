@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -23,6 +23,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.VettingJurisdictionCodesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.JurisdictionCodeHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ai.Et1AiVettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.jpaservice.JpaVenueService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
@@ -83,7 +84,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.EmploymentRightsAc
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class Et1VettingService {
 
     public static final String ADDRESS_NOT_ENTERED = "Address not entered";
@@ -91,12 +91,37 @@ public class Et1VettingService {
     private final TornadoService tornadoService;
     private final JpaVenueService jpaVenueService;
     private final EmploymentRightsActService employmentRightsActService;
+    private final Et1AiVettingService et1AiVettingService;
+
+    public Et1VettingService(TornadoService tornadoService, JpaVenueService jpaVenueService,
+                             EmploymentRightsActService employmentRightsActService) {
+        this(tornadoService, jpaVenueService, employmentRightsActService, null);
+    }
+
+    @Autowired
+    public Et1VettingService(TornadoService tornadoService, JpaVenueService jpaVenueService,
+                             EmploymentRightsActService employmentRightsActService,
+                             @Autowired(required = false) Et1AiVettingService et1AiVettingService) {
+        this.tornadoService = tornadoService;
+        this.jpaVenueService = jpaVenueService;
+        this.employmentRightsActService = employmentRightsActService;
+        this.et1AiVettingService = et1AiVettingService;
+    }
 
     /**
      * Update et1VettingBeforeYouStart.
      * @param caseDetails Get caseId and Update caseData
      */
     public void initialiseEt1Vetting(CaseDetails caseDetails) {
+        initialiseEt1Vetting(caseDetails, null);
+    }
+
+    /**
+     * Update et1VettingBeforeYouStart with document extraction support.
+     * @param caseDetails Get caseId and Update caseData
+     * @param userToken user authorization token
+     */
+    public void initialiseEt1Vetting(CaseDetails caseDetails, String userToken) {
         caseDetails.getCaseData().setEt1VettingBeforeYouStart(initialBeforeYouStart(caseDetails));
         caseDetails.getCaseData().setEt1VettingClaimantDetailsMarkUp(
             getInitialClaimantDetailsMarkUp(caseDetails.getCaseData()));
@@ -105,6 +130,21 @@ public class Et1VettingService {
         populateRespondentAcasDetailsMarkUp(caseDetails.getCaseData());
         populateEraAssessmentMarkUp(caseDetails.getCaseData());
         initialEt1ReasonableAdjustments(caseDetails);
+        if (et1AiVettingService != null) {
+            et1AiVettingService.vetClaimAndPrepopulate(caseDetails, userToken);
+        }
+    }
+
+    /**
+     * Triggers background AI vetting on case submission so suggestions are cached before vetting starts.
+     *
+     * @param caseDetails submitted case details
+     * @param userToken user authorization token
+     */
+    public void triggerBackgroundAiVetting(CaseDetails caseDetails, String userToken) {
+        if (et1AiVettingService != null) {
+            et1AiVettingService.vetClaimInBackground(caseDetails, userToken);
+        }
     }
 
     private static void initialEt1ReasonableAdjustments(CaseDetails caseDetails) {

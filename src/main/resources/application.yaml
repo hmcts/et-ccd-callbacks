@@ -418,3 +418,12 @@ notifications:
     respondentSubmittedForClaimant: ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_CLAIMANT_TEMPLATE_ID:cdb6288d-8247-435a-875f-4ea48ca23c9e}
     respondentSubmittedForTribunal: ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID:12d604ce-df82-4c64-8544-ebbef66eb8c4}
   dataQualityReportTemplateId: ${DATA_QUALITY_REPORT_TEMPLATE_ID:57a8cba5-9885-4772-876b-09a3fe0abe94}
+
+ai:
+  gemini:
+    enabled: ${GEMINI_AI_ENABLED:false}
+    apiKey: ${GEMINI_API_KEY:${ANTIGRAVITY_API_KEY:}}
+    baseUrl: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com/v1beta}
+    model: ${GEMINI_MODEL:gemini-3.6-flash}
+    temperature: ${GEMINI_TEMPERATURE:0.1}
+

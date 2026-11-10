@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ai.Et1AiVettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
@@ -41,6 +42,8 @@ class Et1SubmissionControllerTest extends BaseControllerTest {
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     @MockitoBean
     private Et1SubmissionService et1SubmissionService;
+    @MockitoBean
+    private Et1AiVettingService et1AiVettingService;
     @Autowired
     private MockMvc mvc;
     @Autowired

@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ai.Et1AiVettingService;
 
 import java.io.IOException;
 
@@ -39,6 +40,7 @@ public class Et1SubmissionController {
 
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private final Et1SubmissionService et1SubmissionService;
+    private final Et1AiVettingService et1AiVettingService;
 
     @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Add HMCTSServiceId to supplementary_data on a case and send confirmation email.")
@@ -57,6 +59,7 @@ public class Et1SubmissionController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails);
         et1SubmissionService.sendEt1ConfirmationClaimant(caseDetails, userToken);
+        et1AiVettingService.vetClaimInBackground(caseDetails, userToken);
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 }

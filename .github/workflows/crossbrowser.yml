@@ -44,7 +44,7 @@ jobs:
       # Install npm dependencies
 
       - name: Install dependencies
-        run: yarn install --immutable --mode=skip-build --ignore-scripts
+        run: yarn install --immutable --ignore-scripts
 
       - name: build shared library
         run: yarn build:shared

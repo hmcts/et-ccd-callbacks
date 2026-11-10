@@ -6,10 +6,8 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,14 +42,12 @@ class VerifyTokenServiceServiceTest {
     @Mock
     JWSVerifierFactory jwsVerifierFactory;
 
-    @InjectMocks
     private VerifyTokenService verifyTokenService;
 
     @BeforeEach
     void setUp() {
-        verifyTokenService = new VerifyTokenService();
+        verifyTokenService = new VerifyTokenService("http://idam-api:5000/jwks");
         LoggerTestUtils.initializeLogger(VerifyTokenService.class);
-        ReflectionTestUtils.setField(verifyTokenService, "idamJwkUrl", "http://idam-api:5000/jwks");
     }
 
     @Test

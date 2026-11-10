@@ -43,11 +43,11 @@ jobs:
           cache: npm
       # Install npm dependencies
 
-      - name: build shared library
-        run: yarn run build:shared
-
       - name: Install dependencies
-        run: yarn install --legacy-peer-deps --ignore-scripts
+        run: yarn install --immutable --mode=skip-build --ignore-scripts
+
+      - name: build shared library
+        run: yarn build:shared
 
       # Install Playwright browsers
 

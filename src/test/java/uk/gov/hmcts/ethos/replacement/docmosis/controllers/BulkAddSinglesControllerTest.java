@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.bulkaddsingles.BulkAddSinglesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.bulkaddsingles.BulkAddSinglesValidator;
 
@@ -19,7 +18,6 @@ import static org.mockito.Mockito.when;
 
 class BulkAddSinglesControllerTest {
     private BulkAddSinglesController bulkAddSinglesController;
-    private VerifyTokenService verifyTokenService;
     private BulkAddSinglesValidator bulkAddSinglesValidator;
     private BulkAddSinglesService bulkAddSinglesService;
     private MultipleRequest multipleRequest;
@@ -30,32 +28,12 @@ class BulkAddSinglesControllerTest {
         bulkAddSinglesValidator = mock(BulkAddSinglesValidator.class);
         bulkAddSinglesService = mock(BulkAddSinglesService.class);
         authToken = "some-token";
-        verifyTokenService = mock(VerifyTokenService.class);
         multipleRequest = mock(MultipleRequest.class);
-        bulkAddSinglesController = new BulkAddSinglesController(bulkAddSinglesValidator, bulkAddSinglesService,
-                verifyTokenService);
-    }
-
-    @Test
-    void shouldHandleInvalidTokenForValidation() {
-        when(verifyTokenService.verifyTokenSignature(authToken)).thenReturn(false);
-        ResponseEntity<MultipleCallbackResponse> response =
-                bulkAddSinglesController.bulkAddSingleCasesImportFileMidEventValidation(multipleRequest,
-                authToken);
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
-    }
-
-    @Test
-    void shouldHandleInvalidTokenForCallback() {
-        when(verifyTokenService.verifyTokenSignature(authToken)).thenReturn(false);
-        ResponseEntity<MultipleCallbackResponse> response =
-                bulkAddSinglesController.bulkAddSingleCasesToMultiple(multipleRequest, authToken);
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        bulkAddSinglesController = new BulkAddSinglesController(bulkAddSinglesValidator, bulkAddSinglesService);
     }
 
     @Test
     void shouldReturnValidationResponse() {
-        when(verifyTokenService.verifyTokenSignature(authToken)).thenReturn(true);
         MultipleDetails multipleDetails = mock(MultipleDetails.class);
         when(multipleRequest.getCaseDetails()).thenReturn(multipleDetails);
         List<String> errors = List.of("Error 1", "Error 2", "Error 3");
@@ -68,7 +46,6 @@ class BulkAddSinglesControllerTest {
 
     @Test
     void shouldReturnCallbackResponse() {
-        when(verifyTokenService.verifyTokenSignature(authToken)).thenReturn(true);
         MultipleDetails multipleDetails = mock(MultipleDetails.class);
         when(multipleRequest.getCaseDetails()).thenReturn(multipleDetails);
         List<String> errors = List.of("Error 1", "Error 2", "Error 3");

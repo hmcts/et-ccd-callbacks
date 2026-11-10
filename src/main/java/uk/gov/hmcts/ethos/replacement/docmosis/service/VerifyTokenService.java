@@ -26,7 +26,6 @@ public class VerifyTokenService {
     private String idamJwkUrl;
 
     private final JWSVerifierFactory jwsVerifierFactory;
-    public static final String INVALID_TOKEN = "Invalid Token {}";
 
     public VerifyTokenService() {
         this.jwsVerifierFactory = new DefaultJWSVerifierFactory();
@@ -77,9 +76,5 @@ public class VerifyTokenService {
             log.error("Invalid JWK key", e);
             throw new VerifyTokenServiceException("Invalid JWK", e);
         }
-    }
-
-    public boolean isTokenSignatureValid(String token) {
-        return verifyTokenSignature(token);
     }
 }

@@ -298,15 +298,16 @@ public class Et1VettingPromptBuilder {
 
     private void appendAttachedFilesNotice(StringBuilder sb, List<AiDocumentAttachment> attachments) {
         if (CollectionUtils.isNotEmpty(attachments)) {
-            sb.append("\n-- Attached Claim Particulars Files (Multimodal Input) --\n");
+            sb.append("\n-- Attached Claim & ACAS Documents (Multimodal Input) --\n");
             for (AiDocumentAttachment attachment : attachments) {
                 sb.append("Attached Document: ").append(attachment.getFilename())
                     .append(" (MIME: ").append(attachment.getMimeType()).append(")\n");
             }
-            sb.append("NOTE: The above file(s) are attached directly to this request. ")
-                .append("Examine BOTH the typed Claim Narrative Text above AND the full contents of the attached ")
-                .append("document(s). Synthesize details from both sources to identify all factual grounds, ")
-                .append("dates, remedy requests, and causes of action for vetting.\n");
+            sb.append("NOTE: All ").append(attachments.size()).append(" file(s) listed above are attached directly ")
+                .append("to this request (e.g. ET1 form, Particulars of Claim, and ACAS Early Conciliation ")
+                .append("certificates). Cross-check ALL attached documents alongside the typed Claim Narrative Text ")
+                .append("above to verify claimant/respondent names, ACAS EC numbers, Day A/Day B dates, ")
+                .append("dates of events, remedy requests, and causes of action for Rule 13, ERA, and vetting.\n");
         }
     }
 

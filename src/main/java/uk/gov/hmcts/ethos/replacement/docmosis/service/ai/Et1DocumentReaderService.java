@@ -21,9 +21,16 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
+
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ACAS_CERTIFICATE;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_VETTING;
 
 @Slf4j
 @Service
@@ -31,7 +38,14 @@ import java.util.Objects;
 public class Et1DocumentReaderService {
 
     private static final int MAX_ATTACHMENT_BYTES = 15 * 1024 * 1024;
+    private static final int MAX_TOTAL_ATTACHMENT_BYTES = 25 * 1024 * 1024;
+    private static final int MAX_ATTACHMENT_COUNT = 10;
     private static final String APPLICATION_PDF = "application/pdf";
+    private static final Set<String> RELEVANT_DOCUMENT_TYPES = Set.of(
+            ET1,
+            ET1_ATTACHMENT,
+            ACAS_CERTIFICATE
+    );
 
     private final DocumentManagementService documentManagementService;
 
@@ -85,40 +99,72 @@ public class Et1DocumentReaderService {
     }
 
     /**
-     * Discovers and downloads relevant claim particulars documents for Gemini analysis.
+     * Discovers and downloads all relevant claim documents (Particulars of Claim, ET1 form,
+     * ET1 attachments, and ACAS Early Conciliation certificates) for Gemini analysis.
      *
      * @param caseData CCD CaseData
      * @param userToken auth token for DM Store
-     * @return List of AiDocumentAttachment objects
+     * @return List of deduplicated AiDocumentAttachment objects within payload caps
      */
     public List<AiDocumentAttachment> findClaimDocumentAttachments(CaseData caseData, String userToken) {
+        if (caseData == null) {
+            return List.of();
+        }
         List<AiDocumentAttachment> attachments = new ArrayList<>();
-        ClaimantRequestType requests = caseData.getClaimantRequests();
+        Set<String> seenBinaryUrls = new HashSet<>();
+        int totalBytes = 0;
 
-        if (requests != null && requests.getClaimDescriptionDocument() != null) {
-            AiDocumentAttachment claimDoc = downloadDocumentAttachment(
-                    userToken, requests.getClaimDescriptionDocument());
-            if (claimDoc != null) {
-                attachments.add(claimDoc);
-            }
+        ClaimantRequestType requests = caseData.getClaimantRequests();
+        if (requests != null) {
+            totalBytes = tryAddAttachment(
+                    requests.getClaimDescriptionDocument(), userToken, attachments, seenBinaryUrls, totalBytes);
         }
 
-        boolean hasNarrative = requests != null && StringUtils.isNotBlank(requests.getClaimDescription());
-        if (!hasNarrative && attachments.isEmpty() && CollectionUtils.isNotEmpty(caseData.getDocumentCollection())) {
+        totalBytes = tryAddAttachment(
+                caseData.getEt1SectionThreeDocumentUpload(), userToken, attachments, seenBinaryUrls, totalBytes);
+
+        if (CollectionUtils.isNotEmpty(caseData.getDocumentCollection())) {
             for (DocumentTypeItem docItem : caseData.getDocumentCollection()) {
+                if (attachments.size() >= MAX_ATTACHMENT_COUNT) {
+                    log.info("Reached max AI attachment count ({}); skipping remaining documents",
+                            MAX_ATTACHMENT_COUNT);
+                    break;
+                }
                 if (docItem.getValue() != null && docItem.getValue().getUploadedDocument() != null
-                        && isEt1ClaimDocument(docItem.getValue())) {
-                    AiDocumentAttachment et1Doc = downloadDocumentAttachment(
-                            userToken, docItem.getValue().getUploadedDocument());
-                    if (et1Doc != null) {
-                        attachments.add(et1Doc);
-                        break;
-                    }
+                        && isRelevantVettingDocument(docItem.getValue())) {
+                    totalBytes = tryAddAttachment(docItem.getValue().getUploadedDocument(), userToken,
+                            attachments, seenBinaryUrls, totalBytes);
                 }
             }
         }
 
         return attachments;
+    }
+
+    private int tryAddAttachment(UploadedDocumentType document,
+                                 String userToken,
+                                 List<AiDocumentAttachment> attachments,
+                                 Set<String> seenBinaryUrls,
+                                 int currentTotalBytes) {
+        if (document == null || StringUtils.isBlank(document.getDocumentBinaryUrl())
+                || attachments.size() >= MAX_ATTACHMENT_COUNT) {
+            return currentTotalBytes;
+        }
+        String normalizedUrl = document.getDocumentBinaryUrl().trim();
+        if (!seenBinaryUrls.add(normalizedUrl)) {
+            return currentTotalBytes;
+        }
+        AiDocumentAttachment downloaded = downloadDocumentAttachment(userToken, document);
+        if (downloaded == null || downloaded.getData() == null) {
+            return currentTotalBytes;
+        }
+        if (currentTotalBytes + downloaded.getData().length > MAX_TOTAL_ATTACHMENT_BYTES) {
+            log.warn("Skipping attachment {} because aggregate payload would exceed {} bytes limit",
+                    downloaded.getFilename(), MAX_TOTAL_ATTACHMENT_BYTES);
+            return currentTotalBytes;
+        }
+        attachments.add(downloaded);
+        return currentTotalBytes + downloaded.getData().length;
     }
 
     private String resolveMimeType(String filename, String contentType) {
@@ -139,13 +185,41 @@ public class Et1DocumentReaderService {
         }
     }
 
-    private boolean isEt1ClaimDocument(DocumentType docType) {
-        String type = Objects.toString(docType.getTypeOfDocument(), "").toLowerCase(Locale.ROOT);
-        String starting = Objects.toString(docType.getStartingClaimDocuments(), "").toLowerCase(Locale.ROOT);
-        String name = docType.getUploadedDocument() != null
+    private boolean isRelevantVettingDocument(DocumentType docType) {
+        String filename = docType.getUploadedDocument() != null
                 ? Objects.toString(docType.getUploadedDocument().getDocumentFilename(), "")
-                .toLowerCase(Locale.ROOT) : "";
-        return type.contains("et1") || starting.contains("et1") || name.startsWith("et1");
+                : "";
+        if (isVettingDocument(docType, filename)) {
+            return false;
+        }
+        return matchesRelevantDocumentType(docType.getTypeOfDocument())
+                || matchesRelevantDocumentType(docType.getStartingClaimDocuments())
+                || matchesRelevantDocumentType(docType.getDocumentType())
+                || matchesRelevantFilename(filename);
+    }
+
+    private boolean isVettingDocument(DocumentType docType, String filename) {
+        return ET1_VETTING.equalsIgnoreCase(StringUtils.trimToEmpty(docType.getTypeOfDocument()))
+                || ET1_VETTING.equalsIgnoreCase(StringUtils.trimToEmpty(docType.getStartingClaimDocuments()))
+                || ET1_VETTING.equalsIgnoreCase(StringUtils.trimToEmpty(docType.getDocumentType()))
+                || filename.toLowerCase(Locale.ROOT).contains(ET1_VETTING.toLowerCase(Locale.ROOT));
+    }
+
+    private boolean matchesRelevantDocumentType(String value) {
+        if (StringUtils.isBlank(value)) {
+            return false;
+        }
+        String trimmed = value.trim();
+        return RELEVANT_DOCUMENT_TYPES.stream().anyMatch(trimmed::equalsIgnoreCase);
+    }
+
+    private boolean matchesRelevantFilename(String filename) {
+        if (StringUtils.isBlank(filename)) {
+            return false;
+        }
+        String lower = filename.toLowerCase(Locale.ROOT);
+        return lower.startsWith(ET1.toLowerCase(Locale.ROOT))
+                || lower.contains("acas");
     }
 
     private String resolveAuthToken(String userToken) {

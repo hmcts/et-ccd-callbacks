@@ -32,6 +32,7 @@ export class Et1CreateDraftClaim extends BasePage {
   private readonly claimantStillWorkingNoticePeriodMonths: Locator;
   private readonly claimantStillWorkingNoticePeriodMonthsText: Locator;
   private readonly claimantAverageWeeklyWorkHours: Locator;
+  private readonly claimanttab: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -64,6 +65,7 @@ export class Et1CreateDraftClaim extends BasePage {
     this.claimantStillWorkingNoticePeriodMonths = page.locator('#claimantStillWorkingNoticePeriod-Months');
     this.claimantStillWorkingNoticePeriodMonthsText = page.locator('#claimantStillWorkingNoticePeriodMonths');
     this.claimantAverageWeeklyWorkHours = page.locator('#claimantAverageWeeklyWorkHours');
+    this.claimanttab= page.locator('#mat-tab-label-0-1');
   }
 
   async claimantWorkLocation() {
@@ -243,7 +245,7 @@ export class Et1CreateDraftClaim extends BasePage {
     await this.et1Section3Link.click();
     await this.page.waitForLoadState('load');
     await this.clickContinue(url, 2);
-
+    await expect(this.page.locator('#et1SectionThreeDateOfLastEvent')).toContainText('What is the date of the most recent event complained about?');
     await this.page.getByLabel('Day').fill('1');
     await this.page.getByLabel('Month').fill('1');
     await this.page.getByLabel('Year').fill('2026');
@@ -285,6 +287,8 @@ export class Et1CreateDraftClaim extends BasePage {
 
     await this.caseDetailsTab.isVisible();
     const submissionRef = await this.page.locator('//*[@id="case-viewer-field-read--feeGroupReference"]').innerText();
+    await this.claimanttab.click();
+    await expect(this.page.locator('#case-viewer-field-read--claimantOtherType')).toContainText('Date of last event');
     return submissionRef;
   }
 }

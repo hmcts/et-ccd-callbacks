@@ -28,6 +28,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
@@ -143,7 +144,7 @@ class DataQualityTaskTest {
         verify(ccdClient).submitEventForCase(eq(ADMIN_TOKEN), etCaseDataCaptor.capture(),
             eq(ET_CASE_TYPE_ID), eq(EMPLOYMENT), any(), eq(CASE_ID));
         CaseData submittedData = etCaseDataCaptor.getValue();
-        assertNull(submittedData.getStateAPI());
+        assertEquals(CLOSED_STATE, submittedData.getStateAPI());
         assertEquals(NO, submittedData.getPreAcceptCase().getCaseAccepted());
         assertEquals(ACCEPTED_DATE, submittedData.getPreAcceptCase().getDateRejected());
         assertNull(submittedData.getPreAcceptCase().getDateAccepted());
@@ -180,7 +181,7 @@ class DataQualityTaskTest {
         verify(ecmCcdClient).submitEventForCase(eq(ADMIN_TOKEN), ecmCaseDataCaptor.capture(),
             eq(ECM_CASE_TYPE_ID), eq(EMPLOYMENT), any(), eq(CASE_ID));
         uk.gov.hmcts.ecm.common.model.ccd.CaseData submittedData = ecmCaseDataCaptor.getValue();
-        assertNull(submittedData.getStateAPI());
+        assertEquals(CLOSED_STATE, submittedData.getStateAPI());
         assertEquals(NO, submittedData.getPreAcceptCase().getCaseAccepted());
         assertEquals(ACCEPTED_DATE, submittedData.getPreAcceptCase().getDateRejected());
         assertNull(submittedData.getPreAcceptCase().getDateAccepted());

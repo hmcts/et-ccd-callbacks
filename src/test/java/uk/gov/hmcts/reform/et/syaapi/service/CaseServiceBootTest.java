@@ -8,9 +8,10 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.ArrayList;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -43,10 +45,12 @@ import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.USER_ID;
         + "org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration"
 })
 @EnableAutoConfiguration(exclude = {FlywayAutoConfiguration.class, DataSourceAutoConfiguration.class})
-@Import(RestTemplateConfiguration.class)
+@SpringJUnitConfig(RestTemplateConfiguration.class)
 class CaseServiceBootTest {
     @Autowired
     CaseService caseService;
+    @Autowired
+    private RestTemplate restTemplate;
     @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
     @MockitoBean
@@ -75,6 +79,7 @@ class CaseServiceBootTest {
     private FeatureToggleService featureToggleService;
     @MockitoBean
     private VerifyTokenService verifyTokenService;
+
     private CaseTestData caseTestData;
 
     @BeforeEach
@@ -135,11 +140,16 @@ class CaseServiceBootTest {
     }
 
     @Test
+    void shouldCreateRestTemplateBean() {
+        assertThat(restTemplate).isNotNull();
+    }
+
+
+    @Test
     void theSubmitCaseProducesCaseDetails() {
         when(acasService.getAcasCertificatesByCaseData(caseTestData.getCaseData())).thenReturn(
             new ArrayList<>()
         );
-
         CaseDetails caseDetails = caseService.submitCase(TEST_SERVICE_AUTH_TOKEN, caseTestData.getCaseRequest());
         assertEquals(caseDetails.getId(), caseTestData.getExpectedDetails().getId());
         assertEquals(caseDetails.getJurisdiction(), caseTestData.getExpectedDetails().getJurisdiction());

@@ -144,7 +144,6 @@ class CaseServiceBootTest {
         assertThat(restTemplate).isNotNull();
     }
 
-
     @Test
     void theSubmitCaseProducesCaseDetails() {
         when(acasService.getAcasCertificatesByCaseData(caseTestData.getCaseData())).thenReturn(

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.et.syaapi.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.Jackson2RestTemplates;
 
 /**
  * The configuration used to create a RestTemplate for injection purposes.
@@ -17,6 +18,6 @@ public class RestTemplateConfiguration {
      */
     @Bean
     public RestTemplate getRestTemplate() {
-        return new RestTemplate();
+        return Jackson2RestTemplates.restTemplate();
     }
 }

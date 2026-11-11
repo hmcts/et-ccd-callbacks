@@ -138,7 +138,7 @@ class CaseDocumentServiceTest {
 
     @BeforeEach
     void setup() {
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = uk.gov.hmcts.ethos.replacement.docmosis.config.Jackson2RestTemplates.restTemplate();
         AuthTokenGenerator authTokenGenerator = () -> SERVICE_AUTH;
         caseDocumentService = new CaseDocumentService(restTemplate,
                                                       authTokenGenerator,

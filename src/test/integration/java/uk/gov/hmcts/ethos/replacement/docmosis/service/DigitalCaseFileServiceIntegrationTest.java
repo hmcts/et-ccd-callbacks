@@ -11,9 +11,10 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.http.converter.autoconfigure.HttpMessageConvertersAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cloud.openfeign.FeignAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -53,7 +54,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Import({DecentralisedDataConfiguration.class, DigitalCaseFileService.class,
     DigitalCaseFilePersistenceService.class, ETCaseView.class,
     DigitalCaseFileServiceIntegrationTest.TestConfig.class})
-@ImportAutoConfiguration({FeignAutoConfiguration.class, HttpMessageConvertersAutoConfiguration.class})
+// The application runs Jackson2AutoConfiguration with spring.http.converters.preferred-json-mapper=jackson2;
+// without it HttpMessageConverters falls back to Jackson 3, which is not the wire contract Feign uses in production.
+@ImportAutoConfiguration({FeignAutoConfiguration.class, HttpMessageConvertersAutoConfiguration.class,
+    Jackson2AutoConfiguration.class})
 class DigitalCaseFileServiceIntegrationTest {
 
     private static final long CASE_REFERENCE = 1_234_567_890_123_456L;

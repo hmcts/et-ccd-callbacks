@@ -10,12 +10,15 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScheduledTaskRunner;
+import uk.gov.hmcts.reform.ccd.client.CoreCaseDataClientAutoConfiguration;
 
 import java.util.TimeZone;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EUROPE_LONDON;
 
-@SpringBootApplication(scanBasePackages = {
+// core-case-data-store-client 5.x ships an auto-configuration that registers the same Feign clients ET
+// registers below (and adds a CCD health indicator ET never had). Keep ET as the single owner.
+@SpringBootApplication(exclude = CoreCaseDataClientAutoConfiguration.class, scanBasePackages = {
     "uk.gov.hmcts.ethos",
     "uk.gov.hmcts.ecm.common",
     "uk.gov.hmcts.reform.document",

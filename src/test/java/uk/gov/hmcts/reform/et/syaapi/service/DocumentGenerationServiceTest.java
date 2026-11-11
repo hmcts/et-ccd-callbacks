@@ -43,7 +43,7 @@ class DocumentGenerationServiceTest {
 
     @BeforeEach
     void setup() {
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = uk.gov.hmcts.ethos.replacement.docmosis.config.Jackson2RestTemplates.restTemplate();
         ObjectMapper objectMapper = new ObjectMapper();
         documentGenerationService = new DocumentGenerationService(restTemplate, objectMapper,
             TORNADO_API_URL, SOME_KEY);
@@ -70,7 +70,7 @@ class DocumentGenerationServiceTest {
     @Test
     void genDocumentWithDataFailingToConvertToJsonThrowsDocumentGenerationException()
         throws JsonProcessingException {
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = uk.gov.hmcts.ethos.replacement.docmosis.config.Jackson2RestTemplates.restTemplate();
         ObjectMapper objectMapper = mock(ObjectMapper.class);
         given(objectMapper.writeValueAsString(any()))
             .willThrow(new JsonParseException(null, "wellthatworkednot"));

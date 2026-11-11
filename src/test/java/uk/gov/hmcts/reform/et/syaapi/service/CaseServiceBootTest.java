@@ -36,10 +36,7 @@ import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.USER_ID;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CaseService.class, properties = "spring.flyway.enabled=false")
-@EnableAutoConfiguration(exclude = {
-        FlywayAutoConfiguration.class,
-        DataSourceAutoConfiguration.class
-})
+@EnableAutoConfiguration(exclude = {FlywayAutoConfiguration.class, DataSourceAutoConfiguration.class})
 class CaseServiceBootTest {
     @Autowired
     CaseService caseService;

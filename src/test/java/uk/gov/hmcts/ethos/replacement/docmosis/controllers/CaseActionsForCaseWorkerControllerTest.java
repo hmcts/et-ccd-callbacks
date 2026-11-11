@@ -109,7 +109,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private static final String UPDATE_RESPONDENT_EMAIL_ABOUT_TO_SUBMIT_URL =
             "/updateRespondentEmail/aboutToSubmit";
     private static final String AMEND_RESPONDENT_DETAILS_URL = "/amendRespondentDetails";
-    private static final String AMEND_RESPONDENT_REPRESENTATIVE_URL = "/amendRespondentRepresentative";
     private static final String UPDATE_HEARING_URL = "/updateHearing";
     private static final String RESTRICTED_CASES_URL = "/restrictedCases";
     private static final String AMEND_HEARING_URL = "/amendHearing";
@@ -126,7 +125,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private static final String DYNAMIC_LIST_BF_ACTIONS_URL = "/dynamicListBfActions";
     private static final String ABOUT_TO_START_DISPOSAL_URL = "/aboutToStartDisposal";
     private static final String INITIALISE_AMEND_CASE_DETAILS_URL = "/initialiseAmendCaseDetails";
-    private static final String DYNAMIC_RESPONDENT_REPRESENTATIVE_NAMES_URL = "/dynamicRespondentRepresentativeNames";
     private static final String DYNAMIC_RESTRICTED_REPORTING_URL = "/dynamicRestrictedReporting";
     private static final String DYNAMIC_DEPOSIT_ORDER_URL = "/dynamicDepositOrder";
     private static final String DYNAMIC_JUDGMENT_URL = "/dynamicJudgments";

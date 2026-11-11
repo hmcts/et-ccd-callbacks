@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -45,6 +46,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.PostDefaultValuesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
@@ -88,6 +90,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CaseActionsForCaseWorkerController.class, JsonMapper.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
+@Import(PostDefaultValuesService.class)
 class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     private static final String PRE_DEFAULT_VALUES_URL = "/preDefaultValues";
@@ -1358,334 +1361,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
-    void preDefaultValuesForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(PRE_DEFAULT_VALUES_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void postDefaultValuesForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(POST_DEFAULT_VALUES_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void amendCaseDetailsForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_CASE_DETAILS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void amendClaimantDetailsForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_CLAIMANT_DETAILS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void amendRespondentDetailsForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void amendRespondentRepresentativeForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void updateHearingForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(UPDATE_HEARING_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void restrictedCasesForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(RESTRICTED_CASES_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void amendHearingForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_HEARING_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void midEventAmendHearingForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(MID_EVENT_AMEND_HEARING_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void amendCaseStateForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_CASE_STATE_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void midRespondentAddressForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void jurisdictionValidationForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(JURISDICTION_VALIDATION_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void judgementValidationForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(JUDGEMENT_VALIDATION_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void depositValidationForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DEPOSIT_VALIDATION_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void midRespondentAddressPopulatedForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void singleCaseMultipleMidEventValidationForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(SINGLE_CASE_MULTIPLE_MID_EVENT_VALIDATION_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void hearingMidEventValidationForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(HEARING_MID_EVENT_VALIDATION_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void bfActionsForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(BF_ACTIONS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void dynamicListBfActionsForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DYNAMIC_LIST_BF_ACTIONS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void aboutToStartDisposalForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(ABOUT_TO_START_DISPOSAL_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-        verify(clerkService, never()).initialiseClerkResponsible(any(CaseData.class));
-        verify(fileLocationSelectionService, never()).initialiseFileLocation(any(CaseData.class));
-    }
-
-    @Test
-    @SneakyThrows
-    void dynamicRespondentRepresentativeNamesUrlForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DYNAMIC_RESPONDENT_REPRESENTATIVE_NAMES_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void dynamicDepositOrderUrlForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DYNAMIC_DEPOSIT_ORDER_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void dynamicRestrictedReportingUrlForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DYNAMIC_RESTRICTED_REPORTING_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void dynamicJudgmentUrlForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DYNAMIC_JUDGMENT_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void judgmentSubmittedUrlForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(JUDGEMENT_SUBMITTED_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void dynamicFixCaseAPIForbidden()  {
-        CaseDetails caseDetails = new CaseDetails();
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_FIX_CASE_API_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-        verify(fixCaseApiService, never()).checkUpdateMultipleReference(caseDetails, AUTH_TOKEN);
-    }
-
-    @Test
-    @SneakyThrows
-    void reinstateClosedCaseForbidden()  {
-        CaseData caseData = new CaseData();
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
-                        .content(requestContent2.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-        verify(caseCloseValidator, never()).validateReinstateClosedCaseMidEvent(caseData);
-    }
-
-    @Test
-    @SneakyThrows
-    void initialiseAmendCaseDetailsForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(INITIALISE_AMEND_CASE_DETAILS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-
-        verify(clerkService, never()).initialiseClerkResponsible(any(CaseData.class));
-        verify(fileLocationSelectionService, never()).initialiseFileLocation(any(CaseData.class));
-    }
-
-    @Test
-    @SneakyThrows
     void addServiceIdUrl_tokenOk()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(ADD_SERVICE_ID_URL)
@@ -1698,17 +1373,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
             .andExpect(jsonPath("$.warnings", nullValue()));
         verify(caseManagementForCaseWorkerService, times(1))
                 .setHmctsServiceIdSupplementary(any(CaseDetails.class));
-    }
-
-    @Test
-    @SneakyThrows
-    void addServiceIdUrl_tokenFail()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(ADD_SERVICE_ID_URL)
-                .content(requestContent2.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
     }
 
     @Test

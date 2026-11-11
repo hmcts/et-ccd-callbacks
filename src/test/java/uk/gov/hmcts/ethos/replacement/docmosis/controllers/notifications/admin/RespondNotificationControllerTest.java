@@ -77,16 +77,6 @@ class RespondNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStart_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_START_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void aboutToStart_badRequest() throws Exception {
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content("garbage content")
@@ -106,16 +96,6 @@ class RespondNotificationControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void aboutToSubmit_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -142,16 +122,6 @@ class RespondNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midGetNotification_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_GET_NOTIFICATION_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void midGetNotification_badRequest() throws Exception {
         mockMvc.perform(post(MID_GET_NOTIFICATION_URL)
                         .content("garbage content")
@@ -175,16 +145,6 @@ class RespondNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midValidateInput_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_GET_INPUT_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void midValidateInput_badRequest() throws Exception {
         mockMvc.perform(post(MID_GET_INPUT_URL)
                 .content("garbage content")
@@ -205,16 +165,6 @@ class RespondNotificationControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void submitted_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(SUBMITTED_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 
     @Test

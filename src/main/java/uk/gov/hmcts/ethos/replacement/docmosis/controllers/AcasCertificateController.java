@@ -16,11 +16,9 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AcasService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 
@@ -30,13 +28,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class AcasCertificateController {
     private static final String LOG_MESSAGE = "{} received notification request for case reference : {}";
 
-    private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String GENERATED_DOCUMENT_URL = "Please download the ACAS Certificate from : ";
-    private final VerifyTokenService verifyTokenService;
     private final AcasService acasService;
 
-    public AcasCertificateController(VerifyTokenService verifyTokenService, AcasService acasService) {
-        this.verifyTokenService = verifyTokenService;
+    public AcasCertificateController(AcasService acasService) {
         this.acasService = acasService;
     }
 
@@ -54,11 +49,6 @@ public class AcasCertificateController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
         log.info(LOG_MESSAGE, "RETRIEVE ACAS CERTIFICATES FROM ACAS ---> ", ccdRequest.getCaseDetails().getCaseId());
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = acasService.getAcasCertificate(caseData, userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId());
@@ -77,14 +67,8 @@ public class AcasCertificateController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> confirmation(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest) {
         log.info(LOG_MESSAGE, "SHOW CERTIFICATE CONFIRMATION ---> ", ccdRequest.getCaseDetails().getCaseId());
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
                 .confirmation_body(GENERATED_DOCUMENT_URL + ccdRequest.getCaseDetails().getCaseData().getDocMarkUp())

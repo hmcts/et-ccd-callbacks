@@ -83,21 +83,4 @@ class ListHearingControllerTest extends BaseControllerTest {
                 ccdRequest.getCaseDetails().getCaseData());
         verify(venueSelectionService, never()).initHearingCollection(ccdRequest.getCaseDetails().getCaseData());
     }
-
-    @Test
-    void testInitialiseHearingInvalidToken() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID).build();
-        String userToken = "invalid-token";
-        when(verifyTokenService.verifyTokenSignature(userToken)).thenReturn(false);
-
-        mockMvc.perform(post("/initialiseHearings")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", userToken)
-                .content(jsonMapper.toJson(ccdRequest)))
-
-                .andExpect(status().isForbidden());
-
-        verify(venueSelectionService, never()).initHearingCollection(ccdRequest.getCaseDetails().getCaseData());
-        verify(scotlandVenueSelectionService, never()).initHearingCollection(ccdRequest.getCaseDetails().getCaseData());
-    }
 }

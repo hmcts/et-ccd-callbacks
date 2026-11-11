@@ -78,13 +78,17 @@ class AddDocumentControllerTest {
         verify(documentManagementService, times(1)).addUploadedDocsToCaseDocCollection(any());
     }
 
+    /**
+     * Controllers no longer check the token themselves: RequestInterceptor rejects the request before it
+     * reaches them. This covers that wiring once, rather than repeating it for every callback.
+     */
     @Test
-    void testAboutToSubmitWithInvalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature("invalidToken")).thenReturn(false);
+    void aboutToSubmitRejectedByInterceptorWhenTokenInvalid() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
         verify(documentManagementService, never()).addUploadedDocsToCaseDocCollection(any());
     }

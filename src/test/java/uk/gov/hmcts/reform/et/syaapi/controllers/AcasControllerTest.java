@@ -36,6 +36,7 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -109,6 +110,10 @@ class AcasControllerTest {
             .andExpect(status().isBadRequest());
     }
 
+    /**
+     * Covers the citizen API interceptor rejecting a request before it reaches the controller. The callback
+     * controllers rely on the same pattern, which AddDocumentControllerTest covers for the other interceptor.
+     */
     @Test
     void getLastModifiedCaseListWhenInvalidTokenReturnError() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -116,6 +121,7 @@ class AcasControllerTest {
                             .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                             .param("datetime", REQUEST_DATE_TIME_STRING))
             .andExpect(status().isForbidden());
+        verifyNoInteractions(acasCaseService);
     }
 
     @Test
@@ -150,15 +156,6 @@ class AcasControllerTest {
     }
 
     @Test
-    void getCaseDataInvalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(get(GET_CASE_DATA_URL)
-                            .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                            .param("caseIds", caseIds.toString()))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void getAcasDocumentsDocumentsFound() throws Exception {
         List<CaseDocumentAcasResponse> acasDocs = new ArrayList<>();
         CaseDocumentAcasResponse caseDocumentAcasResponse = CaseDocumentAcasResponse.builder()
@@ -185,15 +182,6 @@ class AcasControllerTest {
     }
 
     @Test
-    void getAcasDocumentsInvalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(get(GET_ACAS_DOCUMENTS_URL)
-                            .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                            .param(CASE_ID_PARAM, "dummy"))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void downloadAcasDocumentsDocumentsFound() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
@@ -210,15 +198,6 @@ class AcasControllerTest {
         mockMvc.perform(get(DOWNLOAD_ACAS_DOCUMENTS_URL)
                             .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN))
             .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void downloadAcasDocumentsInvalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(get(DOWNLOAD_ACAS_DOCUMENTS_URL)
-                            .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                            .param("documentId", UUID.randomUUID().toString()))
-            .andExpect(status().isForbidden());
     }
 
     @Test

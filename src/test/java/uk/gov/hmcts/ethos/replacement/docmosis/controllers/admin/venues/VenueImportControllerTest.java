@@ -63,24 +63,6 @@ class VenueImportControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void testInitImportForbidden() throws Exception {
-        String documentBinaryUrl = "http://dm-store:8888/documents/12131212";
-        CCDRequest ccdRequest = AdminDataBuilder
-                .builder()
-                .withVenueImport(TribunalOffice.LEEDS, documentBinaryUrl)
-                .buildAsCCDRequest();
-        String token = "some-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/admin/venue/initImport")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", token)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(venueImportService, never()).initImport(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
     void testInitImportBadRequest() throws Exception {
         mockMvc.perform(post("/admin/venue/initImport")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -111,25 +93,6 @@ class VenueImportControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(venueImportService, times(1)).importVenues(ccdRequest.getCaseDetails().getAdminData(), token);
-    }
-
-    @Test
-    void testImportForbidden() throws Exception {
-        String documentBinaryUrl = "http://dm-store:8888/documents/12131212";
-        CCDRequest ccdRequest = AdminDataBuilder
-                .builder()
-                .withVenueImport(TribunalOffice.LEEDS, documentBinaryUrl)
-                .buildAsCCDRequest();
-        String token = "some-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/admin/venue/import")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", token)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-
-        verify(venueImportService, never()).importVenues(ccdRequest.getCaseDetails().getAdminData(), token);
     }
 
     @Test

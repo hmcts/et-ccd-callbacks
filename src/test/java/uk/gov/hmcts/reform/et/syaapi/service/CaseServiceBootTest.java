@@ -37,6 +37,7 @@ import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.USER_ID;
     "spring.autoconfigure.exclude=org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration,"
         + "org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration"
 })
+@EnableAutoConfiguration(exclude = {FlywayAutoConfiguration.class, DataSourceAutoConfiguration.class})
 class CaseServiceBootTest {
     @Autowired
     CaseService caseService;

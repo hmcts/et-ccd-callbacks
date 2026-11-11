@@ -71,23 +71,6 @@ class AllocateHearingControllerTest {
     }
 
     @Test
-    void testInitialiseHearingDynamicListInvalidToken() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder()
-                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
-                .build();
-        String token = "invalid-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/allocatehearing/initialiseHearings")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", token)
-                .content(jsonMapper.toJson(ccdRequest)))
-
-                .andExpect(status().isForbidden());
-        verify(allocateHearingService, never()).initialiseAllocateHearing(ccdRequest.getCaseDetails().getCaseData());
-    }
-
-    @Test
     void testHandleListingSelected() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
@@ -105,23 +88,6 @@ class AllocateHearingControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(allocateHearingService, times(1)).handleListingSelected(ccdRequest.getCaseDetails().getCaseData());
-    }
-
-    @Test
-    void testHandleListingSelectedInvalidToken() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder()
-                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
-                .build();
-        String token = "invalid-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/allocatehearing/handleListingSelected")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", token)
-                .content(jsonMapper.toJson(ccdRequest)))
-
-                .andExpect(status().isForbidden());
-        verify(allocateHearingService, never()).handleListingSelected(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
@@ -183,23 +149,6 @@ class AllocateHearingControllerTest {
     }
 
     @Test
-    void testPopulateRoomsInvalidToken() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder()
-                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
-                .build();
-        String token = "invalid-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/allocatehearing/populateRooms")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", token)
-                .content(jsonMapper.toJson(ccdRequest)))
-
-                .andExpect(status().isForbidden());
-        verify(allocateHearingService, never()).populateRooms(ccdRequest.getCaseDetails().getCaseData());
-    }
-
-    @Test
     void testAboutToSubmit_EnglandWales() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
@@ -239,23 +188,5 @@ class AllocateHearingControllerTest {
 
         verify(allocateHearingService, times(1)).updateSelectedHearing(ccdRequest.getCaseDetails().getCaseData());
         verify(scotlandAllocateHearingService, times(1)).updateCase(ccdRequest.getCaseDetails().getCaseData());
-    }
-
-    @Test
-    void testAboutToSubmitInvalidToken() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder()
-                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
-                .build();
-        String token = "invalid-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/allocatehearing/aboutToSubmit")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", token)
-                .content(jsonMapper.toJson(ccdRequest)))
-
-                .andExpect(status().isForbidden());
-        verify(allocateHearingService, never()).updateSelectedHearing(ccdRequest.getCaseDetails().getCaseData());
-        verify(allocateHearingService, never()).updateCase(ccdRequest.getCaseDetails().getCaseData());
     }
 }

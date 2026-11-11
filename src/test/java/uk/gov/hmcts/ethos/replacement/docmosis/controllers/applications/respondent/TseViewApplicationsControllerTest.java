@@ -95,16 +95,6 @@ class TseViewApplicationsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStart_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_START_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void aboutToStart_badRequest() throws Exception {
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content("garbage content")
@@ -127,16 +117,6 @@ class TseViewApplicationsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midPopulateChooseApplication_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_POPULATE_CHOOSE_APPLICATION_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void midPopulateChooseApplication_badRequest() throws Exception {
         mockMvc.perform(post(MID_POPULATE_CHOOSE_APPLICATION_URL)
                         .content("test content")
@@ -156,16 +136,6 @@ class TseViewApplicationsControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void midPopulateReply_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_POPULATE_SELECTED_APPLICATION)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 
     @Test

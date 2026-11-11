@@ -18,7 +18,6 @@ import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -63,21 +62,6 @@ class HearingDetailsControllerTest {
     }
 
     @Test
-    void testInitialiseHearingDynamicListInvalidToken() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
-        String token = "invalid-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/hearingdetails/initialiseHearings")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", token)
-                .content(jsonMapper.toJson(ccdRequest)))
-
-                .andExpect(status().isForbidden());
-        verify(hearingDetailsService, never()).initialiseHearingDetails(ccdRequest.getCaseDetails().getCaseData());
-    }
-
-    @Test
     void testHandleListingSelected() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         String token = "some-token";
@@ -93,21 +77,6 @@ class HearingDetailsControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(hearingDetailsService, times(1)).handleListingSelected(ccdRequest.getCaseDetails().getCaseData());
-    }
-
-    @Test
-    void testHandleListingSelectedInvalidToken() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
-        String token = "invalid-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/hearingdetails/handleListingSelected")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", token)
-                .content(jsonMapper.toJson(ccdRequest)))
-
-                .andExpect(status().isForbidden());
-        verify(hearingDetailsService, never()).handleListingSelected(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
@@ -128,21 +97,6 @@ class HearingDetailsControllerTest {
     }
 
     @Test
-    void testhearingMidEventValidationInvalidToken() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
-        String token = "invalid-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/hearingdetails/hearingMidEventValidation")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", token)
-                .content(jsonMapper.toJson(ccdRequest)))
-
-                .andExpect(status().isForbidden());
-        verify(hearingDetailsService, never()).handleListingSelected(ccdRequest.getCaseDetails().getCaseData());
-    }
-
-    @Test
     void testAboutToSubmit() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         String token = "some-token";
@@ -158,20 +112,5 @@ class HearingDetailsControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(hearingDetailsService, times(1)).updateCase(ccdRequest.getCaseDetails());
-    }
-
-    @Test
-    void testAboutToSubmitInvalidToken() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
-        String token = "invalid-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/hearingdetails/aboutToSubmit")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", token)
-                .content(jsonMapper.toJson(ccdRequest)))
-
-                .andExpect(status().isForbidden());
-        verify(hearingDetailsService, never()).updateCase(ccdRequest.getCaseDetails());
     }
 }

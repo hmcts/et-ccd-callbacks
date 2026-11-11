@@ -141,24 +141,4 @@ class ReferenceDataControllerTest extends BaseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
-
-    @Test
-    void hearingVenueReferenceDataForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(HEARING_VENUE_REFERENCE_DATA)
-                .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void dateListedReferenceDataForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DATE_LISTED_REFERENCE_DATA)
-                .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
 }

@@ -167,16 +167,6 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initICCompleteTokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(COMPLETE_INITIAL_CONSIDERATION_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void initICCompleteBadRequest() throws Exception {
         mvc.perform(post(COMPLETE_INITIAL_CONSIDERATION_URL)
                 .content("bad request")
@@ -202,16 +192,6 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(caseFlagsService, times(1)).setPrivateHearingFlag(any());
         verify(employmentRightsActService, times(1)).processUnfairDismissalEra(any(), any());
-    }
-
-    @Test
-    void submitInitialConsideration_TokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(SUBMIT_INITIAL_CONSIDERATION_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 
     @Test

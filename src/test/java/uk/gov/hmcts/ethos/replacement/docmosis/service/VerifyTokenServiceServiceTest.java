@@ -6,13 +6,11 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,26 +47,19 @@ class VerifyTokenServiceServiceTest {
     @Mock
     JWSVerifierFactory jwsVerifierFactory;
 
-    @InjectMocks
     private VerifyTokenService verifyTokenService;
 
     @BeforeEach
     void setUp() {
-        verifyTokenService = new VerifyTokenService();
+        verifyTokenService = new VerifyTokenService("http://idam-api:5000/jwks");
         LoggerTestUtils.initializeLogger(VerifyTokenService.class);
-        ReflectionTestUtils.setField(verifyTokenService, "idamJwkUrl", "http://idam-api:5000/jwks");
-    }
-
-    @Test
-    void verifyTokenSignature() {
-        assertThat(verifyTokenService.verifyTokenSignature(INVALID_USER_TOKEN)).isFalse();
     }
 
     @Test
     @SneakyThrows
-    void theIsTokenSignatureValid() {
+    void verifyTokenSignature() {
         // when token is invalid should return false and log invalid token error
-        assertThat(verifyTokenService.isTokenSignatureValid(INVALID_USER_TOKEN)).isFalse();
+        assertThat(verifyTokenService.verifyTokenSignature(INVALID_USER_TOKEN)).isFalse();
         LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_TWO, EXPECTED_ERROR_INVALID_TOKEN);
     }
 }

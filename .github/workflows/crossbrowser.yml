@@ -15,20 +15,22 @@ on:
 jobs:
   playwright-tests:
     name: ${{ matrix.os }} - ${{ matrix.browser }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.runs_on  }}
     strategy:
       fail-fast: false
       max-parallel: 1
       matrix:
-        os:
-          - ubuntu-latest
-          - windows-latest
-          - macos-latest
-        browser:
-          - chromium
-          - firefox
-          - webkit
+       include:
+          # Self-hosted runners
+          - runner_type: self-hosted
+            os: linux
+            runs_on: [azure-prod, linux, x64]
+            browser: chromium
 
+          - runner_type: self-hosted
+            os: windows
+            runs_on: [azure-prod, windows, x64]
+            browser: firefox
     timeout-minutes: 300
     steps:
       # Checkout source code

@@ -14,7 +14,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SuppressWarnings("removal")
 class Jackson2RestTemplatesTest {
 
     @Test

@@ -19,7 +19,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
 import java.io.IOException;
@@ -39,11 +38,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 public class AddLegalRepToMultipleController {
 
-    private final VerifyTokenService verifyTokenService;
     private final MultipleReferenceService multipleReferenceService;
     private final UserIdamService userService;
 
-    private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String ADD_USER_COMPLETE =
             "<h1>You have been added to the Multiple for the case: %s</h1>";
 
@@ -54,7 +51,6 @@ public class AddLegalRepToMultipleController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
     public ResponseEntity<CCDCallbackResponse> startAddLegalRepToMultiple(
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
         @RequestBody CCDRequest ccdRequest) {
 
         log.info("START OF ADD LEGAL REP TO MULTIPLE ---> {}", ccdRequest.getCaseDetails().getCaseId());
@@ -99,7 +95,6 @@ public class AddLegalRepToMultipleController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
     public ResponseEntity<CCDCallbackResponse> completeAddLegalRepToMultiple(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
             @RequestBody CCDRequest ccdRequest) {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         log.info("Issue Add Legal Rep to Multiple complete requested for case reference ---> {}",

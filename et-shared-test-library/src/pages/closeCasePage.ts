@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { BasePage } from './basePage';
+import { BasePage } from './basePage.js';
 
 export class CloseCasePage extends BasePage {
   private readonly clerkResponsibleDropdown;

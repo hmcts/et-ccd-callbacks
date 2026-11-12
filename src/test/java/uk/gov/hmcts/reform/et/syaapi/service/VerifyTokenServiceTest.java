@@ -4,9 +4,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -14,13 +12,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 @ExtendWith(MockitoExtension.class)
 class VerifyTokenServiceTest {
 
-    @InjectMocks
     private VerifyTokenService verifyTokenService;
 
     @BeforeEach
     public void setUp() {
-        verifyTokenService = new VerifyTokenService();
-        ReflectionTestUtils.setField(verifyTokenService, "idamJwkUrl", "http://localhost:5555/o/jwks");
+        verifyTokenService = new VerifyTokenService("http://localhost:5555/o/jwks");
     }
 
     @Test

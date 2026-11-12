@@ -1,7 +1,7 @@
 # Employment Tribunals CCD Callbacks Service
 
 [![Java](https://img.shields.io/badge/Java-21-blue.svg)](https://www.oracle.com/java/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.16-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Gradle](https://img.shields.io/badge/Gradle-Wrapper-blue.svg)](https://gradle.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
 
@@ -29,19 +29,23 @@ For detailed information about working with the CCD definitions, see [ccd-defini
 | Component | Version | Status |
 |-----------|---------|--------|
 | Java | 21 | ✅ Supported |
-| Spring Boot | 3.3.0 | ✅ Current |
+| Spring Boot | 3.5.16 | ✅ Current |
 | Spring Security | 6.x | ✅ Current |
-| Node.js | 18+ | ✅ Supported |
+| Node.js | 22 (see [`.nvmrc`](.nvmrc)) | ✅ Supported |
 | Gradle | Wrapper | ✅ Current |
 
 > ⚠️ **Breaking Change**: Java 21 is now required. Java 17 and earlier versions are no longer supported.
+
+## Coding Agents
+
+[`AGENTS.md`](AGENTS.md) is the operating manual for AI coding agents working in this repository (commands, layout, code style, PR quality gates, boundaries, and subagent orchestration in [`docs/subagents.md`](docs/subagents.md)). Codex and Warp load it directly; Claude Code imports it from [`CLAUDE.md`](CLAUDE.md); Cursor loads it via [`.cursor/rules/follow-agents-md.mdc`](.cursor/rules/follow-agents-md.mdc); GitHub Copilot reads [`.github/copilot-instructions.md`](.github/copilot-instructions.md).
 
 ## Prerequisites
 
 ### Java
 - [JDK 21](https://www.oracle.com/java) (upgraded from JDK 17)
 
-**Note: This application has been upgraded to Spring Boot 3.3.0 and requires Java 21.**
+**Note: This application runs on Spring Boot 3.5.16 and requires Java 21.**
 
 ### CCD Common Components
 The application should be run locally in an environment that includes CCD common components.
@@ -49,6 +53,10 @@ The application should be run locally in an environment that includes CCD common
 There are two options for achieving this:
 - [RSE CFT lib](docs/cftlib.md)
 - [ECM CCD Docker](docs/ecm-ccd-docker.md)
+- [Work Allocation with CFTLib](docs/work-allocation-cftlib.md)
+- [CCD Decentralisation](docs/decentralisation.md)
+- [How to Decentralise an Event or Field](docs/how-to-decentralise.md)
+- [Subagent Orchestration Guide](docs/subagents.md)
 
 ### Postgres Database
 A local database is required. This is provided by one of the CCD common components environments.

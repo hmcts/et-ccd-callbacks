@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.ai;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -20,8 +22,12 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.VettingJurisdictionCodesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.ai.GeminiProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ai.AiDocumentAttachment;
@@ -45,6 +51,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ACAS_CERTIFICATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper.DD_MM_YYYY_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper.normalizeDatesToDdMmYyyy;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.EmploymentRightsActService.NOT_APPLICABLE;
@@ -256,19 +263,44 @@ public class Et1AiVettingService {
             List<AiDocumentAttachment> attachments = documentReaderService.findClaimDocumentAttachments(
                     caseDetails.getCaseData(), userToken);
             List<String> availableVenues = resolveAvailableVenueNames(caseDetails.getCaseData());
-            String prompt = promptBuilder.buildPrompt(caseDetails, attachments, availableVenues);
-            String rawJson = geminiClient.generateContent(prompt, attachments);
+            String systemInstruction = promptBuilder.buildSystemInstruction();
+            String casePrompt = promptBuilder.buildCasePrompt(caseDetails, attachments, availableVenues);
+            String rawJson = geminiClient.generateContent(systemInstruction, casePrompt, attachments);
 
             if (StringUtils.isBlank(rawJson)) {
                 log.warn("AI returned empty response for case {}", caseDetails.getCaseId());
                 return Optional.empty();
             }
 
-            return Optional.of(objectMapper.readValue(rawJson, Et1AiVettingResult.class));
+            return parseVettingResult(rawJson, caseDetails.getCaseId());
         } catch (Exception ex) {
             log.error("Failed to run AI vetting for case {}: {}", caseDetails.getCaseId(), ex.getMessage(), ex);
             return Optional.empty();
         }
+    }
+
+    private Optional<Et1AiVettingResult> parseVettingResult(String rawJson, String caseId)
+            throws JsonProcessingException {
+        JsonNode root = objectMapper.readTree(rawJson);
+        if (root == null) {
+            return Optional.empty();
+        }
+        if (root.isArray()) {
+            if (root.isEmpty()) {
+                log.warn("AI returned empty JSON array for case {}", caseId);
+                return Optional.empty();
+            }
+            if (root.size() > 1) {
+                log.warn("AI returned JSON array of size {} for case {}; using first object",
+                        root.size(), caseId);
+            }
+            root = root.get(0);
+        }
+        if (!root.isObject()) {
+            log.warn("AI returned non-object JSON root ({}) for case {}", root.getNodeType(), caseId);
+            return Optional.empty();
+        }
+        return Optional.of(objectMapper.treeToValue(root, Et1AiVettingResult.class));
     }
 
     private String resolveRequestAuthToken() {
@@ -324,11 +356,25 @@ public class Et1AiVettingService {
     }
 
     private void populateAcasAssessments(CaseData caseData, Et1AiVettingResult result) {
-        if (CollectionUtils.isEmpty(result.getAcasAssessments())) {
+        if (CollectionUtils.isNotEmpty(result.getAcasAssessments())) {
+            for (Et1AiVettingResult.AcasAssessment assessment : result.getAcasAssessments()) {
+                setAcasFieldsForRespondent(caseData, assessment);
+            }
+        }
+        appendMissingAcasDocumentWarningNote(caseData);
+    }
+
+    private void appendMissingAcasDocumentWarningNote(CaseData caseData) {
+        if (hasAcasCertificateDocument(caseData) || !hasRespondentAcasDates(caseData)) {
             return;
         }
-        for (Et1AiVettingResult.AcasAssessment assessment : result.getAcasAssessments()) {
-            setAcasFieldsForRespondent(caseData, assessment);
+        String warning = "No ACAS Certificate document is attached; respondent ACAS dates were used and "
+                + "the actual certificate needs to be checked.";
+        String existing = caseData.getEt1VettingAcasCertGeneralNote();
+        if (StringUtils.isBlank(existing)) {
+            caseData.setEt1VettingAcasCertGeneralNote(AI_NOTE_PREFIX + warning);
+        } else if (!existing.toLowerCase(Locale.ROOT).contains("actual certificate")) {
+            caseData.setEt1VettingAcasCertGeneralNote(existing + " " + warning);
         }
     }
 
@@ -1294,11 +1340,18 @@ public class Et1AiVettingService {
             addIfAbsent(items, "Can serve claim: Unable to determine automatically; please verify service details.");
         }
         if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
+            boolean hasAcasDoc = hasAcasCertificateDocument(caseData);
             int count = Math.min(caseData.getRespondentCollection().size(), 6);
             for (int idx = 1; idx <= count; idx++) {
                 if (StringUtils.isBlank(getAcasCertFieldByNumber(caseData, idx))) {
                     addIfAbsent(items, "Respondent " + idx
                             + " ACAS certificate check: Unable to confirm automatically; please double-check.");
+                }
+                RespondentSumType respondent = caseData.getRespondentCollection().get(idx - 1).getValue();
+                if (!hasAcasDoc && hasAcasDates(respondent)) {
+                    addIfAbsent(items, "Respondent " + idx
+                            + " ACAS certificate: No ACAS Certificate document is attached; respondent ACAS dates "
+                            + "were used, so the actual certificate needs to be checked.");
                 }
             }
         }
@@ -1343,5 +1396,41 @@ public class Et1AiVettingService {
             case 6 -> caseData.getEt1VettingAcasCertIsYesOrNo6();
             default -> null;
         };
+    }
+
+    private boolean hasRespondentAcasDates(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+            return false;
+        }
+        return caseData.getRespondentCollection().stream()
+                .map(RespondentSumTypeItem::getValue)
+                .anyMatch(this::hasAcasDates);
+    }
+
+    private boolean hasAcasDates(RespondentSumType respondent) {
+        return respondent != null
+                && (StringUtils.isNotBlank(respondent.getAcasCertificateReceiptDate())
+                || StringUtils.isNotBlank(respondent.getAcasCertificateIssueDate()));
+    }
+
+    private boolean hasAcasCertificateDocument(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
+            return false;
+        }
+        return caseData.getDocumentCollection().stream()
+                .map(DocumentTypeItem::getValue)
+                .anyMatch(this::isAcasCertificateDocument);
+    }
+
+    private boolean isAcasCertificateDocument(DocumentType docType) {
+        if (docType == null || docType.getUploadedDocument() == null) {
+            return false;
+        }
+        String filename = StringUtils.trimToEmpty(docType.getUploadedDocument().getDocumentFilename())
+                .toLowerCase(Locale.ROOT);
+        return ACAS_CERTIFICATE.equalsIgnoreCase(StringUtils.trimToEmpty(docType.getTypeOfDocument()))
+                || ACAS_CERTIFICATE.equalsIgnoreCase(StringUtils.trimToEmpty(docType.getStartingClaimDocuments()))
+                || ACAS_CERTIFICATE.equalsIgnoreCase(StringUtils.trimToEmpty(docType.getDocumentType()))
+                || filename.contains("acas");
     }
 }

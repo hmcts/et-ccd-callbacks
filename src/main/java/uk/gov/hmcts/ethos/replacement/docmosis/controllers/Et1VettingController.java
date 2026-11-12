@@ -31,8 +31,8 @@ import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper.DD_MM_YYYY_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper.buildFlagsImageFileName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.JurisdictionCodeHelper.populateJurCodesCollectionIds;
 
@@ -162,7 +162,7 @@ public class Et1VettingController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         et1VettingService.setEraFields(caseData);
         caseData.setEt1VettingCompletedBy(reportDataService.getUserFullName(userToken));
-        caseData.setEt1DateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern(DD_MM_YYYY_DATE_FORMAT)));
+        caseData.setEt1DateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT)));
         DocumentInfo documentInfo = et1VettingService.generateEt1VettingDocument(caseData, userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId());
         caseData.setEt1VettingDocument(documentManagementService.addDocumentToDocumentField(documentInfo));

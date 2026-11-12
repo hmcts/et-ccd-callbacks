@@ -61,6 +61,21 @@ public class GeminiClient {
      * @return Raw JSON text response from Gemini
      */
     public String generateContent(String prompt, List<AiDocumentAttachment> attachments) {
+        return generateContent(null, prompt, attachments);
+    }
+
+    /**
+     * Calls Google Gemini Generative Language API with separate system instruction, case prompt,
+     * and binary file attachments (multimodal), enabling prompt prefix caching.
+     *
+     * @param systemInstruction Static system rules and JSON schema (optional)
+     * @param prompt Dynamic user prompt text containing claim facts
+     * @param attachments List of binary file attachments (ET1, Particulars, ACAS certificates)
+     * @return Raw JSON text response from Gemini
+     */
+    public String generateContent(String systemInstruction,
+                                  String prompt,
+                                  List<AiDocumentAttachment> attachments) {
         if (StringUtils.isBlank(geminiProperties.getApiKey())) {
             log.warn("Gemini API key is not configured; skipping AI call");
             return null;
@@ -93,10 +108,14 @@ public class GeminiClient {
             generationConfig.put("temperature", geminiProperties.getTemperature());
             generationConfig.put("responseMimeType", "application/json");
 
-            Map<String, Object> requestBody = Map.of(
-                    "contents", Collections.singletonList(content),
-                    "generationConfig", generationConfig
-            );
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("contents", Collections.singletonList(content));
+            requestBody.put("generationConfig", generationConfig);
+            if (StringUtils.isNotBlank(systemInstruction)) {
+                requestBody.put("systemInstruction", Map.of(
+                        "parts", Collections.singletonList(Map.of("text", systemInstruction))
+                ));
+            }
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
             String url = String.format("%s/models/%s:generateContent",

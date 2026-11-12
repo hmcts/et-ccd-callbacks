@@ -62,7 +62,7 @@ public class AcasService {
         }
 
         AcasCertificate acasCertificate = acasCertificateObject.getFirst();
-        if (NOT_FOUND.equals(acasCertificate.getCertificateDocument())) {
+        if (hasInvalidCertificateDocument(acasCertificate)) {
             return List.of("No ACAS Certificate found");
         }
 
@@ -90,7 +90,8 @@ public class AcasService {
         if (respondent.isPresent()) {
             acasName = " - " + respondent.get().getValue().getRespondentName();
         }
-        byte[] pdfData = Base64.getDecoder().decode(acasCertificate.getCertificateDocument());
+        String sanitizedBase64 = acasCertificate.getCertificateDocument().replaceAll("\\s+", "");
+        byte[] pdfData = Base64.getDecoder().decode(sanitizedBase64);
         return tornadoService.createDocumentInfoFromBytes(authToken, pdfData,
                 "ACAS Certificate" + acasName + " - " + acasCertificate.getCertificateNumber() + ".pdf",
                 caseTypeId);
@@ -120,12 +121,27 @@ public class AcasService {
             }
             populateAcasDatesOnRespondents(caseData, acasCertificateList);
             return acasCertificateList.stream()
+                    .filter(cert -> {
+                        if (hasInvalidCertificateDocument(cert)) {
+                            log.warn("No ACAS certificate document returned for certificate {}",
+                                    cert != null ? cert.getCertificateNumber() : "unknown");
+                            return false;
+                        }
+                        return true;
+                    })
                     .map(ac -> createAcasCertificate(caseData, authToken, caseTypeId, ac))
                     .toList();
         } catch (Exception errorException) {
             log.error("Error retrieving ACAS Certificate with exception : {}", errorException.getMessage());
             throw errorException;
         }
+    }
+
+    private boolean hasInvalidCertificateDocument(AcasCertificate acasCertificate) {
+        if (acasCertificate == null || isNullOrEmpty(acasCertificate.getCertificateDocument())) {
+            return true;
+        }
+        return NOT_FOUND.equalsIgnoreCase(acasCertificate.getCertificateDocument().trim());
     }
 
     private void populateAcasDatesOnRespondents(CaseData caseData, List<AcasCertificate> acasCertificateList) {

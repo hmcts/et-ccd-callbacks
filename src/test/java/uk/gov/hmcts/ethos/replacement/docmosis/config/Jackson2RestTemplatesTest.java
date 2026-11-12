@@ -34,11 +34,13 @@ class Jackson2RestTemplatesTest {
         List<HttpMessageReader<?>> readers = strategies.messageReaders();
 
         assertThat(readers).noneMatch(r -> r.toString().contains("tools.jackson")
-            || r.toString().contains("JacksonJsonDecoder") && !r.toString().contains("Jackson2JsonDecoder"));
-        assertThat(readers).anyMatch(r -> r instanceof org.springframework.http.codec.DecoderHttpMessageReader<?> reader
-            && reader.getDecoder() instanceof Jackson2JsonDecoder);
+            || r.toString().contains("JacksonJsonDecoder") && !r.toString().contains("Jackson2JsonDecoder"))
+                .anyMatch(r -> r instanceof org.springframework.http.codec.DecoderHttpMessageReader<?> reader
+                        && reader.getDecoder() instanceof Jackson2JsonDecoder);
     }
 
+    // Jackson 3 converter is not available on the test classpath.
+    @SuppressWarnings("java:S1872")
     private static void assertJackson2Only(RestTemplate restTemplate) {
         List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
         assertThat(converters).anyMatch(MappingJackson2HttpMessageConverter.class::isInstance);

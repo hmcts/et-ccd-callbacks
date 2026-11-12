@@ -18,8 +18,8 @@ on:
 jobs:
   playwright-tests:
     name: ${{ matrix.os }} - ${{ matrix.browser }}
-    runs-on: 
-      group: ${{ inputs.runner-group }}
+    runs-on:
+      group: ${{ inputs.runner-group || 'azure-nonprod' }}
       labels: ${{ matrix.os }}
     strategy:
       fail-fast: false

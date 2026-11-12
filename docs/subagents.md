@@ -76,7 +76,7 @@ Post-Change Verification
   ```bash
   ./gradlew checkstyleMain checkstyleTest checkstyleIntegrationTest pmdMain pmdTest pmdCftlib
   ```
-- **Constraints**: Enforces 4-space indentation, max 120 chars, no `.*` imports, strict import ordering, and variable names $\ge 2$ characters.
+- **Constraints**: Enforces 4-space indentation, max 120 chars, no `.*` imports, strict import ordering, and variable names `>= 2` characters.
 
 #### 2. Unit & Shared Subproject Subagent
 - **Goal**: Run fast unit test suites and verify the `et-shared` subproject.
@@ -107,7 +107,7 @@ Post-Change Verification
 
 ### Archetype 3: Test Coverage, SonarQube & Fortify Diff Subagents
 
-Used to meet both the aggregate JaCoCo thresholds (**$\ge 80\%$** root project, **$\ge 75\%$** `et-shared`) and the **SonarQube "Sonar way" new-code gate** + **Fortify security diff checklist**.
+Used to meet both the aggregate JaCoCo thresholds (**`>= 80%`** root project, **`>= 75%`** `et-shared`) and the **SonarQube "Sonar way" new-code gate** + **Fortify security diff checklist**.
 
 | Subagent Role | Scope | Tasks |
 |---|---|---|
@@ -188,7 +188,7 @@ All subagents operating in this repository must strictly adhere to the following
 
 ### Always Do
 - **Check Imports**: Use single-class imports ordered strictly: third-party/HMCTS (`io.*`, `jakarta.*`, `lombok.*`, `org.*`, `uk.*`), then Java (`java.*`, `javax.*`), then `static` imports.
-- **Follow Clean Code Style**: 4-space indentation, max 120 character line length, variable names $\ge 2$ characters.
+- **Follow Clean Code Style**: 4-space indentation, max 120 character line length, variable names `>= 2` characters.
 - **Run Fast Checks First**: Run targeted single-test commands (`./gradlew test --tests "<ClassName>"`) before running full suite builds.
 
 ### Never Do

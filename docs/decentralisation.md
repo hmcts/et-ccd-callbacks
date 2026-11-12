@@ -36,8 +36,8 @@ Under the **CCD Decentralised Runtime** (`hmcts.ccd.sdk` and `com.github.hmcts:d
         |                 et-ccd-callbacks (et-cos)                   |
         |                                                             |
         |  +------------------------+     +------------------------+  |
-        |  |  JsonCallbackBridge    |     |  ETCaseView            |  |
-        |  |  (In-JVM Callbacks)    |     |  (Dynamic Projection)  |  |
+        |  |  EtJsonCcdConfig &     |     |  ETCaseView            |  |
+        |  |  CCDConfig Events      |     |  (Dynamic Projection)  |  |
         |  +-----------+------------+     +-----------+------------+  |
         |              |                              |               |
         |              | Direct Writes / Events       | Reads & Merges|
@@ -288,11 +288,12 @@ class UpdateNotificationStateEventIntegrationTest {
     @Autowired
     private NotificationViewRepository notificationViewRepository;
 
-    @Test
-    void recordsViewsWithoutChangingTheCcdBlob() {
-        var cases = events.forCaseType(ENGLANDWALES_CASE_TYPE_ID);
+    @ParameterizedTest
+    @ValueSource(strings = {ENGLANDWALES_CASE_TYPE_ID, SCOTLAND_CASE_TYPE_ID})
+    void recordsViewsWithoutChangingTheCcdBlob(String caseTypeId) {
+        var cases = events.forCaseType(caseTypeId);
         long reference = cases.seed(CaseState.Accepted, caseData(NOT_VIEWED_YET, null));
-        var before = cases.snapshot(reference);
+        final var before = cases.snapshot(reference);
 
         var result = cases.event(reference, UpdateNotificationStateEvent.EVENT_ID, caseData(VIEWED, YES))
             .submitExpectingSuccess();
@@ -302,12 +303,37 @@ class UpdateNotificationStateEventIntegrationTest {
         assertThat(result.blobVersion()).isEqualTo(before.blobVersion());
 
         // 2. Verify domain table received the update
-        assertThat(notificationViewRepository.findItemIds(reference)).contains("notification");
+        assertThat(notificationViewRepository.findItemIds(reference))
+            .containsExactlyInAnyOrder("notification", "tribunalResponse", "tseResponse");
 
         // 3. Verify CaseView projected the new state on read
         CaseData projected = result.projectedCase();
         assertThat(projected.getSendNotificationCollection().getFirst().getValue().getNotificationState())
             .isEqualTo(VIEWED);
+    }
+
+    private static CaseData caseData(String viewState, String viewedByClaimant) {
+        CaseData caseData = new CaseData();
+        caseData.setSendNotificationCollection(List.of(SendNotificationTypeItem.builder()
+            .id("notification")
+            .value(SendNotificationType.builder()
+                .notificationState(viewState)
+                .respondNotificationTypeCollection(List.of(GenericTypeItem.<RespondNotificationType>builder()
+                    .id("tribunalResponse")
+                    .value(RespondNotificationType.builder().state(viewState).build())
+                    .build()))
+                .build())
+            .build()));
+        caseData.setGenericTseApplicationCollection(List.of(GenericTseApplicationTypeItem.builder()
+            .id("application")
+            .value(GenericTseApplicationType.builder()
+                .respondCollection(List.of(TseRespondTypeItem.builder()
+                    .id("tseResponse")
+                    .value(TseRespondType.builder().viewedByClaimant(viewedByClaimant).build())
+                    .build()))
+                .build())
+            .build()));
+        return caseData;
     }
 }
 ```

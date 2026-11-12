@@ -48,27 +48,26 @@ Create a new migration script in `src/main/resources/db/migration/V0XX__<Descrip
 > Always add `REFERENCES ccd.case_data(reference) ON DELETE CASCADE`. This guarantees that when cases are deleted by retention policies, off-blob records are automatically purged.
 
 #### Pattern A: Structured Case Data / Complex Type (JSONB)
-*Use this when storing complex data types, config objects, or documents (mirrors `hub_link_status` and `digital_case_file`).*
+*Use this when storing complex data types or status objects per case (mirrors `hub_link_status` in `V018__CreateHubLinkStatus.sql`). If a row can exist before the JSONB object is populated (e.g. `digital_case_file` in `V022__CreateDigitalCaseFileTables.sql`, which can hold only `pending_bundle_id`), make `data` nullable with `CHECK (data IS NULL OR jsonb_typeof(data) = 'object')`.*
 
 ```sql
 CREATE TABLE public.my_feature_data (
     case_reference BIGINT PRIMARY KEY
         REFERENCES ccd.case_data(reference) ON DELETE CASCADE,
     data JSONB NOT NULL
-        CHECK (jsonb_typeof(data) = 'object'),
-    updated_at TIMESTAMP NOT NULL DEFAULT (now() AT TIME ZONE 'UTC')
+        CHECK (jsonb_typeof(data) = 'object')
 );
 ```
 
 #### Pattern B: Discrete Item Records / Read Receipts / Logs
-*Use this when recording discrete item views or audit records (mirrors `notification_view`).*
+*Use this when recording discrete item views or audit records (mirrors `notification_view` in `V023__CreateNotificationView.sql`).*
 
 ```sql
 CREATE TABLE public.my_feature_item (
     case_reference BIGINT NOT NULL
         REFERENCES ccd.case_data(reference) ON DELETE CASCADE,
     item_id TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
+    viewed_at TIMESTAMP NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
     PRIMARY KEY (case_reference, item_id)
 );
 ```

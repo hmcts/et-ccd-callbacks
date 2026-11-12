@@ -44,27 +44,6 @@ public class GeminiClient {
     }
 
     /**
-     * Calls Google Gemini Generative Language API with prompt and returns JSON response text.
-     *
-     * @param prompt User prompt text containing case details and extraction requirements
-     * @return Raw JSON text response from Gemini
-     */
-    public String generateContent(String prompt) {
-        return generateContent(prompt, Collections.emptyList());
-    }
-
-    /**
-     * Calls Google Gemini Generative Language API with text prompt and binary file attachments (multimodal).
-     *
-     * @param prompt User prompt text containing case details and extraction requirements
-     * @param attachments List of binary file attachments (e.g. PDF particulars of claim)
-     * @return Raw JSON text response from Gemini
-     */
-    public String generateContent(String prompt, List<AiDocumentAttachment> attachments) {
-        return generateContent(null, prompt, attachments);
-    }
-
-    /**
      * Calls Google Gemini Generative Language API with separate system instruction, case prompt,
      * and binary file attachments (multimodal), enabling prompt prefix caching.
      *

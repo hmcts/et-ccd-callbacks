@@ -44,32 +44,6 @@ public class Et1VettingPromptBuilder {
     );
 
     /**
-     * Builds a comprehensive prompt containing case facts, attached document references, and vetting instructions.
-     *
-     * @param caseDetails CaseDetails object from CCD
-     * @param attachments List of attached files sent as multimodal parts to Gemini
-     * @return Complete prompt for Gemini
-     */
-    public String buildPrompt(CaseDetails caseDetails, List<AiDocumentAttachment> attachments) {
-        return buildPrompt(caseDetails, attachments, List.of());
-    }
-
-    /**
-     * Builds the combined prompt (static system instructions followed by dynamic claim facts)
-     * for single-prompt callers.
-     *
-     * @param caseDetails CaseDetails object from CCD
-     * @param attachments List of attached files sent as multimodal parts to Gemini
-     * @param availableVenues Valid hearing venue names for the managing office
-     * @return Complete prompt for Gemini
-     */
-    public String buildPrompt(CaseDetails caseDetails,
-                              List<AiDocumentAttachment> attachments,
-                              List<String> availableVenues) {
-        return buildSystemInstruction() + "\n\n" + buildCasePrompt(caseDetails, attachments, availableVenues);
-    }
-
-    /**
      * Builds the static system instruction containing role boundaries, anti-injection guardrails,
      * all 79 official jurisdiction codes, Rule 13 / Rule 49 / track / service criteria, and JSON schema.
      * Placed separately so providers can cache the static prefix cleanly.

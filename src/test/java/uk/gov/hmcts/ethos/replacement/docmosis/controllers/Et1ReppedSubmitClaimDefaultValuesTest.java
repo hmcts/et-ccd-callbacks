@@ -27,6 +27,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PostDefaultValuesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 
 import java.nio.file.Files;
@@ -74,6 +75,8 @@ class Et1ReppedSubmitClaimDefaultValuesTest {
     private EmploymentRightsActService employmentRightsActService;
     @Mock
     private SingleReferenceService singleReferenceService;
+    @Mock
+    private SupportTaskService supportTaskService;
 
     @InjectMocks
     private PostDefaultValuesService postDefaultValuesService;
@@ -84,7 +87,7 @@ class Et1ReppedSubmitClaimDefaultValuesTest {
     void setUp() {
         et1ReppedController = new Et1ReppedController(postDefaultValuesService,
             caseManagementForCaseWorkerService, et1ReppedService, featureToggleService, et1SubmissionService,
-            nocRespondentRepresentativeService);
+            nocRespondentRepresentativeService, caseFlagsService);
 
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
         when(featureToggleService.isEt1DocGenEnabled()).thenReturn(true);
@@ -107,8 +110,9 @@ class Et1ReppedSubmitClaimDefaultValuesTest {
 
         CaseData data = Objects.requireNonNull(response.getBody()).getData();
         assertSoftly(softly -> {
-            softly.assertThat(data.getClaimantFlags()).as("claimant case flags").isNotNull();
-            softly.assertThat(data.getRespondentFlags()).as("respondent case flags").isNotNull();
+            softly.assertThat(data.getAllPartyFlags()).as("all party flags").isNotNull();
+            softly.assertThat(data.getAllPartyFlags().getClaimantFlags()).as("claimant case flags").isNotNull();
+            softly.assertThat(data.getAllPartyFlags().getRespondentFlags()).as("respondent case flags").isNotNull();
             softly.assertThat(data.getPublicCaseName()).as("public case name").isEqualTo("John Doe vs Claimant Org");
             softly.assertThat(data.getCaseManagementLocationCode()).as("case management location code")
                 .isEqualTo(EPIMMS_ID);

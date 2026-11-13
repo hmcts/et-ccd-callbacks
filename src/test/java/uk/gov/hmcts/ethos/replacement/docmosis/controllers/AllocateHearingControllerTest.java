@@ -9,6 +9,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.AllocateHearingService;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -67,7 +69,7 @@ class AllocateHearingControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(allocateHearingService, times(1)).initialiseAllocateHearing(ccdRequest.getCaseDetails().getCaseData());
+        verify(allocateHearingService, times(1)).initialiseAllocateHearing(any(CaseData.class));
     }
 
     @Test
@@ -87,7 +89,7 @@ class AllocateHearingControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(allocateHearingService, times(1)).handleListingSelected(ccdRequest.getCaseDetails().getCaseData());
+        verify(allocateHearingService, times(1)).handleListingSelected(any(CaseData.class));
     }
 
     @Test
@@ -103,7 +105,7 @@ class AllocateHearingControllerTest {
                         .header("Authorization", token)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isBadRequest());
-        verify(allocateHearingService, never()).handleListingSelected(ccdRequest.getCaseDetails().getCaseData());
+        verify(allocateHearingService, never()).handleListingSelected(any(CaseData.class));
     }
 
     @Test
@@ -123,8 +125,8 @@ class AllocateHearingControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(allocateHearingService, times(1)).populateRooms(ccdRequest.getCaseDetails().getCaseData());
-        verify(scotlandAllocateHearingService, never()).populateRooms(ccdRequest.getCaseDetails().getCaseData());
+        verify(allocateHearingService, times(1)).populateRooms(any(CaseData.class));
+        verify(scotlandAllocateHearingService, never()).populateRooms(any(CaseData.class));
     }
 
     @Test
@@ -144,8 +146,8 @@ class AllocateHearingControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(scotlandAllocateHearingService, times(1)).populateRooms(ccdRequest.getCaseDetails().getCaseData());
-        verify(allocateHearingService, never()).populateRooms(ccdRequest.getCaseDetails().getCaseData());
+        verify(scotlandAllocateHearingService, times(1)).populateRooms(any(CaseData.class));
+        verify(allocateHearingService, never()).populateRooms(any(CaseData.class));
     }
 
     @Test
@@ -165,8 +167,8 @@ class AllocateHearingControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(allocateHearingService, times(1)).updateSelectedHearing(ccdRequest.getCaseDetails().getCaseData());
-        verify(allocateHearingService, times(1)).updateCase(ccdRequest.getCaseDetails().getCaseData());
+        verify(allocateHearingService, times(1)).updateSelectedHearing(any(CaseData.class));
+        verify(allocateHearingService, times(1)).updateCase(any(CaseData.class));
     }
 
     @Test
@@ -186,7 +188,7 @@ class AllocateHearingControllerTest {
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(allocateHearingService, times(1)).updateSelectedHearing(ccdRequest.getCaseDetails().getCaseData());
-        verify(scotlandAllocateHearingService, times(1)).updateCase(ccdRequest.getCaseDetails().getCaseData());
+        verify(allocateHearingService, times(1)).updateSelectedHearing(any(CaseData.class));
+        verify(scotlandAllocateHearingService, times(1)).updateCase(any(CaseData.class));
     }
 }

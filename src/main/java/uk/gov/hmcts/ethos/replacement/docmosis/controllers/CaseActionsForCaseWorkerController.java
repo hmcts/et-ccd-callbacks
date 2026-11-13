@@ -7,15 +7,20 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
@@ -48,17 +53,29 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.PostDefaultValuesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskEventService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.wa.SupportTaskClientContextService;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_CREATE_FLAG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_MANAGE_FLAGS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_MANAGE_SUPPORT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_REQUEST_SUPPORT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_SUBMIT_ET3_FORM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_UPDATE_ET3_FORM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
@@ -75,9 +92,14 @@ public class CaseActionsForCaseWorkerController {
     private static final String TWO_HUNDRED = "200";
     private static final String FOUR_HUNDRED = "400";
     private static final String FIVE_HUNDRED = "500";
+    private static final String CLIENT_CONTEXT = "client-context";
     public static final String ACCESSED_SUCCESSFULLY = "Accessed successfully";
     public static final String BAD_REQUEST = "Bad Request";
     public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
+    private static final List<String> RESPONDENT_REVIEW_SUPPORT_TASK_EVENTS =
+            List.of(EVENT_SUBMIT_ET3_FORM, EVENT_UPDATE_ET3_FORM);
+    private static final List<String> NEW_FLAG_REVIEW_SUPPORT_TASK_EVENTS =
+            List.of(EVENT_REQUEST_SUPPORT, EVENT_CREATE_FLAG);
 
     private final CaseCloseValidator caseCloseValidator;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
@@ -95,8 +117,12 @@ public class CaseActionsForCaseWorkerController {
     private final Et1VettingService et1VettingService;
     private final FeatureToggleService featureToggleService;
     private final CaseFlagsService caseFlagsService;
+    private final SupportTaskService supportTaskService;
+    private final SupportTaskEventService supportTaskEventService;
+    private final SupportTaskClientContextService supportTaskClientContextService;
     private final CaseManagementLocationService caseManagementLocationService;
     private final NocRespondentHelper nocRespondentHelper;
+    private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
     private final EmploymentRightsActService employmentRightsActService;
     private final ClaimantEmailService claimantEmailService;
     private final RespondentEmailService respondentEmailService;
@@ -140,6 +166,129 @@ public class CaseActionsForCaseWorkerController {
 
         List<String> errors = postDefaultValuesService.applyPostDefaultValues(ccdRequest, userToken);
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @PostMapping(value = "/supportTasks/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Prepare Review Support and Arrange Support tasks for eligible Case Flags.")
+    public ResponseEntity<CCDCallbackResponse> prepareSupportTasks(
+            @RequestBody CallbackRequest callbackRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
+        CaseDetails caseDetails = callbackRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
+        Set<String> taskTypesToComplete = null;
+
+        if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())) {
+            caseManagementForCaseWorkerService.setNextListedDate(caseData);
+            CaseData caseDataBefore = callbackRequest.getCaseDetailsBefore() == null
+                    ? null
+                    : callbackRequest.getCaseDetailsBefore().getCaseData();
+            if (RESPONDENT_REVIEW_SUPPORT_TASK_EVENTS.contains(callbackRequest.getEventId())) {
+                supportTaskService.prepareRespondentReviewSupportTasks(caseData);
+                supportTaskService.prepareNewFlagArrangeSupportTask(caseData, caseDataBefore);
+            } else if (NEW_FLAG_REVIEW_SUPPORT_TASK_EVENTS.contains(callbackRequest.getEventId())) {
+                supportTaskService.prepareNewFlagReviewSupportTasks(caseData, caseDataBefore);
+            } else if (EVENT_MANAGE_FLAGS.equals(callbackRequest.getEventId())
+                    || EVENT_MANAGE_SUPPORT.equals(callbackRequest.getEventId())) {
+                taskTypesToComplete = supportTaskService.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
+            }
+
+            if (EVENT_CREATE_FLAG.equals(callbackRequest.getEventId())
+                    || EVENT_REQUEST_SUPPORT.equals(callbackRequest.getEventId())) {
+                supportTaskService.prepareNewFlagArrangeSupportTask(caseData, caseDataBefore);
+            } else if (EVENT_MANAGE_FLAGS.equals(callbackRequest.getEventId())) {
+                supportTaskService.prepareArrangeSupportTask(caseData, caseDataBefore);
+            }
+        }
+
+        return addTaskCompletionHeader(
+                getCallbackRespEntityNoErrors(caseData), taskTypesToComplete);
+    }
+
+    @PostMapping(value = "/reviewSupportRequest/aboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Prepare the requested Case Flags for review.")
+    public ResponseEntity<CCDCallbackResponse> prepareReviewSupportRequest(
+            @RequestBody CallbackRequest callbackRequest) {
+        CaseDetails caseDetails = callbackRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
+        if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())) {
+            supportTaskService.prepareReviewSupportRequest(caseData, callbackRequest.getEventId());
+            if (isEmpty(caseData.getReviewSupportRequestFlags())) {
+                return getCallbackRespEntityErrors(
+                        List.of("This case has no requested flags for your role"), caseData);
+            }
+        }
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    @PostMapping(value = "/reviewSupportRequest/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Apply reviewed Case Flags and prepare the related support tasks.")
+    public ResponseEntity<CCDCallbackResponse> applyReviewSupportRequest(
+            @RequestBody CallbackRequest callbackRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
+        CaseDetails caseDetails = callbackRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
+        List<String> errors = new ArrayList<>();
+        Set<String> taskTypesToComplete = null;
+        if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())) {
+            if (!supportTaskService.applyReviewSupportRequest(caseData)) {
+                errors.add("Please select status other than Requested");
+            } else {
+                caseManagementForCaseWorkerService.setNextListedDate(caseData);
+                CaseData caseDataBefore = callbackRequest.getCaseDetailsBefore() == null
+                        ? null
+                        : callbackRequest.getCaseDetailsBefore().getCaseData();
+                taskTypesToComplete = supportTaskService.prepareManagedReviewSupportTasks(caseData, caseDataBefore);
+                supportTaskService.prepareArrangeSupportTask(caseData, caseDataBefore);
+            }
+        }
+        return addTaskCompletionHeader(
+                getCallbackRespEntityErrors(errors, caseData), taskTypesToComplete);
+    }
+
+    @PostMapping(value = "/supportTasks/submitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Trigger category-specific Review Support task cancellation events.")
+    public ResponseEntity<CCDCallbackResponse> closeReviewSupportTasks(
+            @RequestBody CallbackRequest callbackRequest) {
+        CaseDetails caseDetails = callbackRequest.getCaseDetails();
+        if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())) {
+            CaseData caseDataBefore = callbackRequest.getCaseDetailsBefore() == null
+                    ? null
+                    : callbackRequest.getCaseDetailsBefore().getCaseData();
+            supportTaskEventService.triggerArrangeSupportTaskEvents(caseDetails,
+                    supportTaskService.additionalArrangeSupportTasks(caseDetails.getCaseData(), caseDataBefore));
+            Set<String> taskTypesToClose = supportTaskService.reviewTaskTypesToClose(caseDetails.getCaseData());
+            supportTaskEventService.triggerReviewTaskClosureEvents(caseDetails, taskTypesToClose);
+        }
+        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
+    }
+
+    private ResponseEntity<CCDCallbackResponse> addTaskCompletionHeader(
+            ResponseEntity<CCDCallbackResponse> response,
+            Set<String> taskTypesToComplete) {
+        if (taskTypesToComplete == null) {
+            return response;
+        }
+        // The SDK callback bridge only accepts Authorization/ServiceAuthorization header parameters.
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        ServletRequestAttributes servletAttributes = requestAttributes instanceof ServletRequestAttributes attributes
+                ? attributes : null;
+        String clientContext = servletAttributes == null ? null
+                : servletAttributes.getRequest().getHeader(CLIENT_CONTEXT);
+        String updatedClientContext = supportTaskClientContextService.updateTaskCompletion(
+                clientContext, taskTypesToComplete);
+        if (updatedClientContext == null) {
+            supportTaskService.retainReviewTasksForSubmittedCallback(
+                    response.getBody().getData(), taskTypesToComplete);
+            return response;
+        }
+        // SDK invocation unwraps ResponseEntity, so also preserve the header on the enclosing HTTP response.
+        if (servletAttributes != null && servletAttributes.getResponse() != null) {
+            servletAttributes.getResponse().setHeader(CLIENT_CONTEXT, updatedClientContext);
+        }
+        return ResponseEntity.status(response.getStatusCode())
+                .headers(response.getHeaders())
+                .header(CLIENT_CONTEXT, updatedClientContext)
+                .body(response.getBody());
     }
 
     @PostMapping(value = "/addServiceId", consumes = APPLICATION_JSON_VALUE)
@@ -288,7 +437,8 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setPublicCaseName(caseData);
         }
 
-        caseFlagsService.setupCaseFlags(caseData);
+        setupCaseFlags(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
+
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         removeSpacesFromPartyNames(caseData);
         return getCallbackRespEntityNoErrors(caseData);
@@ -389,7 +539,12 @@ public class CaseActionsForCaseWorkerController {
         eventValidationService.validateMaximumSize(caseData).ifPresent(errors::add);
         if (errors.isEmpty() && isNotEmpty(caseData.getRepCollection())) {
             //Needed to keep the respondent names in the rep collection sync
-            nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData);
+            boolean caseFlagsV2Enabled = featureToggleService.isCaseFlagsV2Enabled(
+                    ccdRequest.getCaseDetails().getCaseTypeId());
+            nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData, caseFlagsV2Enabled);
+            if (caseFlagsV2Enabled) {
+                caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
+            }
         }
 
         if (errors.isEmpty() && isNotEmpty(caseData.getRespondentCollection())) {
@@ -405,10 +560,29 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setPublicCaseName(caseData);
         }
 
-        caseFlagsService.setupCaseFlags(caseData);
+        setupCaseFlags(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
+
         caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
         removeSpacesFromPartyNames(caseData);
         return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    @PostMapping(value = "/amendRespondentDetailsSubmitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Realigns representative access after respondents have been reordered.")
+    public void amendRespondentDetailsSubmitted(
+            @RequestBody CallbackRequest callbackRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
+        if (!featureToggleService.isCaseFlagsV2Enabled(callbackRequest.getCaseDetails().getCaseTypeId())) {
+            return;
+        }
+        try {
+            nocRespondentRepresentativeService.realignRespondentRepresentativeAccess(callbackRequest);
+        } catch (RuntimeException exception) {
+            String caseId = callbackRequest == null || callbackRequest.getCaseDetails() == null
+                    ? StringUtils.EMPTY
+                    : callbackRequest.getCaseDetails().getCaseId();
+            log.error("Unable to realign respondent representative access for case {}", caseId, exception);
+        }
     }
 
     @PostMapping(value = "/updateHearing", consumes = APPLICATION_JSON_VALUE)
@@ -899,4 +1073,11 @@ public class CaseActionsForCaseWorkerController {
         return defaultValuesReaderService.getDefaultValues(caseDetails.getCaseData().getManagingOffice());
     }
 
+    private void setupCaseFlags(String caseTypeId, CaseData caseData) {
+        if (featureToggleService.isCaseFlagsV2Enabled(caseTypeId)) {
+            caseFlagsService.setupCaseFlags(caseData);
+        } else {
+            caseFlagsService.setupLegacyCaseFlags(caseData);
+        }
+    }
 }

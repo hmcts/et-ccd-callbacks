@@ -189,6 +189,7 @@
     "PreConditionState(s)": "Accepted;Closed;Rejected",
     "PostConditionState": "*",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/amendRespondentDetails",
+    "CallBackURLSubmittedEvent": "${ET_COS_URL}/amendRespondentDetailsSubmitted",
     "EventEnablingCondition": "managingOffice !=\"Unassigned\"",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",

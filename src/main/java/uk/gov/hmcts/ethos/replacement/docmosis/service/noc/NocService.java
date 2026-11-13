@@ -217,7 +217,7 @@ public class NocService {
      * @param caseId the identifier of the case to which access is being granted
      * @param caseRole the case role to assign to the user
      */
-    public void grantCaseAccess(String userId, String caseId, String caseRole) {
+    public boolean grantCaseAccess(String userId, String caseId, String caseRole) {
         CaseAssignmentUserRole caseAssignmentUserRole = CaseAssignmentUserRole.builder()
                 .userId(userId)
                 .caseDataId(caseId)
@@ -227,8 +227,10 @@ public class NocService {
             caseAssignment.addCaseUserRole(CaseAssignmentUserRolesRequest.builder()
                     .caseAssignmentUserRoles(List.of(caseAssignmentUserRole))
                     .build());
+            return true;
         } catch (IOException e) {
             log.error("Failed to add case assignment user role", e);
+            return false;
         }
     }
 }

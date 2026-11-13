@@ -11,14 +11,14 @@
     "CaseTypeID": "ET_EnglandWales",
     "RoleName": "idam:caseworker-employment-englandwales",
     "ReadOnly": "N",
-    "AccessProfiles": "TTL_profile,caseworker-employment-englandwales"
+    "AccessProfiles": "TTL_profile,caseworker-employment-englandwales,caseworker-employment-caseflags"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "ET_EnglandWales",
     "RoleName": "idam:caseworker-employment-api",
     "ReadOnly": "N",
-    "AccessProfiles": "TTL_profile,caseworker-employment-api"
+    "AccessProfiles": "TTL_profile,caseworker-employment-api,caseworker-employment-caseflags,caseworker-employment-support"
   },
   {
     "LiveFrom": "01/01/2017",
@@ -32,6 +32,6 @@
     "CaseTypeID": "ET_EnglandWales",
     "RoleName": "idam:caseworker-employment-legalrep-solicitor",
     "ReadOnly": "N",
-    "AccessProfiles": "TTL_profile,caseworker-employment-legalrep-solicitor"
+    "AccessProfiles": "TTL_profile,caseworker-employment-legalrep-solicitor,caseworker-employment-support"
   }
 ]

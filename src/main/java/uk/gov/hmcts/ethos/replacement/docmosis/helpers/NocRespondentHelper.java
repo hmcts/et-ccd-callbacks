@@ -179,21 +179,60 @@ public class NocRespondentHelper {
         respondent.getValue().setRepresentativeId(null);
     }
 
-    public void amendRespondentNameRepresentativeNames(CaseData caseData) {
-        List<RepresentedTypeRItem> repCollection = new ArrayList<>();
-        for (RepresentedTypeRItem respondentRep : emptyIfNull(caseData.getRepCollection())) {
-            final List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
-            Optional<RespondentSumTypeItem> matchedRespondent = respondentCollection.stream()
-                    .filter(resp ->
-                            resp.getId().equals(respondentRep.getValue().getRespondentId())).findFirst();
-
-            matchedRespondent.ifPresent(respondent ->
-                    updateRepWithRespondentDetails(respondent, respondentRep, respondentCollection));
-
-            repCollection.add(respondentRep);
+    public void amendRespondentNameRepresentativeNames(CaseData caseData, boolean caseFlagsV2Enabled) {
+        if (!caseFlagsV2Enabled) {
+            amendRespondentNameRepresentativeNamesLegacy(caseData);
+            return;
         }
 
+        List<RepresentedTypeRItem> representatives = emptyIfNull(caseData.getRepCollection());
+        List<RespondentSumTypeItem> respondents = emptyIfNull(caseData.getRespondentCollection());
+        List<RepresentedTypeRItem> alignedRepCollection = new ArrayList<>();
+        List<RepresentedTypeRItem> unmatchedRepresentatives = new ArrayList<>(representatives);
+
+        for (int index = 0; index < respondents.size() && index < SolicitorRole.values().length; index++) {
+            RespondentSumTypeItem respondent = respondents.get(index);
+            Optional<RepresentedTypeRItem> matchedRepresentative =
+                    findRepresentativeByRespondentId(respondent, unmatchedRepresentatives);
+            if (matchedRepresentative.isEmpty()) {
+                continue;
+            }
+
+            RepresentedTypeRItem representative = matchedRepresentative.get();
+            updateRepWithRespondentDetails(respondent, representative, respondents);
+            representative.getValue().setRole(SolicitorRole.values()[index].getCaseRoleLabel());
+            alignedRepCollection.add(representative);
+            unmatchedRepresentatives.remove(representative);
+        }
+
+        alignedRepCollection.addAll(unmatchedRepresentatives);
+        caseData.setRepCollection(alignedRepCollection);
+    }
+
+    private void amendRespondentNameRepresentativeNamesLegacy(CaseData caseData) {
+        List<RepresentedTypeRItem> repCollection = new ArrayList<>();
+        for (RepresentedTypeRItem respondentRep : emptyIfNull(caseData.getRepCollection())) {
+            Optional<RespondentSumTypeItem> matchedRespondent = emptyIfNull(caseData.getRespondentCollection()).stream()
+                    .filter(respondent -> respondent.getId().equals(respondentRep.getValue().getRespondentId()))
+                    .findFirst();
+
+            matchedRespondent.ifPresent(respondent -> updateRepWithRespondentDetails(
+                    respondent, respondentRep, caseData.getRespondentCollection()));
+            repCollection.add(respondentRep);
+        }
         caseData.setRepCollection(repCollection);
+    }
+
+    private Optional<RepresentedTypeRItem> findRepresentativeByRespondentId(
+            RespondentSumTypeItem respondent, List<RepresentedTypeRItem> representatives) {
+        if (respondent == null || StringUtils.isBlank(respondent.getId())) {
+            return Optional.empty();
+        }
+        return representatives.stream()
+                .filter(representative -> representative != null && representative.getValue() != null)
+                .filter(representative -> Objects.equals(respondent.getId(),
+                        representative.getValue().getRespondentId()))
+                .findFirst();
     }
 
     public void updateRepWithRespondentDetails(RespondentSumTypeItem respondent, RepresentedTypeRItem respondentRep,

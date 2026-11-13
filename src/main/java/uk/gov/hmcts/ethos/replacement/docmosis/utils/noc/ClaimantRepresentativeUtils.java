@@ -181,11 +181,15 @@ public final class ClaimantRepresentativeUtils {
      *
      * @param caseData the case data to update to an unrepresented claimant state;
      *                 must not be {@code null}
+     * @param caseFlagsV2Enabled whether claimant representative v2.1 Case Flags should be removed
      */
-    public static void markClaimantAsUnrepresented(CaseData caseData) {
+    public static void markClaimantAsUnrepresented(CaseData caseData, boolean caseFlagsV2Enabled) {
         caseData.setRepresentativeClaimantType(null);
         caseData.setClaimantRepresentativeRemoved(YES);
         caseData.setClaimantRepresentedQuestion(NO);
+        if (caseFlagsV2Enabled) {
+            clearClaimantRepresentativeFlags(caseData);
+        }
         caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder()
                 .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
     }
@@ -260,14 +264,18 @@ public final class ClaimantRepresentativeUtils {
      * <p><strong>Assumption:</strong> The provided {@code caseData} is not {@code null}.</p>
      *
      * @param caseData the case data containing claimant representative information to update
+     * @param caseFlagsV2Enabled whether claimant representative v2.1 Case Flags should be removed
      */
-    public static void addAmendClaimantRepresentative(CaseData caseData) {
+    public static void addAmendClaimantRepresentative(CaseData caseData, boolean caseFlagsV2Enabled) {
         if (NO.equals(caseData.getClaimantRepresentedQuestion()) || caseData.getRepresentativeClaimantType() == null) {
             if (caseData.getRepresentativeClaimantType() != null) {
                 caseData.setClaimantRepresentativeRemoved(YES);
             }
             caseData.setRepresentativeClaimantType(null);
             caseData.setClaimantRepresentedQuestion(NO);
+            if (caseFlagsV2Enabled) {
+                clearClaimantRepresentativeFlags(caseData);
+            }
             caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder().organisation(null)
                     .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
 
@@ -276,6 +284,14 @@ public final class ClaimantRepresentativeUtils {
         caseData.setClaimantRepresentativeRemoved(NO);
         setRepresentativeId(caseData.getRepresentativeClaimantType());
         setClaimantRepresentativeOrganisationPolicy(caseData);
+    }
+
+    private static void clearClaimantRepresentativeFlags(CaseData caseData) {
+        if (caseData.getAllPartyFlags() == null) {
+            return;
+        }
+        caseData.getAllPartyFlags().setClaimantRepresentativeFlags(null);
+        caseData.getAllPartyFlags().setClaimantRepresentativeExternalFlags(null);
     }
 
     private static void setRepresentativeId(RepresentedTypeC claimantRepresentative) {

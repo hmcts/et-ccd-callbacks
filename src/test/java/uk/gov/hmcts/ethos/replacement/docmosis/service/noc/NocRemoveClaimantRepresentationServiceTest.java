@@ -69,6 +69,8 @@ class NocRemoveClaimantRepresentationServiceTest {
     private static final String EXPECTED_EXCEPTION_INVALID_CASE_DETAILS = "Case details are required";
     private static final String EXPECTED_EXCEPTION_REPRESENTATIVE_NOT_FOUND =
             "Representative not found for case ID " + CASE_ID + ".";
+    private static final String EXPECTED_EXCEPTION_LEAD_REPRESENTATIVE_NOT_FOUND =
+            "Lead representative not found for case ID " + CASE_ID + ".";
 
     private CaseDetails caseDetails;
     private CaseUserAssignment caseUserAssignment1;
@@ -105,6 +107,16 @@ class NocRemoveClaimantRepresentationServiceTest {
                 () -> nocRemoveClaimantRepresentationService.populateNocRemovalDetails(DUMMY_USER_TOKEN, null,
                         STAGE_ABOUT_TO_START));
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_INVALID_CASE_DETAILS);
+        // when there is no lead representative and no shared representative should throw generic service exception
+        List<CaseUserAssignment> caseUserAssignments = new ArrayList<>(Collections.singletonList(caseUserAssignment2));
+        when(nocCcdService.findCaseUserAssignmentsByCaseIdAndRole(caseDetails.getCaseId(),
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(caseUserAssignments);
+        when(userService.fetchAndValidateUserDetails(DUMMY_USER_TOKEN, CASE_ID)).thenReturn(userDetails2);
+        when(nocCcdService.findRemainingClaimantRepresentative(caseUserAssignments, userDetails1)).thenReturn(null);
+        gse = assertThrows(GenericServiceException.class,
+                () -> nocRemoveClaimantRepresentationService.populateNocRemovalDetails(DUMMY_USER_TOKEN, caseDetails,
+                        STAGE_ABOUT_TO_START));
+        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_LEAD_REPRESENTATIVE_NOT_FOUND);
         // when representative is lead representative, and case not shared should set nocRepresentativeType to lead and
         // nocCaseSharingStatus to not shared and nocRemoveOption to organisation
         when(userService.fetchAndValidateUserDetails(DUMMY_USER_TOKEN, CASE_ID)).thenReturn(userDetails1);
@@ -115,8 +127,7 @@ class NocRemoveClaimantRepresentationServiceTest {
         assertThat(caseDetails.getCaseData().getNocRemoveOption()).isEqualTo(NOC_REMOVE_OPTION_ORGANISATION);
         // when representative is lead representative, and case shared and stage is about to submit should set
         // nocRepresentativeType to lead, nocCaseSharingStatus to shared and should not update nocRemoveOption
-        List<CaseUserAssignment> caseUserAssignments = new ArrayList<>(Arrays.asList(caseUserAssignment1,
-                caseUserAssignment2));
+        caseUserAssignments = new ArrayList<>(Arrays.asList(caseUserAssignment1, caseUserAssignment2));
         when(nocCcdService.findCaseUserAssignmentsByCaseIdAndRole(caseDetails.getCaseId(),
                 ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(caseUserAssignments);
         when(userService.fetchAndValidateUserDetails(DUMMY_USER_TOKEN, CASE_ID)).thenReturn(userDetails1);
@@ -129,8 +140,7 @@ class NocRemoveClaimantRepresentationServiceTest {
         assertThat(caseDetails.getCaseData().getNocRemoveOption()).isEqualTo(NOC_REMOVE_OPTION_ORGANISATION);
         // when representative is lead representative, and case shared and stage is about to start should set
         // nocRepresentativeType to lead, nocCaseSharingStatus to shared and should update nocRemoveOption to null
-        caseUserAssignments = new ArrayList<>(Arrays.asList(caseUserAssignment1,
-                caseUserAssignment2));
+        caseUserAssignments = new ArrayList<>(Arrays.asList(caseUserAssignment1, caseUserAssignment2));
         when(nocCcdService.findCaseUserAssignmentsByCaseIdAndRole(caseDetails.getCaseId(),
                 ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(caseUserAssignments);
         nocRemoveClaimantRepresentationService.populateNocRemovalDetails(DUMMY_USER_TOKEN, caseDetails,

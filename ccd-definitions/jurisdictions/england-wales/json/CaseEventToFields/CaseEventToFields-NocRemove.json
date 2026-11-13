@@ -73,7 +73,7 @@
     "PageID": 3,
     "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 1,
-    "FieldShowCondition": "nocRemoveOption=\"yourself\"",
+    "FieldShowCondition": "nocRepresentativeType=\"leadRepresentative\" AND nocRemoveOption=\"yourself\"",
     "ShowSummaryChangeOption": "N"
   },
   {

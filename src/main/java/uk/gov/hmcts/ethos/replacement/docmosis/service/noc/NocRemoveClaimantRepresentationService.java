@@ -22,6 +22,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_CASE_SHARING_STATUS_NOT_SHARED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_CASE_SHARING_STATUS_SHARED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_LEAD_REPRESENTATIVE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_YOURSELF;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_LEAD;
@@ -76,6 +77,15 @@ public class NocRemoveClaimantRepresentationService {
         boolean hasSharedRepresentative = hasRemainingClaimantRepresentative(caseDetails, userDetails);
         caseDetails.getCaseData().setNocCaseSharingStatus(hasSharedRepresentative
                 ? NOC_CASE_SHARING_STATUS_SHARED : NOC_CASE_SHARING_STATUS_NOT_SHARED);
+        if (!isLeadRepresentative && !hasSharedRepresentative) {
+            String exceptionMessage = String.format(NOC_LEAD_REPRESENTATIVE_NOT_FOUND, caseDetails.getCaseId());
+            throw new GenericServiceException(exceptionMessage,
+                    new Exception(exceptionMessage),
+                    exceptionMessage,
+                    exceptionMessage,
+                    NocRemoveClaimantRepresentationService.class.getSimpleName(),
+                    methodName);
+        }
         if (STAGE_ABOUT_TO_START.equals(stage)) {
             caseDetails.getCaseData().setNocRemoveOption(null);
         }

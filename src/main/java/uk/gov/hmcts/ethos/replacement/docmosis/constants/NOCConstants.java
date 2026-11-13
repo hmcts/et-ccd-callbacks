@@ -15,6 +15,7 @@ public final class NOCConstants {
     public static final String NOC_REPRESENTATIVE_TYPE_SHARED = "sharedRepresentative";
     public static final String NOC_CASE_SHARING_STATUS_SHARED = "shared";
     public static final String NOC_CASE_SHARING_STATUS_NOT_SHARED = "notShared";
+    public static final String NOC_LEAD_REPRESENTATIVE_NOT_FOUND = "Lead representative not found for case ID %s.";
 
     public static final String EXCEPTION_RESPONDENT_NOT_FOUND = "Respondent not found for case ID %s.";
     public static final String EXCEPTION_RESPONDENT_ID_NOT_FOUND =

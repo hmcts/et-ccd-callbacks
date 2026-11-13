@@ -608,7 +608,7 @@ dependencyManagement {
 }
 
 dependencies {
-    smokeImplementation "io.rest-assured:rest-assured:5.1.0"
+    smokeImplementation "io.rest-assured:rest-assured:6.3.0"
     smokeImplementation "org.junit.jupiter:junit-jupiter-api"
     smokeRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
     smokeRuntimeOnly "org.junit.platform:junit-platform-launcher"

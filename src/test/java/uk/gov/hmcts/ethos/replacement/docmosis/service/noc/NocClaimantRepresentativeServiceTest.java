@@ -30,7 +30,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceExceptio
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -86,8 +85,6 @@ class NocClaimantRepresentativeServiceTest {
     @MockitoBean
     private AdminUserService adminUserService;
     @MockitoBean
-    private UserService userService;
-    @MockitoBean
     private NocCcdService nocCcdService;
     @MockitoBean
     private NocNotificationService nocNotificationService;
@@ -115,7 +112,6 @@ class NocClaimantRepresentativeServiceTest {
                 authTokenGenerator,
                 organisationClient,
                 adminUserService,
-                userService,
                 nocCcdService,
                 nocNotificationService,
                 nocService,

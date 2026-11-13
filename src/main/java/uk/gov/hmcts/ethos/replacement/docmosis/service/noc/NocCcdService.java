@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -42,7 +41,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class NocCcdService {
     private final CcdClient ccdClient;
     private final UserIdamService userIdamService;
@@ -352,8 +350,9 @@ public class NocCcdService {
         if (CollectionUtils.isEmpty(caseUserAssignments)) {
             return null;
         }
+        String userId = ObjectUtils.isEmpty(existingUserDetails) ? null : existingUserDetails.getUid();
         CaseUserAssignment caseUserAssignment = ClaimantRepresentativeUtils
-                .findFirstAssignmentForOtherRepresentative(caseUserAssignments, existingUserDetails.getUid());
+                .findFirstAssignmentForOtherRepresentative(caseUserAssignments, userId);
         if (caseUserAssignment == null) {
             return null;
         }

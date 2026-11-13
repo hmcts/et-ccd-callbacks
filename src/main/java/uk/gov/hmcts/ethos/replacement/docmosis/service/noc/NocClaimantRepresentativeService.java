@@ -21,7 +21,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceExceptio
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
@@ -46,7 +45,6 @@ public class NocClaimantRepresentativeService {
     private final AuthTokenGenerator authTokenGenerator;
     private final OrganisationClient organisationClient;
     private final AdminUserService adminUserService;
-    private final UserService userService;
     private final NocCcdService nocCcdService;
     private final NocNotificationService nocNotificationService;
     private final NocService nocService;
@@ -175,19 +173,15 @@ public class NocClaimantRepresentativeService {
     public CaseData updateClaimantRepresentation(CaseDetails caseDetails, String userToken) throws IOException {
         CaseData caseData = caseDetails.getCaseData();
         String caseId = caseDetails.getCaseId();
-        UserDetails userDetails = userService.findUserDetailsByToken(userToken);
-        updateClaimantRepMap(caseData, caseId, userDetails);
+        updateClaimantRepMap(caseData, caseId);
         prepopulateOrgAddress(caseData, userToken);
         return caseData;
     }
 
-    private void updateClaimantRepMap(CaseData caseData, String caseId, UserDetails userDetails) throws IOException {
+    private void updateClaimantRepMap(CaseData caseData, String caseId) throws IOException {
         caseData.setClaimantRepresentedQuestion(YES);
         caseData.setClaimantRepresentativeRemoved(NO);
         RepresentedTypeC claimantRep = createRepresentedTypeC(caseId, caseData.getChangeOrganisationRequestField());
-        if (userDetails != null) {
-            claimantRep.setIdamId(userDetails.getUid());
-        }
         caseData.setRepresentativeClaimantType(claimantRep);
     }
 
@@ -207,7 +201,7 @@ public class NocClaimantRepresentativeService {
         claimantRep.setNameOfRepresentative(userDetails.getFirstName() + " " + userDetails.getLastName());
         claimantRep.setRepresentativeEmailAddress(userDetails.getEmail());
         claimantRep.setMyHmctsOrganisation(change.getOrganisationToAdd());
-
+        claimantRep.setIdamId(userDetails.getUid());
         return claimantRep;
     }
 

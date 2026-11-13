@@ -1163,5 +1163,22 @@
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "Y"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "updateInitialConsiderationDocument",
+    "Name": "Regenerate IC doc",
+    "Description": "Regenerate the Initial Consideration PDF. Completed by and date are kept.",
+    "DisplayOrder": 21,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "EventEnablingCondition": "icCompletedBy !=\"\"",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/updateInitialConsiderationDocument",
+    "CallBackURLSubmittedEvent": "${ET_COS_URL}/completeUpdateInitialConsiderationDocument",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "EndButtonLabel": "Update IC doc",
+    "ShowSummary": "Y",
+    "Publish": "N"
   }
 ]

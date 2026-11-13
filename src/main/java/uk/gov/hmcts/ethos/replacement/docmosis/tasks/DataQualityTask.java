@@ -27,6 +27,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -44,7 +45,8 @@ import static uk.gov.service.notify.NotificationClient.prepareUpload;
  * ({@code ET_EnglandWales}, {@code ET_Scotland}) or legacy ECM cases.</li>
  * <li>Updates {@code preAcceptCase} by setting {@code caseAccepted} to {@code No},
  * copying {@code dateAccepted} to {@code dateRejected} (and clearing {@code dateAccepted}),
- * and setting {@code rejectReason} to {@code ["Case Input in Error"]}.</li>
+ * setting {@code rejectReason} to {@code ["Case Input in Error"]}, and setting
+ * {@code stateAPI} to {@code Closed}.</li>
  * <li>Submits the updated case back to CCD unless {@code cron.reconfigurationDryRun} is enabled.</li>
  * </ul>
  *
@@ -159,7 +161,7 @@ public class DataQualityTask implements Runnable {
             caseId, FIX_CASE_API_EVENT_ID);
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-        caseData.setStateAPI(null);
+        caseData.setStateAPI(CLOSED_STATE);
         boolean updated = updatePreAcceptCase(
             caseId,
             caseTypeId,
@@ -192,7 +194,7 @@ public class DataQualityTask implements Runnable {
             caseTypeId, EMPLOYMENT, caseId, FIX_CASE_API_EVENT_ID);
         uk.gov.hmcts.ecm.common.model.ccd.CaseDetails caseDetails = ccdRequest.getCaseDetails();
         uk.gov.hmcts.ecm.common.model.ccd.CaseData caseData = caseDetails.getCaseData();
-        caseData.setStateAPI(null);
+        caseData.setStateAPI(CLOSED_STATE);
         boolean updated = updatePreAcceptCase(
             caseId,
             caseTypeId,

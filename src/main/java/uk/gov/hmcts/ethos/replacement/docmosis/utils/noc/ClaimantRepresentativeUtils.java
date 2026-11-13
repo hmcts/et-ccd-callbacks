@@ -410,55 +410,26 @@ public final class ClaimantRepresentativeUtils {
     }
 
     /**
-     * Finds the first case user assignment whose user ID matches the given IDAM ID.
+     * Returns the first case user assignment that does not belong to the specified IDAM user.
      *
-     * @param caseUserAssignments the list of case user assignments to search;
-     *                            may be {@code null} or empty
-     * @param idamId the IDAM ID to match against {@link CaseUserAssignment#getUserId()}
-     * @return the first matching assignment, or {@code null} if the list is
-     *         {@code null} or empty, {@code idamId} is {@code null} or blank,
-     *         or no matching assignment is found
+     * <p>Assumes that {@code caseUserAssignments} contains valid assignments.
+     * Returns {@code null} if the list is null, empty, or no remaining assignment is found.</p>
+     *
+     * @param caseUserAssignments the list of case user assignments to search
+     * @param idamId the IDAM user ID to exclude (case-insensitive)
+     * @return the first remaining case user assignment, or {@code null} if none exists
      */
-    public static CaseUserAssignment findCaseUserAssignmentByIdamId(
+    public static CaseUserAssignment findFirstAssignmentForOtherRepresentative(
             List<CaseUserAssignment> caseUserAssignments, String idamId) {
-        if (CollectionUtils.isEmpty(caseUserAssignments) || StringUtils.isBlank(idamId)) {
+
+        if (CollectionUtils.isEmpty(caseUserAssignments)) {
             return null;
         }
+
         return caseUserAssignments.stream()
-                .filter(assignment -> idamId.equals(assignment.getUserId()))
+                .filter(assignment -> !Strings.CI.equals(idamId, assignment.getUserId()))
                 .findFirst()
                 .orElse(null);
-    }
-
-    /**
-     * Removes the first case user assignment matching the given IDAM ID and
-     * returns the first remaining assignment.
-     *
-     * <p>This method modifies the supplied list when a match is found.
-     * If no match is found, the list is left unchanged.
-     * The returned assignment may belong to the same user.
-     *
-     * @param caseUserAssignments the list of case user assignments; may be
-     *                            {@code null} or empty, but must support removal
-     *                            when a matching assignment exists
-     * @param idamId the IDAM ID to match against {@link CaseUserAssignment#getUserId()};
-     *               may be {@code null} or blank
-     * @return the first remaining assignment after removal, or {@code null}
-     *         if the list is {@code null} or empty, {@code idamId} is {@code null}
-     *         or blank, no matching assignment is found, or no assignments remain
-     * @throws UnsupportedOperationException if a matching assignment is found
-     *                                       but the list does not support removal
-     */
-    public static CaseUserAssignment removeUserAssignmentAndGetFirstRemainingAssignment(
-            List<CaseUserAssignment> caseUserAssignments, String idamId) {
-        CaseUserAssignment caseUserAssignment = findCaseUserAssignmentByIdamId(caseUserAssignments, idamId);
-        if (caseUserAssignment == null) {
-            return null;
-        }
-        caseUserAssignments.remove(caseUserAssignment);
-        return CollectionUtils.isEmpty(caseUserAssignments)
-                ? null
-                : caseUserAssignments.getFirst();
     }
 
     /**

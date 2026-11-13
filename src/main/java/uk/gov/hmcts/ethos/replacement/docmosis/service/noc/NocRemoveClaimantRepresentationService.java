@@ -23,6 +23,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXC
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_CASE_SHARING_STATUS_NOT_SHARED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_CASE_SHARING_STATUS_SHARED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_LEAD_REPRESENTATIVE_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_NO_SHARED_REPRESENTATIVE_TO_REMOVE_YOURSELF;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_YOURSELF;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_LEAD;
@@ -139,6 +140,17 @@ public class NocRemoveClaimantRepresentationService {
         RepresentedTypeC existingClaimantRep = caseData.getRepresentativeClaimantType();
         if (existingClaimantRep == null) {
             String exceptionMessage = String.format(EXCEPTION_REPRESENTATIVE_NOT_FOUND, caseDetails.getCaseId());
+            throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
+                    caseDetails.getCaseId(), NocRemoveClaimantRepresentationService.class.getSimpleName(), methodName);
+        }
+        UserDetails userDetails = userService.findUserDetailsByToken(userToken);
+        boolean hasSharedRepresentative = hasRemainingClaimantRepresentative(caseDetails, userDetails);
+        caseDetails.getCaseData().setNocCaseSharingStatus(hasSharedRepresentative
+                ? NOC_CASE_SHARING_STATUS_SHARED : NOC_CASE_SHARING_STATUS_NOT_SHARED);
+        if (Strings.CS.equals(NOC_REMOVE_OPTION_YOURSELF, caseDetails.getCaseData().getNocRemoveOption())
+                && !hasSharedRepresentative) {
+            String exceptionMessage = String.format(NOC_NO_SHARED_REPRESENTATIVE_TO_REMOVE_YOURSELF,
+                    caseDetails.getCaseId());
             throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
                     caseDetails.getCaseId(), NocRemoveClaimantRepresentationService.class.getSimpleName(), methodName);
         }

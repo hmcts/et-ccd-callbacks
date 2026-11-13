@@ -377,45 +377,24 @@ final class ClaimantRepresentativeUtilsTest {
     }
 
     @Test
-    void theFindCaseUserAssignmentByIdamId() {
-        // when case user assignments is empty should return null
-        List<CaseUserAssignment> caseUserAssignments = new ArrayList<>();
-        assertThat(ClaimantRepresentativeUtils.findCaseUserAssignmentByIdamId(caseUserAssignments,
-                CLAIMANT_REPRESENTATIVE_IDAM_ID_1)).isNull();
-        // when user idam id is empty should return null
-        CaseUserAssignment caseUserAssignment = CaseUserAssignment.builder()
-                .userId(CLAIMANT_REPRESENTATIVE_IDAM_ID_1).caseId(SUBMISSION_REFERENCE).caseRole(ROLE_SOLICITORA)
-                .organisationId(ORGANISATION_ID_1).build();
-        caseUserAssignments.add(caseUserAssignment);
-        assertThat(ClaimantRepresentativeUtils.findCaseUserAssignmentByIdamId(caseUserAssignments, StringUtils.EMPTY))
-                .isNull();
-        // when case user assignments has a matching IDAM id should return that assignment
-        assertThat(ClaimantRepresentativeUtils.findCaseUserAssignmentByIdamId(caseUserAssignments,
-                CLAIMANT_REPRESENTATIVE_IDAM_ID_1)).isEqualTo(caseUserAssignment);
-        // when case user assignments has no matching IDAM id should return null
-        assertThat(ClaimantRepresentativeUtils.findCaseUserAssignmentByIdamId(caseUserAssignments,
-                CLAIMANT_REPRESENTATIVE_IDAM_ID_2)).isNull();
-    }
-
-    @Test
     void theRemoveUserAssignmentAndGetFirstRemainingAssignment() {
         // when case user assignments is empty should return false
         List<CaseUserAssignment> caseUserAssignments = new ArrayList<>();
-        assertThat(ClaimantRepresentativeUtils.removeUserAssignmentAndGetFirstRemainingAssignment(caseUserAssignments,
+        assertThat(ClaimantRepresentativeUtils.findFirstAssignmentForOtherRepresentative(caseUserAssignments,
                 CLAIMANT_REPRESENTATIVE_IDAM_ID_1)).isNull();
         // when case user assignments has a matching IDAM id but not has any other assignments should return false
         CaseUserAssignment caseUserAssignment1 = CaseUserAssignment.builder()
                 .userId(CLAIMANT_REPRESENTATIVE_IDAM_ID_1).caseId(SUBMISSION_REFERENCE).caseRole(ROLE_SOLICITORA)
                 .organisationId(ORGANISATION_ID_1).build();
         caseUserAssignments.add(caseUserAssignment1);
-        assertThat(ClaimantRepresentativeUtils.removeUserAssignmentAndGetFirstRemainingAssignment(caseUserAssignments,
+        assertThat(ClaimantRepresentativeUtils.findFirstAssignmentForOtherRepresentative(caseUserAssignments,
                 CLAIMANT_REPRESENTATIVE_IDAM_ID_1)).isNull();
         // when case user assignments has a matching IDAM id and has other assignments should return true
         CaseUserAssignment caseUserAssignment2 = CaseUserAssignment.builder()
                 .userId(CLAIMANT_REPRESENTATIVE_IDAM_ID_2).caseId(SUBMISSION_REFERENCE).caseRole(ROLE_SOLICITORB)
                 .organisationId(ORGANISATION_ID_2).build();
         caseUserAssignments.addAll(Arrays.asList(caseUserAssignment1, caseUserAssignment2));
-        assertThat(ClaimantRepresentativeUtils.removeUserAssignmentAndGetFirstRemainingAssignment(caseUserAssignments,
+        assertThat(ClaimantRepresentativeUtils.findFirstAssignmentForOtherRepresentative(caseUserAssignments,
                 CLAIMANT_REPRESENTATIVE_IDAM_ID_1)).isEqualTo(caseUserAssignment2);
     }
 

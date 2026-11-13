@@ -353,7 +353,7 @@ public class NocCcdService {
             return null;
         }
         CaseUserAssignment caseUserAssignment = ClaimantRepresentativeUtils
-                .removeUserAssignmentAndGetFirstRemainingAssignment(caseUserAssignments, existingUserDetails.getUid());
+                .findFirstAssignmentForOtherRepresentative(caseUserAssignments, existingUserDetails.getUid());
         if (caseUserAssignment == null) {
             return null;
         }

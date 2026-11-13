@@ -71,6 +71,8 @@ class NocRemoveClaimantRepresentationServiceTest {
             "Representative not found for case ID " + CASE_ID + ".";
     private static final String EXPECTED_EXCEPTION_LEAD_REPRESENTATIVE_NOT_FOUND =
             "Lead representative not found for case ID " + CASE_ID + ".";
+    private static final String EXPECTED_EXCEPTION_NO_SHARED_REPRESENTATIVE_TO_REMOVE_YOURSELF =
+            "You cannot remove yourself from case " + CASE_ID + " unless another shared representative is assigned.";
 
     private CaseDetails caseDetails;
     private CaseUserAssignment caseUserAssignment1;
@@ -192,8 +194,8 @@ class NocRemoveClaimantRepresentationServiceTest {
         GenericServiceException gse = assertThrows(GenericServiceException.class,
                 () -> nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(DUMMY_USER_TOKEN, tmpCaseDetails));
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_REPRESENTATIVE_NOT_FOUND);
-        // when claimant representative exists, but noc remove option is not organisation should revoke only
-        // representation
+        // when remove option is set to yourself and there is no other shared representative should throw no shared
+        // representative to remove yourself exception
         tmpCaseDetails.getCaseData().setRepresentativeClaimantType(RepresentedTypeC.builder()
                 .representativeId(CLAIMANT_REPRESENTATIVE_ID).build());
         tmpCaseDetails.getCaseData().setClaimantRepresentativeRemoved(NO);
@@ -202,6 +204,18 @@ class NocRemoveClaimantRepresentationServiceTest {
         tmpCaseDetails.getCaseData().setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder()
                 .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
                 .organisation(Organisation.builder().organisationID(ORGANISATION_ID).build()).build());
+        gse = assertThrows(GenericServiceException.class,
+                () -> nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(DUMMY_USER_TOKEN, tmpCaseDetails));
+        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_NO_SHARED_REPRESENTATIVE_TO_REMOVE_YOURSELF);
+        // when claimant representative exists, but noc remove option is not organisation should revoke only
+        // representation
+        when(userService.findUserDetailsByToken(DUMMY_USER_TOKEN)).thenReturn(userDetails1);
+        when(nocCcdService.findCaseUserAssignmentsByCaseIdAndRole(tmpCaseDetails.getCaseId(),
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(
+                        new ArrayList<>(Collections.singletonList(caseUserAssignment1)));
+        when(nocCcdService.findRemainingClaimantRepresentative(
+                new ArrayList<>(Collections.singletonList(caseUserAssignment1)), userDetails1))
+                .thenReturn(userDetails2);
         nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(DUMMY_USER_TOKEN, tmpCaseDetails);
         verify(nocCcdService, times(LoggerTestUtils.INTEGER_ONE))
                 .revokeClaimantRepresentation(DUMMY_USER_TOKEN, tmpCaseDetails);
@@ -212,7 +226,7 @@ class NocRemoveClaimantRepresentationServiceTest {
         assertThat(tmpCaseDetails.getCaseData().getClaimantRepresentativeOrganisationPolicy()).isEqualTo(
                 OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
                         ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).organisation(
-                                Organisation.builder().organisationID(ORGANISATION_ID).build()).build());
+                        Organisation.builder().organisationID(ORGANISATION_ID).build()).build());
         // when claimant representative exists, and noc remove option is organisation should revoke representation and
         // mark claimant as unrepresented
         tmpCaseDetails.getCaseData().setNocRemoveOption(NOC_REMOVE_OPTION_ORGANISATION);

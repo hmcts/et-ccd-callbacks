@@ -2,13 +2,6 @@ name: Playwright Cross Browser Tests
 
 on:
   push:
-  workflow_call:  
-    inputs:
-      runner-group:
-        required: false
-        type: string
-        description: "GitHub Actions runner group"
-        default: "azure-nonprod"
 
   pull_request:
     branches:
@@ -19,7 +12,7 @@ jobs:
   playwright-tests:
     name: ${{ matrix.os }} - ${{ matrix.browser }}
     runs-on:
-      group: ${{ inputs.runner-group || 'azure-nonprod' }}
+      group: 'azure-nonprod'
       labels: ${{ matrix.os }}
     strategy:
       fail-fast: false

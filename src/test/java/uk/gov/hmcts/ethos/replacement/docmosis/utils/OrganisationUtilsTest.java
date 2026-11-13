@@ -276,7 +276,7 @@ final class OrganisationUtilsTest {
         // when user response is empty should return false
         assertThat(OrganisationUtils.hasUserIdentifier(null)).isFalse();
         // when user response not has body should return false
-        ResponseEntity<AccountIdByEmailResponse> userResponse = new ResponseEntity<>(null, HttpStatus.OK);
+        ResponseEntity<AccountIdByEmailResponse> userResponse = new ResponseEntity<>(HttpStatus.OK);
         assertThat(OrganisationUtils.hasUserIdentifier(userResponse)).isFalse();
         // when user response not has user identifier should return false
         userResponse = new ResponseEntity<>(new AccountIdByEmailResponse(), HttpStatus.OK);

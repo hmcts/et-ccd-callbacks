@@ -77,7 +77,7 @@ class AcasServiceTest {
     @BeforeEach
     void setup() {
         caseTestData = new CaseTestData();
-        restTemplate = new RestTemplate();
+        restTemplate = uk.gov.hmcts.ethos.replacement.docmosis.config.Jackson2RestTemplates.restTemplate();
         acasService = new AcasService(restTemplate, ACAS_DEV_API_URL, ACAS_API_KEY);
     }
 

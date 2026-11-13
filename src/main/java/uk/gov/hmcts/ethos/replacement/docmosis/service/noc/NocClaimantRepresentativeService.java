@@ -175,7 +175,6 @@ public class NocClaimantRepresentativeService {
         String caseId = caseDetails.getCaseId();
         updateClaimantRepMap(caseData, caseId);
         prepopulateOrgAddress(caseData, userToken);
-
         return caseData;
     }
 
@@ -202,7 +201,7 @@ public class NocClaimantRepresentativeService {
         claimantRep.setNameOfRepresentative(userDetails.getFirstName() + " " + userDetails.getLastName());
         claimantRep.setRepresentativeEmailAddress(userDetails.getEmail());
         claimantRep.setMyHmctsOrganisation(change.getOrganisationToAdd());
-
+        claimantRep.setIdamId(userDetails.getUid());
         return claimantRep;
     }
 

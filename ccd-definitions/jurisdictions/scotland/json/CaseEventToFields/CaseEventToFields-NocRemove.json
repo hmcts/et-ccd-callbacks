@@ -1,0 +1,145 @@
+[
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocCaseSharingStatus",
+    "DisplayContext": "READONLY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "FieldShowCondition": "nocRemoveLeadMultiRepsLandingPageLabel=\"DUMMY\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRepresentativeType",
+    "DisplayContext": "READONLY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "FieldShowCondition": "nocRemoveLeadMultiRepsLandingPageLabel=\"DUMMY\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveLeadMultiRepsLandingPageLabel",
+    "DisplayContext": "READONLY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "FieldShowCondition": "nocRepresentativeType=\"leadRepresentative\" AND nocCaseSharingStatus=\"shared\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveLeadSingleRepLandingPageLabel",
+    "DisplayContext": "READONLY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "FieldShowCondition": "nocRepresentativeType=\"leadRepresentative\" AND nocCaseSharingStatus=\"notShared\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveSharedRepLandingPageLabel",
+    "DisplayContext": "READONLY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "FieldShowCondition": "nocRepresentativeType=\"sharedRepresentative\" AND nocCaseSharingStatus=\"shared\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveOption",
+    "DisplayContext": "MANDATORY",
+    "PageID": 2,
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "PageShowCondition": "nocRepresentativeType=\"leadRepresentative\" AND nocCaseSharingStatus=\"shared\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepSelfRemovalLabel",
+    "DisplayContext": "READONLY",
+    "PageID": 3,
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "FieldShowCondition": "nocRepresentativeType=\"leadRepresentative\" AND nocRemoveOption=\"yourself\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveSharedRepRemovalLabel",
+    "DisplayContext": "READONLY",
+    "PageID": 3,
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "FieldShowCondition": "nocRepresentativeType=\"sharedRepresentative\" AND nocCaseSharingStatus=\"shared\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepSelfConfirm",
+    "DisplayContext": "MANDATORY",
+    "PageID": 3,
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 2,
+    "FieldShowCondition": "nocRemoveOption=\"yourself\" OR (nocRepresentativeType=\"sharedRepresentative\" AND nocCaseSharingStatus=\"shared\")",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepOrgRemovalLabel",
+    "DisplayContext": "READONLY",
+    "PageID": 3,
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "FieldShowCondition": "nocRemoveOption=\"your organisation\" OR (nocRepresentativeType=\"leadRepresentative\" AND nocCaseSharingStatus=\"notShared\")",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepRemoveOrgLabelClaimant",
+    "DisplayContext": "READONLY",
+    "PageID": 3,
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 2,
+    "FieldShowCondition": "nocRemoveOption=\"your organisation\" OR (nocRepresentativeType=\"leadRepresentative\" AND nocCaseSharingStatus=\"notShared\")",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepOrgConfirmation1",
+    "DisplayContext": "MANDATORY",
+    "PageID": 3,
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 3,
+    "FieldShowCondition": "nocRemoveOption=\"your organisation\" OR (nocRepresentativeType=\"leadRepresentative\" AND nocCaseSharingStatus=\"notShared\")",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepOrgConfirmation2",
+    "DisplayContext": "MANDATORY",
+    "PageID": 3,
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 4,
+    "FieldShowCondition": "nocRemoveOption=\"your organisation\" OR (nocRepresentativeType=\"leadRepresentative\" AND nocCaseSharingStatus=\"notShared\")",
+    "ShowSummaryChangeOption": "N"
+  }
+]

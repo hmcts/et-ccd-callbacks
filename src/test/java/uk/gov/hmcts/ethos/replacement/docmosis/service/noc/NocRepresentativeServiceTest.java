@@ -224,7 +224,7 @@ class NocRepresentativeServiceTest {
         when(ccdCaseAssignment.getCaseUserRoles(SUBMISSION_REFERENCE)).thenReturn(caseUserAssignmentData);
         UserDetails userDetails = new UserDetails();
         userDetails.setUid(REPRESENTATIVE_ID_2);
-        when(userService.getValidatedUserDetails(USER_TOKEN, SUBMISSION_REFERENCE)).thenReturn(userDetails);
+        when(userService.fetchAndValidateUserDetails(USER_TOKEN, SUBMISSION_REFERENCE)).thenReturn(userDetails);
         // when no role found should throw generic service exception
         GenericServiceException gse = assertThrows(GenericServiceException.class,
                 () -> nocRepresentativeService.getValidatedRepresentativeRolesByUserToken(USER_TOKEN,

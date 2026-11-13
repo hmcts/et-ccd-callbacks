@@ -138,7 +138,7 @@ public class NocRepresentativeService {
 
         final String methodName = "getValidatedRepresentativeRolesByUserToken";
         List<CaseUserAssignment> caseUserAssignments = getValidatedCaseUserAssignments(submissionReference);
-        UserDetails userDetails = userService.getValidatedUserDetails(userToken, submissionReference);
+        UserDetails userDetails = userService.fetchAndValidateUserDetails(userToken, submissionReference);
         List<String> rolesByUserId = RoleUtils.getCaseRolesForUser(caseUserAssignments, userDetails.getUid());
         List<String> rolesByAssignmentOrder = RoleUtils.findFirstCaseRolesByUserId(caseUserAssignments,
                 userDetails.getUid());

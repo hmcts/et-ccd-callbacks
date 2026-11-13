@@ -26,6 +26,9 @@ public final class GenericConstants {
     public static final String OLD_LOWERCASE = "old";
     public static final String NEW_LOWERCASE = "new";
 
+    public static final String STAGE_ABOUT_TO_START = "aboutToStart";
+    public static final String STAGE_ABOUT_TO_SUBMIT = "aboutToSubmit";
+
     private GenericConstants() {
         // Final classes should not have a public or default constructor.
     }

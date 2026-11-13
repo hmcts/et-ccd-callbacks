@@ -4,7 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.webjars.NotFoundException;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
@@ -390,5 +392,71 @@ public final class ClaimantRepresentativeUtils {
         RepresentedTypeC representative =  caseData.getRepresentativeClaimantType();
         caseData.setEt3ResponseAddress(representative.getRepresentativeAddress());
         caseData.setEt3ResponsePhone(representative.getRepresentativePhoneNumber());
+    }
+
+    /**
+     * Checks whether the claimant representative details required for processing are present.
+     *
+     * <p>The representative is considered complete when the representative details exist
+     * and email address are non-blank.</p>
+     *
+     * @param claimantRepresentative the claimant representative details to check
+     * @return {@code true} if the required claimant representative details are present;
+     *         {@code false} otherwise
+     */
+    public static boolean hasRequiredClaimantRepresentativeDetails(RepresentedTypeC claimantRepresentative) {
+        return ObjectUtils.isNotEmpty(claimantRepresentative)
+                && StringUtils.isNotBlank(claimantRepresentative.getRepresentativeEmailAddress());
+    }
+
+    /**
+     * Returns the first case user assignment that does not belong to the specified IDAM user.
+     *
+     * <p>Assumes that {@code caseUserAssignments} contains valid assignments.
+     * Returns {@code null} if the list is null, empty, or no remaining assignment is found.</p>
+     *
+     * @param caseUserAssignments the list of case user assignments to search
+     * @param idamId the IDAM user ID to exclude (case-insensitive)
+     * @return the first remaining case user assignment, or {@code null} if none exists
+     */
+    public static CaseUserAssignment findFirstAssignmentForOtherRepresentative(
+            List<CaseUserAssignment> caseUserAssignments, String idamId) {
+
+        if (CollectionUtils.isEmpty(caseUserAssignments)) {
+            return null;
+        }
+
+        return caseUserAssignments.stream()
+                .filter(assignment -> !Strings.CI.equals(idamId, assignment.getUserId()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Checks whether the given user is the lead representative for the case.
+     *
+     * <p>The user matches if their email address matches the representative's
+     * email address, or their UID matches the representative's IDAM ID.
+     * Both values in a matching pair must be non-blank. All comparisons are
+     * case-insensitive.</p>
+     *
+     * @param userDetails the user details to check; may be {@code null}
+     * @param caseData the case data containing the claimant representative's
+     *                 details; may be {@code null}
+     * @return {@code true} if either pair of non-blank values matches;
+     *         {@code false} if the user details, case data, or claimant
+     *         representative details are {@code null}, or neither pair matches
+     */
+    public static boolean isLeadRepresentative(UserDetails userDetails, CaseData caseData) {
+        return userDetails != null
+                && caseData != null
+                && caseData.getRepresentativeClaimantType() != null
+                && (StringUtils.isNotBlank(userDetails.getEmail())
+                && StringUtils.isNotBlank(caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress())
+                && Strings.CI.equals(userDetails.getEmail(),
+                caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress())
+                || StringUtils.isNotBlank(caseData.getRepresentativeClaimantType().getIdamId())
+                && StringUtils.isNotBlank(userDetails.getUid())
+                && Strings.CI.equals(userDetails.getUid(), caseData.getRepresentativeClaimantType().getIdamId()));
     }
 }

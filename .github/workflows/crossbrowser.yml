@@ -19,7 +19,7 @@ jobs:
       max-parallel: 1
       matrix:
         os:
-          - ubuntu-24.04
+          - ubuntu-latest
         browser:
           - chromium
           - firefox

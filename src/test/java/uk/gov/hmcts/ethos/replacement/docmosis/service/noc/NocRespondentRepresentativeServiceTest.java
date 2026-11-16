@@ -1151,25 +1151,25 @@ class NocRespondentRepresentativeServiceTest {
         // when case details not have case id should not revoke claimant representative case assignment and return null.
         CaseDetails caseDetails = new CaseDetails();
         assertThat(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails)).isNull();
-        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
+        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeOrganisationClaimantRepresentation(
                 caseDetails);
         // when case details not have case type id should not revoke claimant representative case assignment and
         // return null.
         caseDetails.setCaseId(CASE_ID_1);
         assertThat(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails)).isNull();
-        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
+        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeOrganisationClaimantRepresentation(
                 caseDetails);
         // when case details not have jurisdiction should not revoke claimant representative case assignment and
         // return null.
         caseDetails.setCaseTypeId(CASE_TYPE_ID_ENGLAND_WALES);
         nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails);
-        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
+        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeOrganisationClaimantRepresentation(
                 caseDetails);
         // when case details not have case data should not revoke claimant representative case assignment and
         // return null.
         caseDetails.setJurisdiction(JURISDICTION_EMPLOYMENT);
         nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails);
-        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
+        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeOrganisationClaimantRepresentation(
                 caseDetails);
         // when case details not have respondent representative collection should not revoke claimant representative
         // case assignment and return case data.
@@ -1177,7 +1177,7 @@ class NocRespondentRepresentativeServiceTest {
         caseDetails.setCaseData(tmpCaseData);
         assertThat(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails))
                 .isEqualTo(tmpCaseData);
-        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
+        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeOrganisationClaimantRepresentation(
                 caseDetails);
         // when claimant represented question is NO should not revoke claimant representative case assignment and
         // return case data.
@@ -1190,7 +1190,7 @@ class NocRespondentRepresentativeServiceTest {
         tmpCaseData.setClaimantRepresentedQuestion(NO);
         assertThat(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails))
                 .isEqualTo(tmpCaseData);
-        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
+        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeOrganisationClaimantRepresentation(
                 caseDetails);
         // when there is no matching claimant and respondent representative organisation ids should not revoke claimant
         // representative case assignment and return case data.
@@ -1202,18 +1202,17 @@ class NocRespondentRepresentativeServiceTest {
         tmpCaseData.setClaimantRepresentativeRemoved(NO);
         assertThat(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails))
                 .isEqualTo(tmpCaseData);
-        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
+        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeOrganisationClaimantRepresentation(
                 caseDetails);
         // when claimant representative email is same with respondent representative email should revoke claimant
         // representative case assignment and return case data.
         tmpCaseData.getRepresentativeClaimantType().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_1);
         tmpCaseData.getRepCollection().getFirst().getValue().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_1);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
-        doNothing().when(nocCcdService).revokeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
+        doNothing().when(nocCcdService).revokeOrganisationClaimantRepresentation(caseDetails);
         assertThat(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails))
                 .isEqualTo(tmpCaseData);
-        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ONE)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
-                caseDetails);
+        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ONE)).revokeOrganisationClaimantRepresentation(caseDetails);
         assertThat(tmpCaseData.getClaimantRepresentedQuestion()).isEqualTo(NO);
         assertThat(tmpCaseData.getClaimantRepresentativeRemoved()).isEqualTo(YES);
         assertThat(tmpCaseData.getRepresentativeClaimantType()).isNull();
@@ -1231,8 +1230,7 @@ class NocRespondentRepresentativeServiceTest {
         tmpCaseData.setClaimantRepresentativeRemoved(NO);
         assertThat(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails))
                 .isEqualTo(tmpCaseData);
-        verify(nocCcdService, times(LoggerTestUtils.INTEGER_TWO)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
-                caseDetails);
+        verify(nocCcdService, times(LoggerTestUtils.INTEGER_TWO)).revokeOrganisationClaimantRepresentation(caseDetails);
         assertThat(tmpCaseData.getClaimantRepresentedQuestion()).isEqualTo(NO);
         assertThat(tmpCaseData.getClaimantRepresentativeRemoved()).isEqualTo(YES);
         assertThat(tmpCaseData.getRepresentativeClaimantType()).isNull();

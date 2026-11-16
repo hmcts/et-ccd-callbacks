@@ -71,7 +71,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERR
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_SOLICITOR_ROLE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_REVOKE_CLAIMANT_REPRESENTATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_REVOKE_RESPONDENT_REPRESENTATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_SET_ROLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
@@ -931,12 +930,7 @@ public class NocRespondentRepresentativeService {
         if (!claimantRepresentativeOrganisationMatches && !claimantRepresentativeEmailMatches) {
             return caseDetails.getCaseData();
         }
-        final String adminUserToken = adminUserService.getAdminUserToken();
-        try {
-            nocCcdService.revokeClaimantRepresentation(adminUserToken, caseDetails);
-        } catch (GenericServiceException e) {
-            log.warn(ERROR_UNABLE_TO_REVOKE_CLAIMANT_REPRESENTATION, caseDetails.getCaseId(), e.getMessage());
-        }
+        nocCcdService.revokeOrganisationClaimantRepresentation(caseDetails);
         ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseDetails.getCaseData());
         return caseDetails.getCaseData();
     }

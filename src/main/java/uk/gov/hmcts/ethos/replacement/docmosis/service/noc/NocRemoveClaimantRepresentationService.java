@@ -114,22 +114,27 @@ public class NocRemoveClaimantRepresentationService {
     }
 
     /**
-     * Revokes the claimant's legal representative from the specified case and
-     * updates the case data to mark the claimant as unrepresented.
+     * Revokes legal representation for a claimant as part of the Notice of Change (NoC) removal workflow.
      *
-     * <p>The method first verifies that an existing claimant representative is
-     * present. If no representative is found, a {@link GenericServiceException}
-     * is thrown.</p>
+     * <p>This method executes the following business steps:
+     * <ol>
+     *   <li>Validates that an existing claimant representative ({@code RepresentedTypeC}) is present on the case;</li>
+     *   <li>Determines whether other representatives from the same organisation remain assigned, recording
+     *       the result in {@code nocCaseSharingStatus};</li>
+     *   <li>Ensures that if the user chose to remove only themselves ({@code NOC_REMOVE_OPTION_YOURSELF}),
+     *       at least one shared colleague remains to maintain continuous representation;</li>
+     *   <li>Delegates case role revocation to {@link NocCcdService#revokeClaimantRepresentation};</li>
+     *   <li>Marks the claimant as unrepresented via {@link ClaimantRepresentativeUtils#markClaimantAsUnrepresented}
+     *       if the organisation-level removal option ({@code NOC_REMOVE_OPTION_ORGANISATION}) was chosen.</li>
+     * </ol>
      *
-     * <p>Once the claimant representation has been revoked, the claimant is marked
-     * as unrepresented based on the configured notice of change removal option.</p>
-     *
-     * @param userToken the authentication token used to perform the revocation
-     * @param caseDetails the case containing the claimant representation details
-     * @throws GenericServiceException if no existing claimant representative is found
-     *         or if the representation cannot be revoked
+     * @param userDetails the IDAM {@link UserDetails} of the solicitor performing the revocation
+     * @param caseDetails the {@link CaseDetails} containing the case ID and {@link CaseData} to update
+     * @throws GenericServiceException if no claimant representative exists on the case, or if the user attempts
+     *                                 to remove themselves when no remaining shared representative exists
      */
-    public void revokeClaimantLegalRep(String userToken, CaseDetails caseDetails) throws GenericServiceException {
+    public void revokeClaimantLegalRep(UserDetails userDetails, CaseDetails caseDetails)
+            throws GenericServiceException {
         final String methodName = "revokeClaimantLegalRep";
         CaseData caseData = caseDetails.getCaseData();
         // get existing rep and organisation details for sending emails
@@ -139,7 +144,6 @@ public class NocRemoveClaimantRepresentationService {
             throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
                     caseDetails.getCaseId(), NocRemoveClaimantRepresentationService.class.getSimpleName(), methodName);
         }
-        UserDetails userDetails = userService.findUserDetailsByToken(userToken);
         boolean hasSharedRepresentative = hasRemainingClaimantRepresentative(caseDetails, userDetails);
         caseDetails.getCaseData().setNocCaseSharingStatus(hasSharedRepresentative
                 ? NOC_CASE_SHARING_STATUS_SHARED : NOC_CASE_SHARING_STATUS_NOT_SHARED);
@@ -151,7 +155,7 @@ public class NocRemoveClaimantRepresentationService {
                     caseDetails.getCaseId(), NocRemoveClaimantRepresentationService.class.getSimpleName(), methodName);
         }
         // revoke claimant legal rep
-        nocCcdService.revokeClaimantRepresentation(userToken, caseDetails);
+        nocCcdService.revokeClaimantRepresentation(userDetails, caseDetails);
         if (Strings.CS.equals(NOC_REMOVE_OPTION_ORGANISATION, caseDetails.getCaseData().getNocRemoveOption())) {
             ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseData);
         }

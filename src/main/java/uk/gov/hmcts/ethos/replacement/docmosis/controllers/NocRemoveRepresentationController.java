@@ -83,7 +83,7 @@ public class NocRemoveRepresentationController {
             UserDetails userDetails = userService.fetchAndValidateUserDetails(userToken, caseDetails.getCaseId());
             nocRemoveClaimantRepresentationService.populateNocRemovalDetails(userDetails, caseDetails,
                     STAGE_ABOUT_TO_SUBMIT);
-            nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(userToken, caseDetails);
+            nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(userDetails, caseDetails);
             caseDetails.getCaseData().setNocRemoveOption(null);
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());

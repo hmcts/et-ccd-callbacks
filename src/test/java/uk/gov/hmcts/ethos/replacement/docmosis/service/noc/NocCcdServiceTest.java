@@ -23,7 +23,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
@@ -64,7 +63,6 @@ class NocCcdServiceTest {
     private static final String OK = "Ok";
     private static final String IDAM_ID_1 = "85d97996-22a5-40d7-882e-3a382c8ae1b4";
     private static final String IDAM_ID_2 = "85d97996-22a5-40d7-882e-3a382c8ae1b5";
-    private static final String USER_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ORGANISATION_ID = "ORG123456";
     private static final String ORGANISATION_NAME = "ORGANISATION NAME";
     private static final String REPRESENTATIVE_EMAIL = "representative@hmcts.org";
@@ -86,8 +84,6 @@ class NocCcdServiceTest {
     @MockitoBean
     private CcdClient ccdClient;
     @MockitoBean
-    private UserIdamService userIdamService;
-    @MockitoBean
     private AdminUserService adminUserService;
     @MockitoBean
     private UserService userService;
@@ -97,7 +93,7 @@ class NocCcdServiceTest {
     @BeforeEach
     void setUp() {
         LoggerTestUtils.initializeLogger(NocCcdService.class);
-        nocCcdService = new NocCcdService(ccdClient, userIdamService, adminUserService, userService);
+        nocCcdService = new NocCcdService(ccdClient, adminUserService, userService);
     }
 
     private AuditEventsResponse getAuditEventsResponse() {
@@ -106,21 +102,21 @@ class NocCcdServiceTest {
                 .userFirstName("John")
                 .userLastName("Smith")
                 .id("nocRequest")
-                .createdDate(LocalDateTime.of(2022, 9, 10, 8, 0, 0))
+                .createdDate(LocalDateTime.of(2022, java.time.Month.SEPTEMBER, 10, 8, 0, 0))
                 .build(),
             AuditEvent.builder()
                 .userId("967")
                 .userFirstName("Kate")
                 .userLastName("Johnson")
                 .id("nocRequest")
-                .createdDate(LocalDateTime.of(2022, 10, 1, 0, 0, 0))
+                .createdDate(LocalDateTime.of(2022, java.time.Month.OCTOBER, 1, 0, 0, 0))
                 .build(),
             AuditEvent.builder()
                 .userId("774")
                 .userFirstName("Patrick")
                 .userLastName("Fitzgerald")
                 .id("amendCase")
-                .createdDate(LocalDateTime.of(2022, 11, 22, 0, 0, 0))
+                .createdDate(LocalDateTime.of(2022, java.time.Month.NOVEMBER, 22, 0, 0, 0))
                 .build())).build();
     }
 
@@ -265,9 +261,6 @@ class NocCcdServiceTest {
     @SneakyThrows
     void theRevokeClaimantRepresentation() {
         CaseDetails caseDetails = new CaseDetails();
-        // when user token is empty should not throw exception and should not interact with CCD client
-        assertDoesNotThrow(() -> nocCcdService.revokeClaimantRepresentation(StringUtils.EMPTY, caseDetails));
-        verifyNoInteractions(ccdClient);
         // when remove option is yourself should revoke only that representative's claimant representation
         caseDetails.setCaseId(CASE_ID);
         caseDetails.setCaseData(new CaseData());
@@ -278,7 +271,6 @@ class NocCcdServiceTest {
                 .representativeId(REPRESENTATIVE_ID).build());
         UserDetails userDetails = new UserDetails();
         userDetails.setUid(IDAM_ID_1);
-        when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(userDetails);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         CaseUserAssignment caseUserAssignment = CaseUserAssignment.builder().userId(IDAM_ID_1)
                 .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build();
@@ -286,7 +278,7 @@ class NocCcdServiceTest {
                 List.of(caseUserAssignment)).build();
         when(ccdClient.retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID)).thenReturn(caseUserAssignmentData);
         when(ccdClient.revokeCaseAssignments(ADMIN_USER_TOKEN, caseUserAssignmentData)).thenReturn(OK);
-        assertDoesNotThrow(() -> nocCcdService.revokeClaimantRepresentation(USER_TOKEN, caseDetails));
+        assertDoesNotThrow(() -> nocCcdService.revokeClaimantRepresentation(userDetails, caseDetails));
         verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID);
         verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).revokeCaseAssignments(ADMIN_USER_TOKEN,
                 caseUserAssignmentData);
@@ -294,13 +286,13 @@ class NocCcdServiceTest {
         // assignments
         caseDetails.getCaseData().setNocRemoveOption(null);
         when(ccdClient.retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID)).thenReturn(null);
-        assertDoesNotThrow(() -> nocCcdService.revokeClaimantRepresentation(USER_TOKEN, caseDetails));
+        assertDoesNotThrow(() -> nocCcdService.revokeClaimantRepresentation(userDetails, caseDetails));
         verify(ccdClient, times(LoggerTestUtils.INTEGER_TWO)).retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID);
         verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).revokeCaseAssignments(ADMIN_USER_TOKEN,
                 caseUserAssignmentData);
         // when remove option is not yourself and case assignments found should revoke all case assignments
         when(ccdClient.retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID)).thenReturn(caseUserAssignmentData);
-        assertDoesNotThrow(() -> nocCcdService.revokeClaimantRepresentation(USER_TOKEN, caseDetails));
+        assertDoesNotThrow(() -> nocCcdService.revokeClaimantRepresentation(userDetails, caseDetails));
         verify(ccdClient, times(LoggerTestUtils.INTEGER_THREE)).retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID);
         verify(ccdClient, times(LoggerTestUtils.INTEGER_TWO)).revokeCaseAssignments(ADMIN_USER_TOKEN,
                 caseUserAssignmentData);
@@ -309,32 +301,29 @@ class NocCcdServiceTest {
     @Test
     @SneakyThrows
     void theRevokeUserClaimantRepresentation() {
-        // when user token is empty should not throw exception
+        // when user details is empty should throw exception
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId(CASE_ID);
         caseDetails.setCaseData(new CaseData());
         caseDetails.getCaseData().setNocRepresentativeType(NOC_REPRESENTATIVE_TYPE_SHARED);
-        assertDoesNotThrow(() -> nocCcdService.revokeUserClaimantRepresentation(StringUtils.EMPTY, caseDetails));
-        verifyNoInteractions(ccdClient);
-        // when user details is empty should throw representative not found generic service exception
-        when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(null);
         GenericServiceException gse = assertThrows(GenericServiceException.class,
-                () -> nocCcdService.revokeUserClaimantRepresentation(USER_TOKEN, caseDetails));
+                () -> nocCcdService.revokeUserClaimantRepresentation(null, caseDetails));
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_REPRESENTATIVE_NOT_FOUND_BY_TOKEN);
         verifyNoInteractions(ccdClient);
-        // when user details does not have user idam id should throw representative not found generic service exception
+
+        // when user details does not have idam id should throw representative not found generic service exception
         UserDetails userDetails = new UserDetails();
-        when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(userDetails);
-        gse = assertThrows(GenericServiceException.class, () ->
-                nocCcdService.revokeUserClaimantRepresentation(USER_TOKEN, caseDetails));
+        gse = assertThrows(GenericServiceException.class, () -> nocCcdService.revokeUserClaimantRepresentation(
+                userDetails, caseDetails));
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_REPRESENTATIVE_NOT_FOUND_BY_TOKEN);
         verifyNoInteractions(ccdClient);
+
         // when no case user assignments found by case id, IDAM id and claimant solicitor role should not
         // throw exception and should not revoke case assignments.
+        userDetails.setUid(IDAM_ID_1);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         when(ccdClient.retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID)).thenReturn(null);
-        userDetails.setUid(IDAM_ID_1);
-        assertDoesNotThrow(() -> nocCcdService.revokeUserClaimantRepresentation(USER_TOKEN, caseDetails));
+        assertDoesNotThrow(() -> nocCcdService.revokeUserClaimantRepresentation(userDetails, caseDetails));
         verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID);
         verify(ccdClient, times(LoggerTestUtils.INTEGER_ZERO)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),
                 any(CaseUserAssignmentData.class));
@@ -345,7 +334,7 @@ class NocCcdServiceTest {
         CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder()
                 .caseUserAssignments(List.of(caseUserAssignment)).build();
         when(ccdClient.retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID)).thenReturn(caseUserAssignmentData);
-        assertDoesNotThrow(() -> nocCcdService.revokeUserClaimantRepresentation(USER_TOKEN, caseDetails));
+        assertDoesNotThrow(() -> nocCcdService.revokeUserClaimantRepresentation(userDetails, caseDetails));
         verify(ccdClient, times(LoggerTestUtils.INTEGER_TWO)).retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID);
         verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).revokeCaseAssignments(ADMIN_USER_TOKEN,
                 caseUserAssignmentData);

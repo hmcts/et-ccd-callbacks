@@ -11,6 +11,7 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.AuditEventsResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
@@ -18,7 +19,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UserUtils;
@@ -43,7 +43,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC
 @RequiredArgsConstructor
 public class NocCcdService {
     private final CcdClient ccdClient;
-    private final UserIdamService userIdamService;
     private final AdminUserService adminUserService;
     private final UserService userService;
 
@@ -204,35 +203,52 @@ public class NocCcdService {
     }
 
     /**
-     * Revokes the claimant solicitor's case role assignment for the given case,
-     * if such an assignment exists.
+     * Revokes claimant representation for the specified case based on the selected NOC removal option.
      *
-     * <p>This method performs the following steps:
+     * <p>Assumes that:
      * <ul>
-     *     <li>Returns immediately if the provided {@code userToken} is blank.</li>
-     *     <li>Attempts to locate a {@link CaseUserAssignment} for the
-     *         {@link ClaimantSolicitorRole#CLAIMANTSOLICITOR} role
-     *         associated with the given case ID.</li>
-     *     <li>If no matching assignment is found, the method exits without action.</li>
-     *     <li>If an assignment is found, it is revoked via {@code revokeCaseAssignments}.</li>
+     *   <li>{@code userDetails} is non-null and contains valid user information.</li>
+     *   <li>{@code caseDetails} and its associated case data are non-null.</li>
+     *   <li>The NOC removal option has been validated and contains a valid value.</li>
+     *   <li>The user or organisation has an existing claimant representation to revoke.</li>
      * </ul>
      *
-     * <p>No action is taken if the user token is invalid or the claimant solicitor
-     * role is not currently assigned to the case.
+     * <p>If the removal option is {@code NOC_REMOVE_OPTION_YOURSELF}, revokes the
+     * user's claimant representation. Otherwise, revokes the organisation's
+     * claimant representation.</p>
      *
-     * @param userToken   the authorisation token of the user performing the operation;
-     *                    must not be blank
-     * @param caseDetails the case details containing the case ID from which the
-     *                    claimant solicitor role should be revoked
+     * @param userDetails the details of the user requesting representation removal
+     * @param caseDetails the case details containing the NOC removal option
+     * @throws GenericServiceException if claimant representation cannot be revoked
      */
-    public void revokeClaimantRepresentation(String userToken, CaseDetails caseDetails) throws GenericServiceException {
-        if (StringUtils.isBlank(userToken)) {
-            return;
-        }
+    public void revokeClaimantRepresentation(UserDetails userDetails, CaseDetails caseDetails)
+            throws GenericServiceException {
         if (Strings.CS.equals(NOC_REMOVE_OPTION_YOURSELF, caseDetails.getCaseData().getNocRemoveOption())) {
-            revokeUserClaimantRepresentation(userToken, caseDetails);
+            revokeUserClaimantRepresentation(userDetails, caseDetails);
             return;
         }
+        revokeOrganisationClaimantRepresentation(caseDetails);
+    }
+
+    /**
+     * Revokes all claimant solicitor case assignments associated with the specified case.
+     *
+     * <p>Assumes that:
+     * <ul>
+     *   <li>{@code caseDetails} is non-null and contains a valid case ID.</li>
+     *   <li>The claimant solicitor role is correctly configured.</li>
+     *   <li>The case user assignments retrieved for the claimant solicitor role are valid.</li>
+     *   <li>The admin user token is available and has sufficient permissions to revoke assignments.</li>
+     * </ul>
+     *
+     * <p>Retrieves all case user assignments associated with the claimant solicitor role
+     * and revokes them using the admin user token. If no matching assignments are found,
+     * the method returns without performing any revocation.</p>
+     *
+     * @param caseDetails the case details containing the case ID for which
+     *                    claimant solicitor assignments are to be revoked
+     */
+    public void revokeOrganisationClaimantRepresentation(CaseDetails caseDetails) {
         List<CaseUserAssignment> caseUserAssignments = findCaseUserAssignmentsByCaseIdAndRole(caseDetails.getCaseId(),
                 ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
         if (CollectionUtils.isEmpty(caseUserAssignments)) {
@@ -244,27 +260,43 @@ public class NocCcdService {
     }
 
     /**
-     * Revokes the claimant solicitor case assignment associated with the user
-     * identified by the supplied authentication token.
+     * Revokes a specific individual solicitor's case assignments as a claimant legal representative
+     * ({@code [CLAIMANTSOLICITOR]}) and reassigns lead representation to an active colleague within the firm.
      *
-     * <p>If {@code userToken} is blank, or if no matching claimant solicitor
-     * assignment exists for the user and case, the method returns without making
-     * any changes.</p>
+     * <p>This method performs the following operations:
+     * <ol>
+     *   <li>Validates that {@code userDetails} and the user's IDAM UID are present and non-blank;</li>
+     *   <li>Fetches all active {@code [CLAIMANTSOLICITOR]} assignments for the case from the CCD Case
+     *       Assignment API;</li>
+     *   <li>Filters assignments belonging specifically to {@code userDetails.getUid()};</li>
+     *   <li>Exits early (idempotently) if the user has no active assignments on the case;</li>
+     *   <li>Reassigns lead representative details on {@code CaseData} via {@link #reassignLeadClaimantRepresentative}
+     *       to ensure a remaining organisation colleague becomes the primary contact;</li>
+     *   <li>Invokes {@link #revokeCaseAssignments} using an administrative bearer token
+     *       to delete the user's case-role mappings in CCD.</li>
+     * </ol>
      *
-     * <p>If the user details cannot be resolved from the supplied token, or the
-     * resolved user does not contain a valid IDAM user ID, a
-     * {@link GenericServiceException} is thrown.</p>
+     * <p><b>Assumptions:</b>
+     * <ul>
+     *   <li><b>Case Validity:</b> {@code caseDetails} is non-null with a valid case ID and populated
+     *       {@link CaseData}.</li>
+     *   <li><b>Representative Pre-existence:</b> The target user currently holds the
+     *       {@code [CLAIMANTSOLICITOR]} role on the specified case.</li>
+     *   <li><b>Remaining Representation:</b> At least one colleague from the same organisation remains assigned
+     *       to the case so lead representation can be reassigned (enforced upstream in the "yourself" removal flow).
+     *   </li>
+     *   <li><b>Administrative Privileges:</b> {@code adminUserService.getAdminUserToken()} supplies a valid,
+     *       unexpired system token with sufficient privileges to modify case-user assignments in CCD Data Store.</li>
+     *   <li><b>Downstream Availability:</b> CCD Data Store and Case Assignment APIs are healthy and responsive.</li>
+     * </ul>
      *
-     * @param userToken the authentication token used to identify the user
-     * @param caseDetails the case whose claimant representation should be revoked
-     * @throws GenericServiceException if the user cannot be identified from the supplied token
+     * @param userDetails the {@link UserDetails} of the individual representative whose access is being revoked
+     * @param caseDetails the {@link CaseDetails} containing the case ID and case data to update
+     * @throws GenericServiceException if {@code userDetails} is null, if the user's IDAM UID is blank,
+     *                                 or if downstream reassignment/revocation calls fail
      */
-    public void revokeUserClaimantRepresentation(String userToken, CaseDetails caseDetails)
+    public void revokeUserClaimantRepresentation(UserDetails userDetails, CaseDetails caseDetails)
             throws GenericServiceException {
-        if (StringUtils.isBlank(userToken)) {
-            return;
-        }
-        UserDetails userDetails = userIdamService.getUserDetails(userToken);
         final String methodName = "revokeUserClaimantRepresentation";
         if (userDetails == null || StringUtils.isBlank(userDetails.getUid())) {
             String exceptionMessage = String.format(EXCEPTION_REPRESENTATIVE_NOT_FOUND_BY_TOKEN,

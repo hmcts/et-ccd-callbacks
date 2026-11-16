@@ -63,7 +63,6 @@ class NocRemoveClaimantRepresentationServiceTest {
     private static final String CLAIMANT_REPRESENTATIVE_IDAM_ID_1 = "claimantRepresentativeIdamId1";
     private static final String CLAIMANT_REPRESENTATIVE_IDAM_ID_2 = "claimantRepresentativeIdamId2";
     private static final String CASE_ID = "1775651960650043";
-    private static final String DUMMY_USER_TOKEN = "dummyUserToken";
     private static final String ORGANISATION_ID = "organisationId";
 
     private static final String EXPECTED_EXCEPTION_INVALID_CASE_DETAILS = "Case details are required";
@@ -188,7 +187,7 @@ class NocRemoveClaimantRepresentationServiceTest {
         tmpCaseDetails.setCaseData(new CaseData());
         tmpCaseDetails.setCaseId(CASE_ID);
         GenericServiceException gse = assertThrows(GenericServiceException.class,
-                () -> nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(DUMMY_USER_TOKEN, tmpCaseDetails));
+                () -> nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(userDetails1, tmpCaseDetails));
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_REPRESENTATIVE_NOT_FOUND);
         // when remove option is set to yourself and there is no other shared representative should throw no shared
         // representative to remove yourself exception
@@ -201,20 +200,19 @@ class NocRemoveClaimantRepresentationServiceTest {
                 .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
                 .organisation(Organisation.builder().organisationID(ORGANISATION_ID).build()).build());
         gse = assertThrows(GenericServiceException.class,
-                () -> nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(DUMMY_USER_TOKEN, tmpCaseDetails));
+                () -> nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(userDetails1, tmpCaseDetails));
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_NO_SHARED_REPRESENTATIVE_TO_REMOVE_YOURSELF);
         // when claimant representative exists, but noc remove option is not organisation should revoke only
         // representation
-        when(userService.findUserDetailsByToken(DUMMY_USER_TOKEN)).thenReturn(userDetails1);
         when(nocCcdService.findCaseUserAssignmentsByCaseIdAndRole(tmpCaseDetails.getCaseId(),
                 ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(
                         new ArrayList<>(Collections.singletonList(caseUserAssignment1)));
         when(nocCcdService.findRemainingClaimantRepresentative(
                 new ArrayList<>(Collections.singletonList(caseUserAssignment1)), userDetails1))
                 .thenReturn(userDetails2);
-        nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(DUMMY_USER_TOKEN, tmpCaseDetails);
+        nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(userDetails1, tmpCaseDetails);
         verify(nocCcdService, times(LoggerTestUtils.INTEGER_ONE))
-                .revokeClaimantRepresentation(DUMMY_USER_TOKEN, tmpCaseDetails);
+                .revokeClaimantRepresentation(userDetails1, tmpCaseDetails);
         assertThat(tmpCaseDetails.getCaseData().getRepresentativeClaimantType()).isEqualTo(RepresentedTypeC.builder()
                 .representativeId(CLAIMANT_REPRESENTATIVE_ID).build());
         assertThat(tmpCaseDetails.getCaseData().getClaimantRepresentativeRemoved()).isEqualTo(NO);
@@ -226,9 +224,9 @@ class NocRemoveClaimantRepresentationServiceTest {
         // when claimant representative exists, and noc remove option is organisation should revoke representation and
         // mark claimant as unrepresented
         tmpCaseDetails.getCaseData().setNocRemoveOption(NOC_REMOVE_OPTION_ORGANISATION);
-        nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(DUMMY_USER_TOKEN, tmpCaseDetails);
+        nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(userDetails1, tmpCaseDetails);
         verify(nocCcdService, times(LoggerTestUtils.INTEGER_TWO))
-                .revokeClaimantRepresentation(DUMMY_USER_TOKEN, tmpCaseDetails);
+                .revokeClaimantRepresentation(userDetails1, tmpCaseDetails);
         assertThat(tmpCaseDetails.getCaseData().getRepresentativeClaimantType()).isNull();
         assertThat(tmpCaseDetails.getCaseData().getClaimantRepresentativeRemoved()).isEqualTo(YES);
         assertThat(tmpCaseDetails.getCaseData().getClaimantRepresentedQuestion()).isEqualTo(NO);

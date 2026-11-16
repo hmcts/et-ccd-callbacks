@@ -80,7 +80,7 @@ import {
   UploadDocumentPage,
   UploadDocumentsForHearingPage,
   UploadHearingBundlePage,
-} from '../pages';
+} from '../pages/index.js';
 
 type PageFixtures = {
   applicationTabPage: ApplicationTabPage;

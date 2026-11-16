@@ -61,7 +61,9 @@ class ClaimantEmailServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new ClaimantEmailService(idamApi, ccdCaseAssignment);
+        PartyEmailUpdateSupport partyEmailUpdateSupport =
+                new PartyEmailUpdateSupport(idamApi, ccdCaseAssignment);
+        service = new ClaimantEmailService(partyEmailUpdateSupport);
         ClaimantType claimantType = new ClaimantType();
         claimantType.setClaimantEmailAddress(OLD_EMAIL);
         CaseData caseData = new CaseData();

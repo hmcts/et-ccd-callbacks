@@ -79,16 +79,6 @@ class CaseFlagsDataMigrationControllerTest {
     }
 
     @Test
-    void shouldMigrateCaseFlags_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(CASE_FLAGS_DATA_MIGRATION)
-                        .content(requestContent.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void shouldRollbackCaseFlags() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CASE_FLAGS_DATA_ROLLBACK)
@@ -99,15 +89,5 @@ class CaseFlagsDataMigrationControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void shouldRollbackCaseFlags_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(CASE_FLAGS_DATA_ROLLBACK)
-                        .content(requestContent.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 }

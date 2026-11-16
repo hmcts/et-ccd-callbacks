@@ -1,4 +1,4 @@
-import { BasePage } from '../basePage';
+import { BasePage } from '../basePage.js';
 import { expect, Page, Locator } from '@playwright/test';
 
 export class RespSubmitEt3 extends BasePage {

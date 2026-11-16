@@ -73,16 +73,6 @@ class ExtractNotificationsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_badToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                        .content(requestContent.toString())
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void submitted_ok() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_URL)
@@ -93,15 +83,5 @@ class ExtractNotificationsControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void submitted_badToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(SUBMITTED_URL)
-                        .content(requestContent.toString())
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 }

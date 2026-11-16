@@ -9,6 +9,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_OPEN_TRACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_STANDARD_TRACK;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.JURISDICTION_OUTCOME_INPUT_IN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.JUR_CODE_CONCILIATION_TRACK_NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.JUR_CODE_CONCILIATION_TRACK_OP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.JUR_CODE_CONCILIATION_TRACK_SH;
@@ -46,6 +47,9 @@ public class ConciliationTrackService {
         boolean isConTrackNo = false;
 
         for (JurCodesTypeItem jurCodesTypeItem : caseData.getJurCodesCollection()) {
+            if (JURISDICTION_OUTCOME_INPUT_IN_ERROR.equals(jurCodesTypeItem.getValue().getJudgmentOutcome())) {
+                continue;
+            }
             if (JUR_CODE_CONCILIATION_TRACK_OP.contains(jurCodesTypeItem.getValue().getJuridictionCodesList())) {
                 return "OP";
             } else if (JUR_CODE_CONCILIATION_TRACK_ST.contains(jurCodesTypeItem.getValue().getJuridictionCodesList())) {

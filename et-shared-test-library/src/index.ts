@@ -1,6 +1,6 @@
-export * from "./config"
-export * from "./data-utils"
-export * from "./fixtures"
-export * from "./pages"
-export * from "./types"
+export * from "./config/index.js"
+export * from "./data-utils/index.js"
+export * from "./fixtures/index.js"
+export * from "./pages/index.js"
+export * from "./types/index.js"
 

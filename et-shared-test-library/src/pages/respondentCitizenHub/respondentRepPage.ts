@@ -1,6 +1,6 @@
-import { BasePage } from "../basePage";
+import { BasePage } from "../basePage.js";
 import { expect, Locator, Page } from '@playwright/test';
-import { CaseDetailsValues } from '../../config';
+import { CaseDetailsValues } from '../../config/index.js';
 
 export class RespondentRepPage extends BasePage {
   private readonly nonRegisteredLegalOrg: Locator;

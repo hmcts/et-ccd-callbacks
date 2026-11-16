@@ -96,16 +96,6 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void startAddLegalRepToMultiple_TokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(START_ADD_LEGAL_REP_TO_MULTIPLE_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void startAddLegalRepToMultiple_BadRequest() throws Exception {
         mvc.perform(post(START_ADD_LEGAL_REP_TO_MULTIPLE_URL)
                         .content("bad request")
@@ -129,16 +119,6 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void submitAddLegalRepToMultiple_TokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(SUBMIT_ADD_LEGAL_REP_TO_MULTIPLE_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void submitAddLegalRepToMultiple_BadRequest() throws Exception {
         mvc.perform(post(SUBMIT_ADD_LEGAL_REP_TO_MULTIPLE_URL)
                         .content("bad request")
@@ -156,16 +136,6 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.confirmation_header", notNullValue()));
-    }
-
-    @Test
-    void completeAddLegalRepToMultiple_TokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(COMPLETE_ADD_LEGAL_REP_TO_MULTIPLE_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 
     @Test

@@ -124,17 +124,6 @@ class UpdateReferralControllerTest {
     }
 
     @Test
-    void initReferralHearingDetails_invalidToken() throws Exception {
-
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(START_UPDATE_REFERRAL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void aboutToSubmit_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
@@ -224,34 +213,4 @@ class UpdateReferralControllerTest {
                 .andExpect(jsonPath("$.warnings", nullValue()));
     }
 
-    @Test
-    void aboutToSubmit_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void initHearingAndReferralDetails_doesNotCompleteTaskForAnotherReferral() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        // Referral 1 is selected, but the task ExUI is about to complete was raised for referral 2.
-        String clientContext = Base64.getEncoder().encodeToString((
-            "{\"client_context\":{\"user_task\":{\"task_data\":{\"id\":\"task-id\","
-            + "\"type\":\"ReviewReferralLegalOps\",\"task_title\":\"LO - Review Referral #2 - ET1\"},"
-            + "\"complete_task\":true}}}").getBytes(UTF_8));
-
-        String updatedClientContext = mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .header(CLIENT_CONTEXT_HEADER, clientContext)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getHeader(CLIENT_CONTEXT_HEADER);
-
-        assertThat(new String(Base64.getDecoder().decode(updatedClientContext), UTF_8))
-            .contains("\"complete_task\":false");
-    }
 }

@@ -1,19 +1,24 @@
-import userDetailsData from '@et-shared-test-library/core/resources/payload/user-details.json';
-import acasCertData from '@et-shared-test-library/core/resources/payload/acas-content.json';
 import {
   CaseTypeLocation,
   config,
-  createCaseViaCitizenUI, Events,
+  createCaseViaCitizenUI, Events, resolveResourceJson,
   test,
   users,
   vetAndAcceptCitizenCase
-} from "@et-shared-test-library/core";
+} from "@hmcts/et-shared-test-library";
+
+let userDetailsData: any;
+let acasCertData: any;
 
 test.describe.serial('Add & Search ACAS certificate tests',
   () => {
   test.use({
     storageState: users.etCaseWorker.sessionFile
   })
+    test.beforeAll(async () => {
+      userDetailsData = resolveResourceJson('resources/payload/user-details.json');
+      acasCertData = resolveResourceJson('resources/payload/acas-content.json');
+    });
   let caseId: string;
   let caseNumber: string;
 

@@ -25,6 +25,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
@@ -119,7 +120,8 @@ public class RespondentRepresentativeController {
         log.info("CHECKING RESPONDENT REPRESENTATIVE ORGANISATION ---> {} {}", LOG_MESSAGE,
                 ccdRequest.getCaseDetails().getCaseId());
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = new ArrayList<>();
+        List<String> errors = new ArrayList<>(
+                PhoneNumberValidator.validateRepresentativePhoneNumbers(caseData.getRepCollection()));
         List<String> warnings = new ArrayList<>();
         try {
             warnings.addAll(nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(caseData));
@@ -158,6 +160,7 @@ public class RespondentRepresentativeController {
                 ccdRequest.getCaseDetails().getCaseId());
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>(NocUtils.validateNocCaseData(caseData));
+        errors.addAll(PhoneNumberValidator.validateRepresentativePhoneNumbers(caseData.getRepCollection()));
         errors.addAll(nocRespondentRepresentativeService
                 .validateRespondentRepresentativesOrganisationMatch(ccdRequest.getCaseDetails()));
         if (errors.isEmpty()) {

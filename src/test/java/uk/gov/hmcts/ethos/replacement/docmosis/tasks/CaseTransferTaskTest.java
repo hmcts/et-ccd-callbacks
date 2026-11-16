@@ -8,13 +8,19 @@ import org.mockito.Captor;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ecm.compat.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -24,16 +30,19 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
-import static uk.gov.hmcts.ecm.compat.common.model.helper.Constants.POSITION_TYPE_CASE_TRANSFERRED_SAME_COUNTRY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
 class CaseTransferTaskTest {
 
     private static final String ADMIN_TOKEN = "AdminToken";
-    private static final String CASE_ID = "1234567890";
-    private static final String OLD_CASE_TYPE_ID = "ET_EnglandWales";
-    private static final String NEW_CASE_TYPE_ID = "ET_Scotland";
-    private static final String JURISDICTION = "EMPLOYMENT";
+    private static final String S2S_TOKEN = "S2SToken";
+    private static final String CASE_ID = "1234567890123456";
+    private static final String CASE_ID_2 = "9876543210987654";
+    private static final String TARGET_CASE_TYPE = "MidlandsWest";
+    private static final String EXPECTED_ECM_OFFICE = "Midlands West";
+    private static final String CASE_TRANSFER_ECM_EVENT_ID = "caseTransferECM";
 
     private CaseTransferTask caseTransferTask;
 
@@ -43,13 +52,20 @@ class CaseTransferTaskTest {
     @MockitoBean
     private CcdClient ccdClient;
 
+    @MockitoBean
+    private CoreCaseDataApi coreCaseDataApi;
+
+    @MockitoBean
+    private AuthTokenGenerator authTokenGenerator;
+
     @Captor
     private ArgumentCaptor<CaseData> caseDataCaptor;
 
     @BeforeEach
     void setUp() {
-        caseTransferTask = new CaseTransferTask(adminUserService, ccdClient);
+        caseTransferTask = new CaseTransferTask(adminUserService, ccdClient, coreCaseDataApi, authTokenGenerator);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
+        when(authTokenGenerator.generate()).thenReturn(S2S_TOKEN);
     }
 
     @Test
@@ -58,130 +74,215 @@ class CaseTransferTaskTest {
 
         caseTransferTask.run();
 
-        verify(ccdClient, never()).returnCaseCreationTransfer(any(), any(), any(), any());
+        verify(coreCaseDataApi, never()).getCase(any(), any(), any());
         verify(ccdClient, never()).startEventForCase(any(), any(), any(), any(), any());
         verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
     }
 
     @Test
     void run_doesNothing_whenCasesToUpdateIsEmpty() throws IOException {
-        ReflectionTestUtils.setField(caseTransferTask, "casesToUpdate", "");
+        ReflectionTestUtils.setField(caseTransferTask, "casesToUpdate", "   ");
 
         caseTransferTask.run();
 
-        verify(ccdClient, never()).returnCaseCreationTransfer(any(), any(), any(), any());
+        verify(coreCaseDataApi, never()).getCase(any(), any(), any());
         verify(ccdClient, never()).startEventForCase(any(), any(), any(), any(), any());
         verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
     }
 
     @Test
-    void run_logsError_whenCaseIdsNotMultipleOfThree() throws IOException {
-        // "caseId1,oldType1" has 2 elements, not divisible by 3
-        ReflectionTestUtils.setField(caseTransferTask, "casesToUpdate", "caseId1,oldType1");
+    void run_logsError_whenCaseIdsNotMultipleOfTwo() throws IOException {
+        ReflectionTestUtils.setField(caseTransferTask, "casesToUpdate",
+            CASE_ID + "," + TARGET_CASE_TYPE + "," + CASE_ID_2);
 
         caseTransferTask.run();
 
-        verify(ccdClient, never()).returnCaseCreationTransfer(any(), any(), any(), any());
+        verify(coreCaseDataApi, never()).getCase(any(), any(), any());
+        verify(ccdClient, never()).startEventForCase(any(), any(), any(), any(), any());
+        verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void run_skipsInvalidCaseIdAndContinuesProcessing() throws IOException {
+        ReflectionTestUtils.setField(caseTransferTask, "casesToUpdate",
+            "12345," + TARGET_CASE_TYPE + "," + CASE_ID + "," + TARGET_CASE_TYPE);
+
+        when(coreCaseDataApi.getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID))
+            .thenReturn(buildCoreCaseDetails(ENGLANDWALES_CASE_TYPE_ID));
+        when(ccdClient.startEventForCase(
+            ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, CASE_TRANSFER_ECM_EVENT_ID))
+            .thenReturn(buildCcdRequest(new CaseData()));
+
+        caseTransferTask.run();
+
+        verify(coreCaseDataApi, never()).getCase(ADMIN_TOKEN, S2S_TOKEN, "12345");
+        verify(coreCaseDataApi, times(1)).getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID);
+        verify(ccdClient, times(1)).submitEventForCase(
+            eq(ADMIN_TOKEN), any(CaseData.class), eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT),
+            any(CCDRequest.class), eq(CASE_ID));
+    }
+
+    @Test
+    void run_skipsInvalidTargetCaseType() throws IOException {
+        ReflectionTestUtils.setField(caseTransferTask, "casesToUpdate", CASE_ID + ",InvalidOffice");
+
+        caseTransferTask.run();
+
+        verify(coreCaseDataApi, never()).getCase(any(), any(), any());
+        verify(ccdClient, never()).startEventForCase(any(), any(), any(), any(), any());
+        verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void run_skipsUnsupportedSourceCaseType() throws IOException {
+        ReflectionTestUtils.setField(caseTransferTask, "casesToUpdate", CASE_ID + "," + TARGET_CASE_TYPE);
+        when(coreCaseDataApi.getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID))
+            .thenReturn(buildCoreCaseDetails("MidlandsWest"));
+
+        caseTransferTask.run();
+
         verify(ccdClient, never()).startEventForCase(any(), any(), any(), any(), any());
         verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
     }
 
     @Test
     void run_transfersSingleCase_successfully() throws IOException {
-        ReflectionTestUtils.setField(caseTransferTask, "casesToUpdate",
-            CASE_ID + "," + OLD_CASE_TYPE_ID + "," + NEW_CASE_TYPE_ID);
+        ReflectionTestUtils.setField(caseTransferTask, "casesToUpdate", CASE_ID + "," + TARGET_CASE_TYPE);
 
-        CCDRequest returnCcdRequest = buildCcdRequest();
-        CCDRequest startEventCcdRequest = buildCcdRequest();
-
-        when(ccdClient.returnCaseCreationTransfer(ADMIN_TOKEN, OLD_CASE_TYPE_ID, EMPLOYMENT, CASE_ID))
-            .thenReturn(returnCcdRequest);
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, OLD_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, "caseTransfer"))
-            .thenReturn(startEventCcdRequest);
+        when(coreCaseDataApi.getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID))
+            .thenReturn(buildCoreCaseDetails(ENGLANDWALES_CASE_TYPE_ID));
+        when(ccdClient.startEventForCase(
+            ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, CASE_TRANSFER_ECM_EVENT_ID))
+            .thenReturn(buildCcdRequest(new CaseData()));
 
         caseTransferTask.run();
 
-        // returnCaseCreationTransfer + submitEventForCase (reset) + startEventForCase + submitEventForCase (transfer)
-        verify(ccdClient, times(1)).returnCaseCreationTransfer(ADMIN_TOKEN, OLD_CASE_TYPE_ID, EMPLOYMENT, CASE_ID);
-        verify(ccdClient, times(1))
-            .startEventForCase(ADMIN_TOKEN, OLD_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, "caseTransfer");
-        verify(ccdClient, times(2)).submitEventForCase(
-            eq(ADMIN_TOKEN), any(CaseData.class), eq(OLD_CASE_TYPE_ID), eq(JURISDICTION), any(CCDRequest.class),
-            eq(CASE_ID));
-    }
-
-    @Test
-    void run_setsCorrectCaseDataOnTransferEvent() throws IOException {
-        ReflectionTestUtils.setField(caseTransferTask, "casesToUpdate",
-            CASE_ID + "," + OLD_CASE_TYPE_ID + "," + NEW_CASE_TYPE_ID);
-
-        when(ccdClient.returnCaseCreationTransfer(ADMIN_TOKEN, OLD_CASE_TYPE_ID, EMPLOYMENT, CASE_ID))
-            .thenReturn(buildCcdRequest());
-        when(ccdClient.startEventForCase(ADMIN_TOKEN, OLD_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, "caseTransfer"))
-            .thenReturn(buildCcdRequest());
-
-        caseTransferTask.run();
-
-        // The second submitEventForCase call carries the updated CaseData
-        verify(ccdClient, times(2)).submitEventForCase(
-            eq(ADMIN_TOKEN), caseDataCaptor.capture(), eq(OLD_CASE_TYPE_ID), eq(JURISDICTION),
+        verify(ccdClient, times(1)).startEventForCase(
+            ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, CASE_TRANSFER_ECM_EVENT_ID);
+        verify(ccdClient, times(1)).submitEventForCase(
+            eq(ADMIN_TOKEN), caseDataCaptor.capture(), eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT),
             any(CCDRequest.class), eq(CASE_ID));
 
-        CaseData transferCaseData = caseDataCaptor.getAllValues().get(1);
-        assertEquals(NEW_CASE_TYPE_ID, transferCaseData.getOfficeCT().getValue().getCode());
-        assertEquals(POSITION_TYPE_CASE_TRANSFERRED_SAME_COUNTRY, transferCaseData.getPositionTypeCT());
-        assertEquals("ET Data Quality", transferCaseData.getReasonForCT());
+        CaseData submittedData = caseDataCaptor.getValue();
+        assertEquals(EXPECTED_ECM_OFFICE, submittedData.getEcmOfficeCT());
+        assertEquals(CaseTransferTask.REASON_FOR_CT, submittedData.getReasonForCT());
     }
 
     @Test
-    void run_transfersMultipleCases_successfully() throws IOException {
-        String caseId2 = "9876543210";
-        String oldType2 = "ET_Scotland";
-        String newType2 = "ET_EnglandWales";
-        ReflectionTestUtils.setField(caseTransferTask, "casesToUpdate",
-            CASE_ID + "," + OLD_CASE_TYPE_ID + "," + NEW_CASE_TYPE_ID
-            + "," + caseId2 + "," + oldType2 + "," + newType2);
+    void run_clearsOnlyUnclearedBfActions() throws IOException {
+        ReflectionTestUtils.setField(caseTransferTask, "casesToUpdate", CASE_ID + "," + TARGET_CASE_TYPE);
 
-        when(ccdClient.returnCaseCreationTransfer(any(), any(), any(), any())).thenReturn(buildCcdRequest());
-        when(ccdClient.startEventForCase(any(), any(), any(), any(), any())).thenReturn(buildCcdRequest());
+        BFActionType unclearedBfAction = new BFActionType();
+        BFActionTypeItem unclearedItem = new BFActionTypeItem();
+        unclearedItem.setId("1");
+        unclearedItem.setValue(unclearedBfAction);
+
+        BFActionType clearedBfAction = new BFActionType();
+        clearedBfAction.setCleared("2025-01-15");
+        BFActionTypeItem clearedItem = new BFActionTypeItem();
+        clearedItem.setId("2");
+        clearedItem.setValue(clearedBfAction);
+
+        CaseData caseData = new CaseData();
+        caseData.setBfActions(List.of(unclearedItem, clearedItem));
+
+        when(coreCaseDataApi.getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID))
+            .thenReturn(buildCoreCaseDetails(ENGLANDWALES_CASE_TYPE_ID));
+        when(ccdClient.startEventForCase(
+            ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, CASE_TRANSFER_ECM_EVENT_ID))
+            .thenReturn(buildCcdRequest(caseData));
 
         caseTransferTask.run();
 
-        verify(ccdClient, times(2)).returnCaseCreationTransfer(any(), any(), any(), any());
-        verify(ccdClient, times(2)).startEventForCase(any(), any(), any(), any(), any());
-        // 2 resets + 2 transfers = 4 total submitEventForCase calls
-        verify(ccdClient, times(4)).submitEventForCase(any(), any(), any(), any(), any(), any());
+        verify(ccdClient, times(1)).submitEventForCase(
+            eq(ADMIN_TOKEN), caseDataCaptor.capture(), eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT),
+            any(CCDRequest.class), eq(CASE_ID));
+
+        CaseData submittedData = caseDataCaptor.getValue();
+        assertEquals(LocalDate.now().toString(), submittedData.getBfActions().get(0).getValue().getCleared());
+        assertEquals("2025-01-15", submittedData.getBfActions().get(1).getValue().getCleared());
+    }
+
+    @Test
+    void run_transfersMultipleCasesAcrossJurisdictions_successfully() throws IOException {
+        ReflectionTestUtils.setField(caseTransferTask, "casesToUpdate",
+            CASE_ID + ", " + TARGET_CASE_TYPE + " , " + CASE_ID_2 + ",Scotland");
+
+        when(coreCaseDataApi.getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID))
+            .thenReturn(buildCoreCaseDetails(ENGLANDWALES_CASE_TYPE_ID));
+        when(coreCaseDataApi.getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID_2))
+            .thenReturn(buildCoreCaseDetails(SCOTLAND_CASE_TYPE_ID));
+
+        when(ccdClient.startEventForCase(
+            ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, CASE_TRANSFER_ECM_EVENT_ID))
+            .thenReturn(buildCcdRequest(new CaseData()));
+        when(ccdClient.startEventForCase(
+            ADMIN_TOKEN, SCOTLAND_CASE_TYPE_ID, EMPLOYMENT, CASE_ID_2, CASE_TRANSFER_ECM_EVENT_ID))
+            .thenReturn(buildCcdRequest(new CaseData()));
+
+        caseTransferTask.run();
+
+        verify(ccdClient, times(1)).submitEventForCase(
+            eq(ADMIN_TOKEN), any(CaseData.class), eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT),
+            any(CCDRequest.class), eq(CASE_ID));
+        verify(ccdClient, times(1)).submitEventForCase(
+            eq(ADMIN_TOKEN), caseDataCaptor.capture(), eq(SCOTLAND_CASE_TYPE_ID), eq(EMPLOYMENT),
+            any(CCDRequest.class), eq(CASE_ID_2));
+
+        assertEquals("Glasgow", caseDataCaptor.getValue().getEcmOfficeCT());
     }
 
     @Test
     void run_continuesProcessing_whenOneCaseFails() throws IOException {
-        String caseId2 = "9876543210";
         ReflectionTestUtils.setField(caseTransferTask, "casesToUpdate",
-            CASE_ID + "," + OLD_CASE_TYPE_ID + "," + NEW_CASE_TYPE_ID
-            + "," + caseId2 + "," + OLD_CASE_TYPE_ID + "," + NEW_CASE_TYPE_ID);
+            CASE_ID + "," + TARGET_CASE_TYPE + "," + CASE_ID_2 + "," + TARGET_CASE_TYPE);
 
-        // First case throws; second case succeeds
-        when(ccdClient.returnCaseCreationTransfer(eq(ADMIN_TOKEN), eq(OLD_CASE_TYPE_ID), eq(EMPLOYMENT),
-            eq(CASE_ID))).thenThrow(new IOException("CCD unavailable"));
-        when(ccdClient.returnCaseCreationTransfer(eq(ADMIN_TOKEN), eq(OLD_CASE_TYPE_ID), eq(EMPLOYMENT),
-            eq(caseId2))).thenReturn(buildCcdRequest());
-        when(ccdClient.startEventForCase(any(), any(), any(), eq(caseId2), any())).thenReturn(buildCcdRequest());
+        when(coreCaseDataApi.getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID))
+            .thenReturn(buildCoreCaseDetails(ENGLANDWALES_CASE_TYPE_ID));
+        when(coreCaseDataApi.getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID_2))
+            .thenReturn(buildCoreCaseDetails(ENGLANDWALES_CASE_TYPE_ID));
+
+        when(ccdClient.startEventForCase(
+            ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, CASE_TRANSFER_ECM_EVENT_ID))
+            .thenThrow(new IOException("CCD unavailable"));
+        when(ccdClient.startEventForCase(
+            ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID_2, CASE_TRANSFER_ECM_EVENT_ID))
+            .thenReturn(buildCcdRequest(new CaseData()));
 
         caseTransferTask.run();
 
-        // Both cases attempted the first step
-        verify(ccdClient, times(2)).returnCaseCreationTransfer(any(), any(), any(), any());
-        // Only the successful case proceeds to startEventForCase
-        verify(ccdClient, times(1)).startEventForCase(any(), any(), any(), any(), any());
+        verify(ccdClient, times(2)).startEventForCase(any(), any(), any(), any(), any());
+        verify(ccdClient, times(1)).submitEventForCase(
+            eq(ADMIN_TOKEN), any(CaseData.class), eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT),
+            any(CCDRequest.class), eq(CASE_ID_2));
     }
 
-    // ---- helpers ----
+    @Test
+    void run_skipsSubmit_whenStartEventReturnsNullCaseData() throws IOException {
+        ReflectionTestUtils.setField(caseTransferTask, "casesToUpdate", CASE_ID + "," + TARGET_CASE_TYPE);
 
-    private CCDRequest buildCcdRequest() {
-        CaseData caseData = new CaseData();
+        when(coreCaseDataApi.getCase(ADMIN_TOKEN, S2S_TOKEN, CASE_ID))
+            .thenReturn(buildCoreCaseDetails(ENGLANDWALES_CASE_TYPE_ID));
+        when(ccdClient.startEventForCase(
+            ADMIN_TOKEN, ENGLANDWALES_CASE_TYPE_ID, EMPLOYMENT, CASE_ID, CASE_TRANSFER_ECM_EVENT_ID))
+            .thenReturn(new CCDRequest());
+
+        caseTransferTask.run();
+
+        verify(ccdClient, never()).submitEventForCase(any(), any(), any(), any(), any(), any());
+    }
+
+    private uk.gov.hmcts.reform.ccd.client.model.CaseDetails buildCoreCaseDetails(String caseTypeId) {
+        return uk.gov.hmcts.reform.ccd.client.model.CaseDetails.builder()
+            .caseTypeId(caseTypeId)
+            .jurisdiction(EMPLOYMENT)
+            .build();
+    }
+
+    private CCDRequest buildCcdRequest(CaseData caseData) {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
-        caseDetails.setJurisdiction(JURISDICTION);
+        caseDetails.setJurisdiction(EMPLOYMENT);
         CCDRequest ccdRequest = new CCDRequest();
         ccdRequest.setCaseDetails(caseDetails);
         return ccdRequest;

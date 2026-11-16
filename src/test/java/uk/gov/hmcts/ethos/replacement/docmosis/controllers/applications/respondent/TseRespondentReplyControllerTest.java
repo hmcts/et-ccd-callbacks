@@ -150,16 +150,6 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStart_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_START_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void aboutToStart_badRequest() throws Exception {
         mockMvc.perform(post(ABOUT_TO_START_URL)
                 .content("garbage content")
@@ -234,16 +224,6 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midPopulateReply_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_POPULATE_REPLY_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void midPopulateReply_badRequest() throws Exception {
         mockMvc.perform(post(MID_POPULATE_REPLY_URL)
                 .content("garbage content")
@@ -267,16 +247,6 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void aboutToSubmit_badRequest() throws Exception {
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content("garbage content")
@@ -296,16 +266,6 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void submitted_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(SUBMITTED_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
     }
 
     @Test

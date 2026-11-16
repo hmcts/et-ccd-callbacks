@@ -1,5 +1,5 @@
-import { BasePage } from "./basePage";
-import { expect, Locator, Page } from "@playwright/test";
+import { BasePage } from "./basePage.js";
+import { Locator, Page } from "@playwright/test";
 
 export class ManageTelephoneNotePage extends BasePage {
   private readonly titleField: Locator;

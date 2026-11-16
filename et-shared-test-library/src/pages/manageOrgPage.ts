@@ -1,5 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { BasePage } from './basePage';
+import { BasePage } from './basePage.js';
 
 export class ManageOrgPage extends BasePage {
   readonly casesLink: Locator;

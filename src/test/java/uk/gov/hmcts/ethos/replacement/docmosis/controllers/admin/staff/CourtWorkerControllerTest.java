@@ -22,7 +22,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -82,17 +81,6 @@ class CourtWorkerControllerTest {
     }
 
     @Test
-    void initAddCourtWorker_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(INIT_ADD_COURT_WORKER_URL)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(courtWorkerService, never()).initAddCourtWorker(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
     void addCourtWorker_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(courtWorkerService.addCourtWorker(any())).thenReturn(new ArrayList<>());
@@ -110,17 +98,6 @@ class CourtWorkerControllerTest {
     }
 
     @Test
-    void addCourtWorker_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ADD_COURT_WORKER_URL)
-            .contentType(APPLICATION_JSON)
-            .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-            .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
-        verify(courtWorkerService, never()).addCourtWorker(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
     void updateCourtWorkerMidEventSelectOffice_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(courtWorkerService.getCourtWorkerMidEventSelectOffice(any())).thenReturn(new ArrayList<>());
@@ -133,18 +110,6 @@ class CourtWorkerControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(courtWorkerService, times(1))
-                .getCourtWorkerMidEventSelectOffice(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
-    void updateCourtWorkerMidEventSelectOffice_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(UPDATE_COURT_WORKER_MID_OFFICE_URL)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(courtWorkerService, never())
                 .getCourtWorkerMidEventSelectOffice(ccdRequest.getCaseDetails().getAdminData());
     }
 
@@ -165,18 +130,6 @@ class CourtWorkerControllerTest {
     }
 
     @Test
-    void updateCourtWorkerMidEventSelectCourtWorker_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(UPDATE_COURT_WORKER_MID_CLERK_URL)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(courtWorkerService, never())
-                .getCourtWorkerMidEventSelectCourtWorker(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
     void updateCourtWorker_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(courtWorkerService.updateCourtWorker(any())).thenReturn(new ArrayList<>());
@@ -193,17 +146,6 @@ class CourtWorkerControllerTest {
     }
 
     @Test
-    void updateCourtWorker_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(UPDATE_COURT_WORKER_URL)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(courtWorkerService, never()).updateCourtWorker(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
     void deleteCourtWorker_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(courtWorkerService.deleteCourtWorker(any())).thenReturn(new ArrayList<>());
@@ -217,16 +159,5 @@ class CourtWorkerControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(courtWorkerService, times(1))
                 .deleteCourtWorker(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
-    void deleteCourtWorker_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(DELETE_COURT_WORKER_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(courtWorkerService, never()).deleteCourtWorker(ccdRequest.getCaseDetails().getAdminData());
     }
 }

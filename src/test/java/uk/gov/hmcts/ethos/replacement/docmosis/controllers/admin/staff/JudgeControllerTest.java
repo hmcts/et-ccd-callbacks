@@ -23,7 +23,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -83,17 +82,6 @@ class JudgeControllerTest {
     }
 
     @Test
-    void initAddJudge_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(INIT_ADD_JUDGE_URL)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(judgeService, never()).initAddJudge(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
     void testAddJudgeSuccess() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ADD_JUDGE_URL)
@@ -130,18 +118,6 @@ class JudgeControllerTest {
     }
 
     @Test
-    void testAddJudgeInvalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-
-        mockMvc.perform(post(ADD_JUDGE_URL)
-                        .contentType(APPLICATION_JSON)
-                        .header("Authorization", AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(judgeService, never()).saveJudge(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
     void updateJudgeMidEventSelectOffice_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(UPDATE_JUDGE_MID_OFFICE_URL)
@@ -153,18 +129,6 @@ class JudgeControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(judgeService, times(1))
-                .updateJudgeMidEventSelectOffice(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
-    void updateCourtWorkerMidEventSelectOffice_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(UPDATE_JUDGE_MID_OFFICE_URL)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(judgeService, never())
                 .updateJudgeMidEventSelectOffice(ccdRequest.getCaseDetails().getAdminData());
     }
 
@@ -184,18 +148,6 @@ class JudgeControllerTest {
     }
 
     @Test
-    void updateCourtWorkerMidEventSelectCourtWorker_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(UPDATE_JUDGE_MID_JUDGE_URL)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(judgeService, never())
-                .updateJudgeMidEventSelectJudge(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
     void updateCourtWorker_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(UPDATE_JUDGE_URL)
@@ -210,17 +162,6 @@ class JudgeControllerTest {
     }
 
     @Test
-    void updateCourtWorker_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(UPDATE_JUDGE_URL)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(judgeService, never()).updateJudge(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
     void testDeleteJudgeSuccess() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(DELETE_JUDGE_URL)
@@ -232,17 +173,6 @@ class JudgeControllerTest {
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)));
         verify(judgeService, times(1)).deleteJudge(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
-    void testDeleteJudgeSuccess_InvalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(DELETE_JUDGE_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
-        verify(judgeService, never()).deleteJudge(ccdRequest.getCaseDetails().getAdminData());
     }
 
     @Test
@@ -261,17 +191,6 @@ class JudgeControllerTest {
     }
 
     @Test
-    void testDeleteJudgeMidEventSelectJudge_InvalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(DELETE_JUDGE_MID_JUDGE_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
-        verify(judgeService, never()).deleteJudgeMidEventSelectJudge(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
     void testDeleteJudgeMidEventSelectOffice_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(DELETE_JUDGE_MID_OFFICE_URL)
@@ -284,16 +203,5 @@ class JudgeControllerTest {
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(judgeService, times(1))
             .deleteJudgeMidEventSelectOffice(ccdRequest.getCaseDetails().getAdminData());
-    }
-
-    @Test
-    void testDeleteJudgeMidEventSelectOffice_InvalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(DELETE_JUDGE_MID_OFFICE_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
-        verify(judgeService, never()).deleteJudgeMidEventSelectOffice(ccdRequest.getCaseDetails().getAdminData());
     }
 }

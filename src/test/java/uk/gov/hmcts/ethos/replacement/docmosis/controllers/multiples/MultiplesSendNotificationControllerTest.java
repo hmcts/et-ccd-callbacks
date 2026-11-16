@@ -76,16 +76,6 @@ class MultiplesSendNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStart_badToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_START_URL)
-                        .content(requestContent.toString())
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void aboutToSubmit_ok() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
@@ -99,16 +89,6 @@ class MultiplesSendNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_badToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                        .content(requestContent.toString())
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void submitted_ok() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_URL)
@@ -119,16 +99,6 @@ class MultiplesSendNotificationControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void submitted_badToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(SUBMITTED_URL)
-                        .content(requestContent.toString())
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 
 }

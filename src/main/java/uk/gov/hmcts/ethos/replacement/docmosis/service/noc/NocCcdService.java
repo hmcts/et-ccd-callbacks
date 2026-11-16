@@ -359,6 +359,8 @@ public class NocCcdService {
                 remainingRepresentative.getEmail());
         caseDetails.getCaseData().getRepresentativeClaimantType().setNameOfRepresentative(
                 UserUtils.getFullName(remainingRepresentative));
+        caseDetails.getCaseData().getRepresentativeClaimantType().setRepresentativeReference(null);
+        caseDetails.getCaseData().setRepresentativePhoneNumber(null);
     }
 
     /**

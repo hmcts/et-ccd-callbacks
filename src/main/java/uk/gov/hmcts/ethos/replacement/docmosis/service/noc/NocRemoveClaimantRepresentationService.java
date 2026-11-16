@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Strings;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -29,7 +28,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_LEAD;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_SHARED;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NocRemoveClaimantRepresentationService {
@@ -54,12 +52,11 @@ public class NocRemoveClaimantRepresentationService {
      * representatives, or clears it to {@code null} for the lead representative.
      * This method modifies the supplied case data.
      *
-     * @param userToken the authentication token used to retrieve and validate
-     *                  the current user's details
+     * @param userDetails the validated user details
      * @param caseDetails the case details whose NOC removal fields are updated
      * @throws GenericServiceException if the supplied case details are invalid
      */
-    public void populateNocRemovalDetails(String userToken, CaseDetails caseDetails, String stage)
+    public void populateNocRemovalDetails(UserDetails userDetails, CaseDetails caseDetails, String stage)
             throws GenericServiceException {
         final String methodName = "populateNocRemovalDetails";
         if (!CaseDataUtils.areCaseDetailsValid(caseDetails)) {
@@ -70,7 +67,6 @@ public class NocRemoveClaimantRepresentationService {
                     NocRemoveClaimantRepresentationService.class.getSimpleName(),
                     methodName);
         }
-        UserDetails userDetails = userService.fetchAndValidateUserDetails(userToken, caseDetails.getCaseId());
         boolean isLeadRepresentative = ClaimantRepresentativeUtils.isLeadRepresentative(userDetails,
                 caseDetails.getCaseData());
         caseDetails.getCaseData().setNocRepresentativeType(isLeadRepresentative

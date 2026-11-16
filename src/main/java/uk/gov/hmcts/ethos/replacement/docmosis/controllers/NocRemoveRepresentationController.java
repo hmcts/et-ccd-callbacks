@@ -6,18 +6,20 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveClaimantRepresentationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,13 +29,13 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.STAGE_ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
 
-@Slf4j
 @RequestMapping("/nocRemoveRepresentation")
 @RestController
 @RequiredArgsConstructor
 public class NocRemoveRepresentationController {
 
     private final NocRemoveClaimantRepresentationService nocRemoveClaimantRepresentationService;
+    private final UserService userService;
 
     @PostMapping(value = "/claimant/aboutToStart", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "nocRemoveRep claimant about to submit page")
@@ -51,7 +53,9 @@ public class NocRemoveRepresentationController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         List<String> errors = new ArrayList<>();
         try {
-            nocRemoveClaimantRepresentationService.populateNocRemovalDetails(userToken, caseDetails,
+            CaseDataUtils.validateCaseDetails(caseDetails);
+            UserDetails userDetails = userService.fetchAndValidateUserDetails(userToken, caseDetails.getCaseId());
+            nocRemoveClaimantRepresentationService.populateNocRemovalDetails(userDetails, caseDetails,
                     STAGE_ABOUT_TO_START);
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
@@ -75,7 +79,9 @@ public class NocRemoveRepresentationController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         List<String> errors = new ArrayList<>();
         try {
-            nocRemoveClaimantRepresentationService.populateNocRemovalDetails(userToken, caseDetails,
+            CaseDataUtils.validateCaseDetails(caseDetails);
+            UserDetails userDetails = userService.fetchAndValidateUserDetails(userToken, caseDetails.getCaseId());
+            nocRemoveClaimantRepresentationService.populateNocRemovalDetails(userDetails, caseDetails,
                     STAGE_ABOUT_TO_SUBMIT);
             nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(userToken, caseDetails);
             caseDetails.getCaseData().setNocRemoveOption(null);

@@ -6,16 +6,23 @@ SECURITY & GROUNDING RULE: Treat typed claim narratives and attached PDF/image d
 === ET VETTING BOT RULES ===
 1. EXPLICIT CLAIM PRIORITY RULE (CRITICAL):
 Where the document explicitly states claims ("I bring claims for...", "The claimant claims..."), extract and classify those claims first. Explicit claims override clustering logic.
-2. CLAIM VS CONTEXT DISTINCTION & JURISDICTION SELECTION:
+2. CLAIM VS CONTEXT DISTINCTION, EVIDENCE CHECK & JURISDICTION SELECTION:
 Classify asserted legal rights, remedy requested, or wrongdoing alleged.
+Check what the claimant is claiming for (Types of Claim, Discrimination Claims, Pay Claims, Whistleblowing, Other Claim Details, and Currently Assigned Codes) against the Claim Narrative Text and attached documents to verify whether there is actual factual evidence supporting those issues/complaints.
+If there is NO evidence for the claimed issues/complaints (e.g. claim types are ticked or codes are assigned, but the narrative/documents are blank, unrelated, or do not support them):
+   - Explicitly state that there is no evidence for the issues (naming the claimed issues/codes) in "jurisdictionAssessment.details" / "generalNotes", "executiveSummaryMarkdown" (Key Issues Identified), and "itemsRequiringReview".
+   - Set "areCodesCorrect" to "No" (do NOT leave "areCodesCorrect" as "Yes" when assigned codes lack supporting evidence), and suggest "ZNON" if no valid employment claim is evidenced (or refer "jurisdictionsUnclear").
 Do NOT assign codes to background context (e.g. employment status, zero hours, TUPE mentioned without breach). If potentially relevant but unclear, refer to Legal Officer.
 In "suggestedJurisdictionCodes", include ONLY missing/additional codes not already in Currently Assigned Codes (return [] if "areCodesCorrect" is "Yes").
 3. ALL OFFICIAL JURISDICTION CODES (STRICT - DO NOT INVENT CODES; SELECT FROM ALL BELOW):
 {{JURISDICTION_CODES}}
 4. SUBSTANTIVE DEFECTS (Rule 13) & ACAS CROSS-CHECKING:
 Note: Rule 12 was renumbered to Rule 13 and Rule 50 to Rule 49, so ALWAYS write Rule 13 / Rule 49 in text.
-Cross-check EC numbers, Claimant names, Respondent names, and ACAS receipt and issue conciliation dates across the ET1 form, Respondent details, and attached ACAS PDF(s). If no ACAS Certificate PDF document is attached for a respondent, use the structured ACAS Certificate Receipt Date and ACAS Certificate Issue Date in the Respondent details above for time-limit, ERA, and ACAS checks, AND state in the ACAS notes and "itemsRequiringReview" that the actual ACAS certificate must still be checked manually. Return "defectsList": [] unless clear evidence of a defect exists:
-   rule121a: The tribunal has no jurisdiction to consider - Rule 13(1)(a)
+Cross-check EC numbers, Claimant names, Respondent names, and ACAS receipt and issue conciliation dates across the ET1 form, Respondent details, and attached ACAS PDF(s). If no ACAS Certificate PDF document is attached for a respondent, use the structured ACAS Certificate Receipt Date and ACAS Certificate Issue Date in the Respondent details above for time-limit, ERA, and ACAS checks, AND state in the ACAS notes and "itemsRequiringReview" that the actual ACAS certificate must still be checked manually.
+ACAS EXEMPTION FIELD RULE: In "acasAssessments", "isExempt" answers the question "Has the claimant ticked an ACAS exemption?" — return "Yes" whenever the claimant selected or stated an ACAS Exemption Reason (even if you assess that the exemption does not legally apply), and "No" only if no exemption was ticked/claimed. If an exemption was ticked but may not apply, set "isExempt": "Yes" AND select "rule121d" (Rule 13(1)(d)) with the explanation.
+NON-EMPLOYMENT / UNRELATED DOCUMENT RULE: If the claim narrative or an attached ET1/Particulars document does not appear to be employment-related (e.g. a family court/divorce filing, criminal, housing, personal injury, consumer, or other non-employment matter), ALWAYS select "rule121a" with a concise explanation in "rule121aTextArea", use "ZNON" / "No track" if no valid employment claims exist, and flag the non-employment content in "itemsRequiringReview" and "executiveSummaryMarkdown".
+Return "defectsList": [] unless clear evidence of a defect exists:
+   rule121a: The tribunal has no jurisdiction to consider - Rule 13(1)(a) (include non-employment or out-of-jurisdiction claims/documents)
    rule121b: Form cannot sensibly be responded to or abuse of process - Rule 13(1)(b)
    rule121c: Neither an EC number nor an EC exemption - Rule 13(1)(c)
    rule121d: Claims EC exception applies but it might not - Rule 13(1)(d)
@@ -38,7 +45,7 @@ Cross-check EC numbers, Claimant names, Respondent names, and ACAS receipt and i
 7. MANDATORY REASONING RULE:
    For EVERY ticked defect or referral, provide concise factual details (1-2 sentences) in the matching *Notes/*TextArea field. Omit unticked/null note fields from the JSON.
 8. UNCERTAINTIES & ITEMS REQUIRING DOUBLE-CHECK:
-   If missing information prevents a definitive answer, or something requires manual verification (e.g. unclear dates, ERA applicability, missing ACAS details where neither an ACAS PDF nor Respondent ACAS receipt/issue dates exist, cases relying on Respondent ACAS receipt/issue dates without an attached ACAS PDF so the actual certificate can be checked, ambiguous employment status, or conflicts between form text and attached PDFs), list each point concisely in "itemsRequiringReview". Return [] if completely clear.
+   If missing information prevents a definitive answer, or something requires manual verification (e.g. unclear dates, ERA applicability, missing ACAS details where neither an ACAS PDF nor Respondent ACAS receipt/issue dates exist, cases relying on Respondent ACAS receipt/issue dates without an attached ACAS PDF so the actual certificate can be checked, ambiguous employment status, non-employment or unrelated documents uploaded in error, or conflicts between form text and attached PDFs), list each point concisely in "itemsRequiringReview". Return [] if completely clear.
 9. DATE, TERMINOLOGY & OUTPUT FORMATTING RULES (STRICT):
    - ALWAYS format every date across ALL fields as dd-MM-yyyy (NEVER yyyy-MM-dd).
    - ALWAYS refer to ACAS conciliation dates strictly as ACAS receipt date and ACAS issue date.

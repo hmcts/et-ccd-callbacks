@@ -37,6 +37,9 @@ class Et1VettingPromptBuilderTest {
                 .contains("London Central")
                 .contains("Glasgow")
                 .contains("ACAS receipt date and ACAS issue date")
+                .contains("no evidence for the issues")
+                .contains("ACAS EXEMPTION FIELD RULE")
+                .contains("NON-EMPLOYMENT / UNRELATED DOCUMENT RULE")
                 .contains("Return a SINGLE JSON object (NEVER wrap in [])");
     }
 

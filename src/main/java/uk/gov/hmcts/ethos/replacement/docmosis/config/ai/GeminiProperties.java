@@ -14,4 +14,7 @@ public class GeminiProperties {
     private String baseUrl = "https://generativelanguage.googleapis.com/v1beta";
     private String model = "gemini-3.6-flash";
     private Double temperature = 0.1;
+    private int maxAttachmentBytes = 15 * 1024 * 1024;
+    private long maxTotalAttachmentBytes = 25L * 1024 * 1024;
+    private int maxAttachmentCount = 10;
 }

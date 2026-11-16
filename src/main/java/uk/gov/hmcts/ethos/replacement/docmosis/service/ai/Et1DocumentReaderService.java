@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantRequestType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.ai.GeminiProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ai.AiDocumentAttachment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 
@@ -37,9 +38,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_VETTING
 @RequiredArgsConstructor
 public class Et1DocumentReaderService {
 
-    private static final int MAX_ATTACHMENT_BYTES = 15 * 1024 * 1024;
-    private static final int MAX_TOTAL_ATTACHMENT_BYTES = 25 * 1024 * 1024;
-    private static final int MAX_ATTACHMENT_COUNT = 10;
     private static final String APPLICATION_PDF = "application/pdf";
     private static final Set<String> RELEVANT_DOCUMENT_TYPES = Set.of(
             ET1,
@@ -48,6 +46,7 @@ public class Et1DocumentReaderService {
     );
 
     private final DocumentManagementService documentManagementService;
+    private final GeminiProperties geminiProperties;
 
     /**
      * Downloads an uploaded document from DM Store / CDAM as a raw binary attachment for Gemini multimodal input.
@@ -79,9 +78,9 @@ public class Et1DocumentReaderService {
                 bytes = in.readAllBytes();
             }
 
-            if (bytes.length == 0 || bytes.length > MAX_ATTACHMENT_BYTES) {
-                log.warn("Document {} size ({} bytes) outside acceptable limits",
-                        document.getDocumentFilename(), bytes.length);
+            if (bytes.length == 0 || bytes.length > geminiProperties.getMaxAttachmentBytes()) {
+                log.warn("Document {} size ({} bytes) outside acceptable limits (max {} bytes)",
+                        document.getDocumentFilename(), bytes.length, geminiProperties.getMaxAttachmentBytes());
                 return null;
             }
 
@@ -112,7 +111,7 @@ public class Et1DocumentReaderService {
         }
         List<AiDocumentAttachment> attachments = new ArrayList<>();
         Set<String> seenBinaryUrls = new HashSet<>();
-        int totalBytes = 0;
+        long totalBytes = 0;
 
         ClaimantRequestType requests = caseData.getClaimantRequests();
         if (requests != null) {
@@ -123,11 +122,11 @@ public class Et1DocumentReaderService {
         totalBytes = tryAddAttachment(
                 caseData.getEt1SectionThreeDocumentUpload(), userToken, attachments, seenBinaryUrls, totalBytes);
 
+        int maxCount = geminiProperties.getMaxAttachmentCount();
         if (CollectionUtils.isNotEmpty(caseData.getDocumentCollection())) {
             for (DocumentTypeItem docItem : caseData.getDocumentCollection()) {
-                if (attachments.size() >= MAX_ATTACHMENT_COUNT) {
-                    log.info("Reached max AI attachment count ({}); skipping remaining documents",
-                            MAX_ATTACHMENT_COUNT);
+                if (attachments.size() >= maxCount) {
+                    log.info("Reached max AI attachment count ({}); skipping remaining documents", maxCount);
                     break;
                 }
                 if (docItem.getValue() != null && docItem.getValue().getUploadedDocument() != null
@@ -141,13 +140,13 @@ public class Et1DocumentReaderService {
         return attachments;
     }
 
-    private int tryAddAttachment(UploadedDocumentType document,
-                                 String userToken,
-                                 List<AiDocumentAttachment> attachments,
-                                 Set<String> seenBinaryUrls,
-                                 int currentTotalBytes) {
+    private long tryAddAttachment(UploadedDocumentType document,
+                                  String userToken,
+                                  List<AiDocumentAttachment> attachments,
+                                  Set<String> seenBinaryUrls,
+                                  long currentTotalBytes) {
         if (document == null || StringUtils.isBlank(document.getDocumentBinaryUrl())
-                || attachments.size() >= MAX_ATTACHMENT_COUNT) {
+                || attachments.size() >= geminiProperties.getMaxAttachmentCount()) {
             return currentTotalBytes;
         }
         String normalizedUrl = document.getDocumentBinaryUrl().trim();
@@ -158,9 +157,10 @@ public class Et1DocumentReaderService {
         if (downloaded == null || downloaded.getData() == null) {
             return currentTotalBytes;
         }
-        if (currentTotalBytes + downloaded.getData().length > MAX_TOTAL_ATTACHMENT_BYTES) {
+        long maxTotalBytes = geminiProperties.getMaxTotalAttachmentBytes();
+        if (currentTotalBytes + downloaded.getData().length > maxTotalBytes) {
             log.warn("Skipping attachment {} because aggregate payload would exceed {} bytes limit",
-                    downloaded.getFilename(), MAX_TOTAL_ATTACHMENT_BYTES);
+                    downloaded.getFilename(), maxTotalBytes);
             return currentTotalBytes;
         }
         attachments.add(downloaded);

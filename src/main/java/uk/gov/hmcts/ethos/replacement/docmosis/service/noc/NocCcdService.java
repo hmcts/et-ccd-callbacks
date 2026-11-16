@@ -360,6 +360,7 @@ public class NocCcdService {
         caseDetails.getCaseData().getRepresentativeClaimantType().setNameOfRepresentative(
                 UserUtils.getFullName(remainingRepresentative));
         caseDetails.getCaseData().getRepresentativeClaimantType().setRepresentativeReference(null);
+        caseDetails.getCaseData().getRepresentativeClaimantType().setRepresentativePhoneNumber(null);
         caseDetails.getCaseData().setRepresentativePhoneNumber(null);
     }
 

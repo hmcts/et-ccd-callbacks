@@ -698,10 +698,6 @@ dependencies {
     // CVE-2025-7962
     implementation group: 'org.eclipse.angus', name: 'angus-mail', version: '2.0.5'
 
-    // For using jackson version 2
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}"
-    implementation "com.fasterxml.jackson.module:jackson-module-parameter-names:${jacksonVersion}"
-
     runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.18.0'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

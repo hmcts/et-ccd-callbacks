@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;
@@ -9,11 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.http.converter.autoconfigure.HttpMessageConvertersAutoConfiguration;
-import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cloud.openfeign.FeignAutoConfiguration;
@@ -23,6 +22,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.TestConstructor;
 import org.testcontainers.containers.PostgreSQLContainer;
 import uk.gov.hmcts.ccd.sdk.CaseViewRequest;
 import uk.gov.hmcts.ccd.sdk.config.DecentralisedDataConfiguration;
@@ -35,6 +35,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DigitalCaseFileType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.JacksonConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview.ETCaseView;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.EtCosPostgresqlContainer;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ccd.DigitalCaseFileRepository;
@@ -52,12 +53,12 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
 @Import({DecentralisedDataConfiguration.class, DigitalCaseFileService.class,
-    DigitalCaseFilePersistenceService.class, ETCaseView.class,
+    DigitalCaseFilePersistenceService.class, ETCaseView.class, JacksonConfiguration.class,
     DigitalCaseFileServiceIntegrationTest.TestConfig.class})
-// The application runs Jackson2AutoConfiguration with spring.http.converters.preferred-json-mapper=jackson2;
-// without it HttpMessageConverters falls back to Jackson 3, which is not the wire contract Feign uses in production.
-@ImportAutoConfiguration({FeignAutoConfiguration.class, HttpMessageConvertersAutoConfiguration.class,
-    Jackson2AutoConfiguration.class})
+@ImportAutoConfiguration({FeignAutoConfiguration.class, HttpMessageConvertersAutoConfiguration.class})
+@RequiredArgsConstructor
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+@SuppressWarnings("java:S5960")
 class DigitalCaseFileServiceIntegrationTest {
 
     private static final long CASE_REFERENCE = 1_234_567_890_123_456L;
@@ -68,20 +69,11 @@ class DigitalCaseFileServiceIntegrationTest {
         POSTGRES.start();
     }
 
-    @Autowired
-    private DigitalCaseFileService service;
-
-    @Autowired
-    private ETCaseView caseView;
-
-    @Autowired
-    private DigitalCaseFileRepository repository;
-
-    @Autowired
-    private EntityManager entityManager;
-
-    @Autowired
-    private JdbcTemplate jdbc;
+    private final DigitalCaseFileService service;
+    private final ETCaseView caseView;
+    private final DigitalCaseFileRepository repository;
+    private final EntityManager entityManager;
+    private final JdbcTemplate jdbc;
 
     @DynamicPropertySource
     static void stitchingUrl(DynamicPropertyRegistry registry) {
@@ -94,6 +86,7 @@ class DigitalCaseFileServiceIntegrationTest {
     }
 
     @BeforeEach
+    @SuppressWarnings("SqlResolve")
     void setUp() {
         jdbc.update("delete from ccd.case_data where reference = ?", CASE_REFERENCE);
         jdbc.update("""

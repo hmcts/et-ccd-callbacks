@@ -23,7 +23,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RoleUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -34,7 +33,6 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 
-import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.ACTIVE;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.CLAIMANT_REPRESENTATIVE;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.EXTERNAL;
@@ -1214,40 +1212,6 @@ public class CaseFlagsService {
                 .map(TseAdminRecordDecisionTypeItem::getValue)
                 .filter(o -> o.getDecision() != null)
                 .anyMatch(o -> o.getDecision().startsWith(GRANTED));
-    }
-
-    private ListTypeItem<FlagDetailType> getPartyCaseFlags(CaseData caseData) {
-        ListTypeItem<FlagDetailType> partyLevel = new ListTypeItem<>();
-
-        for (PartyFlag flag : PARTY_FLAGS) {
-            partyLevel = appendDetailsIfPresent(partyLevel, flag.get(caseData));
-        }
-
-        return partyLevel;
-    }
-
-    private ListTypeItem<FlagDetailType> appendDetailsIfPresent(
-            ListTypeItem<FlagDetailType> partyLevel, CaseFlagsType flags) {
-        if (flags != null && flags.getDetails() != null) {
-            return ListTypeItem.concat(partyLevel, flags.getDetails());
-        }
-        return partyLevel;
-    }
-
-    @Nullable
-    private FlagDetailType findFlagByName(ListTypeItem<FlagDetailType> flags, String name) {
-        return flags.stream()
-                .map(GenericTypeItem::getValue)
-                .filter(o -> name.equals(o.getName()))
-                .findFirst()
-                .orElse(null);
-    }
-
-    private boolean areAnyFlagsActive(ListTypeItem<FlagDetailType> flags, String...names) {
-        return Arrays.stream(names)
-                .map(o -> findFlagByName(flags, o))
-                .filter(Objects::nonNull)
-                .anyMatch(o -> ACTIVE.equals(o.getStatus()));
     }
 
     private enum PartyType {

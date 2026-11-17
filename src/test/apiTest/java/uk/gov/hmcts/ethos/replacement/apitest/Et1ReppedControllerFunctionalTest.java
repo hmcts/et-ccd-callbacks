@@ -15,6 +15,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import java.io.IOException;
+import java.net.URISyntaxException;
+
 import static org.hamcrest.Matchers.notNullValue;
 
 @Slf4j
@@ -46,13 +48,8 @@ public class Et1ReppedControllerFunctionalTest extends BaseFunctionalTest {
     private CCDRequest ccdRequest;
 
     @BeforeAll
-    void setUpEt1ReppedData() throws IOException {
-        // Create a real case in CCD
-        JSONObject caseJson = createSinglesCaseDataStore();
-
-        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
-        CaseDetails caseDetails = mapper.readValue(caseJson.toString(), CaseDetails.class);
-        CaseData caseData = caseDetails.getCaseData();
+    void setUpEt1ReppedData() throws IOException, URISyntaxException {
+        CaseData caseData = generateCaseDetails("et1Repped.json").getCaseData();
         caseData.setClaimantFirstName("John");
         caseData.setClaimantLastName("Doe");
 
@@ -62,6 +59,11 @@ public class Et1ReppedControllerFunctionalTest extends BaseFunctionalTest {
         address.setPostCode("SW1A 1AA");
         address.setCountry("United Kingdom");
         caseData.setRespondentAddress(address);
+
+        // Create a real case in CCD
+        JSONObject caseJson = createSinglesCaseDataStore();
+        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
+        CaseDetails caseDetails = mapper.readValue(caseJson.toString(), CaseDetails.class);
 
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseData)

@@ -12,14 +12,11 @@ import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -63,6 +60,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
@@ -72,8 +70,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.succe
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.unsuccessfulDocumentManagementUploadResponse;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
-@ExtendWith(SpringExtension.class)
 class DocumentManagementServiceTest {
 
     @Mock
@@ -110,10 +106,10 @@ class DocumentManagementServiceTest {
         file = createTestFile();
         markup =
                 "<a target=\"_blank\" href=\"null/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary\">Document</a>";
-        when(authTokenGenerator.generate()).thenReturn("authString");
+        lenient().when(authTokenGenerator.generate()).thenReturn("authString");
         responseEntity = MultipleUtil.getResponseOK();
         UserDetails userDetails = HelperTest.getUserDetails();
-        when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
+        lenient().when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
         ReflectionTestUtils.setField(documentManagementService, "ccdDMStoreBaseUrl", "http://dm-store:8080");
         ReflectionTestUtils.setField(documentManagementService, "secureDocStoreEnabled", false);
     }

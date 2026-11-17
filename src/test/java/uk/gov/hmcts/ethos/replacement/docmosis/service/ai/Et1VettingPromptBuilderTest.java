@@ -40,6 +40,11 @@ class Et1VettingPromptBuilderTest {
                 .contains("no evidence for the issues")
                 .contains("ACAS EXEMPTION FIELD RULE")
                 .contains("NON-EMPLOYMENT / UNRELATED DOCUMENT RULE")
+                .contains("### Suggested Next Steps")
+                .contains("Accept | Reject | Refer")
+                .contains("Rule 10(2)/(3)")
+                .contains("Rule 12(1)")
+                .contains("Rule 13(3)-(4)")
                 .contains("Return a SINGLE JSON object (NEVER wrap in [])");
     }
 

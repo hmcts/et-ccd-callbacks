@@ -31,10 +31,15 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.VettingJurisdictionCodesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.ai.GeminiProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ai.AiDocumentAttachment;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ai.AiVettingPendingResult;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ai.Et1AiVettingResult;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ai.AiVettingPendingResultRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.jpaservice.JpaVenueService;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -82,6 +87,8 @@ public class Et1AiVettingService {
             "RPT(S)", "RPT(S) "
     );
 
+    private static final Duration PENDING_RESULT_TTL = Duration.ofMinutes(10);
+
     private final GeminiProperties geminiProperties;
     private final GeminiClient geminiClient;
     private final Et1VettingPromptBuilder promptBuilder;
@@ -91,6 +98,8 @@ public class Et1AiVettingService {
     private final AdminUserService adminUserService;
     private final JpaVenueService jpaVenueService;
     private final TaskExecutor taskExecutor;
+    private final AiVettingPendingResultRepository pendingResultRepository;
+    private final FeatureToggleService featureToggleService;
     private final Set<String> inFlightAutoVets = ConcurrentHashMap.newKeySet();
     private final ConcurrentMap<String, Et1AiVettingResult> pendingAutoVetResults = new ConcurrentHashMap<>();
 
@@ -100,7 +109,36 @@ public class Et1AiVettingService {
                                Et1DocumentReaderService documentReaderService,
                                ObjectMapper objectMapper) {
         this(geminiProperties, geminiClient, promptBuilder, documentReaderService, objectMapper,
-                null, null, null, null);
+                null, null, null, null, null, null);
+    }
+
+    public Et1AiVettingService(
+            GeminiProperties geminiProperties,
+            GeminiClient geminiClient,
+            Et1VettingPromptBuilder promptBuilder,
+            Et1DocumentReaderService documentReaderService,
+            ObjectMapper objectMapper,
+            CcdClient ccdClient,
+            AdminUserService adminUserService,
+            JpaVenueService jpaVenueService,
+            TaskExecutor taskExecutor) {
+        this(geminiProperties, geminiClient, promptBuilder, documentReaderService, objectMapper,
+                ccdClient, adminUserService, jpaVenueService, taskExecutor, null, null);
+    }
+
+    public Et1AiVettingService(
+            GeminiProperties geminiProperties,
+            GeminiClient geminiClient,
+            Et1VettingPromptBuilder promptBuilder,
+            Et1DocumentReaderService documentReaderService,
+            ObjectMapper objectMapper,
+            CcdClient ccdClient,
+            AdminUserService adminUserService,
+            JpaVenueService jpaVenueService,
+            TaskExecutor taskExecutor,
+            AiVettingPendingResultRepository pendingResultRepository) {
+        this(geminiProperties, geminiClient, promptBuilder, documentReaderService, objectMapper,
+                ccdClient, adminUserService, jpaVenueService, taskExecutor, pendingResultRepository, null);
     }
 
     @Autowired
@@ -113,7 +151,9 @@ public class Et1AiVettingService {
             @Autowired(required = false) CcdClient ccdClient,
             @Autowired(required = false) AdminUserService adminUserService,
             @Autowired(required = false) JpaVenueService jpaVenueService,
-            @Autowired(required = false) @Qualifier("applicationTaskExecutor") TaskExecutor taskExecutor) {
+            @Autowired(required = false) @Qualifier("applicationTaskExecutor") TaskExecutor taskExecutor,
+            @Autowired(required = false) AiVettingPendingResultRepository pendingResultRepository,
+            @Autowired(required = false) FeatureToggleService featureToggleService) {
         this.geminiProperties = geminiProperties;
         this.geminiClient = geminiClient;
         this.promptBuilder = promptBuilder;
@@ -123,6 +163,8 @@ public class Et1AiVettingService {
         this.adminUserService = adminUserService;
         this.jpaVenueService = jpaVenueService;
         this.taskExecutor = taskExecutor;
+        this.pendingResultRepository = pendingResultRepository;
+        this.featureToggleService = featureToggleService;
     }
 
     /**
@@ -134,14 +176,16 @@ public class Et1AiVettingService {
      * @param userToken user authorization token for DM Store document download
      */
     public void vetClaimInBackground(CaseDetails caseDetails, String userToken) {
-        if (!geminiProperties.isEnabled() || StringUtils.isBlank(geminiProperties.getApiKey())) {
-            log.info("AI vetting is not enabled or API key is not configured; skipping background vetting.");
-            return;
-        }
         if (caseDetails == null || caseDetails.getCaseData() == null || StringUtils.isBlank(caseDetails.getCaseId())) {
             return;
         }
-        if (UNASSIGNED_OFFICE.equalsIgnoreCase(caseDetails.getCaseData().getManagingOffice())) {
+        String managingOffice = caseDetails.getCaseData().getManagingOffice();
+        if (!isAiVettingEnabledForOffice(managingOffice) || StringUtils.isBlank(geminiProperties.getApiKey())) {
+            log.info("AI vetting is disabled (or LaunchDarkly et1VettingAi off for office '{}') or API key missing; "
+                    + "skipping background vetting.", managingOffice);
+            return;
+        }
+        if (UNASSIGNED_OFFICE.equalsIgnoreCase(managingOffice)) {
             log.info("Managing office is Unassigned for case {}; skipping automatic ET1 vetting trigger.",
                     caseDetails.getCaseId());
             return;
@@ -173,17 +217,18 @@ public class Et1AiVettingService {
      * @param userToken user authorization token for DM Store
      */
     public void vetClaimAndPrepopulate(CaseDetails caseDetails, String userToken) {
-        if (!geminiProperties.isEnabled()) {
-            log.info("AI vetting is not enabled.");
+        if (caseDetails == null || caseDetails.getCaseData() == null) {
             return;
         }
-        if (caseDetails == null || caseDetails.getCaseData() == null) {
+        String managingOffice = caseDetails.getCaseData().getManagingOffice();
+        if (!isAiVettingEnabledForOffice(managingOffice)) {
+            log.info("AI vetting is disabled (or LaunchDarkly et1VettingAi off for office '{}').", managingOffice);
             return;
         }
 
         String caseId = caseDetails.getCaseId();
         if (StringUtils.isNotBlank(caseId)) {
-            Et1AiVettingResult pendingResult = pendingAutoVetResults.remove(caseId);
+            Et1AiVettingResult pendingResult = consumePendingAutoVetResult(caseId);
             if (pendingResult != null) {
                 log.info("Applying pre-computed automated AI vetting result to case {}", caseId);
                 applyVettingResult(caseDetails.getCaseData(), pendingResult);
@@ -195,6 +240,13 @@ public class Et1AiVettingService {
             applyVettingResult(caseDetails.getCaseData(), result);
             log.info("Successfully applied AI vetting suggestions to case {}", caseId);
         });
+    }
+
+    private boolean isAiVettingEnabledForOffice(String managingOffice) {
+        if (!geminiProperties.isEnabled()) {
+            return false;
+        }
+        return featureToggleService == null || featureToggleService.isEt1VettingAiEnabled(managingOffice);
     }
 
     private void autoVetAndSubmitCase(CaseDetails submittedCaseDetails, String submissionUserToken) {
@@ -217,7 +269,7 @@ public class Et1AiVettingService {
             }
 
             Et1AiVettingResult result = maybeResult.get();
-            pendingAutoVetResults.put(caseId, result);
+            savePendingAutoVetResult(caseId, result);
             try {
                 CCDRequest ccdRequest = ccdClient.startEventForCase(
                         adminToken, caseTypeId, EMPLOYMENT, caseId, ET1_VETTING_EVENT_ID);
@@ -228,7 +280,7 @@ public class Et1AiVettingService {
                 }
 
                 CaseData eventCaseData = eventCaseDetails.getCaseData();
-                if (pendingAutoVetResults.remove(caseId) != null) {
+                if (consumePendingAutoVetResult(caseId) != null) {
                     applyVettingResult(eventCaseData, result);
                 }
 
@@ -246,10 +298,71 @@ public class Et1AiVettingService {
                 log.info("Successfully triggered and submitted ET1 Vetting event via system account for case {}",
                         caseId);
             } finally {
-                pendingAutoVetResults.remove(caseId);
+                clearPendingAutoVetResult(caseId);
             }
         } catch (Exception ex) {
             log.error("Failed to automatically trigger ET1 Vetting for case {}: {}", caseId, ex.getMessage(), ex);
+        }
+    }
+
+    private void savePendingAutoVetResult(String caseId, Et1AiVettingResult result) {
+        Long caseReference = parseCaseReference(caseId);
+        if (pendingResultRepository == null || caseReference == null) {
+            pendingAutoVetResults.put(caseId, result);
+            return;
+        }
+        try {
+            Instant now = Instant.now();
+            pendingResultRepository.deleteByExpiresAtBefore(now);
+            String json = objectMapper.writeValueAsString(result);
+            pendingResultRepository.save(AiVettingPendingResult.create(
+                    caseReference, json, now.plus(PENDING_RESULT_TTL)));
+        } catch (Exception ex) {
+            log.warn("Failed to persist pending AI vetting result to DB for case {}; using in-memory fallback: {}",
+                    caseId, ex.getMessage());
+            pendingAutoVetResults.put(caseId, result);
+        }
+    }
+
+    private Et1AiVettingResult consumePendingAutoVetResult(String caseId) {
+        Long caseReference = parseCaseReference(caseId);
+        if (pendingResultRepository != null && caseReference != null) {
+            try {
+                Optional<AiVettingPendingResult> entry = pendingResultRepository.findById(caseReference);
+                if (entry.isPresent()) {
+                    AiVettingPendingResult pending = entry.get();
+                    pendingResultRepository.delete(pending);
+                    if (pending.getExpiresAt() != null && !pending.getExpiresAt().isBefore(Instant.now())) {
+                        return objectMapper.readValue(pending.getResultJson(), Et1AiVettingResult.class);
+                    }
+                }
+            } catch (Exception ex) {
+                log.warn("Failed to read pending AI vetting result from DB for case {}: {}", caseId, ex.getMessage());
+            }
+        }
+        return pendingAutoVetResults.remove(caseId);
+    }
+
+    private void clearPendingAutoVetResult(String caseId) {
+        pendingAutoVetResults.remove(caseId);
+        Long caseReference = parseCaseReference(caseId);
+        if (pendingResultRepository != null && caseReference != null) {
+            try {
+                pendingResultRepository.findById(caseReference).ifPresent(pendingResultRepository::delete);
+            } catch (Exception ex) {
+                log.debug("Failed to clean up pending AI vetting result for case {}: {}", caseId, ex.getMessage());
+            }
+        }
+    }
+
+    private Long parseCaseReference(String caseId) {
+        if (StringUtils.isBlank(caseId)) {
+            return null;
+        }
+        try {
+            return Long.parseLong(caseId.trim());
+        } catch (NumberFormatException ex) {
+            return null;
         }
     }
 
@@ -445,7 +558,9 @@ public class Et1AiVettingService {
             case 4 -> caseData.setEt1VettingAcasCertExemptYesOrNo4(value);
             case 5 -> caseData.setEt1VettingAcasCertExemptYesOrNo5(value);
             case 6 -> caseData.setEt1VettingAcasCertExemptYesOrNo6(value);
-            default -> { }
+            default -> {
+                // No action for invalid respondent number
+            }
         }
     }
 

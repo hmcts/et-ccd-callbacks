@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ecm.common.launchdarkly;
 
+import com.launchdarkly.sdk.ContextBuilder;
 import com.launchdarkly.sdk.LDContext;
 import com.launchdarkly.sdk.LDUser;
 import com.launchdarkly.sdk.server.interfaces.LDClientInterface;
@@ -38,6 +39,20 @@ public class FeatureToggleApi {
 
     public boolean isFeatureEnabled(String feature, LDUser user, boolean defaultValue) {
         return internalClient.boolVariation(feature, LDContext.fromUser(user), defaultValue);
+    }
+
+    public boolean isFeatureEnabled(String feature, LDContext context) {
+        return internalClient.boolVariation(feature, context, false);
+    }
+
+    public boolean isFeatureEnabled(String feature, LDContext context, boolean defaultValue) {
+        return internalClient.boolVariation(feature, context, defaultValue);
+    }
+
+    public ContextBuilder createLDContext() {
+        return LDContext.builder("et-cos")
+                .set("timestamp", String.valueOf(System.currentTimeMillis()))
+                .set("environment", environment);
     }
 
     public LDUser.Builder createLDUser() {

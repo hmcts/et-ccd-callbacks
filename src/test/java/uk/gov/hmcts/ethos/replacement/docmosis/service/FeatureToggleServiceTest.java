@@ -1,14 +1,20 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.launchdarkly.sdk.LDContext;
+import com.launchdarkly.sdk.LDValue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ecm.common.launchdarkly.FeatureToggleApi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -146,6 +152,19 @@ class FeatureToggleServiceTest {
         givenToggle("eraOctober2026", toggleStat);
 
         assertThat(featureToggleService.isEraOctober2026Enabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void returnsCorrectValue_whenEt1VettingAiIsEnabledForOffice(Boolean toggleStat) {
+        when(featureToggleApi.createLDContext()).thenReturn(LDContext.builder("et-cos"));
+        when(featureToggleApi.isFeatureEnabled(eq("et1VettingAi"), any(LDContext.class))).thenReturn(toggleStat);
+
+        assertThat(featureToggleService.isEt1VettingAiEnabled("Leeds")).isEqualTo(toggleStat);
+
+        ArgumentCaptor<LDContext> contextCaptor = ArgumentCaptor.forClass(LDContext.class);
+        verify(featureToggleApi).isFeatureEnabled(eq("et1VettingAi"), contextCaptor.capture());
+        assertThat(contextCaptor.getValue().getValue("managingOffice")).isEqualTo(LDValue.of("Leeds"));
     }
 
     private void givenToggle(String feature, boolean state) {

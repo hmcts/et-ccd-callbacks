@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.launchdarkly.sdk.ContextBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.launchdarkly.FeatureToggleApi;
@@ -80,5 +82,13 @@ public class FeatureToggleService {
 
     public boolean isEraJanuary2027Enabled() {
         return this.featureToggleApi.isFeatureEnabled("eraJanuary2027");
+    }
+
+    public boolean isEt1VettingAiEnabled(String managingOffice) {
+        ContextBuilder contextBuilder = this.featureToggleApi.createLDContext();
+        if (StringUtils.isNotBlank(managingOffice)) {
+            contextBuilder.set("managingOffice", managingOffice.trim());
+        }
+        return this.featureToggleApi.isFeatureEnabled("et1VettingAi", contextBuilder.build());
     }
 }

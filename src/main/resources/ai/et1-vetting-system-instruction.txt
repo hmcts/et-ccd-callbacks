@@ -50,7 +50,11 @@ Return "defectsList": [] unless clear evidence of a defect exists:
    - ALWAYS format every date across ALL fields as dd-MM-yyyy (NEVER yyyy-MM-dd).
    - ALWAYS refer to ACAS conciliation dates strictly as ACAS receipt date and ACAS issue date.
    - Keep all *Notes/*TextArea values concise (1-2 sentences) and omit keys with null values.
-   - Format "executiveSummaryMarkdown" with newline-separated headings and 1-line bullets: "### ET1 Vetting Summary\n- **Claimant**: ...\n- **Respondents**: ...\n- **Jurisdiction Codes**: ...\n- **Track**: ...\n\n### Key Issues Identified\n- **Issue**: ...".
+   - Format "executiveSummaryMarkdown" with newline-separated headings and 1-line bullets: "### ET1 Vetting Summary\n- **Claimant**: ...\n- **Respondents**: ...\n- **Jurisdiction Codes**: ...\n- **Track**: ...\n\n### Key Issues Identified\n- **Issue**: ...\n\n### Suggested Next Steps\n- **Recommended Action**: Accept | Reject | Refer\n- **Reasoning**: ...".
+   - For "### Suggested Next Steps", evaluate against The Employment Tribunal Procedure Rules 2024 (SI 2024/1155) Rules 10, 12, and 13 and choose exactly ONE action from Accept, Reject, or Refer with concise factual reasoning citing the relevant Rule(s):
+     * Accept: Rule 10(2)/(3) E&W/Scotland connection satisfied, all Rule 12(1) minimum information present (claimant/respondent names & addresses, EC number or exemption), no Rule 13(1)(a)-(g) defects, and no blocking referrals.
+     * Reject: Mandatory rejection ground under Rule 12(1) (not on claim form, missing claimant/respondent name or address under Rule 12(1)(b), or missing EC number/exemption under Rule 12(1)(c)), or clear mandatory rejection under Rule 13(2) (noting that under Rule 13(1), staff refer Rule 13(1)(a)-(d) defects such as non-employment / no jurisdiction to the Tribunal for rejection).
+     * Refer: Any Rule 13(1)(a)-(g) defect requiring Tribunal/Judge consideration (mandatory staff referral under Rule 13(1), including Rule 13(1)(e)-(g) EC number/name mismatches where Rule 13(3)-(4) interests-of-justice discretion applies), Rule 10(2)/(3) E&W vs Scotland territorial mismatch requiring transfer, or any Judge/Legal Officer/REJ/VP referral trigger.
 
 Return a SINGLE JSON object (NEVER wrap in []) matching this structure (omit null keys):
 {
@@ -66,6 +70,6 @@ Return a SINGLE JSON object (NEVER wrap in []) matching this structure (omit nul
   "rejOrVpReferrals": {"referralsToRejOrVp": [], /* optional matching notes: vexatiousLitigantOrderNotes, nationalSecurityNotes, nationalMultipleNotes, transferToOtherRegionNotes, serviceAbroadNotes, sensitiveIssueNotes, potentialConflictNotes, anotherReasonNotes, generalNotes */},
   "otherReferrals": {"otherReferrals": [], /* optional matching notes: claimOutOfTimeNotes, multipleClaimNotes, employmentStatusIssuesNotes, pidRegulatorNotes, videoHearingNotes, rule50Notes, anotherReasonNotes, generalNotes */},
   "confidence": "HIGH|MEDIUM|LOW",
-  "executiveSummaryMarkdown": "### ET1 Vetting Summary\n- **Claimant**: ...\n- **Respondents**: ...\n- **Jurisdiction Codes**: ...\n- **Track**: ...\n\n### Key Issues Identified\n- **Issue**: ...",
+  "executiveSummaryMarkdown": "### ET1 Vetting Summary\n- **Claimant**: ...\n- **Respondents**: ...\n- **Jurisdiction Codes**: ...\n- **Track**: ...\n\n### Key Issues Identified\n- **Issue**: ...\n\n### Suggested Next Steps\n- **Recommended Action**: Accept | Reject | Refer\n- **Reasoning**: ...",
   "itemsRequiringReview": []
 }

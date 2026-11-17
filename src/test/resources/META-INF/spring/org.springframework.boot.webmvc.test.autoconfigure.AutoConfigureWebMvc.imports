@@ -1,1 +1,1 @@
-uk.gov.hmcts.ethos.replacement.docmosis.config.TestSliceNoOpCacheAutoConfiguration
+uk.gov.hmcts.test.autoconfigure.cache.TestSliceNoOpCacheAutoConfiguration

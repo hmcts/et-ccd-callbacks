@@ -10,12 +10,7 @@ support-tasks:
         path:
           - Party
           - Reasonable adjustment
-    judge-flag-codes:
-      - RA0029
-      - RA0031
-      - RA0032
-      - RA0037
-      - RA0038
+    judge-flag-codes: []
     legal-officer-flag-codes:
       - RA0034
       - RA0035

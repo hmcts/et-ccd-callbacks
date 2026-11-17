@@ -1,9 +1,17 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.config;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.FlagDetailType;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.AllPartyFlags;
+import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,10 +31,24 @@ class SupportTaskConfigurationTest {
         assertThat(configuration.getClosureRetry().getMaxBackoffMs()).isEqualTo(1000);
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"RA0029", "RA0031", "RA0032", "RA0037", "RA0038"})
+    void formerlyJudgeReviewedFlagsUseAdminReview(String code) {
+        CaseData caseData = new CaseData();
+        caseData.setAllPartyFlags(AllPartyFlags.builder().claimantExternalFlags(CaseFlagsType.builder()
+                .details(ListTypeItem.from(FlagDetailType.builder().flagCode(code).status("Requested").build()))
+                .build()).build());
+
+        new SupportTaskService(configuration).prepareReviewSupportTasks(caseData);
+
+        assertThat(caseData.getSupportTaskState().getAdminTaskRequired()).isEqualTo("Yes");
+        assertThat(caseData.getSupportTaskState().getJudgeTaskRequired()).isNull();
+        assertThat(caseData.getSupportTaskState().getLegalOfficerTaskRequired()).isNull();
+    }
+
     @Test
     void loadsFlagCodesFromYaml() {
-        assertThat(configuration.getReview().getJudgeFlagCodes())
-                .containsExactlyInAnyOrder("RA0029", "RA0031", "RA0032", "RA0037", "RA0038");
+        assertThat(configuration.getReview().getJudgeFlagCodes()).isEmpty();
         assertThat(configuration.getReview().getLegalOfficerFlagCodes())
                 .containsExactlyInAnyOrder("RA0034", "RA0035", "RA0036");
         assertThat(configuration.getReview().getAdminPathFlags()).singleElement().satisfies(pathFlag -> {

@@ -5,6 +5,7 @@ import org.springframework.core.codec.Decoder;
 import org.springframework.http.codec.DecoderHttpMessageReader;
 import org.springframework.http.codec.HttpMessageReader;
 import org.springframework.http.codec.ServerSentEventHttpMessageReader;
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
@@ -73,5 +74,16 @@ class Jackson2RestTemplatesTest {
             JACKSON_2_CONVERTER_CLASS.equals(converter.getClass().getName()));
         assertThat(converters).noneMatch(converter ->
             JACKSON_3_CONVERTER_CLASS.equals(converter.getClass().getName()));
+
+        converters.stream()
+            .filter(FormHttpMessageConverter.class::isInstance)
+            .map(FormHttpMessageConverter.class::cast)
+            .forEach(formConverter -> {
+                List<HttpMessageConverter<?>> partConverters = formConverter.getPartConverters();
+                assertThat(partConverters).anyMatch(converter ->
+                    JACKSON_2_CONVERTER_CLASS.equals(converter.getClass().getName()));
+                assertThat(partConverters).noneMatch(converter ->
+                    JACKSON_3_CONVERTER_CLASS.equals(converter.getClass().getName()));
+            });
     }
 }

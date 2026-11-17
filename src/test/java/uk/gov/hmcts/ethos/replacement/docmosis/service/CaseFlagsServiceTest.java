@@ -926,6 +926,31 @@ class CaseFlagsServiceTest {
     }
 
     @Test
+    void setupCaseFlags_shouldHandleNullPartyNameWhenDuplicatePartyNamesExist() {
+        String sharedRepName = "Shared Representative";
+        caseData.setRepCollection(List.of(
+                representativeItem("2", RepresentedTypeR.builder()
+                        .nameOfRepresentative(sharedRepName)
+                        .role("[SOLICITORB]")
+                        .build()),
+                representativeItem("3", RepresentedTypeR.builder()
+                        .nameOfRepresentative(sharedRepName)
+                        .role("[SOLICITORC]")
+                        .build())
+        ));
+
+        caseFlagsService.setupCaseFlags(caseData);
+
+        AllPartyFlags allPartyFlags = allPartyFlags(caseData);
+        assertAll(
+                () -> assertNull(allPartyFlags.getRepresentativeFlags()),
+                () -> assertNull(allPartyFlags.getRepresentativeExternalFlags()),
+                () -> assertEquals(sharedRepName, allPartyFlags.getRepresentative1Flags().getPartyName()),
+                () -> assertNull(allPartyFlags.getRepresentative2Flags())
+        );
+    }
+
+    @Test
     void setupCaseFlags_shouldNotCreateClaimantRepresentativeFlagsWhenClaimantRepresentativeIsAbsent() {
         caseData.setRepresentativeClaimantType(null);
 

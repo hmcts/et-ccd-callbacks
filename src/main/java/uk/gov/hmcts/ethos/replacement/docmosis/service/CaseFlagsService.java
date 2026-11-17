@@ -696,7 +696,9 @@ public class CaseFlagsService {
             }
 
             String partyName = getPartyName(caseData, flag);
-            CaseFlagsType matchedFlag = existingFlagsByPartyName.get(partyName);
+            CaseFlagsType matchedFlag = StringUtils.isBlank(partyName)
+                    ? null
+                    : existingFlagsByPartyName.get(partyName);
             CaseFlagsType currentFlag = flag.get(caseData);
             alignedFlags.add(matchedFlag != null
                     ? matchedFlag

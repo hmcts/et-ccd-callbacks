@@ -318,6 +318,24 @@ final class RespondentRepresentativeUtilsTest {
     }
 
     @Test
+    void theIsRepresentativeNameChanged() {
+        RepresentedTypeR oldRepresentative = RepresentedTypeR.builder()
+                .nameOfRepresentative(REPRESENTATIVE_NAME_1)
+                .build();
+        RepresentedTypeR newRepresentative = RepresentedTypeR.builder()
+                .nameOfRepresentative(REPRESENTATIVE_NAME_1)
+                .build();
+
+        assertThat(RespondentRepresentativeUtils.isRepresentativeNameChanged(
+                oldRepresentative, newRepresentative)).isFalse();
+
+        newRepresentative.setNameOfRepresentative(REPRESENTATIVE_NAME_2);
+
+        assertThat(RespondentRepresentativeUtils.isRepresentativeNameChanged(
+                oldRepresentative, newRepresentative)).isTrue();
+    }
+
+    @Test
     void theFindNewOrUpdatedRepresentatives() {
         List<RepresentedTypeRItem> newRepresentatives = new ArrayList<>();
         // when old representatives list is empty should return new representative list
@@ -368,6 +386,11 @@ final class RespondentRepresentativeUtilsTest {
         oldRepresentative.getValue().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_1);
         assertThat(RespondentRepresentativeUtils.findNewOrUpdatedRepresentatives(newRepresentatives,
                 oldRepresentatives)).isEmpty();
+        // when the representative name changes, the updated representative should be returned
+        oldRepresentative.getValue().setNameOfRepresentative(REPRESENTATIVE_NAME_1);
+        newRepresentative.getValue().setNameOfRepresentative(REPRESENTATIVE_NAME_2);
+        assertThat(RespondentRepresentativeUtils.findNewOrUpdatedRepresentatives(newRepresentatives,
+                oldRepresentatives)).containsExactly(newRepresentative);
     }
 
     @Test

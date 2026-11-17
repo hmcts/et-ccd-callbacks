@@ -37,12 +37,10 @@ import javax.annotation.Nullable;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.ACTIVE;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.CLAIMANT_REPRESENTATIVE;
-import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.DISRUPTIVE_CUSTOMER;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.EXTERNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.GRANTED;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.INACTIVE;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.INTERNAL;
-import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.LANGUAGE_INTERPRETER;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.NOT_INDEXED;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.REPRESENTATIVE1;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.REPRESENTATIVE10;
@@ -64,8 +62,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT6
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT7;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT8;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT9;
-import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.SIGN_LANGUAGE_INTERPRETER;
-import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.VEXATIOUS_LITIGANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RESTRICT_PUBLICITY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -359,18 +355,8 @@ public class CaseFlagsService {
      * @param caseData Data about the current case.
      */
     public void processNewlySetCaseFlags(CaseData caseData) {
-        if (featureToggleService.isHmcEnabled()) {
-            // Note needs a reindex in production
-            ListTypeItem<FlagDetailType> partyLevel = getPartyCaseFlags(caseData);
-            caseData.setCaseInterpreterRequiredFlag(
-                    areAnyFlagsActive(partyLevel, SIGN_LANGUAGE_INTERPRETER, LANGUAGE_INTERPRETER) ? YES : NO
-            );
-
-            caseData.setCaseAdditionalSecurityFlag(
-                    areAnyFlagsActive(partyLevel, VEXATIOUS_LITIGANT, DISRUPTIVE_CUSTOMER) ? YES : NO
-            );
-
-        }
+        caseData.setCaseInterpreterRequiredFlag(null);
+        caseData.setCaseAdditionalSecurityFlag(null);
     }
 
     /**

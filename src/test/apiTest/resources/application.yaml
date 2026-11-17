@@ -1,4 +1,7 @@
 spring:
+  http:
+    converters:
+      preferred-json-mapper: jackson2
   datasource:
     url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver

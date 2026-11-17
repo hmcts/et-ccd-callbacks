@@ -710,7 +710,10 @@ dependencies {
         exclude module: 'commons-io'
     }
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testImplementation('org.springframework.boot:spring-boot-starter-webmvc-test') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-jackson'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-jackson-test'
+    }
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     testImplementation group: 'com.auth0', name: 'java-jwt', version: '4.6.1'

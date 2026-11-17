@@ -58,7 +58,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @ImportAutoConfiguration({FeignAutoConfiguration.class, HttpMessageConvertersAutoConfiguration.class})
 @RequiredArgsConstructor
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-@SuppressWarnings("java:S5960")
 class DigitalCaseFileServiceIntegrationTest {
 
     private static final long CASE_REFERENCE = 1_234_567_890_123_456L;

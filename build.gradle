@@ -71,6 +71,8 @@ def duplicateCodeExclusionList = [
 
 sonarqube {
     properties {
+        property "sonar.sources", "src/main/java"
+        property "sonar.tests", "src/test/java,src/test/utils/java,src/test/integration/java,src/test/functional/java,src/test/apiTest/java,src/test/contractTest/java"
         property "sonar.exclusions", sonarExclusions.join(', ')
         property "sonar.cpd.exclusions", duplicateCodeExclusionList.join(", ")
         property "sonar.projectKey", "et-ccd-callbacks"

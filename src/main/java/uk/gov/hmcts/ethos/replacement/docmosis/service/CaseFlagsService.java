@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -72,7 +73,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsReference
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CaseFlagsService {
+    private final FeatureToggleService featureToggleService;
     private static final List<PartyFlag> PARTY_FLAGS = List.of(
             claimantFlag(AllPartyFlags::getClaimantFlags, AllPartyFlags::setClaimantFlags, INTERNAL),
             claimantFlag(AllPartyFlags::getClaimantExternalFlags, AllPartyFlags::setClaimantExternalFlags, EXTERNAL),
@@ -356,14 +359,18 @@ public class CaseFlagsService {
      * @param caseData Data about the current case.
      */
     public void processNewlySetCaseFlags(CaseData caseData) {
-        ListTypeItem<FlagDetailType> partyLevel = getPartyCaseFlags(caseData);
-        caseData.setCaseInterpreterRequiredFlag(
-                areAnyFlagsActive(partyLevel, SIGN_LANGUAGE_INTERPRETER, LANGUAGE_INTERPRETER) ? YES : NO
-        );
+        if (featureToggleService.isHmcEnabled()) {
+            // Note needs a reindex in production
+            ListTypeItem<FlagDetailType> partyLevel = getPartyCaseFlags(caseData);
+            caseData.setCaseInterpreterRequiredFlag(
+                    areAnyFlagsActive(partyLevel, SIGN_LANGUAGE_INTERPRETER, LANGUAGE_INTERPRETER) ? YES : NO
+            );
 
-        caseData.setCaseAdditionalSecurityFlag(
-                areAnyFlagsActive(partyLevel, VEXATIOUS_LITIGANT, DISRUPTIVE_CUSTOMER) ? YES : NO
-        );
+            caseData.setCaseAdditionalSecurityFlag(
+                    areAnyFlagsActive(partyLevel, VEXATIOUS_LITIGANT, DISRUPTIVE_CUSTOMER) ? YES : NO
+            );
+
+        }
     }
 
     /**

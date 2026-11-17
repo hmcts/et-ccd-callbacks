@@ -46,6 +46,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.ACTIVE;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.CLAIMANT_REPRESENTATIVE;
@@ -87,12 +89,15 @@ class CaseFlagsServiceTest {
     public static final String CLAIMANT_REPRESENTATIVE_NAME = "Claimant Representative Name";
     public static final String REPRESENTATIVE_NAME = "Representative Name";
     public static final String RESPONDENT_NAME = "Respondent Name";
+    private FeatureToggleService featureToggleService;
     private CaseFlagsService caseFlagsService;
     private CaseData caseData;
 
     @BeforeEach
     void setUp() {
-        caseFlagsService = new CaseFlagsService();
+        featureToggleService = mock(FeatureToggleService.class);
+        when(featureToggleService.isHmcEnabled()).thenReturn(true);
+        caseFlagsService = new CaseFlagsService(featureToggleService);
         caseData = CaseDataBuilder.builder().build();
         caseData.setClaimant(CLAIMANT_NAME);
         caseData.setRespondent(RESPONDENT_NAME);
@@ -1630,6 +1635,21 @@ class CaseFlagsServiceTest {
 
         assertEquals(NO, caseData.getCaseInterpreterRequiredFlag());
         assertEquals(NO, caseData.getCaseAdditionalSecurityFlag());
+    }
+
+    @Test
+    void processNewlySetCaseFlags_shouldNotUpdateFlagsWhenHmcIsDisabled() {
+        when(featureToggleService.isHmcEnabled()).thenReturn(false);
+        caseFlagsService.setupCaseFlags(caseData);
+        allPartyFlags(caseData).getClaimantFlags()
+                .setDetails(ListTypeItem.from(activeFlag(SIGN_LANGUAGE_INTERPRETER)));
+        allPartyFlags(caseData).getRespondentFlags()
+                .setDetails(ListTypeItem.from(activeFlag(VEXATIOUS_LITIGANT)));
+
+        caseFlagsService.processNewlySetCaseFlags(caseData);
+
+        assertNull(caseData.getCaseInterpreterRequiredFlag());
+        assertNull(caseData.getCaseAdditionalSecurityFlag());
     }
 
     @Test

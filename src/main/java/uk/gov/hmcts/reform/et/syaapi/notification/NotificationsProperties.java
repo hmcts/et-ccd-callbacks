@@ -156,6 +156,14 @@ public class NotificationsProperties {
     @NotBlank
     private String bundlesClaimantSubmittedNotificationTemplateId;
 
+    @Value("${notifications.bundles.respondentSubmittedForClaimant}")
+    @NotBlank
+    private String bundlesRespondentSubmittedForClaimantTemplateId;
+
+    @Value("${notifications.bundles.respondentSubmittedForTribunal}")
+    @NotBlank
+    private String bundlesRespondentSubmittedForTribunalTemplateId;
+
     @Value("${notifications.et3SubmissionConfirmation}")
     @NotBlank
     private String et3SubmissionConfirmationTemplateId;
@@ -223,4 +231,12 @@ public class NotificationsProperties {
     @Value("${notifications.tse.respondentResponseNo}")
     @NotBlank
     private String tseRespondentResponseNoTemplateId;
+
+    @Value("${notifications.userInsights.claimantUserInsightTemplateId}")
+    @NotBlank
+    private String claimantUserInsightTemplateId;
+
+    @Value("${notifications.userInsights.respondentUserInsightTemplateId}")
+    @NotBlank
+    private String respondentUserInsightTemplateId;
 }

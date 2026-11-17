@@ -20,10 +20,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled(feature);
     }
 
-    public boolean isCaseFlagsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("case-flags-linking-enabled");
-    }
-
     public boolean isBundlesEnabled() {
         return this.featureToggleApi.isFeatureEnabled("bundles");
     }
@@ -56,6 +52,10 @@ public class FeatureToggleService {
      */
     public boolean isAcasVetAndAcceptEnabled() {
         return this.featureToggleApi.isFeatureEnabled("acasVetAndAccept");
+    }
+
+    public boolean isAcasDocumentsPhase2Enabled() {
+        return this.featureToggleApi.isFeatureEnabled("acasDocumentsPhase2");
     }
 
     /**

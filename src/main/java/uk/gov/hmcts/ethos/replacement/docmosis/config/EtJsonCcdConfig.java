@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.config;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.ccd.sdk.api.CCDConfig;
 import uk.gov.hmcts.ccd.sdk.api.HasRole;
@@ -25,7 +24,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
 @Configuration
-@ComponentScan("uk.gov.hmcts.ccd.sdk")
 public class EtJsonCcdConfig {
 
     private static final String ENGLAND_WALES_JSON_ROOT =

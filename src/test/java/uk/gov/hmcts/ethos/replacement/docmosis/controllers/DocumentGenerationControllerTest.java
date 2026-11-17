@@ -125,17 +125,6 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midAddressLabelsForbidden() throws Exception {
-        when(documentGenerationService.midAddressLabels(isA(CaseData.class))).thenReturn(submitEvent.getCaseData());
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(MID_ADDRESS_LABELS_URL)
-                .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void midSelectedAddressLabelsOk() throws Exception {
         when(documentGenerationService.midSelectedAddressLabels(isA(CaseData.class)))
                 .thenReturn(submitEvent.getCaseData());
@@ -169,18 +158,6 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
-    }
-
-    @Test
-    void midSelectedAddressLabelsForbidden() throws Exception {
-        when(documentGenerationService.midSelectedAddressLabels(isA(CaseData.class)))
-                .thenReturn(submitEvent.getCaseData());
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(MID_SELECTED_ADDRESS_LABELS_URL)
-                .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -235,18 +212,6 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midValidateAddressLabelsForbidden() throws Exception {
-        when(documentGenerationService.midValidateAddressLabels(isA(CaseData.class)))
-                .thenReturn(new ArrayList<>(Collections.singletonList("Error")));
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(MID_VALIDATE_ADDRESS_LABELS_URL)
-                .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void generateDocumentOk() throws Exception {
         when(documentGenerationService.processDocumentRequest(isA(CCDRequest.class),
                 eq(AUTH_TOKEN))).thenReturn(documentInfo);
@@ -298,18 +263,6 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void generateDocumentOkForbidden() throws Exception {
-        when(documentGenerationService.processDocumentRequest(isA(CCDRequest.class),
-                eq(AUTH_TOKEN))).thenReturn(documentInfo);
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(GEN_DOC_URL)
-                .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void generateDocumentConfirmationOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GEN_DOC_CONFIRMATION_URL)
@@ -332,16 +285,6 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void generateDocumentConfirmationForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(GEN_DOC_CONFIRMATION_URL)
-                .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void dynamicLettersOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_LETTERS)
@@ -361,16 +304,6 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void dynamicLettersForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DYNAMIC_LETTERS)
-                .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 
 }

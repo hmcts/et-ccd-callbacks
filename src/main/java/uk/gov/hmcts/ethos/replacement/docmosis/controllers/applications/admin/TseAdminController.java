@@ -246,7 +246,8 @@ public class TseAdminController {
         @RequestHeader("Authorization") String userToken) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        tseAdmCloseService.aboutToSubmitCloseApplication(caseData);
+        tseAdmCloseService.aboutToSubmitCloseApplication(
+            caseData, ccdRequest.getCaseDetails().getCaseTypeId());
         return getCallbackRespEntityNoErrors(caseData);
     }
 

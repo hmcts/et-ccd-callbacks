@@ -48,6 +48,21 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
+    "ID": "SUBMIT_RESPONDENT_BUNDLES",
+    "Name": "Submit respondent hearing docs",
+    "Description": "Submit respondent hearing docs",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "EventEnablingCondition": "caseType=\"dummy\"",
+    "CallBackURLAboutToStartEvent": "",
+    "CallBackURLAboutToSubmitEvent": "",
+    "CallBackURLSubmittedEvent": ""
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
     "ID": "removeHearingBundles",
     "Name": "Remove hearing documents",
     "Description": "Remove Hearing Documents",

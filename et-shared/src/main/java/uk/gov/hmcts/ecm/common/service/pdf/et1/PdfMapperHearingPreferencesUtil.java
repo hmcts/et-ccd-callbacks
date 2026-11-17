@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ecm.common.service.pdf.et1;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.ecm.common.constants.PdfMapperConstants;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
@@ -27,6 +27,7 @@ public final class PdfMapperHearingPreferencesUtil {
             if (!ObjectUtils.isEmpty(caseData)) {
                 setClaimantReasonableAdjustments(caseData, printFields);
                 setClaimantHearingPreferences(caseData, printFields);
+                setClaimantHearingPanelPreferences(caseData, printFields);
             }
         } catch (Exception e) {
             GenericServiceUtil.logException("An error occured while printing hearing preferences to pdf file",
@@ -39,7 +40,7 @@ public final class PdfMapperHearingPreferencesUtil {
 
     private static void setClaimantReasonableAdjustments(CaseData caseData,
                                                         ConcurrentMap<String, Optional<String>> printFields) {
-        if (!ObjectUtils.isEmpty(caseData.getClaimantHearingPreference())
+        if (ObjectUtils.isNotEmpty(caseData.getClaimantHearingPreference())
             && !StringUtils.isEmpty(caseData.getClaimantHearingPreference().getReasonableAdjustments())) {
             if (PdfMapperServiceUtil.isYes(caseData.getClaimantHearingPreference().getReasonableAdjustments())) {
                 printFields.put(PdfMapperConstants.Q12_DISABILITY_YES, Optional.of(YES));
@@ -97,6 +98,29 @@ public final class PdfMapperHearingPreferencesUtil {
                 printFields.put(
                     PdfMapperConstants.I_CAN_TAKE_PART_IN_PHONE_HEARINGS,
                     Optional.of(YES)
+                );
+            }
+        }
+    }
+
+    private static void setClaimantHearingPanelPreferences(CaseData caseData,
+                                                            ConcurrentMap<String, Optional<String>> printFields) {
+        if (ObjectUtils.isNotEmpty(caseData.getClaimantHearingPreference())) {
+            String panelPreference = caseData.getClaimantHearingPreference().getClaimantHearingPanelPreference();
+            if (StringUtils.isNotBlank(panelPreference)) {
+                if ("Judge".equalsIgnoreCase(panelPreference)) {
+                    printFields.put(PdfMapperConstants.HEARINGS_1_12_JUDGE, Optional.of(YES));
+                } else if ("Panel".equalsIgnoreCase(panelPreference)) {
+                    printFields.put(PdfMapperConstants.HEARINGS_1_12_PANEL, Optional.of(YES));
+                } else if ("No preference".equalsIgnoreCase(panelPreference)) {
+                    printFields.put(PdfMapperConstants.HEARINGS_1_12_NO_PREFERENCE, Optional.of(YES));
+                }
+            }
+            String panelWhy = caseData.getClaimantHearingPreference().getClaimantHearingPanelPreferenceWhy();
+            if (StringUtils.isNotBlank(panelWhy)) {
+                printFields.put(
+                    PdfMapperConstants.HEARINGS_1_12_REASONS,
+                    Optional.of(panelWhy)
                 );
             }
         }

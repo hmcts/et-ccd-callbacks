@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.et.syaapi.annotation.ApiResponseGroup;
 import uk.gov.hmcts.reform.et.syaapi.models.ClaimantBundlesRequest;
+import uk.gov.hmcts.reform.et.syaapi.models.RespondentBundlesRequest;
 import uk.gov.hmcts.reform.et.syaapi.service.BundlesService;
 
 import static org.springframework.http.ResponseEntity.ok;
@@ -40,10 +41,31 @@ public class BundlesController {
         @RequestHeader(AUTHORIZATION) String authorization,
         @NotNull @RequestBody ClaimantBundlesRequest request
     ) {
-        log.info("Received submit bundles request - caseTypeId: {} caseId: {}",
+        log.info("Received submit claimant bundles request - caseTypeId: {} caseId: {}",
                  request.getCaseTypeId(), request.getCaseId()
         );
         CaseDetails finalCaseDetails = bundlesService.submitBundles(authorization, request);
+        return ok(finalCaseDetails);
+    }
+
+    /**
+     * Submits respondent hearing document pdf and related information.
+     *
+     * @param authorization jwt of the user
+     * @param request       the request object which contains the respondent bundles passed from syr-frontend
+     * @return the new updated case wrapped in a {@link CaseDetails}
+     */
+    @PutMapping("/submit-respondent-bundles")
+    @Operation(summary = "Submit respondent bundles hearing document and related data")
+    @ApiResponseGroup
+    public ResponseEntity<CaseDetails> submitRespondentBundles(
+        @RequestHeader(AUTHORIZATION) String authorization,
+        @NotNull @RequestBody RespondentBundlesRequest request
+    ) {
+        log.info("Received submit respondent bundles request - caseTypeId: {} caseId: {}",
+                 request.getCaseTypeId(), request.getCaseId()
+        );
+        CaseDetails finalCaseDetails = bundlesService.submitRespondentBundles(authorization, request);
         return ok(finalCaseDetails);
     }
 }

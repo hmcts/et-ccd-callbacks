@@ -65,25 +65,6 @@ class StaffImportControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void testImportForbidden() throws Exception {
-        String documentBinaryUrl = "http://dm-store:8888/documents/12131212";
-        CCDRequest ccdRequest = AdminDataBuilder
-                .builder()
-                .withStaffImportFile(documentBinaryUrl)
-                .buildAsCCDRequest();
-
-        String token = "invalid-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/admin/staff/import")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", token)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(staffImportService, never()).importStaff(ccdRequest.getCaseDetails().getAdminData(), token);
-    }
-
-    @Test
     void testImportBadRequest() throws Exception {
         mockMvc.perform(post("/admin/staff/import")
                         .contentType(MediaType.APPLICATION_JSON)

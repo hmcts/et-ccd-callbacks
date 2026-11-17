@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +19,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
@@ -34,21 +32,22 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ClaimantEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmploymentRightsActService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.PostDefaultValuesService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 
@@ -58,16 +57,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
-import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper.buildFlagsImageFileName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.removeSpacesFromPartyNames;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.updatePositionTypeToClosed;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.JurisdictionCodeHelper.populateJurCodesCollectionIds;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -77,19 +75,15 @@ public class CaseActionsForCaseWorkerController {
     private static final String TWO_HUNDRED = "200";
     private static final String FOUR_HUNDRED = "400";
     private static final String FIVE_HUNDRED = "500";
-    private static final String SUBMIT_CASE_DRAFT = "SUBMIT_CASE_DRAFT";
     public static final String ACCESSED_SUCCESSFULLY = "Accessed successfully";
     public static final String BAD_REQUEST = "Bad Request";
     public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
-    private static final List<String> SUBMISSION_EVENTS = List.of(SUBMIT_CASE_DRAFT, "initiateCase", "submitEt1Draft");
-    public static final String CREATE_ECM_CASE = "createEcmCase";
 
     private final CaseCloseValidator caseCloseValidator;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private final ConciliationTrackService conciliationTrackService;
     private final DefaultValuesReaderService defaultValuesReaderService;
     private final FixCaseApiService fixCaseApiService;
-    private final SingleReferenceService singleReferenceService;
     private final EventValidationService eventValidationService;
     private final SingleCaseMultipleMidEventValidationService singleCaseMultipleMidEventValidationService;
     private final AddSingleCaseToMultipleService addSingleCaseToMultipleService;
@@ -99,12 +93,14 @@ public class CaseActionsForCaseWorkerController {
     private final DepositOrderValidationService depositOrderValidationService;
     private final JudgmentValidationService judgmentValidationService;
     private final Et1VettingService et1VettingService;
-    private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
     private final FeatureToggleService featureToggleService;
     private final CaseFlagsService caseFlagsService;
     private final CaseManagementLocationService caseManagementLocationService;
-    private final Et1SubmissionService et1SubmissionService;
     private final NocRespondentHelper nocRespondentHelper;
+    private final EmploymentRightsActService employmentRightsActService;
+    private final ClaimantEmailService claimantEmailService;
+    private final RespondentEmailService respondentEmailService;
+    private final PostDefaultValuesService postDefaultValuesService;
 
     @PostMapping(value = "/preDefaultValues", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update pre default values in a case.")
@@ -142,59 +138,8 @@ public class CaseActionsForCaseWorkerController {
             @RequestHeader(AUTHORIZATION) String userToken) {
         log.info("POST DEFAULT VALUES ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
-        CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        CaseData caseData = caseDetails.getCaseData();
-        List<String> errors = getValidationDate(ccdRequest.getEventId(), caseDetails);
-
-        if (errors.isEmpty()) {
-            defaultValuesReaderService.setSubmissionReference(caseDetails);
-            DefaultValues defaultValues = getPostDefaultValues(caseDetails);
-            defaultValuesReaderService.setCaseData(caseData, defaultValues);
-            caseManagementForCaseWorkerService.caseDataDefaults(caseData);
-            generateEthosCaseReference(caseData, ccdRequest);
-            buildFlagsImageFileName(ccdRequest.getCaseDetails());
-            caseData.setMultipleFlag(caseData.getEcmCaseType() != null
-                    && Constants.MULTIPLE_CASE_TYPE.equals(caseData.getEcmCaseType()) ? Constants.YES : Constants.NO);
-            caseData.setChangeOrganisationRequestField(null);
-            UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
-            UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
-            DocumentHelper.setDocumentNumbers(caseData);
-            //create NOC answers section only on case submission events
-            if (SUBMISSION_EVENTS.contains(defaultIfEmpty(ccdRequest.getEventId(), EMPTY_STRING))) {
-                caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
-            }
-            defaultValuesReaderService.setPositionAndOffice(caseDetails.getCaseTypeId(), caseData);
-
-            boolean caseFlagsToggle = featureToggleService.isCaseFlagsEnabled();
-            log.info("Caseflags feature flag is {}", caseFlagsToggle);
-            if (caseFlagsToggle && caseFlagsService.caseFlagsSetupRequired(caseData)) {
-                caseFlagsService.setupCaseFlags(caseData);
-            }
-
-            boolean hmcToggle = featureToggleService.isHmcEnabled();
-            log.info("HMC feature flag is {}", hmcToggle);
-            if (hmcToggle) {
-                caseManagementForCaseWorkerService.setPublicCaseName(caseData);
-                caseManagementLocationService.setCaseManagementLocationCode(caseData);
-            }
-
-            if (featureToggleService.citizenEt1Generation() && SUBMIT_CASE_DRAFT.equals(ccdRequest.getEventId())) {
-                caseDetails.setCaseData(caseData);
-                et1SubmissionService.createAndUploadEt1Docs(caseDetails, userToken);
-                et1SubmissionService.vexationCheck(caseDetails, userToken);
-            }
-        }
-
-        log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),
-                caseData.getEthosCaseReference());
-        return getCallbackRespEntityErrors(errors, caseData);
-    }
-
-    private List<String> getValidationDate(String eventId, CaseDetails caseDetails) {
-        if (!CREATE_ECM_CASE.equals(eventId)) {
-            return eventValidationService.validateReceiptDate(caseDetails);
-        }
-        return new ArrayList<>();
+        List<String> errors = postDefaultValuesService.applyPostDefaultValues(ccdRequest, userToken);
+        return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
     @PostMapping(value = "/addServiceId", consumes = APPLICATION_JSON_VALUE)
@@ -239,7 +184,7 @@ public class CaseActionsForCaseWorkerController {
 
         et1VettingService.populateHearingVenue(caseData);
         et1VettingService.populateSuggestedHearingVenues(caseData);
-
+        employmentRightsActService.setEraFlagByReceiptDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -278,6 +223,7 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
             caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
             caseManagementForCaseWorkerService.setNextListedDate(caseData);
+            employmentRightsActService.setEraFlagByReceiptDate(caseData);
             buildFlagsImageFileName(ccdRequest.getCaseDetails());
             UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
             UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
@@ -346,6 +292,70 @@ public class CaseActionsForCaseWorkerController {
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         removeSpacesFromPartyNames(caseData);
         return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    @PostMapping(value = "/updateClaimantEmail/aboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Initialise the claimant email update event.")
+    public ResponseEntity<CCDCallbackResponse> initialiseClaimantEmailUpdate(
+            @RequestBody CCDRequest ccdRequest) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        return getCallbackRespEntityErrors(claimantEmailService.initialise(caseData), caseData);
+    }
+
+    @PostMapping(value = "/updateClaimantEmail/validate", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Validate the claimant's new email address.")
+    public ResponseEntity<CCDCallbackResponse> validateClaimantEmailUpdate(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        return getCallbackRespEntityErrors(
+                claimantEmailService.validateNewEmail(caseData, userToken), caseData);
+    }
+
+    @PostMapping(value = "/updateClaimantEmail/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Update claimant email and case access.")
+    public ResponseEntity<CCDCallbackResponse> updateClaimantEmail(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        return getCallbackRespEntityErrors(
+                claimantEmailService.prepareUpdate(ccdRequest.getCaseDetails(), userToken), caseData);
+    }
+
+    @PostMapping(value = "/updateRespondentEmail/aboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Initialise the respondent email update event.")
+    public ResponseEntity<CCDCallbackResponse> initialiseRespondentEmailUpdate(
+            @RequestBody CCDRequest ccdRequest) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        return getCallbackRespEntityErrors(respondentEmailService.initialise(caseData), caseData);
+    }
+
+    @PostMapping(value = "/updateRespondentEmail/select", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Display the selected respondent's current email address.")
+    public ResponseEntity<CCDCallbackResponse> selectRespondentForEmailUpdate(
+            @RequestBody CCDRequest ccdRequest) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        return getCallbackRespEntityErrors(respondentEmailService.populateCurrentEmail(caseData), caseData);
+    }
+
+    @PostMapping(value = "/updateRespondentEmail/validate", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Validate the respondent's new email address.")
+    public ResponseEntity<CCDCallbackResponse> validateRespondentEmailUpdate(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        return getCallbackRespEntityErrors(
+                respondentEmailService.validateNewEmail(caseData, userToken), caseData);
+    }
+
+    @PostMapping(value = "/updateRespondentEmail/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Update the selected respondent's email address and case access.")
+    public ResponseEntity<CCDCallbackResponse> updateRespondentEmail(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        return getCallbackRespEntityErrors(
+                respondentEmailService.prepareUpdate(ccdRequest.getCaseDetails(), userToken), caseData);
     }
 
     @PostMapping(value = "/amendRespondentDetails", consumes = APPLICATION_JSON_VALUE)
@@ -607,11 +617,12 @@ public class CaseActionsForCaseWorkerController {
         log.info("AMEND JURISDICTION ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        populateJurCodesCollectionIds(caseData);
         conciliationTrackService.populateConciliationTrackForJurisdiction(caseData);
         buildFlagsImageFileName(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
-  
+
     @PostMapping(value = "/singleCaseMultipleMidEventValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates the multiple and sub multiple in the single case when moving to a multiple.")
     @ApiResponses(value = {
@@ -888,11 +899,4 @@ public class CaseActionsForCaseWorkerController {
         return defaultValuesReaderService.getDefaultValues(caseDetails.getCaseData().getManagingOffice());
     }
 
-    private void generateEthosCaseReference(CaseData caseData, CCDRequest ccdRequest) {
-        if (StringUtils.isBlank(caseData.getEthosCaseReference())) {
-            String reference = singleReferenceService.createReference(ccdRequest.getCaseDetails().getCaseTypeId());
-            log.info("Created reference {} for CCD case {}", reference, ccdRequest.getCaseDetails().getCaseId());
-            caseData.setEthosCaseReference(reference);
-        }
-    }
 }

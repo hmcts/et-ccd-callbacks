@@ -74,6 +74,8 @@ class Et3ResponseServiceTest {
     private AuthTokenGenerator authTokenGenerator;
     @MockitoBean
     private MyHmctsService myHmctsService;
+    @MockitoBean
+    private FeatureToggleService featureToggleService;
 
     private static final String VALID_USER_TOKEN = "validUserToken";
     private static final String ERROR_PDF_BOX_SERVICE_GENERATE_PDF_DOCUMENT_INFO =
@@ -92,7 +94,8 @@ class Et3ResponseServiceTest {
     @BeforeEach
     void setUp() {
 
-        et3ResponseService = new Et3ResponseService(documentManagementService, pdfBoxService, myHmctsService);
+        et3ResponseService = new Et3ResponseService(documentManagementService, pdfBoxService, myHmctsService,
+            featureToggleService);
         caseData = CaseDataBuilder.builder()
             .withClaimantIndType("Doris", "Johnson")
             .withClaimantType("232 Petticoat Square", "3 House", null,

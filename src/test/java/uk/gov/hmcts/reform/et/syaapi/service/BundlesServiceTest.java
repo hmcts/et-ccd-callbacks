@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.et.syaapi.helper.CaseDetailsConverter;
 import uk.gov.hmcts.reform.et.syaapi.model.TestData;
 import uk.gov.hmcts.reform.et.syaapi.models.ClaimantBundlesRequest;
+import uk.gov.hmcts.reform.et.syaapi.models.RespondentBundlesRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent.SUBMIT_CLAIMANT_BUNDLES;
+import static uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent.SUBMIT_RESPONDENT_BUNDLES;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_SERVICE_AUTH_TOKEN;
 
 class BundlesServiceTest {
@@ -122,5 +124,90 @@ class BundlesServiceTest {
 
         CaseData data = (CaseData) contentCaptor.getValue().getData();
         Assertions.assertEquals(collection.get(0).getValue(), data.getBundlesClaimantCollection().get(0).getValue());
+    }
+
+    @Test
+    void shouldSubmitUpdateForRespondentBundles() {
+        RespondentBundlesRequest testRequest = testData.getRespondentBundlesRequest();
+
+        bundlesService.submitRespondentBundles(
+            TEST_SERVICE_AUTH_TOKEN,
+            testRequest
+        );
+
+        verify(caseService, times(1)).submitUpdate(
+            eq(TEST_SERVICE_AUTH_TOKEN),
+            eq(testRequest.getCaseId()),
+            any(),
+            any()
+        );
+        verify(notificationService, times(1)).sendRespondentBundlesEmails(
+            any(),
+            eq(testRequest.getCaseId()),
+            eq(testRequest.getRespondentBundles().getHearing())
+        );
+    }
+
+    @Test
+    void shouldAddBundleToRespondentBundleCollection() {
+        RespondentBundlesRequest request = testData.getRespondentBundlesRequest();
+
+        StartEventResponse updateCaseEventResponse = testData.getUpdateCaseEventResponse();
+        when(caseService.startUpdate(
+            TEST_SERVICE_AUTH_TOKEN,
+            request.getCaseId(),
+            request.getCaseTypeId(),
+            SUBMIT_RESPONDENT_BUNDLES
+        )).thenReturn(updateCaseEventResponse);
+
+        List<GenericTypeItem<HearingBundleType>> collection = new ArrayList<>();
+        UploadedDocumentType file = UploadedDocumentType.builder()
+            .documentFilename("filename.pdf").documentBinaryUrl("url").documentUrl("url").build();
+
+        collection.add(
+            GenericTypeItem.from(
+                HearingBundleType.builder()
+                    .agreedDocWith("text")
+                    .hearing("122333-abc-1122333")
+                    .whatDocuments("supplementary")
+                    .whoseDocuments("bothParties")
+                    .uploadFile(file)
+                    .build())
+        );
+
+        ArgumentCaptor<CaseDataContent> contentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
+        bundlesService.submitRespondentBundles(MOCK_TOKEN, request);
+
+        verify(caseService, times(1)).submitUpdate(
+            eq(MOCK_TOKEN), any(), contentCaptor.capture(), any());
+
+        CaseData data = (CaseData) contentCaptor.getValue().getData();
+        Assertions.assertEquals(collection.get(0).getValue(), data.getBundlesRespondentCollection().get(0).getValue());
+    }
+
+    @Test
+    void shouldInitialiseEmptyRespondentBundleCollectionWhenMissing() {
+        RespondentBundlesRequest request = testData.getRespondentBundlesRequest();
+
+        when(caseService.startUpdate(
+            MOCK_TOKEN,
+            request.getCaseId(),
+            request.getCaseTypeId(),
+            SUBMIT_RESPONDENT_BUNDLES
+        )).thenReturn(testData.getUpdateCaseEventResponse());
+
+        ArgumentCaptor<CaseDataContent> contentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
+        bundlesService.submitRespondentBundles(MOCK_TOKEN, request);
+
+        verify(caseService, times(1)).submitUpdate(
+            eq(MOCK_TOKEN), any(), contentCaptor.capture(), any());
+
+        CaseData data = (CaseData) contentCaptor.getValue().getData();
+        Assertions.assertNotNull(data.getBundlesRespondentCollection());
+        Assertions.assertEquals(1, data.getBundlesRespondentCollection().size());
+        Assertions.assertEquals(
+            request.getRespondentBundles(),
+            data.getBundlesRespondentCollection().get(0).getValue()
+        );
     }
 }

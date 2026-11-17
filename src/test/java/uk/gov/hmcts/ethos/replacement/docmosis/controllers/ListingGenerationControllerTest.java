@@ -523,16 +523,6 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void generateReportForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(GENERATE_REPORT_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void dynamicListingVenueError400() throws Exception {
         mvc.perform(post(DYNAMIC_LISTING_VENUE)
                 .content("error")
@@ -677,76 +667,6 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void listingCaseCreationForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(LISTING_CASE_CREATION_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void listingHearingsForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(LISTING_HEARINGS_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void generateHearingDocumentConfirmationForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(GENERATE_HEARING_DOCUMENT_CONFIRMATION_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void generateHearingDocumentWithErrorsForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(GENERATE_HEARING_DOCUMENT_URL)
-                .content(requestContent1.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void listingSingleCasesForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(LISTING_SINGLE_CASES_URL)
-                .content(requestContentSingleCase.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void generateListingsDocSingleCasesForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(GENERATE_LISTINGS_DOC_SINGLE_CASES_URL)
-                .content(requestContentSingleCase.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void generateListingsDocSingleCasesConfirmationForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(GENERATE_LISTINGS_DOC_SINGLE_CASES_CONFIRMATION_URL)
-                .content(requestContentSingleCase.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void initPrintHearingLists() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
@@ -760,19 +680,6 @@ class ListingGenerationControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(printHearingListService, times(1)).initPrintHearingLists(any(CaseData.class));
-    }
-
-    @Test
-    void initPrintHearingListsForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-
-        mvc.perform(post(INIT_PRINT_HEARING_LISTS_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .content(requestContentSingleCase.toString()))
-                .andExpect(status().isForbidden());
-
-        verify(printHearingListService, never()).initPrintHearingLists(any(CaseData.class));
     }
 
     @Test

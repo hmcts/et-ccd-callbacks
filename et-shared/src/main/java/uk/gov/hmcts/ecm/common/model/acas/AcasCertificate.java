@@ -7,6 +7,8 @@ import java.util.Objects;
 
 /**
  * Simply holds the certificate blob data as a string (in Base64 encoded format) along with the associated ACAS number.
+ * As part of the work for ERA, the API has been extended to return the date of notification and
+ * the date the certificate was issued.
  * You can find detailed documentation in the
  * <a href="https://tools.hmcts.net/confluence/display/RET/ACAS+Integration+Consume">confluence page</a>.
  */
@@ -17,10 +19,10 @@ public class AcasCertificate {
     private String certificateDocument;
     @JsonProperty("CertificateNumber")
     private String certificateNumber;
-    @JsonProperty("DateOfReceipt")
-    private String dateOfReceipt;
-    @JsonProperty("DateOfIssue")
-    private String dateOfIssue;
+    @JsonProperty("DateOfNotification")
+    private String dateOfNotification;
+    @JsonProperty("DateCertificateIssued")
+    private String dateCertificateIssued;
 
     @Override
     public boolean equals(Object object) {

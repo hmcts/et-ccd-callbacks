@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DigitalCaseFileHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DigitalCaseFileService;
 
 import java.util.List;
@@ -86,10 +85,8 @@ public class DigitalCaseFileController {
     })
     public ResponseEntity<CCDCallbackResponse> asyncCompleteAboutToSubmit(
             @RequestBody CCDRequest ccdRequest, @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken) {
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        DigitalCaseFileHelper.addDcfToDocumentCollection(caseData);
-        caseData.setCaseBundles(null);
-        return getCallbackRespEntityNoErrors(caseData);
+        digitalCaseFileService.completeDcf(ccdRequest.getCaseDetails());
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 
 }

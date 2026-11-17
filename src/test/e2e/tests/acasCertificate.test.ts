@@ -1,14 +1,24 @@
-import { test  } from '../fixtures/common.fixture';
-import userDetailsData from '../resources/payload/user-details.json';
-import acasCertData from '../resources/payload/acas-content.json';
-import { createCaseViaCitizenUI, vetAndAcceptCitizenCase } from '../pages/helpers/CuiCaseCreationHelper.ts';
-import { CaseTypeLocation, Events } from '../config/case-data.ts';
-import { config, users } from '../config/config.dynamic.ts';
+import {
+  CaseTypeLocation,
+  config,
+  createCaseViaCitizenUI, Events, resolveResourceJson,
+  test,
+  users,
+  vetAndAcceptCitizenCase
+} from "@hmcts/et-shared-test-library";
 
-test.describe('Add & Search ACAS certificate tests', () => {
+let userDetailsData: any;
+let acasCertData: any;
+
+test.describe.serial('Add & Search ACAS certificate tests',
+  () => {
   test.use({
     storageState: users.etCaseWorker.sessionFile
   })
+    test.beforeAll(async () => {
+      userDetailsData = resolveResourceJson('resources/payload/user-details.json');
+      acasCertData = resolveResourceJson('resources/payload/acas-content.json');
+    });
   let caseId: string;
   let caseNumber: string;
 

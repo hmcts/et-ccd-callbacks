@@ -9,5 +9,6 @@ public enum CaseState {
     Closed,
     Rejected,
     Transferred,
-    Delete
+    Delete,
+    PendingDisposal
 }

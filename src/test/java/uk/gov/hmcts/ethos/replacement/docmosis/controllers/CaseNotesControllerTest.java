@@ -91,16 +91,6 @@ class CaseNotesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_badToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MULTIPLES_ABOUT_TO_SUBMIT_URL)
-                        .content(requestContent.toString())
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void aboutToSubmit_badRequest() throws Exception {
         mockMvc.perform(post(MULTIPLES_ABOUT_TO_SUBMIT_URL)
                         .content("garbage content")

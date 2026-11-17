@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.et.common.model.ccd.Address;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 
 import java.util.Objects;
@@ -81,6 +82,7 @@ public final class AddressUtils {
      */
     @NotNull
     public static Address mapOrganisationAddressToAddress(OrganisationAddress organisationAddress) {
+        Objects.requireNonNull(organisationAddress, "organisationAddress must not be null");
         Address address = new Address();
         address.setAddressLine1(organisationAddress.getAddressLine1());
         address.setAddressLine2(organisationAddress.getAddressLine2());
@@ -117,7 +119,7 @@ public final class AddressUtils {
      */
     @NotNull
     public static String getOrganisationAddressAsText(OrganisationAddress organisationAddress) {
-        if (ObjectUtils.isEmpty(organisationAddress)) {
+        if (organisationAddress == null) {
             return StringUtils.EMPTY;
         }
         return Stream.of(
@@ -132,5 +134,38 @@ public final class AddressUtils {
                 .filter(Objects::nonNull)
                 .filter(s -> !s.isBlank())
                 .collect(Collectors.joining(StringUtils.LF));
+    }
+
+    /**
+     * Sets the shared MyHMCTS address text used on Check your answers, and returns the mapped
+     * {@link Address} for party-specific persistence.
+     *
+     * <p>Claimant legal-rep events store the returned address on
+     * {@code representativeClaimantType.representativeAddress}. Respondent legal-rep events store it on
+     * {@code et3ResponseAddress} before copying into {@code repCollection}.
+     *
+     * @param caseData the case data whose {@code myHmctsAddressText} field will be updated
+     * @param organisationAddress the organisation address retrieved from MyHMCTS
+     * @return the mapped {@link Address}, never {@code null}
+     */
+    @NotNull
+    public static Address applyMyHmctsOrganisationAddress(CaseData caseData,
+                                                          OrganisationAddress organisationAddress) {
+        Objects.requireNonNull(caseData, "caseData must not be null");
+        Objects.requireNonNull(organisationAddress, "organisationAddress must not be null");
+        caseData.setMyHmctsAddressText(getOrganisationAddressAsText(organisationAddress));
+        return mapOrganisationAddressToAddress(organisationAddress);
+    }
+
+    /**
+     * Clears the shared MyHMCTS Check your answers field after contact details have been persisted.
+     *
+     * @param caseData the case data to update
+     */
+    public static void clearMyHmctsAddressText(CaseData caseData) {
+        if (caseData == null) {
+            return;
+        }
+        caseData.setMyHmctsAddressText(null);
     }
 }

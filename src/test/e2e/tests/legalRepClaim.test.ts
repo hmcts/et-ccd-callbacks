@@ -1,17 +1,16 @@
-import { test } from '../fixtures/common.fixture';
-import userDetailsData from '../resources/payload/user-details.json';
-import { CaseEventApi } from '../data-utils/api/CaseEventApi.ts';
-import { CaseTypeLocation, Events } from '../config/case-data.ts';
-import { users } from '../config/config.dynamic.ts';
-import { ManageCaseDashboardPage } from '../pages/ManageCaseDashboardPage.ts';
-import LoginPage from '../pages/loginPage.ts';
-import CaseDetailsPage from '../pages/caseDetailsPage.ts';
-import ClaimantDetailsPage from '../pages/claimantDetailsPage.ts';
-import RespondentDetailsPage from '../pages/respondentCitizenHub/respondentDetailsPage.ts';
-import { NocPage } from '../pages/legalRepresentative/NocPage.ts';
+import { test } from '../fixtures/et.test.fixture.ts';
+import {
+  CaseDetailsPage,
+  CaseEventApi, CaseTypeLocation,
+  ClaimantDetailsPage, Events,
+  LoginPage,
+  ManageCaseDashboardPage, NocPage, resolveResourceJson, RespondentDetailsPage,
+  users
+} from "@hmcts/et-shared-test-library";
 
 let caseNumber: string;
 let caseId: string;
+const userDetailsData = resolveResourceJson('resources/payload/user-details.json');
 
 test.describe('Legal Representative submits a case and perform various events', () => {
   test.use({

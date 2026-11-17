@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.Address;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -118,5 +119,32 @@ final class AddressUtilsTest {
                 ORGANISATION_COUNTRY);
         assertThat(AddressUtils.getOrganisationAddressAsText(organisationAddress)).isEqualTo(expectedText);
 
+    }
+
+    @Test
+    void theApplyMyHmctsOrganisationAddress() {
+        OrganisationAddress organisationAddress = OrganisationAddress.builder()
+                .addressLine1(ORGANISATION_ADDRESS_LINE_1)
+                .addressLine2(ORGANISATION_ADDRESS_LINE_2)
+                .addressLine3(ORGANISATION_ADDRESS_LINE_3)
+                .country(ORGANISATION_COUNTRY)
+                .county(ORGANISATION_COUNTY)
+                .postCode(ORGANISATION_POST_CODE)
+                .townCity(ORGANISATION_TOWN_CITY)
+                .build();
+        CaseData caseData = new CaseData();
+        Address address = AddressUtils.applyMyHmctsOrganisationAddress(caseData, organisationAddress);
+        assertThat(address.getAddressLine1()).isEqualTo(ORGANISATION_ADDRESS_LINE_1);
+        assertThat(address.getPostTown()).isEqualTo(ORGANISATION_TOWN_CITY);
+        assertThat(caseData.getMyHmctsAddressText()).isEqualTo(String.join(StringUtils.LF,
+                ORGANISATION_ADDRESS_LINE_1,
+                ORGANISATION_ADDRESS_LINE_2,
+                ORGANISATION_ADDRESS_LINE_3,
+                ORGANISATION_TOWN_CITY,
+                ORGANISATION_POST_CODE,
+                ORGANISATION_COUNTY,
+                ORGANISATION_COUNTRY));
+        AddressUtils.clearMyHmctsAddressText(caseData);
+        assertThat(caseData.getMyHmctsAddressText()).isNull();
     }
 }

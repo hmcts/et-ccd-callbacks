@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -32,10 +33,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ClaimantEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmploymentRightsActService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
@@ -43,10 +46,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.PostDefaultValuesService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -86,12 +90,24 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CaseActionsForCaseWorkerController.class, JsonMapper.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
+@Import(PostDefaultValuesService.class)
 class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     private static final String PRE_DEFAULT_VALUES_URL = "/preDefaultValues";
     private static final String POST_DEFAULT_VALUES_URL = "/postDefaultValues";
     private static final String AMEND_CASE_DETAILS_URL = "/amendCaseDetails";
     private static final String AMEND_CLAIMANT_DETAILS_URL = "/amendClaimantDetails";
+    private static final String UPDATE_CLAIMANT_EMAIL_ABOUT_TO_START_URL =
+            "/updateClaimantEmail/aboutToStart";
+    private static final String UPDATE_CLAIMANT_EMAIL_VALIDATE_URL = "/updateClaimantEmail/validate";
+    private static final String UPDATE_CLAIMANT_EMAIL_ABOUT_TO_SUBMIT_URL =
+            "/updateClaimantEmail/aboutToSubmit";
+    private static final String UPDATE_RESPONDENT_EMAIL_ABOUT_TO_START_URL =
+            "/updateRespondentEmail/aboutToStart";
+    private static final String UPDATE_RESPONDENT_EMAIL_SELECT_URL = "/updateRespondentEmail/select";
+    private static final String UPDATE_RESPONDENT_EMAIL_VALIDATE_URL = "/updateRespondentEmail/validate";
+    private static final String UPDATE_RESPONDENT_EMAIL_ABOUT_TO_SUBMIT_URL =
+            "/updateRespondentEmail/aboutToSubmit";
     private static final String AMEND_RESPONDENT_DETAILS_URL = "/amendRespondentDetails";
     private static final String AMEND_RESPONDENT_REPRESENTATIVE_URL = "/amendRespondentRepresentative";
     private static final String UPDATE_HEARING_URL = "/updateHearing";
@@ -187,7 +203,13 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private CaseManagementLocationService caseManagementLocationService;
 
     @MockitoBean
-    private UserIdamService userIdamService;
+    private ClaimantEmailService claimantEmailService;
+
+    @MockitoBean
+    private RespondentEmailService respondentEmailService;
+
+    @MockitoBean
+    private EmploymentRightsActService employmentRightsActService;
 
     private MockMvc mvc;
     private JsonNode requestContent;
@@ -293,6 +315,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
         when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(caseFlagsService.caseFlagsSetupRequired(any(CaseData.class))).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
             .thenReturn(ccdRequest.getCaseDetails().getCaseData());
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
@@ -303,6 +326,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(caseFlagsService).setupCaseFlags(any(CaseData.class));
     }
 
     @Test
@@ -366,6 +390,199 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void initialiseClaimantEmailUpdate() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(claimantEmailService.initialise(any(CaseData.class))).thenReturn(List.of());
+
+        mvc.perform(post(UPDATE_CLAIMANT_EMAIL_ABOUT_TO_START_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(claimantEmailService).initialise(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void initialiseClaimantEmailUpdateReturnsErrors() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(claimantEmailService.initialise(any(CaseData.class)))
+                .thenReturn(List.of("Initialisation failed"));
+
+        mvc.perform(post(UPDATE_CLAIMANT_EMAIL_ABOUT_TO_START_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]", is("Initialisation failed")))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void validateClaimantEmailUpdateReturnsErrors() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(claimantEmailService.validateNewEmail(any(CaseData.class), anyString()))
+                .thenReturn(List.of("Email validation failed"));
+
+        mvc.perform(post(UPDATE_CLAIMANT_EMAIL_VALIDATE_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]", is("Email validation failed")))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void validateClaimantEmailUpdateSucceeds() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(claimantEmailService.validateNewEmail(any(CaseData.class), anyString())).thenReturn(List.of());
+
+        mvc.perform(post(UPDATE_CLAIMANT_EMAIL_VALIDATE_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(claimantEmailService).validateNewEmail(any(CaseData.class), eq(AUTH_TOKEN));
+    }
+
+    @Test
+    @SneakyThrows
+    void updateClaimantEmailReturnsPreparedCaseData() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(claimantEmailService.prepareUpdate(any(CaseDetails.class), anyString())).thenReturn(List.of());
+
+        mvc.perform(post(UPDATE_CLAIMANT_EMAIL_ABOUT_TO_SUBMIT_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(claimantEmailService).prepareUpdate(any(CaseDetails.class), eq(AUTH_TOKEN));
+    }
+
+    @Test
+    @SneakyThrows
+    void updateClaimantEmailReturnsAccessErrors() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(claimantEmailService.prepareUpdate(any(CaseDetails.class), anyString()))
+                .thenReturn(List.of(ClaimantEmailService.ACCESS_GRANT_ERROR));
+
+        mvc.perform(post(UPDATE_CLAIMANT_EMAIL_ABOUT_TO_SUBMIT_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]", is(ClaimantEmailService.ACCESS_GRANT_ERROR)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void initialiseRespondentEmailUpdate() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(respondentEmailService.initialise(any(CaseData.class))).thenReturn(List.of());
+
+        mvc.perform(post(UPDATE_RESPONDENT_EMAIL_ABOUT_TO_START_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(respondentEmailService).initialise(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void selectRespondentForEmailUpdate() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(respondentEmailService.populateCurrentEmail(any(CaseData.class))).thenReturn(List.of());
+
+        mvc.perform(post(UPDATE_RESPONDENT_EMAIL_SELECT_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(respondentEmailService).populateCurrentEmail(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void validateRespondentEmailUpdateReturnsErrors() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(respondentEmailService.validateNewEmail(any(CaseData.class), anyString()))
+                .thenReturn(List.of("Email validation failed"));
+
+        mvc.perform(post(UPDATE_RESPONDENT_EMAIL_VALIDATE_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]", is("Email validation failed")))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void updateRespondentEmailReturnsPreparedCaseData() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(respondentEmailService.prepareUpdate(any(CaseDetails.class), anyString())).thenReturn(List.of());
+
+        mvc.perform(post(UPDATE_RESPONDENT_EMAIL_ABOUT_TO_SUBMIT_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(respondentEmailService).prepareUpdate(any(CaseDetails.class), eq(AUTH_TOKEN));
+    }
+
+    @Test
+    @SneakyThrows
+    void updateRespondentEmailReturnsAccessErrors() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(respondentEmailService.prepareUpdate(any(CaseDetails.class), anyString()))
+                .thenReturn(List.of(RespondentEmailService.ACCESS_GRANT_ERROR));
+
+        mvc.perform(post(UPDATE_RESPONDENT_EMAIL_ABOUT_TO_SUBMIT_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]", is(RespondentEmailService.ACCESS_GRANT_ERROR)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
@@ -1144,334 +1361,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
-    void preDefaultValuesForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(PRE_DEFAULT_VALUES_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void postDefaultValuesForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(POST_DEFAULT_VALUES_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void amendCaseDetailsForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_CASE_DETAILS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void amendClaimantDetailsForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_CLAIMANT_DETAILS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void amendRespondentDetailsForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void amendRespondentRepresentativeForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void updateHearingForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(UPDATE_HEARING_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void restrictedCasesForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(RESTRICTED_CASES_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void amendHearingForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_HEARING_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void midEventAmendHearingForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(MID_EVENT_AMEND_HEARING_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void amendCaseStateForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_CASE_STATE_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void midRespondentAddressForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void jurisdictionValidationForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(JURISDICTION_VALIDATION_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void judgementValidationForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(JUDGEMENT_VALIDATION_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void depositValidationForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DEPOSIT_VALIDATION_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void midRespondentAddressPopulatedForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void singleCaseMultipleMidEventValidationForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(SINGLE_CASE_MULTIPLE_MID_EVENT_VALIDATION_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void hearingMidEventValidationForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(HEARING_MID_EVENT_VALIDATION_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void bfActionsForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(BF_ACTIONS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void dynamicListBfActionsForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DYNAMIC_LIST_BF_ACTIONS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void aboutToStartDisposalForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(ABOUT_TO_START_DISPOSAL_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-        verify(clerkService, never()).initialiseClerkResponsible(any(CaseData.class));
-        verify(fileLocationSelectionService, never()).initialiseFileLocation(any(CaseData.class));
-    }
-
-    @Test
-    @SneakyThrows
-    void dynamicRespondentRepresentativeNamesUrlForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DYNAMIC_RESPONDENT_REPRESENTATIVE_NAMES_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void dynamicDepositOrderUrlForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DYNAMIC_DEPOSIT_ORDER_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void dynamicRestrictedReportingUrlForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DYNAMIC_RESTRICTED_REPORTING_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void dynamicJudgmentUrlForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DYNAMIC_JUDGMENT_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void judgmentSubmittedUrlForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(JUDGEMENT_SUBMITTED_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void dynamicFixCaseAPIForbidden()  {
-        CaseDetails caseDetails = new CaseDetails();
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_FIX_CASE_API_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-        verify(fixCaseApiService, never()).checkUpdateMultipleReference(caseDetails, AUTH_TOKEN);
-    }
-
-    @Test
-    @SneakyThrows
-    void reinstateClosedCaseForbidden()  {
-        CaseData caseData = new CaseData();
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
-                        .content(requestContent2.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-        verify(caseCloseValidator, never()).validateReinstateClosedCaseMidEvent(caseData);
-    }
-
-    @Test
-    @SneakyThrows
-    void initialiseAmendCaseDetailsForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(INITIALISE_AMEND_CASE_DETAILS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-
-        verify(clerkService, never()).initialiseClerkResponsible(any(CaseData.class));
-        verify(fileLocationSelectionService, never()).initialiseFileLocation(any(CaseData.class));
-    }
-
-    @Test
-    @SneakyThrows
     void addServiceIdUrl_tokenOk()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(ADD_SERVICE_ID_URL)
@@ -1484,17 +1373,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
             .andExpect(jsonPath("$.warnings", nullValue()));
         verify(caseManagementForCaseWorkerService, times(1))
                 .setHmctsServiceIdSupplementary(any(CaseDetails.class));
-    }
-
-    @Test
-    @SneakyThrows
-    void addServiceIdUrl_tokenFail()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(ADD_SERVICE_ID_URL)
-                .content(requestContent2.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
     }
 
     @Test

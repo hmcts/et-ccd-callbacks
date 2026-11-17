@@ -35,14 +35,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValueWhenCaseFlagsLinkingIsEnabled(boolean toggleStat) {
-        givenToggle("case-flags-linking-enabled", toggleStat);
-
-        assertThat(featureToggleService.isCaseFlagsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValueWhenWorkAllocationIsEnabled(boolean toggleStat) {
         givenToggle("work-allocation", toggleStat);
 
@@ -79,6 +71,14 @@ class FeatureToggleServiceTest {
         givenToggle("acasVetAndAccept", toggleStat);
 
         assertThat(featureToggleService.isAcasVetAndAcceptEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValueWhenAcasDocumentsPhase2IsEnabled(boolean toggleStat) {
+        givenToggle("acasDocumentsPhase2", toggleStat);
+
+        assertThat(featureToggleService.isAcasDocumentsPhase2Enabled()).isEqualTo(toggleStat);
     }
 
     private void givenToggle(String feature, boolean state) {

@@ -13,6 +13,7 @@ public class DefaultValues {
     private String tribunalCorrespondenceAddressLine1;
     private String tribunalCorrespondenceAddressLine2;
     private String tribunalCorrespondenceAddressLine3;
+    private String tribunalCorrespondenceAddressLine4;
     private String tribunalCorrespondenceTown;
     private String tribunalCorrespondencePostCode;
     private String tribunalCorrespondenceTelephone;

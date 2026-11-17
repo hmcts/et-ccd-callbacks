@@ -81,19 +81,6 @@ class CreateControllerTest {
     }
 
     @Test
-    void testHandleAboutToSubmitEventForbidden() throws Exception {
-        CCDRequest ccdRequest = AdminDataBuilder.builder().buildAsCCDRequest();
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/admin/create/aboutToSubmitEvent")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", token)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(createService, never()).initCreateAdmin(token);
-    }
-
-    @Test
     void testHandleAboutToSubmitEventBadRequest() throws Exception {
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 

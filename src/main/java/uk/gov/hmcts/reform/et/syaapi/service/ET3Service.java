@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.Et1CaseData;
 import uk.gov.hmcts.et.common.model.ccd.Et3Request;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -38,6 +39,7 @@ import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.beans.BeanUtils.copyProperties;
+import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ET3;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.MODIFICATION_TYPE_SUBMIT;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.ResponseUtil.findSelectedRespondentByRespondentSumTypeItem;
 
@@ -259,6 +261,23 @@ public class ET3Service {
                                                          caseDetails.getId().toString());
         }
         caseDetails.setData(EmployeeObjectMapper.mapCaseDataToLinkedHashMap(caseData));
-        return updateSubmittedCaseWithCaseDetailsForET3FormUpdates(authorisation, startEventResponse);
+        CaseDetails updatedCaseDetails = updateSubmittedCaseWithCaseDetailsForET3FormUpdates(authorisation,
+                                                                                               startEventResponse);
+        if (MODIFICATION_TYPE_SUBMIT.equals(et3Request.getRequestType())) {
+            sendUserInsightsEmail(selectedRespondent.getValue());
+        }
+        return updatedCaseDetails;
+    }
+
+    private void sendUserInsightsEmail(RespondentSumType respondent) {
+        try {
+            notificationService.sendUserInsightsEmail(
+                respondent.getResponseRespondentEmail(),
+                respondent.getRespondentName(),
+                ET3
+            );
+        } catch (Exception e) {
+            log.error("Failed to send ET3 user insights email", e);
+        }
     }
 }

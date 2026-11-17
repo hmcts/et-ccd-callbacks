@@ -17,11 +17,13 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.AmendRepresentativeContactService;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_AMEND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FIVE_HUNDRED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FIVE_ZERO_ONE;
@@ -50,8 +52,8 @@ public class AmendRepresentativeContactController {
     private final AmendRepresentativeContactService amendRepresentativeContactService;
 
     @PostMapping(value = "/aboutToStart", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Updates caseData Et3ResponseAddress and MyHmctsAddressText fields if the user selects the"
-            + "option to use MyHmcts details")
+    @Operation(summary = "Pre-fills the staged respRepPhoneNumber and "
+            + "respRepAddress fields from the current respondent representative details")
     @ApiResponses(value = {
         @ApiResponse(responseCode = HTTP_CODE_TWO_HUNDRED, description = HTTP_MESSAGE_TWO_HUNDRED,
             content = {
@@ -72,7 +74,7 @@ public class AmendRepresentativeContactController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         try {
-            amendRepresentativeContactService.setEt3ResponseContactAddress(userToken, caseData,
+            amendRepresentativeContactService.loadStagedContactDetails(userToken, caseData,
                     ccdRequest.getCaseDetails().getCaseId());
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
@@ -81,8 +83,8 @@ public class AmendRepresentativeContactController {
     }
 
     @PostMapping(value = "/midEvent", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Updates caseData Et3ResponseAddress and MyHmctsAddressText fields if the user selects the"
-            + "option to use MyHmcts details")
+    @Operation(summary = "Updates caseData respRepAddress and MyHmctsAddressText fields if the user "
+            + "selects the option to use MyHmcts details")
     @ApiResponses(value = {
         @ApiResponse(responseCode = HTTP_CODE_TWO_HUNDRED, description = HTTP_MESSAGE_TWO_HUNDRED,
             content = {
@@ -105,7 +107,7 @@ public class AmendRepresentativeContactController {
         try {
             if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS.equals(
                     caseData.getRepresentativeContactChangeOption())) {
-                amendRepresentativeContactService.setRepresentativeMyHmctsContactAddress(userToken, caseData);
+                amendRepresentativeContactService.setStagedMyHmctsContactAddress(userToken, caseData);
             }
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
@@ -113,9 +115,32 @@ public class AmendRepresentativeContactController {
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
+    @PostMapping(value = "/midValidatePhoneNumber", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Validates the staged respRepPhoneNumber when the user chooses to amend contact details")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = HTTP_CODE_TWO_HUNDRED, description = HTTP_MESSAGE_TWO_HUNDRED,
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_HUNDRED, description = HTTP_MESSAGE_FOUR_HUNDRED),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_ONE, description = HTTP_MESSAGE_FOUR_ZERO_ONE),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_THREE, description = HTTP_MESSAGE_FOUR_ZERO_THREE),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_FOUR, description = HTTP_MESSAGE_FOUR_ZERO_FOUR),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_HUNDRED, description = HTTP_MESSAGE_FIVE_HUNDRED),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_ONE, description = HTTP_MESSAGE_FIVE_ZERO_ONE),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_THREE, description = HTTP_MESSAGE_FIVE_ZERO_THREE)
+    })
+    public ResponseEntity<CCDCallbackResponse> midValidatePhoneNumber(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(HTTP_HEADER_AUTHORIZATION) String userToken) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        return getCallbackRespEntityErrors(validateStagedPhoneNumber(caseData), caseData);
+    }
+
     @PostMapping(value = "/aboutToSubmit", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
     @Operation(summary = "Updates RepresentedTypeR model of the respondent representative with new address and phone"
-            + "values")
+            + "values, then clears the staged fields")
     @ApiResponses(value = {
         @ApiResponse(responseCode = HTTP_CODE_TWO_HUNDRED, description = HTTP_MESSAGE_TWO_HUNDRED,
             content = {
@@ -134,15 +159,23 @@ public class AmendRepresentativeContactController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(HTTP_HEADER_AUTHORIZATION) String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = new ArrayList<>();
+        List<String> errors = validateStagedPhoneNumber(caseData);
+        if (!errors.isEmpty()) {
+            return getCallbackRespEntityErrors(errors, caseData);
+        }
         try {
-            amendRepresentativeContactService.updateRepresentativeContactDetails(
+            amendRepresentativeContactService.saveStagedContactDetails(
                     userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
-            caseData.setMyHmctsAddressText(null);
-            caseData.setEt3ResponseAddress(null);
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
         }
         return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    private static List<String> validateStagedPhoneNumber(CaseData caseData) {
+        if (!REPRESENTATIVE_CONTACT_CHANGE_OPTION_AMEND.equals(caseData.getRepresentativeContactChangeOption())) {
+            return new ArrayList<>();
+        }
+        return PhoneNumberValidator.validatePhoneNumber(caseData.getRespRepPhoneNumber());
     }
 }

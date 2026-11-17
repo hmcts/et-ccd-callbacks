@@ -53,8 +53,9 @@ public final class FlagsImageHelper {
     private static final String SPEAK_TO_VP = "SPEAK TO VP";
     private static final String SPEAK_TO_REJ = "SPEAK TO REJ";
     private static final String RESERVED_TO_JUDGE = "RESERVED TO JUDGE";
+    private static final String ERA = "ERA";
 
-    private static final List<String> FLAGS = List.of(FLAG_MIGRATED_FROM_ECM, FLAG_WITH_OUTSTATION,
+    private static final List<String> FLAGS = List.of(ERA, FLAG_MIGRATED_FROM_ECM, FLAG_WITH_OUTSTATION,
             FLAG_DO_NOT_POSTPONE, FLAG_LIVE_APPEAL, FLAG_RULE_493B, FLAG_REPORTING, FLAG_SENSITIVE, FLAG_RESERVED,
             FLAG_ECC, FLAG_DIGITAL_FILE, FLAG_REASONABLE_ADJUSTMENT, FLAG_WELSH_LANGUAGE, SPEAK_TO_VP, SPEAK_TO_REJ,
             RESERVED_TO_JUDGE);
@@ -142,6 +143,11 @@ public final class FlagsImageHelper {
             case RESERVED_TO_JUDGE -> {
                 flagRequired = reservedToJudge(caseData);
                 flagColor = "#85994b";
+            }
+            case ERA -> {
+                flagRequired = YES.equals(defaultIfEmpty(caseData.getAdditionalCaseInfoType() != null
+                        ? caseData.getAdditionalCaseInfoType().getEra() : "", ""));
+                flagColor = "#54319F";
             }
             default -> {
                 flagRequired = false;

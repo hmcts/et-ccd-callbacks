@@ -21,20 +21,18 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelpe
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmploymentRightsActService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
-
 
 /**
  * REST controller for the ET3 Initial Consideration pages. Provides custom formatting for content
@@ -45,14 +43,13 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.set
 @RestController
 public class InitialConsiderationController {
 
-    private final VerifyTokenService verifyTokenService;
     private final InitialConsiderationService initialConsiderationService;
     private final DocumentManagementService documentManagementService;
     private final ReportDataService reportDataService;
     private final CaseFlagsService caseFlagsService;
     private final FeatureToggleService featureToggleService;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
-    private static final String INVALID_TOKEN = "Invalid Token {}";
+    private final EmploymentRightsActService employmentRightsActService;
     private static final String COMPLETE_IC_HDR = "<h1>Initial consideration complete</h1>";
 
     @PostMapping(value = "/completeInitialConsideration", consumes = APPLICATION_JSON_VALUE)
@@ -61,16 +58,9 @@ public class InitialConsiderationController {
         @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public ResponseEntity<CCDCallbackResponse> completeInitialConsideration(@RequestBody CCDRequest ccdRequest,
-                                                                            @RequestHeader("Authorization")
-                                                                                String userToken) {
+    public ResponseEntity<CCDCallbackResponse> completeInitialConsideration(@RequestBody CCDRequest ccdRequest) {
         log.info("Initial consideration complete requested for case reference ---> {}",
             ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .confirmation_header(COMPLETE_IC_HDR)
@@ -94,13 +84,10 @@ public class InitialConsiderationController {
                                                                                   String userToken) {
         log.info("INITIAL CONSIDERATION ABOUT TO SUBMIT ---> {}", ccdRequest.getCaseDetails().getCaseId());
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         initialConsiderationService.processIcDocumentCollections(caseData);
+        employmentRightsActService.setUnfairDismissalEraByReceiptDate(caseData);
+        employmentRightsActService.processUnfairDismissalEra(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
 
         caseData.setIcCompletedBy(reportDataService.getUserFullName(userToken));
         caseData.setIcDateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT)));
@@ -125,15 +112,8 @@ public class InitialConsiderationController {
         @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public ResponseEntity<CCDCallbackResponse> startInitialConsideration(@RequestBody CCDRequest ccdRequest,
-                                                                         @RequestHeader("Authorization")
-                                                                             String userToken) {
+    public ResponseEntity<CCDCallbackResponse> startInitialConsideration(@RequestBody CCDRequest ccdRequest) {
         log.info("START OF INITIAL CONSIDERATION FOR CASE ---> {}", ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         initialConsiderationService.clearOldValues(caseData);
@@ -170,6 +150,7 @@ public class InitialConsiderationController {
         initialConsiderationService.setEt1VettingAndEt3ProcessingDetails(caseData, caseTypeId);
 
         initialConsiderationService.setHearingRegionAndVenue(caseData);
+        employmentRightsActService.setUnfairDismissalEraByReceiptDate(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

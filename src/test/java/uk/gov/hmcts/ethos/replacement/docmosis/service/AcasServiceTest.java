@@ -72,8 +72,9 @@ class AcasServiceTest {
 
         caseData = CaseDataBuilder.builder()
                 .withManagingOffice(TribunalOffice.LEEDS.getOfficeName())
-                .withRespondent("Respondent Name", NO, "R111111/11/11", false)
+                .withRespondent("Respondent Name", NO, "2022-03-01", false)
                 .build();
+        caseData.getRespondentCollection().getFirst().getValue().setRespondentAcas("R111111/11/11");
         caseData.setAcasCertificate("R111111/11/11");
 
         documentInfo = DocumentInfo.builder()
@@ -149,6 +150,8 @@ class AcasServiceTest {
         AcasCertificate acasCertificate = new AcasCertificate();
         acasCertificate.setCertificateNumber("R111111/11/11");
         acasCertificate.setCertificateDocument("dGVzdCBwZGYgZGF0YQ=="); // Base64 encoded "test pdf data"
+        acasCertificate.setDateOfNotification("2026-08-01");
+        acasCertificate.setDateCertificateIssued("2026-08-04");
         
         List<AcasCertificate> certificates = List.of(acasCertificate);
         
@@ -161,6 +164,10 @@ class AcasServiceTest {
                 ENGLANDWALES_CASE_TYPE_ID);
         assertEquals(1, actual.size());
         assertEquals(documentInfo.getDescription(), actual.getFirst().getDescription());
+        assertEquals("2026-08-01", caseData.getRespondentCollection().getFirst().getValue()
+                .getAcasCertificateReceiptDate());
+        assertEquals("2026-08-04", caseData.getRespondentCollection().getFirst().getValue()
+                .getAcasCertificateIssueDate());
     }
 
     @Test

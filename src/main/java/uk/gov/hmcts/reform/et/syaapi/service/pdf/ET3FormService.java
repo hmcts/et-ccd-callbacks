@@ -15,6 +15,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.reform.et.syaapi.service.CaseDocumentException;
 import uk.gov.hmcts.reform.et.syaapi.service.CaseDocumentService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -44,11 +45,16 @@ public class ET3FormService {
     private final PdfService pdfService;
     private final CaseDocumentService caseDocumentService;
     private final IdamClient idamClient;
+    private final FeatureToggleService featureToggleService;
 
     @Value("${pdf.et3English}")
     public String et3EnglishPdfTemplateSource;
     @Value("${pdf.et3Welsh}")
     public String et3WelshPdfTemplateSource;
+    @Value("${pdf.era.et3English}")
+    public String et3EnglishPdfTemplateEra;
+    @Value("${pdf.era.et3Welsh}")
+    public String et3WelshPdfTemplateEra;
 
     public static String createET3PdfDocumentNameFromCaseData(String documentLanguage,
                                                               UserInfo userInfo,
@@ -119,9 +125,13 @@ public class ET3FormService {
             caseData.setSubmitEt3Respondent(DynamicFixedListType.from("SubmitRespondent",
                                                                       selectedRespondent.getId(),
                                                                       true));
+            String englishPdfTemplateSource = featureToggleService.isEraOctober2026Enabled()
+                ? et3EnglishPdfTemplateEra
+                : et3EnglishPdfTemplateSource;
+
             byte[] englishPdfFileByteArray = pdfService.convertCaseToPdf(
                 caseData,
-                et3EnglishPdfTemplateSource,
+                englishPdfTemplateSource,
                 PDF_TYPE_ET3,
                 ET3_FORM_CLIENT_TYPE_RESPONDENT,
                 SUBMIT_ET3_CITIZEN
@@ -147,9 +157,12 @@ public class ET3FormService {
             selectedRespondent.getValue().setEt3Form(englishDocument.getValue().getUploadedDocument());
             if (ET3_RESPONSE_LANGUAGE_PREFERENCE_WELSH.equals(
                 selectedRespondent.getValue().getEt3ResponseLanguagePreference())) {
+                String welshPdfTemplateSource = featureToggleService.isEraOctober2026Enabled()
+                    ? et3WelshPdfTemplateEra
+                    : et3WelshPdfTemplateSource;
                 byte[] welshPdfFileByteArray = pdfService.convertCaseToPdf(
                     caseData,
-                    et3WelshPdfTemplateSource,
+                    welshPdfTemplateSource,
                     PDF_TYPE_ET3,
                     ET3_FORM_CLIENT_TYPE_RESPONDENT,
                     SUBMIT_ET3_CITIZEN

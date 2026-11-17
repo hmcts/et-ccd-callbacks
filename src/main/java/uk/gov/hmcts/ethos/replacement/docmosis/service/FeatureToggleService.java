@@ -22,10 +22,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("global_search_enabled");
     }
 
-    public boolean isCaseFlagsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("case-flags-linking-enabled");
-    }
-
     public boolean isHmcEnabled() {
         return this.featureToggleApi.isFeatureEnabled("hmc");
     }
@@ -76,5 +72,13 @@ public class FeatureToggleService {
 
     public boolean isPartySpacingCronEnabled() {
         return this.featureToggleApi.isFeatureEnabled("party-spacing-cron");
+    }
+
+    public boolean isEraOctober2026Enabled() {
+        return this.featureToggleApi.isFeatureEnabled("eraOctober2026");
+    }
+
+    public boolean isEraJanuary2027Enabled() {
+        return this.featureToggleApi.isFeatureEnabled("eraJanuary2027");
     }
 }

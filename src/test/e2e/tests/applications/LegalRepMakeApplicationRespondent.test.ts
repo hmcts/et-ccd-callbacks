@@ -1,16 +1,13 @@
-import { test } from '../../fixtures/common.fixture.ts';
-import { CitizenClaimantFactory } from '../../data-utils/factory/citizen/ClaimantCitizenFactory.ts';
-import { CaseDetailsValues, CaseTypeLocation, Events } from '../../config/case-data.ts';
-import { CaseEventApi } from '../../data-utils/api/CaseEventApi.ts';
-import DateUtilComponent from '../../data-utils/DateUtilComponent.ts';
-import { users } from '../../config/config.dynamic.ts';
-import CitizenHubLoginPage from '../../pages/claimantCitizenHub/CitizenHubLoginPage.ts';
-import CitizenHubPage from '../../pages/claimantCitizenHub/CitizenHubPage.ts';
-import { ManageCaseDashboardPage } from '../../pages/ManageCaseDashboardPage.ts';
-import LoginPage from '../../pages/loginPage.ts';
-import CaseDetailsPage from '../../pages/caseDetailsPage.ts';
-import { ApplicationTabPage } from '../../pages/applicationTabPage.ts';
-import { CheckYourAnswersPage } from '../../pages/helpers/CheckYourAnswersPage.ts';
+import { test } from '../../fixtures/et.test.fixture.ts';
+import {
+  ApplicationTabPage,
+  CaseDetailsPage, CaseDetailsValues, CaseEventApi, CaseTypeLocation, CheckYourAnswersPage, CitizenClaimantFactory,
+  CitizenHubLoginPage,
+  CitizenHubPage, DateUtilComponent, ET3LoginPage, Et3ResponsesDashboardPage, Events,
+  LoginPage,
+  ManageCaseDashboardPage, RespondentCaseOverviewPage,
+  users
+} from "@hmcts/et-shared-test-library";
 
 let caseId: string;
 let caseNumber: string;
@@ -147,9 +144,21 @@ test.describe('LR Make an application and view Recorded Decision for respondent'
              caseDetailsPage,
              checkYourAnswersPage,
              et3DetailsPage, et3RespondentDetailsPage,
-             et3EmploymentDetailsPage, et3ResponseDetailsPage}) => {
+             et3EmploymentDetailsPage, et3ResponseDetailsPage, browserUtils
+    }) => {
 
-    //perform all ET3 events as a LR
+    const respondentBrowser = await browserUtils.openNewBrowserContext(users.etRespondent.sessionFile);
+    const et3LoginPage = new ET3LoginPage(respondentBrowser);
+    const et3ResponseDashboardPage = new Et3ResponsesDashboardPage(respondentBrowser);
+    const respondentCaseOverviewPage = new RespondentCaseOverviewPage(respondentBrowser);
+
+    await et3LoginPage.processRespondentLogin(users.etRespondent2);
+    await et3LoginPage.replyToClaimAsNewRespondent(caseId, caseNumber, CaseDetailsValues.respondentName, CaseDetailsValues.claimantFirstName, CaseDetailsValues.claimantLastName);
+    await et3ResponseDashboardPage.assertCaseListedInAwaitingResponse(caseNumber, caseId);
+    await et3LoginPage.navigateToCase(caseNumber, caseId);
+    await respondentCaseOverviewPage.assertYourResponseStatusEt3('Not started yet');
+
+      //perform all ET3 events as a LR
     await caseDetailsPage.selectNextEvent(Events.et3RespondentDetails);
     await et3RespondentDetailsPage.enterEt3RespondentDetails(checkYourAnswersPage);
 
@@ -164,6 +173,12 @@ test.describe('LR Make an application and view Recorded Decision for respondent'
 
     await caseDetailsPage.selectNextEvent(Events.submitEt3Form);
     await et3DetailsPage.submitEt3Form(checkYourAnswersPage);
+
+    await et3LoginPage.processRespondentLogin(users.etRespondent2);
+    await et3ResponseDashboardPage.assertCaseListedInResponseSubmittedTable(caseNumber, caseId);
+    await et3LoginPage.navigateToCase(caseNumber, caseId);
+    await respondentCaseOverviewPage.assertYourResponseStatusEt3('Submitted');
+
   });
 });
 

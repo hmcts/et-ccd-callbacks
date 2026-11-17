@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.et.syaapi.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -60,6 +61,7 @@ import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.APP_
 import static uk.gov.hmcts.reform.et.syaapi.constants.DocumentCategoryConstants.CASE_MANAGEMENT_DOC_CATEGORY;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.DEFAULT_TRIBUNAL_OFFICE;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ENGLAND_CASE_TYPE;
+import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ET1;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.JURISDICTION_ID;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SCOTLAND_CASE_TYPE;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.UNASSIGNED_OFFICE;
@@ -204,9 +206,19 @@ public class CaseService {
         CaseData caseData = caseOfficeService.convertCaseRequestToCaseDataWithTribunalOffice(caseRequest);
         // Getting user info from IDAM
         UserInfo userInfo = idamClient.getUserInfo(authorization);
+        StartEventResponse startEventResponse;
+        try {
+            startEventResponse = startUpdate(authorization, caseRequest.getCaseId(),
+                                             caseRequest.getCaseTypeId(), SUBMIT_CASE_DRAFT
+            );
+        } catch (FeignException.UnprocessableEntity e) {
+            // A repeat submission that arrives after the first one has completed can no longer start
+            // SUBMIT_CASE_DRAFT. The first request has already done the post-submission work, so return the case.
+            return getAlreadySubmittedCase(authorization, caseRequest, e);
+        }
         // Submitting the case to CCD, receiving caseDetails and setting ethosCaseReference,
         // receiptDate, feeGroupReference with the received details.
-        CaseDetails caseDetails = triggerEventForSubmitCase(authorization, caseRequest);
+        CaseDetails caseDetails = triggerEventForSubmitCase(authorization, caseRequest, startEventResponse);
 
         if (!featureToggleService.citizenEt1Generation()) {
             log.info("Citizen ET1 generation feature is disabled");
@@ -240,7 +252,25 @@ public class CaseService {
                          caseDetails.getData()
             );
         }
+        sendUserInsightEmail(caseDetails);
+
         return caseDetails;
+    }
+
+    private void sendUserInsightEmail(CaseDetails caseDetails) {
+        try {
+            CaseData submittedCaseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(
+                caseDetails.getData()
+            );
+            notificationService.sendUserInsightsEmail(
+                submittedCaseData.getClaimantType().getClaimantEmailAddress(),
+                submittedCaseData.getClaimant(),
+                ET1
+            );
+        } catch (Exception e) {
+            log.error("Failed to send ET1 user insights email", e);
+        }
+
     }
 
     private List<DocumentTypeItem> uploadAllDocuments(String authorization,
@@ -313,6 +343,11 @@ public class CaseService {
         StartEventResponse startEventResponse = startUpdate(authorization, caseRequest.getCaseId(),
                                                             caseRequest.getCaseTypeId(), SUBMIT_CASE_DRAFT
         );
+        return triggerEventForSubmitCase(authorization, caseRequest, startEventResponse);
+    }
+
+    private CaseDetails triggerEventForSubmitCase(String authorization, CaseRequest caseRequest,
+                                                  StartEventResponse startEventResponse) {
         CaseData caseData1 = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(
             startEventResponse.getCaseDetails().getData());
         enrichCaseDataWithJurisdictionCodes(caseData1);
@@ -344,6 +379,27 @@ public class CaseService {
                 throw e;
             }
         }
+    }
+
+    // Rethrows the original start failure, with any lookup failure suppressed on it, so callers get the same
+    // response as before this check was added.
+    @SuppressWarnings("PMD.PreserveStackTrace")
+    private CaseDetails getAlreadySubmittedCase(String authorization, CaseRequest caseRequest,
+                                                FeignException startFailure) {
+        CaseDetails ccdCaseDetails;
+        try {
+            ccdCaseDetails = ccdApiClient.getCase(authorization, authTokenGenerator.generate(),
+                                                  caseRequest.getCaseId());
+        } catch (RuntimeException lookupFailure) {
+            startFailure.addSuppressed(lookupFailure);
+            throw startFailure;
+        }
+        if (!SUBMITTED_STATE.equals(ccdCaseDetails.getState())) {
+            throw startFailure;
+        }
+        log.info("Case {} has already been submitted, returning it for a repeat submission",
+                 caseRequest.getCaseId());
+        return ccdCaseDetails;
     }
 
     /**

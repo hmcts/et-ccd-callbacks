@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.HandlerMapping;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.UnAuthorisedServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.reform.authorisation.validators.AuthTokenValidator;
@@ -57,13 +58,19 @@ public class RequestInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        if (request.getRequestURI().startsWith(CCD_PERSISTENCE_ENDPOINT_PREFIX)
+        if (isCcdPersistenceEndpoint(request)
             && !CCD_DATA_SERVICE.equals(getServiceName(serviceAuthToken))) {
             log.error(CCD_PERSISTENCE_UNAUTHORISED);
             throw new UnAuthorisedServiceException(CCD_PERSISTENCE_UNAUTHORISED);
         }
 
         return true;
+    }
+
+    private boolean isCcdPersistenceEndpoint(HttpServletRequest request) {
+        Object matchingPattern = request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        return matchingPattern != null
+            && matchingPattern.toString().startsWith(CCD_PERSISTENCE_ENDPOINT_PREFIX);
     }
 
     private String getServiceName(String serviceAuthToken) {

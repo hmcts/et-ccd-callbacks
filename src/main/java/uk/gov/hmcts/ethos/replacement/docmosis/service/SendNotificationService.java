@@ -18,10 +18,10 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
@@ -55,6 +55,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
@@ -295,10 +296,7 @@ public class SendNotificationService {
 
         // Send notification to the respondent(s)
         if (!CLAIMANT_ONLY.equals(caseData.getSendNotificationNotify())) {
-            Map<String, String> personalisation = buildPersonalisation(caseDetails,
-                    emailService.getExuiCaseLink(caseId));
-            List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
-            sendRespondentEmailHearingOther(caseData, personalisation, respondents, caseUserAssignments);
+            sendRespondentEmailHearingOther(caseDetails, caseUserAssignments);
         }
     }
 
@@ -351,22 +349,79 @@ public class SendNotificationService {
 
     }
 
-    private void sendRespondentEmailHearingOther(CaseData caseData, Map<String, String> emailData,
-                                                 List<RespondentSumTypeItem> respondents,
+    private void sendRespondentEmailHearingOther(CaseDetails caseDetails,
                                                  List<CaseUserAssignment> assignments) {
+        CaseData caseData = caseDetails.getCaseData();
+        Map<String, String> exuiEmailData = buildPersonalisation(caseDetails,
+                emailService.getExuiCaseLink(caseDetails.getCaseId()));
+        Set<String> sentEmails = new HashSet<>();
 
-        Set<String> emails = new HashSet<>();
-        respondents.stream()
-                .map(respondent ->
-                        NotificationHelper.getEmailAddressForRespondent(caseData, respondent.getValue()))
-                .filter(email -> email != null && !email.isEmpty())
-                .forEach(emails::add);
+        if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
+            caseData.getRespondentCollection().stream()
+                    .map(respondent ->
+                            NotificationHelper.getEmailAddressForRespondent(caseData, respondent.getValue()))
+                    .filter(StringUtils::isNotBlank)
+                    .forEach(email -> sendRespondentNotificationEmail(exuiEmailData, email, sentEmails));
+        }
+
+        sendUnrepresentedRespondentNotificationEmails(caseDetails, sentEmails);
 
         emailNotificationService.getRespondentSolicitorEmails(assignments).stream()
-                .filter(email -> email != null && !email.isEmpty())
-                .forEach(emails::add);
-        emails.forEach(email ->
-                emailService.sendEmail(respondentSendNotificationTemplateId, email, emailData));
+                .filter(StringUtils::isNotBlank)
+                .forEach(email -> sendRespondentNotificationEmail(exuiEmailData, email, sentEmails));
+    }
+
+    /**
+     * Emails a self-representing respondent who has linked their portal account.
+     * Linking stores their IdAM id and, when they had no response email, their sign-in address on
+     * responseRespondentEmail. A represented respondent is not emailed here.
+     */
+    private void sendUnrepresentedRespondentNotificationEmails(CaseDetails caseDetails,
+                                                               Set<String> sentEmails) {
+        CaseData caseData = caseDetails.getCaseData();
+        if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+            return;
+        }
+
+        String caseId = caseDetails.getCaseId();
+        caseData.getRespondentCollection().forEach(respondentItem -> {
+            if (respondentItem.getValue() == null || StringUtils.isBlank(respondentItem.getValue().getIdamId())) {
+                return;
+            }
+            if (NotificationHelper.getRespondentRepresentative(caseData, respondentItem.getValue()) != null) {
+                return;
+            }
+            String respondentEmail = emailForUnrepresentedRespondent(respondentItem.getValue());
+            if (StringUtils.isBlank(respondentEmail)) {
+                log.info("No email address for unrepresented respondent {} on case {}",
+                        respondentItem.getId(), caseId);
+                return;
+            }
+            Map<String, String> personalisation = buildPersonalisation(caseDetails,
+                    emailService.getRespondentCitizenCaseLink(
+                            caseId, respondentItem.getId(), isWelshRespondent(respondentItem.getValue())));
+            sendRespondentNotificationEmail(personalisation, respondentEmail, sentEmails);
+        });
+    }
+
+    private String emailForUnrepresentedRespondent(RespondentSumType respondent) {
+        if (StringUtils.isNotBlank(respondent.getResponseRespondentEmail())) {
+            return respondent.getResponseRespondentEmail();
+        }
+        return respondent.getRespondentEmail();
+    }
+
+    private boolean isWelshRespondent(RespondentSumType respondent) {
+        return featureToggleService.isWelshEnabled()
+                && WELSH_LANGUAGE.equals(respondent.getEt3ResponseLanguagePreference());
+    }
+
+    private void sendRespondentNotificationEmail(Map<String, String> emailData, String email,
+                                                 Set<String> sentEmails) {
+        if (!sentEmails.add(email)) {
+            return;
+        }
+        emailService.sendEmail(respondentSendNotificationTemplateId, email, emailData);
     }
 
     private Map<String, String> buildPersonalisation(CaseDetails caseDetails, String envUrl) {

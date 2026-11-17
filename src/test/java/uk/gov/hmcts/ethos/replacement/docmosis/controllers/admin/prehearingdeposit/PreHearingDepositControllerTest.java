@@ -111,18 +111,6 @@ class PreHearingDepositControllerTest {
     }
 
     @Test
-    void testImportPHRDepositsForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-        mockMvc.perform(post("/admin/preHearingDeposit/importPHRDeposits")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", token)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(preHearingDepositService, never()).importPreHearingDepositData(
-                ccdRequest.getCaseDetails().getAdminData().getPreHearingDepositImportFile(), token);
-    }
-
-    @Test
     void testImportPHRDepositsBadRequest() throws Exception {
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
         mockMvc.perform(post("/admin/preHearingDeposit/importPHRDeposits")
@@ -153,18 +141,6 @@ class PreHearingDepositControllerTest {
         assertEquals(TEST_PRE_HEARING_DEPOSIT_CLAIMANT_OR_RESPONDENT_NAME,
                 preHearingDepositData.getClaimantOrRespondentName());
 
-    }
-
-    @Test
-    void testCreatePHRDepositForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-        mockMvc.perform(post("/admin/preHearingDeposit/createPHRDeposit")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", token)
-                        .content(jsonMapper.toJson(preHearingDepositRequest)))
-                .andExpect(status().isForbidden());
-        verify(preHearingDepositService, never()).importPreHearingDepositData(
-                ccdRequest.getCaseDetails().getAdminData().getPreHearingDepositImportFile(), token);
     }
 
     @Test

@@ -91,6 +91,42 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "UPDATE_CASE_DRAFT",
+    "UserRole": "[CLAIMANTNONLEGALREPRESENTATIVE]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "SUBMIT_CASE_DRAFT",
+    "UserRole": "[CLAIMANTNONLEGALREPRESENTATIVE]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "DELETE_DRAFT_CASE",
+    "UserRole": "[CLAIMANTNONLEGALREPRESENTATIVE]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "REMOVE_OWN_REP_AS_CLAIMANT",
+    "UserRole": "[CLAIMANTNONLEGALREPRESENTATIVE]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "SUBMIT_CLAIMANT_TSE",
+    "UserRole": "[CLAIMANTNONLEGALREPRESENTATIVE]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "CLAIMANT_TSE_RESPOND",
+    "UserRole": "[CLAIMANTNONLEGALREPRESENTATIVE]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "UPDATE_CASE_SUBMITTED",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
@@ -2377,6 +2413,13 @@
           "caseworker-employment-api"
         ],
         "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment",
+          "caseworker-employment-englandwales"
+        ],
+        "CRUD": "R"
       }
     ]
   },
@@ -2396,6 +2439,42 @@
     "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "DELETE_DRAFT_CASE",
     "UserRole": "[CREATOR]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "updateClaimantEmail",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "updateClaimantEmail",
+    "UserRole": "caseworker-employment-englandwales",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "updateClaimantEmail",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "updateRespondentEmail",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "updateRespondentEmail",
+    "UserRole": "caseworker-employment-englandwales",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "updateRespondentEmail",
+    "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
   }
 ]

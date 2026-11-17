@@ -183,37 +183,6 @@ class ReplyToReferralControllerTest {
     }
 
     @Test
-    void aboutToStartReferralReply_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(START_REPLY_REFERRAL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void initHearingAndReferralDetails_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void aboutToSubmitReferralReply_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        when(userIdamService.getUserDetails(any())).thenReturn(new UserDetails());
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void completeReplyToReferral_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
@@ -222,16 +191,6 @@ class ReplyToReferralControllerTest {
                 .content(jsonMapper.toJson(ccdRequest)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.confirmation_body", notNullValue()));
-    }
-
-    @Test
-    void completeReplyToReferral_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
     }
 
     @Test
@@ -256,16 +215,6 @@ class ReplyToReferralControllerTest {
                         .content(jsonMapper.toJson(noReplyToEmailAddressCDRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)));
-    }
-
-    @Test
-    void validateReplyToEmail_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(VALIDATE_EMAIL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
     }
 
     private ReferralTypeItem createReferralTypeItem() {

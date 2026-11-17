@@ -69,6 +69,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -193,6 +194,45 @@ class NotificationServiceTest {
         SendEmailResponse sendEmailResponse = mockSendEmailResponse();
         assertThat(sendEmailResponse.getTemplateId()).isEqualTo(
             UUID.fromString(TestConstants.UUID_DUMMY_STRING));
+    }
+
+    @Test
+    void shouldSendClaimantUserInsightsEmail() throws NotificationClientException {
+        when(notificationsProperties.getClaimantUserInsightTemplateId()).thenReturn("claimant-user-insights");
+
+        notificationService.sendUserInsightsEmail("claimant@example.com", "Claimant Name", "ET1");
+
+        verify(notificationClient).sendEmail(
+            eq("claimant-user-insights"),
+            eq("claimant@example.com"),
+            claimantParametersCaptor.capture(),
+            anyString()
+        );
+        assertThat(claimantParametersCaptor.getValue()).containsEntry("name", "Claimant Name");
+    }
+
+    @Test
+    void shouldSendRespondentUserInsightsEmail() throws NotificationClientException {
+        when(notificationsProperties.getRespondentUserInsightTemplateId()).thenReturn("respondent-user-insights");
+
+        notificationService.sendUserInsightsEmail("respondent@example.com", "Respondent Name", "ET3");
+
+        verify(notificationClient).sendEmail(
+            eq("respondent-user-insights"),
+            eq("respondent@example.com"),
+            respondentParametersCaptor.capture(),
+            anyString()
+        );
+        assertThat(respondentParametersCaptor.getValue()).containsEntry("name", "Respondent Name");
+    }
+
+    @Test
+    void shouldIgnoreUserInsightsEmailFailure() throws NotificationClientException {
+        when(notificationsProperties.getClaimantUserInsightTemplateId()).thenReturn("claimant-user-insights");
+        doThrow(new RuntimeException("Gov Notify unavailable")).when(notificationClient)
+            .sendEmail(anyString(), anyString(), any(), anyString());
+
+        notificationService.sendUserInsightsEmail("claimant@example.com", "Claimant Name", "ET1");
     }
 
     @SneakyThrows
@@ -1173,6 +1213,41 @@ class NotificationServiceTest {
         verify(notificationClient, times(6)).sendEmail(
             eq("bundlesClaimantSubmittedNotificationTemplateId"),
             any(),
+            any(),
+            eq(caseTestData.getExpectedDetails().getId().toString())
+        );
+    }
+
+    @Test
+    void shouldSendRespondentBundlesEmailToClaimantAndTribunal() throws NotificationClientException {
+        given(notificationsProperties.getBundlesRespondentSubmittedForClaimantTemplateId()
+        ).willReturn("bundlesRespondentSubmittedForClaimantTemplateId");
+        given(notificationsProperties.getBundlesRespondentSubmittedForTribunalTemplateId()
+        ).willReturn("bundlesRespondentSubmittedForTribunalTemplateId");
+        given(notificationsProperties.getCitizenPortalLink()).willReturn("http://citizen/");
+        given(notificationsProperties.getExuiCaseDetailsLink()).willReturn("http://exui/");
+
+        caseData = caseTestData.getCaseData();
+        caseData.setEt1OnlineSubmission(YES);
+        String futureDate = LocalDateTime.now().plusDays(5).toString();
+        caseData.getHearingCollection().getFirst().getValue()
+            .getHearingDateCollection().getFirst().getValue().setListedDate(futureDate);
+
+        notificationService.sendRespondentBundlesEmails(
+            caseData,
+            caseTestData.getExpectedDetails().getId().toString(),
+            "123345"
+        );
+
+        verify(notificationClient, times(1)).sendEmail(
+            eq("bundlesRespondentSubmittedForClaimantTemplateId"),
+            eq(caseData.getClaimantType().getClaimantEmailAddress()),
+            any(),
+            eq(caseTestData.getExpectedDetails().getId().toString())
+        );
+        verify(notificationClient, times(1)).sendEmail(
+            eq("bundlesRespondentSubmittedForTribunalTemplateId"),
+            eq(caseData.getTribunalCorrespondenceEmail()),
             any(),
             eq(caseTestData.getExpectedDetails().getId().toString())
         );

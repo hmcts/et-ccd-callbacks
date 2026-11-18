@@ -37,18 +37,6 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseEventID": "reviewLOSupportRequest",
-    "UserRole": "caseworker-employment-api",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseEventID": "reviewLOSupportRequest",
-    "UserRole": "caseworker-employment-englandwales",
-    "CRUD": "CRU"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "closeAdminReviewSupportTask",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRU"

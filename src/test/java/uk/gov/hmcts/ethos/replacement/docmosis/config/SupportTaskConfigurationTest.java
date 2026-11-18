@@ -32,8 +32,8 @@ class SupportTaskConfigurationTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"RA0029", "RA0031", "RA0032", "RA0037", "RA0038"})
-    void formerlyJudgeReviewedFlagsUseAdminReview(String code) {
+    @ValueSource(strings = {"RA0029", "RA0031", "RA0032", "RA0034", "RA0035", "RA0036", "RA0037", "RA0038"})
+    void formerlyJudgeOrLegalOfficerReviewedFlagsUseAdminReview(String code) {
         CaseData caseData = new CaseData();
         caseData.setAllPartyFlags(AllPartyFlags.builder().claimantExternalFlags(CaseFlagsType.builder()
                 .details(ListTypeItem.from(FlagDetailType.builder().flagCode(code).status("Requested").build()))
@@ -49,8 +49,7 @@ class SupportTaskConfigurationTest {
     @Test
     void loadsFlagCodesFromYaml() {
         assertThat(configuration.getReview().getJudgeFlagCodes()).isEmpty();
-        assertThat(configuration.getReview().getLegalOfficerFlagCodes())
-                .containsExactlyInAnyOrder("RA0034", "RA0035", "RA0036");
+        assertThat(configuration.getReview().getLegalOfficerFlagCodes()).isEmpty();
         assertThat(configuration.getReview().getAdminPathFlags()).singleElement().satisfies(pathFlag -> {
             assertThat(pathFlag.getFlagCode()).isEqualTo("OT0001");
             assertThat(pathFlag.getPath()).containsExactly("Party", "Reasonable adjustment");

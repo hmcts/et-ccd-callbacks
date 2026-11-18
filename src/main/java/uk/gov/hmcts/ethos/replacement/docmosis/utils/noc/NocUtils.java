@@ -263,6 +263,12 @@ public final class NocUtils {
      */
     public static void mapRepresentativesToRespondents(CaseData caseData, String submissionReference)
             throws GenericServiceException {
+        mapRepresentativesToRespondents(caseData, submissionReference, false);
+    }
+
+    public static void mapRepresentativesToRespondents(CaseData caseData, String submissionReference,
+                                                       boolean useSelectedRespondent)
+            throws GenericServiceException {
         if (!RespondentUtils.hasRespondents(caseData)
                 || !RespondentRepresentativeUtils.hasRespondentRepresentative(caseData)) {
             return;
@@ -282,6 +288,9 @@ public final class NocUtils {
             }
             String repRespondentId = representative.getValue().getRespondentId();
             String repRespondentName = representative.getValue().getDynamicRespRepName().getValue().getLabel();
+            if (useSelectedRespondent && respondentsByName.containsKey(repRespondentName)) {
+                repRespondentId = respondentsByName.get(repRespondentName).getId();
+            }
             if  (StringUtils.isNotBlank(repRespondentId) || StringUtils.isNotBlank(repRespondentName)) {
                 setMatchingRespondent(respondentsById, respondentsByName, repRespondentId,
                         repRespondentName, representative, submissionReference);

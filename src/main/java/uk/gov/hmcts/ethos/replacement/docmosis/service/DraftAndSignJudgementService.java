@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.util.Map;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
@@ -67,10 +69,6 @@ public class DraftAndSignJudgementService {
         String userToken
     ) throws NotificationClientException {
         CaseData caseData = caseDetails.getCaseData();
-        byte[] docContent =  getUploadedDocumentContent(
-            judgement.getDraftAndSignJudgementDocuments().getLast(),
-            userToken
-        );
         return Map.of(
             CASE_NUMBER, caseData.getEthosCaseReference(),
             CLAIMANT, caseData.getClaimant(),
@@ -78,8 +76,19 @@ public class DraftAndSignJudgementService {
             REASON_FOR_PUBLICATION, judgement.getShouldForPublicationReason(),
             SUBMITTED_DATE, UtilHelper.formatCurrentDate(LocalDate.now()),
             USER_NAME, reportDataService.getUserFullName(userToken),
-            LINK_TO_DOCUMENT, prepareUpload(docContent)
+            LINK_TO_DOCUMENT, getLinkToDocument(judgement, userToken)
         );
+    }
+
+    private JSONObject getLinkToDocument(
+        DraftAndSignJudgement judgement,
+        String userToken
+    ) throws NotificationClientException {
+        byte[] docContent =  getUploadedDocumentContent(
+            judgement.getDraftAndSignJudgementDocuments().getLast(),
+            userToken
+        );
+        return prepareUpload(docContent);
     }
 
     private byte[] getUploadedDocumentContent(DocumentTypeItem docItem, String userToken) {

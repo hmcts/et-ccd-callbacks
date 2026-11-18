@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({DraftAndSignJudgementController.class, JsonMapper.class})
 class DraftAndSignJudgementControllerTest {
+
     private static final String AUTH_TOKEN = "some-token";
 
     @MockitoBean

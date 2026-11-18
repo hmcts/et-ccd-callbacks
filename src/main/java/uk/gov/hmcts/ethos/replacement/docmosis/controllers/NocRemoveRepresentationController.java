@@ -85,6 +85,8 @@ public class NocRemoveRepresentationController {
                     STAGE_ABOUT_TO_SUBMIT);
             nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(userDetails, caseDetails);
             caseDetails.getCaseData().setNocRemoveOption(null);
+            caseDetails.getCaseData().setNocCaseSharingStatus(null);
+            caseDetails.getCaseData().setNocRepresentativeType(null);
         } catch (GenericServiceException | CcdInputOutputException ex) {
             errors.add(ex.getMessage());
         }

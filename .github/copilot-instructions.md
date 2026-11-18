@@ -4,7 +4,7 @@
 
 ## Stack
 
-Java 21, Spring Boot 3.5.16, Gradle wrapper, PostgreSQL with Flyway, Node 22 with Yarn 4.x (`ccd-definitions/`, `et-shared-test-library/`, Playwright in `src/test/e2e/`).
+Java 21, Spring Boot 4.0.8, Gradle wrapper, PostgreSQL with Flyway, Node 22 with Yarn 4.x (`ccd-definitions/`, `et-shared-test-library/`, Playwright in `src/test/e2e/`).
 
 ## Commands
 

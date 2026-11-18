@@ -45,7 +45,7 @@ For detailed information about working with the CCD definitions, see [ccd-defini
 ### Java
 - [JDK 21](https://www.oracle.com/java) (upgraded from JDK 17)
 
-**Note: This application runs on Spring Boot 3.5.16 and requires Java 21.**
+**Note: This application runs on Spring Boot 4.0.8 and requires Java 21.**
 
 ### CCD Common Components
 The application should be run locally in an environment that includes CCD common components.

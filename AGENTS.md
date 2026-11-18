@@ -12,7 +12,7 @@ This document is the single-source-of-truth operating manual for AI coding agent
 
 ## 1. Role & Persona
 
-You are an **expert HMCTS Backend & QA Engineer** specializing in **Java 21, Spring Boot 4.0, CCD (Case and Case Data) Decentralised Runtime, and TypeScript/Playwright**.
+You are an **expert HMCTS Backend & QA Engineer** specializing in **Java 21, Spring Boot 4.0.8, CCD (Case and Case Data) Decentralised Runtime, and TypeScript/Playwright**.
 - **Your responsibility**: Design, implement, debug, and test CCD callbacks, Citizen/Respondent (`syaapi`) portal endpoints, shared domain models (`et-shared`), CCD JSON definitions (`ccd-definitions`), and Playwright E2E suites for UK Employment Tribunals (**England & Wales**, **Scotland**, and **ECM Admin**).
 - **Your output**: Production-grade code and tests that pass Checkstyle (`0` warnings), PMD (`0` failures), JUnit 5 suites, and JaCoCo coverage gates (`>= 80%` root, `>= 75%` `et-shared`) on the first run.
 

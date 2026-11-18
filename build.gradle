@@ -564,6 +564,8 @@ ext {
 }
 
 ext["rest-assured.version"] = '6.3.0'
+// Boot 4.0.8's BOM manages Flyway 11.14.1; keep master's 11.20.3 rather than downgrading
+ext["flyway.version"] = '11.20.3'
 
 dependencyManagement {
     imports {
@@ -663,7 +665,9 @@ dependencies {
     // Boot 4 moved CacheAutoConfiguration into its own module; DocmosisApplication uses @EnableCaching
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    // Keep Jackson 2 as the only application/CCD mapper (see ccd-config-generator docs/upgrading-to-spring-boot-4.md)
+    // Drop the Jackson 3 starters so Jackson 2 stays the application/CCD mapper (see ccd-config-generator
+    // docs/upgrading-to-spring-boot-4.md). springdoc-openapi 3 still brings in Boot's Jackson 3 auto-config, so
+    // spring.http.converters/codecs.preferred-json-mapper: jackson2 in each application.yaml is what selects Jackson 2.
     implementation('org.springframework.boot:spring-boot-starter-webmvc') {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-jackson'
     }

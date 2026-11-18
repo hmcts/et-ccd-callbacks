@@ -17,7 +17,7 @@
     "CaseTypeID": "ET_EnglandWales",
     "RoleName": "idam:caseworker-employment-etjudge-englandwales",
     "ReadOnly": "N",
-    "AccessProfiles": "caseworker-employment-etjudge-englandwales,caseworker-employment-caseflags"
+    "AccessProfiles": "caseworker-employment-etjudge-englandwales"
   },
   {
     "CaseTypeID": "ET_EnglandWales",

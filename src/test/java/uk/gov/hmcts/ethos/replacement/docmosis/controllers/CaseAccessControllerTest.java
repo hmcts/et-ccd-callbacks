@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -89,7 +88,7 @@ class CaseAccessControllerTest {
     @Test
     void assignClaimantTransferredCaseAccess_error() throws Exception {
         ccdRequest.getCaseDetails().getCaseData().setLinkedCaseCT(null);
-        doCallRealMethod().when(caseAccessService).assignExistingCaseRoles(any(CaseDetails.class));
+        doCallRealMethod().when(caseAccessService).assignExistingCaseRoles(ccdRequest.getCaseDetails());
 
         mockMvc.perform(post(CLAIMANT_TRANSFERRED_CASE_URL)
                         .contentType(APPLICATION_JSON)

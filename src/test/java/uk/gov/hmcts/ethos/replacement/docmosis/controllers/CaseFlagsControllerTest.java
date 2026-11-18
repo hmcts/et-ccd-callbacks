@@ -53,7 +53,6 @@ class CaseFlagsControllerTest extends BaseControllerTest {
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseDetails.getCaseData())
-            .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
             .build();
     }
 

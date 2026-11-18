@@ -17,11 +17,4 @@ public class CCDRequest extends GenericRequest {
 
     @JsonProperty("case_details")
     private CaseDetails caseDetails;
-
-    @JsonProperty("case_details_before")
-    private CaseDetails caseDetailsBefore;
-
-    public CCDRequest(CaseDetails caseDetails) {
-        this.caseDetails = caseDetails;
-    }
 }

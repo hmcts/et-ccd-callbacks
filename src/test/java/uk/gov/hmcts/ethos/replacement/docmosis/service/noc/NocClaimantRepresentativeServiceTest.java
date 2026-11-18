@@ -183,7 +183,7 @@ class NocClaimantRepresentativeServiceTest {
                 .build());
         when(NocUtils.buildApprovedChangeOrganisationRequest(any(), any(), any()))
                 .thenReturn(createChangeOrganisationRequest());
-        nocClaimantRepresentativeService.updateClaimantRepAccess(getCallBackCallbackRequest(), true);
+        nocClaimantRepresentativeService.updateClaimantRepAccess(getCallBackCallbackRequest());
         verify(nocNotificationService, times(1))
                 .sendNotificationOfChangeEmails(any(), any(), any(), eq(true));
     }
@@ -206,7 +206,7 @@ class NocClaimantRepresentativeServiceTest {
         doReturn(ResponseEntity.ok(organisationsResponse)).when(organisationClient)
                 .retrieveOrganisationDetailsByUserId(DUMMY_ADMIN_USER_TOKEN, S2S_TOKEN, DUMMY_ORGANISATION_USER_ID);
         // Act
-        nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest, true);
+        nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest);
         // Assert
         verify(nocNotificationService, times(NumberUtils.INTEGER_ONE)).sendNotificationOfChangeEmails(
                 any(), any(), any(), eq(true));
@@ -230,7 +230,7 @@ class NocClaimantRepresentativeServiceTest {
                 ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(expected);
 
         ChangeOrganisationRequest result =
-                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before, true);
+                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before);
 
         assertThat(result).isSameAs(expected);
     }
@@ -250,85 +250,7 @@ class NocClaimantRepresentativeServiceTest {
                 ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(expected);
 
         ChangeOrganisationRequest result =
-                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before, true);
-
-        assertThat(result).isSameAs(expected);
-    }
-
-    @Test
-    void shouldReturnChangeRequestWithOrganisationToRemoveWhenNameChanges() {
-        Organisation org = Organisation.builder().organisationID("SAME").build();
-        CaseData after = new CaseData();
-        CaseData before = new CaseData();
-        after.setRepresentativeClaimantType(RepresentedTypeC.builder()
-                .nameOfRepresentative("New Representative")
-                .representativeEmailAddress("claimant.rep@example.com")
-                .myHmctsOrganisation(org)
-                .build());
-        before.setRepresentativeClaimantType(RepresentedTypeC.builder()
-                .nameOfRepresentative("Old Representative")
-                .representativeEmailAddress("claimant.rep@example.com")
-                .myHmctsOrganisation(org)
-                .build());
-
-        ChangeOrganisationRequest expected = ChangeOrganisationRequest.builder().build();
-        when(NocUtils.buildApprovedChangeOrganisationRequest(org, org,
-                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(expected);
-
-        ChangeOrganisationRequest result =
-                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before, true);
-
-        assertThat(result).isSameAs(expected);
-    }
-
-    @Test
-    void shouldUseLegacyChangeRequestWhenNameChangesAndV2IsDisabled() {
-        Organisation org = Organisation.builder().organisationID("SAME").build();
-        CaseData after = new CaseData();
-        CaseData before = new CaseData();
-        after.setRepresentativeClaimantType(RepresentedTypeC.builder()
-                .nameOfRepresentative("New Representative")
-                .representativeEmailAddress("claimant.rep@example.com")
-                .myHmctsOrganisation(org)
-                .build());
-        before.setRepresentativeClaimantType(RepresentedTypeC.builder()
-                .nameOfRepresentative("Old Representative")
-                .representativeEmailAddress("claimant.rep@example.com")
-                .myHmctsOrganisation(org)
-                .build());
-
-        ChangeOrganisationRequest expected = ChangeOrganisationRequest.builder().build();
-        when(NocUtils.buildApprovedChangeOrganisationRequest(org, null,
-                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(expected);
-
-        ChangeOrganisationRequest result =
-                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before, false);
-
-        assertThat(result).isSameAs(expected);
-    }
-
-    @Test
-    void shouldReturnChangeRequestWithOrganisationToRemoveWhenEmailChanges() {
-        Organisation org = Organisation.builder().organisationID("SAME").build();
-        CaseData after = new CaseData();
-        CaseData before = new CaseData();
-        after.setRepresentativeClaimantType(RepresentedTypeC.builder()
-                .nameOfRepresentative("Claimant Representative")
-                .representativeEmailAddress("new.claimant.rep@example.com")
-                .myHmctsOrganisation(org)
-                .build());
-        before.setRepresentativeClaimantType(RepresentedTypeC.builder()
-                .nameOfRepresentative("Claimant Representative")
-                .representativeEmailAddress("old.claimant.rep@example.com")
-                .myHmctsOrganisation(org)
-                .build());
-
-        ChangeOrganisationRequest expected = ChangeOrganisationRequest.builder().build();
-        when(NocUtils.buildApprovedChangeOrganisationRequest(org, org,
-                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(expected);
-
-        ChangeOrganisationRequest result =
-                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before, true);
+                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before);
 
         assertThat(result).isSameAs(expected);
     }
@@ -340,7 +262,7 @@ class NocClaimantRepresentativeServiceTest {
 
         ChangeOrganisationRequest expected = ChangeOrganisationRequest.builder().build();
         ChangeOrganisationRequest result =
-                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before, true);
+                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before);
 
         assertThat(result).isEqualTo(expected);
     }

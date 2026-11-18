@@ -9,8 +9,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.hearingdetails.HearingDetailsService;
@@ -20,7 +18,6 @@ import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -61,7 +58,7 @@ class HearingDetailsControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(hearingDetailsService, times(1)).initialiseHearingDetails(any(CaseData.class));
+        verify(hearingDetailsService, times(1)).initialiseHearingDetails(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
@@ -79,7 +76,7 @@ class HearingDetailsControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(hearingDetailsService, times(1)).handleListingSelected(any(CaseData.class));
+        verify(hearingDetailsService, times(1)).handleListingSelected(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
@@ -114,6 +111,6 @@ class HearingDetailsControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(hearingDetailsService, times(1)).updateCase(any(CaseDetails.class));
+        verify(hearingDetailsService, times(1)).updateCase(ccdRequest.getCaseDetails());
     }
 }

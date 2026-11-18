@@ -122,8 +122,7 @@ public final class RolesConstants {
         SPECIFIC_ACCESS_APPROVER_LEGAL_OPS, TASK_SUPERVISOR, TRIBUNAL_CASEWORKER, EMPLOYMENT_TRIBUNAL_CASEWORKER,
         EMPLOYMENT_HEARING_CENTRE_ADMIN, EMPLOYMENT_SENIOR_TRIBUNAL_CASEWORKER,
         EMPLOYMENT_HEARING_CENTRE_TEAM_LEADER, CWD_ADMIN, CWD_SYSTEM_USER, CTSC_TEAM_LEADER,
-        REGIONAL_CENTRE_TEAM_LEADER, "allocated-admin-caseworker", "caseworker-employment-caseflags",
-        "caseworker-employment-support" };
+        REGIONAL_CENTRE_TEAM_LEADER, "allocated-admin-caseworker" };
 
     private RolesConstants() {
     }

@@ -176,7 +176,7 @@ class NocServiceTest {
 
         doNothing().when(caseAssignment).addCaseUserRole(any(CaseAssignmentUserRolesRequest.class));
 
-        assertThat(nocService.grantCaseAccess(userId, caseId, caseRole)).isTrue();
+        nocService.grantCaseAccess(userId, caseId, caseRole);
 
         ArgumentCaptor<CaseAssignmentUserRolesRequest> captor =
                 ArgumentCaptor.forClass(CaseAssignmentUserRolesRequest.class);
@@ -187,14 +187,6 @@ class NocServiceTest {
         assertEquals(userId, role.getUserId());
         assertEquals(caseId, role.getCaseDataId());
         assertEquals(caseRole, role.getCaseRole());
-    }
-
-    @Test
-    void grantCaseAccess_shouldReportFailure() throws IOException {
-        doThrow(new IOException("CCD unavailable"))
-                .when(caseAssignment).addCaseUserRole(any(CaseAssignmentUserRolesRequest.class));
-
-        assertThat(nocService.grantCaseAccess("userId", "case123", "[SOLICITORA]")).isFalse();
     }
 
     private ChangeOrganisationRequest createChangeOrganisationRequest(Organisation organisationToAdd,

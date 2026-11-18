@@ -16,8 +16,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresen
 import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_SUBMIT_CASE_DRAFT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.EVENT_UPDATE_CASE_SUBMITTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper.buildFlagsImageFileName;
 
@@ -30,10 +28,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper.b
 public class PostDefaultValuesService {
 
     public static final String CREATE_ECM_CASE = "createEcmCase";
-    private static final List<String> SUBMISSION_EVENTS = List.of(EVENT_SUBMIT_CASE_DRAFT, "initiateCase",
-            "submitEt1Draft", CREATE_ECM_CASE);
-    private static final List<String> REVIEW_SUPPORT_TASK_EVENTS =
-            List.of(EVENT_SUBMIT_CASE_DRAFT, EVENT_UPDATE_CASE_SUBMITTED);
+    private static final String SUBMIT_CASE_DRAFT = "SUBMIT_CASE_DRAFT";
+    private static final List<String> SUBMISSION_EVENTS = List.of(SUBMIT_CASE_DRAFT, "initiateCase", "submitEt1Draft",
+            CREATE_ECM_CASE);
 
     private final EventValidationService eventValidationService;
     private final EmploymentRightsActService employmentRightsActService;
@@ -42,7 +39,6 @@ public class PostDefaultValuesService {
     private final SingleReferenceService singleReferenceService;
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
     private final CaseFlagsService caseFlagsService;
-    private final SupportTaskService supportTaskService;
     private final FeatureToggleService featureToggleService;
     private final CaseManagementLocationService caseManagementLocationService;
     private final Et1SubmissionService et1SubmissionService;
@@ -89,22 +85,8 @@ public class PostDefaultValuesService {
         }
         defaultValuesReaderService.setPositionAndOffice(caseDetails.getCaseTypeId(), caseData);
 
-        if (caseFlagsSetupRequired(caseDetails.getCaseTypeId(), caseData)) {
-            setupCaseFlags(caseDetails.getCaseTypeId(), caseData);
-        }
-
-        if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())
-                && REVIEW_SUPPORT_TASK_EVENTS.contains(eventId)) {
-            caseManagementForCaseWorkerService.setNextListedDate(caseData);
-            CaseData caseDataBefore = ccdRequest.getCaseDetailsBefore() == null
-                    ? null
-                    : ccdRequest.getCaseDetailsBefore().getCaseData();
-            if (EVENT_SUBMIT_CASE_DRAFT.equals(eventId)) {
-                supportTaskService.prepareReviewSupportTasks(caseData);
-            } else {
-                supportTaskService.prepareUpdatedCaseReviewSupportTasks(caseData, caseDataBefore);
-            }
-            supportTaskService.prepareArrangeSupportTask(caseData, caseDataBefore);
+        if (caseFlagsService.caseFlagsSetupRequired(caseData)) {
+            caseFlagsService.setupCaseFlags(caseData);
         }
 
         boolean hmcToggle = featureToggleService.isHmcEnabled();
@@ -114,27 +96,13 @@ public class PostDefaultValuesService {
             caseManagementLocationService.setCaseManagementLocationCode(caseData);
         }
 
-        if (featureToggleService.citizenEt1Generation() && EVENT_SUBMIT_CASE_DRAFT.equals(eventId)) {
+        if (featureToggleService.citizenEt1Generation() && SUBMIT_CASE_DRAFT.equals(eventId)) {
             et1SubmissionService.createAndUploadEt1Docs(caseDetails, userToken);
             et1SubmissionService.vexationCheck(caseDetails, userToken);
         }
 
         log.info("PostDefaultValues for case: {} {}", caseDetails.getCaseTypeId(), caseData.getEthosCaseReference());
         return List.of();
-    }
-
-    private boolean caseFlagsSetupRequired(String caseTypeId, CaseData caseData) {
-        return featureToggleService.isCaseFlagsV2Enabled(caseTypeId)
-                ? caseFlagsService.caseFlagsSetupRequired(caseData)
-                : caseFlagsService.legacyCaseFlagsSetupRequired(caseData);
-    }
-
-    private void setupCaseFlags(String caseTypeId, CaseData caseData) {
-        if (featureToggleService.isCaseFlagsV2Enabled(caseTypeId)) {
-            caseFlagsService.setupCaseFlags(caseData);
-        } else {
-            caseFlagsService.setupLegacyCaseFlags(caseData);
-        }
     }
 
     private void generateEthosCaseReference(CaseDetails caseDetails) {

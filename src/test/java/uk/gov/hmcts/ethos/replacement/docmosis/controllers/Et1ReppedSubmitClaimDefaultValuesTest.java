@@ -7,11 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -27,7 +27,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PostDefaultValuesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 
 import java.nio.file.Files;
@@ -40,7 +39,6 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 /**
@@ -64,6 +62,7 @@ class Et1ReppedSubmitClaimDefaultValuesTest {
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
     @Mock
     private FeatureToggleService featureToggleService;
+    @Spy
     private CaseFlagsService caseFlagsService;
     @Mock
     private CaseManagementLocationService caseManagementLocationService;
@@ -75,8 +74,6 @@ class Et1ReppedSubmitClaimDefaultValuesTest {
     private EmploymentRightsActService employmentRightsActService;
     @Mock
     private SingleReferenceService singleReferenceService;
-    @Mock
-    private SupportTaskService supportTaskService;
 
     @InjectMocks
     private PostDefaultValuesService postDefaultValuesService;
@@ -85,11 +82,9 @@ class Et1ReppedSubmitClaimDefaultValuesTest {
 
     @BeforeEach
     void setUp() {
-        caseFlagsService = spy(new CaseFlagsService(featureToggleService));
-        ReflectionTestUtils.setField(postDefaultValuesService, "caseFlagsService", caseFlagsService);
         et1ReppedController = new Et1ReppedController(postDefaultValuesService,
             caseManagementForCaseWorkerService, et1ReppedService, featureToggleService, et1SubmissionService,
-            nocRespondentRepresentativeService, caseFlagsService);
+            nocRespondentRepresentativeService);
 
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
         when(featureToggleService.isEt1DocGenEnabled()).thenReturn(true);
@@ -112,9 +107,8 @@ class Et1ReppedSubmitClaimDefaultValuesTest {
 
         CaseData data = Objects.requireNonNull(response.getBody()).getData();
         assertSoftly(softly -> {
-            softly.assertThat(data.getAllPartyFlags()).as("all party flags").isNotNull();
-            softly.assertThat(data.getAllPartyFlags().getClaimantFlags()).as("claimant case flags").isNotNull();
-            softly.assertThat(data.getAllPartyFlags().getRespondentFlags()).as("respondent case flags").isNotNull();
+            softly.assertThat(data.getClaimantFlags()).as("claimant case flags").isNotNull();
+            softly.assertThat(data.getRespondentFlags()).as("respondent case flags").isNotNull();
             softly.assertThat(data.getPublicCaseName()).as("public case name").isEqualTo("John Doe vs Claimant Org");
             softly.assertThat(data.getCaseManagementLocationCode()).as("case management location code")
                 .isEqualTo(EPIMMS_ID);

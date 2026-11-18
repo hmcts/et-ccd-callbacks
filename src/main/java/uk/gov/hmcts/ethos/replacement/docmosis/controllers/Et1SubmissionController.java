@@ -18,9 +18,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskEventService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskService;
 
 import java.io.IOException;
 
@@ -42,9 +39,6 @@ public class Et1SubmissionController {
 
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private final Et1SubmissionService et1SubmissionService;
-    private final FeatureToggleService featureToggleService;
-    private final SupportTaskService supportTaskService;
-    private final SupportTaskEventService supportTaskEventService;
 
     @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Add HMCTSServiceId to supplementary_data on a case and send confirmation email.")
@@ -63,12 +57,6 @@ public class Et1SubmissionController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails);
         et1SubmissionService.sendEt1ConfirmationClaimant(caseDetails, userToken);
-        if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())) {
-            CaseDetails caseDetailsBefore = ccdRequest.getCaseDetailsBefore();
-            supportTaskEventService.triggerArrangeSupportTaskEvents(caseDetails,
-                    supportTaskService.additionalArrangeSupportTasks(caseDetails.getCaseData(),
-                            caseDetailsBefore == null ? null : caseDetailsBefore.getCaseData()));
-        }
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 }

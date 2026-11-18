@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,8 +27,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceExceptio
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PhoneNumberValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
@@ -37,8 +34,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativ
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.IntStream;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -76,8 +71,6 @@ public class RespondentRepresentativeController {
 
     private final NocRespondentHelper nocRespondentHelper;
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
-    private final FeatureToggleService featureToggleService;
-    private final CaseFlagsService caseFlagsService;
 
     @PostMapping(value = "/amendRespondentRepresentativeAboutToStart", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Populates the respondents names into a dynamic list")
@@ -160,35 +153,26 @@ public class RespondentRepresentativeController {
         @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_THREE, description = HTTP_MESSAGE_FIVE_ZERO_THREE)
     })
     public ResponseEntity<CCDCallbackResponse> amendRespondentRepresentativeAboutToSubmit(
-            @RequestBody @NotNull CallbackRequest callbackRequest,
+            @RequestBody @NotNull CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        CaseDataUtils.validateCaseDetails(callbackRequest.getCaseDetails());
+        CaseDataUtils.validateCCDRequest(ccdRequest);
         log.info("AMEND RESPONDENT REPRESENTATIVE ABOUT TO SUBMIT ---> {} {}", LOG_MESSAGE,
-                callbackRequest.getCaseDetails().getCaseId());
-        CaseDetails caseDetails = callbackRequest.getCaseDetails();
-        CaseData caseData = caseDetails.getCaseData();
+                ccdRequest.getCaseDetails().getCaseId());
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>(NocUtils.validateNocCaseData(caseData));
         errors.addAll(PhoneNumberValidator.validateRepresentativePhoneNumbers(caseData.getRepCollection()));
         errors.addAll(nocRespondentRepresentativeService
-                .validateRespondentRepresentativesOrganisationMatch(caseDetails));
+                .validateRespondentRepresentativesOrganisationMatch(ccdRequest.getCaseDetails()));
         if (errors.isEmpty()) {
             try {
-                NocUtils.mapRepresentativesToRespondents(caseData, caseDetails.getCaseId(),
-                        featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId()));
-                if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())
-                        && respondentRepresentationChanged(callbackRequest)) {
-                    nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData, true);
-                }
+                NocUtils.mapRepresentativesToRespondents(caseData, ccdRequest.getCaseDetails().getCaseId());
                 nocRespondentHelper.removeUnmatchedRepresentations(caseData);
                 nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
                 NocUtils.assignNonMyHmctsOrganisationIds(caseData.getRepCollection());
-                nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails);
+                nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(ccdRequest.getCaseDetails());
             } catch (GenericRuntimeException | GenericServiceException gse) {
                 errors.addFirst(gse.getMessage());
             }
-        }
-        if (errors.isEmpty()) {
-            setupCaseFlagsIfRespondentRepresentativeChanged(callbackRequest);
         }
         return getCallbackRespEntityErrors(errors, caseData);
     }
@@ -213,9 +197,6 @@ public class RespondentRepresentativeController {
         try {
             NocUtils.validateCallbackRequest(callbackRequest);
             nocRespondentRepresentativeService.updateRepresentativesAccess(callbackRequest, userToken);
-            if (featureToggleService.isCaseFlagsV2Enabled(callbackRequest.getCaseDetails().getCaseTypeId())) {
-                nocRespondentRepresentativeService.realignRespondentRepresentativeAccess(callbackRequest);
-            }
         } catch (GenericServiceException | GenericRuntimeException e) {
             log.error(ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS,
                     callbackRequest.getCaseDetails().getCaseId(), e.getMessage());
@@ -267,7 +248,6 @@ public class RespondentRepresentativeController {
         // Clears the changeOrganisationRequestField to prevent errors in the existing representative process
         // and to allow further changes to be made
         caseData.setChangeOrganisationRequestField(null);
-        setupCaseFlagsIfRequired(caseDetails);
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 
@@ -295,175 +275,9 @@ public class RespondentRepresentativeController {
         CaseData caseData = caseDetails.getCaseData();
         if (CollectionUtils.isNotEmpty(caseData.getRepCollection())
                 && CollectionUtils.isNotEmpty(caseData.getRepCollectionToRemove())) {
-            if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())) {
-                caseFlagsService.removeRespondentRepresentativeFlags(
-                        caseData, caseData.getRepCollectionToRemove());
-            }
             caseData.getRepCollection().removeAll(caseData.getRepCollectionToRemove());
             caseData.setRepCollectionToRemove(null);
         }
-        setupCaseFlagsIfRequired(caseDetails);
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
-    }
-
-    private void setupCaseFlagsIfRequired(CaseDetails caseDetails) {
-        CaseData caseData = caseDetails.getCaseData();
-        if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())
-                && caseFlagsService.caseFlagsSetupRequired(caseData)) {
-            caseFlagsService.setupCaseFlags(caseData);
-        }
-    }
-
-    private void setupCaseFlagsIfRespondentRepresentativeChanged(CallbackRequest callbackRequest) {
-        CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
-        List<Integer> changedRepresentativeIndexes = changedRespondentRepresentativeIndexes(callbackRequest);
-        boolean representativeRemoved = respondentRepresentativeRemoved(callbackRequest);
-        if (featureToggleService.isCaseFlagsV2Enabled(callbackRequest.getCaseDetails().getCaseTypeId())
-                && (CollectionUtils.isNotEmpty(changedRepresentativeIndexes) || representativeRemoved
-                || respondentRepresentationChanged(callbackRequest))) {
-            List<Integer> representativeIndexesToClear = changedRepresentativeIndexes.stream()
-                    .filter(index -> shouldClearChangedRepresentativeFlags(callbackRequest, index))
-                    .toList();
-            if (CollectionUtils.isNotEmpty(representativeIndexesToClear)) {
-                caseFlagsService.clearRespondentRepresentativeFlags(caseData, representativeIndexesToClear);
-            }
-            caseFlagsService.setupCaseFlags(caseData);
-        }
-    }
-
-    private static boolean shouldClearChangedRepresentativeFlags(
-            CallbackRequest callbackRequest, int currentRepresentativeIndex) {
-        List<RepresentedTypeRItem> previousRepresentatives =
-                callbackRequest.getCaseDetailsBefore().getCaseData().getRepCollection();
-        List<RepresentedTypeRItem> currentRepresentatives =
-                callbackRequest.getCaseDetails().getCaseData().getRepCollection();
-        RepresentedTypeRItem currentRepresentative = currentRepresentatives.get(currentRepresentativeIndex);
-        RepresentedTypeRItem previousRepresentative = previousRepresentatives.stream()
-                .filter(previous -> sameRepresentative(previous, currentRepresentative))
-                .findFirst()
-                .orElse(null);
-
-        if (previousRepresentative == null) {
-            return true;
-        }
-
-        return IntStream.range(0, currentRepresentatives.size())
-                .filter(index -> index != currentRepresentativeIndex)
-                .mapToObj(currentRepresentatives::get)
-                .noneMatch(representative -> sameRepresentativeIdentity(previousRepresentative, representative));
-    }
-
-    private static boolean sameRepresentativeIdentity(
-            RepresentedTypeRItem firstRepresentative, RepresentedTypeRItem secondRepresentative) {
-        return Strings.CI.equals(
-                StringUtils.trimToEmpty(representativeName(firstRepresentative)),
-                StringUtils.trimToEmpty(representativeName(secondRepresentative)))
-                && Strings.CI.equals(
-                        StringUtils.trimToEmpty(representativeEmail(firstRepresentative)),
-                        StringUtils.trimToEmpty(representativeEmail(secondRepresentative)));
-    }
-
-    private static boolean respondentRepresentationChanged(CallbackRequest callbackRequest) {
-        if (callbackRequest.getCaseDetailsBefore() == null
-                || callbackRequest.getCaseDetailsBefore().getCaseData() == null) {
-            return false;
-        }
-        List<RepresentedTypeRItem> previous = callbackRequest.getCaseDetailsBefore().getCaseData().getRepCollection();
-        List<RepresentedTypeRItem> current = callbackRequest.getCaseDetails().getCaseData().getRepCollection();
-        return CollectionUtils.isNotEmpty(previous) && CollectionUtils.isNotEmpty(current)
-                && current.stream().anyMatch(rep -> previous.stream()
-                .filter(old -> sameRepresentative(old, rep))
-                .anyMatch(old -> !Objects.equals(representativeRespondentId(old), representativeRespondentId(rep))));
-    }
-
-    private static boolean respondentRepresentativeRemoved(CallbackRequest callbackRequest) {
-        if (callbackRequest.getCaseDetailsBefore() == null
-                || callbackRequest.getCaseDetailsBefore().getCaseData() == null
-                || CollectionUtils.isEmpty(callbackRequest.getCaseDetailsBefore().getCaseData().getRepCollection())) {
-            return false;
-        }
-
-        List<RepresentedTypeRItem> previousRepresentatives =
-                callbackRequest.getCaseDetailsBefore().getCaseData().getRepCollection();
-        List<RepresentedTypeRItem> currentRepresentatives = callbackRequest.getCaseDetails().getCaseData()
-                .getRepCollection();
-        return previousRepresentatives.stream().anyMatch(previousRepresentative ->
-                CollectionUtils.isEmpty(currentRepresentatives)
-                        || currentRepresentatives.stream().noneMatch(currentRepresentative ->
-                        sameRepresentative(previousRepresentative, currentRepresentative)));
-    }
-
-    private static List<Integer> changedRespondentRepresentativeIndexes(CallbackRequest callbackRequest) {
-        if (callbackRequest.getCaseDetailsBefore() == null
-                || callbackRequest.getCaseDetailsBefore().getCaseData() == null
-                || CollectionUtils.isEmpty(callbackRequest.getCaseDetailsBefore().getCaseData().getRepCollection())
-                || CollectionUtils.isEmpty(callbackRequest.getCaseDetails().getCaseData().getRepCollection())) {
-            return List.of();
-        }
-        List<RepresentedTypeRItem> previousRepresentatives =
-                callbackRequest.getCaseDetailsBefore().getCaseData().getRepCollection();
-        List<RepresentedTypeRItem> currentRepresentatives = callbackRequest.getCaseDetails().getCaseData()
-                .getRepCollection();
-        return IntStream.range(0, currentRepresentatives.size())
-                .filter(currentIndex -> previousRepresentatives.stream()
-                        .filter(previousRepresentative -> sameRepresentative(previousRepresentative,
-                                currentRepresentatives.get(currentIndex)))
-                        .anyMatch(previousRepresentative -> representativeChanged(previousRepresentative,
-                                currentRepresentatives.get(currentIndex))))
-                .boxed()
-                .distinct()
-                .toList();
-    }
-
-    private static boolean representativeChanged(
-            RepresentedTypeRItem previousRepresentative,
-            RepresentedTypeRItem currentRepresentative) {
-        return !Objects.equals(representativeName(previousRepresentative), representativeName(currentRepresentative))
-                || !Strings.CI.equals(representativeEmail(previousRepresentative),
-                representativeEmail(currentRepresentative));
-    }
-
-    private static boolean sameRepresentative(
-            RepresentedTypeRItem previousRepresentative,
-            RepresentedTypeRItem currentRepresentative) {
-        if (previousRepresentative == null || currentRepresentative == null) {
-            return false;
-        }
-        if (StringUtils.isNotBlank(representativeId(previousRepresentative))
-                && StringUtils.isNotBlank(representativeId(currentRepresentative))) {
-            return Objects.equals(representativeId(previousRepresentative), representativeId(currentRepresentative));
-        }
-        return Objects.equals(representativeRespondentId(previousRepresentative),
-                representativeRespondentId(currentRepresentative))
-                && Objects.equals(representativeRespondentName(previousRepresentative),
-                representativeRespondentName(currentRepresentative));
-    }
-
-    private static String representativeName(RepresentedTypeRItem representative) {
-        return representative == null || representative.getValue() == null
-                ? null
-                : representative.getValue().getNameOfRepresentative();
-    }
-
-    private static String representativeEmail(RepresentedTypeRItem representative) {
-        return representative == null || representative.getValue() == null
-                ? null
-                : representative.getValue().getRepresentativeEmailAddress();
-    }
-
-    private static String representativeId(RepresentedTypeRItem representative) {
-        return representative == null ? null : representative.getId();
-    }
-
-    private static String representativeRespondentId(RepresentedTypeRItem representative) {
-        return representative == null || representative.getValue() == null
-                ? null
-                : representative.getValue().getRespondentId();
-    }
-
-    private static String representativeRespondentName(RepresentedTypeRItem representative) {
-        return representative == null || representative.getValue() == null
-                ? null
-                : representative.getValue().getRespRepName();
     }
 }

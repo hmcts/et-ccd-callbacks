@@ -8,7 +8,6 @@ public final class NotificationServiceConstants {
     public static final String CLAIMANT = "claimant";
     public static final String RESPONDENTS = "respondents";
     public static final String RESPONDENT_NAMES = "respondentNames";
-    public static final String LIST_OF_RESPONDENTS = "list_of_respondents";
     public static final String EXUI_CASE_DETAILS_LINK = "exuiCaseDetailsLink";
     public static final String EXUI_HEARING_DOCUMENTS_LINK = "exuiHearingDocumentsLink";
     public static final String HEARING_DOCUMENTS_PATH = "#Hearing%20Documents";
@@ -32,9 +31,9 @@ public final class NotificationServiceConstants {
     public static final String APPLICANT_NAME = "applicantName";
     public static final String LINK_TO_CIT_UI = "linkToCitUI";
     public static final String PARTY_NAME = "party_name";
-    public static final String REASON_FOR_PUBLICATION = "reason_for_publication";
-    public static final String SUBMITTED_DATE = "submitted_date";
-    public static final String USER_NAME = "user_name";
+    public static final String REASON_FOR_PUBLICATION = "reasonForPublication";
+    public static final String SUBMITTED_DATE = "submittedDate";
+    public static final String USER_NAME = "userName";
 
     private NotificationServiceConstants() {
         // restrict instantiation

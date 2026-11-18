@@ -19,8 +19,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_DOCUMENT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LIST_OF_RESPONDENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.REASON_FOR_PUBLICATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.SUBMITTED_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.USER_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
@@ -61,7 +61,7 @@ public class DraftAndSignJudgementService {
         return Map.of(
             CASE_NUMBER, caseData.getEthosCaseReference(),
             CLAIMANT, caseData.getClaimant(),
-            LIST_OF_RESPONDENTS, getRespondentNames(caseData),
+            RESPONDENT_NAMES, getRespondentNames(caseData),
             REASON_FOR_PUBLICATION, judgement.getShouldForPublicationReason(),
             SUBMITTED_DATE, UtilHelper.formatCurrentDate(LocalDate.now()),
             USER_NAME, userName,

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils.noc;
 
+import org.apache.commons.lang3.Strings;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public final class RepresentativeUtils {
         }
 
         return caseUserAssignments.stream()
-                .filter(assignment -> idamId.equals(assignment.getUserId()))
+                .filter(assignment -> Strings.CI.equals(idamId, assignment.getUserId()))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 }

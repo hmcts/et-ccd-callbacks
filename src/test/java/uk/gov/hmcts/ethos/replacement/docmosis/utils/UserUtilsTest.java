@@ -4,7 +4,6 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,8 +30,7 @@ final class UserUtilsTest {
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_INVALID_USER_TOKEN);
 
         // When token is not empty, should not throw exception.
-        final CaseData caseData = new CaseData();
-        assertDoesNotThrow(() -> CaseDataUtils.validateCaseData(caseData, DUMMY_SUBMISSION_REFERENCE));
+        assertDoesNotThrow(() -> UserUtils.validateToken("valid_token", DUMMY_SUBMISSION_REFERENCE));
     }
 
     @Test

@@ -22,7 +22,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UserUtils;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RepresentativeUtils;
 
 import java.io.IOException;
@@ -359,7 +358,6 @@ public class NocCcdService {
                 remainingRepresentative.getEmail());
         caseDetails.getCaseData().getRepresentativeClaimantType().setNameOfRepresentative(
                 UserUtils.getFullName(remainingRepresentative));
-        caseDetails.getCaseData().getRepresentativeClaimantType().setRepresentativeReference(null);
         caseDetails.getCaseData().getRepresentativeClaimantType().setRepresentativePhoneNumber(null);
         caseDetails.getCaseData().setRepresentativePhoneNumber(null);
     }
@@ -385,12 +383,13 @@ public class NocCcdService {
         if (CollectionUtils.isEmpty(caseUserAssignments)) {
             return null;
         }
-        String userId = ObjectUtils.isEmpty(existingUserDetails) ? null : existingUserDetails.getUid();
-        CaseUserAssignment caseUserAssignment = ClaimantRepresentativeUtils
-                .findFirstAssignmentForOtherRepresentative(caseUserAssignments, userId);
-        if (caseUserAssignment == null) {
-            return null;
-        }
-        return userService.findUserDetailsByIdamId(caseUserAssignment.getUserId());
+        String currentUserId = ObjectUtils.isEmpty(existingUserDetails) ? null : existingUserDetails.getUid();
+        return caseUserAssignments.stream()
+                .filter(Objects::nonNull)
+                .filter(a -> !Strings.CI.equals(currentUserId, a.getUserId()))
+                .map(a -> userService.findUserDetailsByIdamId(a.getUserId()))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
     }
 }

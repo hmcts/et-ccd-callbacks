@@ -17,7 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
 import java.io.IOException;
@@ -52,11 +52,12 @@ class NocRemoveClaimantRepresentationServiceTest {
     @Mock
     private NocCcdService nocCcdService;
     @Mock
-    private UserService userService;
+    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private NocRemoveClaimantRepresentationService nocRemoveClaimantRepresentationService;
 
+    private static final String CASE_TYPE_ID_ENGLAND_WALES = "ET_EnglandWales";
     private static final String CLAIMANT_REPRESENTATIVE_EMAIL_VALID = "rep.c@test.com";
     private static final String CLAIMANT_REPRESENTATIVE_EMAIL_INVALID = "rep.r@test.com";
     private static final String CLAIMANT_REPRESENTATIVE_ID = "claimantRepresentativeId";
@@ -186,6 +187,8 @@ class NocRemoveClaimantRepresentationServiceTest {
         CaseDetails tmpCaseDetails = new CaseDetails();
         tmpCaseDetails.setCaseData(new CaseData());
         tmpCaseDetails.setCaseId(CASE_ID);
+        tmpCaseDetails.setCaseTypeId(CASE_TYPE_ID_ENGLAND_WALES);
+        when(featureToggleService.isFeatureEnabled(CASE_TYPE_ID_ENGLAND_WALES)).thenReturn(true);
         GenericServiceException gse = assertThrows(GenericServiceException.class,
                 () -> nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(userDetails1, tmpCaseDetails));
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_REPRESENTATIVE_NOT_FOUND);

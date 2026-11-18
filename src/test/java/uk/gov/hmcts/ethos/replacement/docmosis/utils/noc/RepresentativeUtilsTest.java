@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils.noc;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 
 import java.util.ArrayList;

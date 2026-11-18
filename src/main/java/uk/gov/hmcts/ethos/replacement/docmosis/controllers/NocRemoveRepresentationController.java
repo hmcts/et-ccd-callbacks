@@ -40,7 +40,7 @@ public class NocRemoveRepresentationController {
     private final UserService userService;
 
     @PostMapping(value = "/claimant/aboutToStart", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "nocRemoveRep claimant about to submit page")
+    @Operation(summary = "nocRemoveRep claimant about to start page")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {

@@ -754,4 +754,17 @@ public final class NocUtils {
                 .filter(caseUserAssignment -> role.equals(caseUserAssignment.getCaseRole()))
                 .toList();
     }
+
+    /**
+     * Resets the Notice of Change (NOC) removal options in the provided case data.
+     * Clears the NOC removal option, case sharing status, and representative type
+     * by setting their values to {@code null}.
+     *
+     * @param caseData the case data containing the NOC removal fields to reset
+     */
+    public static void resetNOCRemovalOptions(CaseData caseData) {
+        caseData.setNocRemoveOption(null);
+        caseData.setNocCaseSharingStatus(null);
+        caseData.setNocRepresentativeType(null);
+    }
 }

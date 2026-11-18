@@ -302,7 +302,7 @@ public class NocCcdService {
             String exceptionMessage = String.format(EXCEPTION_REPRESENTATIVE_NOT_FOUND_BY_TOKEN,
                     caseDetails.getCaseId());
             throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
-                    caseDetails.getCaseId(), NocRemoveClaimantRepresentationService.class.getSimpleName(), methodName);
+                    caseDetails.getCaseId(), NocCcdService.class.getSimpleName(), methodName);
         }
         List<CaseUserAssignment> caseUserAssignments = findCaseUserAssignmentsByCaseIdAndRole(
                 caseDetails.getCaseId(), ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
@@ -351,7 +351,7 @@ public class NocCcdService {
                     caseDetails.getCaseId());
             final String methodName = "reassignLeadClaimantRepresentative";
             throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
-                    caseDetails.getCaseId(), NocRemoveClaimantRepresentationService.class.getSimpleName(),
+                    caseDetails.getCaseId(), NocCcdService.class.getSimpleName(),
                     methodName);
         }
         caseDetails.getCaseData().getRepresentativeClaimantType().setIdamId(remainingRepresentative.getUid());

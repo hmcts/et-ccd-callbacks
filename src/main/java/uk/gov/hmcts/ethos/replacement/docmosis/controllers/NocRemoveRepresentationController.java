@@ -16,10 +16,12 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveClaimantRepresentationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,8 +59,8 @@ public class NocRemoveRepresentationController {
             UserDetails userDetails = userService.fetchAndValidateUserDetails(userToken, caseDetails.getCaseId());
             nocRemoveClaimantRepresentationService.populateNocRemovalDetails(userDetails, caseDetails,
                     STAGE_ABOUT_TO_START);
-        } catch (GenericServiceException gse) {
-            errors.add(gse.getMessage());
+        } catch (GenericServiceException | CcdInputOutputException ex) {
+            errors.add(ex.getMessage());
         }
         return getCallbackRespEntity(errors, caseDetails);
     }
@@ -84,9 +86,9 @@ public class NocRemoveRepresentationController {
             nocRemoveClaimantRepresentationService.populateNocRemovalDetails(userDetails, caseDetails,
                     STAGE_ABOUT_TO_SUBMIT);
             nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(userDetails, caseDetails);
-            caseDetails.getCaseData().setNocRemoveOption(null);
-        } catch (GenericServiceException gse) {
-            errors.add(gse.getMessage());
+            NocUtils.resetNOCRemovalOptions(caseDetails.getCaseData());
+        } catch (GenericServiceException | CcdInputOutputException ex) {
+            errors.add(ex.getMessage());
         }
         return getCallbackRespEntity(errors, caseDetails);
     }

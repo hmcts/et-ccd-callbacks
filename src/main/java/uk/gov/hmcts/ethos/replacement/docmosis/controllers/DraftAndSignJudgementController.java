@@ -18,14 +18,15 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DraftAndSignJudgementService;
+import uk.gov.service.notify.NotificationClientException;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
-@Slf4j
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/draftAndSignJudgement")
+@RequiredArgsConstructor
+@Slf4j
 public class DraftAndSignJudgementController {
 
     private final DraftAndSignJudgementService draftAndSignJudgementService;
@@ -46,7 +47,7 @@ public class DraftAndSignJudgementController {
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader("Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) throws NotificationClientException {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();

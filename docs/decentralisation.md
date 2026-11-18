@@ -263,9 +263,11 @@ In CFTLib and Preview environments, CCD Data Store routes case type requests to 
 
 ### Elasticsearch Indexer
 
-In production and preview environments, `ccd-runtime-indexing` publishes decentralised case data to the Elasticsearch cluster:
-- **Preview**: `CCD_SDK_DECENTRALISED_ES_INDEXER_ENABLED: true`
-- **Local/Default**: `CCD_SDK_DECENTRALISED_ES_INDEXER_ENABLED: false`
+`ccd-runtime-indexing` publishes decentralised case data to the Elasticsearch cluster. The SDK enables it unless `CCD_SDK_DECENTRALISED_ES_INDEXER_ENABLED` is `false`, so the `et-cos` chart and its environments leave it unset.
+
+The Service Bus publisher that sends case events to `CCD_SERVICEBUS_DESTINATION` is off in the application by default and turned on by the `et-cos` chart (`ET_SERVICEBUS_SCHEDULER_ENABLED: true`), so every `et-cos` deployment, preview included, publishes.
+
+The ET cron jobs (`et-reconfiguration-cron`, `et-cron-wa-task-for-expired-bfactions`) run the same image through the separate `et-cron` chart. They don't get these chart values: the indexer is turned off in their Flux config, and the publisher stays at the application default of off.
 
 ---
 

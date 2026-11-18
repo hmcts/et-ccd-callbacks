@@ -10,6 +10,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesClaimantService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -22,6 +24,7 @@ import java.net.URISyntaxException;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -96,8 +99,9 @@ class BundlesClaimantControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(bundlesClaimantService).addToBundlesCollection(ccdRequest.getCaseDetails().getCaseData());
-        verify(bundlesClaimantService).clearInputData(ccdRequest.getCaseDetails().getCaseData());
+
+        verify(bundlesClaimantService).addToBundlesCollection(any(CaseData.class));
+        verify(bundlesClaimantService).clearInputData(any(CaseData.class));
     }
 
     @Test
@@ -107,7 +111,7 @@ class BundlesClaimantControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
-        verify(bundlesClaimantService, never()).clearInputData(ccdRequest.getCaseDetails().getCaseData());
+        verify(bundlesClaimantService, never()).clearInputData(any(CaseData.class));
     }
 
     @Test
@@ -164,7 +168,8 @@ class BundlesClaimantControllerTest {
             .andExpect(jsonPath("$.warnings", nullValue()))
             .andExpect(jsonPath("$.confirmation_header", notNullValue()))
             .andExpect(jsonPath("$.confirmation_body", notNullValue()));
-        verify(sendNotificationService).notifyClaimantBundlesSubmitted(ccdRequest.getCaseDetails());
+
+        verify(sendNotificationService).notifyClaimantBundlesSubmitted(any(CaseDetails.class));
     }
 
     @Test

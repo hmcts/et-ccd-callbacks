@@ -24,7 +24,7 @@ export class CUIPreLoginPage extends BasePage{
     this.signInOptionLink = page.locator('//a[@href="/enter-email"]');
   }
 
-  async processPreLoginPagesForTheDraftApplication(region: string, typeOfClaim:string) {
+  async processPreLoginPagesForTheDraftApplication(region: string, typeOfClaim:string){
     await this.startDraftApplication();
     await this.processBeforeYourContinuePage();
     await this.processAreYouMakingTheClaimForYourselfPage(typeOfClaim);
@@ -48,6 +48,7 @@ export class CUIPreLoginPage extends BasePage{
     await this.page.waitForLoadState('load');
     await expect(this.syaLandingPageTitle).toBeVisible();
     await this.verifyMakeAClaimToAnEmploymentTribunal();
+    await this.auditIfEnabled('CUIPreLoginPage - startDraftApplication');
     await this.startNewClaimButton.click();
   }
 

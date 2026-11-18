@@ -12,6 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CallbacksCollectionUtils;
@@ -85,7 +86,11 @@ public class NocRepresentativeService {
             caseData = nocRespondentRepresentativeService.updateRespondentRepresentation(caseDetails);
             caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
             caseDetails.setCaseData(caseData);
-            caseData = nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails);
+            try {
+                caseData = nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails);
+            } catch (GenericServiceException exception) {
+                throw new GenericRuntimeException(exception);
+            }
         }
         return caseData;
     }

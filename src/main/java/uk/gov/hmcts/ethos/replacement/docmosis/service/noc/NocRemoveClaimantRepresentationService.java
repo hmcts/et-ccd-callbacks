@@ -10,7 +10,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 
@@ -33,7 +32,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC
 public class NocRemoveClaimantRepresentationService {
 
     private final NocCcdService nocCcdService;
-    private final UserService userService;
 
     /**
      * Populates the NOC representative type, case-sharing status, and removal option
@@ -157,7 +155,7 @@ public class NocRemoveClaimantRepresentationService {
         // revoke claimant legal rep
         nocCcdService.revokeClaimantRepresentation(userDetails, caseDetails);
         if (Strings.CS.equals(NOC_REMOVE_OPTION_ORGANISATION, caseDetails.getCaseData().getNocRemoveOption())) {
-            ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseData);
+            ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseData, true);
         }
     }
 }

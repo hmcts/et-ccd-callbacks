@@ -23,8 +23,8 @@ public class ClearHmcCaseFlagsTask implements Runnable {
         FROM ccd.case_data
         WHERE case_type_id = :caseTypeId
           AND (
-              data ? 'caseAdditionalSecurityFlag'
-              OR data ? 'caseInterpreterRequiredFlag'
+              jsonb_exists(data, 'caseAdditionalSecurityFlag')
+              OR jsonb_exists(data, 'caseInterpreterRequiredFlag')
           )
         """;
 
@@ -33,8 +33,8 @@ public class ClearHmcCaseFlagsTask implements Runnable {
         SET data = data - 'caseAdditionalSecurityFlag' - 'caseInterpreterRequiredFlag'
         WHERE case_type_id = :caseTypeId
           AND (
-              data ? 'caseAdditionalSecurityFlag'
-              OR data ? 'caseInterpreterRequiredFlag'
+              jsonb_exists(data, 'caseAdditionalSecurityFlag')
+              OR jsonb_exists(data, 'caseInterpreterRequiredFlag')
           )
         """;
 

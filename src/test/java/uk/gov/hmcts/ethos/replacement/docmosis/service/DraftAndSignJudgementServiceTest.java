@@ -45,7 +45,7 @@ class DraftAndSignJudgementServiceTest {
     private static final String EMAIL = "find-case-law@example.com";
     private static final String CASE_REF = "123456/2026";
     private static final String DOC_FILENAME = "doc_file_name.pdf";
-    private static final String DOC_UUID = "1234";
+    private static final String DOC_UUID = "3f8b9d42-6c1e-4a77-b2d8-91c0e5f4a6ab";
     private static final String DOC_CONTENT_TYPE = "application/pdf";
 
     private DraftAndSignJudgementService draftAndSignJudgementService;

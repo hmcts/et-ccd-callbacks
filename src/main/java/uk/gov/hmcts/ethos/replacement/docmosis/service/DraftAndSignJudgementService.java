@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_DOCUMENT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.NOT_PROVIDED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.REASON_FOR_PUBLICATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.SUBMITTED_DATE;
@@ -68,11 +70,14 @@ public class DraftAndSignJudgementService {
         String userToken
     ) throws NotificationClientException {
         CaseData caseData = caseDetails.getCaseData();
+        String reasonForPublication = StringUtils.isNotBlank(judgement.getShouldForPublicationReason())
+            ? judgement.getShouldForPublicationReason()
+            : NOT_PROVIDED;
         return Map.of(
             CASE_NUMBER, caseData.getEthosCaseReference(),
             CLAIMANT, caseData.getClaimant(),
             RESPONDENT_NAMES, getRespondentNames(caseData),
-            REASON_FOR_PUBLICATION, judgement.getShouldForPublicationReason(),
+            REASON_FOR_PUBLICATION, reasonForPublication,
             SUBMITTED_DATE, UtilHelper.formatCurrentDate(LocalDate.now()),
             USER_NAME, reportDataService.getUserFullName(userToken),
             LINK_TO_DOCUMENT, getLinkToDocument(judgement, userToken)

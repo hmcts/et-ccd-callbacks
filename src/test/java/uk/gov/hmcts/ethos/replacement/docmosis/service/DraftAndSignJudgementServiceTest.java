@@ -105,6 +105,23 @@ class DraftAndSignJudgementServiceTest {
     }
 
     @Test
+    void shouldSendEmailWhenReasonForPublicationEmpty() throws Exception {
+        caseDetails.getCaseData().setDraftAndSignJudgement(buildDraftAndSignJudgement(YES, YES));
+        caseDetails.getCaseData().getDraftAndSignJudgement().setShouldForPublicationReason(null);
+        when(documentManagementService.downloadFile(eq(USER_TOKEN), any()))
+            .thenReturn(buildUploadedDocument());
+        when(reportDataService.getUserFullName(USER_TOKEN))
+            .thenReturn("Judge Jane Doe");
+
+        draftAndSignJudgementService.checkAndSendEmails(caseDetails, USER_TOKEN);
+
+        verify(emailService, times(1)).sendEmail(eq(TEMPLATE_ID), eq(EMAIL), personalisationCaptor.capture());
+
+        Map<String, Object> personalisation = personalisationCaptor.getValue();
+        assertThat(personalisation).containsEntry("reasonForPublication", "Not provided");
+    }
+
+    @Test
     void shouldNotSendEmailWhenConditionsNotMet() throws NotificationClientException {
         caseDetails.getCaseData().setDraftAndSignJudgement(buildDraftAndSignJudgement(NO, YES));
 

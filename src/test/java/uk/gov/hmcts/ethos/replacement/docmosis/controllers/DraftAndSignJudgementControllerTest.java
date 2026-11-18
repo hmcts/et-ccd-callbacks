@@ -18,6 +18,7 @@ import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,11 +42,11 @@ class DraftAndSignJudgementControllerTest {
     private JsonMapper jsonMapper;
 
     @Test
-    void testInitialiseHearingDynamicList() throws Exception {
+    void testAboutToSubmit() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
-        mockMvc.perform(post("/hearingdetails/initialiseHearings")
+        mockMvc.perform(post("/draftAndSignJudgement/aboutToSubmit")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))
@@ -54,6 +55,6 @@ class DraftAndSignJudgementControllerTest {
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(draftAndSignJudgementService, times(1)).checkAndSendEmails(any(CaseDetails.class), AUTH_TOKEN);
+        verify(draftAndSignJudgementService, times(1)).checkAndSendEmails(any(CaseDetails.class), eq(AUTH_TOKEN));
     }
 }

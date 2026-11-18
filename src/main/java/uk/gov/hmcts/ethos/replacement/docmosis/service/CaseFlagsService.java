@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +23,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RoleUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -33,15 +33,12 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 
-import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.ACTIVE;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.CLAIMANT_REPRESENTATIVE;
-import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.DISRUPTIVE_CUSTOMER;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.EXTERNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.GRANTED;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.INACTIVE;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.INTERNAL;
-import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.LANGUAGE_INTERPRETER;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.NOT_INDEXED;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.REPRESENTATIVE1;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.REPRESENTATIVE10;
@@ -63,8 +60,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT6
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT7;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT8;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.RESPONDENT9;
-import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.SIGN_LANGUAGE_INTERPRETER;
-import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.VEXATIOUS_LITIGANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RESTRICT_PUBLICITY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -72,7 +67,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsReference
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CaseFlagsService {
+    private final FeatureToggleService featureToggleService;
     private static final List<PartyFlag> PARTY_FLAGS = List.of(
             claimantFlag(AllPartyFlags::getClaimantFlags, AllPartyFlags::setClaimantFlags, INTERNAL),
             claimantFlag(AllPartyFlags::getClaimantExternalFlags, AllPartyFlags::setClaimantExternalFlags, EXTERNAL),
@@ -356,14 +353,8 @@ public class CaseFlagsService {
      * @param caseData Data about the current case.
      */
     public void processNewlySetCaseFlags(CaseData caseData) {
-        ListTypeItem<FlagDetailType> partyLevel = getPartyCaseFlags(caseData);
-        caseData.setCaseInterpreterRequiredFlag(
-                areAnyFlagsActive(partyLevel, SIGN_LANGUAGE_INTERPRETER, LANGUAGE_INTERPRETER) ? YES : NO
-        );
-
-        caseData.setCaseAdditionalSecurityFlag(
-                areAnyFlagsActive(partyLevel, VEXATIOUS_LITIGANT, DISRUPTIVE_CUSTOMER) ? YES : NO
-        );
+        caseData.setCaseInterpreterRequiredFlag(null);
+        caseData.setCaseAdditionalSecurityFlag(null);
     }
 
     /**
@@ -696,7 +687,9 @@ public class CaseFlagsService {
             }
 
             String partyName = getPartyName(caseData, flag);
-            CaseFlagsType matchedFlag = existingFlagsByPartyName.get(partyName);
+            CaseFlagsType matchedFlag = StringUtils.isBlank(partyName)
+                    ? null
+                    : existingFlagsByPartyName.get(partyName);
             CaseFlagsType currentFlag = flag.get(caseData);
             alignedFlags.add(matchedFlag != null
                     ? matchedFlag
@@ -1219,40 +1212,6 @@ public class CaseFlagsService {
                 .map(TseAdminRecordDecisionTypeItem::getValue)
                 .filter(o -> o.getDecision() != null)
                 .anyMatch(o -> o.getDecision().startsWith(GRANTED));
-    }
-
-    private ListTypeItem<FlagDetailType> getPartyCaseFlags(CaseData caseData) {
-        ListTypeItem<FlagDetailType> partyLevel = new ListTypeItem<>();
-
-        for (PartyFlag flag : PARTY_FLAGS) {
-            partyLevel = appendDetailsIfPresent(partyLevel, flag.get(caseData));
-        }
-
-        return partyLevel;
-    }
-
-    private ListTypeItem<FlagDetailType> appendDetailsIfPresent(
-            ListTypeItem<FlagDetailType> partyLevel, CaseFlagsType flags) {
-        if (flags != null && flags.getDetails() != null) {
-            return ListTypeItem.concat(partyLevel, flags.getDetails());
-        }
-        return partyLevel;
-    }
-
-    @Nullable
-    private FlagDetailType findFlagByName(ListTypeItem<FlagDetailType> flags, String name) {
-        return flags.stream()
-                .map(GenericTypeItem::getValue)
-                .filter(o -> name.equals(o.getName()))
-                .findFirst()
-                .orElse(null);
-    }
-
-    private boolean areAnyFlagsActive(ListTypeItem<FlagDetailType> flags, String...names) {
-        return Arrays.stream(names)
-                .map(o -> findFlagByName(flags, o))
-                .filter(Objects::nonNull)
-                .anyMatch(o -> ACTIVE.equals(o.getStatus()));
     }
 
     private enum PartyType {

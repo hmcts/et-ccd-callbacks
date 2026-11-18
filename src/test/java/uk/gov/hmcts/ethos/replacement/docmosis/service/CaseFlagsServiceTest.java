@@ -46,6 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.ACTIVE;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.CLAIMANT_REPRESENTATIVE;
@@ -87,12 +88,14 @@ class CaseFlagsServiceTest {
     public static final String CLAIMANT_REPRESENTATIVE_NAME = "Claimant Representative Name";
     public static final String REPRESENTATIVE_NAME = "Representative Name";
     public static final String RESPONDENT_NAME = "Respondent Name";
+    private FeatureToggleService featureToggleService;
     private CaseFlagsService caseFlagsService;
     private CaseData caseData;
 
     @BeforeEach
     void setUp() {
-        caseFlagsService = new CaseFlagsService();
+        featureToggleService = mock(FeatureToggleService.class);
+        caseFlagsService = new CaseFlagsService(featureToggleService);
         caseData = CaseDataBuilder.builder().build();
         caseData.setClaimant(CLAIMANT_NAME);
         caseData.setRespondent(RESPONDENT_NAME);
@@ -281,12 +284,14 @@ class CaseFlagsServiceTest {
     }
 
     @Test
-    void migrateExistingClaimantAndRespondentCaseFlags_shouldRecalculateDependentIndicators() {
+    void migrateExistingClaimantAndRespondentCaseFlags_shouldClearDependentIndicators() {
         FlagDetailType interpreterFlag = flagDetail(LANGUAGE_INTERPRETER, ACTIVE, NO);
         FlagDetailType securityFlag = flagDetail(DISRUPTIVE_CUSTOMER, ACTIVE, YES);
         AllPartyFlags allPartyFlags = getOrCreateAllPartyFlags(caseData);
         allPartyFlags.setClaimantFlags(legacyCaseFlags(interpreterFlag));
         allPartyFlags.setRespondentFlags(legacyCaseFlags(securityFlag));
+        caseData.setCaseInterpreterRequiredFlag(YES);
+        caseData.setCaseAdditionalSecurityFlag(YES);
 
         caseFlagsService.migrateExistingClaimantAndRespondentCaseFlags(
                 caseData,
@@ -296,8 +301,8 @@ class CaseFlagsServiceTest {
                 )
         );
 
-        assertEquals(YES, caseData.getCaseInterpreterRequiredFlag());
-        assertEquals(YES, caseData.getCaseAdditionalSecurityFlag());
+        assertNull(caseData.getCaseInterpreterRequiredFlag());
+        assertNull(caseData.getCaseAdditionalSecurityFlag());
     }
 
     @Test
@@ -926,6 +931,31 @@ class CaseFlagsServiceTest {
     }
 
     @Test
+    void setupCaseFlags_shouldHandleNullPartyNameWhenDuplicatePartyNamesExist() {
+        String sharedRepName = "Shared Representative";
+        caseData.setRepCollection(List.of(
+                representativeItem("2", RepresentedTypeR.builder()
+                        .nameOfRepresentative(sharedRepName)
+                        .role("[SOLICITORB]")
+                        .build()),
+                representativeItem("3", RepresentedTypeR.builder()
+                        .nameOfRepresentative(sharedRepName)
+                        .role("[SOLICITORC]")
+                        .build())
+        ));
+
+        caseFlagsService.setupCaseFlags(caseData);
+
+        AllPartyFlags allPartyFlags = allPartyFlags(caseData);
+        assertAll(
+                () -> assertNull(allPartyFlags.getRepresentativeFlags()),
+                () -> assertNull(allPartyFlags.getRepresentativeExternalFlags()),
+                () -> assertEquals(sharedRepName, allPartyFlags.getRepresentative1Flags().getPartyName()),
+                () -> assertNull(allPartyFlags.getRepresentative2Flags())
+        );
+    }
+
+    @Test
     void setupCaseFlags_shouldNotCreateClaimantRepresentativeFlagsWhenClaimantRepresentativeIsAbsent() {
         caseData.setRepresentativeClaimantType(null);
 
@@ -1504,107 +1534,27 @@ class CaseFlagsServiceTest {
     }
 
     @Test
-    void processNewlySetCaseFlags_shouldSetInterpreterRequiredTrue() {
-        getOrCreateAllPartyFlags(caseData).setRespondentFlags(CaseFlagsType.builder().build());
-        getOrCreateAllPartyFlags(caseData).setClaimantFlags(CaseFlagsType.builder()
-                .details(
-                        ListTypeItem.from(
-                                FlagDetailType.builder()
-                                        .name(SIGN_LANGUAGE_INTERPRETER)
-                                        .status(ACTIVE)
-                                        .flagCode("RA00010")
-                                        .build()))
-                .build());
-        getOrCreateAllPartyFlags(caseData).setClaimantExternalFlags(CaseFlagsType.builder().build());
+    void processNewlySetCaseFlags_shouldClearInterpreterAndSecurityFlags() {
+        caseFlagsService.setupCaseFlags(caseData);
+        allPartyFlags(caseData).getClaimantFlags()
+                .setDetails(ListTypeItem.from(activeFlag(SIGN_LANGUAGE_INTERPRETER)));
+        allPartyFlags(caseData).getRespondentFlags()
+                .setDetails(ListTypeItem.from(activeFlag(VEXATIOUS_LITIGANT)));
+        caseData.setCaseInterpreterRequiredFlag(YES);
+        caseData.setCaseAdditionalSecurityFlag(YES);
 
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
-        assertEquals(YES, caseData.getCaseInterpreterRequiredFlag());
+        assertNull(caseData.getCaseInterpreterRequiredFlag());
+        assertNull(caseData.getCaseAdditionalSecurityFlag());
     }
 
     @Test
-    void processNewlySetCaseFlags_shouldSetAdditionalSecurityFlagTrue() {
-        getOrCreateAllPartyFlags(caseData).setRespondentFlags(CaseFlagsType.builder().build());
-        getOrCreateAllPartyFlags(caseData).setClaimantFlags(CaseFlagsType.builder()
-                .details(
-                        ListTypeItem.from(
-                                FlagDetailType.builder()
-                                        .name(VEXATIOUS_LITIGANT)
-                                        .status(ACTIVE)
-                                        .flagCode("CA00010")
-                                        .build()))
-                .build());
-        getOrCreateAllPartyFlags(caseData).setClaimantExternalFlags(CaseFlagsType.builder().build());
-
+    void processNewlySetCaseFlags_shouldKeepFlagsNullWhenPartyFlagCollectionsAreMissing() {
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
-        assertEquals(YES, caseData.getCaseAdditionalSecurityFlag());
-    }
-
-    @ParameterizedTest(name = "{0}")
-    @MethodSource("allPartyFlagSlots")
-    void processNewlySetCaseFlags_shouldReadInterpreterFlagsFromAnyPartyFlagCollection(FlagSlot slot) {
-        caseFlagsService.setupCaseFlags(caseData);
-        Objects.requireNonNull(slot.get(caseData)).setDetails(ListTypeItem.from(activeFlag(SIGN_LANGUAGE_INTERPRETER)));
-
-        caseFlagsService.processNewlySetCaseFlags(caseData);
-
-        assertEquals(YES, caseData.getCaseInterpreterRequiredFlag());
-        assertEquals(NO, caseData.getCaseAdditionalSecurityFlag());
-    }
-
-    @ParameterizedTest(name = "{0}")
-    @MethodSource("allPartyFlagSlots")
-    void processNewlySetCaseFlags_shouldReadSecurityFlagsFromAnyPartyFlagCollection(FlagSlot slot) {
-        caseFlagsService.setupCaseFlags(caseData);
-        Objects.requireNonNull(slot.get(caseData)).setDetails(ListTypeItem.from(activeFlag(VEXATIOUS_LITIGANT)));
-
-        caseFlagsService.processNewlySetCaseFlags(caseData);
-
-        assertEquals(NO, caseData.getCaseInterpreterRequiredFlag());
-        assertEquals(YES, caseData.getCaseAdditionalSecurityFlag());
-    }
-
-    @Test
-    void processNewlySetCaseFlags_shouldSupportAlternativeInterpreterAndSecurityFlagNames() {
-        caseFlagsService.setupCaseFlags(caseData);
-        allPartyFlags(caseData).getClaimantRepresentativeExternalFlags()
-                .setDetails(ListTypeItem.from(activeFlag(LANGUAGE_INTERPRETER)));
-        allPartyFlags(caseData).getRepresentative9ExternalFlags()
-                .setDetails(ListTypeItem.from(activeFlag(DISRUPTIVE_CUSTOMER)));
-
-        caseFlagsService.processNewlySetCaseFlags(caseData);
-
-        assertEquals(YES, caseData.getCaseInterpreterRequiredFlag());
-        assertEquals(YES, caseData.getCaseAdditionalSecurityFlag());
-    }
-
-    @Test
-    void processNewlySetCaseFlags_shouldSetFlagsToNoWhenMatchingFlagsAreInactiveOrAbsent() {
-        caseFlagsService.setupCaseFlags(caseData);
-        allPartyFlags(caseData).getClaimantFlags().setDetails(ListTypeItem.from(FlagDetailType.builder()
-                .name(SIGN_LANGUAGE_INTERPRETER)
-                .status(INACTIVE)
-                .build()));
-        allPartyFlags(caseData).getRespondentFlags().setDetails(ListTypeItem.from(FlagDetailType.builder()
-                .name(VEXATIOUS_LITIGANT)
-                .status(INACTIVE)
-                .build()));
-        allPartyFlags(caseData).getRespondentExternalFlags()
-                .setDetails(ListTypeItem.from(activeFlag("A different flag")));
-
-        caseFlagsService.processNewlySetCaseFlags(caseData);
-
-        assertEquals(NO, caseData.getCaseInterpreterRequiredFlag());
-        assertEquals(NO, caseData.getCaseAdditionalSecurityFlag());
-    }
-
-    @Test
-    void processNewlySetCaseFlags_shouldSetFlagsToNoWhenPartyFlagCollectionsAreMissing() {
-        caseFlagsService.processNewlySetCaseFlags(caseData);
-
-        assertEquals(NO, caseData.getCaseInterpreterRequiredFlag());
-        assertEquals(NO, caseData.getCaseAdditionalSecurityFlag());
+        assertNull(caseData.getCaseInterpreterRequiredFlag());
+        assertNull(caseData.getCaseAdditionalSecurityFlag());
     }
 
     @Test

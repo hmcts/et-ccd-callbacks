@@ -351,7 +351,7 @@ public class NocCcdService {
                     caseDetails.getCaseId());
             final String methodName = "reassignLeadClaimantRepresentative";
             throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
-                    caseDetails.getCaseId(), NocRemoveClaimantRepresentationService.class.getSimpleName(),
+                    caseDetails.getCaseId(), NocCcdService.class.getSimpleName(),
                     methodName);
         }
         caseDetails.getCaseData().getRepresentativeClaimantType().setIdamId(remainingRepresentative.getUid());

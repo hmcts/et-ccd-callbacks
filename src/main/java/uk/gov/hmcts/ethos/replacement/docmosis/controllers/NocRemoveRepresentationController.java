@@ -57,8 +57,8 @@ public class NocRemoveRepresentationController {
             UserDetails userDetails = userService.fetchAndValidateUserDetails(userToken, caseDetails.getCaseId());
             nocRemoveClaimantRepresentationService.populateNocRemovalDetails(userDetails, caseDetails,
                     STAGE_ABOUT_TO_START);
-        } catch (GenericServiceException gse) {
-            errors.add(gse.getMessage());
+        } catch (GenericServiceException | CcdInputOutputException ex) {
+            errors.add(ex.getMessage());
         }
         return getCallbackRespEntity(errors, caseDetails);
     }

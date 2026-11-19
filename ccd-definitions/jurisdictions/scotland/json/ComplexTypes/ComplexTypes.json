@@ -874,6 +874,15 @@
     "SecurityClassification": "Public"
   },
   {
+    "ID": "ClaimantRepresentative",
+    "ListElementCode": "idamId",
+    "FieldType": "Text",
+    "ElementLabel": "Claimant representative idam id",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "name_of_representative=\"dummy_representative_name3864\"",
+    "Searchable": "N"
+  },
+  {
     "ID": "ET3Vetting",
     "ListElementCode": "et3VettingDocument",
     "FieldType": "Document",

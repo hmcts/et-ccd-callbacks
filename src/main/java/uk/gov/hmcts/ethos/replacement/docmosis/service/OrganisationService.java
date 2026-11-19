@@ -4,16 +4,21 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.tika.utils.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
 import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse.SuperUser;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.util.ArrayList;
@@ -129,5 +134,88 @@ public class OrganisationService {
         }
         assert organisationResponse.getBody() != null;
         return organisationResponse.getBody().getSuperUser();
+    }
+
+    /**
+     * Retrieves the organisation associated with the specified IDAM user ID.
+     * <p>
+     * The organisation details are requested from the organisation service using
+     * an administrative user token and a service-to-service authentication token.
+     * If the response is valid and contains organisation details, the response body
+     * is returned; otherwise {@code null} is returned.
+     * </p>
+     *
+     * <p><strong>Assumptions:</strong></p>
+     * <ul>
+     *     <li>The supplied {@code idamId} is valid and non-blank.</li>
+     *     <li>The administrative user token can be successfully obtained.</li>
+     *     <li>A valid service-to-service authentication token can be generated.</li>
+     *     <li>The organisation service is available and accessible.</li>
+     *     <li>A valid organisation response satisfies the checks defined by
+     *         {@link OrganisationUtils#hasValidOrganisationResponse(ResponseEntity)}.</li>
+     * </ul>
+     *
+     * @param idamId the IDAM user ID used to retrieve the associated organisation
+     * @return the organisation details associated with the IDAM user ID,
+     *         or {@code null} if no valid organisation response is returned
+     */
+    public OrganisationsResponse findOrganisationByIdamId(String idamId) {
+        ResponseEntity<OrganisationsResponse> organisationsResponseEntity =
+                organisationClient.retrieveOrganisationDetailsByUserId(adminUserService.getAdminUserToken(),
+                        authTokenGenerator.generate(), idamId);
+        if (OrganisationUtils.hasValidOrganisationResponse(organisationsResponseEntity)) {
+            return organisationsResponseEntity.getBody();
+        }
+        return null;
+    }
+
+    /**
+     * Resolves the claimant representative's organisation name using the available
+     * representative and user details.
+     * <p>
+     * The organisation name is first resolved from the claimant representative details
+     * using {@link ClaimantRepresentativeUtils#resolveClaimantRepresentativeOrganisationName(RepresentedTypeC)}.
+     * If no organisation name is available, the method attempts to retrieve the
+     * organisation using the user's IDAM ID. If no valid organisation name can be
+     * resolved from either source, an empty string is returned.
+     * </p>
+     *
+     * <p><strong>Assumptions:</strong></p>
+     * <ul>
+     *     <li>{@code userDetails} is not {@code null}.</li>
+     *     <li>The claimant representative details may be {@code null} or may not contain
+     *         an organisation name.</li>
+     *     <li>If a valid organisation name is present in the claimant representative
+     *         details, it takes precedence over the organisation retrieved using the
+     *         user's IDAM ID.</li>
+     *     <li>If the user's IDAM ID is blank, no organisation lookup is performed.</li>
+     *     <li>{@link #findOrganisationByIdamId(String)} may return {@code null} when no
+     *         valid organisation can be found.</li>
+     *     <li>If the resolved organisation is absent or its name is blank, an empty
+     *         string is returned.</li>
+     * </ul>
+     *
+     * @param claimantRepresentative the claimant representative details used to resolve
+     *                               the organisation name
+     * @param userDetails the user details containing the IDAM ID used as a fallback
+     *                    for the organisation lookup
+     * @return the resolved claimant representative organisation name, or an empty
+     *         string if no organisation name can be found
+     */
+    public String resolveClaimantRepresentativeOrganisationName(RepresentedTypeC claimantRepresentative,
+                                                                UserDetails userDetails) {
+        String organisationName = ClaimantRepresentativeUtils
+                .resolveClaimantRepresentativeOrganisationName(claimantRepresentative);
+        if (StringUtils.isNotBlank(organisationName)) {
+            return organisationName;
+        }
+        if (StringUtils.isBlank(userDetails.getUid())) {
+            return StringUtils.EMPTY;
+        }
+        OrganisationsResponse organisation = findOrganisationByIdamId(userDetails.getUid());
+        return ObjectUtils.isNotEmpty(organisation)
+                && StringUtils.isNotBlank(organisation.getName())
+                ? organisation.getName()
+                : StringUtils.EMPTY;
     }
 }

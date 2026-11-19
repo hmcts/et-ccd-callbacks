@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
@@ -28,6 +29,9 @@ final class RespondentUtilsTest {
     private static final String RESPONDENT_ID_2 = "dummy65_respondent43_id21";
     private static final String REPRESENTATIVE_ID_1 = "dummy12_representative34_id56";
     private static final String REPRESENTATIVE_ID_2 = "dummy65_representative43_id21";
+    private static final String ROLE_SOLICITOR_A = "[SOLICITORA]";
+    private static final String ROLE_INVALID = "ROLE_INVALID";
+
     private static final String EXCEPTION_RESPONDENT_NOT_FOUND =
             "Respondent not found for case ID 1234567890123456.";
     private static final String EXCEPTION_RESPONDENT_ID_NOT_FOUND =
@@ -42,7 +46,7 @@ final class RespondentUtilsTest {
     private MockedStatic<RespondentUtils> respondentUtils;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         respondentUtils = mockStatic(RespondentUtils.class);
     }
 
@@ -282,5 +286,64 @@ final class RespondentUtilsTest {
         // when index is valid should return respondent
         assertThat(RespondentUtils.getRespondentAtIndex(caseData, NumberUtils.INTEGER_ZERO)).isNotNull()
                 .isSameAs(respondent).isEqualTo(respondent);
+    }
+
+    @Test
+    void theGetValidRespondents() {
+        respondentUtils.close();
+        // when case data is null should return empty list
+        assertThat(RespondentUtils.getValidRespondents(null)).isEmpty();
+        // when case data does not have any respondent should return empty list
+        CaseData caseData = new CaseData();
+        assertThat(RespondentUtils.getValidRespondents(caseData)).isEmpty();
+        // when case data does not have any valid respondent should return empty list
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        caseData.setRespondentCollection(List.of(respondent));
+        assertThat(RespondentUtils.getValidRespondents(caseData)).isEmpty();
+        // when case data has valid respondent should return that respondent in a list
+        respondent.setId(RESPONDENT_ID_1);
+        respondent.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_1).build());
+        assertThat(RespondentUtils.getValidRespondents(caseData).getFirst()).isEqualTo(respondent);
+    }
+
+    @Test
+    void theFindRespondentNameByRole() {
+        respondentUtils.close();
+        // when role index is -1 should return null
+        CaseData caseData = new CaseData();
+        assertThat(RespondentUtils.findRespondentNameByRole(caseData, ROLE_INVALID)).isNull();
+        // when notice of change answers is empty should return null
+        assertThat(RespondentUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_A)).isNull();
+        // when notice of change answers does not have respondent name should return null
+        NoticeOfChangeAnswers noticeOfChangeAnswers = NoticeOfChangeAnswers.builder().build();
+        caseData.setNoticeOfChangeAnswers0(noticeOfChangeAnswers);
+        assertThat(RespondentUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_A)).isNull();
+        // when notice of change answers has respondent name should return that respondent name
+        noticeOfChangeAnswers = NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_1).build();
+        caseData.setNoticeOfChangeAnswers0(noticeOfChangeAnswers);
+        assertThat(RespondentUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_A))
+                .isEqualTo(RESPONDENT_NAME_1);
+    }
+
+    @Test
+    void theHasRepresentativeLookupData() {
+        respondentUtils.close();
+        // when respondent is null should return false
+        assertThat(RespondentUtils.hasRepresentativeLookupData(null)).isFalse();
+        // when respondent id and value are null should return false
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        assertThat(RespondentUtils.hasRepresentativeLookupData(respondent)).isFalse();
+        // when respondent id, representative id and respondent name are null and blank, should return false
+        respondent.setValue(RespondentSumType.builder().build());
+        assertThat(RespondentUtils.hasRepresentativeLookupData(respondent)).isFalse();
+        // when respondent name is not blank should return true
+        respondent.getValue().setRespondentName(RESPONDENT_NAME_1);
+        assertThat(RespondentUtils.hasRepresentativeLookupData(respondent)).isTrue();
+        // when representative id is not blank should return true
+        respondent.getValue().setRepresentativeId(REPRESENTATIVE_ID_1);
+        assertThat(RespondentUtils.hasRepresentativeLookupData(respondent)).isTrue();
+        // when respondent has id should return true
+        respondent.setId(RESPONDENT_ID_1);
+        assertThat(RespondentUtils.hasRepresentativeLookupData(respondent)).isTrue();
     }
 }

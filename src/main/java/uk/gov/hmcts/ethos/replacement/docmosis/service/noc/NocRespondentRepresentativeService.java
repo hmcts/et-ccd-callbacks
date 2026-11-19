@@ -1212,6 +1212,7 @@ public class NocRespondentRepresentativeService {
         nocCcdService.revokeClaimantRepresentation(null, caseDetails);
         ClaimantRepresentativeUtils.markClaimantAsUnrepresented(
                 caseDetails.getCaseData(), featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId()));
+        caseDetails.getCaseData().setNocRemoveOption(null);
         return caseDetails.getCaseData();
     }
 

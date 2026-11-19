@@ -1624,7 +1624,7 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(tmpCaseData.getClaimantRepresentedQuestion()).isEqualTo(NO);
         assertThat(tmpCaseData.getClaimantRepresentativeRemoved()).isEqualTo(YES);
         assertThat(tmpCaseData.getRepresentativeClaimantType()).isNull();
-        assertThat(tmpCaseData.getNocRemoveOption()).isEqualTo(NOC_REMOVE_OPTION_ORGANISATION);
+        assertThat(tmpCaseData.getNocRemoveOption()).isNull();
         assertThat(tmpCaseData.getAllPartyFlags().getClaimantRepresentativeFlags()).isNull();
         assertThat(tmpCaseData.getAllPartyFlags().getClaimantRepresentativeExternalFlags()).isNull();
         assertThat(tmpCaseData.getAllPartyFlags().getClaimantFlags()).isNotNull();
@@ -1648,7 +1648,7 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(tmpCaseData.getClaimantRepresentedQuestion()).isEqualTo(NO);
         assertThat(tmpCaseData.getClaimantRepresentativeRemoved()).isEqualTo(YES);
         assertThat(tmpCaseData.getRepresentativeClaimantType()).isNull();
-        assertThat(tmpCaseData.getNocRemoveOption()).isEqualTo(NOC_REMOVE_OPTION_ORGANISATION);
+        assertThat(tmpCaseData.getNocRemoveOption()).isNull();
         assertThat(tmpCaseData.getClaimantRepresentativeOrganisationPolicy()).isEqualTo(tmpClaimantOrganisationPolicy);
 
     }

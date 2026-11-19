@@ -298,4 +298,31 @@ public class NocClaimantRepresentativeService {
     private static String normaliseRepresentativeIdentity(String value) {
         return StringUtils.trimToEmpty(value).toLowerCase(Locale.ROOT);
     }
+
+    /**
+     * Sets the claimant representative's IDAM ID using their email address.
+     *
+     * <p>Assumes that the representative's email address is associated with an
+     * organisation user account and that the organisation service can retrieve
+     * the corresponding user identifier.</p>
+     *
+     * <p>The IDAM ID is only set if the claimant representative is not {@code null},
+     * their existing IDAM ID is blank, and a valid email address is provided.
+     * If no matching account is found, the existing IDAM ID remains unchanged.</p>
+     *
+     * @param claimantRepresentative the claimant representative whose IDAM ID
+     *                               should be populated, if available
+     */
+    public void setClaimantRepresentativeIdamId(RepresentedTypeC claimantRepresentative) {
+        if (claimantRepresentative == null
+                || StringUtils.isNotBlank(claimantRepresentative.getIdamId())
+                || StringUtils.isBlank(claimantRepresentative.getRepresentativeEmailAddress())) {
+            return;
+        }
+        AccountIdByEmailResponse userAccount =
+                organisationService.findAccountByEmail(claimantRepresentative.getRepresentativeEmailAddress());
+        if (userAccount != null) {
+            claimantRepresentative.setIdamId(userAccount.getUserIdentifier());
+        }
+    }
 }

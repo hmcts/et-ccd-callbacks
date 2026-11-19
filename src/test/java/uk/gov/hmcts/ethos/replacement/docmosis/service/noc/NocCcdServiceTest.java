@@ -43,6 +43,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EVENT_UPDATE_CASE_SUBMITTED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_YOURSELF;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_LEAD;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_SHARED;
@@ -282,15 +283,24 @@ class NocCcdServiceTest {
         verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID);
         verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).revokeCaseAssignments(ADMIN_USER_TOKEN,
                 caseUserAssignmentData);
-        // when remove option is not yourself but case assignments not found should not interact with revoke case
+        // when remove option is not yourself and your organisation case assignments found should not revoke any case
         // assignments
         caseDetails.getCaseData().setNocRemoveOption(null);
+        when(ccdClient.retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID)).thenReturn(caseUserAssignmentData);
+        assertDoesNotThrow(() -> nocCcdService.revokeClaimantRepresentation(userDetails, caseDetails));
+        verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID);
+        verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).revokeCaseAssignments(ADMIN_USER_TOKEN,
+                caseUserAssignmentData);
+        // when remove option is your organisation but case assignments not found should not interact with revoke case
+        // assignments
+        caseDetails.getCaseData().setNocRemoveOption(NOC_REMOVE_OPTION_ORGANISATION);
         when(ccdClient.retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID)).thenReturn(null);
         assertDoesNotThrow(() -> nocCcdService.revokeClaimantRepresentation(userDetails, caseDetails));
         verify(ccdClient, times(LoggerTestUtils.INTEGER_TWO)).retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID);
         verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).revokeCaseAssignments(ADMIN_USER_TOKEN,
                 caseUserAssignmentData);
-        // when remove option is not yourself and case assignments found should revoke all case assignments
+        // when remove option is your organisation case assignments found should revoke all case
+        // assignments
         when(ccdClient.retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID)).thenReturn(caseUserAssignmentData);
         assertDoesNotThrow(() -> nocCcdService.revokeClaimantRepresentation(userDetails, caseDetails));
         verify(ccdClient, times(LoggerTestUtils.INTEGER_THREE)).retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID);

@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EVENT_UPDATE_CASE_SUBMITTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REMAINING_REPRESENTATIVE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_NOT_FOUND_BY_TOKEN;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_YOURSELF;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_LEAD;
 
@@ -226,7 +227,9 @@ public class NocCcdService {
             revokeUserClaimantRepresentation(userDetails, caseDetails);
             return;
         }
-        revokeOrganisationClaimantRepresentation(caseDetails);
+        if (Strings.CS.equals(NOC_REMOVE_OPTION_ORGANISATION, caseDetails.getCaseData().getNocRemoveOption())) {
+            revokeOrganisationClaimantRepresentation(caseDetails);
+        }
     }
 
     /**

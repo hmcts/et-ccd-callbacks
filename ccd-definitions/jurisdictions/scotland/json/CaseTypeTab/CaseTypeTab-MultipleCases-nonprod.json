@@ -1,0 +1,19 @@
+[
+  {
+    "CaseTypeID": "ET_Scotland_Multiple",
+    "Channel": "CaseWorker",
+    "TabID": "MultipleCases",
+    "TabLabel": "Cases",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "multipleCasesMarkdown",
+    "TabFieldDisplayOrder": 1,
+    "FieldShowCondition": "multipleReference=\"dummy\""
+  },
+  {
+    "CaseTypeID": "ET_Scotland_Multiple",
+    "Channel": "CaseWorker",
+    "TabID": "MultipleCases",
+    "CaseFieldID": "multipleCasesLabel",
+    "TabFieldDisplayOrder": 2
+  }
+]

@@ -16,10 +16,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationUsersIdamUser;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
-import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
-import uk.gov.hmcts.et.common.model.multiples.items.CaseMultipleTypeItem;
-import uk.gov.hmcts.et.common.model.multiples.items.SubMultipleTypeItem;
-import uk.gov.hmcts.et.common.model.multiples.types.MultipleObjectType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
@@ -32,18 +28,14 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -58,7 +50,6 @@ public class MultipleCreationService {
     private final ExcelDocManagementService excelDocManagementService;
     private final MultipleReferenceService multipleReferenceService;
     private final MultipleHelperService multipleHelperService;
-    private final SubMultipleUpdateService subMultipleUpdateService;
     private final MultipleTransferService multipleTransferService;
     private final CaseManagementLocationService caseManagementLocationService;
     private final FeatureToggleService featureToggleService;
@@ -96,23 +87,11 @@ public class MultipleCreationService {
             addLegalRepsFromSinglesCases(multipleDetails);
         }
 
-        if (multipleData.getMultipleSource().equals(ET1_ONLINE_CASE_SOURCE)
-                || multipleData.getMultipleSource().equals(MIGRATION_CASE_SOURCE)) {
-
-            multipleCreationET1OnlineMigration(userToken, multipleDetails);
-
-        } else {
-
-            log.info("Multiple Creation UI");
-
-            multipleCreationUI(userToken, multipleDetails, errors);
-
-        }
+        log.info("Multiple Creation UI");
+        multipleCreationUI(userToken, multipleDetails, errors);
 
         log.info("Clearing the payload");
-
         clearingMultipleCreationPayload(multipleDetails);
-
     }
 
     private void addLegalRepsFromSinglesCases(MultipleDetails multipleDetails) throws IOException {
@@ -240,100 +219,6 @@ public class MultipleCreationService {
         log.info("Send updates to single cases");
 
         sendUpdatesToSingles(userToken, multipleDetails, errors, ethosCaseRefCollection);
-
-    }
-
-    private void multipleCreationET1OnlineMigration(String userToken, MultipleDetails multipleDetails) {
-
-        if (multipleDetails.getCaseData().getMultipleSource().equals(MIGRATION_CASE_SOURCE)) {
-
-            log.info("Multiple Creation Migration Logic");
-
-            multipleDetails.getCaseData().setPreAcceptDone(YES);
-
-            List<MultipleObject> multipleObjectList = new ArrayList<>();
-
-            HashSet<String> subMultipleNames = new HashSet<>();
-
-            multipleCreationMigrationLogic(multipleDetails, multipleObjectList, subMultipleNames);
-
-            log.info("Generating the excel document for Migration");
-
-            excelDocManagementService.writeAndUploadExcelDocument(
-                    multipleObjectList,
-                    userToken,
-                    multipleDetails,
-                    new ArrayList<>(subMultipleNames));
-
-        } else {
-
-            multipleDetails.getCaseData().setPreAcceptDone(NO);
-
-            log.info("Generating the excel document for ET1 Online");
-
-            excelDocManagementService.writeAndUploadExcelDocument(
-                    MultiplesHelper.getCaseIds(multipleDetails.getCaseData()),
-                    userToken,
-                    multipleDetails,
-                    new ArrayList<>());
-
-        }
-
-        log.info("Resetting creation fields");
-
-        multipleDetails.getCaseData().setCaseMultipleCollection(null);
-
-    }
-
-    private void multipleCreationMigrationLogic(MultipleDetails multipleDetails,
-                                                           List<MultipleObject> multipleObjectList,
-                                                           Set<String> subMultipleNames) {
-
-        List<CaseMultipleTypeItem> caseMultipleTypeItemList = multipleDetails.getCaseData().getCaseMultipleCollection();
-
-        Set<SubMultipleTypeItem> subMultipleTypeItems = new HashSet<>();
-
-        if (caseMultipleTypeItemList != null) {
-
-            for (CaseMultipleTypeItem caseMultipleTypeItem : caseMultipleTypeItemList) {
-
-                MultipleObjectType multipleObjectType = caseMultipleTypeItem.getValue();
-
-                if (StringUtils.isNotBlank(multipleObjectType.getSubMultiple())
-                        && !subMultipleNames.contains(multipleObjectType.getSubMultiple())) {
-
-                    subMultipleNames.add(multipleObjectType.getSubMultiple());
-
-                    log.info("Generating subMultiple type: {}", multipleObjectType.getSubMultiple());
-
-                    subMultipleTypeItems.add(
-                            subMultipleUpdateService.createSubMultipleTypeItemWithReference(
-                                    multipleDetails, multipleObjectType.getSubMultiple()));
-
-                }
-
-                multipleObjectList.add(generateMultipleObjectFromMultipleObjectType(multipleObjectType));
-
-            }
-
-        }
-
-        log.info("Adding the subMultipleCollection coming from Migration");
-
-        multipleDetails.getCaseData().setSubMultipleCollection(new ArrayList<>(subMultipleTypeItems));
-
-    }
-
-    private MultipleObject generateMultipleObjectFromMultipleObjectType(MultipleObjectType multipleObjectType) {
-
-        return MultipleObject.builder()
-                .ethosCaseRef(multipleObjectType.getEthosCaseRef())
-                .subMultiple(multipleObjectType.getSubMultiple() != null ? multipleObjectType.getSubMultiple() : "")
-                .flag1(multipleObjectType.getFlag1() != null ? multipleObjectType.getFlag1() : "")
-                .flag2(multipleObjectType.getFlag2() != null ? multipleObjectType.getFlag2() : "")
-                .flag3(multipleObjectType.getFlag3() != null ? multipleObjectType.getFlag3() : "")
-                .flag4(multipleObjectType.getFlag4() != null ? multipleObjectType.getFlag4() : "")
-                .build();
 
     }
 

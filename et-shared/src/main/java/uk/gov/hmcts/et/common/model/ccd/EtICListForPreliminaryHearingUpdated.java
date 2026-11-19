@@ -21,6 +21,10 @@ public class EtICListForPreliminaryHearingUpdated {
     private String prelimHearingLengthNumType;
     @JsonProperty("etICIsPreliminaryHearingWithMembersV2")
     private String etICIsPreliminaryHearingWithMembers;
+    @JsonProperty("etICIsPreliminaryHearingWithMembersYes")
+    private List<String> etICIsPreliminaryHearingWithMembersYes;
+    @JsonProperty("etICIsPreliminaryHearingWithMembersYesOther")
+    private String etICIsPreliminaryHearingWithMembersYesOther;
     @JsonProperty("etICIsPreliminaryHearingWithMembersReasonV2")
     private String etICIsPreliminaryHearingWithMembersReason;
 }

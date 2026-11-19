@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -21,6 +23,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -45,12 +48,17 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.PostDefaultValuesService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskEventService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
+import uk.gov.hmcts.ethos.replacement.docmosis.wa.SupportTaskClientContextService;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,23 +67,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.nullable;
+import static org.mockito.Mockito.same;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
@@ -87,10 +101,17 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CaseActionsForCaseWorkerController.class, JsonMapper.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
+@Import(PostDefaultValuesService.class)
 class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     private static final String PRE_DEFAULT_VALUES_URL = "/preDefaultValues";
     private static final String POST_DEFAULT_VALUES_URL = "/postDefaultValues";
+    private static final String SUPPORT_TASKS_URL = "/supportTasks/aboutToSubmit";
+    private static final String SUPPORT_TASKS_SUBMITTED_URL = "/supportTasks/submitted";
+    private static final String REVIEW_SUPPORT_REQUEST_ABOUT_TO_START_URL =
+            "/reviewSupportRequest/aboutToStart";
+    private static final String REVIEW_SUPPORT_REQUEST_ABOUT_TO_SUBMIT_URL =
+            "/reviewSupportRequest/aboutToSubmit";
     private static final String AMEND_CASE_DETAILS_URL = "/amendCaseDetails";
     private static final String AMEND_CLAIMANT_DETAILS_URL = "/amendClaimantDetails";
     private static final String UPDATE_CLAIMANT_EMAIL_ABOUT_TO_START_URL =
@@ -98,7 +119,14 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private static final String UPDATE_CLAIMANT_EMAIL_VALIDATE_URL = "/updateClaimantEmail/validate";
     private static final String UPDATE_CLAIMANT_EMAIL_ABOUT_TO_SUBMIT_URL =
             "/updateClaimantEmail/aboutToSubmit";
+    private static final String UPDATE_RESPONDENT_EMAIL_ABOUT_TO_START_URL =
+            "/updateRespondentEmail/aboutToStart";
+    private static final String UPDATE_RESPONDENT_EMAIL_SELECT_URL = "/updateRespondentEmail/select";
+    private static final String UPDATE_RESPONDENT_EMAIL_VALIDATE_URL = "/updateRespondentEmail/validate";
+    private static final String UPDATE_RESPONDENT_EMAIL_ABOUT_TO_SUBMIT_URL =
+            "/updateRespondentEmail/aboutToSubmit";
     private static final String AMEND_RESPONDENT_DETAILS_URL = "/amendRespondentDetails";
+    private static final String AMEND_RESPONDENT_DETAILS_SUBMITTED_URL = "/amendRespondentDetailsSubmitted";
     private static final String AMEND_RESPONDENT_REPRESENTATIVE_URL = "/amendRespondentRepresentative";
     private static final String UPDATE_HEARING_URL = "/updateHearing";
     private static final String RESTRICTED_CASES_URL = "/restrictedCases";
@@ -126,6 +154,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     private static final String ADD_SERVICE_ID_URL = "/addServiceId";
     private static final String AUTHORIZATION = "Authorization";
+    private static final String CLIENT_CONTEXT = "client-context";
+    private static final String ENCODED_CLIENT_CONTEXT = "encoded-client-context";
+    private static final String UPDATED_CLIENT_CONTEXT = "updated-client-context";
     @Autowired
     private JsonMapper jsonMapper;
     @Autowired
@@ -182,6 +213,15 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private CaseFlagsService caseFlagsService;
 
     @MockitoBean
+    private SupportTaskService supportTaskService;
+
+    @MockitoBean
+    private SupportTaskEventService supportTaskEventService;
+
+    @MockitoBean
+    private SupportTaskClientContextService supportTaskClientContextService;
+
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @MockitoBean
@@ -194,6 +234,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @MockitoBean
     private ClaimantEmailService claimantEmailService;
+
+    @MockitoBean
+    private RespondentEmailService respondentEmailService;
 
     @MockitoBean
     private EmploymentRightsActService employmentRightsActService;
@@ -249,6 +292,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .tribunalCorrespondenceDX("123456")
                 .tribunalCorrespondenceEmail("manchester@gmail.com")
                 .build();
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
     }
 
     @ParameterizedTest
@@ -302,6 +347,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
         when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
         when(caseFlagsService.caseFlagsSetupRequired(any(CaseData.class))).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
             .thenReturn(ccdRequest.getCaseDetails().getCaseData());
@@ -314,6 +360,333 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(caseFlagsService).setupCaseFlags(any(CaseData.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"SUBMIT_CASE_DRAFT", "UPDATE_CASE_SUBMITTED"})
+    @SneakyThrows
+    void postDefaultValuesPreparesSupportTasksForCaseFlagsV2Events(String eventId) {
+        ((ObjectNode) requestContent2).put("event_id", eventId);
+        ((ObjectNode) requestContent2).set("case_details_before",
+                requestContent2.get("case_details").deepCopy());
+        when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
+        when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+
+        mvc.perform(post(POST_DEFAULT_VALUES_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        if ("SUBMIT_CASE_DRAFT".equals(eventId)) {
+            verify(supportTaskService).prepareReviewSupportTasks(any(CaseData.class));
+            verify(supportTaskService, never()).prepareUpdatedCaseReviewSupportTasks(any(), any());
+        } else {
+            verify(supportTaskService).prepareUpdatedCaseReviewSupportTasks(any(CaseData.class), any(CaseData.class));
+            verify(supportTaskService, never()).prepareReviewSupportTasks(any());
+        }
+        verify(supportTaskService).prepareArrangeSupportTask(
+                any(CaseData.class), any(CaseData.class));
+        verify(caseManagementForCaseWorkerService).setNextListedDate(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void postDefaultValuesDoesNotPrepareReviewSupportTasksWhenCaseFlagsV2IsDisabled() {
+        ((ObjectNode) requestContent2).put("event_id", "UPDATE_CASE_SUBMITTED");
+        when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
+        when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mvc.perform(post(POST_DEFAULT_VALUES_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(supportTaskService, never()).prepareReviewSupportTasks(any(CaseData.class));
+        verify(supportTaskService, never()).prepareArrangeSupportTask(
+                any(CaseData.class), nullable(CaseData.class));
+        verify(caseManagementForCaseWorkerService, never()).setNextListedDate(any(CaseData.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"SUBMIT_ET3_FORM", "UPDATE_ET3_FORM"})
+    @SneakyThrows
+    void preparesRespondentReviewSupportTasksForEt3Events(String eventId) {
+        ((ObjectNode) requestContent2).put("event_id", eventId);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+
+        mvc.perform(post(SUPPORT_TASKS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(supportTaskService).prepareRespondentReviewSupportTasks(any(CaseData.class));
+        verify(supportTaskService).prepareNewFlagArrangeSupportTask(
+                any(CaseData.class), nullable(CaseData.class));
+        verify(caseManagementForCaseWorkerService).setNextListedDate(any(CaseData.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"requestSupport", "createFlag"})
+    @SneakyThrows
+    void preparesReviewSupportTasksForNewCaseFlags(String eventId) {
+        ((ObjectNode) requestContent2).put("event_id", eventId);
+        ((ObjectNode) requestContent2).set("case_details_before",
+                requestContent2.get("case_details").deepCopy());
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+
+        mvc.perform(post(SUPPORT_TASKS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(supportTaskService).prepareNewFlagReviewSupportTasks(
+                any(CaseData.class), any(CaseData.class));
+        verify(supportTaskService).prepareNewFlagArrangeSupportTask(
+                any(CaseData.class), any(CaseData.class));
+        verify(caseManagementForCaseWorkerService).setNextListedDate(any(CaseData.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"manageFlags", "manageSupport"})
+    @SneakyThrows
+    void preparesReviewSupportTaskCompletionForManagedCaseFlags(String eventId) {
+        ((ObjectNode) requestContent2).put("event_id", eventId);
+        ((ObjectNode) requestContent2).set("case_details_before",
+                requestContent2.get("case_details").deepCopy());
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+        when(supportTaskService.prepareManagedReviewSupportTasks(any(CaseData.class), any(CaseData.class)))
+                .thenReturn(Set.of("ReviewSupportRequestAdmin"));
+        when(supportTaskClientContextService.updateTaskCompletion(
+                ENCODED_CLIENT_CONTEXT, Set.of("ReviewSupportRequestAdmin")))
+                .thenReturn(UPDATED_CLIENT_CONTEXT);
+
+        mvc.perform(post(SUPPORT_TASKS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .header(CLIENT_CONTEXT, ENCODED_CLIENT_CONTEXT)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(header().string(CLIENT_CONTEXT, UPDATED_CLIENT_CONTEXT));
+
+        verify(supportTaskService).prepareManagedReviewSupportTasks(
+                any(CaseData.class), any(CaseData.class));
+        verify(supportTaskClientContextService).updateTaskCompletion(
+                ENCODED_CLIENT_CONTEXT, Set.of("ReviewSupportRequestAdmin"));
+        if ("manageFlags".equals(eventId)) {
+            verify(supportTaskService).prepareArrangeSupportTask(
+                    any(CaseData.class), any(CaseData.class));
+        }
+        verify(caseManagementForCaseWorkerService).setNextListedDate(any(CaseData.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"manageFlags", "manageSupport"})
+    @SneakyThrows
+    void retainsReviewTaskForSubmittedCallbackWhenClientContextIsMissing(String eventId) {
+        ((ObjectNode) requestContent2).put("event_id", eventId);
+        ((ObjectNode) requestContent2).set("case_details_before",
+                requestContent2.get("case_details").deepCopy());
+        Set<String> taskTypes = Set.of("ReviewSupportRequestAdmin");
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+        when(supportTaskService.prepareManagedReviewSupportTasks(any(CaseData.class), any(CaseData.class)))
+                .thenReturn(taskTypes);
+
+        mvc.perform(post(SUPPORT_TASKS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(header().doesNotExist(CLIENT_CONTEXT));
+
+        verify(supportTaskClientContextService).updateTaskCompletion(null, taskTypes);
+        verify(supportTaskService).retainReviewTasksForSubmittedCallback(any(CaseData.class), eq(taskTypes));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"UPDATE_CASE_SUBMITTED", "SUBMIT_ET3_FORM", "UPDATE_ET3_FORM"})
+    @SneakyThrows
+    void triggersCategorySpecificReviewTaskClosureEventsAfterSubmission(String eventId) {
+        ((ObjectNode) requestContent2).put("event_id", eventId);
+        Set<String> taskTypes = Set.of("ReviewSupportRequestAdmin", "ReviewSupportRequestJudge");
+        List<SupportTaskService.ArrangeSupportTask> arrangeTasks = List.of(
+                new SupportTaskService.ArrangeSupportTask("flag-2", "Sign language interpreter"),
+                new SupportTaskService.ArrangeSupportTask("flag-3", "Sign language interpreter"));
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+        when(supportTaskService.reviewTaskTypesToClose(any(CaseData.class))).thenReturn(taskTypes);
+        when(supportTaskService.additionalArrangeSupportTasks(any(CaseData.class), nullable(CaseData.class)))
+                .thenReturn(arrangeTasks);
+
+        mvc.perform(post(SUPPORT_TASKS_SUBMITTED_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(supportTaskEventService).triggerArrangeSupportTaskEvents(any(CaseDetails.class), eq(arrangeTasks));
+        verify(supportTaskEventService).triggerReviewTaskClosureEvents(any(CaseDetails.class), eq(taskTypes));
+    }
+
+    @Test
+    @SneakyThrows
+    void doesNotTriggerReviewTaskClosureEventsWhenCaseFlagsV2IsDisabled() {
+        mvc.perform(post(SUPPORT_TASKS_SUBMITTED_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verifyNoInteractions(supportTaskEventService);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "reviewAdminSupportRequest",
+        "reviewLOSupportRequest",
+        "reviewJudgeSupportRequest"
+    })
+    @SneakyThrows
+    void preparesRequestedFlagsForTheReviewTaskCategory(String eventId) {
+        ((ObjectNode) requestContent2).put("event_id", eventId);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+
+        mvc.perform(post(REVIEW_SUPPORT_REQUEST_ABOUT_TO_START_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(supportTaskService).prepareReviewSupportRequest(any(CaseData.class), eq(eventId));
+    }
+
+    @Test
+    @SneakyThrows
+    void appliesReviewedFlagAndPreparesCompletionAndArrangeTasks() {
+        ((ObjectNode) requestContent2).put("event_id", "reviewAdminSupportRequest");
+        ((ObjectNode) requestContent2).set("case_details_before",
+                requestContent2.get("case_details").deepCopy());
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+        when(supportTaskService.applyReviewSupportRequest(any(CaseData.class))).thenReturn(true);
+        when(supportTaskService.prepareManagedReviewSupportTasks(any(CaseData.class), any(CaseData.class)))
+                .thenReturn(Set.of("ReviewSupportRequestAdmin"));
+        when(supportTaskClientContextService.updateTaskCompletion(
+                ENCODED_CLIENT_CONTEXT, Set.of("ReviewSupportRequestAdmin")))
+                .thenReturn(UPDATED_CLIENT_CONTEXT);
+
+        mvc.perform(post(REVIEW_SUPPORT_REQUEST_ABOUT_TO_SUBMIT_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .header(CLIENT_CONTEXT, ENCODED_CLIENT_CONTEXT)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(header().string(CLIENT_CONTEXT, UPDATED_CLIENT_CONTEXT))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)));
+
+        verify(supportTaskService).prepareManagedReviewSupportTasks(
+                any(CaseData.class), any(CaseData.class));
+        verify(supportTaskClientContextService).updateTaskCompletion(
+                ENCODED_CLIENT_CONTEXT, Set.of("ReviewSupportRequestAdmin"));
+        verify(supportTaskService).prepareArrangeSupportTask(
+                any(CaseData.class), any(CaseData.class));
+        verify(caseManagementForCaseWorkerService).setNextListedDate(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void rejectsReviewSupportRequestWhenNoFlagWasActioned() {
+        ((ObjectNode) requestContent2).put("event_id", "reviewAdminSupportRequest");
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+
+        mvc.perform(post(REVIEW_SUPPORT_REQUEST_ABOUT_TO_SUBMIT_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.ERRORS + "[0]",
+                        is("Please select status other than Requested")));
+
+        verify(supportTaskService, never()).prepareManagedReviewSupportTasks(
+                any(CaseData.class), nullable(CaseData.class));
+        verifyNoInteractions(supportTaskClientContextService);
+        verify(caseManagementForCaseWorkerService, never()).setNextListedDate(any(CaseData.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"manageFlags", "manageSupport"})
+    @SneakyThrows
+    void preservesCaseFlagUpdateCommentWhenSupportRequestIsNotApproved(String eventId) {
+        ((ObjectNode) requestContent2).put("event_id", eventId);
+        ObjectNode caseData = (ObjectNode) requestContent2.at("/case_details/case_data");
+        ObjectNode flag = caseData.putObject("claimantExternalFlags")
+                .putArray("details")
+                .addObject()
+                .put("id", "flag-id")
+                .putObject("value");
+        flag.put("flagCode", "RA0038");
+        flag.put("status", "Not Approved");
+        flag.put("flagComment", "Original request comment");
+        flag.put("flagUpdateComment", "Rejection comment");
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+
+        mvc.perform(post(SUPPORT_TASKS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.claimantExternalFlags.details[0].value.flagComment",
+                        is("Original request comment")))
+                .andExpect(jsonPath("$.data.claimantExternalFlags.details[0].value.flagUpdateComment",
+                        is("Rejection comment")));
+    }
+
+    @Test
+    @SneakyThrows
+    void doesNotPrepareReviewSupportTasksWhenCaseFlagsV2IsDisabled() {
+        ((ObjectNode) requestContent2).put("event_id", "SUBMIT_ET3_FORM");
+
+        mvc.perform(post(SUPPORT_TASKS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(supportTaskService, never()).prepareRespondentReviewSupportTasks(any(CaseData.class));
+        verify(supportTaskService, never()).prepareNewFlagReviewSupportTasks(
+                any(CaseData.class), any(CaseData.class));
+        verify(supportTaskService, never()).prepareManagedReviewSupportTasks(
+                any(CaseData.class), nullable(CaseData.class));
+        verify(supportTaskService, never()).prepareArrangeSupportTask(
+                any(CaseData.class), nullable(CaseData.class));
+        verify(supportTaskService, never()).prepareNewFlagArrangeSupportTask(
+                any(CaseData.class), nullable(CaseData.class));
+        verify(caseManagementForCaseWorkerService, never()).setNextListedDate(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void postDefaultValuesSetsUpLegacyFlagsOnPrepopulatedCaseData() {
+        CaseData prepopulatedCaseData = new CaseData();
+        ((ObjectNode) requestContent2).put("event_id", "initiateCase");
+        when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
+        when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(caseFlagsService.legacyCaseFlagsSetupRequired(any(CaseData.class))).thenReturn(true);
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
+                .thenReturn(prepopulatedCaseData);
+
+        mvc.perform(post(POST_DEFAULT_VALUES_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(caseFlagsService).setupLegacyCaseFlags(same(prepopulatedCaseData));
     }
 
     @Test
@@ -368,7 +741,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
-    void amendClaimantDetails() {
+    void amendClaimantDetailsUsesLegacyCaseFlagsWhenV2IsDisabled() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_CLAIMANT_DETAILS_URL)
                 .content(requestContent2.toString())
@@ -378,6 +751,28 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(caseFlagsService, times(0)).setupCaseFlags(any(CaseData.class));
+        verify(caseFlagsService).setupLegacyCaseFlags(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void amendClaimantDetailsSetsUpCaseFlagsWhenEnabled() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+
+        mvc.perform(post(AMEND_CLAIMANT_DETAILS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(caseFlagsService, times(1)).setupCaseFlags(any(CaseData.class));
+        verify(caseFlagsService, times(0)).setupLegacyCaseFlags(any(CaseData.class));
     }
 
     @Test
@@ -487,11 +882,100 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
-    void amendRespondentDetails() {
+    void initialiseRespondentEmailUpdate() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(respondentEmailService.initialise(any(CaseData.class))).thenReturn(List.of());
+
+        mvc.perform(post(UPDATE_RESPONDENT_EMAIL_ABOUT_TO_START_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(respondentEmailService).initialise(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void selectRespondentForEmailUpdate() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(respondentEmailService.populateCurrentEmail(any(CaseData.class))).thenReturn(List.of());
+
+        mvc.perform(post(UPDATE_RESPONDENT_EMAIL_SELECT_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(respondentEmailService).populateCurrentEmail(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void validateRespondentEmailUpdateReturnsErrors() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(respondentEmailService.validateNewEmail(any(CaseData.class), anyString()))
+                .thenReturn(List.of("Email validation failed"));
+
+        mvc.perform(post(UPDATE_RESPONDENT_EMAIL_VALIDATE_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]", is("Email validation failed")))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void updateRespondentEmailReturnsPreparedCaseData() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(respondentEmailService.prepareUpdate(any(CaseDetails.class), anyString())).thenReturn(List.of());
+
+        mvc.perform(post(UPDATE_RESPONDENT_EMAIL_ABOUT_TO_SUBMIT_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(respondentEmailService).prepareUpdate(any(CaseDetails.class), eq(AUTH_TOKEN));
+    }
+
+    @Test
+    @SneakyThrows
+    void updateRespondentEmailReturnsAccessErrors() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(respondentEmailService.prepareUpdate(any(CaseDetails.class), anyString()))
+                .thenReturn(List.of(RespondentEmailService.ACCESS_GRANT_ERROR));
+
+        mvc.perform(post(UPDATE_RESPONDENT_EMAIL_ABOUT_TO_SUBMIT_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]", is(RespondentEmailService.ACCESS_GRANT_ERROR)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void amendRespondentDetailsUsesLegacyCaseFlagsWhenV2IsDisabled() {
         when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any(CaseData.class));
+        doNothing().when(nocRespondentHelper)
+                .amendRespondentNameRepresentativeNames(any(CaseData.class), eq(false));
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                         .content(requestContent2.toString())
                         .header(AUTHORIZATION, AUTH_TOKEN)
@@ -500,6 +984,36 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(caseFlagsService, times(0)).setupCaseFlags(any(CaseData.class));
+        verify(caseFlagsService).setupLegacyCaseFlags(any(CaseData.class));
+        verify(nocRespondentHelper, times(1))
+                .amendRespondentNameRepresentativeNames(any(CaseData.class), eq(false));
+        verify(nocRespondentRepresentativeService, never())
+                .prepopulateOrgPolicyAndNoc(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void amendRespondentDetailsSetsUpCaseFlagsWhenEnabled() {
+        when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
+                .thenReturn(submitEvent.getCaseData());
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+        doNothing().when(nocRespondentHelper)
+                .amendRespondentNameRepresentativeNames(any(CaseData.class), eq(true));
+
+        mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(caseFlagsService, times(1)).setupCaseFlags(any(CaseData.class));
+        verify(caseFlagsService, times(0)).setupLegacyCaseFlags(any(CaseData.class));
     }
 
     @Test
@@ -520,7 +1034,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(nocRespondentHelper, times(0)).amendRespondentNameRepresentativeNames(any(CaseData.class));
+        verify(nocRespondentHelper, times(0))
+                .amendRespondentNameRepresentativeNames(any(CaseData.class), anyBoolean());
+        verify(nocRespondentRepresentativeService, never()).prepopulateOrgPolicyAndNoc(any(CaseData.class));
     }
 
     @Test
@@ -541,7 +1057,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(nocRespondentHelper, times(0)).amendRespondentNameRepresentativeNames(any(CaseData.class));
+        verify(nocRespondentHelper, times(0))
+                .amendRespondentNameRepresentativeNames(any(CaseData.class), anyBoolean());
+        verify(nocRespondentRepresentativeService, never()).prepopulateOrgPolicyAndNoc(any(CaseData.class));
     }
 
     @Test
@@ -550,7 +1068,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any(CaseData.class));
+        doNothing().when(nocRespondentHelper)
+                .amendRespondentNameRepresentativeNames(any(CaseData.class), anyBoolean());
 
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
 
@@ -575,7 +1094,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
             .thenReturn(ccdRequest.getCaseDetails().getCaseData());
-        doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any(CaseData.class));
+        doNothing().when(nocRespondentHelper)
+                .amendRespondentNameRepresentativeNames(any(CaseData.class), anyBoolean());
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -584,6 +1104,47 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void amendRespondentDetailsSubmittedRealignsRepresentativeAccess() {
+        CaseDetails previousCaseDetails = new CaseDetails();
+        previousCaseDetails.setCaseId(ccdRequest.getCaseDetails().getCaseId());
+        previousCaseDetails.setCaseData(new CaseData());
+        CallbackRequest callbackRequest = CallbackRequest.builder()
+                .caseDetailsBefore(previousCaseDetails)
+                .caseDetails(ccdRequest.getCaseDetails())
+                .build();
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isCaseFlagsV2Enabled(anyString())).thenReturn(true);
+
+        mvc.perform(post(AMEND_RESPONDENT_DETAILS_SUBMITTED_URL)
+                        .content(jsonMapper.toJson(callbackRequest))
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(nocRespondentRepresentativeService)
+                .realignRespondentRepresentativeAccess(any(CallbackRequest.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void amendRespondentDetailsSubmittedDoesNotRealignRepresentativeAccessWhenV2IsDisabled() {
+        CallbackRequest callbackRequest = CallbackRequest.builder()
+                .caseDetails(ccdRequest.getCaseDetails())
+                .build();
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mvc.perform(post(AMEND_RESPONDENT_DETAILS_SUBMITTED_URL)
+                        .content(jsonMapper.toJson(callbackRequest))
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(nocRespondentRepresentativeService, never())
+                .realignRespondentRepresentativeAccess(any(CallbackRequest.class));
     }
 
     @Test
@@ -1260,334 +1821,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
-    void preDefaultValuesForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(PRE_DEFAULT_VALUES_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void postDefaultValuesForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(POST_DEFAULT_VALUES_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void amendCaseDetailsForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_CASE_DETAILS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void amendClaimantDetailsForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_CLAIMANT_DETAILS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void amendRespondentDetailsForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void amendRespondentRepresentativeForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void updateHearingForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(UPDATE_HEARING_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void restrictedCasesForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(RESTRICTED_CASES_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void amendHearingForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_HEARING_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void midEventAmendHearingForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(MID_EVENT_AMEND_HEARING_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void amendCaseStateForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_CASE_STATE_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void midRespondentAddressForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void jurisdictionValidationForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(JURISDICTION_VALIDATION_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void judgementValidationForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(JUDGEMENT_VALIDATION_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void depositValidationForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DEPOSIT_VALIDATION_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void midRespondentAddressPopulatedForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void singleCaseMultipleMidEventValidationForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(SINGLE_CASE_MULTIPLE_MID_EVENT_VALIDATION_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void hearingMidEventValidationForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(HEARING_MID_EVENT_VALIDATION_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void bfActionsForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(BF_ACTIONS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void dynamicListBfActionsForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DYNAMIC_LIST_BF_ACTIONS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void aboutToStartDisposalForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(ABOUT_TO_START_DISPOSAL_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-        verify(clerkService, never()).initialiseClerkResponsible(any(CaseData.class));
-        verify(fileLocationSelectionService, never()).initialiseFileLocation(any(CaseData.class));
-    }
-
-    @Test
-    @SneakyThrows
-    void dynamicRespondentRepresentativeNamesUrlForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DYNAMIC_RESPONDENT_REPRESENTATIVE_NAMES_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void dynamicDepositOrderUrlForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DYNAMIC_DEPOSIT_ORDER_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void dynamicRestrictedReportingUrlForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DYNAMIC_RESTRICTED_REPORTING_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void dynamicJudgmentUrlForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(DYNAMIC_JUDGMENT_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void judgmentSubmittedUrlForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(JUDGEMENT_SUBMITTED_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void dynamicFixCaseAPIForbidden()  {
-        CaseDetails caseDetails = new CaseDetails();
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(AMEND_FIX_CASE_API_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-        verify(fixCaseApiService, never()).checkUpdateMultipleReference(caseDetails, AUTH_TOKEN);
-    }
-
-    @Test
-    @SneakyThrows
-    void reinstateClosedCaseForbidden()  {
-        CaseData caseData = new CaseData();
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
-                        .content(requestContent2.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-        verify(caseCloseValidator, never()).validateReinstateClosedCaseMidEvent(caseData);
-    }
-
-    @Test
-    @SneakyThrows
-    void initialiseAmendCaseDetailsForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(INITIALISE_AMEND_CASE_DETAILS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-
-        verify(clerkService, never()).initialiseClerkResponsible(any(CaseData.class));
-        verify(fileLocationSelectionService, never()).initialiseFileLocation(any(CaseData.class));
-    }
-
-    @Test
-    @SneakyThrows
     void addServiceIdUrl_tokenOk()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(ADD_SERVICE_ID_URL)
@@ -1600,17 +1833,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
             .andExpect(jsonPath("$.warnings", nullValue()));
         verify(caseManagementForCaseWorkerService, times(1))
                 .setHmctsServiceIdSupplementary(any(CaseDetails.class));
-    }
-
-    @Test
-    @SneakyThrows
-    void addServiceIdUrl_tokenFail()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(ADD_SERVICE_ID_URL)
-                .content(requestContent2.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
     }
 
     @Test

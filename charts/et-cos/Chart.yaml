@@ -1,7 +1,7 @@
 apiVersion: v2
 name: et-cos
 home: https://github.com/hmcts/et-ccd-callbacks
-version: 0.0.84
+version: 0.0.88
 description: HMCTS Employment Tribunals CCD Callbacks service
 maintainers:
   - name: HMCTS Employment Tribunals Team
@@ -14,7 +14,7 @@ dependencies:
     condition: java.enabled
   # Below charts are used for Preview environments only
   - name: ccd
-    version: 9.3.0
+    version: 9.3.1
     repository: 'oci://hmctsprod.azurecr.io/helm'
     tags:
       - et-ccd-stack
@@ -24,7 +24,7 @@ dependencies:
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: xui-webapp.enabled
   - name: idam-pr
-    version: ~2.3.0
+    version: ~2.4.0
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: idam-pr.enabled
   - name: et-sya
@@ -75,6 +75,10 @@ dependencies:
     version: ~0.0.25
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: rd-professional-api.enabled
+  - name: rd-commondata-api
+    version: ~0.0.21
+    repository: 'oci://hmctsprod.azurecr.io/helm'
+    condition: rd-commondata-api.enabled
   - name: rd-user-profile-api
     version: ~0.0.28
     repository: 'oci://hmctsprod.azurecr.io/helm'

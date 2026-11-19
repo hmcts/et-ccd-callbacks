@@ -7,7 +7,7 @@ import {
   CitizenClaimantFactory, ClaimantDetailsPage, Events,
   InitialConsiderationPage, LoginPage, ManageCaseDashboardPage, RespondentRepPage,
   users
-} from "@et-shared-test-library/core";
+} from "@hmcts/et-shared-test-library";
 
 let caseNumber: string;
 let caseId: string;

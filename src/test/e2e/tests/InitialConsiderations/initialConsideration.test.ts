@@ -1,5 +1,5 @@
 import { test } from '../../fixtures/et.test.fixture.ts';
-import {CaseTypeLocation, CaseworkerCaseFactory, Events, users} from "@et-shared-test-library/core";
+import {CaseTypeLocation, CaseworkerCaseFactory, Events, users} from "@hmcts/et-shared-test-library";
 
 test.describe('Initial Consideration Tests', () => {
   let caseId: string, caseNumber: string;

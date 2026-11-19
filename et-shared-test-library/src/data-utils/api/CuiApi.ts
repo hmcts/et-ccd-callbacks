@@ -3,15 +3,15 @@
  * It supports both England/Wales and Scotland jurisdictions, and includes utilities for modifying payloads dynamically.
  */
 
-import { axiosRequest } from './ApiHelper';
-import engCase from '../../../resources/payload/citizen/et-england-case-data.json';
-import scotCase from '../../../resources/payload/citizen/et-scotland-case-data.json';
-import eng2RespondentCase from '../../../resources/payload/citizen/et-england-case-data-2-repondent.json';
-import et3 from '../../../resources/payload/citizen/et3.json';
-import { CaseTypeLocation } from '../../config';
-import { getUserAuthToken, getUserId } from './TokenHelperApi';
-import { set, unset } from 'lodash';
-import { staticConfig } from '../../config';
+import { axiosRequest } from './ApiHelper.js';
+import engCase from '../../../resources/payload/citizen/et-england-case-data.json' with { type: 'json' };
+import scotCase from '../../../resources/payload/citizen/et-scotland-case-data.json' with { type: 'json' };
+import eng2RespondentCase from '../../../resources/payload/citizen/et-england-case-data-2-repondent.json' with { type: 'json' };
+import et3 from '../../../resources/payload/citizen/et3.json' with { type: 'json' };
+import { CaseTypeLocation, staticConfig } from '../../config/index.js';
+import { getUserAuthToken, getUserId } from './TokenHelperApi.js';
+import pkg from 'lodash';
+const {set, unset} = pkg;
 
 const syaApiBaseUrl = staticConfig.EtCosPreviewEtSyaApiUrl;
 const payloadMap: Record<CaseTypeLocation, any> = {

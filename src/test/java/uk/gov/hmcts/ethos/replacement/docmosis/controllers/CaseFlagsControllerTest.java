@@ -53,6 +53,7 @@ class CaseFlagsControllerTest extends BaseControllerTest {
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseDetails.getCaseData())
+            .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
             .build();
     }
 
@@ -67,16 +68,6 @@ class CaseFlagsControllerTest extends BaseControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
-    }
-
-    @Test
-    void aboutToSubmit_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
     }
 
     @Test

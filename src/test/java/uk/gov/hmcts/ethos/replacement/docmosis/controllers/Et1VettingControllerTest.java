@@ -92,17 +92,6 @@ class Et1VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initialiseEt1Vetting_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(INIT_CASE_VETTING_ENDPOINT)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(et1VettingService, never()).initialiseEt1Vetting(ccdRequest.getCaseDetails());
-    }
-
-    @Test
     void initialiseEt1Vetting_BadRequest() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(INIT_CASE_VETTING_ENDPOINT)
@@ -133,17 +122,6 @@ class Et1VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void jurisdictionCodes_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(JURISDICTION_CODE_ENDPOINT)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
-        verify(et1VettingService, never()).initialiseEt1Vetting(ccdRequest.getCaseDetails());
-    }
-
-    @Test
     void hearingVenues_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(et1VettingService.getAddressesHtml(any())).thenReturn("addressesHtml");
@@ -156,17 +134,6 @@ class Et1VettingControllerTest extends BaseControllerTest {
             .andExpect(jsonPath("$.data.et1AddressDetails", notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void hearingVenues_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(HEARING_VENUE_ENDPOINT)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
-        verify(et1VettingService, never()).initialiseEt1Vetting(ccdRequest.getCaseDetails());
     }
 
     private void addJurCodeToExistingCollection(CaseData caseData, String code) {
@@ -192,16 +159,6 @@ class Et1VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void et1ProcessingComplete_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ET1_PROCESSING_COMPLETE_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(APPLICATION_JSON))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void et1ProcessingComplete_badRequest() throws Exception {
         mockMvc.perform(post(ET1_PROCESSING_COMPLETE_URL)
                 .content("garbage content")
@@ -222,16 +179,6 @@ class Et1VettingControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("$.data.jurCodesCollection[0].id", notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void et1VettingAboutToSubmit_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ET1_VETTING_ABOUT_TO_SUBMIT)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 
     @Test

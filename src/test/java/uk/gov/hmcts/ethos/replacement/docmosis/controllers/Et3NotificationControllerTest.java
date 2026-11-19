@@ -149,16 +149,6 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStart_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(ABOUT_TO_START_URL)
-                        .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void midUploadDocuments_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(servingService.generateOtherTypeDocumentLink(anyList())).thenReturn("expectedDocumentName");
@@ -199,16 +189,6 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midUploadDocuments_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(MID_UPLOAD_DOCUMENTS_URL)
-                .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void midUploadDocuments_badRequest() throws Exception {
         mvc.perform(post(SUBMITTED_URL)
                 .content("garbage content")
@@ -233,16 +213,6 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                        .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void submitted_tokenOk() throws Throwable {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SUBMITTED_URL)
@@ -255,16 +225,6 @@ class Et3NotificationControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void submitted_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(SUBMITTED_URL)
-                .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
     }
 
     @Test

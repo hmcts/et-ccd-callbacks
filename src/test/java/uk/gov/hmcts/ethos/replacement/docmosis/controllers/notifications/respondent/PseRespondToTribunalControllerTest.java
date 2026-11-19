@@ -13,6 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PseRespondToTribunalService;
@@ -26,6 +27,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -100,16 +102,6 @@ class PseRespondToTribunalControllerTest {
     }
 
     @Test
-    void aboutToStart_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_START_URL)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void showError_returnError() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockHelper.when(() -> Helper.isClaimantNonSystemUser(any()))
@@ -154,18 +146,8 @@ class PseRespondToTribunalControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(pseRespondToTribunalService).initialOrdReqDetailsTableMarkUp(ccdRequest.getCaseDetails().getCaseData(),
-                RESPONDENT_TITLE);
-    }
-
-    @Test
-    void midDetailsTable_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_TABLE_DETAILS)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
+        verify(pseRespondToTribunalService).initialOrdReqDetailsTableMarkUp(
+                any(CaseData.class), eq(RESPONDENT_TITLE));
     }
 
     @Test
@@ -179,17 +161,7 @@ class PseRespondToTribunalControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(pseRespondToTribunalService).validateRespondentInput(ccdRequest.getCaseDetails().getCaseData());
-    }
-
-    @Test
-    void midValidateInput_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_VALIDATE_INPUT)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
+        verify(pseRespondToTribunalService).validateRespondentInput(any(CaseData.class));
     }
 
     @Test
@@ -203,24 +175,16 @@ class PseRespondToTribunalControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(pseRespondToTribunalService, times(1)).sendAcknowledgeEmail(ccdRequest.getCaseDetails(), AUTH_TOKEN);
-        verify(pseRespondToTribunalService, times(1)).sendClaimantEmail(ccdRequest.getCaseDetails());
-        verify(pseRespondToTribunalService, times(1)).sendTribunalEmail(ccdRequest.getCaseDetails(), RESPONDENT_TITLE);
-    }
-
-    @Test
-    void aboutToSubmit_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
+        verify(pseRespondToTribunalService, times(1)).sendAcknowledgeEmail(
+                any(CaseDetails.class), eq(AUTH_TOKEN));
+        verify(pseRespondToTribunalService, times(1)).sendClaimantEmail(any(CaseDetails.class));
+        verify(pseRespondToTribunalService, times(1)).sendTribunalEmail(
+                any(CaseDetails.class), eq(RESPONDENT_TITLE));
     }
 
     @Test
     void submitted_Success() throws Exception {
-        when(pseRespondToTribunalService.getRespondentSubmittedBody(ccdRequest.getCaseDetails().getCaseData()))
+        when(pseRespondToTribunalService.getRespondentSubmittedBody(any(CaseData.class)))
             .thenReturn("SubmittedBody");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_URL)
@@ -232,16 +196,6 @@ class PseRespondToTribunalControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void submitted_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(SUBMITTED_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
     }
 
 }

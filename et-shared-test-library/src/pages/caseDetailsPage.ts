@@ -1,8 +1,8 @@
-import { BasePage } from "./basePage";
+import { BasePage } from "./basePage.js";
 import { BrowserContext, expect, Locator, Page } from '@playwright/test';
-import { CaseEvent } from '../config';
-import { Tab, TabContentItem } from '../types';
-import { FileTree } from '../types';
+import { CaseEvent } from '../config/index.js';
+import { Tab, TabContentItem } from '../types/index.js';
+import { FileTree } from '../types/index.js';
 
 export class CaseDetailsPage extends BasePage {
 

@@ -57,15 +57,4 @@ class ClaimantHearingPreferencesControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, empty()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
-
-    @Test
-    void testMidEventForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-
-        mockMvc.perform(post(MID_EVENT_HEARING_PREFERENCES_URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-    }
 }

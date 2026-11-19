@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { ContactTheTribunalPage } from './ContactTheTribunalPage';
-import {resolveResourcePath} from "../../data-utils/resourcePath";
+import { ContactTheTribunalPage } from './ContactTheTribunalPage.js';
+import {resolveResourcePath} from "../../data-utils/resourceFilePathData.js";
 export class PrepareAndSubmitDocumentPage extends ContactTheTribunalPage {
 
   private readonly prepareAndSubmitDocumentPageHeading: Locator;

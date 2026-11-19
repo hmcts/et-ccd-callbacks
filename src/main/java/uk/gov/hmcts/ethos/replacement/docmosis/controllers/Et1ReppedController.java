@@ -24,10 +24,12 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.PostDefaultValuesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 
@@ -47,12 +49,13 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/et1Repped")
 public class Et1ReppedController {
     private static final String GENERATED_DOCUMENT_URL = "Please download the draft ET1 from : ";
-    private final CaseActionsForCaseWorkerController caseActionsForCaseWorkerController;
+    private final PostDefaultValuesService postDefaultValuesService;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private final Et1ReppedService et1ReppedService;
     private final FeatureToggleService featureToggleService;
     private final Et1SubmissionService et1SubmissionService;
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
+    private final CaseFlagsService caseFlagsService;
 
     /**
      * Callback to handle postcode validation for the ET1 Repped journey.
@@ -510,7 +513,12 @@ public class Et1ReppedController {
         Et1ReppedHelper.setEt1SubmitData(caseData);
         et1ReppedService.addDefaultData(caseDetails.getCaseTypeId(), caseData);
         et1ReppedService.addClaimantRepresentativeDetails(caseData, userToken);
-        caseActionsForCaseWorkerController.postDefaultValues(ccdRequest, userToken);
+        List<String> errors = postDefaultValuesService.applyPostDefaultValues(ccdRequest, userToken);
+        // Default values may replace the case data instance, so read it back from the case details
+        caseData = caseDetails.getCaseData();
+        if (!errors.isEmpty()) {
+            return getCallbackRespEntityErrors(errors, caseData);
+        }
         if (featureToggleService.isEt1DocGenEnabled()) {
             caseData.setRequiresSubmissionDocuments(YES);
         } else {
@@ -519,6 +527,12 @@ public class Et1ReppedController {
         et1SubmissionService.sendEt1ConfirmationMyHmcts(caseDetails, userToken);
         Et1ReppedHelper.clearEt1ReppedCreationFields(caseData);
         caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
+
+        boolean caseFlagsV2Toggle = featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId());
+        if (caseFlagsV2Toggle && caseFlagsService.caseFlagsSetupRequired(caseData)) {
+            caseFlagsService.setupCaseFlags(caseData);
+            caseFlagsService.processNewlySetCaseFlags(caseData);
+        }
 
         return getCallbackRespEntityNoErrors(caseData);
     }

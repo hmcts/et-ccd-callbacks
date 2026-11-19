@@ -4,7 +4,7 @@ import {
   cuiApi,
   Et1ClaimsListPage,
   users
-} from "@et-shared-test-library/core";
+} from "@hmcts/et-shared-test-library";
 import {test} from "../fixtures/et.test.fixture.ts";
 
 test.describe('Claimant navigate back to Case list', () => {

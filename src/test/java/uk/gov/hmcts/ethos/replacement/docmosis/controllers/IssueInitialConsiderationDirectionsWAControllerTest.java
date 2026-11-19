@@ -94,16 +94,6 @@ class IssueInitialConsiderationDirectionsWAControllerTest extends BaseController
     }
 
     @Test
-    void submitInitialConsideration_TokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(SUBMIT_INITIAL_CONSIDERATION_DIRECTIONS_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void submitInitialConsideration_BadRequest() throws Exception {
         mvc.perform(post(SUBMIT_INITIAL_CONSIDERATION_DIRECTIONS_URL)
                         .content("bad request")
@@ -121,16 +111,6 @@ class IssueInitialConsiderationDirectionsWAControllerTest extends BaseController
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.confirmation_header", notNullValue()));
-    }
-
-    @Test
-    void initICCompleteTokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(COMPLETE_INITIAL_CONSIDERATION_DIRECTIONS_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 
     @Test

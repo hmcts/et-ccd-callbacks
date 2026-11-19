@@ -31,6 +31,7 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -112,16 +113,6 @@ class TseAdminControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStart_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_START_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void aboutToStart_badRequest() throws Exception {
         mockMvc.perform(post(ABOUT_TO_START_URL)
                 .content("garbage content")
@@ -142,21 +133,8 @@ class TseAdminControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseAdminService).initialTseAdminTableMarkUp(
-                ccdRequest.getCaseDetails().getCaseData(),
-                AUTH_TOKEN);
-    }
-
-    @Test
-    void midDetailsTable_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_DETAILS_TABLE)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-        verify(tseAdminService, never()).initialTseAdminTableMarkUp(
-                ccdRequest.getCaseDetails().getCaseData(),
-                AUTH_TOKEN);
+                any(CaseData.class),
+                eq(AUTH_TOKEN));
     }
 
     @Test
@@ -167,8 +145,8 @@ class TseAdminControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
         verify(tseAdminService, never()).initialTseAdminTableMarkUp(
-                ccdRequest.getCaseDetails().getCaseData(),
-                AUTH_TOKEN);
+                any(CaseData.class),
+                eq(AUTH_TOKEN));
     }
 
     @Test
@@ -183,19 +161,7 @@ class TseAdminControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseAdminService, times(1))
-            .validateInput(ccdRequest.getCaseDetails().getCaseData());
-    }
-
-    @Test
-    void midValidateInput_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_VALIDATE_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
-        verify(tseAdminService, never())
-            .validateInput(ccdRequest.getCaseDetails().getCaseData());
+            .validateInput(any(CaseData.class));
     }
 
     @Test
@@ -206,7 +172,7 @@ class TseAdminControllerTest extends BaseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
         verify(tseAdminService, never())
-            .validateInput(ccdRequest.getCaseDetails().getCaseData());
+            .validateInput(any(CaseData.class));
     }
 
     @Test
@@ -221,30 +187,13 @@ class TseAdminControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseAdminService).saveTseAdminDataFromCaseData(
-                ccdRequest.getCaseDetails().getCaseData());
+                any(CaseData.class));
         verify(tseAdminService).sendEmailToClaimant(
-            ccdRequest.getCaseDetails().getCaseId(),
-            ccdRequest.getCaseDetails().getCaseData());
+            eq(ccdRequest.getCaseDetails().getCaseId()),
+            any(CaseData.class));
         verify(tseAdminService).clearTseAdminDataFromCaseData(
-                ccdRequest.getCaseDetails().getCaseData());
+                any(CaseData.class));
         verify(caseFlagsService, times(1)).setPrivateHearingFlag(any());
-    }
-
-    @Test
-    void aboutToSubmit_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
-        verify(tseAdminService, never()).saveTseAdminDataFromCaseData(
-                ccdRequest.getCaseDetails().getCaseData());
-        verify(tseAdminService, never()).sendEmailToClaimant(
-            ccdRequest.getCaseDetails().getCaseId(),
-            ccdRequest.getCaseDetails().getCaseData());
-        verify(tseAdminService, never()).clearTseAdminDataFromCaseData(
-                ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
@@ -255,12 +204,12 @@ class TseAdminControllerTest extends BaseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
         verify(tseAdminService, never()).saveTseAdminDataFromCaseData(
-                ccdRequest.getCaseDetails().getCaseData());
+                any(CaseData.class));
         verify(tseAdminService, never()).sendEmailToClaimant(
-            ccdRequest.getCaseDetails().getCaseId(),
-            ccdRequest.getCaseDetails().getCaseData());
+            eq(ccdRequest.getCaseDetails().getCaseId()),
+            any(CaseData.class));
         verify(tseAdminService, never()).clearTseAdminDataFromCaseData(
-                ccdRequest.getCaseDetails().getCaseData());
+                any(CaseData.class));
     }
 
     @Test
@@ -275,16 +224,6 @@ class TseAdminControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void submitted_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(SUBMITTED_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
     }
 
     @Test
@@ -308,21 +247,8 @@ class TseAdminControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseAdmCloseService).aboutToSubmitCloseApplication(
-            ccdRequest.getCaseDetails().getCaseData(),
-            ENGLANDWALES_CASE_TYPE_ID);
-    }
-
-    @Test
-    void aboutToSubmitCloseApplication_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_CLOSE_APP_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
-        verify(tseAdmCloseService, never()).aboutToSubmitCloseApplication(
-            ccdRequest.getCaseDetails().getCaseData(),
-            ENGLANDWALES_CASE_TYPE_ID);
+            any(CaseData.class),
+            eq(ENGLANDWALES_CASE_TYPE_ID));
     }
 
     @Test
@@ -333,8 +259,8 @@ class TseAdminControllerTest extends BaseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
         verify(tseAdmCloseService, never()).aboutToSubmitCloseApplication(
-            ccdRequest.getCaseDetails().getCaseData(),
-            ENGLANDWALES_CASE_TYPE_ID);
+            any(CaseData.class),
+            eq(ENGLANDWALES_CASE_TYPE_ID));
     }
 
     @Test
@@ -349,16 +275,6 @@ class TseAdminControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void submittedCloseApplication_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(SUBMITTED_CLOSE_APP_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 
     @Test

@@ -1,14 +1,13 @@
 import { readFileSync } from 'fs';
-import path from 'path';
-import { set, unset } from 'lodash';
-import { ReplacementAction } from '../../types/replacement-action';
-import {axiosRequest} from './ApiHelper';
-import {getServiceToken, getUserId, getUserAuthToken} from './TokenHelperApi';
+import pkg from 'lodash';
+import { ReplacementAction } from '../../types/index.js';
+import {axiosRequest} from './ApiHelper.js';
+import {getServiceToken, getUserId, getUserAuthToken} from './TokenHelperApi.js';
 import {AxiosResponse} from 'axios';
-import { CaseTypeLocation } from '../../config/case-data';
-import { staticConfig } from '../../config/config.static';
-import {resolveResourcePath} from "../resourcePath";
+import { CaseTypeLocation, staticConfig } from '../../config/index.js';
+import {resolveResourcePath} from "../resourceFilePathData.js";
 
+const {set, unset} = pkg;
 const ccdApiUrl = staticConfig.ccdDataStoreApi;
 
 /**

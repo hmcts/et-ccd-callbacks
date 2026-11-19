@@ -108,6 +108,40 @@ final class NocUtilsTest {
     private static final String CASE_ID = "1234567890123456";
 
     @Test
+    void mapsThreeRepresentativesToNewSelectionsInsteadOfSavedRespondentIds() throws GenericServiceException {
+        CaseData data = new CaseData();
+        List<RespondentSumTypeItem> respondents = new ArrayList<>();
+        List<RepresentedTypeRItem> representatives = new ArrayList<>();
+        int[] previousRespondents = {2, 1, 3};
+        int[] selectedRespondents = {1, 3, 2};
+        for (int index = 0; index < 3; index++) {
+            RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+            respondent.setId("respondent-" + (index + 1));
+            respondent.setValue(RespondentSumType.builder().respondentName("Respondent " + (index + 1)).build());
+            respondents.add(respondent);
+            DynamicValueType selected = new DynamicValueType();
+            selected.setLabel("Respondent " + selectedRespondents[index]);
+            DynamicFixedListType selection = new DynamicFixedListType();
+            selection.setValue(selected);
+            representatives.add(RepresentedTypeRItem.builder().id("representative-" + (index + 1))
+                    .value(RepresentedTypeR.builder().nameOfRepresentative("Representative " + (index + 1))
+                            .respondentId("respondent-" + previousRespondents[index])
+                            .dynamicRespRepName(selection).build()).build());
+        }
+        data.setRespondentCollection(respondents);
+        data.setRepCollection(representatives);
+
+        NocUtils.mapRepresentativesToRespondents(data, DUMMY_CASE_SUBMISSION_REFERENCE_1, true);
+
+        for (int index = 0; index < 3; index++) {
+            assertThat(representatives.get(index).getValue().getRespondentId())
+                    .isEqualTo("respondent-" + selectedRespondents[index]);
+            assertThat(respondents.get(selectedRespondents[index] - 1).getValue().getRepresentativeId())
+                    .isEqualTo(representatives.get(index).getId());
+        }
+    }
+
+    @Test
     void theValidateRepresentativeRespondentMapping() {
         // when representative collection is empty should return an empty list
         List<RespondentSumTypeItem> respondents = new ArrayList<>();

@@ -20,7 +20,7 @@ test.describe.serial('Case creation in Citizen UI',
   test(
     'Create a claim for still working for organisation, submit and process within manage cases',
     {
-      tag: ['@cx', '@smoke', '@ccd-callback-tests'],
+      tag: ['@cx', '@smoke', '@ccd-callback-tests','@accessibility'],
     },
     async ({
       page,

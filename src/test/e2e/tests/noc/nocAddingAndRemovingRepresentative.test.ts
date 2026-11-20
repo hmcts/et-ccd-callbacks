@@ -40,15 +40,15 @@ test.describe('Legalrep/Caseworker add or remove Representative via NoC or manag
   });
 
   //RET-6074
-  test('validate removal of respondent representatives when self-assigning(via noc) as claimant  representative with same organisation', async ({
-                                                                              manageCaseDashboardPage,
-                                                                              nocPage,
-                                                                            }) => {
+  test('validate removal of respondent representatives when self-assigning(via noc) as claimant  representative with same organisation',
+    async ({
+        manageCaseDashboardPage,
+        nocPage,
+      }) => {
     //perform noc for respondent representative
     await manageCaseDashboardPage.navigateToNoticeOfChange();
     await nocPage.processNocRequest(caseId, CaseDetailsValues.respondentName, caseNumber);
     await manageCaseDashboardPage.navigateToCaseDetails(caseId, CaseTypeLocation.EnglandAndWales, true);
-
 
     //Caseworker can see a respondent representative
     await manageCaseDashboardPageCW.visit();

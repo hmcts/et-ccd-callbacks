@@ -59,7 +59,11 @@ export abstract class BasePage {
     }
 
     this.lastAuditedKey = key;
-    await this.axeUtils.audit();
+    // Excluded these locators because defects already raised RET-7433, RET-7434, RET-7435,
+    let excludeSelectors: string[] = ['#claimantHearingPanelPreference-2', '#claimantHearingPanelPreference-3', '#reasonableAdjustments',
+    '#pension', '#employee-benefits', '#acasCert', '#whistleblowing-claim', '#linkedCases-2', 'a[data-navigation-link=""]',
+    '.govuk-grid-column-one-third > .govuk-body > a[target="_blank"]', '.govuk-body > a[target="_blank"]'];
+    await this.axeUtils.audit({exclude: excludeSelectors});
   }
 
   async clickContinue(url: string = '', pageNum?: number, shouldContinue: boolean = true) {

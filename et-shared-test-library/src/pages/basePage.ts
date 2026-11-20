@@ -1,9 +1,16 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { CommonActionsHelper } from './helpers/CommonActionsHelper.js';
+import {AxeUtils} from "@hmcts/playwright-common";
+import {config} from "../config";
 
 export abstract class BasePage {
   readonly page: Page;
   readonly commonActionsHelper: CommonActionsHelper;
+
+  protected axeUtils?: AxeUtils;
+  protected accessibilityEnabled: boolean = false;
+  private lastAuditedKey?: string;
+
   readonly saveAsDraftButton: Locator;
   readonly closeAndReturnButton: Locator;
   readonly applyFilterButton: Locator;
@@ -36,6 +43,29 @@ export abstract class BasePage {
     await this.page.waitForTimeout(time);
   }
 
+  setAccessibilityContext(axeUtils: AxeUtils) {
+    this.axeUtils = axeUtils;
+    this.accessibilityEnabled = config.accessibilityEnabled === 'true';
+  }
+
+  protected async auditIfEnabled(stepName?: string) {
+    if (!this.accessibilityEnabled || !this.axeUtils) {
+      return;
+    }
+
+    const key = `${this.page.url()}::${stepName ?? 'default'}`;
+    if (this.lastAuditedKey === key) {
+      return;
+    }
+
+    this.lastAuditedKey = key;
+    // Excluded these locators because defects already raised RET-7433, RET-7434, RET-7435,
+    let excludeSelectors: string[] = ['#claimantHearingPanelPreference-2', '#claimantHearingPanelPreference-3', '#reasonableAdjustments',
+    '#pension', '#employee-benefits', '#acasCert', '#whistleblowing-claim', '#linkedCases-2', 'a[data-navigation-link=""]',
+    '.govuk-grid-column-one-third > .govuk-body > a[target="_blank"]', '.govuk-body > a[target="_blank"]'];
+    await this.axeUtils.audit({exclude: excludeSelectors});
+  }
+
   async clickContinue(url: string = '', pageNum?: number, shouldContinue: boolean = true) {
     await this.page.waitForLoadState('load');
     const maxRetries = 3;
@@ -47,7 +77,10 @@ export abstract class BasePage {
       await this.continueButton.click({force: true});
       await this.page.waitForLoadState('load');
       await this.waitForSpinner(180_000); // 3 mins dynamic wait time for spinner to disappear as some CCD callbacks can take time
-      if (!shouldContinue) return;
+      if (!shouldContinue) {
+        await this.auditIfEnabled(`BasePage - clickContinueNo - ${url}${pageNum ? pageNum : ''}`);
+        return;
+      }
       // If url or url+pageNum is provided, check if current URL contains the expected string
       if (url || url?.length > 0) {
         const expected = `${url}${pageNum ? pageNum : ''}`;
@@ -74,6 +107,7 @@ export abstract class BasePage {
       }
       if(!process.env.CI) console.log('No error detected after clicking Continue.');
       // No error and URL is as expected, break out of loop
+      await this.auditIfEnabled(`BasePage - clickContinueYes - ${url}${pageNum ? pageNum : ''}`);
       return;
     }
     if (shouldContinue && attempt === maxRetries) {
@@ -98,9 +132,11 @@ export abstract class BasePage {
     await this.saveAsDraftButton.click();
     await this.waitForSpinner();
     await this.page.waitForLoadState('load');
+    await this.auditIfEnabled('BasePage - saveAsDraft');
   }
 
   async clickCloseAndReturn() {
+    await this.auditIfEnabled('BasePage - clickCloseAndReturn');
     await this.closeAndReturnButton.click();
     await this.waitForSpinner();
     await this.page.waitForLoadState('load');
@@ -132,7 +168,10 @@ export abstract class BasePage {
       await this.submitButton.click({force: true });
       await this.page.waitForLoadState('load', { timeout: 4000 });
       await this.waitForSpinner(180_000);
-      if (!submitted) return;
+      if (!submitted) {
+        await this.auditIfEnabled('BasePage - clickSubmitButtonNo');
+        return;
+      }
       // Check if error is visible
       const h3Visible = await this.errorHeading.waitFor({ state: 'visible', timeout: 3000 })
         .then(() => true)
@@ -145,6 +184,7 @@ export abstract class BasePage {
         continue;
       }
       // No error, break out of loop
+      await this.auditIfEnabled('BasePage - clickSubmitButtonYes');
       return;
     }
     if (submitted && attempt === maxRetries) {
@@ -154,6 +194,7 @@ export abstract class BasePage {
   }
 
   async clickIgnoreAndContinueButton() {
+    await this.auditIfEnabled('BasePage - clickIgnoreAndContinueButton');
     await this.page.getByRole('button', { name: 'Ignore Warning and Continue' }).click();
     await this.page.waitForLoadState('load', { timeout: 5000 });
   }
@@ -195,6 +236,7 @@ export abstract class BasePage {
   }
 
   async saveAndContinueButton() {
+    await this.auditIfEnabled('BasePage - saveAndContinueButton');
     await this.page.getByRole('button', { name: 'Save and continue' }).click();
   }
 

@@ -5,7 +5,7 @@ import { CcdApi } from '../data-utils/api/CcdApi.js';
 import { CuiApi } from '../data-utils/api/CuiApi.js';
 import { utilFixtures } from './utils.fixture.js';
 
-export const test = mergeTests(pageFixtures, allyTest, utilFixtures);
+export const test = mergeTests(allyTest, pageFixtures, utilFixtures);
 export { expect };
 
 export const ccdApi = new CcdApi();

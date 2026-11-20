@@ -9,11 +9,14 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.Document;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingDetailTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingDetailType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingRecordingType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.SelectionServiceTestUtils;
 
@@ -25,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -145,6 +149,88 @@ class HearingDetailsServiceTest {
         assertNull(hearingDetailType.getHearingDetailsTimingFinish());
         assertNull(hearingDetailType.getHearingDetailsTimingDuration());
         assertNull(hearingDetailType.getHearingDetailsHearingNotes2());
+        assertNull(hearingDetailType.getHearingDetailsRecordings());
+    }
+
+    @Test
+    void handleListingSelected_dayHasRecordings_copiesRecordingsToEvent() {
+        List<GenericTypeItem<HearingRecordingType>> recordings = List.of(
+            recording("morning.mp3", "Morning session", "10:00"),
+            recording("afternoon.mp3", "Afternoon session", "14:00"));
+        selectedListing.setHearingRecordings(recordings);
+        CaseData caseData = createCaseData();
+
+        hearingDetailsService.handleListingSelected(caseData);
+
+        HearingDetailType hearingDetailType = caseData.getHearingDetailsCollection().getFirst().getValue();
+        assertEquals(recordings, hearingDetailType.getHearingDetailsRecordings());
+    }
+
+    @Test
+    void updateCase_recordingsUploaded_storesRecordingsOnDayAndClearsEventCopy() {
+        List<GenericTypeItem<HearingRecordingType>> recordings = List.of(
+            recording("morning.mp3", "Morning session", "10:00"),
+            recording("afternoon.mp3", null, null));
+        CaseDetails caseDetails = caseDetailsWithEventRecordings(recordings);
+
+        hearingDetailsService.updateCase(caseDetails);
+
+        assertEquals(recordings, selectedListing.getHearingRecordings());
+        assertNull(caseDetails.getCaseData().getHearingDetailsCollection().getFirst().getValue()
+            .getHearingDetailsRecordings());
+    }
+
+    @Test
+    void updateCase_allRecordingsRemoved_clearsRecordingsOnDay() {
+        selectedListing.setHearingRecordings(List.of(recording("morning.mp3", null, null)));
+        CaseDetails caseDetails = caseDetailsWithEventRecordings(new ArrayList<>());
+
+        hearingDetailsService.updateCase(caseDetails);
+
+        assertTrue(selectedListing.getHearingRecordings().isEmpty());
+    }
+
+    @Test
+    void updateCase_noHearingDetailsCollection_doesNotFail() {
+        CaseData caseData = createCaseData();
+        caseData.setHearingDetailsCollection(null);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+
+        hearingDetailsService.updateCase(caseDetails);
+
+        assertNull(caseData.getHearingDetailsCollection());
+    }
+
+    private CaseDetails caseDetailsWithEventRecordings(List<GenericTypeItem<HearingRecordingType>> recordings) {
+        selectedListing.setListedDate("2026-11-12T10:00:00.000");
+        HearingDetailType hearingDetailType = new HearingDetailType();
+        hearingDetailType.setHearingDetailsDate(selectedListing.getListedDate());
+        hearingDetailType.setHearingDetailsStatus(Constants.HEARING_STATUS_HEARD);
+        hearingDetailType.setHearingDetailsRecordings(recordings);
+        HearingDetailTypeItem hearingDetailTypeItem = new HearingDetailTypeItem();
+        hearingDetailTypeItem.setValue(hearingDetailType);
+
+        CaseData caseData = createCaseData();
+        caseData.setHearingDetailsCollection(List.of(hearingDetailTypeItem));
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        return caseDetails;
+    }
+
+    private static GenericTypeItem<HearingRecordingType> recording(String fileName, String description,
+                                                                   String startTime) {
+        UploadedDocumentType document = UploadedDocumentType.builder()
+            .documentFilename(fileName)
+            .documentUrl("http://dm-store/documents/" + fileName)
+            .documentBinaryUrl("http://dm-store/documents/" + fileName + "/binary")
+            .categoryId("C84")
+            .build();
+        return GenericTypeItem.from(HearingRecordingType.builder()
+            .hearingRecordingDocument(document)
+            .hearingRecordingDescription(description)
+            .hearingRecordingStartTime(startTime)
+            .build());
     }
 
     @Test

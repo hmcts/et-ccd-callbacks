@@ -2,6 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +20,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Map;
 
-import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
@@ -36,9 +37,12 @@ import static uk.gov.service.notify.NotificationClient.prepareUpload;
 @RequiredArgsConstructor
 public class DraftAndSignJudgementService {
 
-    private static final String ERROR_MSG_DOWNLOAD_DOC = "Source: DraftAndSignJudgementService, "
-        + "method: getUploadedDocumentContent, "
-        + "Error downloading uploaded document binary content: {}";
+    private static final String ERROR_MSG_MISSING_DOC = "Draft and sign judgement document is missing";
+    private static final String ERROR_MSG_MORE_THAN_ONE_DOC =
+        "Expected exactly one draft and sign judgement document, but found multiple";
+    private static final String ERROR_MSG_DOWNLOAD_FILE = "Downloaded document is null or has no content";
+    private static final String ERROR_MSG_GET_INPUT_STREAM = "Error getting document input stream binary content";
+    private static final String ERROR_MSG_EMPTY_DOC_CONTENT = "Document content is empty";
 
     private final EmailService emailService;
     private final ReportDataService reportDataService;
@@ -49,11 +53,18 @@ public class DraftAndSignJudgementService {
     @Value("${email.forFindCaseLaw}")
     private String emailAddressToSend;
 
+    /**
+     * Checks if the Draft and Sign Judgement is judgement and if it is for publication.
+     * If yes, sends an email confirmation if the Judicial Recommendation is for Find Case Law Publication.
+     * @param caseDetails Details on the case
+     * @param userToken User token for the request
+     * @throws NotificationClientException if there is an error in prepareUpload
+     */
     public void checkAndSendEmails(CaseDetails caseDetails, String userToken) throws NotificationClientException {
         CaseData caseData = caseDetails.getCaseData();
         DraftAndSignJudgement judgement = caseData.getDraftAndSignJudgement();
 
-        if (isNotEmpty(judgement)
+        if (ObjectUtils.isNotEmpty(judgement)
             && YES.equals(judgement.getIsJudgement())
             && YES.equals(judgement.getShouldForPublication())) {
             emailService.sendEmail(
@@ -88,26 +99,40 @@ public class DraftAndSignJudgementService {
         DraftAndSignJudgement judgement,
         String userToken
     ) throws NotificationClientException {
-        byte[] docContent =  getUploadedDocumentContent(
+        if (CollectionUtils.isEmpty(judgement.getDraftAndSignJudgementDocuments())) {
+            throw new IllegalStateException(ERROR_MSG_MISSING_DOC);
+        }
+
+        if (judgement.getDraftAndSignJudgementDocuments().size() > 1) {
+            throw new IllegalStateException(ERROR_MSG_MORE_THAN_ONE_DOC);
+        }
+
+        byte[] docContent =  getDocumentContent(
             judgement.getDraftAndSignJudgementDocuments().getLast(),
             userToken
         );
         return prepareUpload(docContent);
     }
 
-    private byte[] getUploadedDocumentContent(DocumentTypeItem docItem, String userToken) {
-        byte[] uploadedDocContent = null;
-        try {
-            UploadedDocument uploadedDoc = documentManagementService.downloadFile(
-                userToken,
-                docItem.getValue().getUploadedDocument().getDocumentBinaryUrl()
-            );
-            if (uploadedDoc != null) {
-                uploadedDocContent = uploadedDoc.getContent().getInputStream().readAllBytes();
-            }
-        } catch (IOException ioException) {
-            log.error(ERROR_MSG_DOWNLOAD_DOC, ioException.getMessage());
+    private byte[] getDocumentContent(DocumentTypeItem docItem, String userToken) {
+        UploadedDocument uploadedDoc = documentManagementService.downloadFile(
+            userToken,
+            docItem.getValue().getUploadedDocument().getDocumentBinaryUrl()
+        );
+        if (uploadedDoc == null || uploadedDoc.getContent() == null) {
+            throw new IllegalStateException(ERROR_MSG_DOWNLOAD_FILE);
         }
-        return uploadedDocContent;
+
+        byte[] content;
+        try {
+            content = uploadedDoc.getContent().getInputStream().readAllBytes();
+        } catch (IOException ioException) {
+            throw new IllegalStateException(ERROR_MSG_GET_INPUT_STREAM, ioException);
+        }
+
+        if (content.length == 0) {
+            throw new IllegalStateException(ERROR_MSG_EMPTY_DOC_CONTENT);
+        }
+        return content;
     }
 }

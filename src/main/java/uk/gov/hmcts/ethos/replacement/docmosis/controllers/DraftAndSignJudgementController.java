@@ -32,7 +32,7 @@ public class DraftAndSignJudgementController {
     private final DraftAndSignJudgementService draftAndSignJudgementService;
 
     /**
-     * Sends email confirmation of case unlinking and sets HearingIsLinkedFlag to false if no linked cases remain.
+     * Sends email confirmation of Draft and Sign event when Judicial Recommendation for Find Case Law Publication.
      */
     @PostMapping(value = "aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Sends email confirmation.")

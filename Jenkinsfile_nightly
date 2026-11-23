@@ -115,8 +115,9 @@ withNightlyPipeline(type, product, component) {
         }
          stage('Accessibility tests') {
             try {
-                env.ENABLE_ACCESSIBILITY_AUDIT='true'
-                yarnBuilder.yarn('test:accessibility')
+                withEnv(['ENABLE_ACCESSIBILITY_AUDIT=true']) {
+                    yarnBuilder.yarn('test:accessibility')
+                }
             } catch (Error) {
                 unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
             } finally {

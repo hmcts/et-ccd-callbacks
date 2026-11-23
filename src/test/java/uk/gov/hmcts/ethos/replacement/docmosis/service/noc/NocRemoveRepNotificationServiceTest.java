@@ -7,10 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
@@ -32,14 +30,13 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_YOURSELF;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class NocRemoveRepNotificationServiceTest {
     @Mock
     private EmailService emailService;
     @Mock
     private NocNotificationService nocNotificationService;
 
-    @InjectMocks
     private NocRemoveRepNotificationService nocRemoveRepNotificationService;
 
     private CaseDetails caseDetails;
@@ -53,12 +50,8 @@ class NocRemoveRepNotificationServiceTest {
     private static final String USER_NAME = "John Smith";
     private static final String CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID =
             "6d53b5ec-9247-4abe-b48a-c796ee66fe92";
-    private static final String CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID_FIELD =
-            "claimantRepresentativeSelfRemovalOrgAdminTemplateId";
     private static final String CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_REPRESENTATIVE_TEMPLATE_ID =
             "fe52b39f-852c-43ca-a42a-b9a27c43b130";
-    private static final String CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_REPRESENTATIVE_TEMPLATE_ID_FIELD =
-            "claimantRepresentativeSelfRemovalRepTemplateId";
 
     private static final String EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION =
             "Failed to send NOC notification email to organisation admin, case id: 1775651960650043, error: ";
@@ -71,11 +64,10 @@ class NocRemoveRepNotificationServiceTest {
     @BeforeEach
     @SneakyThrows
     void setUp() {
-        ReflectionTestUtils.setField(nocRemoveRepNotificationService,
-                CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID_FIELD,
-                CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID);
-        ReflectionTestUtils.setField(nocRemoveRepNotificationService,
-                CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_REPRESENTATIVE_TEMPLATE_ID_FIELD,
+        nocRemoveRepNotificationService = new NocRemoveRepNotificationService(
+                emailService,
+                nocNotificationService,
+                CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID,
                 CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_REPRESENTATIVE_TEMPLATE_ID);
         caseDetails = generateCaseDetails();
         LoggerTestUtils.initializeLogger(NocRemoveRepNotificationService.class);

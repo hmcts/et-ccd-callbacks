@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputExceptio
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveClaimantRepresentationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveRepNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CallbackObjectUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
@@ -37,8 +39,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequiredArgsConstructor
 public class NocRemoveRepresentationController {
 
-    private final NocRemoveClaimantRepresentationService nocRemoveClaimantRepresentationService;
     private final UserService userService;
+    private final NocRemoveClaimantRepresentationService nocRemoveClaimantRepresentationService;
+    private final NocRemoveRepNotificationService nocRemoveRepNotificationService;
 
     @PostMapping(value = "/claimant/aboutToStart", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "nocRemoveRep claimant about to start page")
@@ -92,7 +95,7 @@ public class NocRemoveRepresentationController {
             nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails,
                     caseDetailsBeforeRevoke);
             NocUtils.resetNOCRemovalOptions(caseDetails.getCaseData());
-        } catch (GenericServiceException | CcdInputOutputException ex) {
+        } catch (GenericServiceException | CcdInputOutputException | JsonProcessingException ex) {
             errors.add(ex.getMessage());
         }
         return getCallbackRespEntity(errors, caseDetails);

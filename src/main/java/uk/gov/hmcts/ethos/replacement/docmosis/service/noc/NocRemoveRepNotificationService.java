@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,16 +20,25 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class NocRemoveRepNotificationService {
 
     private final EmailService emailService;
     private final NocNotificationService nocNotificationService;
+    private final String claimantRepresentativeSelfRemovalOrgAdminTemplateId;
+    private final String claimantRepresentativeSelfRemovalRepTemplateId;
 
-    @Value("${template.removeRepresentationNotifications.claimantRepresentative.selfRemoval.orgAdmin}")
-    private String claimantRepresentativeSelfRemovalOrgAdminTemplateId;
-    @Value("${template.removeRepresentationNotifications.claimantRepresentative.selfRemoval.representative}")
-    private String claimantRepresentativeSelfRemovalRepTemplateId;
+    public NocRemoveRepNotificationService(
+            EmailService emailService,
+            NocNotificationService nocNotificationService,
+            @Value("${template.removeRepresentationNotifications.claimantRepresentative.selfRemoval.orgAdmin}")
+            String claimantRepresentativeSelfRemovalOrgAdminTemplateId,
+            @Value("${template.removeRepresentationNotifications.claimantRepresentative.selfRemoval.representative}")
+            String claimantRepresentativeSelfRemovalRepTemplateId) {
+        this.emailService = emailService;
+        this.nocNotificationService = nocNotificationService;
+        this.claimantRepresentativeSelfRemovalOrgAdminTemplateId = claimantRepresentativeSelfRemovalOrgAdminTemplateId;
+        this.claimantRepresentativeSelfRemovalRepTemplateId = claimantRepresentativeSelfRemovalRepTemplateId;
+    }
 
     public void sendClaimantRepresentativeRemovalNotifications(UserDetails userDetails, CaseDetails caseDetails) {
         String orgAdminEmail = nocNotificationService.findClaimantRepOrgSuperUserEmail(caseDetails.getCaseData()

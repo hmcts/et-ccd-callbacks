@@ -10,7 +10,7 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -55,13 +55,12 @@ class UserServiceTest {
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_USER_ID_NOT_FOUND);
         // when user idam service returns user details without user email should throw GenericServiceException
         userDetails.setUid(USER_ID);
-        assertThat(userService.fetchAndValidateUserDetails(USER_TOKEN, SUBMISSION_REFERENCE))
         gse = assertThrows(GenericServiceException.class, () ->
-                userService.getValidatedUserDetails(USER_TOKEN, SUBMISSION_REFERENCE));
+                userService.fetchAndValidateUserDetails(USER_TOKEN, SUBMISSION_REFERENCE));
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_USER_EMAIL_NOT_FOUND);
         // when user idam service returns user details with all required fields should return the same user details
         userDetails.setEmail(USER_EMAIL);
-        assertThat(userService.getValidatedUserDetails(USER_TOKEN, SUBMISSION_REFERENCE))
+        assertThat(userService.fetchAndValidateUserDetails(USER_TOKEN, SUBMISSION_REFERENCE))
                 .isEqualTo(userDetails);
 
     }

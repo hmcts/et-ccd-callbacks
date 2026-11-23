@@ -2,8 +2,11 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -63,6 +66,8 @@ public final class UserUtils {
         return hasRequiredUserDetails(userDetails)
                 && ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(claimantRepresentative)
                 && Strings.CI.equals(userDetails.getEmail(), claimantRepresentative.getRepresentativeEmailAddress());
+    }
+
     /**
      * Returns the user's full name by joining their first and last names with a single space.
      *

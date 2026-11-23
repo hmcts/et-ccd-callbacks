@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -47,11 +47,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_SHARED;
 
 @ExtendWith(SpringExtension.class)
-class NocRemoveClaimantRepresentationServiceTest {
+class   NocRemoveClaimantRepresentationServiceTest {
 
-    @Mock
+    @MockitoBean
     private NocCcdService nocCcdService;
-    @Mock
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @InjectMocks
@@ -83,6 +83,8 @@ class NocRemoveClaimantRepresentationServiceTest {
     @BeforeEach
     @SneakyThrows
     void setUp() {
+        nocRemoveClaimantRepresentationService = new NocRemoveClaimantRepresentationService(
+                nocCcdService, featureToggleService);
         caseDetails = generateCaseDetails();
         caseUserAssignment1 = CaseUserAssignment.builder().userId(CLAIMANT_REPRESENTATIVE_IDAM_ID_1).build();
         caseUserAssignment2 = CaseUserAssignment.builder().userId(CLAIMANT_REPRESENTATIVE_IDAM_ID_2).build();

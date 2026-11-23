@@ -369,7 +369,7 @@ export const pageFixtures = base.extend<PageFixtures & AllyFixture>({
     uploadDocumentsForHearingPage:async({page, axeUtils}, use)=>{
       await use(wireAlly(new UploadDocumentsForHearingPage(page), axeUtils));
     },
-    checkYourAnswersPage:async({page, axeUtils}, use) => {
+    checkYourAnswersPage:async({page}, use) => {
       await use(new CheckYourAnswersPage(page));
     },
     baseEventPage:async({page, axeUtils}, use) => {

@@ -1,7 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { CommonActionsHelper } from './helpers/CommonActionsHelper.js';
 import {AxeUtils} from "@hmcts/playwright-common";
-import {config} from "../config";
+import {config} from "../config/index.js";
 
 export abstract class BasePage {
   readonly page: Page;
@@ -129,10 +129,10 @@ export abstract class BasePage {
   }
 
   async saveAsDraft() {
+    await this.auditIfEnabled('BasePage - saveAsDraft');
     await this.saveAsDraftButton.click();
     await this.waitForSpinner();
     await this.page.waitForLoadState('load');
-    await this.auditIfEnabled('BasePage - saveAsDraft');
   }
 
   async clickCloseAndReturn() {
@@ -157,6 +157,7 @@ export abstract class BasePage {
   async clickSubmitButton(submitted: boolean = true) {
     await this.page.waitForLoadState('load');
     await this.submitButton.scrollIntoViewIfNeeded();
+    await this.auditIfEnabled('BasePage - clickSubmitButton-beforeSubmit');
     await this.page.evaluate(el => el?.scrollIntoView({ block: 'center' }), await this.submitButton.elementHandle());
     await expect(this.submitButton).toBeVisible();
     await expect(this.submitButton).toBeEnabled();

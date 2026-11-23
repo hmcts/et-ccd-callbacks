@@ -99,5 +99,6 @@ export const  staticConfig = {
     worklist: 'work/my-work/list',
     organisation: 'organisation',
   },
+  accessibilityEnabled: process.env.ENABLE_ACCESSIBILITY_AUDIT || 'false',
 };
 

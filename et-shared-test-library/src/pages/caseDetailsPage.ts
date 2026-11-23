@@ -334,6 +334,7 @@ export class CaseDetailsPage extends BasePage {
     };
 
     if (await tryClickTargetTab()) {
+      await this.auditIfEnabled(`CaseDetailsPage - navigateToTab - ${tabName}`);
       return;
     }
 
@@ -346,6 +347,7 @@ export class CaseDetailsPage extends BasePage {
 
     for (const direction of directions) {
       if (await paginateAndClick(direction)) {
+        await this.auditIfEnabled(`CaseDetailsPage - navigateToTab - ${tabName}`);
         return;
       }
     }
@@ -373,6 +375,7 @@ export class CaseDetailsPage extends BasePage {
           await this.waitForSpinner();
           console.log(this.page.url());
           await this.page.waitForURL(`**/${event.ccdCallback}/**`, { timeout: 10000 });
+          await this.auditIfEnabled(`CaseDetailsPage - selectNextEvent - ${event.listItem}`);
           return;
         } catch (e) {
           if (attempt === maxRetries) throw e;

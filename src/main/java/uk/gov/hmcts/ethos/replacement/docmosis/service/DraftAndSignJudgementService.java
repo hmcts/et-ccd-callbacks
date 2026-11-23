@@ -50,7 +50,7 @@ public class DraftAndSignJudgementService {
 
     @Value("${template.draftAndSignJudgement.forFindCaseLaw}")
     private String forFindCaseLawEmailTemplateId;
-    @Value("${email.forFindCaseLaw}")
+    @Value("${notifications.draftAndSignFindCaseLawEmail}")
     private String emailAddressToSend;
 
     /**

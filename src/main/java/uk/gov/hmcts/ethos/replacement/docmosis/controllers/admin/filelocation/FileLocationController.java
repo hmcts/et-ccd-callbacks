@@ -6,23 +6,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation.FileLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation.SaveFileLocationException;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
@@ -40,12 +36,10 @@ public class FileLocationController {
     /**
      * Verify Token Service injection.
      */
-    private final VerifyTokenService verifyTokenService;
     /**
      * File Location Service injection.
      */
     private final FileLocationService fileLocationService;
-
 
     /**
      * This service Gets userToken as a parameter for security validation
@@ -53,7 +47,6 @@ public class FileLocationController {
      * Initializes AdminData to null values to not show any existing values for
      * both the creation and update of file locations.
      *
-     * @param  userToken        Used for authorization
      *
      * @param ccdRequest        AdminData which is a generic data type for most of the
      *                          methods which holds file location code, file location name
@@ -73,12 +66,7 @@ public class FileLocationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> initAdminData(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         fileLocationService.initAdminData(adminData);
 
@@ -93,7 +81,6 @@ public class FileLocationController {
      * One for the same file location code and Tribunal office
      * and one for the same file location name and Tribunal office
      *
-     * @param  userToken        Used for authorisation
      *
      * @param ccdRequest        AdminData which is a generic data type for most of the
      *                          methods which holds file location code, file location name
@@ -112,12 +99,7 @@ public class FileLocationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> addFileLocation(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         try {
@@ -138,7 +120,6 @@ public class FileLocationController {
      * ERROR_FILE_LOCATION_NOT_FOUND_BY_TRIBUNAL_OFFICE defined as
      * "There is not any file location found in the %s office"
      *
-     * @param  userToken        Used for authorisation
      *
      * @param ccdRequest        AdminData which is a generic data type for most of the
      *                          methods which holds file location code, file location name
@@ -154,12 +135,7 @@ public class FileLocationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> midEventSelectTribunalOffice(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = fileLocationService.midEventSelectTribunalOffice(adminData);
@@ -176,7 +152,6 @@ public class FileLocationController {
      * ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE defined as
      * "There is not any file location found with the %s location code"
      *
-     * @param  userToken        Used for authorisation
      *
      * @param ccdRequest        AdminData which is a generic data type for most of the
      *                          methods which holds file location code, file location name
@@ -192,12 +167,7 @@ public class FileLocationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> midEventSelectFileLocation(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = fileLocationService.midEventSelectFileLocation(adminData);
@@ -215,7 +185,6 @@ public class FileLocationController {
      * ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE defined as
      * "There is not any file location found with the %s location code"
      *
-     * @param  userToken        Used for authorisation
      *
      * @param ccdRequest        AdminData which is a generic data type for most of the
      *                          methods which holds file location code, file location name
@@ -231,12 +200,7 @@ public class FileLocationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> updateFileLocation(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = fileLocationService.updateFileLocation(adminData);
@@ -254,7 +218,6 @@ public class FileLocationController {
      * ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE defined as
      * "There is not any file location found with the %s location code"
      *
-     * @param  userToken        Used for authorisation
      *
      * @param ccdRequest        AdminData which is a generic data type for most of the
      *                          methods which holds file location code, file location name
@@ -270,12 +233,7 @@ public class FileLocationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> deleteFileLocation(
-            @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = fileLocationService.deleteFileLocation(adminData);

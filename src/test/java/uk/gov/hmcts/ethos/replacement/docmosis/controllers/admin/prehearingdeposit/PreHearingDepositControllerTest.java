@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -111,18 +111,6 @@ class PreHearingDepositControllerTest {
     }
 
     @Test
-    void testImportPHRDepositsForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-        mockMvc.perform(post("/admin/preHearingDeposit/importPHRDeposits")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", token)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(preHearingDepositService, never()).importPreHearingDepositData(
-                ccdRequest.getCaseDetails().getAdminData().getPreHearingDepositImportFile(), token);
-    }
-
-    @Test
     void testImportPHRDepositsBadRequest() throws Exception {
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
         mockMvc.perform(post("/admin/preHearingDeposit/importPHRDeposits")
@@ -153,18 +141,6 @@ class PreHearingDepositControllerTest {
         assertEquals(TEST_PRE_HEARING_DEPOSIT_CLAIMANT_OR_RESPONDENT_NAME,
                 preHearingDepositData.getClaimantOrRespondentName());
 
-    }
-
-    @Test
-    void testCreatePHRDepositForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-        mockMvc.perform(post("/admin/preHearingDeposit/createPHRDeposit")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", token)
-                        .content(jsonMapper.toJson(preHearingDepositRequest)))
-                .andExpect(status().isForbidden());
-        verify(preHearingDepositService, never()).importPreHearingDepositData(
-                ccdRequest.getCaseDetails().getAdminData().getPreHearingDepositImportFile(), token);
     }
 
     @Test

@@ -28,12 +28,14 @@ export class CitizenHubLoginPage extends LoginPage {
 
   async assertSyaLandingPage() {
     await this.page.waitForLoadState('load');
+    await this.auditIfEnabled('CitizenHubLoginPage - assertSyaLandingPage');
     await expect(this.syaLandingPageTitle).toBeVisible();
     await expect(this.startNewClaimButton).toBeVisible();
     await expect(this.returnToDraftOrSubmittedClaimLink).toBeVisible();
   }
 
   async assertReturnToDraftOrSubmittedClaimPage() {
+    await this.auditIfEnabled('CitizenHubLoginPage - assertReturnToDraftOrSubmittedClaimPage');
     await expect(this.returnToExistingClaimPageTitle).toBeVisible();
     await expect(this.returnToDraftOrSubmittedClaimPageTitle).toBeAttached();
     await expect(this.returnTodraftClaimCheckbox).toBeVisible();

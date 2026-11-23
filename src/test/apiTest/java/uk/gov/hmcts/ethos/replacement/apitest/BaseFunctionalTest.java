@@ -54,6 +54,7 @@ import static org.apache.http.client.methods.RequestBuilder.post;
 @SpringBootTest(classes = {DocmosisApplication.class, TestCacheConfig.class})
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class BaseFunctionalTest {
     public static final String AUTHORIZATION = "Authorization";
 
@@ -130,9 +131,11 @@ public abstract class BaseFunctionalTest {
                 .setHeader("ServiceAuthorization", serviceToken)
                 .setHeader("Content-Type", "application/json");
 
-        CloseableHttpResponse execute = client.execute(requestBuilder.build());
-        JSONObject jsonObject = new JSONObject(EntityUtils.toString(execute.getEntity()));
-        String eventToken = jsonObject.getString("token");
+        String eventToken;
+        try (CloseableHttpResponse execute = client.execute(requestBuilder.build())) {
+            JSONObject jsonObject = new JSONObject(EntityUtils.toString(execute.getEntity()));
+            eventToken = jsonObject.getString("token");
+        }
 
         StringEntity caseEntity = new StringEntity(payload.replace("%EVENT_TOKEN%", eventToken));
 
@@ -143,9 +146,10 @@ public abstract class BaseFunctionalTest {
                 .setHeader("Content-Type", "application/json")
                 .setEntity(caseEntity);
 
-        CloseableHttpResponse postResponse = client.execute(submitRequest.build());
-        String result = EntityUtils.toString(postResponse.getEntity());
-        return new JSONObject(result);
+        try (CloseableHttpResponse postResponse = client.execute(submitRequest.build())) {
+            String result = EntityUtils.toString(postResponse.getEntity());
+            return new JSONObject(result);
+        }
     }
 
     public String readJsonResource(String name) throws IOException {

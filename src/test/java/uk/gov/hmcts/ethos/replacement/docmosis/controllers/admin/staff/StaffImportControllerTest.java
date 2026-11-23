@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers.admin.staff;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -62,25 +62,6 @@ class StaffImportControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(staffImportService, times(1)).importStaff(ccdRequest.getCaseDetails().getAdminData(), token);
-    }
-
-    @Test
-    void testImportForbidden() throws Exception {
-        String documentBinaryUrl = "http://dm-store:8888/documents/12131212";
-        CCDRequest ccdRequest = AdminDataBuilder
-                .builder()
-                .withStaffImportFile(documentBinaryUrl)
-                .buildAsCCDRequest();
-
-        String token = "invalid-token";
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/admin/staff/import")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", token)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(staffImportService, never()).importStaff(ccdRequest.getCaseDetails().getAdminData(), token);
     }
 
     @Test

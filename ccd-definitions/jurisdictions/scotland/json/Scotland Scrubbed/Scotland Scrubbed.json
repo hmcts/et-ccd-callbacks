@@ -6972,14 +6972,14 @@
   },
   {
     "ID": "msl_IcVideoOrders",
-    "ListElementCode": "6 Medical evidence",
-    "ListElement": "6 Medical evidence",
+    "ListElementCode": "6 Medical evidence/Disability Impact Statement",
+    "ListElement": "6 Medical evidence/Disability Impact Statement",
     "DisplayOrder": 6
   },
   {
     "ID": "msl_IcVideoOrders",
-    "ListElementCode": "7 Disability impact statement",
-    "ListElement": "7 Disability impact statement",
+    "ListElementCode": "7 Response to medical evidence",
+    "ListElement": "7 Response to medical evidence",
     "DisplayOrder": 7
   },
   {
@@ -7026,14 +7026,14 @@
   },
   {
     "ID": "msl_IcF2FOrders",
-    "ListElementCode": "8 Medical evidence",
-    "ListElement": "8 Medical evidence",
+    "ListElementCode": "8 Medical evidence/Disability Impact Statement",
+    "ListElement": "8 Medical evidence/Disability Impact Statement",
     "DisplayOrder": 8
   },
   {
     "ID": "msl_IcF2FOrders",
-    "ListElementCode": "9 Disability impact statement",
-    "ListElement": "9 Disability impact statement",
+    "ListElementCode": "9 Response to medical evidence",
+    "ListElement": "9 Response to medical evidence",
     "DisplayOrder": 9
   },
   {

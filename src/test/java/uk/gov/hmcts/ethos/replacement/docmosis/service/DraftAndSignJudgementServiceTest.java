@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockedStatic;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -42,6 +43,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
+@ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 class DraftAndSignJudgementServiceTest {
 
@@ -64,7 +66,7 @@ class DraftAndSignJudgementServiceTest {
     private DocumentManagementService documentManagementService;
 
     @Captor
-    ArgumentCaptor<Map<String, Object>> personalisationCaptor;
+    private ArgumentCaptor<Map<String, Object>> personalisationCaptor;
 
     @BeforeEach
     void setUp() {

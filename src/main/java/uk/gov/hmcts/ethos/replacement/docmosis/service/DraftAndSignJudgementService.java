@@ -37,6 +37,10 @@ import static uk.gov.service.notify.NotificationClient.prepareUpload;
 @RequiredArgsConstructor
 public class DraftAndSignJudgementService {
 
+    private static final String ERROR_MSG_MISSING_CASE_DETAILS = "Case details is missing";
+    private static final String ERROR_MSG_MISSING_USER_TOKEN = "User token is missing";
+    private static final String ERROR_MSG_MISSING_CASE_DATA = "Case data is missing or incomplete";
+    private static final String ERROR_MSG_MISSING_DRAFT_AND_SIGN = "Draft and sign judgement is missing";
     private static final String ERROR_MSG_MISSING_DOC = "Draft and sign judgement document is missing";
     private static final String ERROR_MSG_MORE_THAN_ONE_DOC =
         "Expected exactly one draft and sign judgement document, but found multiple";
@@ -61,11 +65,26 @@ public class DraftAndSignJudgementService {
      * @throws NotificationClientException if there is an error in prepareUpload
      */
     public void checkAndSendEmails(CaseDetails caseDetails, String userToken) throws NotificationClientException {
-        CaseData caseData = caseDetails.getCaseData();
-        DraftAndSignJudgement judgement = caseData.getDraftAndSignJudgement();
+        if (caseDetails == null) {
+            throw new IllegalStateException(ERROR_MSG_MISSING_CASE_DETAILS);
+        }
 
-        if (ObjectUtils.isNotEmpty(judgement)
-            && YES.equals(judgement.getIsJudgement())
+        if (StringUtils.isBlank(userToken)) {
+            throw new IllegalStateException(ERROR_MSG_MISSING_USER_TOKEN);
+        }
+
+        CaseData caseData = caseDetails.getCaseData();
+        if (caseData == null
+            || StringUtils.isBlank(caseData.getEthosCaseReference())
+            || StringUtils.isBlank(caseData.getClaimant())) {
+            throw new IllegalStateException(ERROR_MSG_MISSING_CASE_DATA);
+        }
+
+        DraftAndSignJudgement judgement = caseData.getDraftAndSignJudgement();
+        if (ObjectUtils.isEmpty(judgement)) {
+            throw new IllegalStateException(ERROR_MSG_MISSING_DRAFT_AND_SIGN);
+        }
+        if (YES.equals(judgement.getIsJudgement())
             && YES.equals(judgement.getShouldForPublication())) {
             emailService.sendEmail(
                 forFindCaseLawEmailTemplateId,
@@ -115,6 +134,13 @@ public class DraftAndSignJudgementService {
     }
 
     private byte[] getDocumentContent(DocumentTypeItem docItem, String userToken) {
+        if (docItem == null
+            || docItem.getValue() == null
+            || docItem.getValue().getUploadedDocument() == null
+            || StringUtils.isBlank(docItem.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
+            throw new IllegalStateException(ERROR_MSG_DOWNLOAD_FILE);
+        }
+
         UploadedDocument uploadedDoc = documentManagementService.downloadFile(
             userToken,
             docItem.getValue().getUploadedDocument().getDocumentBinaryUrl()

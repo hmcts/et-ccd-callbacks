@@ -114,6 +114,7 @@ class DraftAndSignJudgementServiceTest {
     @Test
     void shouldSendEmailWhenReasonForPublicationEmpty() throws Exception {
         caseDetails.getCaseData().getDraftAndSignJudgement().setShouldForPublicationReason(null);
+
         when(reportDataService.getUserFullName(USER_TOKEN))
             .thenReturn("Judge Jane Doe");
         when(documentManagementService.downloadFile(eq(USER_TOKEN), any()))
@@ -150,10 +151,73 @@ class DraftAndSignJudgementServiceTest {
     }
 
     @Test
-    void shouldNotSendEmailWhenDraftAndSignIsNull() throws NotificationClientException {
+    void shouldThrowErrorIfCaseDetailsMissing() {
+        assertThatThrownBy(() -> draftAndSignJudgementService.checkAndSendEmails(null, USER_TOKEN))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("Case details is missing");
+
+        verify(emailService, never()).sendEmail(any(), any(), any());
+        verify(documentManagementService, never()).downloadFile(any(), any());
+        verify(reportDataService, never()).getUserFullName(any());
+    }
+
+    @Test
+    void shouldThrowErrorIfUserTokenMissing() {
+        assertThatThrownBy(() -> draftAndSignJudgementService.checkAndSendEmails(caseDetails, null))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("User token is missing");
+
+        verify(emailService, never()).sendEmail(any(), any(), any());
+        verify(documentManagementService, never()).downloadFile(any(), any());
+        verify(reportDataService, never()).getUserFullName(any());
+    }
+
+    @Test
+    void shouldThrowErrorIfCaseDataMissing() {
+        caseDetails.setCaseData(null);
+
+        assertThatThrownBy(() -> draftAndSignJudgementService.checkAndSendEmails(caseDetails, USER_TOKEN))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("Case data is missing or incomplete");
+
+        verify(emailService, never()).sendEmail(any(), any(), any());
+        verify(documentManagementService, never()).downloadFile(any(), any());
+        verify(reportDataService, never()).getUserFullName(any());
+    }
+
+    @Test
+    void shouldThrowErrorIfEthosCaseReferenceMissing() {
+        caseDetails.getCaseData().setEthosCaseReference(null);
+
+        assertThatThrownBy(() -> draftAndSignJudgementService.checkAndSendEmails(caseDetails, USER_TOKEN))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("Case data is missing or incomplete");
+
+        verify(emailService, never()).sendEmail(any(), any(), any());
+        verify(documentManagementService, never()).downloadFile(any(), any());
+        verify(reportDataService, never()).getUserFullName(any());
+    }
+
+    @Test
+    void shouldThrowErrorIfClaimantMissing() {
+        caseDetails.getCaseData().setClaimant(null);
+
+        assertThatThrownBy(() -> draftAndSignJudgementService.checkAndSendEmails(caseDetails, USER_TOKEN))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("Case data is missing or incomplete");
+
+        verify(emailService, never()).sendEmail(any(), any(), any());
+        verify(documentManagementService, never()).downloadFile(any(), any());
+        verify(reportDataService, never()).getUserFullName(any());
+    }
+
+    @Test
+    void shouldThrowErrorIfDraftAndSignIsNull() {
         caseDetails.getCaseData().setDraftAndSignJudgement(null);
 
-        draftAndSignJudgementService.checkAndSendEmails(caseDetails, USER_TOKEN);
+        assertThatThrownBy(() -> draftAndSignJudgementService.checkAndSendEmails(caseDetails, USER_TOKEN))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("Draft and sign judgement is missing");
 
         verify(emailService, never()).sendEmail(any(), any(), any());
         verify(documentManagementService, never()).downloadFile(any(), any());
@@ -163,6 +227,7 @@ class DraftAndSignJudgementServiceTest {
     @Test
     void shouldThrowErrorIfDocMissing() {
         caseDetails.getCaseData().getDraftAndSignJudgement().setDraftAndSignJudgementDocuments(null);
+
         when(reportDataService.getUserFullName(USER_TOKEN))
             .thenReturn("Judge Jane Doe");
 
@@ -177,6 +242,7 @@ class DraftAndSignJudgementServiceTest {
     void shouldThrowErrorIfDocMoreThanOne() {
         caseDetails.getCaseData().getDraftAndSignJudgement().setDraftAndSignJudgementDocuments(
             List.of(buildDocuments().getFirst(), buildDocuments().getFirst()));
+
         when(reportDataService.getUserFullName(USER_TOKEN))
             .thenReturn("Judge Jane Doe");
 
@@ -185,6 +251,77 @@ class DraftAndSignJudgementServiceTest {
             .hasMessage("Expected exactly one draft and sign judgement document, but found multiple");
 
         verify(emailService, never()).sendEmail(any(), any(), any());
+    }
+
+    @Test
+    void shouldThrowErrorIfDocItemIsNull() {
+        caseDetails.getCaseData().getDraftAndSignJudgement().setDraftAndSignJudgementDocuments(
+            new java.util.ArrayList<>(java.util.Collections.singletonList(null))
+        );
+
+        when(reportDataService.getUserFullName(USER_TOKEN)).thenReturn("Judge Jane Doe");
+
+        assertThatThrownBy(() -> draftAndSignJudgementService.checkAndSendEmails(caseDetails, USER_TOKEN))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("Downloaded document is null or has no content");
+
+        verify(emailService, never()).sendEmail(any(), any(), any());
+        verify(documentManagementService, never()).downloadFile(any(), any());
+    }
+
+    @Test
+    void shouldThrowErrorIfDocItemValueIsNull() {
+        caseDetails.getCaseData().getDraftAndSignJudgement().setDraftAndSignJudgementDocuments(
+            List.of(new DocumentTypeItem())
+        );
+
+        when(reportDataService.getUserFullName(USER_TOKEN)).thenReturn("Judge Jane Doe");
+
+        assertThatThrownBy(() -> draftAndSignJudgementService.checkAndSendEmails(caseDetails, USER_TOKEN))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("Downloaded document is null or has no content");
+
+        verify(emailService, never()).sendEmail(any(), any(), any());
+        verify(documentManagementService, never()).downloadFile(any(), any());
+    }
+
+    @Test
+    void shouldThrowErrorIfUploadedDocumentIsNull() {
+        DocumentType documentType = new DocumentType();
+        DocumentTypeItem item = new DocumentTypeItem();
+        item.setValue(documentType);
+
+        caseDetails.getCaseData().getDraftAndSignJudgement().setDraftAndSignJudgementDocuments(List.of(item));
+        when(reportDataService.getUserFullName(USER_TOKEN)).thenReturn("Judge Jane Doe");
+
+        assertThatThrownBy(() -> draftAndSignJudgementService.checkAndSendEmails(caseDetails, USER_TOKEN))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("Downloaded document is null or has no content");
+
+        verify(emailService, never()).sendEmail(any(), any(), any());
+        verify(documentManagementService, never()).downloadFile(any(), any());
+    }
+
+    @Test
+    void shouldThrowErrorIfDocumentBinaryUrlIsBlank() {
+        UploadedDocumentType uploadedDocumentType = buildUploadedDocumentType();
+        uploadedDocumentType.setDocumentBinaryUrl("   ");
+
+        DocumentType documentType = new DocumentType();
+        documentType.setUploadedDocument(uploadedDocumentType);
+
+        DocumentTypeItem item = new DocumentTypeItem();
+        item.setValue(documentType);
+
+        caseDetails.getCaseData().getDraftAndSignJudgement().setDraftAndSignJudgementDocuments(List.of(item));
+        when(reportDataService.getUserFullName(USER_TOKEN)).thenReturn("Judge Jane Doe");
+
+        assertThatThrownBy(() -> draftAndSignJudgementService.checkAndSendEmails(caseDetails, USER_TOKEN))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("Downloaded document is null or has no content");
+
+        verify(emailService, never()).sendEmail(any(), any(), any());
+        verify(documentManagementService, never()).downloadFile(any(), any());
     }
 
     @Test
@@ -241,6 +378,7 @@ class DraftAndSignJudgementServiceTest {
     @Test
     void shouldThrowErrorIfDocumentBinaryContentIsEmpty() {
         when(reportDataService.getUserFullName(USER_TOKEN)).thenReturn("Judge Jane Doe");
+
         UploadedDocument emptyContentDoc = UploadedDocument.builder()
             .content(new ByteArrayResource(new byte[0]))
             .contentType(DOC_CONTENT_TYPE)
@@ -293,11 +431,15 @@ class DraftAndSignJudgementServiceTest {
             .build();
     }
 
-    private List<DocumentTypeItem> buildDocuments() {
-        UploadedDocumentType uploadedDocumentType = UploadedDocumentBuilder.builder()
+    private UploadedDocumentType buildUploadedDocumentType() {
+        return UploadedDocumentBuilder.builder()
             .withFilename(DOC_FILENAME)
             .withUuid(DOC_UUID)
             .build();
+    }
+
+    private List<DocumentTypeItem> buildDocuments() {
+        UploadedDocumentType uploadedDocumentType = buildUploadedDocumentType();
 
         DocumentType documentType = new DocumentType();
         documentType.setUploadedDocument(uploadedDocumentType);

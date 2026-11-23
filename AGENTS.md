@@ -12,7 +12,7 @@ This document is the single-source-of-truth operating manual for AI coding agent
 
 ## 1. Role & Persona
 
-You are an **expert HMCTS Backend & QA Engineer** specializing in **Java 21, Spring Boot 3.5, CCD (Case and Case Data) Decentralised Runtime, and TypeScript/Playwright**.
+You are an **expert HMCTS Backend & QA Engineer** specializing in **Java 21, Spring Boot 4.0.8, CCD (Case and Case Data) Decentralised Runtime, and TypeScript/Playwright**.
 - **Your responsibility**: Design, implement, debug, and test CCD callbacks, Citizen/Respondent (`syaapi`) portal endpoints, shared domain models (`et-shared`), CCD JSON definitions (`ccd-definitions`), and Playwright E2E suites for UK Employment Tribunals (**England & Wales**, **Scotland**, and **ECM Admin**).
 - **Your output**: Production-grade code and tests that pass Checkstyle (`0` warnings), PMD (`0` failures), JUnit 5 suites, and JaCoCo coverage gates (`>= 80%` root, `>= 75%` `et-shared`) on the first run.
 
@@ -110,11 +110,11 @@ yarn --cwd et-shared-test-library typecheck
 | Layer | Technology & Version | Notes |
 | :--- | :--- | :--- |
 | **Language & JDK** | **Java 21** (Temurin / Gradle Toolchain) | Java 17 is not supported. |
-| **Framework** | **Spring Boot 3.5.16** / **Spring Framework 6.2.19** | Spring Security 6.x, Spring Data JPA, Spring Cloud OpenFeign 4.3.3, SpringDoc OpenAPI 2.5.0. |
-| **CCD Runtime** | `hmcts.ccd.sdk` `7.5.0`, `rse-cft-lib` `0.19.2453` | Uses `com.github.hmcts:decentralised-runtime` storing ET cases in `et_cos` DB. |
-| **Database** | **PostgreSQL** (`42.7.13` driver) + **Flyway 11.20.3** | Testcontainers `1.21.4` and H2 `2.4.240` for tests. |
+| **Framework** | **Spring Boot 4.0.8** / **Spring Framework 7.0.9** | Spring Security 7.x, Spring Data JPA, Spring Cloud OpenFeign 5.0.3, SpringDoc OpenAPI 3.0.0. |
+| **CCD Runtime** | `hmcts.ccd.sdk` `8.11.0`, `rse-cft-lib` `0.19.2486` | Uses `com.github.hmcts:decentralised-runtime` storing ET cases in `et_cos` DB. |
+| **Database** | **PostgreSQL** (`42.7.13` driver) + **Flyway 11.20.3** | Testcontainers `2.0.5` and H2 `2.4.240` for tests. |
 | **Document / Email** | **Docmosis Tornado**, **Apache PDFBox 3.0.8**, **GovNotify 5.2.1** | Renders `.docx` templates via Tornado and fills `ET1`/`ET3` PDFs (including ERA 2026 templates). |
-| **Java Testing** | **JUnit Jupiter 5.13.4**, **Mockito 5.19.0**, **AssertJ 3.27.7** | ByteBuddy `1.17.7`, Pact Consumer `4.6.20`, Serenity BDD `5.3.11`. |
+| **Java Testing** | **JUnit Jupiter 6.0.3**, **Mockito 5.19.0**, **AssertJ 3.27.7** | ByteBuddy `1.17.7`, Pact Consumer `4.6.20`, Serenity BDD `5.3.11`. |
 | **Static Analysis** | **Checkstyle 10.14.0**, **PMD 7.0.0**, **JaCoCo**, **SonarQube** | Zero-warning Checkstyle and zero-failure PMD gates run before unit tests. |
 | **Node.js & Yarn** | **Node v22.18.0** ([`.nvmrc`](.nvmrc)), **Yarn 4.x** | `yarn@4.18.0` at root & `et-shared-test-library`; `yarn@4.13.0` in `ccd-definitions`. |
 | **E2E Testing** | **TypeScript 5.9**, **Playwright 1.64.0** | `@hmcts/playwright-common` `1.1.7` and `@hmcts/et-shared-test-library`. |

@@ -1,7 +1,7 @@
 # Employment Tribunals CCD Callbacks Service
 
 [![Java](https://img.shields.io/badge/Java-21-blue.svg)](https://www.oracle.com/java/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.16-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.8-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Gradle](https://img.shields.io/badge/Gradle-Wrapper-blue.svg)](https://gradle.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
 
@@ -29,8 +29,8 @@ For detailed information about working with the CCD definitions, see [ccd-defini
 | Component | Version | Status |
 |-----------|---------|--------|
 | Java | 21 | ✅ Supported |
-| Spring Boot | 3.5.16 | ✅ Current |
-| Spring Security | 6.x | ✅ Current |
+| Spring Boot | 4.0.8 | ✅ Current |
+| Spring Security | 7.x | ✅ Current |
 | Node.js | 22 (see [`.nvmrc`](.nvmrc)) | ✅ Supported |
 | Gradle | Wrapper | ✅ Current |
 
@@ -45,7 +45,7 @@ For detailed information about working with the CCD definitions, see [ccd-defini
 ### Java
 - [JDK 21](https://www.oracle.com/java) (upgraded from JDK 17)
 
-**Note: This application runs on Spring Boot 3.5.16 and requires Java 21.**
+**Note: This application runs on Spring Boot 4.0.8 and requires Java 21.**
 
 ### CCD Common Components
 The application should be run locally in an environment that includes CCD common components.
@@ -115,7 +115,7 @@ API documentation is provided with SpringDoc OpenAPI
 
 http://localhost:8081/swagger-ui.html
 
-**Note:** After the Spring Boot 3 upgrade, the OpenAPI documentation is now provided by SpringDoc OpenAPI 2.5.0. The URL remains the same, but the underlying implementation has been updated.
+**Note:** Since the Spring Boot 4 upgrade, the OpenAPI documentation is provided by SpringDoc OpenAPI 3.0.0. The URL remains the same, but the underlying implementation has been updated.
 
 ## Developing
 

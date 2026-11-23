@@ -660,13 +660,6 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingRecordings",
-    "UserRole": "caseworker-employment",
-    "CRUD": "CRU"
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
-    "CaseFieldID": "hearingCollection",
     "ListElementCode": "hearingShowDetails",
     "UserRole": "citizen",
     "CRUD": "R"
@@ -1719,6 +1712,125 @@
     "CaseFieldID": "hearingDetailsCollection",
     "ListElementCode": "hearingDetailsHearingNotes2",
     "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsDate",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsStatus",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsPostponedBy",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsCaseDisposed",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsPartHeard",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsReservedJudgment",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeClaimant",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeNonAttendees",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeRespNoRep",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeRespAndRep",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeRepOnly",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingStart",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingBreak",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingResume",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingFinish",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingDuration",
+    "UserRole": "caseworker-employment",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsHearingNotes2",
+    "UserRole": "caseworker-employment",
     "CRUD": "R"
   },
   {

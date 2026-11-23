@@ -520,925 +520,1037 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingRecordings",
+    "ListElementCode": "hearingShowDetails",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "Hearing_type",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingNotesDocument",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDates",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingFormat",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "judicialMediation",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingPublicPrivate",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingNumber",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "Hearing_venue",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingEstLengthNum",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingEstLengthNumType",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingSitAlone",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "judge",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "additionalJudge",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingERMember",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingEEMember",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "Hearing_stage",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "Hearing_notes",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingShowDetails",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "Hearing_type",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingNotesDocument",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDates",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingFormat",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "judicialMediation",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingPublicPrivate",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingNumber",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "Hearing_venue",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingEstLengthNum",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingEstLengthNumType",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingSitAlone",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "judge",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "additionalJudge",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingERMember",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingEEMember",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "Hearing_stage",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "Hearing_notes",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.listedDate",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.Hearing_status",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.Postponed_by",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.postponedDate",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.hearingVenueDay",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.hearingRoom",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.hearingClerk",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.hearingCaseDisposed",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.Hearing_part_heard",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.Hearing_reserved_judgement",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.attendee_claimant",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.attendee_non_attendees",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.attendee_resp_no_rep",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.attendee_resp_&_rep",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.attendee_rep_only",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.hearingTimingStart",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.hearingTimingBreak",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.hearingTimingResume",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.hearingTimingFinish",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.hearingTimingDuration",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.HearingNotes2",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.listedDate",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.Hearing_status",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.Postponed_by",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.postponedDate",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.hearingVenueDay",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.hearingRoom",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.hearingClerk",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.hearingCaseDisposed",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.Hearing_part_heard",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.Hearing_reserved_judgement",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.attendee_claimant",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.attendee_non_attendees",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.attendee_resp_no_rep",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.attendee_resp_&_rep",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.attendee_rep_only",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.hearingTimingStart",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.hearingTimingBreak",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.hearingTimingResume",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.hearingTimingFinish",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.hearingTimingDuration",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDateCollection.HearingNotes2",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsDate",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsStatus",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsPostponedBy",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsCaseDisposed",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsPartHeard",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsReservedJudgment",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeClaimant",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "D"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeNonAttendees",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "D"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeRespNoRep",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "D"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeRespAndRep",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "D"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeRepOnly",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "D"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingStart",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "D"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingBreak",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "D"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingResume",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "D"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingFinish",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "D"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingDuration",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "D"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsHearingNotes2",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "D"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsDate",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsStatus",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsPostponedBy",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsCaseDisposed",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsPartHeard",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsReservedJudgment",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeClaimant",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeNonAttendees",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeRespNoRep",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeRespAndRep",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeRepOnly",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingStart",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingBreak",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingResume",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingFinish",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingDuration",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsHearingNotes2",
+    "UserRole": "citizen",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsDate",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsStatus",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsPostponedBy",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsCaseDisposed",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsPartHeard",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsReservedJudgment",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeClaimant",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeNonAttendees",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeRespNoRep",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeRespAndRep",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsAttendeeRepOnly",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingStart",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingBreak",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingResume",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingFinish",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsTimingDuration",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsHearingNotes2",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsDate",
     "UserRole": "caseworker-employment",
-    "CRUD": "CRU"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingShowDetails",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "Hearing_type",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingNotesDocument",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDates",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingFormat",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "judicialMediation",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingPublicPrivate",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingNumber",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "Hearing_venue",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingEstLengthNum",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingEstLengthNumType",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingSitAlone",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "judge",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "additionalJudge",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingERMember",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingEEMember",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "Hearing_stage",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "Hearing_notes",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingShowDetails",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "Hearing_type",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingNotesDocument",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDates",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingFormat",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "judicialMediation",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingPublicPrivate",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingNumber",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "Hearing_venue",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingEstLengthNum",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingEstLengthNumType",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingSitAlone",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "judge",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "additionalJudge",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingERMember",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingEEMember",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "Hearing_stage",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "Hearing_notes",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.listedDate",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.Hearing_status",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.Postponed_by",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.postponedDate",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingVenueDay",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingRoom",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingClerk",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingCaseDisposed",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.Hearing_part_heard",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.Hearing_reserved_judgement",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.attendee_claimant",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.attendee_non_attendees",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.attendee_resp_no_rep",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.attendee_resp_&_rep",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.attendee_rep_only",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingTimingStart",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingTimingBreak",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingTimingResume",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingTimingFinish",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingTimingDuration",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.HearingNotes2",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.listedDate",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.Hearing_status",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.Postponed_by",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.postponedDate",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingVenueDay",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingRoom",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingClerk",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingCaseDisposed",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.Hearing_part_heard",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.Hearing_reserved_judgement",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.attendee_claimant",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.attendee_non_attendees",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.attendee_resp_no_rep",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.attendee_resp_&_rep",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.attendee_rep_only",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingTimingStart",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingTimingBreak",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingTimingResume",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingTimingFinish",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.hearingTimingDuration",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingCollection",
-    "ListElementCode": "hearingDateCollection.HearingNotes2",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsDate",
-    "UserRole": "caseworker-employment-legalrep-solicitor",
     "CRUD": "R"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "hearingDetailsCollection",
     "ListElementCode": "hearingDetailsStatus",
-    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "UserRole": "caseworker-employment",
     "CRUD": "R"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "hearingDetailsCollection",
     "ListElementCode": "hearingDetailsPostponedBy",
-    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "UserRole": "caseworker-employment",
     "CRUD": "R"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "hearingDetailsCollection",
     "ListElementCode": "hearingDetailsCaseDisposed",
-    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "UserRole": "caseworker-employment",
     "CRUD": "R"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "hearingDetailsCollection",
     "ListElementCode": "hearingDetailsPartHeard",
-    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "UserRole": "caseworker-employment",
     "CRUD": "R"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "hearingDetailsCollection",
     "ListElementCode": "hearingDetailsReservedJudgment",
-    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "UserRole": "caseworker-employment",
     "CRUD": "R"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "hearingDetailsCollection",
     "ListElementCode": "hearingDetailsAttendeeClaimant",
-    "UserRole": "caseworker-employment-legalrep-solicitor",
-    "CRUD": "D"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsAttendeeNonAttendees",
-    "UserRole": "caseworker-employment-legalrep-solicitor",
-    "CRUD": "D"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsAttendeeRespNoRep",
-    "UserRole": "caseworker-employment-legalrep-solicitor",
-    "CRUD": "D"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsAttendeeRespAndRep",
-    "UserRole": "caseworker-employment-legalrep-solicitor",
-    "CRUD": "D"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsAttendeeRepOnly",
-    "UserRole": "caseworker-employment-legalrep-solicitor",
-    "CRUD": "D"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsTimingStart",
-    "UserRole": "caseworker-employment-legalrep-solicitor",
-    "CRUD": "D"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsTimingBreak",
-    "UserRole": "caseworker-employment-legalrep-solicitor",
-    "CRUD": "D"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsTimingResume",
-    "UserRole": "caseworker-employment-legalrep-solicitor",
-    "CRUD": "D"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsTimingFinish",
-    "UserRole": "caseworker-employment-legalrep-solicitor",
-    "CRUD": "D"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsTimingDuration",
-    "UserRole": "caseworker-employment-legalrep-solicitor",
-    "CRUD": "D"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsHearingNotes2",
-    "UserRole": "caseworker-employment-legalrep-solicitor",
-    "CRUD": "D"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsDate",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsStatus",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsPostponedBy",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsCaseDisposed",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsPartHeard",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsReservedJudgment",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsAttendeeClaimant",
-    "UserRole": "citizen",
+    "UserRole": "caseworker-employment",
     "CRUD": "R"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "hearingDetailsCollection",
     "ListElementCode": "hearingDetailsAttendeeNonAttendees",
-    "UserRole": "citizen",
+    "UserRole": "caseworker-employment",
     "CRUD": "R"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "hearingDetailsCollection",
     "ListElementCode": "hearingDetailsAttendeeRespNoRep",
-    "UserRole": "citizen",
+    "UserRole": "caseworker-employment",
     "CRUD": "R"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "hearingDetailsCollection",
     "ListElementCode": "hearingDetailsAttendeeRespAndRep",
-    "UserRole": "citizen",
+    "UserRole": "caseworker-employment",
     "CRUD": "R"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "hearingDetailsCollection",
     "ListElementCode": "hearingDetailsAttendeeRepOnly",
-    "UserRole": "citizen",
+    "UserRole": "caseworker-employment",
     "CRUD": "R"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "hearingDetailsCollection",
     "ListElementCode": "hearingDetailsTimingStart",
-    "UserRole": "citizen",
+    "UserRole": "caseworker-employment",
     "CRUD": "R"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "hearingDetailsCollection",
     "ListElementCode": "hearingDetailsTimingBreak",
-    "UserRole": "citizen",
+    "UserRole": "caseworker-employment",
     "CRUD": "R"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "hearingDetailsCollection",
     "ListElementCode": "hearingDetailsTimingResume",
-    "UserRole": "citizen",
+    "UserRole": "caseworker-employment",
     "CRUD": "R"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "hearingDetailsCollection",
     "ListElementCode": "hearingDetailsTimingFinish",
-    "UserRole": "citizen",
+    "UserRole": "caseworker-employment",
     "CRUD": "R"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "hearingDetailsCollection",
     "ListElementCode": "hearingDetailsTimingDuration",
-    "UserRole": "citizen",
+    "UserRole": "caseworker-employment",
     "CRUD": "R"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "hearingDetailsCollection",
     "ListElementCode": "hearingDetailsHearingNotes2",
-    "UserRole": "citizen",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsDate",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsStatus",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsPostponedBy",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsCaseDisposed",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsPartHeard",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsReservedJudgment",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsAttendeeClaimant",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsAttendeeNonAttendees",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsAttendeeRespNoRep",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsAttendeeRespAndRep",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsAttendeeRepOnly",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsTimingStart",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsTimingBreak",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsTimingResume",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsTimingFinish",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsTimingDuration",
-    "UserRole": "et-acas-api",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseFieldID": "hearingDetailsCollection",
-    "ListElementCode": "hearingDetailsHearingNotes2",
-    "UserRole": "et-acas-api",
+    "UserRole": "caseworker-employment",
     "CRUD": "R"
   },
   {

@@ -2718,45 +2718,57 @@
   },
   {
     "ID": "fl_Part_1",
+    "ListElementCode": "3.1",
+    "ListElement": "3.1 Acknowledgment of Claim Open Track",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_1",
     "ListElementCode": "3.5",
     "ListElement": "3.5 Letter to claimant when time bar issue identified",
-    "DisplayOrder": 5
+    "DisplayOrder": 6
   },
   {
     "ID": "fl_Part_1",
     "ListElementCode": "4",
     "ListElement": "4 Application for reconsideration not considered – failure to comply with rule 14(2)",
-    "DisplayOrder": 6
+    "DisplayOrder": 7
   },
   {
     "ID": "fl_Part_1",
     "ListElementCode": "5",
     "ListElement": "5 Application for reconsideration granted",
-    "DisplayOrder": 7
+    "DisplayOrder": 8
   },
   {
     "ID": "fl_Part_1",
     "ListElementCode": "6",
     "ListElement": "6 Application for reconsideration – rejection confirmed",
-    "DisplayOrder": 8
+    "DisplayOrder": 9
   },
   {
     "ID": "fl_Part_1",
     "ListElementCode": "7",
     "ListElement": "7 Notice of claim standard",
-    "DisplayOrder": 8
+    "DisplayOrder": 10
   },
   {
     "ID": "fl_Part_1",
     "ListElementCode": "7 Reform",
     "ListElement": "7 Reform Notice of claim standard",
-    "DisplayOrder": 9
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "7.1",
+    "ListElement": "7.1 Notice of claim Open Track",
+    "DisplayOrder": 12
   },
   {
     "ID": "fl_Part_1",
     "ListElementCode": "7.5",
     "ListElement": "7.5 Letter to respondent when time bar issue identified",
-    "DisplayOrder": 10
+    "DisplayOrder": 13
   },
   {
     "ID": "fl_Part_2",

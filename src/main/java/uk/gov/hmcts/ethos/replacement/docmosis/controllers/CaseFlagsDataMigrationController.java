@@ -15,12 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsReferenceDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 
@@ -29,13 +30,13 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 public class CaseFlagsDataMigrationController {
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
-    private static final String INVALID_TOKEN = "Invalid Token {}";
 
-    private final VerifyTokenService verifyTokenService;
     private final CaseFlagsService caseFlagsService;
+    private final CaseFlagsReferenceDataService caseFlagsReferenceDataService;
+    private final FeatureToggleService featureToggleService;
 
     @PostMapping(value = "/case-flags-migration/about-to-submit", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "update existing cases with default values for case flags.")
+    @Operation(summary = "migrate existing party case flags into internal and external sections.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
                 content = {@Content(mediaType = "application/json",
@@ -45,21 +46,21 @@ public class CaseFlagsDataMigrationController {
     })
     public ResponseEntity<CCDCallbackResponse> addCaseFlagsData(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestHeader(AUTHORIZATION) String userToken) {
         log.info("Migrating existing case Id for case flags ---> "
                 + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        if (featureToggleService.isCaseFlagsV2Enabled(ccdRequest.getCaseDetails().getCaseTypeId())) {
+            caseFlagsService.migrateExistingClaimantAndRespondentCaseFlags(
+                    caseData,
+                    caseFlagsReferenceDataService.getPartyFlagVisibilities(userToken)
+            );
+        } else {
+            caseFlagsService.setupLegacyCaseFlags(caseData);
         }
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseFlagsService.setupCaseFlags(caseData);
-        log.info("Migrating existing case: {} for claimant: {},  respondent: {},",
-                ccdRequest.getCaseDetails().getCaseTypeId(),
-                caseData.getClaimantFlags().getPartyName(),
-                caseData.getRespondentFlags().getPartyName());
+        log.info("Migrating existing case: {}", ccdRequest.getCaseDetails().getCaseId());
 
         return getCallbackRespEntityErrors(List.of(), caseData);
     }
@@ -74,18 +75,16 @@ public class CaseFlagsDataMigrationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> rollbackCaseFlagsData(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest) {
         log.info("Rolling back existing case Id for case flags ---> "
                 + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseFlagsService.rollbackCaseFlags(caseData);
+        if (featureToggleService.isCaseFlagsV2Enabled(ccdRequest.getCaseDetails().getCaseTypeId())) {
+            caseFlagsService.rollbackCaseFlags(caseData);
+        } else {
+            caseFlagsService.rollbackLegacyCaseFlags(caseData);
+        }
 
         return getCallbackRespEntityErrors(List.of(), caseData);
     }

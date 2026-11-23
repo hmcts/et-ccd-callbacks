@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,7 +33,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 /**
  * REST controller for the "Respond to an Application" event.
  */
-@Slf4j
 @RequestMapping("/tseResponse")
 @RestController
 @RequiredArgsConstructor
@@ -42,7 +40,6 @@ public class TseRespondentReplyController {
 
     private final TseRespondentReplyService tseRespondentReplyService;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
-    private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String SUBMITTED_BODY = """
         ### What happens next \r
         \r

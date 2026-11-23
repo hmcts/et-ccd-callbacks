@@ -22,6 +22,7 @@ import java.util.List;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.JurisdictionCodeHelper.populateJurCodesCollectionIds;
 
 @Slf4j
 @RequestMapping("/preAcceptanceCase")
@@ -57,6 +58,7 @@ public class PreAcceptanceCaseController {
         CaseData caseData = caseDetails.getCaseData();
         List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
         preAcceptanceCaseService.clearPreAcceptanceDates(caseData);
+        populateJurCodesCollectionIds(caseData);
         return getCallbackRespEntityErrors(errors, caseData);
     }
 }

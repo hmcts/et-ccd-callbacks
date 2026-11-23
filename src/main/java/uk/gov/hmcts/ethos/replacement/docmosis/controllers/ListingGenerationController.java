@@ -33,12 +33,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.GenerateReportService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ListingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PrintHearingListService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SERVING_CLAIMS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
@@ -52,11 +50,9 @@ public class ListingGenerationController {
 
     private static final String LOG_MESSAGE = "received notification request for case reference : ";
     private static final String GENERATED_DOCUMENT_URL = "Please download the document from : ";
-    private static final String INVALID_TOKEN = "Invalid Token {}";
     private final ListingService listingService;
     private final ReportDataService reportDataService;
     private final DefaultValuesReaderService defaultValuesReaderService;
-    private final VerifyTokenService verifyTokenService;
     private final PrintHearingListService printHearingListService;
     private final GenerateReportService generateReportService;
 
@@ -71,14 +67,8 @@ public class ListingGenerationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<ListingCallbackResponse> listingCaseCreation(
-            @RequestBody ListingRequest listingRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody ListingRequest listingRequest) {
         log.info("LISTING CASE CREATION ---> " + LOG_MESSAGE + listingRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         ListingData listingData = listingService.listingCaseCreation(listingRequest.getCaseDetails());
 
@@ -98,14 +88,8 @@ public class ListingGenerationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> listingSingleCases(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest) {
         log.info("LISTING SINGLE CASES ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         List<String> errors = new ArrayList<>();
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
@@ -134,11 +118,6 @@ public class ListingGenerationController {
             @RequestBody ListingRequest listingRequest,
             @RequestHeader("Authorization") String userToken) {
         log.info("LISTING HEARINGS ---> " + LOG_MESSAGE + listingRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         List<String> errors = new ArrayList<>();
         ListingData listingData = listingRequest.getCaseDetails().getCaseData();
@@ -169,11 +148,6 @@ public class ListingGenerationController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
         log.info("GENERATE LISTINGS DOC SINGLE CASES ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         List<String> errors = new ArrayList<>();
         ListingData listingData = ccdRequest.getCaseDetails().getCaseData().getPrintHearingCollection();
@@ -207,15 +181,9 @@ public class ListingGenerationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> generateListingsDocSingleCasesConfirmation(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest) {
         log.info("GENERATE LISTINGS DOC SINGLE CASES CONFIRMATION ---> "
                 + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
@@ -231,14 +199,8 @@ public class ListingGenerationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<ListingCallbackResponse> initGenerateReport(
-            @RequestBody ListingRequest listingRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody ListingRequest listingRequest) {
         log.info("INIT GENERATE REPORT ---> " + LOG_MESSAGE + listingRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         generateReportService.initGenerateReport(listingRequest.getCaseDetails());
 
@@ -261,11 +223,6 @@ public class ListingGenerationController {
             @RequestBody ListingRequest listingRequest,
             @RequestHeader("Authorization") String userToken) {
         log.info("GENERATE REPORT ---> " + LOG_MESSAGE + listingRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         ListingData listingData = reportDataService.generateReportData(listingRequest.getCaseDetails(), userToken);
 
@@ -341,11 +298,6 @@ public class ListingGenerationController {
             @RequestHeader("Authorization") String userToken) {
         log.info("GENERATE HEARING DOCUMENT ---> " + LOG_MESSAGE + listingRequest.getCaseDetails().getCaseId());
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         ListingData listingData = listingRequest.getCaseDetails().getCaseData();
         String caseTypeId = listingRequest.getCaseDetails().getCaseTypeId();
 
@@ -381,15 +333,9 @@ public class ListingGenerationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<ListingCallbackResponse> generateHearingDocumentConfirmation(
-            @RequestBody ListingRequest listingRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody ListingRequest listingRequest) {
         log.info("GENERATE HEARING DOCUMENT CONFIRMATION ---> "
                 + LOG_MESSAGE + listingRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         return ResponseEntity.ok(ListingCallbackResponse.builder()
                 .data(listingRequest.getCaseDetails().getCaseData())
@@ -406,14 +352,8 @@ public class ListingGenerationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> initPrintHearingLists(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest) {
         log.info("INIT PRINT HEARING LISTS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         printHearingListService.initPrintHearingLists(caseData);
@@ -429,14 +369,8 @@ public class ListingGenerationController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<ListingCallbackResponse> dynamicListingVenue(
-            @RequestBody ListingRequest listingRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody ListingRequest listingRequest) {
         log.info("DYNAMIC LISTING VENUE LISTS ---> " + LOG_MESSAGE + listingRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         String caseTypeId = listingRequest.getCaseDetails().getCaseTypeId();
         ListingData listingData = listingRequest.getCaseDetails().getCaseData();

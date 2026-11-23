@@ -11,6 +11,13 @@ public final class NOCConstants {
     public static final String NOC_TYPE_ADDITION = "Addition";
     public static final String NOC_REMOVE_OPTION_ORGANISATION = "your organisation";
     public static final String NOC_REMOVE_OPTION_YOURSELF = "yourself";
+    public static final String NOC_REPRESENTATIVE_TYPE_LEAD = "leadRepresentative";
+    public static final String NOC_REPRESENTATIVE_TYPE_SHARED = "sharedRepresentative";
+    public static final String NOC_CASE_SHARING_STATUS_SHARED = "shared";
+    public static final String NOC_CASE_SHARING_STATUS_NOT_SHARED = "notShared";
+    public static final String NOC_LEAD_REPRESENTATIVE_NOT_FOUND = "Lead representative not found for case ID %s.";
+    public static final String NOC_NO_SHARED_REPRESENTATIVE_TO_REMOVE_YOURSELF =
+            "You cannot remove yourself from case %s unless another shared representative is assigned.";
 
     public static final String EXCEPTION_RESPONDENT_NOT_FOUND = "Respondent not found for case ID %s.";
     public static final String EXCEPTION_RESPONDENT_ID_NOT_FOUND =
@@ -23,6 +30,8 @@ public final class NOCConstants {
             "Representative not found for case ID %s.";
     public static final String EXCEPTION_REPRESENTATIVE_NOT_FOUND_BY_TOKEN =
             "Representative not found by token for case ID %s.";
+    public static final String EXCEPTION_REMAINING_REPRESENTATIVE_NOT_FOUND =
+            "Remaining representative not found for case ID %s.";
     public static final String EXCEPTION_REPRESENTATIVE_ID_NOT_FOUND =
             "Representative ID not found for case ID %s.";
     public static final String EXCEPTION_REPRESENTATIVE_DETAILS_NOT_EXIST =

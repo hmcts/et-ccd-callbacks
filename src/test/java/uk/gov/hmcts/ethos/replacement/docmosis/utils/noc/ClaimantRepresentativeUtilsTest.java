@@ -2,15 +2,16 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils.noc;
 
 import ch.qos.logback.classic.Level;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.Assertions;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.types.AllPartyFlags;
+import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -154,21 +156,31 @@ final class ClaimantRepresentativeUtilsTest {
 
     @Test
     void theMarkClaimantAsUnrepresented() {
-        // Should not remove representative organisation if selected removal type is not organisation
+        // should remove all claimant representative details and not throw any exception
         CaseData caseData = new CaseData();
+        caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
         caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().representativeId(CLAIMANT_REPRESENTATIVE_ID)
                 .myHmctsOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_1).build()).build());
+        caseData.setAllPartyFlags(AllPartyFlags.builder()
+                .claimantFlags(CaseFlagsType.builder().build())
+                .claimantExternalFlags(CaseFlagsType.builder().build())
+                .claimantRepresentativeFlags(CaseFlagsType.builder().build())
+                .claimantRepresentativeExternalFlags(CaseFlagsType.builder().build())
+                .build());
         caseData.setClaimantRepresentativeRemoved(NO);
         caseData.setClaimantRepresentedQuestion(YES);
-        caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).organisation(Organisation.builder()
-                .organisationID(ORGANISATION_ID_1).build()).build());
-        ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseData);
+        ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseData, true);
         assertThat(caseData.getRepresentativeClaimantType()).isNull();
         assertThat(caseData.getClaimantRepresentativeRemoved()).isEqualTo(YES);
         assertThat(caseData.getClaimantRepresentedQuestion()).isEqualTo(NO);
         assertThat(caseData.getClaimantRepresentativeOrganisationPolicy()).isEqualTo(OrganisationPolicy.builder()
                 .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
+        assertThat(caseData.getAllPartyFlags().getClaimantRepresentativeFlags()).isNull();
+        assertThat(caseData.getAllPartyFlags().getClaimantRepresentativeExternalFlags()).isNull();
+        assertThat(caseData.getAllPartyFlags().getClaimantFlags()).isNotNull();
+        assertThat(caseData.getAllPartyFlags().getClaimantExternalFlags()).isNotNull();
+
     }
 
     @Test
@@ -216,58 +228,141 @@ final class ClaimantRepresentativeUtilsTest {
     }
 
     @Test
-    void theAddAmendClaimantRepresentative() {
-        // when claimant representative empty should not assign any claimant representative
+    void addAmendClaimantRepresentativeDoesNotAssignWhenClaimantRepresentativeEmpty() {
         CaseData caseData = new CaseData();
-        ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData);
+
+        ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData, true);
+
         assertThat(caseData.getRepresentativeClaimantType()).isNull();
         assertThat(caseData.getClaimantRepresentativeRemoved()).isNull();
+        assertThat(caseData.getAllPartyFlags()).isNull();
         assertThat(caseData.getClaimantRepresentativeOrganisationPolicy().getOrganisation()).isNull();
-        // when claimant represented question is no and there exists claimant representative should set claimant
-        // representative removed Yes
+    }
+
+    @Test
+    void addAmendClaimantRepresentativeRemovesRepresentativeWhenClaimantNotRepresented() {
+        CaseFlagsType claimantFlags = CaseFlagsType.builder().build();
+        CaseFlagsType claimantRepresentativeFlags = CaseFlagsType.builder()
+                .partyName(CLAIMANT_REPRESENTATIVE_NAME)
+                .build();
+        CaseFlagsType claimantRepresentativeExternalFlags = CaseFlagsType.builder()
+                .partyName(CLAIMANT_REPRESENTATIVE_NAME)
+                .build();
+        CaseData caseData = new CaseData();
         caseData.setClaimantRepresentedQuestion(NO);
         caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().build());
-        ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData);
+        caseData.setAllPartyFlags(AllPartyFlags.builder()
+                .claimantFlags(claimantFlags)
+                .claimantRepresentativeFlags(claimantRepresentativeFlags)
+                .claimantRepresentativeExternalFlags(claimantRepresentativeExternalFlags)
+                .build());
+
+        ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData, true);
+
         assertThat(caseData.getRepresentativeClaimantType()).isNull();
         assertThat(caseData.getClaimantRepresentativeRemoved()).isEqualTo(YES);
+        assertThat(caseData.getAllPartyFlags().getClaimantFlags()).isSameAs(claimantFlags);
+        assertThat(caseData.getAllPartyFlags().getClaimantRepresentativeFlags()).isNull();
+        assertThat(caseData.getAllPartyFlags().getClaimantRepresentativeExternalFlags()).isNull();
         assertThat(caseData.getClaimantRepresentativeOrganisationPolicy().getOrganisation()).isNull();
-        // when claimant representative exists and claimant represented question is Yes should assign representative
+    }
+
+    @Test
+    void addAmendClaimantRepresentativeAssignsRepresentativeWhenClaimantRepresented() {
+        CaseFlagsType claimantRepresentativeFlags = CaseFlagsType.builder()
+                .partyName(CLAIMANT_REPRESENTATIVE_NAME)
+                .build();
+        CaseFlagsType claimantRepresentativeExternalFlags = CaseFlagsType.builder()
+                .partyName(CLAIMANT_REPRESENTATIVE_NAME)
+                .build();
         RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder()
-                .nameOfRepresentative(CLAIMANT_REPRESENTATIVE_NAME).build();
+                .nameOfRepresentative(CLAIMANT_REPRESENTATIVE_NAME)
+                .build();
+        CaseData caseData = new CaseData();
         caseData.setRepresentativeClaimantType(claimantRepresentative);
         caseData.setClaimantRepresentedQuestion(YES);
-        ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData);
+        caseData.setAllPartyFlags(AllPartyFlags.builder()
+                .claimantRepresentativeFlags(claimantRepresentativeFlags)
+                .claimantRepresentativeExternalFlags(claimantRepresentativeExternalFlags)
+                .build());
+
+        ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData, true);
+
         assertThat(caseData.getClaimantRepresentativeRemoved()).isEqualTo(NO);
         assertThat(caseData.getRepresentativeClaimantType().getRepresentativeId()).isNotNull();
         assertThat(caseData.getRepresentativeClaimantType().getOrganisationId()).isNotNull();
+        assertThat(caseData.getAllPartyFlags().getClaimantRepresentativeFlags())
+                .isSameAs(claimantRepresentativeFlags);
+        assertThat(caseData.getAllPartyFlags().getClaimantRepresentativeExternalFlags())
+                .isSameAs(claimantRepresentativeExternalFlags);
         assertThat(caseData.getClaimantRepresentativeOrganisationPolicy().getOrganisation()).isNotNull();
         assertThat(caseData.getClaimantRepresentativeOrganisationPolicy().getOrganisation().getOrganisationID())
                 .isEqualTo(caseData.getRepresentativeClaimantType().getOrganisationId());
-        // when claimant representative exists and already has representative and organisation ids should not change
-        // those ids
-        claimantRepresentative.setRepresentativeId(CLAIMANT_REPRESENTATIVE_ID);
-        claimantRepresentative.setOrganisationId(ORGANISATION_ID_1);
-        ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData);
+    }
+
+    @Test
+    void addAmendClaimantRepresentativeRetainsExistingRepresentativeAndOrganisationIds() {
+        RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder()
+                .nameOfRepresentative(CLAIMANT_REPRESENTATIVE_NAME)
+                .representativeId(CLAIMANT_REPRESENTATIVE_ID)
+                .organisationId(ORGANISATION_ID_1)
+                .build();
+        CaseData caseData = new CaseData();
+        caseData.setRepresentativeClaimantType(claimantRepresentative);
+        caseData.setClaimantRepresentedQuestion(YES);
+
+        ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData, true);
+
         assertThat(caseData.getClaimantRepresentativeRemoved()).isEqualTo(NO);
-        assertThat(caseData.getRepresentativeClaimantType().getRepresentativeId()).isNotNull()
+        assertThat(caseData.getRepresentativeClaimantType().getRepresentativeId())
                 .isEqualTo(CLAIMANT_REPRESENTATIVE_ID);
-        assertThat(caseData.getRepresentativeClaimantType().getOrganisationId()).isNotNull()
+        assertThat(caseData.getRepresentativeClaimantType().getOrganisationId())
                 .isEqualTo(ORGANISATION_ID_1);
         assertThat(caseData.getClaimantRepresentativeOrganisationPolicy().getOrganisation()).isNotNull();
         assertThat(caseData.getClaimantRepresentativeOrganisationPolicy().getOrganisation().getOrganisationID())
                 .isEqualTo(ORGANISATION_ID_1);
-        // when claimant representative exists and has my hmcts organisation with id should set organisation id to
-        // my hmcts organisation id
-        claimantRepresentative.setMyHmctsOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_2).build());
-        ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData);
+    }
+
+    @Test
+    void addAmendClaimantRepresentativeSetsOrganisationIdFromMyHmctsOrganisation() {
+        RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder()
+                .nameOfRepresentative(CLAIMANT_REPRESENTATIVE_NAME)
+                .representativeId(CLAIMANT_REPRESENTATIVE_ID)
+                .organisationId(ORGANISATION_ID_1)
+                .myHmctsOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_2).build())
+                .build();
+        CaseData caseData = new CaseData();
+        caseData.setRepresentativeClaimantType(claimantRepresentative);
+        caseData.setClaimantRepresentedQuestion(YES);
+
+        ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData, true);
+
         assertThat(caseData.getClaimantRepresentativeRemoved()).isEqualTo(NO);
-        assertThat(caseData.getRepresentativeClaimantType().getRepresentativeId()).isNotNull()
+        assertThat(caseData.getRepresentativeClaimantType().getRepresentativeId())
                 .isEqualTo(CLAIMANT_REPRESENTATIVE_ID);
-        assertThat(caseData.getRepresentativeClaimantType().getOrganisationId()).isNotNull()
+        assertThat(caseData.getRepresentativeClaimantType().getOrganisationId())
                 .isEqualTo(ORGANISATION_ID_2);
         assertThat(caseData.getClaimantRepresentativeOrganisationPolicy().getOrganisation()).isNotNull();
         assertThat(caseData.getClaimantRepresentativeOrganisationPolicy().getOrganisation().getOrganisationID())
                 .isEqualTo(ORGANISATION_ID_2);
+    }
+
+    @Test
+    void addAmendClaimantRepresentativeRetainsV2FlagsWhenV2IsDisabled() {
+        CaseFlagsType internalFlags = CaseFlagsType.builder().build();
+        CaseFlagsType externalFlags = CaseFlagsType.builder().build();
+        CaseData caseData = new CaseData();
+        caseData.setClaimantRepresentedQuestion(NO);
+        caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().build());
+        caseData.setAllPartyFlags(AllPartyFlags.builder()
+                .claimantRepresentativeFlags(internalFlags)
+                .claimantRepresentativeExternalFlags(externalFlags)
+                .build());
+
+        ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData, false);
+
+        assertThat(caseData.getAllPartyFlags().getClaimantRepresentativeFlags()).isSameAs(internalFlags);
+        assertThat(caseData.getAllPartyFlags().getClaimantRepresentativeExternalFlags()).isSameAs(externalFlags);
     }
 
     @Test
@@ -316,8 +411,8 @@ final class ClaimantRepresentativeUtilsTest {
         CaseData caseData = new CaseData();
         caseData.setEt3ResponseAddress(address);
         caseData.setEt3ResponsePhone(REPRESENTATIVE_PHONE);
-        GenericServiceException gse = Assertions.assertThrows(GenericServiceException.class,
-                () -> ClaimantRepresentativeUtils.updateRepresentativeContactDetails(caseData, SUBMISSION_REFERENCE));
+        GenericServiceException gse = assertThrows(GenericServiceException.class, () -> ClaimantRepresentativeUtils
+                .updateRepresentativeContactDetails(caseData, SUBMISSION_REFERENCE));
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_CLAIMANT_REPRESENTATIVE_NOT_FOUND);
         // when case data has representative claimant type should update contact details without throwing any exception
         caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().build());
@@ -350,23 +445,5 @@ final class ClaimantRepresentativeUtilsTest {
         ClaimantRepresentativeUtils.updateET3ResponseContactDetails(caseData);
         assertThat(caseData.getEt3ResponseAddress()).isEqualTo(address);
         assertThat(caseData.getEt3ResponsePhone()).isEqualTo(REPRESENTATIVE_PHONE);
-    }
-
-    @Test
-    void theHasRequiredClaimantRepresentativeDetails() {
-        // when claimant representative is empty should return false
-        assertThat(ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(null)).isFalse();
-        // when claimant representative's id is empty should return false
-        RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder().build();
-        assertThat(ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(claimantRepresentative))
-                .isFalse();
-        // when claimant representative's email address is not empty should return true
-        claimantRepresentative.setRepresentativeId(CLAIMANT_REPRESENTATIVE_ID);
-        assertThat(ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(claimantRepresentative))
-                .isFalse();
-        // when claimant representative's email address is not empty should return true
-        claimantRepresentative.setRepresentativeEmailAddress(CLAIMANT_REPRESENTATIVE_EMAIL_ADDRESS);
-        assertThat(ClaimantRepresentativeUtils.hasRequiredClaimantRepresentativeDetails(claimantRepresentative))
-                .isTrue();
     }
 }

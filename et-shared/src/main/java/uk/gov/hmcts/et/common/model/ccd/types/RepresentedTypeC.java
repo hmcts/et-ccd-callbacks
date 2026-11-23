@@ -52,4 +52,6 @@ public class RepresentedTypeC {
     private List<String> representativeAttendHearing;
     @JsonProperty("organisationUsers")
     private List<GenericTypeItem<OrganisationUsersIdamUser>> organisationUsers;
+    @JsonProperty("idamId")
+    private String idamId;
 }

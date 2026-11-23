@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -78,19 +78,6 @@ class CreateControllerTest {
 
         verify(createService, times(1)).initCreateAdmin(token);
         assertEquals(ADMIN_CASE_NAME, adminData.getName());
-    }
-
-    @Test
-    void testHandleAboutToSubmitEventForbidden() throws Exception {
-        CCDRequest ccdRequest = AdminDataBuilder.builder().buildAsCCDRequest();
-        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
-
-        mockMvc.perform(post("/admin/create/aboutToSubmitEvent")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", token)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-        verify(createService, never()).initCreateAdmin(token);
     }
 
     @Test

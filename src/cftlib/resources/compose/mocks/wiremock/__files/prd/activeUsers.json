@@ -2,10 +2,17 @@
   "organisationIdentifier": "79ZRSOU",
   "users": [
     {
-      "userIdentifier": "92e750d0-8a45-4975-9f1a-9cfc56247d37",
+      "userIdentifier": "112b0bdd-5e58-32f1-8c51-6e71f5f90bc5",
       "firstName": "Solicitor1",
       "lastName": "Organisation1",
       "email": "solicitor1@etorganisation1.com",
+      "idamStatus": "Active"
+    },
+    {
+      "userIdentifier": "007b5478-775b-387e-a7f6-19f7be483c8e",
+      "firstName": "Solicitor2",
+      "lastName": "Organisation2",
+      "email": "solicitor2@etorganisation2.com",
       "idamStatus": "Active"
     },
     {

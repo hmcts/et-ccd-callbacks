@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -56,6 +57,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -420,6 +423,28 @@ class CaseServiceTest {
         );
 
         assertEquals(YES, caseDetails.getData().get(ET1_ONLINE_SUBMISSION));
+    }
+
+    @Test
+    void submitCaseSendsUserInsightsEmailLast() {
+        caseService.submitCase(TEST_SERVICE_AUTH_TOKEN, caseTestData.getCaseRequest());
+        CaseData submittedCaseData = convertCaseDataMapToCaseDataObject(caseTestData.getExpectedDetails().getData());
+
+        InOrder notificationOrder = inOrder(notificationService);
+        notificationOrder.verify(notificationService).sendSubmitCaseConfirmationEmail(any(), any(), any(), any());
+        notificationOrder.verify(notificationService).sendUserInsightsEmail(
+            eq(submittedCaseData.getClaimantType().getClaimantEmailAddress()),
+            eq(submittedCaseData.getClaimant()),
+            eq("ET1")
+        );
+    }
+
+    @Test
+    void submitCaseContinuesWhenUserInsightsEmailFails() {
+        doThrow(new RuntimeException("Gov Notify unavailable")).when(notificationService)
+            .sendUserInsightsEmail(anyString(), anyString(), anyString());
+
+        assertDoesNotThrow(() -> caseService.submitCase(TEST_SERVICE_AUTH_TOKEN, caseTestData.getCaseRequest()));
     }
 
     private DocumentTypeItem createDocumentTypeItem() {

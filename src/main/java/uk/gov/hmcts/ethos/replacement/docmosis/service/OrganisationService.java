@@ -34,6 +34,36 @@ public class OrganisationService {
     private final OrganisationClient organisationClient;
 
     /**
+     * Finds an organisation user's account by their email address.
+     *
+     * <p>Assumes that the email address belongs to an organisation user and that
+     * the organisation service is accessible using the generated authentication tokens.</p>
+     *
+     * <p>Returns {@code null} if the email is blank, the user does not have a valid
+     * identifier, or the organisation service throws a {@link FeignException}.</p>
+     *
+     * @param email the email address of the organisation user to look up
+     * @return the {@link AccountIdByEmailResponse} containing the user's account details,
+     *         or {@code null} if the lookup is unsuccessful
+     */
+    public AccountIdByEmailResponse findAccountByEmail(String email) {
+        if (StringUtils.isBlank(email)) {
+            return null;
+        }
+        ResponseEntity<AccountIdByEmailResponse> userResponse;
+        try {
+            userResponse = organisationClient.getAccountIdByEmail(adminUserService.getAdminUserToken(),
+                    authTokenGenerator.generate(), email);
+            if (!OrganisationUtils.hasUserIdentifier(userResponse)) {
+                return null;
+            }
+        } catch (FeignException e) {
+            return null;
+        }
+        return userResponse.getBody();
+    }
+
+    /**
      * Checks whether a representative account can be found using the supplied email address.
      *
      * <p>This method calls the organisation service to look up an account by email. If no
@@ -74,7 +104,7 @@ public class OrganisationService {
             ResponseEntity<AccountIdByEmailResponse> userResponse =
                     organisationClient.getAccountIdByEmail(adminUserService.getAdminUserToken(),
                             authTokenGenerator.generate(), email);
-            // checking if representative email address exists in organisation users
+            // checking if representative account exists in organisation users
             if (!OrganisationUtils.hasUserIdentifier(userResponse)) {
                 String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
                         representativeName);

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_EMAIL_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_ID_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_NOT_FOUND;
 
@@ -17,27 +16,23 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConst
 @RequiredArgsConstructor
 public class UserService {
 
+    private final AdminUserService adminUserService;
     private final UserIdamService userIdamService;
 
     private static final String CLASS_NAME = UserService.class.getName();
 
     /**
-     * Retrieves the user details associated with the supplied authentication token
-     * and validates that the required user information is present.
-     * <p>
-     * The returned user details must contain a user ID and email address.
-     * If the user cannot be found, or either of the required fields is missing,
-     * a {@link GenericServiceException} is thrown using the supplied submission
-     * reference for error tracking.
-     * </p>
+     * Fetches user details from IDAM and validates that the details are present
+     * and the user's UID is non-blank.
      *
      * @param userToken the authentication token used to retrieve the user details
-     * @param submissionReference the submission reference used for error tracking
-     * @return the validated user details
-     * @throws GenericServiceException if the user details cannot be found, or if the
-     *                                 user ID or email address is missing
+     * @param submissionReference the submission reference included in validation
+     *                            exceptions for error reporting
+     * @return the retrieved user details with a non-blank UID; never {@code null}
+     * @throws GenericServiceException if the user details are missing or the UID
+     *                                 is {@code null}, empty, or contains only whitespace
      */
-    public UserDetails getValidatedUserDetails(String userToken, String submissionReference)
+    public UserDetails fetchAndValidateUserDetails(String userToken, String submissionReference)
             throws GenericServiceException {
         final String methodName = "getUserDetails";
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
@@ -64,6 +59,35 @@ public class UserService {
                     submissionReference,
                     CLASS_NAME,
                     methodName);
+        }
+        return userDetails;
+    }
+
+    /**
+     * Retrieves the user details associated with the given authentication token.
+     *
+     * <p>Returns {@code null} if no user details are found or if the retrieved
+     * user's UID is null, empty, or contains only whitespace.</p>
+     *
+     * @param userToken the authentication token used to retrieve the user details
+     * @return the user details if found and the UID is non-blank; otherwise {@code null}
+     */
+    public UserDetails findUserDetailsByToken(String userToken) {
+        UserDetails userDetails = userIdamService.getUserDetails(userToken);
+        return ObjectUtils.isEmpty(userDetails) || StringUtils.isBlank(userDetails.getUid()) ? null : userDetails;
+    }
+
+    /**
+     * Finds user details in IDAM for the given IDAM ID.
+     *
+     * @param idamId the IDAM ID of the user whose details are requested
+     * @return the user details, or {@code null} if the service returns no details
+     *         or the returned user's UID is {@code null}, empty, or whitespace only
+     */
+    public UserDetails findUserDetailsByIdamId(String idamId) {
+        UserDetails userDetails = userIdamService.getUserDetailsById(adminUserService.getAdminUserToken(), idamId);
+        if (ObjectUtils.isEmpty(userDetails) || StringUtils.isBlank(userDetails.getUid())) {
+            return null;
         }
         return userDetails;
     }

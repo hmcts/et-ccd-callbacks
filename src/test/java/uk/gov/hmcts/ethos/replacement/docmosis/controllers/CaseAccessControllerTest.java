@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -61,7 +62,7 @@ class CaseAccessControllerTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         CaseData caseData = new CaseData();
-        caseData.setLinkedCaseCT("http://example.com/1234567890123456");
+        caseData.setLinkedCaseCT("https://example.com/1234567890123456");
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseData)
                 .withCaseId("1111222233334444")
@@ -88,7 +89,7 @@ class CaseAccessControllerTest {
     @Test
     void assignClaimantTransferredCaseAccess_error() throws Exception {
         ccdRequest.getCaseDetails().getCaseData().setLinkedCaseCT(null);
-        doCallRealMethod().when(caseAccessService).assignExistingCaseRoles(ccdRequest.getCaseDetails());
+        doCallRealMethod().when(caseAccessService).assignExistingCaseRoles(any(CaseDetails.class));
 
         mockMvc.perform(post(CLAIMANT_TRANSFERRED_CASE_URL)
                         .contentType(APPLICATION_JSON)

@@ -12,6 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 import uk.gov.hmcts.reform.et.syaapi.service.utils.NoticeOfChangeUtils;
 
@@ -354,6 +355,19 @@ public final class RespondentRepresentativeUtils {
     }
 
     /**
+     * Checks whether a representative's name has changed.
+     *
+     * @param oldRepresentative representative before the update
+     * @param newRepresentative representative after the update
+     * @return {@code true} when the names differ
+     */
+    public static boolean isRepresentativeNameChanged(RepresentedTypeR oldRepresentative,
+                                                       RepresentedTypeR newRepresentative) {
+        return !Strings.CS.equals(oldRepresentative.getNameOfRepresentative(),
+                newRepresentative.getNameOfRepresentative());
+    }
+
+    /**
      * Determines whether the provided new representative is both valid and
      * represents the same respondent as the old representative.
      *
@@ -400,7 +414,7 @@ public final class RespondentRepresentativeUtils {
      * </p>
      * <p>
      * Representatives are considered unchanged only when they represent the same respondent
-     * and both the organisation and email address remain the same.
+     * and the name, organisation and email address remain the same.
      * </p>
      * <p>
      * Any invalid representatives are ignored during the comparison.
@@ -409,7 +423,7 @@ public final class RespondentRepresentativeUtils {
      * @param newRepresentatives the list of representatives from the updated case data
      * @param oldRepresentatives the list of representatives from the previous case data
      * @return a list of representatives that are either new or have been updated due to
-     *         a change in organisation or email address
+     *         a change in name, organisation or email address
      */
     public static List<RepresentedTypeRItem> findNewOrUpdatedRepresentatives(
             List<RepresentedTypeRItem> newRepresentatives, List<RepresentedTypeRItem> oldRepresentatives) {
@@ -430,6 +444,7 @@ public final class RespondentRepresentativeUtils {
                         && representsSameRespondent(oldRepresentative, newRepresentative)
                         && !hasRespondentRepresentativeOrganisationChanged(oldRepresentative.getValue(),
                         newRepresentative.getValue())
+                        && !isRepresentativeNameChanged(oldRepresentative.getValue(), newRepresentative.getValue())
                         && !isRepresentativeEmailChanged(oldRepresentative.getValue(), newRepresentative.getValue())) {
                     representsSameRespondent = true;
                     break;
@@ -1007,26 +1022,150 @@ public final class RespondentRepresentativeUtils {
      */
     public static void updateRepresentativeContactDetails(CaseData caseData,
                                                           List<String> roles) {
+        if (caseData == null) {
+            return;
+        }
+        for (RepresentedTypeR representative : findRepresentativesByRoles(caseData, roles)) {
+            if (representative == null) {
+                continue;
+            }
+            representative.setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
+            representative.setRepresentativeAddress(caseData.getEt3ResponseAddress());
+        }
+    }
+
+    /**
+     * Finds the representatives linked to the respondents identified by the given case roles.
+     * <p>
+     * Each role label is mapped to a respondent index via
+     * {@link RoleUtils#findRoleIndexByRoleLabel(String)}. The respondent at that index is then
+     * matched against the representative collection by respondent ID.
+     * <p>
+     * An empty list is returned when the representative collection, the roles, or the respondent
+     * collection is empty. Roles that do not resolve to a valid respondent are skipped, as are
+     * representatives that fail {@link #isValidRepresentative(RepresentedTypeRItem)}.
+     *
+     * @param caseData the case data containing respondent and representative details
+     * @param roles the list of case role labels used to identify respondents
+     * @return the matching representative value objects; never {@code null}
+     */
+    public static List<RepresentedTypeR> findRepresentativesByRoles(CaseData caseData, List<String> roles) {
+        List<RepresentedTypeR> representatives = new ArrayList<>();
+        if (caseData == null) {
+            return representatives;
+        }
         if (CollectionUtils.isEmpty(caseData.getRepCollection())
                 || CollectionUtils.isEmpty(roles)
                 || CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
-            return;
+            return representatives;
         }
         for (String role : roles) {
             int roleIndex = RoleUtils.findRoleIndexByRoleLabel(role);
-            if (roleIndex >= caseData.getRespondentCollection().size()
-                    || StringUtils.isBlank(caseData.getRespondentCollection().get(roleIndex).getId())) {
+            if (roleIndex < 0 || roleIndex >= caseData.getRespondentCollection().size()) {
                 continue;
             }
             RespondentSumTypeItem respondentSumTypeItem = caseData.getRespondentCollection().get(roleIndex);
+            if (respondentSumTypeItem == null || StringUtils.isBlank(respondentSumTypeItem.getId())) {
+                continue;
+            }
             for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
-                if (RespondentRepresentativeUtils.isValidRepresentative(representative)
-                        && representative.getValue().getRespondentId().equals(respondentSumTypeItem.getId())) {
-                    representative.getValue().setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
-                    representative.getValue().setRepresentativeAddress(caseData.getEt3ResponseAddress());
+                if (!RespondentRepresentativeUtils.isValidRepresentative(representative)) {
+                    continue;
+                }
+                RepresentedTypeR representativeValue = representative.getValue();
+                if (representativeValue == null) {
+                    continue;
+                }
+                if (respondentSumTypeItem.getId().equals(representativeValue.getRespondentId())) {
+                    representatives.add(representativeValue);
                 }
             }
         }
+        return representatives;
+    }
+
+    /**
+     * Copies the current representative contact details into the dedicated staging fields used by
+     * the respondent legal representative "Amend contact details" event.
+     * <p>
+     * The staging fields {@code respRepPhoneNumber} and
+     * {@code respRepAddress} exist so that this event never reads from or writes to
+     * the live ET3 response fields.
+     *
+     * @param caseData the case data containing respondent and representative details
+     * @param roles the list of case role labels used to identify respondents
+     */
+    public static void loadStagedRepresentativeContactDetails(CaseData caseData, List<String> roles) {
+        if (caseData == null) {
+            return;
+        }
+        for (RepresentedTypeR representative : findRepresentativesByRoles(caseData, roles)) {
+            if (representative == null) {
+                continue;
+            }
+            caseData.setRespRepPhoneNumber(representative.getRepresentativePhoneNumber());
+            caseData.setRespRepAddress(representative.getRepresentativeAddress());
+        }
+    }
+
+    /**
+     * Persists the staged contact details onto every representative linked to the given case roles.
+     * <p>
+     * Reads {@code respRepPhoneNumber} and {@code respRepAddress}
+     * rather than the live ET3 response fields. Use this for the "Amend contact details" option.
+     *
+     * @param caseData the case data containing respondent and representative details
+     * @param roles the list of case role labels used to identify respondents
+     */
+    public static void saveStagedRepresentativeContactDetails(CaseData caseData, List<String> roles) {
+        persistStagedRepresentativeContact(caseData, roles, true);
+    }
+
+    /**
+     * Persists only the staged address onto every representative linked to the given case roles.
+     * <p>
+     * Used for the "Use MyHMCTS details" option, where the phone staging field is hidden and must
+     * not overwrite the existing representative phone number.
+     *
+     * @param caseData the case data containing respondent and representative details
+     * @param roles the list of case role labels used to identify respondents
+     */
+    public static void saveStagedRepresentativeAddress(CaseData caseData, List<String> roles) {
+        persistStagedRepresentativeContact(caseData, roles, false);
+    }
+
+    private static void persistStagedRepresentativeContact(CaseData caseData, List<String> roles,
+                                                           boolean includePhoneNumber) {
+        if (caseData == null) {
+            return;
+        }
+        for (RepresentedTypeR representative : findRepresentativesByRoles(caseData, roles)) {
+            if (representative == null) {
+                continue;
+            }
+            if (includePhoneNumber) {
+                representative.setRepresentativePhoneNumber(caseData.getRespRepPhoneNumber());
+            }
+            representative.setRepresentativeAddress(caseData.getRespRepAddress());
+        }
+    }
+
+    /**
+     * Clears the transient staging and Check your answers fields used by the respondent legal
+     * representative "Amend contact details" event, so nothing is left on the case after submit.
+     *
+     * <p>The live ET3 response fields are deliberately not touched.
+     *
+     * @param caseData the case data to clear
+     */
+    public static void clearStagedRepresentativeContactDetails(CaseData caseData) {
+        if (caseData == null) {
+            return;
+        }
+        caseData.setRespRepPhoneNumber(null);
+        caseData.setRespRepAddress(null);
+        caseData.setRepresentativeContactChangeOption(null);
+        AddressUtils.clearMyHmctsAddressText(caseData);
     }
 
     /**
@@ -1061,25 +1200,15 @@ public final class RespondentRepresentativeUtils {
      */
     public static void updateET3ResponseContactDetails(CaseData caseData,
                                                        List<String> roles) {
-        if (CollectionUtils.isEmpty(caseData.getRepCollection())
-                || CollectionUtils.isEmpty(roles)
-                || CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+        if (caseData == null) {
             return;
         }
-        for (String role : roles) {
-            int roleIndex = RoleUtils.findRoleIndexByRoleLabel(role);
-            if (roleIndex >= caseData.getRespondentCollection().size()
-                    || StringUtils.isBlank(caseData.getRespondentCollection().get(roleIndex).getId())) {
+        for (RepresentedTypeR representative : findRepresentativesByRoles(caseData, roles)) {
+            if (representative == null) {
                 continue;
             }
-            RespondentSumTypeItem respondentSumTypeItem = caseData.getRespondentCollection().get(roleIndex);
-            for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
-                if (RespondentRepresentativeUtils.isValidRepresentative(representative)
-                        && representative.getValue().getRespondentId().equals(respondentSumTypeItem.getId())) {
-                    caseData.setEt3ResponsePhone(representative.getValue().getRepresentativePhoneNumber());
-                    caseData.setEt3ResponseAddress(representative.getValue().getRepresentativeAddress());
-                }
-            }
+            caseData.setEt3ResponsePhone(representative.getRepresentativePhoneNumber());
+            caseData.setEt3ResponseAddress(representative.getRepresentativeAddress());
         }
     }
 }

@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -175,7 +176,6 @@ public class NocClaimantRepresentativeService {
         String caseId = caseDetails.getCaseId();
         updateClaimantRepMap(caseData, caseId);
         prepopulateOrgAddress(caseData, userToken);
-
         return caseData;
     }
 
@@ -202,7 +202,7 @@ public class NocClaimantRepresentativeService {
         claimantRep.setNameOfRepresentative(userDetails.getFirstName() + " " + userDetails.getLastName());
         claimantRep.setRepresentativeEmailAddress(userDetails.getEmail());
         claimantRep.setMyHmctsOrganisation(change.getOrganisationToAdd());
-
+        claimantRep.setIdamId(userDetails.getUid());
         return claimantRep;
     }
 
@@ -226,14 +226,14 @@ public class NocClaimantRepresentativeService {
         }
     }
 
-    public void updateClaimantRepAccess(CallbackRequest callbackRequest)
+    public void updateClaimantRepAccess(CallbackRequest callbackRequest, boolean caseFlagsV2Enabled)
             throws IOException {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
         CaseDetails caseDetailsBefore = callbackRequest.getCaseDetailsBefore();
         CaseData caseDataBefore = caseDetailsBefore.getCaseData();
         CaseData caseData = caseDetails.getCaseData();
-        ChangeOrganisationRequest changeRequest = identifyRepresentationChanges(caseData,
-                caseDataBefore);
+        ChangeOrganisationRequest changeRequest = identifyRepresentationChanges(
+                caseData, caseDataBefore, caseFlagsV2Enabled);
         try {
             nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest, true);
         } catch (Exception exception) {
@@ -264,14 +264,16 @@ public class NocClaimantRepresentativeService {
         }
     }
 
-    public ChangeOrganisationRequest identifyRepresentationChanges(CaseData  after, CaseData before) {
-        Organisation newRepOrg = after.getRepresentativeClaimantType() != null
-                ? after.getRepresentativeClaimantType().getMyHmctsOrganisation() : null;
-        Organisation oldRepOrg = before.getRepresentativeClaimantType() != null
-                ? before.getRepresentativeClaimantType().getMyHmctsOrganisation() : null;
+    public ChangeOrganisationRequest identifyRepresentationChanges(
+            CaseData after, CaseData before, boolean caseFlagsV2Enabled) {
+        RepresentedTypeC newRep = after.getRepresentativeClaimantType();
+        RepresentedTypeC oldRep = before.getRepresentativeClaimantType();
+        Organisation newRepOrg = newRep != null ? newRep.getMyHmctsOrganisation() : null;
+        Organisation oldRepOrg = oldRep != null ? oldRep.getMyHmctsOrganisation() : null;
         ChangeOrganisationRequest changeRequests;
 
-        if (!Objects.equals(newRepOrg, oldRepOrg)) {
+        if (!Objects.equals(newRepOrg, oldRepOrg)
+                || (caseFlagsV2Enabled && claimantRepresentativeChanged(newRep, oldRep))) {
             changeRequests = NocUtils.buildApprovedChangeOrganisationRequest(newRepOrg, oldRepOrg,
                     ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
         } else {
@@ -280,5 +282,47 @@ public class NocClaimantRepresentativeService {
         }
 
         return changeRequests;
+    }
+
+    private static boolean claimantRepresentativeChanged(RepresentedTypeC current, RepresentedTypeC previous) {
+        if (current == null || previous == null) {
+            return false;
+        }
+
+        return !Objects.equals(normaliseRepresentativeIdentity(current.getNameOfRepresentative()),
+                normaliseRepresentativeIdentity(previous.getNameOfRepresentative()))
+                || !Objects.equals(normaliseRepresentativeIdentity(current.getRepresentativeEmailAddress()),
+                normaliseRepresentativeIdentity(previous.getRepresentativeEmailAddress()));
+    }
+
+    private static String normaliseRepresentativeIdentity(String value) {
+        return StringUtils.trimToEmpty(value).toLowerCase(Locale.ROOT);
+    }
+
+    /**
+     * Sets the claimant representative's IDAM ID using their email address.
+     *
+     * <p>Assumes that the representative's email address is associated with an
+     * organisation user account and that the organisation service can retrieve
+     * the corresponding user identifier.</p>
+     *
+     * <p>The IDAM ID is only set if the claimant representative is not {@code null},
+     * their existing IDAM ID is blank, and a valid email address is provided.
+     * If no matching account is found, the existing IDAM ID remains unchanged.</p>
+     *
+     * @param claimantRepresentative the claimant representative whose IDAM ID
+     *                               should be populated, if available
+     */
+    public void setClaimantRepresentativeIdamId(RepresentedTypeC claimantRepresentative) {
+        if (claimantRepresentative == null
+                || StringUtils.isNotBlank(claimantRepresentative.getIdamId())
+                || StringUtils.isBlank(claimantRepresentative.getRepresentativeEmailAddress())) {
+            return;
+        }
+        AccountIdByEmailResponse userAccount =
+                organisationService.findAccountByEmail(claimantRepresentative.getRepresentativeEmailAddress());
+        if (userAccount != null) {
+            claimantRepresentative.setIdamId(userAccount.getUserIdentifier());
+        }
     }
 }

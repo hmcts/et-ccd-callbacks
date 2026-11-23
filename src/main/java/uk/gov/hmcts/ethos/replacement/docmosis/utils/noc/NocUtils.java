@@ -263,6 +263,12 @@ public final class NocUtils {
      */
     public static void mapRepresentativesToRespondents(CaseData caseData, String submissionReference)
             throws GenericServiceException {
+        mapRepresentativesToRespondents(caseData, submissionReference, false);
+    }
+
+    public static void mapRepresentativesToRespondents(CaseData caseData, String submissionReference,
+                                                       boolean useSelectedRespondent)
+            throws GenericServiceException {
         if (!RespondentUtils.hasRespondents(caseData)
                 || !RespondentRepresentativeUtils.hasRespondentRepresentative(caseData)) {
             return;
@@ -282,6 +288,9 @@ public final class NocUtils {
             }
             String repRespondentId = representative.getValue().getRespondentId();
             String repRespondentName = representative.getValue().getDynamicRespRepName().getValue().getLabel();
+            if (useSelectedRespondent && respondentsByName.containsKey(repRespondentName)) {
+                repRespondentId = respondentsByName.get(repRespondentName).getId();
+            }
             if  (StringUtils.isNotBlank(repRespondentId) || StringUtils.isNotBlank(repRespondentName)) {
                 setMatchingRespondent(respondentsById, respondentsByName, repRespondentId,
                         repRespondentName, representative, submissionReference);
@@ -744,5 +753,18 @@ public final class NocUtils {
         return caseUserAssignments.stream()
                 .filter(caseUserAssignment -> role.equals(caseUserAssignment.getCaseRole()))
                 .toList();
+    }
+
+    /**
+     * Resets the Notice of Change (NOC) removal options in the provided case data.
+     * Clears the NOC removal option, case sharing status, and representative type
+     * by setting their values to {@code null}.
+     *
+     * @param caseData the case data containing the NOC removal fields to reset
+     */
+    public static void resetNOCRemovalOptions(CaseData caseData) {
+        caseData.setNocRemoveOption(null);
+        caseData.setNocCaseSharingStatus(null);
+        caseData.setNocRepresentativeType(null);
     }
 }

@@ -1,7 +1,7 @@
 [
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "nocRemoveRepLandingPageLeadLabel",
+    "CaseFieldID": "nocRemoveLeadMultiRepsLandingPageLabel",
     "AccessControl": [
       {
         "UserRoles": [
@@ -13,7 +13,31 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "nocRemoveRepLandingPageSharedLabel",
+    "CaseFieldID": "nocRemoveLeadSingleRepLandingPageLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveSharedRepLandingPageLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveSharedRepRemovalLabel",
     "AccessControl": [
       {
         "UserRoles": [
@@ -37,19 +61,7 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "nocRemoveRepRemoveLabelSelf",
-    "AccessControl": [
-      {
-        "UserRoles": [
-          "[CLAIMANTSOLICITOR]"
-        ],
-        "CRUD": "R"
-      }
-    ]
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "nocRemoveRepRemoveSelfConfirm",
+    "CaseFieldID": "nocCaseSharingStatus",
     "AccessControl": [
       {
         "UserRoles": [
@@ -61,7 +73,43 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "nocRemoveRepRemoveLabelOrg",
+    "CaseFieldID": "nocRepresentativeType",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveRepSelfRemovalLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveRepSelfConfirm",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveRepOrgRemovalLabel",
     "AccessControl": [
       {
         "UserRoles": [
@@ -85,7 +133,7 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "nocRemoveRepRemoveOrgConfirm1",
+    "CaseFieldID": "nocRemoveRepOrgConfirmation1",
     "AccessControl": [
       {
         "UserRoles": [
@@ -97,7 +145,7 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "nocRemoveRepRemoveOrgConfirm2",
+    "CaseFieldID": "nocRemoveRepOrgConfirmation2",
     "AccessControl": [
       {
         "UserRoles": [

@@ -24,6 +24,14 @@ public class BaseCaseData {
     @JsonProperty("newClaimantEmail")
     private String newClaimantEmail;
 
+    // Update respondent email
+    @JsonProperty("respondentEmailUpdateSelection")
+    private DynamicFixedListType respondentEmailUpdateSelection;
+    @JsonProperty("currentRespondentEmail")
+    private String currentRespondentEmail;
+    @JsonProperty("newRespondentEmail")
+    private String newRespondentEmail;
+
     //Referral
     @JsonProperty("referralCollection")
     private List<ReferralTypeItem> referralCollection;

@@ -1,13 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,30 +16,32 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveRepNotificationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveRepresentationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveClaimantRepresentationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CallbackObjectUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.STAGE_ABOUT_TO_START;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.STAGE_ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
 
-@Slf4j
 @RequestMapping("/nocRemoveRepresentation")
 @RestController
 @RequiredArgsConstructor
 public class NocRemoveRepresentationController {
 
+    private final NocRemoveClaimantRepresentationService nocRemoveClaimantRepresentationService;
     private final UserService userService;
-    private final NocRemoveRepresentationService nocRemoveRepresentationService;
-    private final NocRemoveRepNotificationService nocRemoveRepNotificationService;
 
     @PostMapping(value = "/claimant/aboutToStart", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "nocRemoveRep claimant about to submit page")
+    @Operation(summary = "nocRemoveRep claimant about to start page")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -56,10 +56,12 @@ public class NocRemoveRepresentationController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         List<String> errors = new ArrayList<>();
         try {
-            UserDetails userDetails = userService.getValidatedUserDetails(userToken, caseDetails.getCaseId());
-            nocRemoveRepresentationService.setNocRemoveOption(userDetails, caseDetails);
-        } catch (GenericServiceException gse) {
-            errors.add(gse.getMessage());
+            CaseDataUtils.validateCaseDetails(caseDetails);
+            UserDetails userDetails = userService.fetchAndValidateUserDetails(userToken, caseDetails.getCaseId());
+            nocRemoveClaimantRepresentationService.populateNocRemovalDetails(userDetails, caseDetails,
+                    STAGE_ABOUT_TO_START);
+        } catch (GenericServiceException | CcdInputOutputException ex) {
+            errors.add(ex.getMessage());
         }
         return getCallbackRespEntity(errors, caseDetails);
     }
@@ -80,16 +82,18 @@ public class NocRemoveRepresentationController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         List<String> errors = new ArrayList<>();
         try {
-            UserDetails userDetails = userService.getValidatedUserDetails(userToken, caseDetails.getCaseId());
-            nocRemoveRepresentationService.setNocRemoveOption(userDetails, caseDetails);
+            CaseDataUtils.validateCaseDetails(caseDetails);
+            UserDetails userDetails = userService.fetchAndValidateUserDetails(userToken, caseDetails.getCaseId());
+            nocRemoveClaimantRepresentationService.populateNocRemovalDetails(userDetails, caseDetails,
+                    STAGE_ABOUT_TO_SUBMIT);
             CaseDetails caseDetailsBeforeRevoke =
                     CallbackObjectUtils.cloneObject(ccdRequest.getCaseDetails(), CaseDetails.class);
-            nocRemoveRepresentationService.revokeClaimantLegalRep(userToken, caseDetails);
+            nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(userDetails, caseDetails);
             nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails,
                     caseDetailsBeforeRevoke);
-            caseDetails.getCaseData().setNocRemoveOption(null);
-        } catch (GenericServiceException | JsonProcessingException e) {
-            errors.add(e.getMessage());
+            NocUtils.resetNOCRemovalOptions(caseDetails.getCaseData());
+        } catch (GenericServiceException | CcdInputOutputException ex) {
+            errors.add(ex.getMessage());
         }
         return getCallbackRespEntity(errors, caseDetails);
     }

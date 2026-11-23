@@ -6,6 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.Address;
@@ -26,6 +29,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @ExtendWith(SpringExtension.class)
 class AmendRepresentativeContactServiceTest {
 
@@ -154,6 +159,121 @@ class AmendRepresentativeContactServiceTest {
                 SUBMISSION_REFERENCE);
         assertThat(caseData.getEt3ResponsePhone()).isEqualTo(REPRESENTATIVE_PHONE_NUMBER);
         assertThat(caseData.getEt3ResponseAddress()).isEqualTo(address);
+    }
+
+    @Test
+    @SneakyThrows
+    void theLoadStagedContactDetails_prefillsStagingFieldsAndLeavesEt3Untouched() {
+        CaseData caseData = new CaseData();
+        Address address = createAddress();
+        caseData.setRepCollection(List.of(RepresentedTypeRItem.builder()
+                .id(RESPONDENT_REPRESENTATIVE_ID)
+                .value(RepresentedTypeR.builder()
+                        .respondentId(RESPONDENT_ID)
+                        .representativeAddress(address)
+                        .representativePhoneNumber(REPRESENTATIVE_PHONE_NUMBER)
+                        .build())
+                .build()));
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setId(RESPONDENT_ID);
+        respondent.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME).build());
+        caseData.setRespondentCollection(List.of(respondent));
+        when(nocRepresentativeService.getValidatedRepresentativeRolesByUserToken(VALID_USER_TOKEN,
+                SUBMISSION_REFERENCE)).thenReturn(List.of(ROLE_SOLICITOR_A));
+
+        amendRepresentativeContactService.loadStagedContactDetails(VALID_USER_TOKEN, caseData, SUBMISSION_REFERENCE);
+
+        assertThat(caseData.getRespRepPhoneNumber()).isEqualTo(REPRESENTATIVE_PHONE_NUMBER);
+        assertThat(caseData.getRespRepAddress()).isEqualTo(address);
+        // the live ET3 response fields must not be used as staging by this event
+        assertThat(caseData.getEt3ResponsePhone()).isNull();
+        assertThat(caseData.getEt3ResponseAddress()).isNull();
+    }
+
+    @Test
+    @SneakyThrows
+    void theSaveStagedContactDetails_persistsStagingThenClearsItAndLeavesEt3Untouched() {
+        CaseData caseData = new CaseData();
+        Address stagedAddress = createAddress();
+        Address et3Address = new Address();
+        et3Address.setAddressLine1("10 Downing Street");
+        caseData.setRespRepPhoneNumber(REPRESENTATIVE_PHONE_NUMBER);
+        caseData.setRespRepAddress(stagedAddress);
+        caseData.setMyHmctsAddressText("Org House");
+        caseData.setRepresentativeContactChangeOption(StringUtils.EMPTY);
+        caseData.setEt3ResponsePhone("01234567890");
+        caseData.setEt3ResponseAddress(et3Address);
+
+        RepresentedTypeR representativeValue = RepresentedTypeR.builder().respondentId(RESPONDENT_ID).build();
+        caseData.setRepCollection(List.of(RepresentedTypeRItem.builder()
+                .id(RESPONDENT_REPRESENTATIVE_ID).value(representativeValue).build()));
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setId(RESPONDENT_ID);
+        respondent.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME).build());
+        caseData.setRespondentCollection(List.of(respondent));
+        when(nocRepresentativeService.getValidatedRepresentativeRolesByUserToken(VALID_USER_TOKEN,
+                SUBMISSION_REFERENCE)).thenReturn(List.of(ROLE_SOLICITOR_A));
+
+        amendRepresentativeContactService.saveStagedContactDetails(VALID_USER_TOKEN, caseData, SUBMISSION_REFERENCE);
+
+        assertThat(representativeValue.getRepresentativePhoneNumber()).isEqualTo(REPRESENTATIVE_PHONE_NUMBER);
+        assertThat(representativeValue.getRepresentativeAddress()).isEqualTo(stagedAddress);
+        // staged and Check your answers fields are cleared once persisted
+        assertThat(caseData.getRespRepPhoneNumber()).isNull();
+        assertThat(caseData.getRespRepAddress()).isNull();
+        assertThat(caseData.getRepresentativeContactChangeOption()).isNull();
+        assertThat(caseData.getMyHmctsAddressText()).isNull();
+        // the live ET3 response fields are left exactly as they were
+        assertThat(caseData.getEt3ResponsePhone()).isEqualTo("01234567890");
+        assertThat(caseData.getEt3ResponseAddress()).isEqualTo(et3Address);
+    }
+
+    @Test
+    @SneakyThrows
+    void theSaveStagedContactDetails_withMyHmctsOption_usesOrganisationAddress() {
+        CaseData caseData = new CaseData();
+        caseData.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS);
+        // CCD clears the hidden phone staging field for the MyHMCTS option
+        caseData.setRespRepPhoneNumber(null);
+        when(myHmctsService.getUserOrganisationAddress(VALID_USER_TOKEN)).thenReturn(OrganisationAddress.builder()
+                .addressLine1(ADDRESS_LINE_1).addressLine2(ADDRESS_LINE_2).addressLine3(ADDRESS_LINE_3)
+                .country(COUNTRY).county(COUNTY).postCode(POSTAL_CODE).townCity(TOWN_CITY).build());
+
+        RepresentedTypeR representativeValue = RepresentedTypeR.builder()
+                .respondentId(RESPONDENT_ID)
+                .representativePhoneNumber(REPRESENTATIVE_PHONE_NUMBER)
+                .build();
+        caseData.setRepCollection(List.of(RepresentedTypeRItem.builder()
+                .id(RESPONDENT_REPRESENTATIVE_ID).value(representativeValue).build()));
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setId(RESPONDENT_ID);
+        respondent.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME).build());
+        caseData.setRespondentCollection(List.of(respondent));
+        when(nocRepresentativeService.getValidatedRepresentativeRolesByUserToken(VALID_USER_TOKEN,
+                SUBMISSION_REFERENCE)).thenReturn(List.of(ROLE_SOLICITOR_A));
+
+        amendRepresentativeContactService.saveStagedContactDetails(VALID_USER_TOKEN, caseData, SUBMISSION_REFERENCE);
+
+        assertThat(representativeValue.getRepresentativeAddress()).isEqualTo(createAddress());
+        // existing phone must not be wiped when the staging phone field is hidden/null
+        assertThat(representativeValue.getRepresentativePhoneNumber()).isEqualTo(REPRESENTATIVE_PHONE_NUMBER);
+        assertThat(caseData.getEt3ResponseAddress()).isNull();
+        assertThat(caseData.getRespRepAddress()).isNull();
+    }
+
+    @Test
+    @SneakyThrows
+    void theSetStagedMyHmctsContactAddress_writesStagingFieldOnly() {
+        CaseData caseData = new CaseData();
+        when(myHmctsService.getUserOrganisationAddress(VALID_USER_TOKEN)).thenReturn(OrganisationAddress.builder()
+                .addressLine1(ADDRESS_LINE_1).addressLine2(ADDRESS_LINE_2).addressLine3(ADDRESS_LINE_3)
+                .country(COUNTRY).county(COUNTY).postCode(POSTAL_CODE).townCity(TOWN_CITY).build());
+
+        amendRepresentativeContactService.setStagedMyHmctsContactAddress(VALID_USER_TOKEN, caseData);
+
+        assertThat(caseData.getRespRepAddress()).isEqualTo(createAddress());
+        assertThat(caseData.getMyHmctsAddressText()).isNotNull();
+        assertThat(caseData.getEt3ResponseAddress()).isNull();
     }
 
     private static Address createAddress() {

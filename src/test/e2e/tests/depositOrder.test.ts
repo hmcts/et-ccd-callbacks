@@ -1,9 +1,13 @@
-import { test } from '../fixtures/common.fixture';
-import { CaseworkerCaseFactory } from '../data-utils/factory/exui/CaseworkerCaseFactory.ts';
-import { CaseTypeLocation, Events } from '../config/case-data.ts';
-import { users } from '../config/config.dynamic.ts';
+import { test } from '../fixtures/et.test.fixture.ts';
+import {
+    CaseTypeLocation,
+    CaseworkerCaseFactory,
+    Events,
+    resolveResourceJson,
+    users
+} from "@hmcts/et-shared-test-library";
 
-const depositOrderData = require('../resources/payload/deposit-order-content.json');
+const depositOrderData = resolveResourceJson('resources/payload/deposit-order-content.json');
 let formattedAmount: string;
 let caseNumber: string;
 let caseId: string;

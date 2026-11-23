@@ -1,7 +1,7 @@
 [
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRemoveRepLandingPageLeadLabel",
+    "CaseFieldID": "nocRemoveLeadMultiRepsLandingPageLabel",
     "AccessControl": [
       {
         "UserRoles": [
@@ -13,7 +13,31 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRemoveRepLandingPageSharedLabel",
+    "CaseFieldID": "nocRemoveLeadSingleRepLandingPageLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "nocRemoveSharedRepLandingPageLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "nocRemoveSharedRepRemovalLabel",
     "AccessControl": [
       {
         "UserRoles": [
@@ -37,19 +61,7 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRemoveRepRemoveLabelSelf",
-    "AccessControl": [
-      {
-        "UserRoles": [
-          "[CLAIMANTSOLICITOR]"
-        ],
-        "CRUD": "R"
-      }
-    ]
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRemoveRepRemoveSelfConfirm",
+    "CaseFieldID": "nocCaseSharingStatus",
     "AccessControl": [
       {
         "UserRoles": [
@@ -61,7 +73,43 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRemoveRepRemoveLabelOrg",
+    "CaseFieldID": "nocRepresentativeType",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "nocRemoveRepSelfRemovalLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "nocRemoveRepSelfConfirm",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "nocRemoveRepOrgRemovalLabel",
     "AccessControl": [
       {
         "UserRoles": [
@@ -85,7 +133,7 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRemoveRepRemoveOrgConfirm1",
+    "CaseFieldID": "nocRemoveRepOrgConfirmation1",
     "AccessControl": [
       {
         "UserRoles": [
@@ -97,7 +145,7 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRemoveRepRemoveOrgConfirm2",
+    "CaseFieldID": "nocRemoveRepOrgConfirmation2",
     "AccessControl": [
       {
         "UserRoles": [

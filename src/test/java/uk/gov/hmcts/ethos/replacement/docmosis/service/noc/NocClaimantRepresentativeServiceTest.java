@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.tika.utils.StringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -67,6 +69,7 @@ class NocClaimantRepresentativeServiceTest {
     private static final String DUMMY_ORGANISATION_USER_ID = "dummyOrganisationUserId";
     private static final String ORGANISATION_ID_NEW = "ORG3_NEW";
     private static final String REPRESENTATIVE_NAME_1 = "Representative Name 1";
+    private static final String REPRESENTATIVE_IDAM_ID = "dda9d1c3-1a11-3c3a-819e-74174fbec26b";
     private static final String S2S_TOKEN = "s2sToken";
     private static final String DUMMY_EXCEPTION_MESSAGE = "System error!...";
 
@@ -183,7 +186,7 @@ class NocClaimantRepresentativeServiceTest {
                 .build());
         when(NocUtils.buildApprovedChangeOrganisationRequest(any(), any(), any()))
                 .thenReturn(createChangeOrganisationRequest());
-        nocClaimantRepresentativeService.updateClaimantRepAccess(getCallBackCallbackRequest());
+        nocClaimantRepresentativeService.updateClaimantRepAccess(getCallBackCallbackRequest(), true);
         verify(nocNotificationService, times(1))
                 .sendNotificationOfChangeEmails(any(), any(), any(), eq(true));
     }
@@ -206,7 +209,7 @@ class NocClaimantRepresentativeServiceTest {
         doReturn(ResponseEntity.ok(organisationsResponse)).when(organisationClient)
                 .retrieveOrganisationDetailsByUserId(DUMMY_ADMIN_USER_TOKEN, S2S_TOKEN, DUMMY_ORGANISATION_USER_ID);
         // Act
-        nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest);
+        nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest, true);
         // Assert
         verify(nocNotificationService, times(NumberUtils.INTEGER_ONE)).sendNotificationOfChangeEmails(
                 any(), any(), any(), eq(true));
@@ -230,7 +233,7 @@ class NocClaimantRepresentativeServiceTest {
                 ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(expected);
 
         ChangeOrganisationRequest result =
-                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before);
+                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before, true);
 
         assertThat(result).isSameAs(expected);
     }
@@ -250,7 +253,85 @@ class NocClaimantRepresentativeServiceTest {
                 ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(expected);
 
         ChangeOrganisationRequest result =
-                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before);
+                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before, true);
+
+        assertThat(result).isSameAs(expected);
+    }
+
+    @Test
+    void shouldReturnChangeRequestWithOrganisationToRemoveWhenNameChanges() {
+        Organisation org = Organisation.builder().organisationID("SAME").build();
+        CaseData after = new CaseData();
+        CaseData before = new CaseData();
+        after.setRepresentativeClaimantType(RepresentedTypeC.builder()
+                .nameOfRepresentative("New Representative")
+                .representativeEmailAddress("claimant.rep@example.com")
+                .myHmctsOrganisation(org)
+                .build());
+        before.setRepresentativeClaimantType(RepresentedTypeC.builder()
+                .nameOfRepresentative("Old Representative")
+                .representativeEmailAddress("claimant.rep@example.com")
+                .myHmctsOrganisation(org)
+                .build());
+
+        ChangeOrganisationRequest expected = ChangeOrganisationRequest.builder().build();
+        when(NocUtils.buildApprovedChangeOrganisationRequest(org, org,
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(expected);
+
+        ChangeOrganisationRequest result =
+                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before, true);
+
+        assertThat(result).isSameAs(expected);
+    }
+
+    @Test
+    void shouldUseLegacyChangeRequestWhenNameChangesAndV2IsDisabled() {
+        Organisation org = Organisation.builder().organisationID("SAME").build();
+        CaseData after = new CaseData();
+        CaseData before = new CaseData();
+        after.setRepresentativeClaimantType(RepresentedTypeC.builder()
+                .nameOfRepresentative("New Representative")
+                .representativeEmailAddress("claimant.rep@example.com")
+                .myHmctsOrganisation(org)
+                .build());
+        before.setRepresentativeClaimantType(RepresentedTypeC.builder()
+                .nameOfRepresentative("Old Representative")
+                .representativeEmailAddress("claimant.rep@example.com")
+                .myHmctsOrganisation(org)
+                .build());
+
+        ChangeOrganisationRequest expected = ChangeOrganisationRequest.builder().build();
+        when(NocUtils.buildApprovedChangeOrganisationRequest(org, null,
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(expected);
+
+        ChangeOrganisationRequest result =
+                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before, false);
+
+        assertThat(result).isSameAs(expected);
+    }
+
+    @Test
+    void shouldReturnChangeRequestWithOrganisationToRemoveWhenEmailChanges() {
+        Organisation org = Organisation.builder().organisationID("SAME").build();
+        CaseData after = new CaseData();
+        CaseData before = new CaseData();
+        after.setRepresentativeClaimantType(RepresentedTypeC.builder()
+                .nameOfRepresentative("Claimant Representative")
+                .representativeEmailAddress("new.claimant.rep@example.com")
+                .myHmctsOrganisation(org)
+                .build());
+        before.setRepresentativeClaimantType(RepresentedTypeC.builder()
+                .nameOfRepresentative("Claimant Representative")
+                .representativeEmailAddress("old.claimant.rep@example.com")
+                .myHmctsOrganisation(org)
+                .build());
+
+        ChangeOrganisationRequest expected = ChangeOrganisationRequest.builder().build();
+        when(NocUtils.buildApprovedChangeOrganisationRequest(org, org,
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(expected);
+
+        ChangeOrganisationRequest result =
+                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before, true);
 
         assertThat(result).isSameAs(expected);
     }
@@ -262,7 +343,7 @@ class NocClaimantRepresentativeServiceTest {
 
         ChangeOrganisationRequest expected = ChangeOrganisationRequest.builder().build();
         ChangeOrganisationRequest result =
-                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before);
+                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before, true);
 
         assertThat(result).isEqualTo(expected);
     }
@@ -339,5 +420,30 @@ class NocClaimantRepresentativeServiceTest {
                 .thenThrow(new GenericServiceException(DUMMY_EXCEPTION_MESSAGE));
         assertThat(nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisationMatch(tmpCaseDetails))
                 .isEmpty();
+    }
+
+    @Test
+    void theSetClaimantRepresentativeIdamId() {
+        // when claimant representative is empty should not set claimant representative idam id
+        assertDoesNotThrow(() -> nocClaimantRepresentativeService.setClaimantRepresentativeIdamId(null));
+        // when claimant representative already has an idam id should not set claimant representative idam id
+        RepresentedTypeC representedTypeC = RepresentedTypeC.builder().idamId(REPRESENTATIVE_IDAM_ID).build();
+        nocClaimantRepresentativeService.setClaimantRepresentativeIdamId(representedTypeC);
+        assertThat(representedTypeC.getIdamId()).isEqualTo(REPRESENTATIVE_IDAM_ID);
+        // when claimant representative not has email address should not set idam id
+        representedTypeC.setIdamId(StringUtils.EMPTY);
+        nocClaimantRepresentativeService.setClaimantRepresentativeIdamId(representedTypeC);
+        assertThat(representedTypeC.getIdamId()).isEmpty();
+        // when organisation service does not return user account should not set idam id
+        representedTypeC.setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_1);
+        when(organisationService.findAccountByEmail(REPRESENTATIVE_EMAIL_1)).thenReturn(null);
+        nocClaimantRepresentativeService.setClaimantRepresentativeIdamId(representedTypeC);
+        assertThat(representedTypeC.getIdamId()).isEmpty();
+        // when organisation service returns user account should set idam id
+        AccountIdByEmailResponse userAccount = new AccountIdByEmailResponse();
+        userAccount.setUserIdentifier(REPRESENTATIVE_IDAM_ID);
+        when(organisationService.findAccountByEmail(REPRESENTATIVE_EMAIL_1)).thenReturn(userAccount);
+        nocClaimantRepresentativeService.setClaimantRepresentativeIdamId(representedTypeC);
+        assertThat(representedTypeC.getIdamId()).isEqualTo(REPRESENTATIVE_IDAM_ID);
     }
 }

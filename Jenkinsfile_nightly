@@ -113,23 +113,23 @@ withNightlyPipeline(type, product, component) {
                 steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
             }
         }
-        withEnv(["ENABLE_ACCESSIBILITY_AUDIT=true"]) {
-            stage('Accessibility tests') {
-                try {
+         stage('Accessibility tests') {
+            try {
+                withEnv(['ENABLE_ACCESSIBILITY_AUDIT=true']) {
                     yarnBuilder.yarn('test:accessibility')
-                } catch (Error) {
-                    unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-                } finally {
-                    publishHTML([
-                            allowMissing         : true,
-                            alwaysLinkToLastBuild: true,
-                            keepAll              : true,
-                            reportDir            : 'playwright-report',
-                            reportFiles          : 'index.html',
-                            reportName           : 'ET Accessibility Test Report'
-                    ])
-                    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
                 }
+            } catch (Error) {
+                unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+            } finally {
+                publishHTML([
+                    allowMissing         : true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll              : true,
+                    reportDir            : 'playwright-report',
+                    reportFiles          : 'index.html',
+                    reportName           : 'ET Accessibility Test Report'
+            ])
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
             }
         }
          stage('Cross browser test - Chromium') {

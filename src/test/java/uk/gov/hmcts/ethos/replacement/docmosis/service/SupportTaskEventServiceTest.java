@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.HttpClientErrorException;
@@ -59,7 +60,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConst
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.TASK_TYPE_REVIEW_SUPPORT_JUDGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.SupportTaskConstants.TASK_TYPE_REVIEW_SUPPORT_LEGAL_OFFICER;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 class SupportTaskEventServiceTest {
     private static final String TOKEN = "token";
     private static final String CASE_ID = "1234567890123456";
@@ -355,9 +356,9 @@ class SupportTaskEventServiceTest {
         when(adminUserService.getAdminUserToken()).thenReturn(TOKEN);
         when(ccdClient.startEventForCase(TOKEN, CASE_TYPE, JURISDICTION, CASE_ID,
                 EVENT_CLOSE_ADMIN_REVIEW_SUPPORT_TASK)).thenThrow(new IOException("CCD unavailable"));
-
+        Set<String> taskList = Set.of(TASK_TYPE_REVIEW_SUPPORT_ADMIN);
         assertThrows(GenericRuntimeException.class,
-                () -> service.triggerReviewTaskClosureEvents(caseDetails, Set.of(TASK_TYPE_REVIEW_SUPPORT_ADMIN)));
+                () -> service.triggerReviewTaskClosureEvents(caseDetails, taskList));
         verify(ccdClient, times(3)).startEventForCase(TOKEN, CASE_TYPE, JURISDICTION, CASE_ID,
                 EVENT_CLOSE_ADMIN_REVIEW_SUPPORT_TASK);
     }
@@ -384,9 +385,9 @@ class SupportTaskEventServiceTest {
         when(ccdClient.startEventForCase(TOKEN, CASE_TYPE, JURISDICTION, CASE_ID,
                 EVENT_CLOSE_ADMIN_REVIEW_SUPPORT_TASK))
                 .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
-
+        Set<String> taskList = Set.of(TASK_TYPE_REVIEW_SUPPORT_ADMIN);
         assertThrows(GenericRuntimeException.class,
-                () -> service.triggerReviewTaskClosureEvents(caseDetails, Set.of(TASK_TYPE_REVIEW_SUPPORT_ADMIN)));
+                () -> service.triggerReviewTaskClosureEvents(caseDetails, taskList));
         verify(ccdClient).startEventForCase(TOKEN, CASE_TYPE, JURISDICTION, CASE_ID,
                 EVENT_CLOSE_ADMIN_REVIEW_SUPPORT_TASK);
     }

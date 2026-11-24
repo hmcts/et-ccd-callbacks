@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -22,7 +22,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.CaseLocation;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferDifferentCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferSameCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferToEcmService;
@@ -42,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -122,18 +122,6 @@ class CaseTransferControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void testInitTransferToScotlandForbidden() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-
-        mockMvc.perform(post(INIT_TRANSFER_TO_SCOTLAND_URL)
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void testInitTransferToEnglandWales() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -155,18 +143,6 @@ class CaseTransferControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void testInitTransferToEnglandWalesForbidden() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-
-        mockMvc.perform(post(INIT_TRANSFER_TO_ENGLANDWALES_URL)
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void testTransferSameCountry() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -180,7 +156,7 @@ class CaseTransferControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(caseTransferSameCountryService, times(1)).transferCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(caseTransferSameCountryService, times(1)).transferCase(any(CaseDetails.class), eq(AUTH_TOKEN));
     }
 
     @Test
@@ -192,20 +168,6 @@ class CaseTransferControllerTest extends BaseControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(caseTransferSameCountryService, never()).transferCase(any(CaseDetails.class), anyString());
-    }
-
-    @Test
-    void testTransferSameCountryForbidden() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-
-        mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_URL)
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-
-        verify(caseTransferSameCountryService, never()).transferCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
     }
 
     @Test
@@ -222,7 +184,7 @@ class CaseTransferControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(caseTransferSameCountryService, times(1)).updateEccLinkedCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(caseTransferSameCountryService, times(1)).updateEccLinkedCase(any(CaseDetails.class), eq(AUTH_TOKEN));
     }
 
     @Test
@@ -234,20 +196,6 @@ class CaseTransferControllerTest extends BaseControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(caseTransferSameCountryService, never()).updateEccLinkedCase(any(CaseDetails.class), anyString());
-    }
-
-    @Test
-    void testTransferSameCountryEccLinkedCaseForbidden() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-
-        mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_ECC_LINKED_CASE_URL)
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-
-        verify(caseTransferSameCountryService, never()).updateEccLinkedCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
     }
 
     @Test
@@ -264,7 +212,7 @@ class CaseTransferControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(caseTransferDifferentCountryService, times(1)).transferCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(caseTransferDifferentCountryService, times(1)).transferCase(any(CaseDetails.class), eq(AUTH_TOKEN));
     }
 
     @Test
@@ -276,20 +224,6 @@ class CaseTransferControllerTest extends BaseControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(caseTransferDifferentCountryService, never()).transferCase(any(CaseDetails.class), anyString());
-    }
-
-    @Test
-    void testTransferDifferentCountryForbidden() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-
-        mockMvc.perform(post(CASE_TRANSFER_DIFFERENT_COUNTRY_URL)
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-
-        verify(caseTransferDifferentCountryService, never()).transferCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
     }
 
     @Test
@@ -311,18 +245,6 @@ class CaseTransferControllerTest extends BaseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("error"))
                 .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void testCaseTransferToEcmForbidden() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-
-        mockMvc.perform(post(CASE_TRANSFER_TO_ECM)
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -371,18 +293,6 @@ class CaseTransferControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void assignCaseForbidden() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-
-        mockMvc.perform(post(ASSIGN_CASE)
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void testTransferSameCountryAddsCaseMgtLocationCode() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -397,7 +307,7 @@ class CaseTransferControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(caseManagementLocationService, times(1))
-                .setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
+                .setCaseManagementLocationCode(any(CaseData.class));
     }
 
     @Test
@@ -415,7 +325,7 @@ class CaseTransferControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(caseManagementLocationService, times(1))
-                .setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
+                .setCaseManagementLocationCode(any(CaseData.class));
 
     }
 
@@ -459,14 +369,12 @@ class CaseTransferControllerTest extends BaseControllerTest {
         CCDRequest ccdRequest = new CCDRequest();
         ccdRequest.setCaseDetails(caseDetails);
 
-        VerifyTokenService verifyTokenService = mock(VerifyTokenService.class);
         CaseTransferSameCountryService sameCountryService = mock(CaseTransferSameCountryService.class);
         CaseTransferDifferentCountryService diffCountryService = mock(CaseTransferDifferentCountryService.class);
         CaseTransferToEcmService toEcmService = mock(CaseTransferToEcmService.class);
         DefaultValuesReaderService defaultValuesReaderServiceMock = mock(DefaultValuesReaderService.class);
         CaseManagementLocationService caseManagementLocationServiceMock = mock(CaseManagementLocationService.class);
         FeatureToggleService featureToggleServiceMock = mock(FeatureToggleService.class);
-        when(verifyTokenService.verifyTokenSignature("token")).thenReturn(true);
         when(featureToggleServiceMock.isHmcEnabled()).thenReturn(true);
         when(featureToggleServiceMock.isWorkAllocationEnabled()).thenReturn(false);
         DefaultValues defaultValues = mock(DefaultValues.class);
@@ -485,15 +393,14 @@ class CaseTransferControllerTest extends BaseControllerTest {
         }).when(caseManagementLocationServiceMock).setCaseManagementLocationCode(caseDataToBeUpdated);
 
         CaseTransferController controller = new CaseTransferController(
-                verifyTokenService, sameCountryService, diffCountryService, toEcmService,
+                sameCountryService, diffCountryService, toEcmService,
                 defaultValuesReaderService, caseManagementLocationServiceMock, featureToggleServiceMock);
 
         // Act
-        ResponseEntity<?> response = controller.assignCase(ccdRequest, "token");
+        ResponseEntity<?> response = controller.assignCase(ccdRequest);
 
         // Assert
         assertEquals(200, response.getStatusCode().value());
-        verify(verifyTokenService).verifyTokenSignature("token");
         verify(caseManagementLocationServiceMock, times(2)).setCaseManagementLocationCode(caseDataToBeUpdated);
         verify(caseManagementLocationServiceMock).setCaseManagementLocation(caseDataToBeUpdated);
         assertNotNull(caseDataToBeUpdated.getManagingOffice());

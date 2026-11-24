@@ -1,6 +1,6 @@
-import { BasePage } from "./basePage";
+import { BasePage } from "./basePage.js";
 import { Locator, Page, expect } from '@playwright/test';
-import depositOrderData from '../../resources/payload/deposit-order-content.json';
+import depositOrderData from '../../resources/payload/deposit-order-content.json' with { type: 'json' };
 
 export class DepositOrderPage extends BasePage {
     private readonly depositAmnt: Locator;

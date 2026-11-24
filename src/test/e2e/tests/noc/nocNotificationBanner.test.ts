@@ -5,7 +5,7 @@ import {
   CaseTypeLocation,
   CitizenClaimantFactory, CitizenHubLoginPage, CitizenHubPage, ET3LoginPage,
   users
-} from "@et-shared-test-library/core";
+} from "@hmcts/et-shared-test-library";
 
 let caseId: string;
 let caseNumber: string;
@@ -32,7 +32,11 @@ test.describe('NOC Notification Banner', () => {
   });
 
   //RET-5419
-  test('Perform NOC and validate the notification banner in CUI', async ({
+  test('Perform NOC and validate the notification banner in CUI',
+    {
+      tag: ['@accessibility'],
+    },
+    async ({
     nocPage, browserUtils
   }) => {
     await nocPage.processNocRequest(caseId, `${firstName} ${lastName}`, caseNumber);
@@ -51,7 +55,11 @@ test.describe('NOC Notification Banner', () => {
   });
 
   //RET-5791
-  test('Perform NOC and validate the notification banner in  Respondent UI', async ({
+  test('Perform NOC and validate the notification banner in  Respondent UI',
+    {
+      tag: ['@accessibility'],
+    },
+    async ({
     nocPage, browserUtils
   }) => {
     await nocPage.processNocRequest(caseId, respName, caseNumber);

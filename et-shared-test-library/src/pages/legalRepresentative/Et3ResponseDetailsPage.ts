@@ -1,7 +1,7 @@
-import { Et3DetailsPage } from './Et3DetailsPage';
+import { Et3DetailsPage } from './Et3DetailsPage.js';
 import { expect, Locator, Page } from '@playwright/test';
-import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage';
-import {resolveResourcePath} from "../../data-utils/resourcePath";
+import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage.js';
+import {resolveResourcePath} from "../../data-utils/resourceFilePathData.js";
 
 export class Et3ResponseDetailsPage extends Et3DetailsPage {
   private readonly et3ResponseDetailsPageTitle: Locator;

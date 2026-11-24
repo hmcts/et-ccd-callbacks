@@ -1,4 +1,4 @@
-import { BasePage } from "./basePage";
+import { BasePage } from "./basePage.js";
 import { expect, Locator, Page } from "@playwright/test";
 import { AxeUtils } from '@hmcts/playwright-common';
 

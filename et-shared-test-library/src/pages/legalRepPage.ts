@@ -1,7 +1,7 @@
-import { BasePage } from './basePage';
+import { BasePage } from './basePage.js';
 import { expect, Locator, Page } from '@playwright/test';
-import { Events } from '../config';
-import {resolveResourcePath} from "../data-utils/resourcePath";
+import { Events } from '../config/index.js';
+import {resolveResourcePath} from "../data-utils/resourceFilePathData.js";
 
 export class LegalRepPage extends BasePage {
   readonly changeDocuUploaded: Locator;

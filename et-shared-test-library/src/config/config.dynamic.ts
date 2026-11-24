@@ -1,6 +1,6 @@
 // Dynamic config: loads dynamic users if present, otherwise falls back to env/static
-import { staticUsers, staticConfig } from './config.static';
-import { getDynamicUser } from '../data-utils/CachingHelper';
+import { staticUsers, staticConfig } from './config.static.js';
+import { getDynamicUser } from '../data-utils/CachingHelper.js';
 
 // Helper to read dynamic test users from JSON if env vars are not set
 const dynamicClaimant = getDynamicUser('etClaimant');

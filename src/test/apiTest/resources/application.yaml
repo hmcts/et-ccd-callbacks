@@ -1,4 +1,9 @@
 spring:
+  http:
+    converters:
+      preferred-json-mapper: jackson2
+    codecs:
+      preferred-json-mapper: jackson2
   datasource:
     url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
@@ -195,6 +200,7 @@ assign_case_access_api_url: ${AAC_URL:http://localhost:4454}
 apply_noc_access_api_assignments_path: /noc/apply-decision
 
 rd_professional-api-url: ${RD_PROFESSIONAL_API_URL:http://localhost:4507}
+rd_commondata-api-url: ${RD_COMMONDATA_API_URL:http://localhost:4507}
 
 case-details-url:
   citizen: ${CITIZEN_CASE_DETAILS_URL:http://localhost:3001/citizen-hub/}
@@ -222,7 +228,19 @@ cron:
   bfActionCronCaseIdsToSkip: ${CRON_BFACTION_CRON_CASE_IDS_TO_SKIP:}
 
 pdf:
+  english: "ET1_0224.pdf"
+  welsh: "CY_ET1_0224.pdf"
   et3form: "ET3_0224.pdf"
+  et3English: "ET3_0224.pdf"
+  et3Welsh: "CY_ET3_0224.pdf"
+  contact_tribunal_template: "EM-TRB-EGW-ENG-00068.docx"
+  claimant_response_template: "EM-TRB-EGW-ENG-00069.docx"
+  era:
+    english: "ET1_1026.pdf"
+    welsh: "CY_ET1_1026.pdf"
+    et3form: "ET3_1026.pdf"
+    et3English: "ET3_1026.pdf"
+    et3Welsh: "CY_ET3_1026.pdf"
 
 feature:
   secure-doc-store:

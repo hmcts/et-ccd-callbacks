@@ -9,8 +9,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 6 : undefined,
-  reporter: process.env.CI ? [["html"], ["list"]] : [["list"]],
-  timeout: 4 * 60 * 1000,
+  reporter: process.env.CI ? [["html"], ["list"]] : [["list"], ["html"]],
+  timeout: 5 * 60 * 1000,
   globalSetup: './config/global/global-setup',
   globalTeardown: './config/global/global-teardown',
   expect: {

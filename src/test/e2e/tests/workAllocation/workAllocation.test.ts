@@ -7,7 +7,7 @@ import {
   LoginPage,
   ManageCaseDashboardPage, ReferralPage, RolesAndAccessPage,
   users
-} from "@et-shared-test-library/core";
+} from "@hmcts/et-shared-test-library";
 import {expect} from "@playwright/test";
 
 let caseNumber: string;
@@ -18,7 +18,9 @@ test.describe.serial('Work Allocation', () => {
     storageState: users.etCaseWorker.sessionFile,
   })
 
-  test('CTSC user assign a task to itself and completes a task', async ({
+  test('CTSC user assign a task to itself and completes a task',
+    {tag: ['@accessibility']},
+    async ({
     page,
     caseDetailsPage,
     et1VettingPage, manageCaseDashboardPage, loginPage
@@ -35,6 +37,7 @@ test.describe.serial('Work Allocation', () => {
   });
 
   test('Caseworker sends Referral to Judge- Referral task generated, Judge assign and completes referral task',
+    {tag: ['@accessibility']},
     async ({
     referralPage, caseDetailsPage, browserUtils, manageCaseDashboardPage
   }) => {

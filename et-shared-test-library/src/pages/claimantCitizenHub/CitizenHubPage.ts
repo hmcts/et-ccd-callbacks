@@ -1,7 +1,7 @@
-import { BasePage } from "../basePage";
+import { BasePage } from "../basePage.js";
 import { expect, Locator, Page } from '@playwright/test';
-import { config } from '../../config';
-import {resolveResourcePath} from "../../data-utils/resourcePath";
+import { config } from '../../config/index.js';
+import {resolveResourcePath} from "../../data-utils/resourceFilePathData.js";
 
 export class CitizenHubPage extends BasePage {
   private readonly caseOverviewPageTitle: Locator;
@@ -193,6 +193,7 @@ export class CitizenHubPage extends BasePage {
 
   async appointLegalRep(caseNumber: string, submissionReference: string) {
     await expect(this.appointALegalRepLink).toBeVisible();
+    await this.auditIfEnabled('CitizenHubPage - appointLegalRepLink');
     await this.appointALegalRepLink.click();
     await this.page.waitForLoadState('load');
 
@@ -222,7 +223,7 @@ export class CitizenHubPage extends BasePage {
     const docName = `ET1 - ${claimantNameText?.trim()}.pdf`;
     const documentLinkLocator = this.page.locator(`xpath=//a[normalize-space()='${docName}']`);
     await expect(documentLinkLocator).toBeVisible();
-
+    await this.auditIfEnabled('CitizenHubPage - appointLegalRepLink2');
     return { caseRef: caseRefText??'', claimantName: claimantNameText??'', tribunalCaseNumber: tribunalCaseNumberText??'' };
   }
 

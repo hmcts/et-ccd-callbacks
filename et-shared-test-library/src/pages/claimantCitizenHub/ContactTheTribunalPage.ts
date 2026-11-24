@@ -1,6 +1,6 @@
-import { BasePage } from '../basePage';
+import { BasePage } from '../basePage.js';
 import { expect, Locator, Page } from '@playwright/test';
-import {resolveResourcePath} from "../../data-utils/resourcePath";
+import {resolveResourcePath} from "../../data-utils/resourceFilePathData.js";
 
 export class ContactTheTribunalPage extends BasePage {
 
@@ -145,7 +145,6 @@ export class ContactTheTribunalPage extends BasePage {
   }
 
   async assertApplicationSentSuccessPageIsDisplayed() {
-    await this.page.waitForLoadState('load');
     const applicationSentSuccessPageTitle = this.page.getByRole('heading', {name: 'You have sent your application to the tribunal'});
     await expect(applicationSentSuccessPageTitle).toBeVisible();
   }

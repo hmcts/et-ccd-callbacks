@@ -84,3 +84,5 @@ bin/
 src/test/token-cache.json
 /test-results
 /et-shared/bin/
+/.tmp
+/playwright-report/

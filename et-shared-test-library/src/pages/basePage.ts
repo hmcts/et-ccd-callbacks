@@ -1,9 +1,16 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { CommonActionsHelper } from './helpers/CommonActionsHelper';
+import { CommonActionsHelper } from './helpers/CommonActionsHelper.js';
+import {AxeUtils} from "@hmcts/playwright-common";
+import {config} from "../config/index.js";
 
 export abstract class BasePage {
   readonly page: Page;
   readonly commonActionsHelper: CommonActionsHelper;
+
+  protected axeUtils?: AxeUtils;
+  protected accessibilityEnabled: boolean = false;
+  private lastAuditedKey?: string;
+
   readonly saveAsDraftButton: Locator;
   readonly closeAndReturnButton: Locator;
   readonly applyFilterButton: Locator;
@@ -23,7 +30,7 @@ export abstract class BasePage {
     this.closeAndReturnButton = this.page.getByRole('button', { name: 'Close and Return to case' });
     this.applyFilterButton = this.page.getByRole('button', { name: 'Apply filter' });
     this.addNewBtn = page.getByRole('button', { name: 'Add new' });
-    this.newHearingBtn = '#hearingCollection > div > button.button.write-collection-add-item__bottom.ng-star-inserted';
+    this.newHearingBtn = '#hearingCollection > div > button.button.write-collection-add-item__bottom';
     this.newUploadDocBtn = page.locator('//*[@id="documentCollection"]/div/button[2]');
     this.continueButton = page.getByRole('button', { name: 'Continue' });
     this.submitButton = page.getByRole('button', { name: 'Submit' });
@@ -34,6 +41,29 @@ export abstract class BasePage {
 
   async wait(time: number) {
     await this.page.waitForTimeout(time);
+  }
+
+  setAccessibilityContext(axeUtils: AxeUtils) {
+    this.axeUtils = axeUtils;
+    this.accessibilityEnabled = config.accessibilityEnabled === 'true';
+  }
+
+  protected async auditIfEnabled(stepName?: string) {
+    if (!this.accessibilityEnabled || !this.axeUtils) {
+      return;
+    }
+
+    const key = `${this.page.url()}::${stepName ?? 'default'}`;
+    if (this.lastAuditedKey === key) {
+      return;
+    }
+
+    this.lastAuditedKey = key;
+    // Excluded these locators because defects already raised RET-7433, RET-7434, RET-7435,
+    let excludeSelectors: string[] = ['#claimantHearingPanelPreference-2', '#claimantHearingPanelPreference-3', '#reasonableAdjustments',
+    '#pension', '#employee-benefits', '#acasCert', '#whistleblowing-claim', '#linkedCases-2', 'a[data-navigation-link=""]',
+    '.govuk-grid-column-one-third > .govuk-body > a[target="_blank"]', '.govuk-body > a[target="_blank"]'];
+    await this.axeUtils.audit({exclude: excludeSelectors});
   }
 
   async clickContinue(url: string = '', pageNum?: number, shouldContinue: boolean = true) {
@@ -47,7 +77,10 @@ export abstract class BasePage {
       await this.continueButton.click({force: true});
       await this.page.waitForLoadState('load');
       await this.waitForSpinner(180_000); // 3 mins dynamic wait time for spinner to disappear as some CCD callbacks can take time
-      if (!shouldContinue) return;
+      if (!shouldContinue) {
+        await this.auditIfEnabled(`BasePage - clickContinueNo - ${url}${pageNum ? pageNum : ''}`);
+        return;
+      }
       // If url or url+pageNum is provided, check if current URL contains the expected string
       if (url || url?.length > 0) {
         const expected = `${url}${pageNum ? pageNum : ''}`;
@@ -74,6 +107,7 @@ export abstract class BasePage {
       }
       if(!process.env.CI) console.log('No error detected after clicking Continue.');
       // No error and URL is as expected, break out of loop
+      await this.auditIfEnabled(`BasePage - clickContinueYes - ${url}${pageNum ? pageNum : ''}`);
       return;
     }
     if (shouldContinue && attempt === maxRetries) {
@@ -95,12 +129,14 @@ export abstract class BasePage {
   }
 
   async saveAsDraft() {
+    await this.auditIfEnabled('BasePage - saveAsDraft');
     await this.saveAsDraftButton.click();
     await this.waitForSpinner();
     await this.page.waitForLoadState('load');
   }
 
   async clickCloseAndReturn() {
+    await this.auditIfEnabled('BasePage - clickCloseAndReturn');
     await this.closeAndReturnButton.click();
     await this.waitForSpinner();
     await this.page.waitForLoadState('load');
@@ -121,6 +157,7 @@ export abstract class BasePage {
   async clickSubmitButton(submitted: boolean = true) {
     await this.page.waitForLoadState('load');
     await this.submitButton.scrollIntoViewIfNeeded();
+    await this.auditIfEnabled('BasePage - clickSubmitButton-beforeSubmit');
     await this.page.evaluate(el => el?.scrollIntoView({ block: 'center' }), await this.submitButton.elementHandle());
     await expect(this.submitButton).toBeVisible();
     await expect(this.submitButton).toBeEnabled();
@@ -132,7 +169,10 @@ export abstract class BasePage {
       await this.submitButton.click({force: true });
       await this.page.waitForLoadState('load', { timeout: 4000 });
       await this.waitForSpinner(180_000);
-      if (!submitted) return;
+      if (!submitted) {
+        await this.auditIfEnabled('BasePage - clickSubmitButtonNo');
+        return;
+      }
       // Check if error is visible
       const h3Visible = await this.errorHeading.waitFor({ state: 'visible', timeout: 3000 })
         .then(() => true)
@@ -145,6 +185,7 @@ export abstract class BasePage {
         continue;
       }
       // No error, break out of loop
+      await this.auditIfEnabled('BasePage - clickSubmitButtonYes');
       return;
     }
     if (submitted && attempt === maxRetries) {
@@ -154,6 +195,7 @@ export abstract class BasePage {
   }
 
   async clickIgnoreAndContinueButton() {
+    await this.auditIfEnabled('BasePage - clickIgnoreAndContinueButton');
     await this.page.getByRole('button', { name: 'Ignore Warning and Continue' }).click();
     await this.page.waitForLoadState('load', { timeout: 5000 });
   }
@@ -195,6 +237,7 @@ export abstract class BasePage {
   }
 
   async saveAndContinueButton() {
+    await this.auditIfEnabled('BasePage - saveAndContinueButton');
     await this.page.getByRole('button', { name: 'Save and continue' }).click();
   }
 

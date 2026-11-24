@@ -2,11 +2,9 @@ package uk.gov.hmcts.reform.et.syaapi.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -34,15 +32,10 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_SERVICE_AUTH_TOKEN;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.USER_ID;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = CaseService.class, properties = {
-    "spring.flyway.enabled=false",
-    "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration,"
-        + "org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration"
-})
+@SpringJUnitConfig(classes = {CaseService.class})
 class CaseServiceBootTest {
     @Autowired
-    CaseService caseService;
+    private CaseService caseService;
     @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
     @MockitoBean
@@ -77,6 +70,7 @@ class CaseServiceBootTest {
     private ExcelReadingService excelReadingService;
     @MockitoBean
     private UserIdamService userIdamService;
+
     private CaseTestData caseTestData;
 
     @BeforeEach
@@ -141,7 +135,6 @@ class CaseServiceBootTest {
         when(acasService.getAcasCertificatesByCaseData(caseTestData.getCaseData())).thenReturn(
             new ArrayList<>()
         );
-
         CaseDetails caseDetails = caseService.submitCase(TEST_SERVICE_AUTH_TOKEN, caseTestData.getCaseRequest());
         assertEquals(caseDetails.getId(), caseTestData.getExpectedDetails().getId());
         assertEquals(caseDetails.getJurisdiction(), caseTestData.getExpectedDetails().getJurisdiction());

@@ -7,17 +7,17 @@
   "license": "hmcts",
   "private": true,
   "scripts": {
-    "build:shared": "yarn --cwd et-shared-test-library install && yarn --cwd et-shared-test-library build",
+    "build:shared": "yarn --cwd et-shared-test-library install && yarn --cwd et-shared-test-library build && rm -rf et-shared-test-library/node_modules",
     "pwinstall": "yarn exec playwright install",
     "pwtest": "yarn exec playwright test -c src/test/e2e/playwright.config.ts",
     "test:smoke": "yarn pwinstall chromium && yarn pwtest --project=chromium --grep @smoke",
     "test:functional-chromium": "yarn pwinstall chromium && yarn test:functional-ccd-callback",
-    "test:full-functional-chromium": "yarn pwinstall chromium && yarn pwtest --project=chromium --grep-invert @accessibility",
+    "test:full-functional-chromium": "yarn pwinstall chromium && yarn pwtest --project=chromium",
     "test:functional-webkit": "yarn pwinstall webkit && yarn pwtest --project=webkit --grep @cx",
     "test:functional-firefox": "yarn pwinstall firefox && yarn pwtest --project=firefox --grep @cx",
     "test:accessibility": "yarn pwinstall && yarn pwtest --project=chromium --grep @accessibility",
     "test:functional-ccd-callback": "yarn pwinstall chromium && yarn pwtest --project=chromium --grep @ccd-callback-tests",
-    "test:functional-chromium-demo": "yarn pwinstall chromium && yarn pwtest --project=chromium --grep-invert @accessibility --grep @demo",
+    "test:functional-chromium-demo": "yarn pwinstall chromium && yarn pwtest --project=chromium --grep @demo",
     "lint-staged": "lint-staged",
     "lint": "eslint",
     "fortifyScan": "./src/test/java/gradlew -p src/test/java fortifyScan",
@@ -29,10 +29,10 @@
     "test/**/*.{js,jsx,ts,tsx}": "eslint"
   },
   "dependencies": {
-    "@et-shared-test-library/core": "portal:./et-shared-test-library",
-    "@hmcts/playwright-common": "^1.1.5",
-    "@playwright/test": "^1.61.0",
-    "playwright-core": "^1.61.0"
+    "@hmcts/et-shared-test-library": "portal:./et-shared-test-library",
+    "@hmcts/playwright-common": "1.1.7",
+    "@playwright/test": "1.64.0",
+    "playwright-core": "1.64.0"
   },
   "devDependencies": {
     "eslint": "^10.12.0",

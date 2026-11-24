@@ -10,16 +10,8 @@ support-tasks:
         path:
           - Party
           - Reasonable adjustment
-    judge-flag-codes:
-      - RA0029
-      - RA0031
-      - RA0032
-      - RA0037
-      - RA0038
-    legal-officer-flag-codes:
-      - RA0034
-      - RA0035
-      - RA0036
+    judge-flag-codes: []
+    legal-officer-flag-codes: []
   arrange:
     flag-titles:
       RA0017: Guidance on how to complete forms

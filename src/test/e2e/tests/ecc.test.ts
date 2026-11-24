@@ -7,7 +7,7 @@ import {
   config,
   Events,
   users
-} from "@et-shared-test-library/core";
+} from "@hmcts/et-shared-test-library";
 
 let subRef: any;
 let caseNumber: any;

@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { BasePage } from "../basePage";
-import {resolveResourcePath} from "../../data-utils/resourcePath";
+import { BasePage } from "../basePage.js";
+import {resolveResourcePath} from "../../data-utils/resourceFilePathData.js";
 
 export class DraftJudgementPage extends BasePage {
 

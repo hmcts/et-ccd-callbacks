@@ -1,7 +1,7 @@
-import { BasePage } from '../basePage';
+import { BasePage } from '../basePage.js';
 import { expect, Locator, Page } from '@playwright/test';
-import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage';
-import { AddressDetails } from '../../types';
+import { CheckYourAnswersPage } from '../helpers/CheckYourAnswersPage.js';
+import { AddressDetails } from '../../types/index.js';
 
 export class AmendContactDetailsLrPage extends BasePage {
 

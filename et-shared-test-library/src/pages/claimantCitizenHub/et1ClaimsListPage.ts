@@ -1,5 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { BasePage } from '../basePage';
+import { BasePage } from '../basePage.js';
 
 export class Et1ClaimsListPage extends BasePage {
   private readonly myEt1Claims: Locator;
@@ -26,6 +26,7 @@ export class Et1ClaimsListPage extends BasePage {
   async clickMyEt1ClaimLink() {
     await this.page.waitForLoadState('load');
     await expect(this.myEt1Claims).toBeVisible();
+    await this.auditIfEnabled('Et1ClaimsListPage - clickMyEt1ClaimLink');
     await this.myEt1Claims.click();
   }
 
@@ -35,6 +36,7 @@ export class Et1ClaimsListPage extends BasePage {
     const targetHref = `/claimant-application/${caseId}?lng=en`;
     const targetLink = this.draftClaimsTable.locator(`a[href="${targetHref}"]`);
     await expect(targetLink).toBeVisible();
+    await this.auditIfEnabled('Et1ClaimsListPage - assertCaseListedInDraftClaims');
     return targetLink;
   }
 

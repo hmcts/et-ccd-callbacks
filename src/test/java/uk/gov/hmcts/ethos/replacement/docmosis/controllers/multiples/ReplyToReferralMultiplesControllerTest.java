@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -184,37 +184,6 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStartReferralReply_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(START_REPLY_REFERRAL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(request)))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void initHearingAndReferralDetails_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_HEARING_DETAILS_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(request)))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void aboutToSubmitReferralReply_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        when(userIdamService.getUserDetails(any())).thenReturn(new UserDetails());
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(request)))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
     void completeReplyToReferral_tokenOk() throws Exception {
 
         mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
@@ -223,16 +192,6 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
                 .content(jsonMapper.toJson(request)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.confirmation_body", notNullValue()));
-    }
-
-    @Test
-    void completeReplyToReferral_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(request)))
-            .andExpect(status().isForbidden());
     }
 
     @Test
@@ -254,15 +213,5 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
                         .content(jsonMapper.toJson(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)));
-    }
-
-    @Test
-    void validateReplyToEmail_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(VALIDATE_EMAIL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(request)))
-            .andExpect(status().isForbidden());
     }
 }

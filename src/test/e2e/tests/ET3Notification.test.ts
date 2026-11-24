@@ -1,5 +1,5 @@
 import { test } from '../fixtures/et.test.fixture.ts';
-import {CaseTypeLocation, CitizenClaimantFactory, Events, users} from "@et-shared-test-library/core";
+import {CaseTypeLocation, CitizenClaimantFactory, Events, users} from "@hmcts/et-shared-test-library";
 import {expect} from "@playwright/test";
 
 let caseNumber: string;

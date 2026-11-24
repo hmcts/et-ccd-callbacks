@@ -79,8 +79,16 @@ import {
   TaskPage,
   UploadDocumentPage,
   UploadDocumentsForHearingPage,
-  UploadHearingBundlePage,
-} from '../pages';
+  UploadHearingBundlePage, BasePage,
+} from '../pages/index.js';
+import {AxeUtils} from "@hmcts/playwright-common";
+
+function wireAlly<T extends BasePage>(pageObject: T, axeUtils?: AxeUtils): T {
+  if (axeUtils) {
+    pageObject.setAccessibilityContext(axeUtils);
+  }
+  return pageObject;
+}
 
 type PageFixtures = {
   applicationTabPage: ApplicationTabPage;
@@ -164,286 +172,286 @@ type PageFixtures = {
   manageSupportPage: ManageSupportPage;
   et3ResponseDashboardPage: Et3ResponsesDashboardPage;
 };
+type AllyFixture = { axeUtils: AxeUtils };
+export const pageFixtures = base.extend<PageFixtures & AllyFixture>({
 
-export const pageFixtures = base.extend<PageFixtures>({
-
-    applicationTabPage: async ({ page }, use) => {
-        await use(new ApplicationTabPage(page));
-    },
-
-    manageCaseDashboardPage: async ({page}, use) => {
-      await use(new ManageCaseDashboardPage(page));
+    applicationTabPage: async ({ page, axeUtils }, use) => {
+        await use(wireAlly(new ApplicationTabPage(page), axeUtils));
     },
 
-    caseListPage: async ({page}, use) => {
-        await use(new CaseListPage(page));
+    manageCaseDashboardPage: async ({page, axeUtils}, use) => {
+      await use(wireAlly(new ManageCaseDashboardPage(page), axeUtils));
     },
 
-    createCaseFlagPage: async ({page}, use) => {
-        await use(new CreateCaseFlagPage(page));
+    caseListPage: async ({page, axeUtils}, use) => {
+        await use(wireAlly(new CaseListPage(page), axeUtils));
     },
 
-    manageCaseFlagPage: async ({page}, use) => {
-        await use(new ManageCaseFlagPage(page));
+    createCaseFlagPage: async ({page, axeUtils}, use) => {
+        await use(wireAlly(new CreateCaseFlagPage(page), axeUtils));
     },
 
-    et1CaseServingPage: async ({page}, use) => {
-        await use(new Et1CaseServingPage(page));
+    manageCaseFlagPage: async ({page, axeUtils}, use) => {
+        await use(wireAlly(new ManageCaseFlagPage(page), axeUtils));
     },
 
-    loginPage: async ({page}, use) => {
-        await use(new LoginPage(page));
+    et1CaseServingPage: async ({page, axeUtils}, use) => {
+        await use(wireAlly(new Et1CaseServingPage(page), axeUtils));
     },
 
-    listHearingPage: async ({page}, use) => {
-        await use(new ListHearingPage(page));
+    loginPage: async ({page, axeUtils}, use) => {
+        await use(wireAlly(new LoginPage(page), axeUtils));
     },
 
-    legalRepPage: async ({page}, use) => {
-        await use(new LegalRepPage(page));
+    listHearingPage: async ({page, axeUtils}, use) => {
+        await use(wireAlly(new ListHearingPage(page), axeUtils));
     },
 
-    citizenHubPage: async ({page}, use) => {
-        await use(new CitizenHubPage(page));
+    legalRepPage: async ({page, axeUtils}, use) => {
+        await use(wireAlly(new LegalRepPage(page), axeUtils));
     },
 
-    caseLinkPage: async ({page}, use) => {
-        await use(new CaseLinkPage(page));
+    citizenHubPage: async ({page, axeUtils}, use) => {
+        await use(wireAlly(new CitizenHubPage(page), axeUtils));
     },
 
-    respondentRepPage: async ({page}, use) => {
-        await use(new RespondentRepPage(page));
+    caseLinkPage: async ({page, axeUtils}, use) => {
+        await use(wireAlly(new CaseLinkPage(page), axeUtils));
     },
 
-    et3LoginPage: async ({page}, use) => {
-        await use(new ET3LoginPage(page));
+    respondentRepPage: async ({page, axeUtils}, use) => {
+        await use(wireAlly(new RespondentRepPage(page), axeUtils));
     },
 
-    respondentCaseOverviewPage: async ({page}, use) => {
-        await use(new RespondentCaseOverviewPage(page));
+    et3LoginPage: async ({page, axeUtils}, use) => {
+        await use(wireAlly(new ET3LoginPage(page), axeUtils));
     },
 
-    respondentTaskListPage: async ({page}, use) => {
-        await use(new RespondentTaskListPage(page));
+    respondentCaseOverviewPage: async ({page, axeUtils}, use) => {
+        await use(wireAlly(new RespondentCaseOverviewPage(page), axeUtils));
     },
 
-    responseLandingPage: async ({page}, use) => {
-        await use(new ResponseLandingPage(page));
+    respondentTaskListPage: async ({page, axeUtils}, use) => {
+        await use(wireAlly(new RespondentTaskListPage(page), axeUtils));
     },
 
-    respContactDetailsPages: async ({page}, use) => {
-        await use(new RespContactDetailsPages(page));
+    responseLandingPage: async ({page, axeUtils}, use) => {
+        await use(wireAlly(new ResponseLandingPage(page), axeUtils));
     },
 
-    respClaimantDetails:async ({page}, use) => {
-        await use(new RespClaimantDetails(page));
+    respContactDetailsPages: async ({page, axeUtils}, use) => {
+        await use(wireAlly(new RespContactDetailsPages(page), axeUtils));
     },
 
-    respContestClaim:async ({page}, use) => {
-        await use(new RespContestClaim(page));
+    respClaimantDetails:async ({page, axeUtils}, use) => {
+        await use(wireAlly(new RespClaimantDetails(page), axeUtils));
     },
 
-    respSubmitEt3:async ({page}, use) => {
-        await use(new RespSubmitEt3(page));
+    respContestClaim:async ({page, axeUtils}, use) => {
+        await use(wireAlly(new RespContestClaim(page), axeUtils));
     },
 
-    bfActionPage:async ({page}, use) => {
-        await use(new BfActionPage(page));
+    respSubmitEt3:async ({page, axeUtils}, use) => {
+        await use(wireAlly(new RespSubmitEt3(page), axeUtils));
     },
 
-    jurisdictionPage:async ({page}, use) => {
-        await use(new JurisdictionPage(page));
+    bfActionPage:async ({page, axeUtils}, use) => {
+        await use(wireAlly(new BfActionPage(page), axeUtils));
     },
 
-    caseTransferPage:async ({page}, use) => {
-        await use(new CaseTransferPage(page));
+    jurisdictionPage:async ({page, axeUtils}, use) => {
+        await use(wireAlly(new JurisdictionPage(page), axeUtils));
     },
 
-    caseTransferToEcmPage:async ({page}, use) => {
-      await use(new CaseTransferToEcmPage(page));
+    caseTransferPage:async ({page, axeUtils}, use) => {
+        await use(wireAlly(new CaseTransferPage(page), axeUtils));
     },
 
-    caseWorkerNotificationPage:async ({page}, use) => {
-        await use(new CaseWorkerNotificationPage(page));
+    caseTransferToEcmPage:async ({page, axeUtils}, use) => {
+      await use(wireAlly(new CaseTransferToEcmPage(page), axeUtils));
     },
 
-    claimantDetailsPage:async ({page}, use) => {
-        await use(new ClaimantDetailsPage(page));
+    caseWorkerNotificationPage:async ({page, axeUtils}, use) => {
+        await use(wireAlly(new CaseWorkerNotificationPage(page), axeUtils));
     },
 
-    respondentDetailsPage:async ({page}, use) => {
-        await use(new RespondentDetailsPage(page));
+    claimantDetailsPage:async ({page, axeUtils}, use) => {
+        await use(wireAlly(new ClaimantDetailsPage(page), axeUtils));
     },
 
-    nocPage:async ({page}, use) => {
-        await use(new NocPage(page));
+    respondentDetailsPage:async ({page, axeUtils}, use) => {
+        await use(wireAlly(new RespondentDetailsPage(page), axeUtils));
     },
 
-    manageOrgPage:async ({page}, use) => {
-        await use(new ManageOrgPage(page));
+    nocPage:async ({page, axeUtils}, use) => {
+        await use(wireAlly(new NocPage(page), axeUtils));
     },
 
-    icUploadDocPage:async ({page}, use) => {
-        await use(new ICUploadDocPage(page));
+    manageOrgPage:async ({page, axeUtils}, use) => {
+        await use(wireAlly(new ManageOrgPage(page), axeUtils));
     },
 
-    restrictedReportingPage:async ({page}, use) => {
-        await use(new RestrictedReportingPage(page));
+    icUploadDocPage:async ({page, axeUtils}, use) => {
+        await use(wireAlly(new ICUploadDocPage(page), axeUtils));
     },
 
-    uploadDocumentPage:async ({page}, use)=>{
-        await use(new UploadDocumentPage(page));
+    restrictedReportingPage:async ({page, axeUtils}, use) => {
+        await use(wireAlly(new RestrictedReportingPage(page), axeUtils));
     },
 
-    referralPage:async ({page}, use)=>{
-        await use(new ReferralPage(page));
+    uploadDocumentPage:async ({page, axeUtils}, use)=>{
+        await use(wireAlly(new UploadDocumentPage(page), axeUtils));
     },
 
-    draftJudgementPage:async ({page}, use)=>{
-        await use(new DraftJudgementPage(page));
+    referralPage:async ({page, axeUtils}, use)=>{
+        await use(wireAlly(new ReferralPage(page), axeUtils));
     },
 
-    issueJudgementPage:async ({page}, use)=>{
-        await use(new IssueJudgementPage(page));
+    draftJudgementPage:async ({page, axeUtils}, use)=>{
+        await use(wireAlly(new DraftJudgementPage(page), axeUtils));
     },
 
-    searchAcasPage:async ({page}, use)=>{
-        await use(new SearchAcasPage(page));
+    issueJudgementPage:async ({page, axeUtils}, use)=>{
+        await use(wireAlly(new IssueJudgementPage(page), axeUtils));
     },
 
-    lettersPage:async ({page}, use)=>{
-        await use(new LettersPage(page));
+    searchAcasPage:async ({page, axeUtils}, use)=>{
+        await use(wireAlly(new SearchAcasPage(page), axeUtils));
     },
 
-    depositOrderPage:async ({page}, use)=>{
-        await use(new DepositOrderPage(page));
+    lettersPage:async ({page, axeUtils}, use)=>{
+        await use(wireAlly(new LettersPage(page), axeUtils));
     },
 
-    rolesAndAccessPage: async ({page}, use)=>{
-        await use(new RolesAndAccessPage(page));
+    depositOrderPage:async ({page, axeUtils}, use)=>{
+        await use(wireAlly(new DepositOrderPage(page), axeUtils));
     },
 
-    taskPage: async ({page}, use)=>{
-        await use(new TaskPage(page));
+    rolesAndAccessPage: async ({page, axeUtils}, use)=>{
+        await use(wireAlly(new RolesAndAccessPage(page), axeUtils));
     },
 
-    hearingDetailsPage: async ({page}, use)=>{
-        await use(new HearingDetailsPage(page));
+    taskPage: async ({page, axeUtils}, use)=>{
+        await use(wireAlly(new TaskPage(page), axeUtils));
     },
 
-    adrDocument:async ({page}, use)=>{
-        await use(new AdrDocumentPage(page));
+    hearingDetailsPage: async ({page, axeUtils}, use)=>{
+        await use(wireAlly(new HearingDetailsPage(page), axeUtils));
     },
-    caseDetailsPage:async ({page}, use)=>{
-        await use(new CaseDetailsPage(page));
+
+    adrDocument:async ({page, axeUtils}, use)=>{
+        await use(wireAlly(new AdrDocumentPage(page), axeUtils));
     },
-    et3NotificationPage:async ({page}, use)=>{
-      await use(new Et3NotificationPage(page));
+    caseDetailsPage:async ({page, axeUtils}, use)=>{
+        await use(wireAlly(new CaseDetailsPage(page), axeUtils));
     },
-    uploadHearingBundlePage:async({page}, use)=>{
-        await use(new UploadHearingBundlePage(page));
+    et3NotificationPage:async ({page, axeUtils}, use)=>{
+      await use(wireAlly(new Et3NotificationPage(page), axeUtils));
     },
-    caseNotesPage:async({page}, use)=>{
-      await use(new CaseNotesPage(page));
+    uploadHearingBundlePage:async({page, axeUtils}, use)=>{
+        await use(wireAlly(new UploadHearingBundlePage(page), axeUtils));
     },
-    manageTelephoneNotePage:async ({page}, use) => {
-      await use(new ManageTelephoneNotePage(page));
+    caseNotesPage:async({page, axeUtils}, use)=>{
+      await use(wireAlly(new CaseNotesPage(page), axeUtils));
     },
-    claimantRepresentativePage:async ({page}, use) => {
-        await use(new ClaimantRepresentativePage(page));
+    manageTelephoneNotePage:async ({page, axeUtils}, use) => {
+      await use(wireAlly(new ManageTelephoneNotePage(page), axeUtils));
     },
-    closeCasePage:async({page}, use)=>{
-      await use(new CloseCasePage(page));
+    claimantRepresentativePage:async ({page, axeUtils}, use) => {
+        await use(wireAlly(new ClaimantRepresentativePage(page), axeUtils));
     },
-    reinstateCasePage:async({page}, use)=>{
-      await use(new ReinstateCasePage(page));
+    closeCasePage:async({page, axeUtils}, use)=>{
+      await use(wireAlly(new CloseCasePage(page), axeUtils));
     },
-    uploadDocumentsForHearingPage:async({page}, use)=>{
-      await use(new UploadDocumentsForHearingPage(page));
+    reinstateCasePage:async({page, axeUtils}, use)=>{
+      await use(wireAlly(new ReinstateCasePage(page), axeUtils));
+    },
+    uploadDocumentsForHearingPage:async({page, axeUtils}, use)=>{
+      await use(wireAlly(new UploadDocumentsForHearingPage(page), axeUtils));
     },
     checkYourAnswersPage:async({page}, use) => {
       await use(new CheckYourAnswersPage(page));
     },
-    baseEventPage:async({page}, use) => {
-      await use(new BaseEventPage(page));
+    baseEventPage:async({page, axeUtils}, use) => {
+      await use(wireAlly(new BaseEventPage(page), axeUtils));
     },
-    legalRepNotificationPage:async ({page}, use) => {
-        await use(new LegalRepNotificationPage(page));
+    legalRepNotificationPage:async ({page, axeUtils}, use) => {
+        await use(wireAlly(new LegalRepNotificationPage(page), axeUtils));
     },
-   citizenHubLoginPage:async({page}, use) => {
-      await use (new CitizenHubLoginPage (page));
+   citizenHubLoginPage:async({page, axeUtils}, use) => {
+      await use (wireAlly(new CitizenHubLoginPage (page), axeUtils));
     },
-    contactTheTribunalPage:async({page}, use) => {
-      await use (new ContactTheTribunalPage (page));
+    contactTheTribunalPage:async({page, axeUtils}, use) => {
+      await use (wireAlly(new ContactTheTribunalPage (page), axeUtils));
     },
-    prepareAbdSubmitDocumentPage:async({page}, use) => {
-      await use (new PrepareAndSubmitDocumentPage (page));
+    prepareAbdSubmitDocumentPage:async({page, axeUtils}, use) => {
+      await use (wireAlly(new PrepareAndSubmitDocumentPage (page), axeUtils));
     },
-  et1VettingPage:async ({page}, use)=>{
-    await use(new Et1VettingPages(page));
+  et1VettingPage:async ({page, axeUtils}, use)=>{
+    await use(wireAlly(new Et1VettingPages(page), axeUtils));
   },
-  citizenPreLoginPage:async({page}, use) => {
-    await use (new CUIPreLoginPage (page));
+  citizenPreLoginPage:async({page, axeUtils}, use) => {
+    await use (wireAlly(new CUIPreLoginPage (page), axeUtils));
   },
-  citizenPostLoginPage:async({page}, use)=>{
-    await use (new CUIPostLoginPages (page));
+  citizenPostLoginPage:async({page, axeUtils}, use)=>{
+    await use (wireAlly(new CUIPostLoginPages (page), axeUtils));
   },
-  personalDetailsPage:async({page}, use)=>{
-    await use (new PersonalDetailsPage (page));
+  personalDetailsPage:async({page, axeUtils}, use)=>{
+    await use (wireAlly(new PersonalDetailsPage (page), axeUtils));
   },
-  employmentAndRespondentDetailsPage:async({page}, use)=>{
-    await use (new EmploymentAndRespDetailsPage (page));
+  employmentAndRespondentDetailsPage:async({page, axeUtils}, use)=>{
+    await use (wireAlly(new EmploymentAndRespDetailsPage (page), axeUtils));
   },
-  claimDetailsPage:async({page}, use)=>{
-    await use (new ClaimDetailsPage (page));
+  claimDetailsPage:async({page, axeUtils}, use)=>{
+    await use (wireAlly(new ClaimDetailsPage (page), axeUtils));
   },
-  submitClaimPage:async({page}, use)=>{
-    await use (new SubmitClaimPage (page));
+  submitClaimPage:async({page, axeUtils}, use)=>{
+    await use (wireAlly(new SubmitClaimPage (page), axeUtils));
   },
-  et1CreateDraftClaim:async({page}, use)=>{
-    await use (new Et1CreateDraftClaim (page));
+  et1CreateDraftClaim:async({page, axeUtils}, use)=>{
+    await use (wireAlly(new Et1CreateDraftClaim (page), axeUtils));
   },
-  et3ProcessPage:async({page}, use)=>{
-    await use (new ET3ProcessPage (page));
+  et3ProcessPage:async({page, axeUtils}, use)=>{
+    await use (wireAlly(new ET3ProcessPage (page), axeUtils));
   },
-  initialConsiderationPage:async({page}, use)=>{
-    await use (new InitialConsiderationPage (page));
+  initialConsiderationPage:async({page, axeUtils}, use)=>{
+    await use (wireAlly(new InitialConsiderationPage (page), axeUtils));
   },
-  et3DetailsPage:async({page}, use)=>{
-    await use (new Et3DetailsPage (page));
+  et3DetailsPage:async({page, axeUtils}, use)=>{
+    await use (wireAlly(new Et3DetailsPage (page), axeUtils));
   },
-  et3RespondentDetailsPage:async({page}, use)=>{
-    await use (new Et3RespondentDetailsPage (page));
+  et3RespondentDetailsPage:async({page, axeUtils}, use)=>{
+    await use (wireAlly(new Et3RespondentDetailsPage (page), axeUtils));
   },
-  et3EmploymentDetailsPage:async({page}, use)=>{
-    await use (new Et3EmploymentDetailsPage (page));
+  et3EmploymentDetailsPage:async({page, axeUtils}, use)=>{
+    await use (wireAlly(new Et3EmploymentDetailsPage (page), axeUtils));
   },
-  et3ResponseDetailsPage:async({page}, use)=>{
-    await use (new Et3ResponseDetailsPage (page));
+  et3ResponseDetailsPage:async({page, axeUtils}, use)=>{
+    await use (wireAlly(new Et3ResponseDetailsPage (page), axeUtils));
   },
-  allocateHearingPAge:async({page}, use)=>{
-    await use (new AllocateHearingPage(page));
+  allocateHearingPAge:async({page, axeUtils}, use)=>{
+    await use (wireAlly(new AllocateHearingPage(page), axeUtils));
   },
-  et1ClaimsListPage:async({page}, use)=>{
-      await use (new Et1ClaimsListPage (page));
+  et1ClaimsListPage:async({page, axeUtils}, use)=>{
+      await use (wireAlly(new Et1ClaimsListPage (page), axeUtils));
   },
-  amendContactDetailsLrPage:async({page}, use)=>{
-      await use (new AmendContactDetailsLrPage (page));
+  amendContactDetailsLrPage:async({page, axeUtils}, use)=>{
+      await use (wireAlly(new AmendContactDetailsLrPage (page), axeUtils));
   },
-  citizenApplicationsPage:async({page}, use)=>{
-      await use (new CitizenApplicationsPage (page));
+  citizenApplicationsPage:async({page, axeUtils}, use)=>{
+      await use (wireAlly(new CitizenApplicationsPage (page), axeUtils));
   },
-  resClaimantsApplicationsPage:async({page}, use)=>{
-      await use (new ResClaimantsApplicationsPage (page));
+  resClaimantsApplicationsPage:async({page, axeUtils}, use)=>{
+      await use (wireAlly(new ResClaimantsApplicationsPage (page), axeUtils));
   },
-  singleOrMultipleClaimPage:async({page}, use)=>{
-    await use (new SingleOrMultipleClaimPage(page));
+  singleOrMultipleClaimPage:async({page, axeUtils}, use)=>{
+    await use (wireAlly(new SingleOrMultipleClaimPage(page), axeUtils));
   },
-  requestSupportPage:async({page}, use) => {
-      await use (new RequestSupportPage (page));
+  requestSupportPage:async({page, axeUtils}, use) => {
+      await use (wireAlly(new RequestSupportPage (page), axeUtils));
   },
-  manageSupportPage:async({page}, use) => {
-      await use (new ManageSupportPage (page));
+  manageSupportPage:async({page, axeUtils}, use) => {
+      await use (wireAlly(new ManageSupportPage (page), axeUtils));
   }
 
 });

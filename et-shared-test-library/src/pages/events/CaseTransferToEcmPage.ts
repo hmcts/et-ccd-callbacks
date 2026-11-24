@@ -1,4 +1,4 @@
-import { BaseEventPage } from './BaseEventPage';
+import { BaseEventPage } from './BaseEventPage.js';
 import { expect, Locator, Page } from '@playwright/test';
 
 export class CaseTransferToEcmPage extends BaseEventPage {

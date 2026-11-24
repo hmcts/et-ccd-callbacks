@@ -1,0 +1,6 @@
+---
+description: Operating manual for et-ccd-callbacks. Points to AGENTS.md at the repository root.
+alwaysApply: true
+---
+
+Read and follow [AGENTS.md](../../AGENTS.md) at the repository root. It is the single source of truth for commands, architecture, code style, quality gates, and boundaries in this repository. Do not duplicate its contents here.

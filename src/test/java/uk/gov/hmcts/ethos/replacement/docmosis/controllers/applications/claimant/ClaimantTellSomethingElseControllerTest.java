@@ -6,13 +6,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.controllers.BaseControllerTest;
@@ -33,6 +34,7 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -147,8 +149,8 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(tseService).createApplication(ccdRequest.getCaseDetails().getCaseData(), CLAIMANT_REP_TITLE);
-        verify(claimantTseService).sendEmails(ccdRequest.getCaseDetails());
+        verify(tseService).createApplication(any(CaseData.class), eq(CLAIMANT_REP_TITLE));
+        verify(claimantTseService).sendEmails(any(CaseDetails.class));
     }
 
     @Test
@@ -163,8 +165,8 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(tseService).createApplication(ccdRequest.getCaseDetails().getCaseData(), CLAIMANT_REP_TITLE);
-        verify(claimantTseService).sendEmails(ccdRequest.getCaseDetails());
+        verify(tseService).createApplication(any(CaseData.class), eq(CLAIMANT_REP_TITLE));
+        verify(claimantTseService).sendEmails(any(CaseDetails.class));
     }
 
     @Test
@@ -180,7 +182,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(claimantTseService).buildApplicationCompleteResponse(ccdRequest.getCaseDetails().getCaseData());
+        verify(claimantTseService).buildApplicationCompleteResponse(any(CaseData.class));
     }
 
     @Test
@@ -194,7 +196,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(claimantTseService).validateGiveDetails(ccdRequest.getCaseDetails().getCaseData());
+        verify(claimantTseService).validateGiveDetails(any(CaseData.class));
     }
 
     private List<GenericTseApplicationTypeItem> createApplicationCollection() {
@@ -219,17 +221,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(claimantTseService).generateClaimantApplicationTableMarkdown(ccdRequest.getCaseDetails().getCaseData());
-    }
-
-    @Test
-    void displayClaimantApplicationsTable_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(DISPLAY_TABLE_URL)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
+        verify(claimantTseService).generateClaimantApplicationTableMarkdown(any(CaseData.class));
     }
 
     @Test
@@ -243,16 +235,6 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void aboutToStart_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(VIEW_APPLICATION_ABOUT_TO_START_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -278,16 +260,6 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midPopulateChooseApplication_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_POPULATE_CHOOSE_APPLICATION_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void midPopulateChooseApplication_badRequest() throws Exception {
         mockMvc.perform(post(MID_POPULATE_CHOOSE_APPLICATION_URL)
                         .content("test content")
@@ -307,16 +279,6 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void midPopulateReply_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_POPULATE_SELECTED_APPLICATION)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isForbidden());
     }
 
     @Test

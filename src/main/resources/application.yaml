@@ -12,6 +12,11 @@ management:
         enabled: false
 
 spring:
+  http:
+    converters:
+      preferred-json-mapper: jackson2
+    codecs:
+      preferred-json-mapper: jackson2
   jpa:
     hibernate:
       ddl-auto: none

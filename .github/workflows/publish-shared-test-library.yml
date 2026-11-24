@@ -1,11 +1,13 @@
 name: Publish Shared Test Library
 
 on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
   push:
     branches:
       - master
-    paths:
-      - 'et-shared-test-library/**'
 
 jobs:
   publish-npm:
@@ -22,8 +24,49 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+        
+      - name: Detect et-shared-test-library changes
+        id: changes
+        working-directory: .
+        run: |
+          ET_SHARED_TEST_LIBRARY_PATHS=(
+            et-shared-test-library
+            .github/workflows/publish-shared-test-library.yml
+          )
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual dispatch - publishing"
+            echo "publish=true" >> $GITHUB_OUTPUT
+            exit 0
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+            HEAD="${{ github.event.pull_request.head.sha }}"
+            RANGE="${BASE}...${HEAD}"
+          else
+            BASE=$(git describe --tags --abbrev=0 --match 'et-shared-test-library-*' 2>/dev/null || true)
+            if [ -z "$BASE" ]; then
+              BASE="${{ github.event.before }}"
+            fi
+            if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+              echo "No previous release tag found - publishing"
+              echo "publish=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            RANGE="${BASE}..HEAD"
+          fi
+          if git diff --quiet "$RANGE" -- "${ET_SHARED_TEST_LIBRARY_PATHS[@]}"; then
+            echo "No et-shared-test-library changes in $RANGE - skipping publish"
+            echo "publish=false" >> $GITHUB_OUTPUT
+          else
+            echo "et-shared-test-library changes in $RANGE:"
+            git diff --name-only "$RANGE" -- "${ET_SHARED_TEST_LIBRARY_PATHS[@]}"
+            echo "publish=true" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
 
       - name: Setup Node
+        if: steps.changes.outputs.publish == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -35,12 +78,15 @@ jobs:
           npm --version
 
       - name: Install dependencies
+        if: steps.changes.outputs.publish == 'true'
         run: yarn install --immutable --mode=skip-build
 
       - name: Build package
+        if: steps.changes.outputs.publish == 'true'
         run: yarn build
 
       - name: Enforce unique package version on npm
+        if: steps.changes.outputs.publish == 'true'
         run: |
           PKG_NAME=$(node -p "require('./package.json').name")
           PKG_VERSION=$(node -p "require('./package.json').version")
@@ -55,6 +101,7 @@ jobs:
           echo "✅ Version ${PKG_VERSION} is available for publishing."
 
       - name: Publish (OIDC)
+        if: steps.changes.outputs.publish == 'true' && github.event_name != 'pull_request'
         run: |
           export NPM_CONFIG_USERCONFIG="$RUNNER_TEMP/npmrc-noauth"
           printf "registry=https://registry.npmjs.org/\n" > "$NPM_CONFIG_USERCONFIG"

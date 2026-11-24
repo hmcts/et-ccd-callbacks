@@ -12,18 +12,24 @@ jobs:
   playwright-tests:
     name: ${{ matrix.os }} - ${{ matrix.browser }}
     runs-on:
-      group: 'azure-prod'
-      # labels: ${{ matrix.os }}
+      group: ${{ matrix.runner-group }}
+  
     strategy:
       fail-fast: false
       max-parallel: 1 
       matrix:
-        # os:
-        #   - ubuntu-latest
+        os:
+          - linux
+          - windows
         browser:
           - chromium
           - firefox
           - webkit
+        include:
+          - os: linux
+            runner-group: azure-prod
+          - os: windows
+            runner-group: azure-prod-windows
 
     timeout-minutes: 300
     steps:

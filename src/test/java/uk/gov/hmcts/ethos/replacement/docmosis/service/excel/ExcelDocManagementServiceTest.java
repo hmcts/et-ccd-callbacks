@@ -8,7 +8,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.multiples.CaseImporterFile;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
@@ -26,6 +29,7 @@ import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -119,6 +123,32 @@ class ExcelDocManagementServiceTest {
                 multipleDetails.getCaseData().getLeadCase(), userToken, caseTypeId);
         verifyNoMoreInteractions(excelCreationService);
         assertEquals("3", multipleDetails.getCaseData().getCaseCounter());
+    }
+
+    @Test
+    void regenerationReplacesSelectionCriteriaFileLink() {
+        MultipleData data = multipleDetails.getCaseData();
+        data.setMultipleName("Mrs Test Auto");
+        data.setMultipleReference("6000007");
+        final CaseImporterFile originalFile = data.getCaseImporterFile();
+        List<String> cases = List.of("245000/2020");
+        String filename = "Mrs Test Auto-6000007.xlsx";
+        ReflectionTestUtils.setField(excelDocManagementService, "ccdCaseDocumentUrl", "http://case-document-am");
+        when(excelCreationService.writeExcel(cases,
+                MultiplesHelper.generateSubMultipleStringCollection(data), data.getLeadCase(), userToken, caseTypeId))
+                .thenReturn(bytes);
+        when(documentManagementService.uploadDocument(userToken, bytes, filename, APPLICATION_EXCEL_VALUE, caseTypeId))
+                .thenReturn(URI.create("http://dm-store/documents/regenerated"));
+
+        excelDocManagementService.generateAndUploadExcel(cases, userToken, multipleDetails);
+
+        assertNotSame(originalFile, data.getCaseImporterFile());
+        assertEquals(filename, data.getCaseImporterFile().getUploadedDocument().getDocumentFilename());
+        assertEquals("http://case-document-am/documents/regenerated",
+                data.getCaseImporterFile().getUploadedDocument().getDocumentUrl());
+        assertEquals("http://case-document-am/documents/regenerated/binary",
+                data.getCaseImporterFile().getUploadedDocument().getDocumentBinaryUrl());
+        assertEquals("1", data.getCaseCounter());
     }
 
     @Test

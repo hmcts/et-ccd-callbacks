@@ -215,5 +215,47 @@
     "ShowEventNotes": "N",
     "ShowSummary": "N",
     "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "ID": "addCasesToMultiple",
+    "Name": "Add Cases to Multiple",
+    "Description": "Add Cases to Multiple",
+    "DisplayOrder": 30,
+    "PreConditionState(s)": "Open",
+    "PostConditionState": "Open",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/multiples/addCases",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "EndButtonLabel": "Submit"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "ID": "removeCasesFromMultiple",
+    "Name": "Remove Cases from Multiple",
+    "Description": "Remove Cases from Multiple",
+    "DisplayOrder": 31,
+    "PreConditionState(s)": "Open",
+    "PostConditionState": "Open",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/multiples/removeCases",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "EndButtonLabel": "Submit"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "ID": "updateLeadCase",
+    "Name": "Update Lead Case",
+    "Description": "Update Lead Case",
+    "DisplayOrder": 32,
+    "PreConditionState(s)": "Open",
+    "PostConditionState": "Open",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/multiples/updateLeadCase",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "EndButtonLabel": "Submit"
   }
 ]

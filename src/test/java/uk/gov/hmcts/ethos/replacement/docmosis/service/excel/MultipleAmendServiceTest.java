@@ -3,6 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -110,7 +113,7 @@ class MultipleAmendServiceTest {
         assertNull(multipleDetails.getCaseData().getTypeOfAmendmentMSL());
         assertNull(multipleDetails.getCaseData().getAltCaseIdCollection());
 
-        verify(multipleAmendLeadCaseService, times(1))
+        verify(multipleAmendLeadCaseService, never())
                 .bulkAmendLeadCaseLogic(any(), any(), any(), any());
         verify(multipleAmendCaseIdsService, never())
                 .bulkAmendCaseIdsLogic(any(), any(), any(), any());
@@ -172,6 +175,52 @@ class MultipleAmendServiceTest {
                 .bulkRemoveCaseIdsLogic(any(), any(), any(), any());
         verify(excelDocManagementService, times(1))
                 .generateAndUploadExcel(getMultipleObjectsListFromAmendService(), userToken, multipleDetails);
+        verifyNoMoreInteractions(excelDocManagementService);
+    }
+
+    @Test
+    void bulkAmendMultipleLogic_RemoveCasesDoesNotUploadTwice() {
+        multipleDetails.getCaseData().setTypeOfAmendmentMSL(List.of(REMOVE_CASES_FROM_MULTIPLE_AMENDMENT));
+        when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
+                .thenReturn(multipleObjects);
+
+        multipleAmendService.bulkAmendMultipleLogic(userToken, multipleDetails, errors);
+
+        verify(multipleAmendCaseIdsService).bulkRemoveCaseIdsLogic(userToken, multipleDetails, errors, multipleObjects);
+        verify(multipleAmendCaseIdsService, never()).bulkAmendCaseIdsLogic(any(), any(), any(), any());
+        verify(multipleAmendLeadCaseService, never()).bulkAmendLeadCaseLogic(any(), any(), any(), any());
+        verifyNoMoreInteractions(excelDocManagementService);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {LEAD_CASE_AMENDMENT, ADD_CASES_TO_MULTIPLE_AMENDMENT, REMOVE_CASES_FROM_MULTIPLE_AMENDMENT})
+    void doesNotAmendOrGenerateSpreadsheetWhenReadingFails(String amendment) {
+        multipleDetails.getCaseData().setTypeOfAmendmentMSL(List.of(amendment));
+        doAnswer(invocation -> {
+            errors.add("Unable to read spreadsheet");
+            return multipleObjects;
+        }).when(excelReadingService).readExcel(anyString(), anyString(), anyList(), any(), any());
+
+        multipleAmendService.bulkAmendMultipleLogic(userToken, multipleDetails, errors);
+
+        verify(multipleAmendLeadCaseService, never()).bulkAmendLeadCaseLogic(any(), any(), any(), any());
+        verify(multipleAmendCaseIdsService, never()).bulkAmendCaseIdsLogic(any(), any(), any(), any());
+        verify(multipleAmendCaseIdsService, never()).bulkRemoveCaseIdsLogic(any(), any(), any(), any());
+        verifyNoMoreInteractions(excelDocManagementService);
+    }
+
+    @Test
+    void doesNotGenerateSpreadsheetWhenAddingCasesFails() {
+        multipleDetails.getCaseData().setTypeOfAmendmentMSL(List.of(ADD_CASES_TO_MULTIPLE_AMENDMENT));
+        when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
+                .thenReturn(multipleObjects);
+        doAnswer(invocation -> {
+            errors.add("Unable to update single cases");
+            return getMultipleObjectsListFromAmendService();
+        }).when(multipleAmendCaseIdsService).bulkAmendCaseIdsLogic(anyString(), any(), anyList(), any());
+
+        multipleAmendService.bulkAmendMultipleLogic(userToken, multipleDetails, errors);
+
         verifyNoMoreInteractions(excelDocManagementService);
     }
 

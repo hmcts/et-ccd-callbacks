@@ -338,6 +338,8 @@ public class MultipleData extends BaseCaseData {
 
     @JsonProperty("multipleNote")
     private String multipleNote;
+    @JsonProperty("multipleAmendReview")
+    private String multipleAmendReview;
 
     @JsonProperty("altCaseIdCollection")
     private List<CaseIdTypeItem> altCaseIdCollection;

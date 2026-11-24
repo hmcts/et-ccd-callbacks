@@ -712,13 +712,6 @@
   },
   {
     "CaseTypeID": "ET_Scotland_Multiple",
-    "ID": "multipleNote",
-    "Label": "Multiple Note",
-    "FieldType": "TextArea",
-    "SecurityClassification": "Public"
-  },
-  {
-    "CaseTypeID": "ET_Scotland_Multiple",
     "ID": "altCaseIdCollection",
     "Label": "Case Numbers",
     "HintText": "The lead case cannot be removed",
@@ -739,6 +732,21 @@
     "Label": "Update Live cases only?",
     "FieldType": "FixedRadioList",
     "FieldTypeParameter": "frl_liveCases",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland_Multiple",
+    "ID": "multipleAmendReview",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland_Multiple",
+    "ID": "multipleAmendReviewLabel",
+    "Label": "${multipleAmendReview}",
+    "FieldType": "Label",
     "SecurityClassification": "Public"
   }
 ]

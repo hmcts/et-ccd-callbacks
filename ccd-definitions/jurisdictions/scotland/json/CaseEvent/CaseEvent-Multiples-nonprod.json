@@ -201,5 +201,50 @@
     "ShowEventNotes": "N",
     "ShowSummary": "N",
     "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "ET_Scotland_Multiple",
+    "ID": "addCasesToMultiple",
+    "Name": "Add Cases to Multiple",
+    "Description": "Add Cases to Multiple",
+    "DisplayOrder": 30,
+    "PreConditionState(s)": "Open",
+    "PostConditionState": "Open",
+    "EventEnablingCondition": "multipleSource=\"Manually Created\" OR multipleSource=\"Migrated\" OR preAcceptDone =\"Yes\"",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/multiples/addCases",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "EndButtonLabel": "Submit"
+  },
+  {
+    "CaseTypeID": "ET_Scotland_Multiple",
+    "ID": "removeCasesFromMultiple",
+    "Name": "Remove Cases from Multiple",
+    "Description": "Remove Cases from Multiple",
+    "DisplayOrder": 31,
+    "PreConditionState(s)": "Open",
+    "PostConditionState": "Open",
+    "EventEnablingCondition": "multipleSource=\"Manually Created\" OR multipleSource=\"Migrated\" OR preAcceptDone =\"Yes\"",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/multiples/removeCases",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "EndButtonLabel": "Submit"
+  },
+  {
+    "CaseTypeID": "ET_Scotland_Multiple",
+    "ID": "updateLeadCase",
+    "Name": "Update Lead Case",
+    "Description": "Update Lead Case",
+    "DisplayOrder": 32,
+    "PreConditionState(s)": "Open",
+    "PostConditionState": "Open",
+    "EventEnablingCondition": "multipleSource=\"Manually Created\" OR multipleSource=\"Migrated\" OR preAcceptDone =\"Yes\"",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/multiples/updateLeadCase",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "EndButtonLabel": "Submit"
   }
 ]

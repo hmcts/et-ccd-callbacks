@@ -6602,5 +6602,12 @@
     "FieldType": "Email",
     "SecurityClassification": "Public",
     "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "ID": "multipleNote",
+    "Label": "Multiple Note",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
   }
 ]

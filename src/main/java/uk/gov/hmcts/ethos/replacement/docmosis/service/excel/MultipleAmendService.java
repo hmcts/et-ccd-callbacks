@@ -53,7 +53,7 @@ public class MultipleAmendService {
         List<?> newMultipleObjects = new ArrayList<>();
 
         List<String> typesOfAmendment = multipleData.getTypeOfAmendmentMSL();
-        if (TYPES_OF_AMENDMENT.stream().anyMatch(typesOfAmendment::contains)) {
+        if (errors.isEmpty() && TYPES_OF_AMENDMENT.stream().anyMatch(typesOfAmendment::contains)) {
 
             if (typesOfAmendment.contains(LEAD_CASE_AMENDMENT)) {
                 log.info("Amend lead case logic");

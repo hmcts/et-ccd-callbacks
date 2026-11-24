@@ -83,7 +83,8 @@ public class MultipleCreationMidEventValidationService {
                 log.info("Validating lead case introduced by user: {}", multipleData.getLeadCase());
 
                 validateCases(userToken, caseTypeId, managingOffice,
-                        new ArrayList<>(Collections.singletonList(multipleData.getLeadCase())), errors, warnings, true);
+                        new ArrayList<>(Collections.singletonList(multipleData.getLeadCase())),
+                        errors, warnings, true, false);
             }
 
             List<String> ethosCaseRefCollection =
@@ -91,7 +92,8 @@ public class MultipleCreationMidEventValidationService {
 
             validateCaseReferenceCollectionSize(ethosCaseRefCollection, errors);
 
-            validateCases(userToken, caseTypeId, managingOffice, ethosCaseRefCollection, errors, warnings, false);
+            validateCases(userToken, caseTypeId, managingOffice,
+                    ethosCaseRefCollection, errors, warnings, false, amendAction);
         }
     }
 
@@ -169,7 +171,8 @@ public class MultipleCreationMidEventValidationService {
                                List<String> caseRefCollection,
                                List<String> errors,
                                List<String> warnings,
-                               boolean isLead) {
+                               boolean isLead,
+                               boolean requireAccepted) {
 
         if (!caseRefCollection.isEmpty()) {
             List<SubmitEvent> submitEvents = singleCasesReadingService.retrieveSingleCases(
@@ -179,7 +182,8 @@ public class MultipleCreationMidEventValidationService {
 
             log.info("Validating case states");
             boolean isScotland = SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId);
-            validateSingleCasesState(submitEvents, errors, warnings, isLead, managingOffice, isScotland);
+            validateSingleCasesState(submitEvents, errors, warnings, isLead,
+                    managingOffice, isScotland, requireAccepted);
         }
     }
 
@@ -212,7 +216,8 @@ public class MultipleCreationMidEventValidationService {
                                           List<String> warnings,
                                           boolean isLead,
                                           String multipleManagingOffice,
-                                          boolean isScotland) {
+                                          boolean isScotland,
+                                          boolean requireAccepted) {
 
         List<String> listCasesStateVettingWarnings = new ArrayList<>();
         List<String> listCasesStateSubmittedWarnings = new ArrayList<>();
@@ -223,7 +228,7 @@ public class MultipleCreationMidEventValidationService {
         for (SubmitEvent submitEvent : submitEvents) {
             String ethosCaseReference = submitEvent.getCaseData().getEthosCaseReference();
 
-            if (featureToggleService.isMultiplesEnabled()) {
+            if (featureToggleService.isMultiplesEnabled() && !requireAccepted) {
                 validateState(submitEvent.getState(),
                         listCasesStateVettingWarnings,
                         listCasesStateSubmittedWarnings,
@@ -249,7 +254,7 @@ public class MultipleCreationMidEventValidationService {
 
         if (!listCasesStateError.isEmpty()) {
             String errorMessage = isLead ? LEAD_STATE_ERROR_OLD : CASE_STATE_ERROR_OLD;
-            if (featureToggleService.isMultiplesEnabled()) {
+            if (featureToggleService.isMultiplesEnabled() && !requireAccepted) {
                 errorMessage = isLead ? LEAD_STATE_ERROR : CASE_STATE_ERROR;
             }
 

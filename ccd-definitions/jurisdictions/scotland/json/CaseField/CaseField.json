@@ -5674,6 +5674,13 @@
   },
   {
     "CaseTypeID": "ET_Scotland_Multiple",
+    "ID": "multipleNote",
+    "Label": "Multiple Note",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_Scotland_Multiple",
     "ID": "multipleReference",
     "Label": "Multiple reference",
     "HintText": "Assign a multiple reference",
@@ -6766,12 +6773,5 @@
     "FieldType": "Email",
     "SecurityClassification": "Public",
     "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_Scotland_Multiple",
-    "ID": "multipleNote",
-    "Label": "Multiple Note",
-    "FieldType": "TextArea",
-    "SecurityClassification": "Public"
   }
 ]

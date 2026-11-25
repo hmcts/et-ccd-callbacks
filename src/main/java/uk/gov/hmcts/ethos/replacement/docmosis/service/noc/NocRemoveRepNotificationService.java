@@ -26,20 +26,20 @@ public class NocRemoveRepNotificationService {
 
     private final EmailService emailService;
     private final NocNotificationService nocNotificationService;
-    private final String claimantNonSharedRepRemovalOrgAdminTemplate;
-    private final String claimantRepRemovalRepresentativeTemplateId;
+    private final String claimantNonSharedLeadRepRemovalOrgAdminTemplate;
+    private final String claimantLeadRepRemovalRepresentativeTemplateId;
 
     public NocRemoveRepNotificationService(
             EmailService emailService,
             NocNotificationService nocNotificationService,
-            @Value("${template.representation.remove.claimant.nonSharedRepOrgAdmin}")
-            String claimantNonSharedRepRemovalOrgAdminTemplate,
-            @Value("${template.representation.remove.claimant.representative}")
-            String claimantRepRemovalRepresentativeTemplateId) {
+            @Value("${template.representation.remove.claimant.nonSharedLeadRepOrgAdmin}")
+            String claimantNonSharedLeadRepRemovalOrgAdminTemplate,
+            @Value("${template.representation.remove.claimant.nonSharedLeadRep}")
+            String claimantLeadRepRemovalRepresentativeTemplateId) {
         this.emailService = emailService;
         this.nocNotificationService = nocNotificationService;
-        this.claimantNonSharedRepRemovalOrgAdminTemplate = claimantNonSharedRepRemovalOrgAdminTemplate;
-        this.claimantRepRemovalRepresentativeTemplateId = claimantRepRemovalRepresentativeTemplateId;
+        this.claimantNonSharedLeadRepRemovalOrgAdminTemplate = claimantNonSharedLeadRepRemovalOrgAdminTemplate;
+        this.claimantLeadRepRemovalRepresentativeTemplateId = claimantLeadRepRemovalRepresentativeTemplateId;
     }
 
     /**
@@ -68,9 +68,9 @@ public class NocRemoveRepNotificationService {
             String orgAdminEmail = nocNotificationService.findClaimantRepOrgSuperUserEmail(caseDetails.getCaseData()
                     .getRepresentativeClaimantType());
             // We don't send email to claimant
-            sendClaimantRepRemovalOrgAdminNotification(caseDetails, orgAdminEmail,
+            sendClaimantNonSharedLeadRepRemovalOrgAdminNotification(caseDetails, orgAdminEmail,
                     UserUtils.resolveUserDisplayName(userDetails));
-            sendClaimantRepRemovalRepresentativeNotification(caseDetails, userDetails.getEmail());
+            sendClaimantNonSharedLeadRepRemovalRepresentativeNotification(caseDetails, userDetails.getEmail());
         }
     }
 
@@ -90,9 +90,9 @@ public class NocRemoveRepNotificationService {
      * @param orgAdminEmail the email address of the claimant organisation administrator
      * @param representativeName the name of the removed claimant representative
      */
-    public void sendClaimantRepRemovalOrgAdminNotification(CaseDetails caseDetails,
-                                                           String orgAdminEmail,
-                                                           String representativeName) {
+    public void sendClaimantNonSharedLeadRepRemovalOrgAdminNotification(CaseDetails caseDetails,
+                                                                        String orgAdminEmail,
+                                                                        String representativeName) {
         if (StringUtils.isBlank(orgAdminEmail)) {
             log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION_ADMIN, caseDetails.getCaseId(),
                     WARNING_ORGANISATION_ADMIN_EMAIL_NOT_FOUND);
@@ -101,7 +101,7 @@ public class NocRemoveRepNotificationService {
         Map<String, String> personalisation = NocNotificationHelper.addCommonEmailValues(caseDetails.getCaseData());
         personalisation.put(LEGAL_REP_NAME, representativeName);
         try {
-            emailService.sendEmail(claimantNonSharedRepRemovalOrgAdminTemplate, orgAdminEmail, personalisation);
+            emailService.sendEmail(claimantNonSharedLeadRepRemovalOrgAdminTemplate, orgAdminEmail, personalisation);
         } catch (Exception e) {
             log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION_ADMIN, caseDetails.getCaseId(),
                     e.getMessage());
@@ -121,8 +121,8 @@ public class NocRemoveRepNotificationService {
      * @param caseDetails the case details used to populate the email notification
      * @param representativeEmail the email address of the removed claimant representative
      */
-    public void sendClaimantRepRemovalRepresentativeNotification(CaseDetails caseDetails,
-                                                                 String representativeEmail) {
+    public void sendClaimantNonSharedLeadRepRemovalRepresentativeNotification(CaseDetails caseDetails,
+                                                                              String representativeEmail) {
         if (StringUtils.isBlank(representativeEmail)) {
             log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_REPRESENTATIVE, caseDetails.getCaseId(),
                     WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND);
@@ -130,7 +130,8 @@ public class NocRemoveRepNotificationService {
         }
         Map<String, String> personalisation = NocNotificationHelper.addCommonEmailValues(caseDetails.getCaseData());
         try {
-            emailService.sendEmail(claimantRepRemovalRepresentativeTemplateId, representativeEmail, personalisation);
+            emailService.sendEmail(claimantLeadRepRemovalRepresentativeTemplateId, representativeEmail,
+                    personalisation);
         } catch (Exception e) {
             log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_REPRESENTATIVE, caseDetails.getCaseId(),
                     e.getMessage());

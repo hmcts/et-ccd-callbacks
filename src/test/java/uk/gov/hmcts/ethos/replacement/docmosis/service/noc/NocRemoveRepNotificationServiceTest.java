@@ -105,14 +105,14 @@ class NocRemoveRepNotificationServiceTest {
     @Test
     void theSendClaimantRepRemovalOrgAdminNotification() {
         // when organisation admin email is blank, should log a warning and not send email
-        nocRemoveRepNotificationService.sendClaimantRepRemovalOrgAdminNotification(caseDetails, StringUtils.EMPTY,
-                REPRESENTATIVE_NAME);
+        nocRemoveRepNotificationService.sendClaimantNonSharedLeadRepRemovalOrgAdminNotification(caseDetails,
+                StringUtils.EMPTY, REPRESENTATIVE_NAME);
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
                 EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION
                         + ERROR_ORGANISATION_ADMIN_EMAIL_NOT_FOUND);
         // when email is successfully sent, should invoke sendEmail at least once
-        nocRemoveRepNotificationService.sendClaimantRepRemovalOrgAdminNotification(caseDetails, ORG_ADMIN_EMAIL,
-                REPRESENTATIVE_NAME);
+        nocRemoveRepNotificationService.sendClaimantNonSharedLeadRepRemovalOrgAdminNotification(caseDetails,
+                ORG_ADMIN_EMAIL, REPRESENTATIVE_NAME);
         verify(emailService, times(LoggerTestUtils.INTEGER_ONE))
                 .sendEmail(eq(CLAIMANT_NON_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID), eq(ORG_ADMIN_EMAIL),
                         anyMap());
@@ -120,8 +120,8 @@ class NocRemoveRepNotificationServiceTest {
         doThrow(new RuntimeException(ERROR_SYSTEM))
                 .when(emailService).sendEmail(eq(CLAIMANT_NON_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID),
                         eq(ORG_ADMIN_EMAIL), anyMap());
-        nocRemoveRepNotificationService.sendClaimantRepRemovalOrgAdminNotification(caseDetails, ORG_ADMIN_EMAIL,
-                REPRESENTATIVE_NAME);
+        nocRemoveRepNotificationService.sendClaimantNonSharedLeadRepRemovalOrgAdminNotification(caseDetails,
+                ORG_ADMIN_EMAIL, REPRESENTATIVE_NAME);
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_TWO,
                 EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION + ERROR_SYSTEM);
     }
@@ -129,13 +129,14 @@ class NocRemoveRepNotificationServiceTest {
     @Test
     void theSendClaimantRepresentativeSelfRemovalRepNotification() {
         // when representative email not found should log a warning and return
-        nocRemoveRepNotificationService.sendClaimantRepRemovalRepresentativeNotification(caseDetails,
+        nocRemoveRepNotificationService.sendClaimantNonSharedLeadRepRemovalRepresentativeNotification(caseDetails,
                 StringUtils.EMPTY);
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
                 EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_REPRESENTATIVE
                         + WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND);
         // when email is successfully sent, should invoke sendEmail at least once
-        nocRemoveRepNotificationService.sendClaimantRepRemovalRepresentativeNotification(caseDetails, USER_EMAIL);
+        nocRemoveRepNotificationService.sendClaimantNonSharedLeadRepRemovalRepresentativeNotification(caseDetails,
+                USER_EMAIL);
         verify(emailService, times(LoggerTestUtils.INTEGER_ONE))
                 .sendEmail(eq(CLAIMANT_REP_REMOVAL_REPRESENTATIVE_TEMPLATE_ID), eq(USER_EMAIL),
                         anyMap());
@@ -143,7 +144,8 @@ class NocRemoveRepNotificationServiceTest {
         doThrow(new RuntimeException(ERROR_SYSTEM))
                 .when(emailService).sendEmail(eq(CLAIMANT_REP_REMOVAL_REPRESENTATIVE_TEMPLATE_ID),
                         eq(USER_EMAIL), anyMap());
-        nocRemoveRepNotificationService.sendClaimantRepRemovalRepresentativeNotification(caseDetails, USER_EMAIL);
+        nocRemoveRepNotificationService.sendClaimantNonSharedLeadRepRemovalRepresentativeNotification(caseDetails,
+                USER_EMAIL);
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_TWO,
                 EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_REPRESENTATIVE + ERROR_SYSTEM);
     }

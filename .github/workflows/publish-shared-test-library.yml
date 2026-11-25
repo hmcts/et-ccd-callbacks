@@ -159,7 +159,12 @@ jobs:
           npm config delete //registry.npmjs.org/:_authToken || true
           npm config delete _authToken || true
 
-          npm publish --access public
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          if [[ "$PKG_VERSION" == *-* ]]; then
+            npm publish --access public --tag prerelease
+          else
+            npm publish --access public
+          fi
 
       - name: Comment Release Version
         if: steps.changes.outputs.publish == 'true' && github.event_name == 'pull_request'

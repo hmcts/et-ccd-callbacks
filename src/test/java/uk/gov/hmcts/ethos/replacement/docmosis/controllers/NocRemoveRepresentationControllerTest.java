@@ -60,7 +60,6 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
     private UserDetails userDetails;
 
     private static final String BAD_REQUEST_CONTENT = "bad request content";
-    private static final String USER_NAME = "dummyUserName";
     private static final String CASE_ID = "1234567890123456";
     private static final String USER_ID = "dda9d1c3-1a11-3c3a-819e-74174fbec26b";
     private static final String USER_FIRST_NAME = "Joe";
@@ -78,12 +77,9 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
                 .build();
         userDetails = new UserDetails();
         userDetails.setUid(USER_ID);
-        userDetails.setEmail(USER_NAME);
-        userDetails = new UserDetails();
-        userDetails.setUid(USER_ID);
+        userDetails.setEmail(USER_EMAIL);
         userDetails.setFirstName(USER_FIRST_NAME);
         userDetails.setLastName(USER_LAST_NAME);
-        userDetails.setEmail(USER_EMAIL);
         userDetails.setRoles(List.of(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()));
         when(userService.fetchAndValidateUserDetails(AUTH_TOKEN, ccdRequest.getCaseDetails().getCaseId()))
                 .thenReturn(userDetails);
@@ -115,7 +111,7 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         doNothing().when(nocRemoveClaimantRepresentationService).populateNocRemovalDetails(eq(userDetails),
                 eq(ccdRequest.getCaseDetails()), anyString());
-        mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_START)
+        mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .contentType(APPLICATION_JSON))
@@ -128,7 +124,7 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         doNothing().when(nocRemoveClaimantRepresentationService).populateNocRemovalDetails(eq(userDetails),
                 eq(ccdRequest.getCaseDetails()), anyString());
-        mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_SUBMIT)
+        mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_START)
                         .content(BAD_REQUEST_CONTENT)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .contentType(APPLICATION_JSON))
@@ -157,18 +153,5 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS).value((empty())))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    @SneakyThrows
-    void aboutToSubmitClaimant_badRequest() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(nocRemoveClaimantRepresentationService).populateNocRemovalDetails(eq(userDetails),
-                eq(ccdRequest.getCaseDetails()), anyString());
-        mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_START)
-                        .content(BAD_REQUEST_CONTENT)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
     }
 }

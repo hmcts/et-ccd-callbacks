@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -19,9 +18,6 @@ final class UserUtilsTest {
     private static final String DUMMY_SUBMISSION_REFERENCE = "1234567890123456";
     private static final String DUMMY_USER_ID = "user123";
     private static final String DUMMY_EMAIL_1 = "user123@example.com";
-    private static final String FIRST_NAME = "Mehmet Tahir";
-    private static final String LAST_NAME = "Dede";
-    private static final String FULL_NAME = FIRST_NAME + " " + LAST_NAME;
 
     private static final String EXPECTED_EXCEPTION_INVALID_USER_TOKEN = "Invalid user token";
 
@@ -52,29 +48,6 @@ final class UserUtilsTest {
         assertThat(UserUtils.hasRequiredUserDetails(userDetails)).isTrue();
     }
 
-    @Test
-    void theGetFullName() {
-        // When userDetails has first and last name, should return full name.
-        UserDetails userDetails = new UserDetails();
-        userDetails.setFirstName(FIRST_NAME);
-        userDetails.setLastName(LAST_NAME);
-        assertThat(UserUtils.getFullName(userDetails)).isEqualTo(FULL_NAME);
-
-        // When userDetails has only first name, should return first name.
-        userDetails.setLastName(null);
-        assertThat(UserUtils.getFullName(userDetails)).isEqualTo(FIRST_NAME);
-
-        // When userDetails has only last name, should return last name.
-        userDetails.setFirstName(null);
-        userDetails.setLastName(LAST_NAME);
-        assertThat(UserUtils.getFullName(userDetails)).isEqualTo(LAST_NAME);
-
-        // When userDetails has no first or last name, should return empty string.
-        userDetails.setFirstName(null);
-        userDetails.setLastName(null);
-        assertThat(UserUtils.getFullName(userDetails)).isEqualTo(StringUtils.EMPTY);
-    }
-
     @ParameterizedTest
     @CsvSource(value = {"'John Smith', 'John', 'Smith', 'John Smith'",
         "null, 'John', 'Smith', 'John Smith'",
@@ -91,6 +64,11 @@ final class UserUtilsTest {
         when(userDetails.getFirstName()).thenReturn(firstName);
         when(userDetails.getLastName()).thenReturn(lastName);
 
-        assertThat(expected).isEqualTo(UserUtils.resolveUserDisplayName(userDetails));
+        assertThat(UserUtils.resolveUserDisplayName(userDetails)).isEqualTo(expected);
+    }
+
+    @Test
+    void theResolveUserDisplayName_null() {
+        assertThat(UserUtils.resolveUserDisplayName(null)).isEmpty();
     }
 }

@@ -50,21 +50,28 @@ public class NocRemoveRepNotificationService {
     }
 
     public void sendClaimantRepresentativeRemovalNotifications(UserDetails userDetails, CaseDetails caseDetails) {
-        String orgAdminEmail = nocNotificationService.findClaimantRepOrgSuperUserEmail(caseDetails.getCaseData()
-                .getRepresentativeClaimantType());
         if (NOC_REPRESENTATIVE_TYPE_SHARED.equals(caseDetails.getCaseData().getNocRepresentativeType())
                 && NOC_CASE_SHARING_STATUS_SHARED.equals(caseDetails.getCaseData().getNocCaseSharingStatus())) {
+            String orgAdminEmail = nocNotificationService.findClaimantRepOrgSuperUserEmail(caseDetails.getCaseData()
+                    .getRepresentativeClaimantType());
             // We don't send email to claimant
             sendClaimantRepRemovalOrgAdminNotification(caseDetails, orgAdminEmail,
                     UserUtils.resolveUserDisplayName(userDetails), claimantSharedRepRemovalOrgAdminTemplate);
         }
         if (NOC_REPRESENTATIVE_TYPE_LEAD.equals(caseDetails.getCaseData().getNocRepresentativeType())
                 && NOC_CASE_SHARING_STATUS_NOT_SHARED.equals(caseDetails.getCaseData().getNocCaseSharingStatus())) {
+            String orgAdminEmail = nocNotificationService.findClaimantRepOrgSuperUserEmail(caseDetails.getCaseData()
+                    .getRepresentativeClaimantType());
             // We don't send email to claimant
             sendClaimantRepRemovalOrgAdminNotification(caseDetails, orgAdminEmail,
                     UserUtils.resolveUserDisplayName(userDetails), claimantNonSharedRepRemovalOrgAdminTemplate);
         }
-        sendClaimantRepRemovalRepresentativeNotification(caseDetails, userDetails.getEmail());
+        if (NOC_REPRESENTATIVE_TYPE_SHARED.equals(caseDetails.getCaseData().getNocRepresentativeType())
+                && NOC_CASE_SHARING_STATUS_SHARED.equals(caseDetails.getCaseData().getNocCaseSharingStatus())
+                || NOC_REPRESENTATIVE_TYPE_LEAD.equals(caseDetails.getCaseData().getNocRepresentativeType())
+                && NOC_CASE_SHARING_STATUS_NOT_SHARED.equals(caseDetails.getCaseData().getNocCaseSharingStatus())) {
+            sendClaimantRepRemovalRepresentativeNotification(caseDetails, userDetails.getEmail());
+        }
     }
 
     /**

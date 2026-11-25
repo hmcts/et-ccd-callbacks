@@ -2,6 +2,10 @@ name: Publish Shared Test Library
 
 on:
   workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Release version to publish for et-shared-test-library (e.g. 1.0.3)'
+        required: false
   pull_request:
     branches:
       - master
@@ -14,8 +18,9 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read
+      contents: write
       id-token: write
+      pull-requests: write
 
     defaults:
       run:
@@ -26,7 +31,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-        
+
+      # Only publish when something that ends up in the et-shared-test-library artifact has changed.
       - name: Detect et-shared-test-library changes
         id: changes
         working-directory: .
@@ -72,10 +78,73 @@ jobs:
           node-version: 24
 
       - name: Ensure npm version (Trusted Publishing)
+        if: steps.changes.outputs.publish == 'true'
         run: |
           npm --version
           npm i -g npm@11.5.1 --ignore-scripts
           npm --version
+
+      - name: Get version from tags
+        id: get_version
+        if: steps.changes.outputs.publish == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0 --match 'et-shared-test-library-*' 2>/dev/null | sed 's/et-shared-test-library-//' || true)
+          if [ -z "$LATEST_TAG" ]; then
+            LATEST_TAG=$(npm view @hmcts/et-shared-test-library version --registry=https://registry.npmjs.org/ 2>/dev/null || echo '1.0.0')
+          fi
+          NEXT_PATCH=$(echo "$LATEST_TAG" | awk -F. '{ print $3+1 }')
+          NEXT_VERSION="1.0.${NEXT_PATCH}"
+          while git rev-parse "et-shared-test-library-$NEXT_VERSION" >/dev/null 2>&1 || npm view "@hmcts/et-shared-test-library@$NEXT_VERSION" version --registry=https://registry.npmjs.org/ >/dev/null 2>&1; do
+            NEXT_PATCH=$((NEXT_PATCH + 1))
+            NEXT_VERSION="1.0.${NEXT_PATCH}"
+          done
+          echo "next_version=$NEXT_VERSION" >> $GITHUB_OUTPUT
+          echo "Next version calculated: $NEXT_VERSION"
+        shell: bash
+
+      - name: Set Release Version
+        id: set_release_version
+        if: steps.changes.outputs.publish == 'true'
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            RELEASE_VERSION="${{ github.event.inputs.release_version }}"
+            if [ -z "$RELEASE_VERSION" ]; then
+              LATEST_TAG=$(git describe --tags --abbrev=0 --match 'et-shared-test-library-*' 2>/dev/null | sed 's/et-shared-test-library-//' || true)
+              if [ -z "$LATEST_TAG" ]; then
+                LATEST_TAG=$(npm view @hmcts/et-shared-test-library version --registry=https://registry.npmjs.org/ 2>/dev/null || echo '1.0.0')
+              fi
+              NEXT_PATCH=$(echo "$LATEST_TAG" | awk -F. '{ print $3+1 }')
+              RELEASE_VERSION="1.0.${NEXT_PATCH}"
+              while git rev-parse "et-shared-test-library-$RELEASE_VERSION" >/dev/null 2>&1 || npm view "@hmcts/et-shared-test-library@$RELEASE_VERSION" version --registry=https://registry.npmjs.org/ >/dev/null 2>&1; do
+                NEXT_PATCH=$((NEXT_PATCH + 1))
+                RELEASE_VERSION="1.0.${NEXT_PATCH}"
+              done
+            fi
+            echo "release_version=$RELEASE_VERSION" >> $GITHUB_OUTPUT
+            npm version "$RELEASE_VERSION" --no-git-tag-version --allow-same-version
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            BRANCH_NAME="$GITHUB_HEAD_REF"
+            SAFE_BRANCH_NAME=$(echo "$BRANCH_NAME" | tr -cd 'A-Za-z0-9._-')
+            if [ -z "$SAFE_BRANCH_NAME" ]; then
+              SAFE_BRANCH_NAME="pr"
+            fi
+            if [[ "$BRANCH_NAME" == renovate/* ]]; then
+              TRANSFORMED_BRANCH_NAME="${SAFE_BRANCH_NAME//\//-}"
+            else
+              TRANSFORMED_BRANCH_NAME="$SAFE_BRANCH_NAME"
+            fi
+            SHA=$(jq -r .pull_request.head.sha "$GITHUB_EVENT_PATH")
+            RELEASE_VERSION="0.0.0-${TRANSFORMED_BRANCH_NAME}-${SHA:0:7}"
+            echo "release_version=$RELEASE_VERSION" >> $GITHUB_OUTPUT
+            npm version "$RELEASE_VERSION" --no-git-tag-version --allow-same-version 2>/dev/null || true
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            RELEASE_VERSION=${{ steps.get_version.outputs.next_version }}
+            echo "release_version=$RELEASE_VERSION" >> $GITHUB_OUTPUT
+            npm version "$RELEASE_VERSION" --no-git-tag-version --allow-same-version
+            git tag "et-shared-test-library-$RELEASE_VERSION"
+            git push origin "et-shared-test-library-$RELEASE_VERSION"
+          fi
+        shell: bash
 
       - name: Install dependencies
         if: steps.changes.outputs.publish == 'true'
@@ -85,22 +154,7 @@ jobs:
         if: steps.changes.outputs.publish == 'true'
         run: yarn build
 
-      - name: Enforce unique package version on npm
-        if: steps.changes.outputs.publish == 'true'
-        run: |
-          PKG_NAME=$(node -p "require('./package.json').name")
-          PKG_VERSION=$(node -p "require('./package.json').version")
-          
-          echo "Checking uniqueness for ${PKG_NAME}@${PKG_VERSION}"
-          
-          if npm view "${PKG_NAME}@${PKG_VERSION}" version --registry=https://registry.npmjs.org/ >/dev/null 2>&1; then
-            echo "::error::${PKG_NAME}@${PKG_VERSION} already exists on npm. Please bump the version."
-            exit 1
-          fi
-          
-          echo "✅ Version ${PKG_VERSION} is available for publishing."
-
-      - name: Publish (OIDC)
+      - name: Publish to npm
         if: steps.changes.outputs.publish == 'true' && github.event_name != 'pull_request'
         run: |
           export NPM_CONFIG_USERCONFIG="$RUNNER_TEMP/npmrc-noauth"
@@ -111,3 +165,11 @@ jobs:
           npm config delete _authToken || true
 
           npm publish --access public
+
+      - name: Comment Release Version
+        if: steps.changes.outputs.publish == 'true' && github.event_name == 'pull_request'
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body "Validated et-shared-test-library build for PR with version: ${{ steps.set_release_version.outputs.release_version }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash

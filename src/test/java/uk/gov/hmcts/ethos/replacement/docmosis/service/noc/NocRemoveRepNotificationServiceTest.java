@@ -28,8 +28,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_CASE_SHARING_STATUS_NOT_SHARED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_CASE_SHARING_STATUS_SHARED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_LEAD;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_SHARED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND;
 
 @ExtendWith(MockitoExtension.class)
@@ -97,7 +99,16 @@ class NocRemoveRepNotificationServiceTest {
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
                 EXPECTED_WARNING_FAILED_TO_SEND_NOTIFICATION_EMAIL_REMOVED_REPRESENTATIVE_NOT_FOUND);
         // when removed representative is not lead should not send any notification
-        nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails, caseDetails, null);
+        caseDetails.getCaseData().setNocRepresentativeType(NOC_REPRESENTATIVE_TYPE_SHARED);
+        nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails, caseDetails,
+                caseDetails.getCaseData().getRepresentativeClaimantType());
+        verify(emailService, never()).sendEmail(eq(CLAIMANT_NON_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID),
+                eq(ORG_ADMIN_EMAIL), anyMap());
+        // when removed representative is lead and sharing status is shared should not send any notification
+        caseDetails.getCaseData().setNocRepresentativeType(NOC_REPRESENTATIVE_TYPE_LEAD);
+        caseDetails.getCaseData().setNocCaseSharingStatus(NOC_CASE_SHARING_STATUS_SHARED);
+        nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails, caseDetails,
+                caseDetails.getCaseData().getRepresentativeClaimantType());
         verify(emailService, never()).sendEmail(eq(CLAIMANT_NON_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID),
                 eq(ORG_ADMIN_EMAIL), anyMap());
         // when representative is lead representative and sharing status is not shared should

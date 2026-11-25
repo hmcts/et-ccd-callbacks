@@ -57,6 +57,7 @@ public class NocRemoveRepNotificationService {
             // We don't send email to claimant
             sendClaimantRepRemovalOrgAdminNotification(caseDetails, orgAdminEmail,
                     UserUtils.resolveUserDisplayName(userDetails), claimantSharedRepRemovalOrgAdminTemplate);
+            sendClaimantRepRemovalRepresentativeNotification(caseDetails, userDetails.getEmail());
         }
         if (NOC_REPRESENTATIVE_TYPE_LEAD.equals(caseDetails.getCaseData().getNocRepresentativeType())
                 && NOC_CASE_SHARING_STATUS_NOT_SHARED.equals(caseDetails.getCaseData().getNocCaseSharingStatus())) {
@@ -65,11 +66,6 @@ public class NocRemoveRepNotificationService {
             // We don't send email to claimant
             sendClaimantRepRemovalOrgAdminNotification(caseDetails, orgAdminEmail,
                     UserUtils.resolveUserDisplayName(userDetails), claimantNonSharedRepRemovalOrgAdminTemplate);
-        }
-        if (NOC_REPRESENTATIVE_TYPE_SHARED.equals(caseDetails.getCaseData().getNocRepresentativeType())
-                && NOC_CASE_SHARING_STATUS_SHARED.equals(caseDetails.getCaseData().getNocCaseSharingStatus())
-                || NOC_REPRESENTATIVE_TYPE_LEAD.equals(caseDetails.getCaseData().getNocRepresentativeType())
-                && NOC_CASE_SHARING_STATUS_NOT_SHARED.equals(caseDetails.getCaseData().getNocCaseSharingStatus())) {
             sendClaimantRepRemovalRepresentativeNotification(caseDetails, userDetails.getEmail());
         }
     }

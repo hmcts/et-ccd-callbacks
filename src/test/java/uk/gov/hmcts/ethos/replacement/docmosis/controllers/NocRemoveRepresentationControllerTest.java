@@ -34,8 +34,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.STAGE_ABOUT_TO_START;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.STAGE_ABOUT_TO_SUBMIT;
 
 @WebMvcTest({NocRemoveRepresentationController.class, JsonMapper.class})
 class NocRemoveRepresentationControllerTest extends BaseControllerTest {
@@ -91,11 +89,9 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(userService.fetchAndValidateUserDetails(AUTH_TOKEN, ccdRequest.getCaseDetails().getCaseId()))
                 .thenReturn(userDetails);
-        doNothing().when(nocRemoveClaimantRepresentationService).populateNocRemovalDetails(userDetails,
-                ccdRequest.getCaseDetails(), STAGE_ABOUT_TO_START);
         doNothing().when(nocRemoveClaimantRepresentationService).populateNocRemovalDetails(eq(userDetails),
                 eq(ccdRequest.getCaseDetails()), anyString());
-        mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_SUBMIT)
+        mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_START)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .contentType(APPLICATION_JSON))
@@ -137,8 +133,6 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(userService.fetchAndValidateUserDetails(AUTH_TOKEN, ccdRequest.getCaseDetails().getCaseId()))
                 .thenReturn(userDetails);
-        doNothing().when(nocRemoveClaimantRepresentationService).populateNocRemovalDetails(userDetails,
-                ccdRequest.getCaseDetails(), STAGE_ABOUT_TO_SUBMIT);
         doNothing().when(nocRemoveClaimantRepresentationService).revokeClaimantLegalRep(eq(userDetails),
                 any(CaseDetails.class));
         doNothing().when(nocRemoveRepNotificationService).sendClaimantRepresentativeRemovalNotifications(

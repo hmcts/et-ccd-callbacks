@@ -80,7 +80,7 @@ jobs:
           ET_JUDGE_USER_NAME_WORKALLOCATION: ${{ secrets.ET_JUDGE_USER_NAME_WORKALLOCATION }}
           ET_JUDGE_USER_PASSWORD_WORKALLOCATION: ${{ secrets.ET_JUDGE_USER_PASSWORD_WORKALLOCATION }}
           ET_REPSONDENT_USER_NAME: ${{ secrets.ET_REPSONDENT_USER_NAME }}
-          ET_REPSONDENT_PASSWORD : ${{ secrets.EET_REPSONDENT_PASSWORD }}
+          ET_REPSONDENT_PASSWORD : ${{ secrets.ET_REPSONDENT_PASSWORD }}
 
       # Upload Playwright HTML report
       - name: Upload Playwright report

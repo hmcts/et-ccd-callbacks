@@ -141,14 +141,10 @@ public final class NOCConstants {
     public static final String WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL =
             "Cannot retrieve {} organisation by id {} [{}] {}. Unable to resolve organisation's superuser email. "
                     + "Case id: {}";
-    public static final String WARNING_INVALID_PARAMETERS_TO_RESOLVE_ORGANISATION_EMAIL =
-            "Invalid parameters(orgId, caseId, nocType). Unable to resolve organisation's superuser email Case id: {}";
     public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION_ADMIN =
             "Failed to send NOC notification email to organisation admin, case id: {}, error: {}";
     public static final String WARNING_ORGANISATION_ADMIN_EMAIL_NOT_FOUND = "Organisation admin email not found";
     public static final String WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND = "Representative email not found";
-    public static final String WARNING_EMAIL_TEMPLATE_NOT_FOUND =
-            "Email template not found";
     public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_REPRESENTATIVE =
             "Failed to send NOC notification email to representative, case id: {}, error: {}";
     public static final String WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_TRIBUNAL_FOR_RESPONDENT_REP_UPDATE =

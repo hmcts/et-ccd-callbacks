@@ -13,10 +13,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.UserUtils;
 import java.util.Map;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_CASE_SHARING_STATUS_NOT_SHARED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_CASE_SHARING_STATUS_SHARED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_LEAD;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_SHARED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_EMAIL_TEMPLATE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION_ADMIN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_REPRESENTATIVE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_ORGANISATION_ADMIN_EMAIL_NOT_FOUND;
@@ -29,82 +26,82 @@ public class NocRemoveRepNotificationService {
 
     private final EmailService emailService;
     private final NocNotificationService nocNotificationService;
-    private final String claimantSharedRepRemovalOrgAdminTemplate;
     private final String claimantNonSharedRepRemovalOrgAdminTemplate;
     private final String claimantRepRemovalRepresentativeTemplateId;
 
     public NocRemoveRepNotificationService(
             EmailService emailService,
             NocNotificationService nocNotificationService,
-            @Value("${template.representation.remove.claimant.sharedRepOrgAdmin}")
-            String claimantSharedRepRemovalOrgAdminTemplate,
             @Value("${template.representation.remove.claimant.nonSharedRepOrgAdmin}")
             String claimantNonSharedRepRemovalOrgAdminTemplate,
             @Value("${template.representation.remove.claimant.representative}")
             String claimantRepRemovalRepresentativeTemplateId) {
         this.emailService = emailService;
         this.nocNotificationService = nocNotificationService;
-        this.claimantSharedRepRemovalOrgAdminTemplate = claimantSharedRepRemovalOrgAdminTemplate;
         this.claimantNonSharedRepRemovalOrgAdminTemplate = claimantNonSharedRepRemovalOrgAdminTemplate;
         this.claimantRepRemovalRepresentativeTemplateId = claimantRepRemovalRepresentativeTemplateId;
     }
 
+    /**
+     * Sends removal notifications to the claimant representative and their organisation
+     * administrator when the lead representative is removed from a non-shared case.
+     *
+     * <p>Assumes that removing the lead representative from a non-shared case results
+     * in the removal of the entire claimant organisation from the case.</p>
+     *
+     * <p>Notifications are sent only when the representative is identified as the lead
+     * representative and the case sharing status is not shared. The organisation
+     * administrator is notified using the resolved representative's name, and the
+     * removed representative receives a separate notification. No notification
+     * is sent to the claimant.</p>
+     *
+     * <p>If either notification fails, the failure is handled and logged by the
+     * respective notification method without propagating the exception.</p>
+     *
+     * @param userDetails the details of the removed claimant representative
+     * @param caseDetails the case details used to determine notification eligibility
+     *                    and populate the email notifications
+     */
     public void sendClaimantRepresentativeRemovalNotifications(UserDetails userDetails, CaseDetails caseDetails) {
-        if (NOC_REPRESENTATIVE_TYPE_SHARED.equals(caseDetails.getCaseData().getNocRepresentativeType())
-                && NOC_CASE_SHARING_STATUS_SHARED.equals(caseDetails.getCaseData().getNocCaseSharingStatus())) {
-            String orgAdminEmail = nocNotificationService.findClaimantRepOrgSuperUserEmail(caseDetails.getCaseData()
-                    .getRepresentativeClaimantType());
-            // We don't send email to claimant
-            sendClaimantRepRemovalOrgAdminNotification(caseDetails, orgAdminEmail,
-                    UserUtils.resolveUserDisplayName(userDetails), claimantSharedRepRemovalOrgAdminTemplate);
-            sendClaimantRepRemovalRepresentativeNotification(caseDetails, userDetails.getEmail());
-        }
         if (NOC_REPRESENTATIVE_TYPE_LEAD.equals(caseDetails.getCaseData().getNocRepresentativeType())
                 && NOC_CASE_SHARING_STATUS_NOT_SHARED.equals(caseDetails.getCaseData().getNocCaseSharingStatus())) {
             String orgAdminEmail = nocNotificationService.findClaimantRepOrgSuperUserEmail(caseDetails.getCaseData()
                     .getRepresentativeClaimantType());
             // We don't send email to claimant
             sendClaimantRepRemovalOrgAdminNotification(caseDetails, orgAdminEmail,
-                    UserUtils.resolveUserDisplayName(userDetails), claimantNonSharedRepRemovalOrgAdminTemplate);
+                    UserUtils.resolveUserDisplayName(userDetails));
             sendClaimantRepRemovalRepresentativeNotification(caseDetails, userDetails.getEmail());
         }
     }
 
     /**
      * Sends a notification email to the claimant representative's organisation administrator
-     * when a claimant representative is removed from a case.
+     * when the claimant's representation is removed from a non-shared case.
      *
-     * <p>Assumes that the appropriate notification template has already been selected
-     * based on the representative's role (lead or shared representative) and whether
-     * the case is shared with other organisations.</p>
+     * <p>Assumes that the removal of the lead representative results in the removal
+     * of the entire claimant organisation from the case, and that the notification
+     * template ID has been configured correctly.</p>
      *
      * <p>The email includes common case details and the removed representative's name.
-     * If the organisation administrator's email address or template ID is missing,
-     * or if sending the email fails, a warning is logged without throwing an exception.</p>
+     * If the organisation administrator's email address is missing, or if sending
+     * the email fails, a warning is logged without throwing an exception.</p>
      *
      * @param caseDetails the case details used to populate the email notification
-     * @param orgAdminEmail the email address of the organisation administrator
+     * @param orgAdminEmail the email address of the claimant organisation administrator
      * @param representativeName the name of the removed claimant representative
-     * @param templateId the notification template ID selected based on the removal scenario
      */
     public void sendClaimantRepRemovalOrgAdminNotification(CaseDetails caseDetails,
                                                            String orgAdminEmail,
-                                                           String representativeName,
-                                                           String templateId) {
+                                                           String representativeName) {
         if (StringUtils.isBlank(orgAdminEmail)) {
             log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION_ADMIN, caseDetails.getCaseId(),
                     WARNING_ORGANISATION_ADMIN_EMAIL_NOT_FOUND);
             return;
         }
-        if (StringUtils.isBlank(templateId)) {
-            log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION_ADMIN, caseDetails.getCaseId(),
-                    WARNING_EMAIL_TEMPLATE_NOT_FOUND);
-            return;
-        }
         Map<String, String> personalisation = NocNotificationHelper.addCommonEmailValues(caseDetails.getCaseData());
         personalisation.put(LEGAL_REP_NAME, representativeName);
         try {
-            emailService.sendEmail(templateId, orgAdminEmail, personalisation);
+            emailService.sendEmail(claimantNonSharedRepRemovalOrgAdminTemplate, orgAdminEmail, personalisation);
         } catch (Exception e) {
             log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION_ADMIN, caseDetails.getCaseId(),
                     e.getMessage());

@@ -284,9 +284,6 @@ template:
   representation:
     remove:
       claimant:
-        # Template id of the notification to organisation admin when a case is shared and that shared representative
-        # removes themselves from the case
-        sharedRepOrgAdmin: ${CLAIMANT_SHARED_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID:6d53b5ec-9247-4abe-b48a-c796ee66fe92}
         # Template id of the notification to organisation admin when a case is not shared and lead representative
         # removes themselves from the case
         nonSharedRepOrgAdmin: ${CLAIMANT_LEAD_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID:b29450e0-b047-49a3-b465-5d4df3f67401}

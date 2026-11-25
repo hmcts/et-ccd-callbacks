@@ -21,20 +21,14 @@ import java.nio.file.Paths;
 import java.util.Objects;
 
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_CASE_SHARING_STATUS_NOT_SHARED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_CASE_SHARING_STATUS_SHARED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_ORGANISATION;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REMOVE_OPTION_YOURSELF;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_LEAD;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_SHARED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_EMAIL_TEMPLATE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,8 +49,6 @@ class NocRemoveRepNotificationServiceTest {
     private static final String USER_ID = "6281d99e-1a94-4369-870e-9f527801d913";
     private static final String USER_EMAIL = "user@example.com";
     private static final String USER_NAME = "John Smith";
-    private static final String CLAIMANT_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID =
-            "6d53b5ec-9247-4abe-b48a-c796ee66fe92";
     private static final String CLAIMANT_NON_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID =
             "b29450e0-b047-49a3-b465-5d4df3f67401";
     private static final String CLAIMANT_REP_REMOVAL_REPRESENTATIVE_TEMPLATE_ID =
@@ -76,7 +68,6 @@ class NocRemoveRepNotificationServiceTest {
         nocRemoveRepNotificationService = new NocRemoveRepNotificationService(
                 emailService,
                 nocNotificationService,
-                CLAIMANT_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID,
                 CLAIMANT_NON_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID,
                 CLAIMANT_REP_REMOVAL_REPRESENTATIVE_TEMPLATE_ID);
         caseDetails = generateCaseDetails();
@@ -98,18 +89,6 @@ class NocRemoveRepNotificationServiceTest {
         userDetails.setName(USER_NAME);
         when(nocNotificationService.findClaimantRepOrgSuperUserEmail(caseDetails.getCaseData()
                 .getRepresentativeClaimantType())).thenReturn(ORG_ADMIN_EMAIL);
-        // when representative is a shared representative and sharing status is shared should
-        // send organisation admin notification with CLAIMANT_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID
-        // and send representative notification with CLAIMANT_REP_REMOVAL_REPRESENTATIVE_TEMPLATE_ID
-        caseDetails.getCaseData().setNocRemoveOption(NOC_REMOVE_OPTION_YOURSELF);
-        caseDetails.getCaseData().setNocCaseSharingStatus(NOC_CASE_SHARING_STATUS_SHARED);
-        caseDetails.getCaseData().setNocRepresentativeType(NOC_REPRESENTATIVE_TYPE_SHARED);
-        doNothing().when(emailService).sendEmail(anyString(), eq(ORG_ADMIN_EMAIL), anyMap());
-        nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails, caseDetails);
-        verify(emailService, times(LoggerTestUtils.INTEGER_ONE)).sendEmail(
-                eq(CLAIMANT_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID), eq(ORG_ADMIN_EMAIL), anyMap());
-        verify(emailService, times(LoggerTestUtils.INTEGER_ONE)).sendEmail(
-                eq(CLAIMANT_REP_REMOVAL_REPRESENTATIVE_TEMPLATE_ID), eq(USER_EMAIL), anyMap());
         // when representative is lead representative and sharing status is not shared should
         // send organisation admin notification with CLAIMANT_NON_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID
         // and send representative notification with CLAIMANT_REP_REMOVAL_REPRESENTATIVE_TEMPLATE_ID
@@ -119,37 +98,31 @@ class NocRemoveRepNotificationServiceTest {
         nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails, caseDetails);
         verify(emailService, times(LoggerTestUtils.INTEGER_ONE)).sendEmail(
                 eq(CLAIMANT_NON_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID), eq(ORG_ADMIN_EMAIL), anyMap());
-        verify(emailService, times(LoggerTestUtils.INTEGER_TWO)).sendEmail(
+        verify(emailService, times(LoggerTestUtils.INTEGER_ONE)).sendEmail(
                 eq(CLAIMANT_REP_REMOVAL_REPRESENTATIVE_TEMPLATE_ID), eq(USER_EMAIL), anyMap());
     }
 
     @Test
     void theSendClaimantRepRemovalOrgAdminNotification() {
         // when organisation admin email is blank, should log a warning and not send email
-        nocRemoveRepNotificationService.sendClaimantRepRemovalOrgAdminNotification(caseDetails,
-                StringUtils.EMPTY, REPRESENTATIVE_NAME, CLAIMANT_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID);
+        nocRemoveRepNotificationService.sendClaimantRepRemovalOrgAdminNotification(caseDetails, StringUtils.EMPTY,
+                REPRESENTATIVE_NAME);
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
                 EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION
                         + ERROR_ORGANISATION_ADMIN_EMAIL_NOT_FOUND);
-        // when template id is blank, should log a warning and not send email
-        nocRemoveRepNotificationService.sendClaimantRepRemovalOrgAdminNotification(caseDetails,
-                ORG_ADMIN_EMAIL, REPRESENTATIVE_NAME, StringUtils.EMPTY);
-        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_TWO,
-                EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION
-                        + WARNING_EMAIL_TEMPLATE_NOT_FOUND);
         // when email is successfully sent, should invoke sendEmail at least once
-        nocRemoveRepNotificationService.sendClaimantRepRemovalOrgAdminNotification(caseDetails,
-                ORG_ADMIN_EMAIL, REPRESENTATIVE_NAME, CLAIMANT_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID);
+        nocRemoveRepNotificationService.sendClaimantRepRemovalOrgAdminNotification(caseDetails, ORG_ADMIN_EMAIL,
+                REPRESENTATIVE_NAME);
         verify(emailService, times(LoggerTestUtils.INTEGER_ONE))
-                .sendEmail(eq(CLAIMANT_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID), eq(ORG_ADMIN_EMAIL),
+                .sendEmail(eq(CLAIMANT_NON_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID), eq(ORG_ADMIN_EMAIL),
                         anyMap());
         // when email sending fails, should log a warning
         doThrow(new RuntimeException(ERROR_SYSTEM))
-                .when(emailService).sendEmail(eq(CLAIMANT_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID),
+                .when(emailService).sendEmail(eq(CLAIMANT_NON_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID),
                         eq(ORG_ADMIN_EMAIL), anyMap());
-        nocRemoveRepNotificationService.sendClaimantRepRemovalOrgAdminNotification(caseDetails,
-                ORG_ADMIN_EMAIL, REPRESENTATIVE_NAME, CLAIMANT_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID);
-        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_THREE,
+        nocRemoveRepNotificationService.sendClaimantRepRemovalOrgAdminNotification(caseDetails, ORG_ADMIN_EMAIL,
+                REPRESENTATIVE_NAME);
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_TWO,
                 EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION + ERROR_SYSTEM);
     }
 

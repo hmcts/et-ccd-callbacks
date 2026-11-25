@@ -9,16 +9,22 @@ on:
   pull_request:
     branches:
       - master
+    paths:
+      - 'et-shared-test-library/**'
+      - '.github/workflows/publish-shared-test-library.yml'
   push:
     branches:
       - master
+    paths:
+      - 'et-shared-test-library/**'
+      - '.github/workflows/publish-shared-test-library.yml'
 
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write
+      contents: read
       id-token: write
       pull-requests: write
 
@@ -50,12 +56,9 @@ jobs:
             HEAD="${{ github.event.pull_request.head.sha }}"
             RANGE="${BASE}...${HEAD}"
           else
-            BASE=$(git describe --tags --abbrev=0 --match 'et-shared-test-library-*' 2>/dev/null || true)
-            if [ -z "$BASE" ]; then
-              BASE="${{ github.event.before }}"
-            fi
+            BASE="${{ github.event.before }}"
             if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
-              echo "No previous release tag found - publishing"
+              echo "No previous commit found - publishing"
               echo "publish=true" >> $GITHUB_OUTPUT
               exit 0
             fi
@@ -84,17 +87,14 @@ jobs:
           npm i -g npm@11.5.1 --ignore-scripts
           npm --version
 
-      - name: Get version from tags
+      - name: Get version
         id: get_version
         if: steps.changes.outputs.publish == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
-          LATEST_TAG=$(git describe --tags --abbrev=0 --match 'et-shared-test-library-*' 2>/dev/null | sed 's/et-shared-test-library-//' || true)
-          if [ -z "$LATEST_TAG" ]; then
-            LATEST_TAG=$(npm view @hmcts/et-shared-test-library version --registry=https://registry.npmjs.org/ 2>/dev/null || echo '1.0.0')
-          fi
-          NEXT_PATCH=$(echo "$LATEST_TAG" | awk -F. '{ print $3+1 }')
+          LATEST_VERSION=$(npm view @hmcts/et-shared-test-library version --registry=https://registry.npmjs.org/ 2>/dev/null || echo '1.0.0')
+          NEXT_PATCH=$(echo "$LATEST_VERSION" | awk -F. '{ print $3+1 }')
           NEXT_VERSION="1.0.${NEXT_PATCH}"
-          while git rev-parse "et-shared-test-library-$NEXT_VERSION" >/dev/null 2>&1 || npm view "@hmcts/et-shared-test-library@$NEXT_VERSION" version --registry=https://registry.npmjs.org/ >/dev/null 2>&1; do
+          while npm view "@hmcts/et-shared-test-library@$NEXT_VERSION" version --registry=https://registry.npmjs.org/ >/dev/null 2>&1; do
             NEXT_PATCH=$((NEXT_PATCH + 1))
             NEXT_VERSION="1.0.${NEXT_PATCH}"
           done
@@ -109,13 +109,10 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             RELEASE_VERSION="${{ github.event.inputs.release_version }}"
             if [ -z "$RELEASE_VERSION" ]; then
-              LATEST_TAG=$(git describe --tags --abbrev=0 --match 'et-shared-test-library-*' 2>/dev/null | sed 's/et-shared-test-library-//' || true)
-              if [ -z "$LATEST_TAG" ]; then
-                LATEST_TAG=$(npm view @hmcts/et-shared-test-library version --registry=https://registry.npmjs.org/ 2>/dev/null || echo '1.0.0')
-              fi
-              NEXT_PATCH=$(echo "$LATEST_TAG" | awk -F. '{ print $3+1 }')
+              LATEST_VERSION=$(npm view @hmcts/et-shared-test-library version --registry=https://registry.npmjs.org/ 2>/dev/null || echo '1.0.0')
+              NEXT_PATCH=$(echo "$LATEST_VERSION" | awk -F. '{ print $3+1 }')
               RELEASE_VERSION="1.0.${NEXT_PATCH}"
-              while git rev-parse "et-shared-test-library-$RELEASE_VERSION" >/dev/null 2>&1 || npm view "@hmcts/et-shared-test-library@$RELEASE_VERSION" version --registry=https://registry.npmjs.org/ >/dev/null 2>&1; do
+              while npm view "@hmcts/et-shared-test-library@$RELEASE_VERSION" version --registry=https://registry.npmjs.org/ >/dev/null 2>&1; do
                 NEXT_PATCH=$((NEXT_PATCH + 1))
                 RELEASE_VERSION="1.0.${NEXT_PATCH}"
               done
@@ -141,8 +138,6 @@ jobs:
             RELEASE_VERSION=${{ steps.get_version.outputs.next_version }}
             echo "release_version=$RELEASE_VERSION" >> $GITHUB_OUTPUT
             npm version "$RELEASE_VERSION" --no-git-tag-version --allow-same-version
-            git tag "et-shared-test-library-$RELEASE_VERSION"
-            git push origin "et-shared-test-library-$RELEASE_VERSION"
           fi
         shell: bash
 
@@ -155,7 +150,7 @@ jobs:
         run: yarn build
 
       - name: Publish to npm
-        if: steps.changes.outputs.publish == 'true' && github.event_name != 'pull_request'
+        if: steps.changes.outputs.publish == 'true' && github.event_name == 'pull_request'
         run: |
           export NPM_CONFIG_USERCONFIG="$RUNNER_TEMP/npmrc-noauth"
           printf "registry=https://registry.npmjs.org/\n" > "$NPM_CONFIG_USERCONFIG"

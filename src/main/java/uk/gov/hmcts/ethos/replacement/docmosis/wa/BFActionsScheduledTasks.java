@@ -17,14 +17,19 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import javax.sql.DataSource;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -33,6 +38,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 public class BFActionsScheduledTasks {
     private static final String LOCK_NAMESPACE = "et-bf-actions";
     private static final String LOCK_NAME = "task";
+    private static final String CLAIM_SERVED = "Claim served";
 
     private final AdminUserService adminUserService;
     private final CcdClient ccdClient;
@@ -88,7 +94,8 @@ public class BFActionsScheduledTasks {
     private void processExpiredBfDates() {
         log.info("Checking for expired BFDates");
 
-        String yesterday = UtilHelper.formatCurrentDate2(LocalDate.now().minusDays(1));
+        LocalDate yesterdayDate = LocalDate.now().minusDays(1);
+        String yesterday = UtilHelper.formatCurrentDate2(yesterdayDate);
         String query = buildQueryForExpiredBFActionsWithNoResponse(yesterday);
 
         String adminUserToken = adminUserService.getAdminUserToken();
@@ -104,12 +111,40 @@ public class BFActionsScheduledTasks {
                 }
                 cases.stream()
                     .filter(submitEvent -> !bfActionCronCaseIdsToSkip.contains(String.valueOf(submitEvent.getCaseId())))
+                    .filter(submitEvent -> hasExpiredClaimServedBfAction(submitEvent, yesterdayDate))
                     .forEach(submitEvent -> triggerTaskEventForCase(adminUserToken, submitEvent, caseTypeId));
 
             } catch (Exception ex) {
                 log.error(ex.getMessage());
             }
         });
+    }
+
+    private boolean hasExpiredClaimServedBfAction(SubmitEvent submitEvent, LocalDate yesterdayDate) {
+        if (submitEvent == null
+                || submitEvent.getCaseData() == null
+                || CollectionUtils.isEmpty(submitEvent.getCaseData().getBfActions())) {
+            return false;
+        }
+        return submitEvent.getCaseData().getBfActions().stream()
+                .filter(Objects::nonNull)
+                .map(BFActionTypeItem::getValue)
+                .filter(Objects::nonNull)
+                .anyMatch(bfAction -> isExpiredClaimServedBfAction(bfAction, yesterdayDate, submitEvent.getCaseId()));
+    }
+
+    private boolean isExpiredClaimServedBfAction(BFActionType bfAction, LocalDate yesterdayDate, long caseId) {
+        if (!CLAIM_SERVED.equals(bfAction.getAllActions())
+                || isNullOrEmpty(bfAction.getBfDate())
+                || !isNullOrEmpty(bfAction.getCleared())) {
+            return false;
+        }
+        try {
+            return !LocalDate.parse(bfAction.getBfDate()).isAfter(yesterdayDate);
+        } catch (DateTimeParseException ex) {
+            log.warn("Invalid bfDate '{}' for case {}", bfAction.getBfDate(), caseId);
+            return false;
+        }
     }
 
     private String buildQueryForExpiredBFActionsWithNoResponse(String yesterday) {
@@ -119,7 +154,7 @@ public class BFActionsScheduledTasks {
                         .must(new TermQueryBuilder("data.respondentCollection.value.responseReceived", NO))
                         .must(QueryBuilders.rangeQuery("data.bfActions.value.bfDate").to(yesterday).includeUpper(true))
                         .mustNot(new MatchQueryBuilder("data.waRule21ReferralSent", YES))
-                        .must(new TermQueryBuilder("data.bfActions.value.allActions.keyword", "Claim served")))
+                        .must(new TermQueryBuilder("data.bfActions.value.allActions.keyword", CLAIM_SERVED)))
                 .toString();
     }
 

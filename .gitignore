@@ -85,4 +85,7 @@ src/test/token-cache.json
 /test-results
 /et-shared/bin/
 /.tmp
+/playwright-report/
+
+### Skill ###
 /skills/system/run-workflow/SKILL.md

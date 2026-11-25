@@ -13,7 +13,11 @@ test.describe('ET3/Respondent Journey', () => {
     ({ caseId, caseNumber } = await CaseworkerCaseFactory.createEnglandAndAcceptCase());
   });
 
-  test('Validate ET3 Form start page and check case sensitivity', async ({et3LoginPage,
+  test('Validate ET3 Form start page and check case sensitivity',
+    {
+      tag: ['@accessibility'],
+    },
+    async ({et3LoginPage,
     respondentCaseOverviewPage,
     respondentTaskListPage
   }) => {
@@ -28,14 +32,22 @@ test.describe('ET3/Respondent Journey', () => {
     await respondentTaskListPage.validateTaskListPage();
   });
 
-  test('Validate claimant details in respondent application', async ({ et3LoginPage }) => {
+  test('Validate claimant details in respondent application',
+    {
+      tag: ['@accessibility'],
+    },
+    async ({ et3LoginPage }) => {
     //RET-5517
     await et3LoginPage.processRespondentLogin(users.etRespondent);
     await et3LoginPage.replyToNewClaim(caseId, caseNumber, CaseDetailsValues.respondentName, CaseDetailsValues.claimantFirstName, CaseDetailsValues.claimantLastName);
     await et3LoginPage.validateClaimantDetailsInRespondentApp(CaseDetailsValues.claimantFirstName, CaseDetailsValues.claimantLastName);
   });
   //RET-6200
-  test('Validating the error message after the respondent tries to reassign the same case', async ({ et3LoginPage, browserUtils}) => {
+  test('Validating the error message after the respondent tries to reassign the same case',
+    {
+      tag: ['@accessibility'],
+    },
+    async ({ et3LoginPage, browserUtils}) => {
       await et3LoginPage.processRespondentLogin(users.etRespondent);
       await et3LoginPage.replyToNewClaim(caseId, caseNumber, CaseDetailsValues.respondentName, CaseDetailsValues.claimantFirstName, CaseDetailsValues.claimantLastName);
 

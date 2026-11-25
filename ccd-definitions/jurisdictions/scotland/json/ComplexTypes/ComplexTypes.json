@@ -8169,6 +8169,27 @@
   },
   {
     "ID": "DraftAndSignJudgement",
+    "ListElementCode": "shouldForPublication",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Should this judgment be considered for publication on Find Case Law?",
+    "FieldShowCondition": "isJudgement=\"Yes\"",
+    "RetainHiddenValue": "No",
+    "SecurityClassification": "Public",
+    "HintText": "Judgments may still be published even if you select \"No\".",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DraftAndSignJudgement",
+    "ListElementCode": "shouldForPublicationReason",
+    "FieldType": "TextArea",
+    "ElementLabel": "Why should it be considered for publication?",
+    "FieldShowCondition": "shouldForPublication=\"Yes\"",
+    "RetainHiddenValue": "No",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DraftAndSignJudgement",
     "ListElementCode": "draftAndSignJudgementDocument",
     "FieldType": "Document",
     "ElementLabel": "Document upload",

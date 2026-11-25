@@ -50,6 +50,7 @@ export class ClaimDetailsPage extends CitizenHubPage{
     this.dateOfLastEventMonth = this.page.locator('#dateOfLastEvent-month');
     this.dateOfLastEventYear = this.page.locator('#dateOfLastEvent-year');
     this.describeYourClaimHeading = this.page.getByRole('heading', {
+      level: 1,
       name: /^(Describe your claim|Describe the claim)$/,
     });
     this.claimSummaryTextArea = this.page.locator(`#claim-summary-text`);
@@ -106,7 +107,7 @@ export class ClaimDetailsPage extends CitizenHubPage{
   }
 
   private async completeDateOfLastEventIfEnabled() {
-    await this.page.waitForURL(/\/(date-of-last-event|describe-what-happened)(?:\?.*)?$/);
+    await this.page.waitForURL(/\/(date-of-last-event|describe-what-happened|claimant-describe-what-happened)(?:\?.*)?$/);
 
     if (new URL(this.page.url()).pathname !== '/date-of-last-event') {
       return;
@@ -118,7 +119,7 @@ export class ClaimDetailsPage extends CitizenHubPage{
     await this.dateOfLastEventMonth.fill(String(dateOfLastEvent.getMonth() + 1).padStart(2, '0'));
     await this.dateOfLastEventYear.fill(String(dateOfLastEvent.getFullYear()));
     await this.saveAndContinueButton();
-    await this.page.waitForURL(/\/describe-what-happened(?:\?.*)?$/);
+    await this.page.waitForURL(/\/(?:describe-what-happened|claimant-describe-what-happened)(?:\?.*)?$/);
   }
 
   private getDateFourMonthsAgo(): Date {

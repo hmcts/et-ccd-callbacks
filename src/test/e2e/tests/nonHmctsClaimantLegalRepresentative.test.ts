@@ -4,7 +4,7 @@ import {config, createCaseViaCitizenUI, resolveResourceJson, users} from "@hmcts
 const userDetailsData = resolveResourceJson('resources/payload/user-details.json');
 test.describe('non-HMCTS claimant legal representative Case creation in Citizen UI', () => {
 
-  test.skip();
+
   test(
     'Create a claim as a claimant representative for still working for organisation, submit and process within manage cases',
     {

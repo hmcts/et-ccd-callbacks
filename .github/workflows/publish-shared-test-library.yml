@@ -150,7 +150,7 @@ jobs:
         run: yarn build
 
       - name: Publish to npm
-        if: steps.changes.outputs.publish == 'true' && github.event_name == 'pull_request'
+        if: steps.changes.outputs.publish == 'true' && github.event_name != 'pull_request'
         run: |
           export NPM_CONFIG_USERCONFIG="$RUNNER_TEMP/npmrc-noauth"
           printf "registry=https://registry.npmjs.org/\n" > "$NPM_CONFIG_USERCONFIG"

@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UserUtils;
@@ -14,9 +16,11 @@ import java.util.Map;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_CASE_SHARING_STATUS_NOT_SHARED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REPRESENTATIVE_TYPE_LEAD;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION_ADMIN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_REPRESENTATIVE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_ORGANISATION_ADMIN_EMAIL_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REMOVED_REPRESENTATIVE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LEGAL_REP_NAME;
 
@@ -62,11 +66,17 @@ public class NocRemoveRepNotificationService {
      * @param caseDetails the case details used to determine notification eligibility
      *                    and populate the email notifications
      */
-    public void sendClaimantRepresentativeRemovalNotifications(UserDetails userDetails, CaseDetails caseDetails) {
+    public void sendClaimantRepresentativeRemovalNotifications(UserDetails userDetails,
+                                                               CaseDetails caseDetails,
+                                                               RepresentedTypeC removedRepresentative) {
+        if (ObjectUtils.isEmpty(removedRepresentative)) {
+            log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL, caseDetails.getCaseId(),
+                    WARNING_REMOVED_REPRESENTATIVE_NOT_FOUND);
+            return;
+        }
         if (NOC_REPRESENTATIVE_TYPE_LEAD.equals(caseDetails.getCaseData().getNocRepresentativeType())
                 && NOC_CASE_SHARING_STATUS_NOT_SHARED.equals(caseDetails.getCaseData().getNocCaseSharingStatus())) {
-            String orgAdminEmail = nocNotificationService.findClaimantRepOrgSuperUserEmail(caseDetails.getCaseData()
-                    .getRepresentativeClaimantType());
+            String orgAdminEmail = nocNotificationService.findClaimantRepOrgSuperUserEmail(removedRepresentative);
             // We don't send email to claimant
             sendClaimantNonSharedLeadRepRemovalOrgAdminNotification(caseDetails, orgAdminEmail,
                     UserUtils.resolveUserDisplayName(userDetails));
@@ -102,9 +112,9 @@ public class NocRemoveRepNotificationService {
         personalisation.put(LEGAL_REP_NAME, representativeName);
         try {
             emailService.sendEmail(claimantNonSharedLeadRepRemovalOrgAdminTemplate, orgAdminEmail, personalisation);
-        } catch (Exception e) {
+        } catch (Exception ex) {
             log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION_ADMIN, caseDetails.getCaseId(),
-                    e.getMessage());
+                    ex.getMessage());
         }
     }
 

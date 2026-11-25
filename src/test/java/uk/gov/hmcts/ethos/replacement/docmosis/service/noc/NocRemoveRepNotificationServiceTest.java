@@ -58,6 +58,8 @@ class NocRemoveRepNotificationServiceTest {
             "Failed to send NOC notification email to organisation admin, case id: 1775651960650043, error: ";
     private static final String EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_REPRESENTATIVE =
             "Failed to send NOC notification email to representative, case id: 1775651960650043, error: ";
+    private static final String EXPECTED_WARNING_FAILED_TO_SEND_NOTIFICATION_EMAIL_REMOVED_REPRESENTATIVE_NOT_FOUND =
+            "Failed to send NOC notification email, case id: 1775651960650043, error: Removed representative not found";
 
     private static final String ERROR_ORGANISATION_ADMIN_EMAIL_NOT_FOUND = "Organisation admin email not found";
     private static final String ERROR_SYSTEM = "System error";
@@ -89,13 +91,18 @@ class NocRemoveRepNotificationServiceTest {
         userDetails.setName(USER_NAME);
         when(nocNotificationService.findClaimantRepOrgSuperUserEmail(caseDetails.getCaseData()
                 .getRepresentativeClaimantType())).thenReturn(ORG_ADMIN_EMAIL);
+        // when removed representative is empty should log remove representative not found warning
+        nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails, caseDetails, null);
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
+                EXPECTED_WARNING_FAILED_TO_SEND_NOTIFICATION_EMAIL_REMOVED_REPRESENTATIVE_NOT_FOUND);
         // when representative is lead representative and sharing status is not shared should
         // send organisation admin notification with CLAIMANT_NON_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID
         // and send representative notification with CLAIMANT_REP_REMOVAL_REPRESENTATIVE_TEMPLATE_ID
         caseDetails.getCaseData().setNocRemoveOption(NOC_REMOVE_OPTION_ORGANISATION);
         caseDetails.getCaseData().setNocCaseSharingStatus(NOC_CASE_SHARING_STATUS_NOT_SHARED);
         caseDetails.getCaseData().setNocRepresentativeType(NOC_REPRESENTATIVE_TYPE_LEAD);
-        nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails, caseDetails);
+        nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails, caseDetails,
+                caseDetails.getCaseData().getRepresentativeClaimantType());
         verify(emailService, times(LoggerTestUtils.INTEGER_ONE)).sendEmail(
                 eq(CLAIMANT_NON_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID), eq(ORG_ADMIN_EMAIL), anyMap());
         verify(emailService, times(LoggerTestUtils.INTEGER_ONE)).sendEmail(

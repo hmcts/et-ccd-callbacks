@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,12 +16,12 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveClaimantRepresentationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveRepNotificationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.CallbackObjectUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 
@@ -89,13 +88,12 @@ public class NocRemoveRepresentationController {
             UserDetails userDetails = userService.fetchAndValidateUserDetails(userToken, caseDetails.getCaseId());
             nocRemoveClaimantRepresentationService.populateNocRemovalDetails(userDetails, caseDetails,
                     STAGE_ABOUT_TO_SUBMIT);
-            CaseDetails caseDetailsBeforeRevoke =
-                    CallbackObjectUtils.cloneObject(ccdRequest.getCaseDetails(), CaseDetails.class);
+            RepresentedTypeC oldRepresentative = caseDetails.getCaseData().getRepresentativeClaimantType();
             nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(userDetails, caseDetails);
-            nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails,
-                    caseDetailsBeforeRevoke);
+            nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails, caseDetails,
+                    oldRepresentative);
             NocUtils.resetNOCRemovalOptions(caseDetails.getCaseData());
-        } catch (GenericServiceException | CcdInputOutputException | JsonProcessingException ex) {
+        } catch (GenericServiceException | CcdInputOutputException ex) {
             errors.add(ex.getMessage());
         }
         return getCallbackRespEntity(errors, caseDetails);

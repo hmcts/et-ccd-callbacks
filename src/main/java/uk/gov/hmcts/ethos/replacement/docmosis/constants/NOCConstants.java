@@ -143,6 +143,9 @@ public final class NOCConstants {
                     + "Case id: {}";
     public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION_ADMIN =
             "Failed to send NOC notification email to organisation admin, case id: {}, error: {}";
+    public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL =
+            "Failed to send NOC notification email, case id: {}, error: {}";
+    public static final String WARNING_REMOVED_REPRESENTATIVE_NOT_FOUND = "Removed representative not found";
     public static final String WARNING_ORGANISATION_ADMIN_EMAIL_NOT_FOUND = "Organisation admin email not found";
     public static final String WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND = "Representative email not found";
     public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_REPRESENTATIVE =

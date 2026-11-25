@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveClaimantRepresentationService;
@@ -136,7 +137,7 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
         doNothing().when(nocRemoveClaimantRepresentationService).revokeClaimantLegalRep(eq(userDetails),
                 any(CaseDetails.class));
         doNothing().when(nocRemoveRepNotificationService).sendClaimantRepresentativeRemovalNotifications(
-                eq(userDetails), any(CaseDetails.class));
+                eq(userDetails), any(CaseDetails.class), any(RepresentedTypeC.class));
         doNothing().when(nocRemoveClaimantRepresentationService).populateNocRemovalDetails(eq(userDetails),
                 eq(ccdRequest.getCaseDetails()), anyString());
         mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_SUBMIT)

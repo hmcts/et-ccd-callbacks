@@ -23,6 +23,7 @@ import java.util.Objects;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -95,6 +96,10 @@ class NocRemoveRepNotificationServiceTest {
         nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails, caseDetails, null);
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
                 EXPECTED_WARNING_FAILED_TO_SEND_NOTIFICATION_EMAIL_REMOVED_REPRESENTATIVE_NOT_FOUND);
+        // when removed representative is not lead should not send any notification
+        nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails, caseDetails, null);
+        verify(emailService, never()).sendEmail(eq(CLAIMANT_NON_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID),
+                eq(ORG_ADMIN_EMAIL), anyMap());
         // when representative is lead representative and sharing status is not shared should
         // send organisation admin notification with CLAIMANT_NON_SHARED_REP_REMOVAL_ORG_ADMIN_TEMPLATE_ID
         // and send representative notification with CLAIMANT_REP_REMOVAL_REPRESENTATIVE_TEMPLATE_ID

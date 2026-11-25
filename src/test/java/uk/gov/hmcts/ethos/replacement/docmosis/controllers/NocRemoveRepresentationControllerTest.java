@@ -80,6 +80,9 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
         userDetails.setFirstName(USER_FIRST_NAME);
         userDetails.setLastName(USER_LAST_NAME);
         userDetails.setRoles(List.of(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()));
+        RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder().idamId(USER_ID)
+                .representativeEmailAddress(USER_EMAIL).build();
+        ccdRequest.getCaseDetails().getCaseData().setRepresentativeClaimantType(claimantRepresentative);
         when(userService.fetchAndValidateUserDetails(AUTH_TOKEN, ccdRequest.getCaseDetails().getCaseId()))
                 .thenReturn(userDetails);
     }
@@ -137,7 +140,8 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
         doNothing().when(nocRemoveClaimantRepresentationService).revokeClaimantLegalRep(eq(userDetails),
                 any(CaseDetails.class));
         doNothing().when(nocRemoveRepNotificationService).sendClaimantRepresentativeRemovalNotifications(
-                eq(userDetails), any(CaseDetails.class), any(RepresentedTypeC.class));
+                eq(userDetails), any(CaseDetails.class),
+                eq(ccdRequest.getCaseDetails().getCaseData().getRepresentativeClaimantType()));
         doNothing().when(nocRemoveClaimantRepresentationService).populateNocRemovalDetails(eq(userDetails),
                 eq(ccdRequest.getCaseDetails()), anyString());
         mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_SUBMIT)

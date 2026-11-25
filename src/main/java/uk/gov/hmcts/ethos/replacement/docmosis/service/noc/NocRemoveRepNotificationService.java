@@ -53,18 +53,21 @@ public class NocRemoveRepNotificationService {
      * <p>Assumes that removing the lead representative from a non-shared case results
      * in the removal of the entire claimant organisation from the case.</p>
      *
-     * <p>Notifications are sent only when the representative is identified as the lead
-     * representative and the case sharing status is not shared. The organisation
-     * administrator is notified using the resolved representative's name, and the
-     * removed representative receives a separate notification. No notification
-     * is sent to the claimant.</p>
+     * <p>If the removed representative's details are missing, a warning is logged
+     * and no notifications are sent. Notifications are sent only when the removed
+     * representative is identified as the lead representative and the case is not shared.
+     * The organisation administrator is notified using the removed representative's
+     * name, and the removed representative receives a separate notification.
+     * No notification is sent to the claimant.</p>
      *
-     * <p>If either notification fails, the failure is handled and logged by the
-     * respective notification method without propagating the exception.</p>
+     * <p>Any failures during email delivery are handled and logged by the respective
+     * notification methods without propagating the exceptions.</p>
      *
-     * @param userDetails the details of the removed claimant representative
+     * @param userDetails the user details of the removed claimant representative
      * @param caseDetails the case details used to determine notification eligibility
      *                    and populate the email notifications
+     * @param removedRepresentative the removed claimant representative's details,
+     *                              used to identify the organisation administrator
      */
     public void sendClaimantRepresentativeRemovalNotifications(UserDetails userDetails,
                                                                CaseDetails caseDetails,
@@ -142,9 +145,9 @@ public class NocRemoveRepNotificationService {
         try {
             emailService.sendEmail(claimantLeadRepRemovalRepresentativeTemplateId, representativeEmail,
                     personalisation);
-        } catch (Exception e) {
+        } catch (Exception ex) {
             log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_REPRESENTATIVE, caseDetails.getCaseId(),
-                    e.getMessage());
+                    ex.getMessage());
         }
     }
 }

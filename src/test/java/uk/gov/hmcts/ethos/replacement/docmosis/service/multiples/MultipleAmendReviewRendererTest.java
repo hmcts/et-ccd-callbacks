@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;

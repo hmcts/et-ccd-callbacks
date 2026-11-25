@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples;
 
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template;

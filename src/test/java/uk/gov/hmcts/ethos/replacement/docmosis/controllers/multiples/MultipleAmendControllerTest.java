@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
+package uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,10 +19,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleAmendReviewService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleAmendService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCreationMidEventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleAmendReviewService;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -35,7 +34,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -48,8 +46,6 @@ class MultipleAmendControllerTest {
 
     private static final String USER_TOKEN = "authString";
 
-    @Mock
-    private VerifyTokenService verifyTokenService;
     @Mock
     private MultipleAmendService multipleAmendService;
     @Mock
@@ -79,7 +75,6 @@ class MultipleAmendControllerTest {
     @ParameterizedTest
     @ValueSource(strings = {"Updated note", ""})
     void savesNameAndNoteWithoutUpdatingCases(String note) throws Exception {
-        when(verifyTokenService.verifyTokenSignature(USER_TOKEN)).thenReturn(true);
         ObjectNode request = (ObjectNode) new ObjectMapper().readTree(requestBody);
         ObjectNode data = (ObjectNode) request.path("case_details").path("case_data");
         data.put("multipleName", "Updated multiple name");
@@ -101,7 +96,6 @@ class MultipleAmendControllerTest {
     @ParameterizedTest
     @MethodSource("amendments")
     void submitsOnlyTheRequestedAmendment(String url, String amendment) throws Exception {
-        when(verifyTokenService.verifyTokenSignature(USER_TOKEN)).thenReturn(true);
         doAnswer(invocation -> {
             MultipleDetails details = invocation.getArgument(1);
             assertEquals("1792493410971326", details.getCaseId());
@@ -126,24 +120,7 @@ class MultipleAmendControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-        "/multiples/amendDetails", "/multiples/addCases", "/multiples/removeCases", "/multiples/updateLeadCase",
-        "/multiples/addCases/review", "/multiples/removeCases/review"
-    })
-    void rejectsInvalidToken(String url) throws Exception {
-        when(verifyTokenService.verifyTokenSignature(USER_TOKEN)).thenReturn(false);
-
-        mvc.perform(post(url)
-                .header("Authorization", USER_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
-                .andExpect(status().isForbidden());
-
-        verifyNoInteractions(multipleAmendService, multipleAmendReviewService);
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {
-        "/multiples/amendDetails", "/multiples/addCases", "/multiples/removeCases", "/multiples/updateLeadCase",
+        "/multiples/addCases", "/multiples/removeCases", "/multiples/updateLeadCase",
         "/multiples/addCases/review", "/multiples/removeCases/review"
     })
     void requiresAuthorizationHeader(String url) throws Exception {
@@ -152,13 +129,12 @@ class MultipleAmendControllerTest {
                 .content(requestBody))
                 .andExpect(status().isBadRequest());
 
-        verifyNoInteractions(verifyTokenService, multipleAmendService, multipleAmendReviewService);
+        verifyNoInteractions(multipleAmendService, multipleAmendReviewService, validationService);
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"/multiples/addCases", "/multiples/removeCases", "/multiples/updateLeadCase"})
     void returnsErrorsToPreventSubmission(String url) throws Exception {
-        when(verifyTokenService.verifyTokenSignature(USER_TOKEN)).thenReturn(true);
         doAnswer(invocation -> {
             List<String> errors = invocation.getArgument(2);
             errors.add("Unable to amend the multiple");
@@ -177,7 +153,6 @@ class MultipleAmendControllerTest {
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
     void reviewsCasesWithoutSubmittingTheAmendment(boolean removing) throws Exception {
-        when(verifyTokenService.verifyTokenSignature(USER_TOKEN)).thenReturn(true);
         doAnswer(invocation -> {
             MultipleDetails details = invocation.getArgument(1);
             details.getCaseData().setMultipleAmendReview("<table>Review</table>");
@@ -204,7 +179,6 @@ class MultipleAmendControllerTest {
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
     void returnsReviewErrorsWithoutSubmitting(boolean removing) throws Exception {
-        when(verifyTokenService.verifyTokenSignature(USER_TOKEN)).thenReturn(true);
         doAnswer(invocation -> {
             List<String> errors = invocation.getArgument(3);
             errors.add("Unable to load case details");
@@ -224,7 +198,6 @@ class MultipleAmendControllerTest {
 
     @Test
     void rejectsUnacceptedCasesAtSubmissionEvenWhenWarningsAreIgnored() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(USER_TOKEN)).thenReturn(true);
         doAnswer(invocation -> {
             List<String> errors = invocation.getArgument(2);
             errors.add("[6000188/2026] cases have not been Accepted.");

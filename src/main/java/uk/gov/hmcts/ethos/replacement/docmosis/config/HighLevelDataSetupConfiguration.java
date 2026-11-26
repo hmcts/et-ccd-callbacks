@@ -39,6 +39,8 @@ public class HighLevelDataSetupConfiguration extends DataLoaderToDefinitionStore
         new CcdRoleConfig("caseworker-approver", PUBLIC),
         new CcdRoleConfig("caseworker-caa", PUBLIC),
         new CcdRoleConfig("caseworker-et-pcqextractor", PUBLIC),
+        new CcdRoleConfig("caseworker-employment-caseflags", PUBLIC),
+        new CcdRoleConfig("caseworker-employment-support", PUBLIC),
     };
 
     public HighLevelDataSetupConfiguration(CcdEnvironment dataSetupEnvironment) {

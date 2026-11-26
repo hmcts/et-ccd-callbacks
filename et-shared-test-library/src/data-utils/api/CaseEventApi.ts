@@ -1,4 +1,4 @@
-import { ReplacementAction } from '../../types';
+import { ReplacementAction } from '../../types/index.js';
 import { ccdApi } from '../../fixtures/index.js';
 import { CaseTypeLocation, Events, PayloadPath } from '../../config/index.js';
 import { DateUtilComponent } from '../DateUtilComponent.js';

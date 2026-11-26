@@ -5,6 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -35,6 +38,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @ExtendWith(SpringExtension.class)
 class WaTaskCreationCronForExpiredBfActionsTest {
     @Mock
@@ -139,6 +144,7 @@ class WaTaskCreationCronForExpiredBfActionsTest {
         submitEvent.setCaseId(Long.parseLong("1741710954147332"));
         submitEvent.getCaseData().getBfActions().get(1).getValue().setBfDate(
                 LocalDate.now().minusDays(1).toString());
+        submitEvent.getCaseData().getBfActions().get(1).getValue().setAllActions(null);
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
                 .thenReturn(List.of(submitEvent)).thenReturn(Collections.emptyList());
 
@@ -270,6 +276,65 @@ class WaTaskCreationCronForExpiredBfActionsTest {
         verify(ccdClient, times(1)).startEventForCase(any(), any(), any(), any(), any());
         verify(ccdClient, times(0))
                 .submitEventForCase(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void skipsCasesWithOnlyExpiredClaimServedBfAction() throws IOException {
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
+        when(featureToggleService.isWaTaskForExpiredBfActionsEnabled()).thenReturn(true);
+
+        SubmitEvent submitEvent = expiredBfActionSubmitEvent(LocalDate.now().minusDays(1));
+        submitEvent.getCaseData().getBfActions().getFirst().getValue().setAllActions("Claim served");
+
+        when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
+                .thenReturn(List.of(submitEvent)).thenReturn(Collections.emptyList());
+
+        waTaskCreationCronForExpiredBfActions.run();
+
+        verify(ccdClient, times(0)).startEventForCase(any(), any(), any(), any(), any());
+        verify(ccdClient, times(0)).submitEventForCase(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void processesOtherExpiredBfActionWhenClaimServedIsNotExpired() throws IOException {
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
+        when(featureToggleService.isWaTaskForExpiredBfActionsEnabled()).thenReturn(true);
+
+        BFActionType otherBf = new BFActionType();
+        otherBf.setBfDate(LocalDate.now().minusDays(1).toString());
+        otherBf.setNotes("Awaiting Response from Claimant");
+        BFActionTypeItem otherBfItem = new BFActionTypeItem();
+        otherBfItem.setId("OtherBfId");
+        otherBfItem.setValue(otherBf);
+
+        BFActionType claimServedBf = new BFActionType();
+        claimServedBf.setBfDate(LocalDate.now().plusDays(10).toString());
+        claimServedBf.setAllActions("Claim served");
+        claimServedBf.setLetters("Yes");
+        BFActionTypeItem claimServedBfItem = new BFActionTypeItem();
+        claimServedBfItem.setId("ClaimServedBfId");
+        claimServedBfItem.setValue(claimServedBf);
+
+        CaseData caseData = new CaseData();
+        caseData.setBfActions(List.of(otherBfItem, claimServedBfItem));
+        SubmitEvent submitEvent = new SubmitEvent();
+        submitEvent.setCaseId(456L);
+        submitEvent.setCaseData(caseData);
+
+        when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
+                .thenReturn(List.of(submitEvent)).thenReturn(Collections.emptyList());
+
+        CCDRequest build = CCDRequestBuilder.builder().withCaseData(caseData).build();
+        build.getCaseDetails().setJurisdiction("EMPLOYMENT");
+        when(ccdClient.startEventForCase(any(), any(), any(), any(), any())).thenReturn(build);
+
+        waTaskCreationCronForExpiredBfActions.run();
+
+        verify(ccdClient, times(1)).startEventForCase(
+                any(), eq(ENGLANDWALES_CASE_TYPE_ID), eq("EMPLOYMENT"), eq("456"), eq("WA_EXPIRED_BF_ACTION_TASK"));
+        verify(ccdClient, times(1)).submitEventForCase(any(), any(), any(), any(), any(), any());
+        assertThat(otherBf.getIsWaTaskCreated()).isEqualTo("Yes");
+        assertThat(claimServedBf.getIsWaTaskCreated()).isNull();
     }
 
     private SubmitEvent expiredBfActionSubmitEvent(LocalDate bfDate) {

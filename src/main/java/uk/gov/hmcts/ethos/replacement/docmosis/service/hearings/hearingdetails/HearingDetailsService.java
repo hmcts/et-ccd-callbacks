@@ -69,7 +69,21 @@ public class HearingDetailsService {
             updatedMatchingHearing(dateListedTypeItems, hearingDetailTypeItemsList);
             setHearingNotesDocument(caseData);
         }
+        clearEventRecordings(hearingDetailTypeItemsList);
         buildFlagsImageFileName(caseDetails);
+    }
+
+    /**
+     * The recordings are stored on the hearing day. Removing them from the event's working copy stops each
+     * recording appearing twice in the case file view.
+     */
+    private void clearEventRecordings(List<HearingDetailTypeItem> hearingDetailTypeItemsList) {
+        if (isNotEmpty(hearingDetailTypeItemsList)) {
+            hearingDetailTypeItemsList.stream()
+                .map(HearingDetailTypeItem::getValue)
+                .filter(Objects::nonNull)
+                .forEach(hearingDetailType -> hearingDetailType.setHearingDetailsRecordings(null));
+        }
     }
 
     private void setHearingNotesDocument(CaseData caseData) {
@@ -132,6 +146,7 @@ public class HearingDetailsService {
         dateListedType.setHearingTimingFinish(hearingDetailType.getHearingDetailsTimingFinish());
         dateListedType.setHearingTimingDuration(hearingDetailType.getHearingDetailsTimingDuration());
         dateListedType.setHearingNotes2(hearingDetailType.getHearingDetailsHearingNotes2());
+        dateListedType.setHearingRecordings(hearingDetailType.getHearingDetailsRecordings());
     }
 
     private HearingDetailTypeItem getHearingDetailTypeItem(DateListedType dateListedType) {
@@ -153,6 +168,7 @@ public class HearingDetailsService {
         hearingDetailType.setHearingDetailsTimingFinish(dateListedType.getHearingTimingFinish());
         hearingDetailType.setHearingDetailsTimingDuration(dateListedType.getHearingTimingDuration());
         hearingDetailType.setHearingDetailsHearingNotes2(dateListedType.getHearingNotes2());
+        hearingDetailType.setHearingDetailsRecordings(dateListedType.getHearingRecordings());
 
         HearingDetailTypeItem hearingDetailTypeItem = new HearingDetailTypeItem();
         hearingDetailTypeItem.setId(UUID.randomUUID().toString());

@@ -470,6 +470,13 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
+    "CategoryID": "C84",
+    "CategoryLabel": "Hearing recording",
+    "DisplayOrder": 10,
+    "ParentCategoryID": "C6"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
     "CategoryID": "C60",
     "CategoryLabel": "Judgment",
     "DisplayOrder": 1,

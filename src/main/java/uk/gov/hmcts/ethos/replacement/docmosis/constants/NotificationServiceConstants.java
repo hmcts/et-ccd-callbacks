@@ -34,6 +34,10 @@ public final class NotificationServiceConstants {
     public static final String LINK_TO_CIT_UI = "linkToCitUI";
     public static final String PARTY_NAME = "party_name";
     public static final String LEGAL_REP_NAME = "legalRepName";
+    public static final String REASON_FOR_PUBLICATION = "reasonForPublication";
+    public static final String SUBMITTED_DATE = "submittedDate";
+    public static final String USER_NAME = "userName";
+    public static final String NOT_PROVIDED = "Not provided";
 
     private NotificationServiceConstants() {
         // restrict instantiation

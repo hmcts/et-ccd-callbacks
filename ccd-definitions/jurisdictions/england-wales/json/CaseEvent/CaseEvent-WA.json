@@ -435,7 +435,7 @@
     "ShowSummary": "Y",
     "EventEnablingCondition": "caseType =\"dummy\"",
     "CallBackURLAboutToStartEvent": "",
-    "CallBackURLAboutToSubmitEvent": "",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/draftAndSignJudgement/aboutToSubmit",
     "CallBackURLSubmittedEvent": "",
     "Publish": "Y"
   },

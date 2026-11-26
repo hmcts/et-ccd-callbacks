@@ -289,6 +289,8 @@ template:
         nonSharedLeadRepOrgAdmin: ${CLAIMANT_LEAD_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID:b29450e0-b047-49a3-b465-5d4df3f67401}
         # Template id of the notification to representative when representative(s) removes themselves from the case
         nonSharedLeadRep: ${CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_REP_TEMPLATE_ID:fe52b39f-852c-43ca-a42a-b9a27c43b130}
+  draftAndSignJudgement:
+    forFindCaseLaw: ${JUDGEMENT_FIND_CASE_LAW_TEMPLATE_ID:0e28266f-8504-45a4-b72d-f82fb7f9462a}
 
 etcos:
   system:
@@ -434,3 +436,4 @@ notifications:
     respondentSubmittedForClaimant: ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_CLAIMANT_TEMPLATE_ID:cdb6288d-8247-435a-875f-4ea48ca23c9e}
     respondentSubmittedForTribunal: ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID:12d604ce-df82-4c64-8544-ebbef66eb8c4}
   dataQualityReportTemplateId: ${DATA_QUALITY_REPORT_TEMPLATE_ID:57a8cba5-9885-4772-876b-09a3fe0abe94}
+  draftAndSignFindCaseLawEmail: ${DRAFT_AND_SIGN_FIND_CASE_LAW_EMAIL:dummy@test.com}

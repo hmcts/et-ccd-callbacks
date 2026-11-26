@@ -14,10 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
@@ -53,17 +53,25 @@ class SingleCasesValidatorTest {
     }
 
     @Test
-     void shouldSetSubmittedCaseAsInvalid() throws IOException {
+    void shouldSetSubmittedCaseAsValid() throws IOException {
         String ethosReference = "case1";
         caseIds.add(ethosReference);
         submitEvents.add(createSubmitEvent(ethosReference, SINGLE_CASE_TYPE, SUBMITTED_STATE, null));
 
         List<ValidatedSingleCase> validatedCases = singleCasesValidator.getValidatedCases(caseIds, multipleDetails,
             AUTH_TOKEN);
-        assertEquals(1, validatedCases.size());
-        assertFalse(validatedCases.get(0).isValid());
-        assertEquals(ethosReference, validatedCases.get(0).getEthosReference());
-        assertEquals("Case is in state " + SUBMITTED_STATE, validatedCases.get(0).getInvalidReason());
+        verify(validatedCases, ethosReference, true, null);
+    }
+
+    @Test
+    void shouldSetClosedCaseAsValid() throws IOException {
+        String ethosReference = "case1";
+        caseIds.add(ethosReference);
+        submitEvents.add(createSubmitEvent(ethosReference, SINGLE_CASE_TYPE, CLOSED_STATE, null));
+
+        List<ValidatedSingleCase> validatedCases = singleCasesValidator.getValidatedCases(caseIds, multipleDetails,
+            AUTH_TOKEN);
+        verify(validatedCases, ethosReference, true, null);
     }
 
     @Test
@@ -138,8 +146,7 @@ class SingleCasesValidatorTest {
         List<ValidatedSingleCase> validatedCases = singleCasesValidator.getValidatedCases(caseIds, multipleDetails,
             AUTH_TOKEN);
         assertEquals(4, validatedCases.size());
-        verify(validatedCases.get(0), "case1", false, "Case is in state "
-            + SUBMITTED_STATE);
+        verify(validatedCases.get(0), "case1", true, null);
         verify(validatedCases.get(1), "case2", true, null);
         verify(validatedCases.get(2), "case3", true, null);
         verify(validatedCases.get(3), "case4", false, "Case not found");
@@ -194,7 +201,7 @@ class SingleCasesValidatorTest {
     private void verify(List<ValidatedSingleCase> validatedCases, String expectedEthosReference,
                         boolean expectedValid, String expectedInvalidReason) {
         assertEquals(1, validatedCases.size());
-        verify(validatedCases.get(0), expectedEthosReference, expectedValid, expectedInvalidReason);
+        verify(validatedCases.getFirst(), expectedEthosReference, expectedValid, expectedInvalidReason);
     }
 
     private void verify(ValidatedSingleCase validatedCase, String expectedEthosReference,

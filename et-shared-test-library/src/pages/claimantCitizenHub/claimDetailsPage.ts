@@ -50,7 +50,6 @@ export class ClaimDetailsPage extends CitizenHubPage{
     this.dateOfLastEventMonth = this.page.locator('#dateOfLastEvent-month');
     this.dateOfLastEventYear = this.page.locator('#dateOfLastEvent-year');
     this.describeYourClaimHeading = this.page.getByRole('heading', {
-      level: 1,
       name: /^(Describe your claim|Describe the claim)$/,
     });
     this.claimSummaryTextArea = this.page.locator(`#claim-summary-text`);

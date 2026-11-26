@@ -216,6 +216,8 @@ public class DateListedType {
     private String hearingRoomBlackpoolMag;
     @JsonProperty("hearingRoomTheLowry")
     private String hearingRoomTheLowry;
+    @JsonProperty("hearingRoomMancCjc")
+    private String hearingRoomMancCjc;
 
     //MIDLANDS EAST
     @JsonProperty("hearingRoomBedford")

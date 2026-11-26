@@ -3,6 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -96,7 +98,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 any(), any(), any(), any());
 
         assertEquals(2, errors.size());
-        assertEquals("There are 55 cases in the multiple. The limit is 50.", errors.get(0));
+        assertEquals("There are 55 cases in the multiple. The limit is 50.", errors.getFirst());
         assertEquals("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,"
                 + " 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, "
                 + "48, 49, 50, 51, 52, 53, 54] cases do not exist.", errors.get(1));
@@ -106,11 +108,11 @@ class MultipleCreationMidEventValidationServiceTest {
     void multipleRemoveCasesValidationLogic_TryRemoveLeadCase() {
         List<SubmitEvent> cases = getSubmitEvents();
         cases.remove(1);
-        String leadRef = cases.get(0).getCaseData().getEthosCaseReference();
-        String multiRef = cases.get(0).getCaseData().getMultipleReference();
+        String leadRef = cases.getFirst().getCaseData().getEthosCaseReference();
+        String multiRef = cases.getFirst().getCaseData().getMultipleReference();
 
         multipleDetails.getCaseData().setAltCaseIdCollection(createCaseIdCollection(1));
-        multipleDetails.getCaseData().getAltCaseIdCollection().get(0).getValue().setEthosCaseReference(leadRef);
+        multipleDetails.getCaseData().getAltCaseIdCollection().getFirst().getValue().setEthosCaseReference(leadRef);
         multipleDetails.getCaseData().setLeadCase(leadRef);
 
         multipleDetails.getCaseData().setMultipleReference(multiRef);
@@ -126,7 +128,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 any(), any(), any(), any());
 
         assertEquals(1, errors.size());
-        assertEquals("245000/2020 lead case cannot be removed.", errors.get(0));
+        assertEquals("245000/2020 lead case cannot be removed.", errors.getFirst());
 
     }
 
@@ -144,7 +146,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 any(), any(), any(), any());
 
         assertEquals(1, errors.size());
-        assertEquals("[245000/2020, 245001/2020] cases are not a part of the multiple.", errors.get(0));
+        assertEquals("[245000/2020, 245001/2020] cases are not a part of the multiple.", errors.getFirst());
 
     }
 
@@ -174,7 +176,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 false);
 
         assertEquals(1, errors.size());
-        assertEquals("[245000/2020, 245001/2020] cases do not exist.", errors.get(0));
+        assertEquals("[245000/2020, 245001/2020] cases do not exist.", errors.getFirst());
     }
 
     @Test
@@ -190,7 +192,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 false);
 
         assertEquals(3, errors.size());
-        assertEquals("[21006/2020] lead case does not exist.", errors.get(0));
+        assertEquals("[21006/2020] lead case does not exist.", errors.getFirst());
         assertEquals("There are 60 cases in the multiple. The limit is 50.", errors.get(1));
         assertEquals("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,"
                 + " 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, "
@@ -204,7 +206,7 @@ class MultipleCreationMidEventValidationServiceTest {
         multipleDetails.getCaseData().setLeadCase(null);
 
         List<SubmitEvent> cases = getSubmitEvents();
-        cases.get(0).setState(REJECTED_STATE);
+        cases.getFirst().setState(REJECTED_STATE);
         cases.get(1).setState(CLOSED_STATE);
 
         when(singleCasesReadingService.retrieveSingleCases(userToken,
@@ -221,7 +223,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 false);
 
         assertEquals(3, errors.size());
-        assertEquals("Case 245001/2020 is managed by Bristol", errors.get(0));
+        assertEquals("Case 245001/2020 is managed by Bristol", errors.getFirst());
         assertEquals("[245000/2020, 245001/2020] cases have not been Accepted, Vetted, or Submitted.", errors.get(1));
         assertEquals("[245000/2020] cases already belong to a different multiple", errors.get(2));
     }
@@ -231,7 +233,7 @@ class MultipleCreationMidEventValidationServiceTest {
         multipleDetails.getCaseData().setLeadCase(null);
 
         List<SubmitEvent> cases = getSubmitEvents();
-        cases.get(0).setState(REJECTED_STATE);
+        cases.getFirst().setState(REJECTED_STATE);
         cases.get(1).setState(CLOSED_STATE);
 
         when(singleCasesReadingService.retrieveSingleCases(userToken,
@@ -248,7 +250,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 false);
 
         assertEquals(3, errors.size());
-        assertEquals("Case 245001/2020 is managed by Bristol", errors.get(0));
+        assertEquals("Case 245001/2020 is managed by Bristol", errors.getFirst());
         assertEquals("[245000/2020, 245001/2020] cases have not been Accepted.", errors.get(1));
         assertEquals("[245000/2020] cases already belong to a different multiple", errors.get(2));
     }
@@ -258,18 +260,18 @@ class MultipleCreationMidEventValidationServiceTest {
         when(featureToggleService.isMultiplesEnabled()).thenReturn(true);
 
         List<SubmitEvent> cases = getSubmitEvents();
-        cases.get(0).setState(VETTED_STATE);
-        cases.get(0).getCaseData().setMultipleReference(" ");
+        cases.getFirst().setState(VETTED_STATE);
+        cases.getFirst().getCaseData().setMultipleReference(" ");
         cases.get(1).setState(ACCEPTED_STATE);
         cases.get(1).getCaseData().setManagingOffice("Manchester");
 
-        multipleDetails.getCaseData().setLeadCase(cases.get(0).getCaseData().getEthosCaseReference());
+        multipleDetails.getCaseData().setLeadCase(cases.getFirst().getCaseData().getEthosCaseReference());
         when(singleCasesReadingService.retrieveSingleCases(
                 userToken,
                 multipleDetails.getCaseTypeId(),
-                List.of(MultiplesHelper.getCaseIds(multipleDetails.getCaseData()).get(0)),
+                List.of(MultiplesHelper.getCaseIds(multipleDetails.getCaseData()).getFirst()),
                 MANUALLY_CREATED_POSITION))
-                .thenReturn(List.of(cases.get(0)));
+                .thenReturn(List.of(cases.getFirst()));
 
         when(singleCasesReadingService.retrieveSingleCases(
                 userToken,
@@ -348,7 +350,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 true);
 
         assertEquals(1, errors.size());
-        assertEquals("[245000/2020, 245001/2020] cases do not exist.", errors.get(0));
+        assertEquals("[245000/2020, 245001/2020] cases do not exist.", errors.getFirst());
 
     }
 
@@ -378,7 +380,7 @@ class MultipleCreationMidEventValidationServiceTest {
     void checkIfSingleIsInDifferentOffice_Scotland() {
         multipleDetails.setCaseTypeId(SCOTLAND_BULK_CASE_TYPE_ID);
         List<SubmitEvent> submitEvents = getSubmitEvents();
-        submitEvents.get(0).getCaseData().setManagingOffice(TribunalOffice.ABERDEEN.getOfficeName());
+        submitEvents.getFirst().getCaseData().setManagingOffice(TribunalOffice.ABERDEEN.getOfficeName());
         submitEvents.get(1).getCaseData().setManagingOffice(TribunalOffice.DUNDEE.getOfficeName());
         when(singleCasesReadingService.retrieveSingleCases(userToken,
                 multipleDetails.getCaseTypeId(),
@@ -397,6 +399,47 @@ class MultipleCreationMidEventValidationServiceTest {
                 "245000/2020", TribunalOffice.ABERDEEN.getOfficeName())));
         assertFalse(errors.contains(String.format(CASE_BELONGS_DIFFERENT_OFFICE,
                 "245001/2020", TribunalOffice.DUNDEE.getOfficeName())));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "Submitted, true", "Vetted, true", "Rejected, true", "Closed, true",
+        "Submitted, false", "Vetted, false", "Rejected, false", "Closed, false"
+    })
+    void addingCasesRejectsUnacceptedStatesWithoutWarnings(String state, boolean multiplesEnabled) {
+        when(featureToggleService.isMultiplesEnabled()).thenReturn(multiplesEnabled);
+        List<SubmitEvent> cases = getSubmitEvents();
+        cases.forEach(event -> {
+            event.setState(state);
+            event.getCaseData().setMultipleReference(null);
+            event.getCaseData().setManagingOffice(multipleDetails.getCaseData().getManagingOffice());
+        });
+        when(singleCasesReadingService.retrieveSingleCases(any(), any(), any(), any())).thenReturn(cases);
+
+        multipleCreationMidEventValidationService.multipleCreationValidationLogic(
+                userToken, multipleDetails, errors, warnings, true);
+
+        assertEquals(List.of("[245000/2020, 245001/2020] cases have not been Accepted."), errors);
+        assertTrue(warnings.isEmpty());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void addingAcceptedCasesReturnsNoErrorsOrWarnings(boolean multiplesEnabled) {
+        when(featureToggleService.isMultiplesEnabled()).thenReturn(multiplesEnabled);
+        List<SubmitEvent> cases = getSubmitEvents();
+        cases.forEach(event -> {
+            event.setState(ACCEPTED_STATE);
+            event.getCaseData().setMultipleReference(null);
+            event.getCaseData().setManagingOffice(multipleDetails.getCaseData().getManagingOffice());
+        });
+        when(singleCasesReadingService.retrieveSingleCases(any(), any(), any(), any())).thenReturn(cases);
+
+        multipleCreationMidEventValidationService.multipleCreationValidationLogic(
+                userToken, multipleDetails, errors, warnings, true);
+
+        assertTrue(errors.isEmpty());
+        assertTrue(warnings.isEmpty());
     }
 
     private List<CaseIdTypeItem> createCaseIdCollection(int numberCases) {

@@ -93,6 +93,25 @@ class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
+    void removeCasesRegeneratesSpreadsheetWithOnlyRemainingCases() {
+        when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
+                .thenReturn(multipleObjects);
+        when(multipleHelperService.getLeadCaseFromExcel(anyString(), any(), anyList()))
+                .thenReturn("21006/2020");
+        List<String> removedCases = List.of("245000/2020", "245003/2020");
+        List<Object> remainingCases = multipleObjects.entrySet().stream()
+                .filter(entry -> !removedCases.contains(entry.getKey()))
+                .map(Map.Entry::getValue)
+                .toList();
+
+        multipleBatchUpdate2Service.removeCasesFromCurrentMultiple(
+                userToken, multipleDetails, new ArrayList<>(), removedCases);
+
+        verify(excelDocManagementService).generateAndUploadExcel(remainingCases, userToken, multipleDetails);
+        verifyNoMoreInteractions(excelDocManagementService);
+    }
+
+    @Test
     void batchUpdate2LogicDetachCases() throws IOException {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
@@ -176,7 +195,7 @@ class MultipleBatchUpdate2ServiceTest {
                 anyString(),
                 any());
         verifyNoMoreInteractions(excelDocManagementService);
-        assertNull(submitMultipleEvents.get(0).getCaseData().getLegalRepCollection());
+        assertNull(submitMultipleEvents.getFirst().getCaseData().getLegalRepCollection());
     }
 
     @Test
@@ -201,7 +220,7 @@ class MultipleBatchUpdate2ServiceTest {
                 anyString(),
                 any());
         verifyNoMoreInteractions(excelDocManagementService);
-        assertNull(submitMultipleEvents.get(0).getCaseData().getLegalRepCollection());
+        assertNull(submitMultipleEvents.getFirst().getCaseData().getLegalRepCollection());
     }
 
     @Test
@@ -226,7 +245,7 @@ class MultipleBatchUpdate2ServiceTest {
                 anyString(),
                 any());
         verifyNoMoreInteractions(excelDocManagementService);
-        assertNull(submitMultipleEvents.get(0).getCaseData().getLegalRepCollection());
+        assertNull(submitMultipleEvents.getFirst().getCaseData().getLegalRepCollection());
     }
 
     @Test
@@ -257,7 +276,7 @@ class MultipleBatchUpdate2ServiceTest {
         verify(ccdClient, never()).removeUserFromMultiple(any(), any(), any(), any(), any());
         verifyNoMoreInteractions(ccdClient);
         assertEquals(2, multipleDetails.getCaseData().getLegalRepCollection().size());
-        assertNull(submitMultipleEvents.get(0).getCaseData().getLegalRepCollection());
+        assertNull(submitMultipleEvents.getFirst().getCaseData().getLegalRepCollection());
         verify(multipleReferenceService, never()).addUsersToMultiple(any(), any(), any(), any());
     }
 
@@ -289,7 +308,7 @@ class MultipleBatchUpdate2ServiceTest {
                 any(), any(), any(), any(), any());
         verifyNoMoreInteractions(ccdClient);
         assertEquals(2, multipleDetails.getCaseData().getLegalRepCollection().size());
-        assertEquals(2, submitMultipleEvents.get(0).getCaseData().getLegalRepCollection().size());
+        assertEquals(2, submitMultipleEvents.getFirst().getCaseData().getLegalRepCollection().size());
         verify(multipleReferenceService, times(1)).addUsersToMultiple(any(), any(), any(), any());
     }
 
@@ -299,7 +318,7 @@ class MultipleBatchUpdate2ServiceTest {
         multipleDetails.getCaseData().getMoveCases().setUpdatedMultipleRef("246001");
         multipleDetails.getCaseData().setLegalRepCollection(addCaseLegalRepDetails(multipleObjects));
 
-        submitMultipleEvents.get(0).getCaseData().setLegalRepCollection(new ListTypeItem<>());
+        submitMultipleEvents.getFirst().getCaseData().setLegalRepCollection(new ListTypeItem<>());
 
         when(excelReadingService.readExcel(
                 anyString(), anyString(), anyList(), any(), any())
@@ -323,7 +342,7 @@ class MultipleBatchUpdate2ServiceTest {
                 any(), any(), any(), any(), any());
         verifyNoMoreInteractions(ccdClient);
         assertEquals(2, multipleDetails.getCaseData().getLegalRepCollection().size());
-        assertEquals(2, submitMultipleEvents.get(0).getCaseData().getLegalRepCollection().size());
+        assertEquals(2, submitMultipleEvents.getFirst().getCaseData().getLegalRepCollection().size());
         verify(multipleReferenceService, times(1)).addUsersToMultiple(any(), any(), any(), any());
     }
 
@@ -334,14 +353,14 @@ class MultipleBatchUpdate2ServiceTest {
 
         ListTypeItem<SubCaseLegalRepDetails> lrCollection = addCaseLegalRepDetails(multipleObjects);
         ListTypeItem<SubCaseLegalRepDetails> oldCollection = new ListTypeItem<>();
-        oldCollection.add(lrCollection.get(0));
+        oldCollection.add(lrCollection.getFirst());
         oldCollection.add(lrCollection.get(1));
         oldCollection.add(lrCollection.get(2));
         ListTypeItem<SubCaseLegalRepDetails> newCollection = new ListTypeItem<>();
         newCollection.add(lrCollection.get(3));
 
         multipleDetails.getCaseData().setLegalRepCollection(oldCollection);
-        submitMultipleEvents.get(0).getCaseData().setLegalRepCollection(newCollection);
+        submitMultipleEvents.getFirst().getCaseData().setLegalRepCollection(newCollection);
 
         when(excelReadingService.readExcel(
                 anyString(), anyString(), anyList(), any(), any())
@@ -365,7 +384,7 @@ class MultipleBatchUpdate2ServiceTest {
                 any(), any(), any(), any(), any());
         verifyNoMoreInteractions(ccdClient);
         assertEquals(1, multipleDetails.getCaseData().getLegalRepCollection().size());
-        assertEquals(3, submitMultipleEvents.get(0).getCaseData().getLegalRepCollection().size());
+        assertEquals(3, submitMultipleEvents.getFirst().getCaseData().getLegalRepCollection().size());
         verify(multipleReferenceService, times(1)).addUsersToMultiple(any(), any(), any(), any());
     }
 
@@ -419,8 +438,8 @@ class MultipleBatchUpdate2ServiceTest {
     void batchUpdate2LogicDetachCases_Overlap() throws IOException {
         ListTypeItem<SubCaseLegalRepDetails> legalRepCollection = addCaseLegalRepDetails(multipleObjects);
 
-        legalRepCollection.get(0).getValue().getLegalRepIds().get(0).setValue("DuplicateLRid");
-        legalRepCollection.get(2).getValue().getLegalRepIds().get(0).setValue("DuplicateLRid");
+        legalRepCollection.getFirst().getValue().getLegalRepIds().getFirst().setValue("DuplicateLRid");
+        legalRepCollection.get(2).getValue().getLegalRepIds().getFirst().setValue("DuplicateLRid");
 
         multipleDetails.getCaseData().setLegalRepCollection(legalRepCollection);
 

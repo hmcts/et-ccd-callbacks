@@ -5494,6 +5494,13 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales_Multiple",
+    "ID": "multipleNote",
+    "Label": "Multiple Note",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
     "ID": "multipleReference",
     "Label": "Multiple reference",
     "HintText": "Assign a multiple reference",

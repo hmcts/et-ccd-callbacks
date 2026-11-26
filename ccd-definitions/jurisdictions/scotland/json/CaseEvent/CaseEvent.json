@@ -739,7 +739,7 @@
     "PreConditionState(s)": "Open",
     "PostConditionState": "Open",
     "EventEnablingCondition": "multipleSource=\"Manually Created\" OR multipleSource=\"Migrated\" OR preAcceptDone =\"Yes\"",
-    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/amendMultiple",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/multiples/amendDetails",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "N"

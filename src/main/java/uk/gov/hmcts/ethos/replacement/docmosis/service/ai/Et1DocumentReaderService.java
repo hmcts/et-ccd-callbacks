@@ -90,13 +90,13 @@ public class Et1DocumentReaderService {
             return null;
         }
 
+        String documentUuid = extractDocumentUuid(document.getDocumentBinaryUrl());
         try {
-            log.info("Downloading file {} from DM Store for AI multimodal vetting",
-                    document.getDocumentFilename());
+            log.info("Downloading document {} from DM Store for AI multimodal vetting", documentUuid);
             UploadedDocument uploadedDoc = documentManagementService.downloadFile(
                     token, document.getDocumentBinaryUrl());
             if (uploadedDoc == null || uploadedDoc.getContent() == null) {
-                log.warn("Document {} downloaded but content is empty", document.getDocumentFilename());
+                log.warn("Document {} downloaded but content is empty", documentUuid);
                 return null;
             }
 
@@ -108,19 +108,20 @@ public class Et1DocumentReaderService {
 
             if (bytes.length == 0 || bytes.length > aiGatewayProperties.getMaxAttachmentBytes()) {
                 log.warn("Document {} size ({} bytes) outside acceptable limits (max {} bytes)",
-                        document.getDocumentFilename(), bytes.length, aiGatewayProperties.getMaxAttachmentBytes());
+                        documentUuid, bytes.length, aiGatewayProperties.getMaxAttachmentBytes());
                 return null;
             }
 
             String mimeType = resolveMimeType(document.getDocumentFilename(), uploadedDoc.getContentType());
             return AiDocumentAttachment.builder()
+                    .documentId(documentUuid)
                     .filename(document.getDocumentFilename())
                     .mimeType(mimeType)
                     .data(bytes)
                     .build();
         } catch (Exception ex) {
-            log.warn("Could not download file {} for AI multimodal vetting: {}",
-                    document.getDocumentFilename(), ex.getMessage());
+            log.warn("Could not download document {} for AI multimodal vetting: {}",
+                    documentUuid, ex.getMessage());
             return null;
         }
     }
@@ -188,7 +189,7 @@ public class Et1DocumentReaderService {
         long maxTotalBytes = aiGatewayProperties.getMaxTotalAttachmentBytes();
         if (currentTotalBytes + downloaded.getData().length > maxTotalBytes) {
             log.warn("Skipping attachment {} because aggregate payload would exceed {} bytes limit",
-                    downloaded.getFilename(), maxTotalBytes);
+                    downloaded.getDocumentId(), maxTotalBytes);
             return currentTotalBytes;
         }
         attachments.add(downloaded);
@@ -208,6 +209,23 @@ public class Et1DocumentReaderService {
             }
         }
         return "application/octet-stream";
+    }
+
+    private String extractDocumentUuid(String binaryUrl) {
+        if (StringUtils.isBlank(binaryUrl)) {
+            return "unknown";
+        }
+        String trimmed = binaryUrl.trim();
+        int docsIdx = trimmed.indexOf("/documents/");
+        if (docsIdx >= 0) {
+            String rest = trimmed.substring(docsIdx + "/documents/".length());
+            int slashIdx = rest.indexOf('/');
+            String uuid = slashIdx >= 0 ? rest.substring(0, slashIdx) : rest;
+            if (StringUtils.isNotBlank(uuid)) {
+                return uuid;
+            }
+        }
+        return "unknown";
     }
 
     private boolean isRelevantVettingDocument(DocumentType docType) {

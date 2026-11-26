@@ -88,34 +88,35 @@ public class AiAttachmentExtractor {
             String mimeType = StringUtils.defaultIfBlank(attachment.getMimeType(), "application/pdf")
                     .toLowerCase(Locale.ROOT);
             String filename = StringUtils.defaultIfBlank(attachment.getFilename(), "attachment");
+            String docId = StringUtils.defaultIfBlank(attachment.getDocumentId(), "unknown");
             String ext = extractExtension(filename);
 
             if (DIRECT_IMAGE_MIME_TYPES.contains(mimeType)) {
                 addImagePart(userParts, mimeType, attachment.getData());
             } else if (isConvertibleImage(mimeType, ext)) {
-                convertImageToPngPart(userParts, filename, attachment.getData());
+                convertImageToPngPart(userParts, docId, attachment.getData());
             } else if ("application/pdf".equals(mimeType) || ".pdf".equals(ext)) {
-                appendPdfParts(userParts, filename, attachment.getData());
+                appendPdfParts(userParts, docId, filename, attachment.getData());
             } else if (".docx".equals(ext)) {
-                appendDocxTextPart(userParts, filename, attachment.getData());
+                appendDocxTextPart(userParts, docId, filename, attachment.getData());
             } else if (EXCEL_OPENXML_EXT.contains(ext)) {
-                appendExcelOpenXmlTextPart(userParts, filename, attachment.getData());
+                appendExcelOpenXmlTextPart(userParts, docId, filename, attachment.getData());
             } else if (PPT_OPENXML_EXT.contains(ext)) {
-                appendPowerPointOpenXmlTextPart(userParts, filename, attachment.getData());
+                appendPowerPointOpenXmlTextPart(userParts, docId, filename, attachment.getData());
             } else if (".rtf".equals(ext) || mimeType.contains("rtf")) {
-                appendRtfTextPart(userParts, filename, attachment.getData());
+                appendRtfTextPart(userParts, docId, filename, attachment.getData());
             } else if (LEGACY_OFFICE_EXT.contains(ext)) {
-                appendLegacyOfficeTextPart(userParts, filename, attachment.getData());
+                appendLegacyOfficeTextPart(userParts, docId, filename, attachment.getData());
             } else if (mimeType.startsWith("text/")) {
                 String text = new String(attachment.getData(), StandardCharsets.UTF_8);
                 appendLabeledTextPart(userParts, filename, text);
             } else {
-                log.info("Skipping unsupported binary attachment {} ({}) for Chat Completions", filename, mimeType);
+                log.info("Skipping unsupported binary attachment {} ({}) for Chat Completions", docId, mimeType);
             }
         }
     }
 
-    private void appendPdfParts(List<Map<String, Object>> userParts, String filename, byte[] data) {
+    private void appendPdfParts(List<Map<String, Object>> userParts, String docId, String filename, byte[] data) {
         try (PDDocument document = Loader.loadPDF(data)) {
             StringBuilder combinedText = new StringBuilder();
             String acroFormText = extractAcroFormFields(document);
@@ -143,14 +144,14 @@ public class AiAttachmentExtractor {
                 byte[] jpegBytes = jpegOut.toByteArray();
                 if (totalImageBytes + jpegBytes.length > MAX_TOTAL_IMAGE_BYTES) {
                     log.info("Stopping PDF page rendering for {} at page {}/{} to stay within {} byte image budget",
-                            filename, idx, pageCount, MAX_TOTAL_IMAGE_BYTES);
+                            docId, idx, pageCount, MAX_TOTAL_IMAGE_BYTES);
                     break;
                 }
                 addImagePart(userParts, "image/jpeg", jpegBytes);
                 totalImageBytes += jpegBytes.length;
             }
         } catch (IOException ex) {
-            log.warn("Failed to extract PDF content from {}: {}", filename, ex.getMessage());
+            log.warn("Failed to extract PDF content from {}: {}", docId, ex.getMessage());
         }
     }
 
@@ -169,16 +170,19 @@ public class AiAttachmentExtractor {
         return sb.toString();
     }
 
-    private void appendDocxTextPart(List<Map<String, Object>> userParts, String filename, byte[] data) {
-        Map<String, String> entries = readZipXmlEntries(data, filename, "word/document.xml");
+    private void appendDocxTextPart(List<Map<String, Object>> userParts, String docId, String filename, byte[] data) {
+        Map<String, String> entries = readZipXmlEntries(data, docId, "word/document.xml");
         String xml = entries.get("word/document.xml");
         if (StringUtils.isNotBlank(xml)) {
             appendLabeledTextPart(userParts, filename, stripXmlTags(xml, "<w:p[^>]*>"));
         }
     }
 
-    private void appendExcelOpenXmlTextPart(List<Map<String, Object>> userParts, String filename, byte[] data) {
-        Map<String, String> entries = readZipXmlEntries(data, filename, "xl/sharedStrings.xml", "xl/worksheets/sheet");
+    private void appendExcelOpenXmlTextPart(List<Map<String, Object>> userParts,
+                                            String docId,
+                                            String filename,
+                                            byte[] data) {
+        Map<String, String> entries = readZipXmlEntries(data, docId, "xl/sharedStrings.xml", "xl/worksheets/sheet");
         if (entries.isEmpty()) {
             return;
         }
@@ -238,9 +242,12 @@ public class AiAttachmentExtractor {
         }
     }
 
-    private void appendPowerPointOpenXmlTextPart(List<Map<String, Object>> userParts, String filename, byte[] data) {
+    private void appendPowerPointOpenXmlTextPart(List<Map<String, Object>> userParts,
+                                                 String docId,
+                                                 String filename,
+                                                 byte[] data) {
         Map<String, String> entries = readZipXmlEntries(
-                data, filename, "ppt/slides/slide", "ppt/notesSlides/notesSlide");
+                data, docId, "ppt/slides/slide", "ppt/notesSlides/notesSlide");
         if (entries.isEmpty()) {
             return;
         }
@@ -254,7 +261,7 @@ public class AiAttachmentExtractor {
         appendLabeledTextPart(userParts, filename, sb.toString());
     }
 
-    private Map<String, String> readZipXmlEntries(byte[] data, String filename, String... prefixes) {
+    private Map<String, String> readZipXmlEntries(byte[] data, String docId, String... prefixes) {
         Map<String, String> entries = new TreeMap<>();
         try (ZipInputStream zipIn = new ZipInputStream(new ByteArrayInputStream(data))) {
             ZipEntry entry = zipIn.getNextEntry();
@@ -266,7 +273,7 @@ public class AiAttachmentExtractor {
                 entry = zipIn.getNextEntry();
             }
         } catch (IOException ex) {
-            log.warn("Failed to extract OpenXML content from {}: {}", filename, ex.getMessage());
+            log.warn("Failed to extract OpenXML content from {}: {}", docId, ex.getMessage());
         }
         return entries;
     }
@@ -287,31 +294,34 @@ public class AiAttachmentExtractor {
                 .trim();
     }
 
-    private void appendRtfTextPart(List<Map<String, Object>> userParts, String filename, byte[] data) {
+    private void appendRtfTextPart(List<Map<String, Object>> userParts, String docId, String filename, byte[] data) {
         try {
             RTFEditorKit rtfKit = new RTFEditorKit();
             Document doc = rtfKit.createDefaultDocument();
             rtfKit.read(new ByteArrayInputStream(data), doc, 0);
             appendLabeledTextPart(userParts, filename, doc.getText(0, doc.getLength()));
         } catch (IOException | BadLocationException ex) {
-            log.warn("Failed to extract RTF text from {}: {}", filename, ex.getMessage());
+            log.warn("Failed to extract RTF text from {}: {}", docId, ex.getMessage());
         }
     }
 
-    private void appendLegacyOfficeTextPart(List<Map<String, Object>> userParts, String filename, byte[] data) {
+    private void appendLegacyOfficeTextPart(List<Map<String, Object>> userParts,
+                                            String docId,
+                                            String filename,
+                                            byte[] data) {
         String header = new String(data, 0, Math.min(data.length, 8), StandardCharsets.ISO_8859_1);
         if (header.startsWith("{\\rtf")) {
-            appendRtfTextPart(userParts, filename, data);
+            appendRtfTextPart(userParts, docId, filename, data);
             return;
         }
         if (header.startsWith("PK")) {
             String ext = extractExtension(filename);
             if (ext.startsWith(".xl")) {
-                appendExcelOpenXmlTextPart(userParts, filename, data);
+                appendExcelOpenXmlTextPart(userParts, docId, filename, data);
             } else if (ext.startsWith(".pp")) {
-                appendPowerPointOpenXmlTextPart(userParts, filename, data);
+                appendPowerPointOpenXmlTextPart(userParts, docId, filename, data);
             } else {
-                appendDocxTextPart(userParts, filename, data);
+                appendDocxTextPart(userParts, docId, filename, data);
             }
             return;
         }
@@ -359,18 +369,18 @@ public class AiAttachmentExtractor {
         return dotIdx >= 0 ? lower.substring(dotIdx) : "";
     }
 
-    private void convertImageToPngPart(List<Map<String, Object>> userParts, String filename, byte[] data) {
+    private void convertImageToPngPart(List<Map<String, Object>> userParts, String docId, byte[] data) {
         try {
             BufferedImage image = ImageIO.read(new ByteArrayInputStream(data));
             if (image == null) {
-                log.warn("Could not decode image {} for PNG conversion", filename);
+                log.warn("Could not decode image {} for PNG conversion", docId);
                 return;
             }
             ByteArrayOutputStream pngOut = new ByteArrayOutputStream();
             ImageIO.write(image, "png", pngOut);
             addImagePart(userParts, "image/png", pngOut.toByteArray());
         } catch (IOException ex) {
-            log.warn("Failed to convert image {} to PNG: {}", filename, ex.getMessage());
+            log.warn("Failed to convert image {} to PNG: {}", docId, ex.getMessage());
         }
     }
 

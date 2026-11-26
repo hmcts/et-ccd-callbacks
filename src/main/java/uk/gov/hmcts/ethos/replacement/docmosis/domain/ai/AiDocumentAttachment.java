@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AiDocumentAttachment {
+    private String documentId;
     private String filename;
     private String mimeType;
     private byte[] data;

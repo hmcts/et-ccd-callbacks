@@ -15,12 +15,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 public class BFHelperTest {
 
@@ -124,6 +127,32 @@ public class BFHelperTest {
         bfAction.setCleared(null);
         String yesterday = BFHelper.getEffectiveYesterday(LocalDate.of(2025, 5, 1));
         assertTrue(BFHelper.isBfExpired(bfAction, yesterday));
+    }
+
+    @Test
+    void isBfExpiredReturnsFalseForClaimServedBfAction() {
+        BFActionType letterClaimServed = new BFActionType();
+        letterClaimServed.setBfDate(LocalDate.now().minusDays(1).toString());
+        letterClaimServed.setAllActions("Claim served");
+        letterClaimServed.setLetters(YES);
+        String yesterday = BFHelper.getEffectiveYesterday(LocalDate.of(2025, 5, 1));
+        assertFalse(BFHelper.isBfExpired(letterClaimServed, yesterday));
+
+        BFActionType nonLetterClaimServed = new BFActionType();
+        nonLetterClaimServed.setBfDate(LocalDate.now().minusDays(1).toString());
+        nonLetterClaimServed.setAllActions("Claim served");
+        nonLetterClaimServed.setLetters(null);
+        assertFalse(BFHelper.isBfExpired(nonLetterClaimServed, yesterday));
+    }
+
+    @Test
+    void isBfExpiredReturnsTrueForEccServedBfAction() {
+        BFActionType eccServed = new BFActionType();
+        eccServed.setBfDate(LocalDate.now().minusDays(1).toString());
+        eccServed.setAllActions("ECC served");
+        eccServed.setLetters(NO);
+        String yesterday = BFHelper.getEffectiveYesterday(LocalDate.of(2025, 5, 1));
+        assertTrue(BFHelper.isBfExpired(eccServed, yesterday));
     }
 
     @Test

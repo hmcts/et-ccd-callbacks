@@ -571,9 +571,27 @@
     "ID": "DraftAndSignJudgement",
     "CaseEventID": "draftAndSignJudgement",
     "CaseFieldID": "draftAndSignJudgement",
+    "ListElementCode": "shouldForPublication",
+    "EventElementLabel": "Should this judgment be considered for publication on Find Case Law?",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DraftAndSignJudgement",
+    "CaseEventID": "draftAndSignJudgement",
+    "CaseFieldID": "draftAndSignJudgement",
+    "ListElementCode": "shouldForPublicationReason",
+    "EventElementLabel": "Why should it be considered for publication?",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "DraftAndSignJudgement",
+    "CaseEventID": "draftAndSignJudgement",
+    "CaseFieldID": "draftAndSignJudgement",
     "ListElementCode": "draftAndSignJudgementDocuments",
     "EventElementLabel": "Document",
-    "FieldDisplayOrder": 2,
+    "FieldDisplayOrder": 4,
     "DisplayContext": "MANDATORY"
   },
   {
@@ -582,7 +600,7 @@
     "CaseFieldID": "draftAndSignJudgement",
     "ListElementCode": "draftAndSignJudgementDocuments.uploadedDocument",
     "EventElementLabel": "Document",
-    "FieldDisplayOrder": 3,
+    "FieldDisplayOrder": 5,
     "DisplayContext": "MANDATORY"
   },
   {
@@ -591,7 +609,7 @@
     "CaseFieldID": "draftAndSignJudgement",
     "ListElementCode": "draftAndSignJudgementDocuments.shortDescription",
     "EventElementLabel": "Description",
-    "FieldDisplayOrder": 4,
+    "FieldDisplayOrder": 6,
     "DisplayContext": "OPTIONAL"
   },
   {
@@ -600,7 +618,7 @@
     "CaseFieldID": "draftAndSignJudgement",
     "ListElementCode": "furtherDirections",
     "EventElementLabel": "Any further directions?",
-    "FieldDisplayOrder": 5,
+    "FieldDisplayOrder": 7,
     "DisplayContext": "OPTIONAL"
   },
   {
@@ -609,7 +627,7 @@
     "CaseFieldID": "draftAndSignJudgement",
     "ListElementCode": "isUrgent",
     "EventElementLabel": "Is this urgent?",
-    "FieldDisplayOrder": 6,
+    "FieldDisplayOrder": 8,
     "DisplayContext": "MANDATORY",
     "Publish": "Y"
   },

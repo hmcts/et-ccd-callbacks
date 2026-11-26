@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import com.launchdarkly.sdk.LDContext;
 import com.launchdarkly.sdk.LDValue;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -16,6 +17,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
 @ExtendWith(MockitoExtension.class)
 class FeatureToggleServiceTest {
@@ -46,6 +49,27 @@ class FeatureToggleServiceTest {
         givenToggle(caseFileKey, toggleStat);
 
         assertThat(featureToggleService.isFeatureEnabled(caseFileKey)).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenEnglandWalesCaseFlagsLinkingIsEnabled(Boolean toggleStat) {
+        givenToggle("case-flags-v2-enabled-england-wales", toggleStat);
+
+        assertThat(featureToggleService.isCaseFlagsV2Enabled(ENGLANDWALES_CASE_TYPE_ID)).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenScotlandCaseFlagsLinkingIsEnabled(Boolean toggleStat) {
+        givenToggle("case-flags-v2-enabled-scotland", toggleStat);
+
+        assertThat(featureToggleService.isCaseFlagsV2Enabled(SCOTLAND_CASE_TYPE_ID)).isEqualTo(toggleStat);
+    }
+
+    @Test
+    void shouldDisableCaseFlagsForUnknownCaseType() {
+        assertThat(featureToggleService.isCaseFlagsV2Enabled("unknown")).isFalse();
     }
 
     @ParameterizedTest

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
@@ -418,8 +418,8 @@ class Et3ResponseControllerTest extends BaseControllerTest {
         documentInfo.setMarkUp("Document");
         documentInfo.setDescription("Document.pdf");
         ccdRequest.setEventId("draftEt3");
-        when(et3ResponseService.generateEt3ResponseDocument(ccdRequest.getCaseDetails().getCaseData(), AUTH_TOKEN,
-                ENGLANDWALES_CASE_TYPE_ID, "draftEt3")).thenReturn(documentInfo);
+        when(et3ResponseService.generateEt3ResponseDocument(any(CaseData.class), anyString(),
+                anyString(), anyString())).thenReturn(documentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DOWNLOAD_DRAFT_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))

@@ -189,6 +189,7 @@
     "PreConditionState(s)": "Accepted;Closed;Rejected",
     "PostConditionState": "*",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/amendRespondentDetails",
+    "CallBackURLSubmittedEvent": "${ET_COS_URL}/amendRespondentDetailsSubmitted",
     "EventEnablingCondition": "managingOffice !=\"Unassigned\"",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
@@ -434,7 +435,7 @@
     "ShowSummary": "Y",
     "EventEnablingCondition": "caseType =\"dummy\"",
     "CallBackURLAboutToStartEvent": "",
-    "CallBackURLAboutToSubmitEvent": "",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/draftAndSignJudgement/aboutToSubmit",
     "CallBackURLSubmittedEvent": "",
     "Publish": "Y"
   },

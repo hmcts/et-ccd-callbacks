@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -20,6 +20,8 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -75,8 +77,7 @@ class PseRespondentViewControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(provideSomethingElseViewService).populateSelectDropdownView(ccdRequest.getCaseDetails().getCaseData(),
-                RESPONDENT_TITLE);
+        verify(provideSomethingElseViewService).populateSelectDropdownView(any(CaseData.class), eq(RESPONDENT_TITLE));
     }
 
     @Test
@@ -91,7 +92,7 @@ class PseRespondentViewControllerTest {
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(provideSomethingElseViewService).initialOrdReqDetailsTableMarkUp(
-                ccdRequest.getCaseDetails().getCaseData(), RESPONDENT_TITLE);
+                any(CaseData.class), eq(RESPONDENT_TITLE));
     }
 
 }

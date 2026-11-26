@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
@@ -63,6 +66,8 @@ public class DateListedType {
     private String hearingNotes2;
     @JsonProperty("postponedDate")
     private String postponedDate;
+    @JsonProperty("hearingRecordings")
+    private List<GenericTypeItem<HearingRecordingType>> hearingRecordings;
 
     public boolean hasHearingVenue() {
         return hearingVenueDay != null && hearingVenueDay.getValue() != null;

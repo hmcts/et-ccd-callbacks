@@ -24,6 +24,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
@@ -54,6 +55,7 @@ public class Et1ReppedController {
     private final FeatureToggleService featureToggleService;
     private final Et1SubmissionService et1SubmissionService;
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
+    private final CaseFlagsService caseFlagsService;
     private final Et1AiVettingService et1AiVettingService;
 
     public Et1ReppedController(PostDefaultValuesService postDefaultValuesService,
@@ -61,9 +63,11 @@ public class Et1ReppedController {
                                Et1ReppedService et1ReppedService,
                                FeatureToggleService featureToggleService,
                                Et1SubmissionService et1SubmissionService,
-                               NocRespondentRepresentativeService nocRespondentRepresentativeService) {
+                               NocRespondentRepresentativeService nocRespondentRepresentativeService,
+                               CaseFlagsService caseFlagsService) {
         this(postDefaultValuesService, caseManagementForCaseWorkerService, et1ReppedService,
-                featureToggleService, et1SubmissionService, nocRespondentRepresentativeService, null);
+                featureToggleService, et1SubmissionService, nocRespondentRepresentativeService,
+                caseFlagsService, null);
     }
 
     @Autowired
@@ -73,6 +77,7 @@ public class Et1ReppedController {
                                FeatureToggleService featureToggleService,
                                Et1SubmissionService et1SubmissionService,
                                NocRespondentRepresentativeService nocRespondentRepresentativeService,
+                               CaseFlagsService caseFlagsService,
                                @Autowired(required = false) Et1AiVettingService et1AiVettingService) {
         this.postDefaultValuesService = postDefaultValuesService;
         this.caseManagementForCaseWorkerService = caseManagementForCaseWorkerService;
@@ -80,6 +85,7 @@ public class Et1ReppedController {
         this.featureToggleService = featureToggleService;
         this.et1SubmissionService = et1SubmissionService;
         this.nocRespondentRepresentativeService = nocRespondentRepresentativeService;
+        this.caseFlagsService = caseFlagsService;
         this.et1AiVettingService = et1AiVettingService;
     }
 
@@ -553,6 +559,12 @@ public class Et1ReppedController {
         et1SubmissionService.sendEt1ConfirmationMyHmcts(caseDetails, userToken);
         Et1ReppedHelper.clearEt1ReppedCreationFields(caseData);
         caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
+
+        boolean caseFlagsV2Toggle = featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId());
+        if (caseFlagsV2Toggle && caseFlagsService.caseFlagsSetupRequired(caseData)) {
+            caseFlagsService.setupCaseFlags(caseData);
+            caseFlagsService.processNewlySetCaseFlags(caseData);
+        }
 
         return getCallbackRespEntityNoErrors(caseData);
     }

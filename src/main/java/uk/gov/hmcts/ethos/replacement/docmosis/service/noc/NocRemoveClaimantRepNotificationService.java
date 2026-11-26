@@ -26,14 +26,14 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 
 @Slf4j
 @Service
-public class NocRemoveRepNotificationService {
+public class NocRemoveClaimantRepNotificationService {
 
     private final EmailService emailService;
     private final NocNotificationService nocNotificationService;
     private final String claimantNonSharedLeadRepRemovalOrgAdminTemplate;
     private final String claimantLeadRepRemovalRepresentativeTemplateId;
 
-    public NocRemoveRepNotificationService(
+    public NocRemoveClaimantRepNotificationService(
             EmailService emailService,
             NocNotificationService nocNotificationService,
             @Value("${template.representation.remove.claimant.nonSharedLeadRepOrgAdmin}")

@@ -17,10 +17,12 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Locale.UK;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER_PROP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CIT_UI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LIST_OF_RESPONDENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.PARTY_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 
@@ -128,8 +130,8 @@ public final class NocNotificationHelper {
 
     private static void addCommonValues(CaseData caseData, Map<String, String> personalisation) {
         personalisation.put(CLAIMANT, caseData.getClaimant());
-        personalisation.put("list_of_respondents", getListOfRespondents(caseData));
-        personalisation.put("case_number", caseData.getEthosCaseReference());
+        personalisation.put(LIST_OF_RESPONDENTS, getListOfRespondents(caseData));
+        personalisation.put(CASE_NUMBER_PROP, caseData.getEthosCaseReference());
     }
 
     @NotNull

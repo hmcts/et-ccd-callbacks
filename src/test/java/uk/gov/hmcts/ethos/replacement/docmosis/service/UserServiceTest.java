@@ -27,8 +27,11 @@ class UserServiceTest {
     private static final String ADMIN_USER_TOKEN = "dummy admin user token";
     private static final String SUBMISSION_REFERENCE = "dummy submission reference";
     private static final String USER_ID = "dummy user id";
+    private static final String USER_EMAIL = "user_email@example.com";
+
     private static final String EXPECTED_EXCEPTION_USER_NOT_FOUND = "User not found";
     private static final String EXPECTED_EXCEPTION_USER_ID_NOT_FOUND = "User ID not found";
+    private static final String EXPECTED_EXCEPTION_USER_EMAIL_NOT_FOUND = "User email not found";
 
     @BeforeEach
     @SneakyThrows
@@ -50,10 +53,16 @@ class UserServiceTest {
         gse = assertThrows(GenericServiceException.class, () ->
                 userService.fetchAndValidateUserDetails(USER_TOKEN, SUBMISSION_REFERENCE));
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_USER_ID_NOT_FOUND);
-        // when user idam service returns correct user details should return the same user details
+        // when user idam service returns user details without user email should throw GenericServiceException
         userDetails.setUid(USER_ID);
+        gse = assertThrows(GenericServiceException.class, () ->
+                userService.fetchAndValidateUserDetails(USER_TOKEN, SUBMISSION_REFERENCE));
+        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_USER_EMAIL_NOT_FOUND);
+        // when user idam service returns user details with all required fields should return the same user details
+        userDetails.setEmail(USER_EMAIL);
         assertThat(userService.fetchAndValidateUserDetails(USER_TOKEN, SUBMISSION_REFERENCE))
                 .isEqualTo(userDetails);
+
     }
 
     @Test

@@ -281,6 +281,14 @@ template:
     submitCaseEmailTemplateId: ${SUBMIT_CASE_EMAIL_TEMPLATE_ID:7b1f33eb-31c5-4a00-b1a4-c1bca84bc441}
     cySubmitCaseEmailTemplateId: ${CY_SUBMIT_CASE_EMAIL_TEMPLATE_ID:7b1f33eb-31c5-4a00-b1a4-c1bca84bc441}
 
+  representation:
+    remove:
+      claimant:
+        # Template id of the notification to organisation admin when a case is not shared and lead representative
+        # removes themselves from the case
+        nonSharedLeadRepOrgAdmin: ${CLAIMANT_LEAD_REPRESENTATIVE_SELF_REMOVAL_ORG_ADMIN_TEMPLATE_ID:b29450e0-b047-49a3-b465-5d4df3f67401}
+        # Template id of the notification to representative when representative(s) removes themselves from the case
+        nonSharedLeadRep: ${CLAIMANT_REPRESENTATIVE_SELF_REMOVAL_REP_TEMPLATE_ID:fe52b39f-852c-43ca-a42a-b9a27c43b130}
   draftAndSignJudgement:
     forFindCaseLaw: ${JUDGEMENT_FIND_CASE_LAW_TEMPLATE_ID:0e28266f-8504-45a4-b72d-f82fb7f9462a}
 

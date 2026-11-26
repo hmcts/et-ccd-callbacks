@@ -5,14 +5,11 @@ import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_INVALID_USER_TOKEN;
 
 public final class UserUtils {
 
-    private static final String CLASS_NAME = RespondentUtils.class.getSimpleName();
+    private static final String CLASS_NAME = UserUtils.class.getSimpleName();
 
     private UserUtils() {
         // Utility classes should not have a public or default constructor.
@@ -47,21 +44,27 @@ public final class UserUtils {
     }
 
     /**
-     * Returns the user's full name by joining their first and last names with a single space.
+     * Resolves a display name for the given user details.
+     * <p>
+     * If {@link UserDetails#getName()} contains a non-blank value, it is returned.
+     * Otherwise, the display name is constructed from the user's first and last names,
+     * ignoring any blank values.
+     * </p>
      *
-     * <p>Null and empty names are omitted. If only one name is present, it is
-     * returned without adding a space. If both names are null or empty, an empty
-     * string is returned.</p>
-     *
-     * @param userDetails the user details containing the first and last names;
-     *                    must not be {@code null}
-     * @return the combined name, the single available name, or {@code ""}
-     *         if both names are null or empty
-     * @throws NullPointerException if {@code userDetails} is {@code null}
+     * @param userDetails the user details used to resolve the display name
+     * @return the resolved display name, or an empty string if no name information is available
      */
-    public static String getFullName(UserDetails userDetails) {
-        return Stream.of(userDetails.getFirstName(), userDetails.getLastName())
-                .filter(name -> name != null && !name.isEmpty())
-                .collect(Collectors.joining(StringUtils.SPACE));
+    public static String resolveUserDisplayName(UserDetails userDetails) {
+        if (ObjectUtils.isEmpty(userDetails)) {
+            return StringUtils.EMPTY;
+        }
+        if (StringUtils.isNotBlank(userDetails.getName())) {
+            return StringUtils.trimToEmpty(userDetails.getName());
+        }
+
+        String firstName = StringUtils.trimToEmpty(userDetails.getFirstName());
+        String lastName = StringUtils.trimToEmpty(userDetails.getLastName());
+
+        return StringUtils.joinWith(StringUtils.SPACE, firstName, lastName).trim();
     }
 }

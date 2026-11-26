@@ -571,17 +571,16 @@
     "ID": "DraftAndSignJudgement",
     "CaseEventID": "draftAndSignJudgement",
     "CaseFieldID": "draftAndSignJudgement",
-    "ListElementCode": "shouldForPublication",
-    "EventElementLabel": "Should this judgment be considered for publication on Find Case Law?",
+    "ListElementCode": "findCaseLawPublicationLabel",
     "FieldDisplayOrder": 2,
-    "DisplayContext": "MANDATORY"
+    "DisplayContext": "READONLY"
   },
   {
     "ID": "DraftAndSignJudgement",
     "CaseEventID": "draftAndSignJudgement",
     "CaseFieldID": "draftAndSignJudgement",
-    "ListElementCode": "shouldForPublicationReason",
-    "EventElementLabel": "Why should it be considered for publication?",
+    "ListElementCode": "notForPublication",
+    "EventElementLabel": "Why should this judgment not be published on Find Case Law (FCL) as well as the Employment Tribunal Register?",
     "FieldDisplayOrder": 3,
     "DisplayContext": "OPTIONAL"
   },
@@ -589,8 +588,8 @@
     "ID": "DraftAndSignJudgement",
     "CaseEventID": "draftAndSignJudgement",
     "CaseFieldID": "draftAndSignJudgement",
-    "ListElementCode": "draftAndSignJudgementDocuments",
-    "EventElementLabel": "Document",
+    "ListElementCode": "nonPublicationReason",
+    "EventElementLabel": "Reason for non-publication",
     "FieldDisplayOrder": 4,
     "DisplayContext": "MANDATORY"
   },
@@ -598,7 +597,7 @@
     "ID": "DraftAndSignJudgement",
     "CaseEventID": "draftAndSignJudgement",
     "CaseFieldID": "draftAndSignJudgement",
-    "ListElementCode": "draftAndSignJudgementDocuments.uploadedDocument",
+    "ListElementCode": "draftAndSignJudgementDocuments",
     "EventElementLabel": "Document",
     "FieldDisplayOrder": 5,
     "DisplayContext": "MANDATORY"
@@ -607,9 +606,18 @@
     "ID": "DraftAndSignJudgement",
     "CaseEventID": "draftAndSignJudgement",
     "CaseFieldID": "draftAndSignJudgement",
+    "ListElementCode": "draftAndSignJudgementDocuments.uploadedDocument",
+    "EventElementLabel": "Document",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DraftAndSignJudgement",
+    "CaseEventID": "draftAndSignJudgement",
+    "CaseFieldID": "draftAndSignJudgement",
     "ListElementCode": "draftAndSignJudgementDocuments.shortDescription",
     "EventElementLabel": "Description",
-    "FieldDisplayOrder": 6,
+    "FieldDisplayOrder": 7,
     "DisplayContext": "OPTIONAL"
   },
   {
@@ -618,7 +626,7 @@
     "CaseFieldID": "draftAndSignJudgement",
     "ListElementCode": "furtherDirections",
     "EventElementLabel": "Any further directions?",
-    "FieldDisplayOrder": 7,
+    "FieldDisplayOrder": 8,
     "DisplayContext": "OPTIONAL"
   },
   {
@@ -627,7 +635,7 @@
     "CaseFieldID": "draftAndSignJudgement",
     "ListElementCode": "isUrgent",
     "EventElementLabel": "Is this urgent?",
-    "FieldDisplayOrder": 8,
+    "FieldDisplayOrder": 9,
     "DisplayContext": "MANDATORY",
     "Publish": "Y"
   },

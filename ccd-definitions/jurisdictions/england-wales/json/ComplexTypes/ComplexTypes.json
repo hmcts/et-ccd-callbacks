@@ -3485,7 +3485,7 @@
     "ListElementCode": "shouldForPublication",
     "FieldType": "YesOrNo",
     "ElementLabel": "Should this judgment be considered for publication on Find Case Law?",
-    "FieldShowCondition": "isJudgement=\"Yes\"",
+    "FieldShowCondition": "isJudgement=\"dummy\"",
     "RetainHiddenValue": "No",
     "SecurityClassification": "Public",
     "HintText": "Judgments may still be published even if you select \"No\".",
@@ -3496,7 +3496,38 @@
     "ListElementCode": "shouldForPublicationReason",
     "FieldType": "TextArea",
     "ElementLabel": "Why should it be considered for publication?",
-    "FieldShowCondition": "shouldForPublication=\"Yes\"",
+    "FieldShowCondition": "isJudgement=\"dummy\"",
+    "RetainHiddenValue": "No",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DraftAndSignJudgement",
+    "ListElementCode": "findCaseLawPublicationLabel",
+    "FieldType": "Label",
+    "ElementLabel": "### Find Case Law publication",
+    "FieldShowCondition": "isJudgement=\"Yes\"",
+    "RetainHiddenValue": "No",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DraftAndSignJudgement",
+    "ListElementCode": "notForPublication",
+    "FieldType": "MultiSelectList",
+    "ElementLabel": "Why should this judgment not be published on Find Case Law (FCL) as well as the Employment Tribunal Register?",
+    "FieldTypeParameter": "msl_notForPublication",
+    "FieldShowCondition": "isJudgement=\"Yes\"",
+    "RetainHiddenValue": "No",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DraftAndSignJudgement",
+    "ListElementCode": "nonPublicationReason",
+    "FieldType": "TextArea",
+    "ElementLabel": "Reason for non-publication",
+    "FieldShowCondition": "isJudgement=\"Yes\" AND notForPublication CONTAINS \"notForPublication\"",
     "RetainHiddenValue": "No",
     "SecurityClassification": "Public",
     "Searchable": "N"

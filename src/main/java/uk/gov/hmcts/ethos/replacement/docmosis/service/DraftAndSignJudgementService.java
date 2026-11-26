@@ -18,14 +18,13 @@ import uk.gov.service.notify.NotificationClientException;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_DOCUMENT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.NOT_PROVIDED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.REASON_FOR_PUBLICATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.SUBMITTED_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.USER_NAME;
@@ -37,6 +36,8 @@ import static uk.gov.service.notify.NotificationClient.prepareUpload;
 @RequiredArgsConstructor
 public class DraftAndSignJudgementService {
 
+    public static final String NOT_FOR_PUBLICATION = "notForPublication";
+    public static final String ERROR_MSG_MISSING_NON_PUBLICATION_REASON = "Reason for non-publication is required";
     private static final String ERROR_MSG_MISSING_CASE_DETAILS = "Case details is missing";
     private static final String ERROR_MSG_MISSING_USER_TOKEN = "User token is missing";
     private static final String ERROR_MSG_MISSING_CASE_DATA = "Case data is missing or incomplete";
@@ -58,8 +59,28 @@ public class DraftAndSignJudgementService {
     private String emailAddressToSend;
 
     /**
-     * Checks if the Draft and Sign Judgement is judgement and if it is for publication.
-     * If yes, sends an email confirmation if the Judicial Recommendation is for Find Case Law Publication.
+     * Validates that a non-publication reason is provided when the judgment is marked
+     * as not to be published on Find Case Law.
+     * @param caseData Case data containing draft and sign judgement details
+     * @return List of validation error messages, or empty list if valid
+     */
+    public List<String> validateNonPublicationReason(CaseData caseData) {
+        if (caseData == null || ObjectUtils.isEmpty(caseData.getDraftAndSignJudgement())) {
+            return List.of();
+        }
+        DraftAndSignJudgement judgement = caseData.getDraftAndSignJudgement();
+        if (YES.equals(judgement.getIsJudgement())
+            && isNotForPublication(judgement)
+            && StringUtils.isBlank(judgement.getNonPublicationReason())) {
+            return List.of(ERROR_MSG_MISSING_NON_PUBLICATION_REASON);
+        }
+        return List.of();
+    }
+
+    /**
+     * Checks if the Draft and Sign Judgement is a judgment and is suitable for Find Case Law publication
+     * (i.e. not marked as excluded from publication).
+     * If so, sends an email notification to the Find Case Law email address.
      * @param caseDetails Details on the case
      * @param userToken User token for the request
      * @throws NotificationClientException if there is an error in prepareUpload
@@ -84,8 +105,7 @@ public class DraftAndSignJudgementService {
         if (ObjectUtils.isEmpty(judgement)) {
             throw new IllegalStateException(ERROR_MSG_MISSING_DRAFT_AND_SIGN);
         }
-        if (YES.equals(judgement.getIsJudgement())
-            && YES.equals(judgement.getShouldForPublication())) {
+        if (YES.equals(judgement.getIsJudgement()) && !isNotForPublication(judgement)) {
             emailService.sendEmail(
                 forFindCaseLawEmailTemplateId,
                 emailAddressToSend,
@@ -94,20 +114,21 @@ public class DraftAndSignJudgementService {
         }
     }
 
+    private boolean isNotForPublication(DraftAndSignJudgement judgement) {
+        return CollectionUtils.isNotEmpty(judgement.getNotForPublication())
+            && judgement.getNotForPublication().contains(NOT_FOR_PUBLICATION);
+    }
+
     private Map<String, Object> prepareEmailContent(
         CaseDetails caseDetails,
         DraftAndSignJudgement judgement,
         String userToken
     ) throws NotificationClientException {
         CaseData caseData = caseDetails.getCaseData();
-        String reasonForPublication = StringUtils.isNotBlank(judgement.getShouldForPublicationReason())
-            ? judgement.getShouldForPublicationReason()
-            : NOT_PROVIDED;
         return Map.of(
             CASE_NUMBER, caseData.getEthosCaseReference(),
             CLAIMANT, caseData.getClaimant(),
             RESPONDENT_NAMES, getRespondentNames(caseData),
-            REASON_FOR_PUBLICATION, reasonForPublication,
             SUBMITTED_DATE, UtilHelper.formatCurrentDate(LocalDate.now()),
             USER_NAME, reportDataService.getUserFullName(userToken),
             LINK_TO_DOCUMENT, getLinkToDocument(judgement, userToken)

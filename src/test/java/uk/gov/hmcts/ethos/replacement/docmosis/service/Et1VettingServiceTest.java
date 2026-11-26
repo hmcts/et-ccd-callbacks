@@ -26,6 +26,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.VettingJurisdictionCodesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ai.Et1AiVettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.jpaservice.JpaVenueService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -40,6 +41,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -941,6 +944,19 @@ class Et1VettingServiceTest {
 
         String markUp = caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1();
         assertThat(markUp).doesNotContain("Effective Elapsed Time");
+    }
+
+    @Test
+    void initialiseAndTriggerBackgroundAiVetting_delegatesWhenAiServicePresent() {
+        Et1AiVettingService mockAiService = mock(Et1AiVettingService.class);
+        Et1VettingService serviceWithAi = new Et1VettingService(
+                tornadoService, jpaVenueService, employmentRightsActService, mockAiService);
+
+        serviceWithAi.initialiseEt1Vetting(caseDetails, "Bearer token");
+        serviceWithAi.triggerBackgroundAiVetting(caseDetails, "Bearer token");
+
+        verify(mockAiService).vetClaimAndPrepopulate(caseDetails, "Bearer token");
+        verify(mockAiService).vetClaimInBackground(caseDetails, "Bearer token");
     }
 
 }

@@ -2,6 +2,11 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.ai;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDResources;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
+import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.ai.AiGatewayProperties;
@@ -124,5 +129,41 @@ class AiAttachmentExtractorTest {
         assertThat(parts).hasSize(3);
         assertThat((String) parts.get(1).get("text")).contains("Misnamed RTF");
         assertThat((String) parts.get(2).get("text")).contains("42");
+    }
+
+    @Test
+    void buildUserParts_extractsAcroFormFieldsAndAsciiLegacyRuns() throws IOException {
+        byte[] acroPdf;
+        try (PDDocument document = new PDDocument();
+             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            document.addPage(new PDPage());
+            PDAcroForm acroForm = new PDAcroForm(document);
+            PDResources resources = new PDResources();
+            resources.put(org.apache.pdfbox.cos.COSName.getPDFName("Helv"),
+                    new PDType1Font(Standard14Fonts.FontName.HELVETICA));
+            acroForm.setDefaultResources(resources);
+            acroForm.setDefaultAppearance("/Helv 12 Tf 0 g");
+            PDTextField field = new PDTextField(acroForm);
+            field.setPartialName("claimantName");
+            field.setValue("Alice Smith");
+            acroForm.getFields().add(field);
+            document.getDocumentCatalog().setAcroForm(acroForm);
+            document.save(out);
+            acroPdf = out.toByteArray();
+        }
+
+        byte[] asciiDoc = {0, 1, 'C', 'l', 'a', 'i', 'm', ' ', 't', 'e', 'x', 't', 0, 2};
+
+        List<Map<String, Object>> parts = extractor.buildUserParts("Prompt", List.of(
+                AiDocumentAttachment.builder().documentId("acro-1").filename("form.pdf")
+                        .mimeType("application/pdf").data(acroPdf).build(),
+                AiDocumentAttachment.builder().documentId("doc-ascii").filename("old.doc")
+                        .mimeType("application/msword").data(asciiDoc).build()
+        ));
+
+        assertThat((String) parts.get(1).get("text"))
+                .contains("[Form Fields]")
+                .contains("claimantName: Alice Smith");
+        assertThat((String) parts.get(3).get("text")).contains("Claim text");
     }
 }

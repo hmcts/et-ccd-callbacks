@@ -10,9 +10,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.task.SyncTaskExecutor;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.client.CcdSubmitEventParams;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.ai.AiGatewayProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ai.AiVettingPendingResult;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ai.Et1AiVettingResult;
@@ -458,5 +465,79 @@ class Et1AiVettingServiceTest {
         assertThat(data.getIsLocationCorrect()).isEqualTo("Yes");
         assertThat(data.getEt1SuggestHearingVenue()).isEqualTo("No");
         assertThat(data.getEt1VettingBeforeYouStart()).contains("Evaluation Confidence:");
+    }
+
+    @Test
+    void vetClaimAndPrepopulate_exercisesEmptyReferralsEraTracksVenuesAndMissingAcasWarning() throws Exception {
+        Et1AiVettingResult emptyReferralsResult = Et1AiVettingResult.builder()
+                .et1VettingEra("Not applicable")
+                .substantiveDefects(Et1AiVettingResult.SubstantiveDefectsAssessment.builder()
+                        .defectsList(List.of()).build())
+                .jurisdictionAssessment(Et1AiVettingResult.JurisdictionAssessment.builder()
+                        .areCodesCorrect("No")
+                        .suggestedJurisdictionCodes(List.of("ZNON"))
+                        .build())
+                .trackAllocation(Et1AiVettingResult.TrackAllocationAssessment.builder()
+                        .isTrackCorrect("No")
+                        .suggestedTrack("Short")
+                        .build())
+                .locationAndVenue(Et1AiVettingResult.LocationAndVenueAssessment.builder()
+                        .isLocationCorrect("No")
+                        .suggestedOffice("Leeds")
+                        .suggestHearingVenue("Yes")
+                        .suggestedHearingVenue("Leeds ET")
+                        .build())
+                .judicialReferrals(Et1AiVettingResult.JudicialReferralAssessment.builder()
+                        .referralsToJudge(List.of()).build())
+                .rejOrVpReferrals(Et1AiVettingResult.RejOrVpReferralAssessment.builder()
+                        .referralsToRejOrVp(List.of()).build())
+                .otherReferrals(Et1AiVettingResult.OtherReferralAssessment.builder()
+                        .otherReferrals(List.of()).build())
+                .confidence("LOW")
+                .build();
+
+        when(jpaVenueService.getVenues(TribunalOffice.LEEDS))
+                .thenReturn(List.of(DynamicValueType.create("LEEDS_ET", "Leeds ET")));
+        when(pendingResultRepository.findById(CASE_REFERENCE)).thenReturn(Optional.empty());
+        when(documentReaderService.findClaimDocumentAttachments(any(CaseData.class), any()))
+                .thenReturn(List.of());
+        when(aiGatewayClient.generateContent(anyString(), anyString(), anyList()))
+                .thenReturn(objectMapper.writeValueAsString(emptyReferralsResult));
+
+        RespondentSumType respondent = new RespondentSumType();
+        respondent.setRespondentName("Acme Ltd");
+        respondent.setRespondentAcasQuestion("Yes");
+        respondent.setAcasCertificateReceiptDate("2026-10-01");
+        respondent.setAcasCertificateIssueDate("2026-10-15");
+        RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
+        respondentItem.setId("1");
+        respondentItem.setValue(respondent);
+
+        UploadedDocumentType et1Doc = new UploadedDocumentType();
+        et1Doc.setDocumentFilename("ET1.pdf");
+        DocumentType docType = new DocumentType();
+        docType.setTypeOfDocument("ET1");
+        docType.setUploadedDocument(et1Doc);
+        DocumentTypeItem docItem = new DocumentTypeItem();
+        docItem.setId("1");
+        docItem.setValue(docType);
+
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+                .withEthosCaseReference("6000010/2026")
+                .withManagingOffice("Leeds")
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseId(CASE_ID);
+        caseDetails.getCaseData().setEt1VettingEraAssessmentMarkUp("ERA triggered");
+        caseDetails.getCaseData().setRespondentCollection(List.of(respondentItem));
+        caseDetails.getCaseData().setDocumentCollection(List.of(docItem));
+
+        aiVettingService.vetClaimAndPrepopulate(caseDetails, "Bearer user-token");
+
+        CaseData data = caseDetails.getCaseData();
+        assertThat(data.getEt1VettingEra()).isEqualTo("Not applicable");
+        assertThat(data.getSuggestAnotherTrack()).isEqualTo("Short");
+        assertThat(data.getEt1HearingVenues().getValue().getCode()).isEqualTo("LEEDS_ET");
+        assertThat(data.getEt1VettingAcasCertGeneralNote())
+                .contains("No ACAS Certificate document is attached");
     }
 }

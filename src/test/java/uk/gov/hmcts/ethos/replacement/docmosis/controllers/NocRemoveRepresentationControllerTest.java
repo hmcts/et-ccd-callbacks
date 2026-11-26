@@ -14,8 +14,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveClaimantRepNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveClaimantRepresentationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveRepNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -44,7 +44,7 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
     @MockitoBean
     private NocRemoveClaimantRepresentationService nocRemoveClaimantRepresentationService;
     @MockitoBean
-    private NocRemoveRepNotificationService nocRemoveRepNotificationService;
+    private NocRemoveClaimantRepNotificationService nocRemoveClaimantRepNotificationService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -139,7 +139,7 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
                 .thenReturn(userDetails);
         doNothing().when(nocRemoveClaimantRepresentationService).revokeClaimantLegalRep(eq(userDetails),
                 any(CaseDetails.class));
-        doNothing().when(nocRemoveRepNotificationService).sendClaimantRepresentativeRemovalNotifications(
+        doNothing().when(nocRemoveClaimantRepNotificationService).sendClaimantRepresentativeRemovalNotifications(
                 eq(userDetails), any(CaseDetails.class),
                 eq(ccdRequest.getCaseDetails().getCaseData().getRepresentativeClaimantType()));
         doNothing().when(nocRemoveClaimantRepresentationService).populateNocRemovalDetails(eq(userDetails),

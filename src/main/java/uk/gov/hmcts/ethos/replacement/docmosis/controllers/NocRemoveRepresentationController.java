@@ -20,8 +20,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveClaimantRepNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveClaimantRepresentationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveRepNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 
@@ -40,7 +40,7 @@ public class NocRemoveRepresentationController {
 
     private final UserService userService;
     private final NocRemoveClaimantRepresentationService nocRemoveClaimantRepresentationService;
-    private final NocRemoveRepNotificationService nocRemoveRepNotificationService;
+    private final NocRemoveClaimantRepNotificationService nocRemoveClaimantRepNotificationService;
 
     @PostMapping(value = "/claimant/aboutToStart", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "nocRemoveRep claimant about to start page")
@@ -90,8 +90,8 @@ public class NocRemoveRepresentationController {
                     STAGE_ABOUT_TO_SUBMIT);
             RepresentedTypeC oldRepresentative = caseDetails.getCaseData().getRepresentativeClaimantType();
             nocRemoveClaimantRepresentationService.revokeClaimantLegalRep(userDetails, caseDetails);
-            nocRemoveRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails, caseDetails,
-                    oldRepresentative);
+            nocRemoveClaimantRepNotificationService.sendClaimantRepresentativeRemovalNotifications(userDetails,
+                    caseDetails, oldRepresentative);
             NocUtils.resetNOCRemovalOptions(caseDetails.getCaseData());
         } catch (GenericServiceException | CcdInputOutputException ex) {
             errors.add(ex.getMessage());

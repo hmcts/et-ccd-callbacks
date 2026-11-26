@@ -40,6 +40,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_VETTING
 public class Et1DocumentReaderService {
 
     private static final String APPLICATION_PDF = "application/pdf";
+    private static final String MIME_MS_EXCEL = "application/vnd.ms-excel";
+    private static final String MIME_MS_POWERPOINT = "application/vnd.ms-powerpoint";
     private static final Set<String> RELEVANT_DOCUMENT_TYPES = Set.of(
             ET1,
             ET1_ATTACHMENT,
@@ -59,15 +61,15 @@ public class Et1DocumentReaderService {
             Map.entry(".doc", "application/msword"),
             Map.entry(".dot", "application/msword"),
             Map.entry(".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
-            Map.entry(".xls", "application/vnd.ms-excel"),
-            Map.entry(".xlt", "application/vnd.ms-excel"),
-            Map.entry(".xla", "application/vnd.ms-excel"),
+            Map.entry(".xls", MIME_MS_EXCEL),
+            Map.entry(".xlt", MIME_MS_EXCEL),
+            Map.entry(".xla", MIME_MS_EXCEL),
             Map.entry(".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
             Map.entry(".xltx", "application/vnd.openxmlformats-officedocument.spreadsheetml.template"),
-            Map.entry(".ppt", "application/vnd.ms-powerpoint"),
-            Map.entry(".pot", "application/vnd.ms-powerpoint"),
-            Map.entry(".pps", "application/vnd.ms-powerpoint"),
-            Map.entry(".ppa", "application/vnd.ms-powerpoint"),
+            Map.entry(".ppt", MIME_MS_POWERPOINT),
+            Map.entry(".pot", MIME_MS_POWERPOINT),
+            Map.entry(".pps", MIME_MS_POWERPOINT),
+            Map.entry(".ppa", MIME_MS_POWERPOINT),
             Map.entry(".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"),
             Map.entry(".potx", "application/vnd.openxmlformats-officedocument.presentationml.template"),
             Map.entry(".ppsx", "application/vnd.openxmlformats-officedocument.presentationml.slideshow")

@@ -40,6 +40,7 @@ import javax.swing.text.rtf.RTFEditorKit;
 @RequiredArgsConstructor
 public class AiAttachmentExtractor {
 
+    private static final String IMAGE_URL_KEY = "image_url";
     private static final int MAX_PDF_IMAGE_PAGES = 8;
     private static final float PDF_IMAGE_DPI = 100f;
     private static final int MAX_TOTAL_IMAGE_BYTES = 1_500_000;
@@ -82,37 +83,39 @@ public class AiAttachmentExtractor {
             return;
         }
         for (AiDocumentAttachment attachment : attachments) {
-            if (attachment == null || attachment.getData() == null || attachment.getData().length == 0) {
-                continue;
+            if (attachment != null && attachment.getData() != null && attachment.getData().length > 0) {
+                appendSingleAttachment(userParts, attachment);
             }
-            String mimeType = StringUtils.defaultIfBlank(attachment.getMimeType(), "application/pdf")
-                    .toLowerCase(Locale.ROOT);
-            String filename = StringUtils.defaultIfBlank(attachment.getFilename(), "attachment");
-            String docId = StringUtils.defaultIfBlank(attachment.getDocumentId(), "unknown");
-            String ext = extractExtension(filename);
+        }
+    }
 
-            if (DIRECT_IMAGE_MIME_TYPES.contains(mimeType)) {
-                addImagePart(userParts, mimeType, attachment.getData());
-            } else if (isConvertibleImage(mimeType, ext)) {
-                convertImageToPngPart(userParts, docId, attachment.getData());
-            } else if ("application/pdf".equals(mimeType) || ".pdf".equals(ext)) {
-                appendPdfParts(userParts, docId, filename, attachment.getData());
-            } else if (".docx".equals(ext)) {
-                appendDocxTextPart(userParts, docId, filename, attachment.getData());
-            } else if (EXCEL_OPENXML_EXT.contains(ext)) {
-                appendExcelOpenXmlTextPart(userParts, docId, filename, attachment.getData());
-            } else if (PPT_OPENXML_EXT.contains(ext)) {
-                appendPowerPointOpenXmlTextPart(userParts, docId, filename, attachment.getData());
-            } else if (".rtf".equals(ext) || mimeType.contains("rtf")) {
-                appendRtfTextPart(userParts, docId, filename, attachment.getData());
-            } else if (LEGACY_OFFICE_EXT.contains(ext)) {
-                appendLegacyOfficeTextPart(userParts, docId, filename, attachment.getData());
-            } else if (mimeType.startsWith("text/")) {
-                String text = new String(attachment.getData(), StandardCharsets.UTF_8);
-                appendLabeledTextPart(userParts, filename, text);
-            } else {
-                log.info("Skipping unsupported binary attachment {} ({}) for Chat Completions", docId, mimeType);
-            }
+    private void appendSingleAttachment(List<Map<String, Object>> userParts, AiDocumentAttachment attachment) {
+        String mimeType = StringUtils.defaultIfBlank(attachment.getMimeType(), "application/pdf")
+                .toLowerCase(Locale.ROOT);
+        String filename = StringUtils.defaultIfBlank(attachment.getFilename(), "attachment");
+        String docId = StringUtils.defaultIfBlank(attachment.getDocumentId(), "unknown");
+        String ext = extractExtension(filename);
+
+        if (DIRECT_IMAGE_MIME_TYPES.contains(mimeType)) {
+            addImagePart(userParts, mimeType, attachment.getData());
+        } else if (isConvertibleImage(mimeType, ext)) {
+            convertImageToPngPart(userParts, docId, attachment.getData());
+        } else if ("application/pdf".equals(mimeType) || ".pdf".equals(ext)) {
+            appendPdfParts(userParts, docId, filename, attachment.getData());
+        } else if (".docx".equals(ext)) {
+            appendDocxTextPart(userParts, docId, filename, attachment.getData());
+        } else if (EXCEL_OPENXML_EXT.contains(ext)) {
+            appendExcelOpenXmlTextPart(userParts, docId, filename, attachment.getData());
+        } else if (PPT_OPENXML_EXT.contains(ext)) {
+            appendPowerPointOpenXmlTextPart(userParts, docId, filename, attachment.getData());
+        } else if (".rtf".equals(ext) || mimeType.contains("rtf")) {
+            appendRtfTextPart(userParts, docId, filename, attachment.getData());
+        } else if (LEGACY_OFFICE_EXT.contains(ext)) {
+            appendLegacyOfficeTextPart(userParts, docId, filename, attachment.getData());
+        } else if (mimeType.startsWith("text/")) {
+            appendLabeledTextPart(userParts, filename, new String(attachment.getData(), StandardCharsets.UTF_8));
+        } else {
+            log.info("Skipping unsupported binary attachment {} ({}) for Chat Completions", docId, mimeType);
         }
     }
 
@@ -218,28 +221,25 @@ public class AiAttachmentExtractor {
     private void extractWorksheetCells(String sheetXml, List<String> sharedStrings, StringBuilder sb) {
         Matcher cellMatcher = CELL_PATTERN.matcher(sheetXml);
         while (cellMatcher.find()) {
-            String attrs = cellMatcher.group(1);
-            String cellBody = cellMatcher.group(2);
-            Matcher valMatcher = CELL_VALUE_PATTERN.matcher(cellBody);
-            String value = null;
-            if (valMatcher.find()) {
-                String rawVal = valMatcher.group(1);
-                if (attrs.contains("t=\"s\"") && StringUtils.isNumeric(rawVal)) {
-                    int idx = Integer.parseInt(rawVal);
-                    value = idx >= 0 && idx < sharedStrings.size() ? sharedStrings.get(idx) : rawVal;
-                } else {
-                    value = rawVal;
-                }
-            } else {
-                Matcher inlineMatcher = XML_TEXT_PATTERN.matcher(cellBody);
-                if (inlineMatcher.find()) {
-                    value = inlineMatcher.group(1);
-                }
-            }
+            String value = resolveCellValue(cellMatcher.group(1), cellMatcher.group(2), sharedStrings);
             if (StringUtils.isNotBlank(value)) {
                 sb.append(value.trim()).append('\n');
             }
         }
+    }
+
+    private String resolveCellValue(String attrs, String cellBody, List<String> sharedStrings) {
+        Matcher valMatcher = CELL_VALUE_PATTERN.matcher(cellBody);
+        if (valMatcher.find()) {
+            String rawVal = valMatcher.group(1);
+            if (attrs.contains("t=\"s\"") && StringUtils.isNumeric(rawVal)) {
+                int idx = Integer.parseInt(rawVal);
+                return idx >= 0 && idx < sharedStrings.size() ? sharedStrings.get(idx) : rawVal;
+            }
+            return rawVal;
+        }
+        Matcher inlineMatcher = XML_TEXT_PATTERN.matcher(cellBody);
+        return inlineMatcher.find() ? inlineMatcher.group(1) : null;
     }
 
     private void appendPowerPointOpenXmlTextPart(List<Map<String, Object>> userParts,
@@ -392,14 +392,10 @@ public class AiAttachmentExtractor {
     private long currentImageBytes(List<Map<String, Object>> userParts) {
         long total = 0;
         for (Map<String, Object> part : userParts) {
-            if ("image_url".equals(part.get("type"))) {
-                Object imageUrlObj = part.get("image_url");
-                if (imageUrlObj instanceof Map<?, ?> imageUrlMap) {
-                    Object url = imageUrlMap.get("url");
-                    if (url instanceof String urlStr) {
-                        total += (urlStr.length() * 3L) / 4L;
-                    }
-                }
+            if (IMAGE_URL_KEY.equals(part.get("type"))
+                    && part.get(IMAGE_URL_KEY) instanceof Map<?, ?> imageUrlMap
+                    && imageUrlMap.get("url") instanceof String urlStr) {
+                total += (urlStr.length() * 3L) / 4L;
             }
         }
         return total;
@@ -408,8 +404,8 @@ public class AiAttachmentExtractor {
     private void addImagePart(List<Map<String, Object>> userParts, String mimeType, byte[] data) {
         String base64 = Base64.getEncoder().encodeToString(data);
         userParts.add(Map.of(
-                "type", "image_url",
-                "image_url", Map.of("url", "data:" + mimeType + ";base64," + base64)
+                "type", IMAGE_URL_KEY,
+                IMAGE_URL_KEY, Map.of("url", "data:" + mimeType + ";base64," + base64)
         ));
     }
 

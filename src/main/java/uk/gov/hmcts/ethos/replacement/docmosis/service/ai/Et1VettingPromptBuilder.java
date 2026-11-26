@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
@@ -40,6 +41,8 @@ public class Et1VettingPromptBuilder {
 
     private static final String NOT_SPECIFIED = "Not specified";
     private static final String SYSTEM_INSTRUCTION_RESOURCE = "ai/et1-vetting-system-instruction.txt";
+    private static final ZoneId LONDON_ZONE = ZoneId.of("Europe/London");
+    private static final String DISCRIMINATION_PREFIX = "Discrimination/harassment: ";
     private static final Map<JurisdictionCode, String> ENUM_TO_CCD_CODE = Map.of(
             JurisdictionCode.ADTST, "ADT(ST)",
             JurisdictionCode.RPTS, "RPT(S)",
@@ -77,7 +80,7 @@ public class Et1VettingPromptBuilder {
                                   List<AiDocumentAttachment> attachments,
                                   List<String> availableVenues) {
         CaseData caseData = caseDetails.getCaseData();
-        String today = LocalDate.now().format(DateTimeFormatter.ofPattern(DD_MM_YYYY_DATE_FORMAT));
+        String today = LocalDate.now(LONDON_ZONE).format(DateTimeFormatter.ofPattern(DD_MM_YYYY_DATE_FORMAT));
         StringBuilder sb = new StringBuilder(4_096);
 
         sb.append("=== CLAIM FACTS ===\n")
@@ -226,76 +229,97 @@ public class Et1VettingPromptBuilder {
     private void appendClaimNarrative(StringBuilder sb, CaseData caseData) {
         sb.append("\n-- Claim Grounds & Narrative --\n");
 
-        List<String> types = CollectionUtils.isNotEmpty(caseData.getTypesOfClaim())
-            ? caseData.getTypesOfClaim()
-            : (CollectionUtils.isNotEmpty(caseData.getTypeOfClaim())
-            ? caseData.getTypeOfClaim()
-            : caseData.getEt1SectionThreeTypeOfClaim());
+        List<String> types = resolveTypesOfClaim(caseData);
         if (CollectionUtils.isNotEmpty(types)) {
             sb.append("Types of Claim: ").append(types).append('\n');
         }
 
         ClaimantRequestType requests = caseData.getClaimantRequests();
-
-        List<String> discriminations = requests != null
-            && CollectionUtils.isNotEmpty(requests.getDiscriminationClaims())
-            ? requests.getDiscriminationClaims()
-            : caseData.getDiscriminationTypesOfClaim();
+        List<String> discriminations = resolveFirstNonEmptyList(
+                requests != null ? requests.getDiscriminationClaims() : null,
+                caseData.getDiscriminationTypesOfClaim());
         if (CollectionUtils.isNotEmpty(discriminations)) {
             sb.append("Discrimination Claims: ").append(discriminations).append('\n');
         }
 
-        List<String> payClaims = requests != null && CollectionUtils.isNotEmpty(requests.getPayClaims())
-            ? requests.getPayClaims()
-            : caseData.getPayTypesOfClaim();
+        List<String> payClaims = resolveFirstNonEmptyList(
+                requests != null ? requests.getPayClaims() : null,
+                caseData.getPayTypesOfClaim());
         if (CollectionUtils.isNotEmpty(payClaims)) {
             sb.append("Pay Claims: ").append(payClaims).append('\n');
         }
 
-        String whistleblowing = requests != null && StringUtils.isNotBlank(requests.getWhistleblowing())
-            ? requests.getWhistleblowing()
-            : (CollectionUtils.isNotEmpty(caseData.getWhistleblowingYesNo())
-            ? caseData.getWhistleblowingYesNo().toString() : null);
-        appendIfNotBlank(sb, "Whistleblowing", whistleblowing);
+        appendIfNotBlank(sb, "Whistleblowing", resolveWhistleblowing(requests, caseData));
 
-        String wbAuthority = requests != null && StringUtils.isNotBlank(requests.getWhistleblowingAuthority())
-            ? requests.getWhistleblowingAuthority()
-            : caseData.getWhistleblowingRegulator();
+        String wbAuthority = resolveFirstNonBlank(
+                requests != null ? requests.getWhistleblowingAuthority() : null,
+                caseData.getWhistleblowingRegulator());
         appendIfNotBlank(sb, "Whistleblowing Regulator / Authority", wbAuthority);
 
-        String otherClaim = requests != null && StringUtils.isNotBlank(requests.getOtherClaim())
-            ? requests.getOtherClaim()
-            : caseData.getOtherTypeOfClaimDetails();
+        String otherClaim = resolveFirstNonBlank(
+                requests != null ? requests.getOtherClaim() : null,
+                caseData.getOtherTypeOfClaimDetails());
         appendIfNotBlank(sb, "Other Claim Details", otherClaim);
 
-        if (requests != null) {
-            if (StringUtils.isNotBlank(requests.getClaimantCompensationAmount())) {
-                sb.append("Compensation Amount Claimed: £")
-                    .append(requests.getClaimantCompensationAmount()).append('\n');
-            }
-            appendIfNotBlank(sb, "Compensation Details", requests.getClaimantCompensationText());
-            if (CollectionUtils.isNotEmpty(requests.getClaimOutcome())) {
-                sb.append("Remedies / Outcomes Sought: ").append(requests.getClaimOutcome()).append('\n');
-            }
-            appendIfNotBlank(sb, "Tribunal Recommendations Sought", requests.getClaimantTribunalRecommendation());
-            if (StringUtils.isNotBlank(requests.getLinkedCases())) {
-                sb.append("Linked Cases Stated: ").append(requests.getLinkedCases())
-                    .append(" - ").append(defaultString(requests.getLinkedCasesDetail(), "")).append('\n');
-            }
-        }
+        appendCompensationAndLinkedCases(sb, requests);
 
         String lastEvent = caseData.getClaimantOtherType() != null
-            && StringUtils.isNotBlank(caseData.getClaimantOtherType().getDateOfLastEvent())
-            ? caseData.getClaimantOtherType().getDateOfLastEvent()
+            ? resolveFirstNonBlank(caseData.getClaimantOtherType().getDateOfLastEvent(),
+                    caseData.getEt1SectionThreeDateOfLastEvent())
             : caseData.getEt1SectionThreeDateOfLastEvent();
         appendDateField(sb, "Date of Last Event", lastEvent, true);
 
-        String claimNarrative = requests != null && StringUtils.isNotBlank(requests.getClaimDescription())
-            ? requests.getClaimDescription()
-            : caseData.getEt1SectionThreeClaimDetails();
+        String claimNarrative = resolveFirstNonBlank(
+                requests != null ? requests.getClaimDescription() : null,
+                caseData.getEt1SectionThreeClaimDetails());
         if (StringUtils.isNotBlank(claimNarrative)) {
             sb.append("Claim Narrative Text:\n").append(claimNarrative).append('\n');
         }
+    }
+
+    private void appendCompensationAndLinkedCases(StringBuilder sb, ClaimantRequestType requests) {
+        if (requests == null) {
+            return;
+        }
+        if (StringUtils.isNotBlank(requests.getClaimantCompensationAmount())) {
+            sb.append("Compensation Amount Claimed: £")
+                .append(requests.getClaimantCompensationAmount()).append('\n');
+        }
+        appendIfNotBlank(sb, "Compensation Details", requests.getClaimantCompensationText());
+        if (CollectionUtils.isNotEmpty(requests.getClaimOutcome())) {
+            sb.append("Remedies / Outcomes Sought: ").append(requests.getClaimOutcome()).append('\n');
+        }
+        appendIfNotBlank(sb, "Tribunal Recommendations Sought", requests.getClaimantTribunalRecommendation());
+        if (StringUtils.isNotBlank(requests.getLinkedCases())) {
+            sb.append("Linked Cases Stated: ").append(requests.getLinkedCases())
+                .append(" - ").append(defaultString(requests.getLinkedCasesDetail(), "")).append('\n');
+        }
+    }
+
+    private List<String> resolveTypesOfClaim(CaseData caseData) {
+        if (CollectionUtils.isNotEmpty(caseData.getTypesOfClaim())) {
+            return caseData.getTypesOfClaim();
+        }
+        return CollectionUtils.isNotEmpty(caseData.getTypeOfClaim())
+                ? caseData.getTypeOfClaim()
+                : caseData.getEt1SectionThreeTypeOfClaim();
+    }
+
+    private List<String> resolveFirstNonEmptyList(List<String> primary, List<String> fallback) {
+        return CollectionUtils.isNotEmpty(primary) ? primary : fallback;
+    }
+
+    private String resolveWhistleblowing(ClaimantRequestType requests, CaseData caseData) {
+        if (requests != null && StringUtils.isNotBlank(requests.getWhistleblowing())) {
+            return requests.getWhistleblowing();
+        }
+        return CollectionUtils.isNotEmpty(caseData.getWhistleblowingYesNo())
+                ? caseData.getWhistleblowingYesNo().toString()
+                : null;
+    }
+
+    private String resolveFirstNonBlank(String primary, String fallback) {
+        return StringUtils.isNotBlank(primary) ? primary : fallback;
     }
 
     private void appendAttachedFilesNotice(StringBuilder sb, List<AiDocumentAttachment> attachments) {
@@ -374,13 +398,13 @@ public class Et1VettingPromptBuilder {
     private String compactDescription(String description) {
         return description
                 .replace("Discrimination, including indirect discrimination based on association or perception,"
-                        + " or harassment on grounds of ", "Discrimination/harassment: ")
+                        + " or harassment on grounds of ", DISCRIMINATION_PREFIX)
                 .replace("Discrimination, including indirect discrimination, discrimination based on association or "
-                        + "perception, or harassment because of ", "Discrimination/harassment: ")
+                        + "perception, or harassment because of ", DISCRIMINATION_PREFIX)
                 .replace("Discrimination, including indirect discrimination, discrimination based on association or "
-                        + "perception, or harassment on grounds of ", "Discrimination/harassment: ")
+                        + "perception, or harassment on grounds of ", DISCRIMINATION_PREFIX)
                 .replace("Discrimination, including indirect discrimination based on association or perception "
-                        + "or harassment on grounds of ", "Discrimination/harassment: ")
+                        + "or harassment on grounds of ", DISCRIMINATION_PREFIX)
                 .replace("Suffered a detriment and/or dismissal ", "Detriment/dismissal ")
                 .replace("Suffer a detriment and/or dismissal ", "Detriment/dismissal ");
     }

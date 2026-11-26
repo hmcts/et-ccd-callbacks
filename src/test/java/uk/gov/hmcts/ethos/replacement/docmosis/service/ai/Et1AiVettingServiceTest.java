@@ -192,4 +192,192 @@ class Et1AiVettingServiceTest {
         verify(aiGatewayClient, never()).generateContent(anyString(), anyString(), anyList());
         verify(ccdClient, never()).startEventForCase(any(), any(), any(), any(), any());
     }
+
+    @Test
+    void vetClaimAndPrepopulate_appliesFullVettingResultFieldsAndBanner() throws Exception {
+        Et1AiVettingResult fullResult = Et1AiVettingResult.builder()
+                .canServeClaim(Et1AiVettingResult.CanServeClaimAssessment.builder()
+                        .canServe("No")
+                        .reason("Missing postcode")
+                        .notes("Rule 12(1)(b) incomplete respondent address")
+                        .build())
+                .acasAssessments(List.of(
+                        Et1AiVettingResult.AcasAssessment.builder()
+                                .respondentNumber(1).hasCertificate("Yes").isExempt("No").build(),
+                        Et1AiVettingResult.AcasAssessment.builder()
+                                .respondentNumber(2).hasCertificate("No").isExempt("Yes").build(),
+                        Et1AiVettingResult.AcasAssessment.builder()
+                                .respondentNumber(3).hasCertificate("Yes").isExempt("No").build(),
+                        Et1AiVettingResult.AcasAssessment.builder()
+                                .respondentNumber(4).hasCertificate("No").isExempt("No").build(),
+                        Et1AiVettingResult.AcasAssessment.builder()
+                                .respondentNumber(5).hasCertificate("Yes").isExempt("No").build(),
+                        Et1AiVettingResult.AcasAssessment.builder()
+                                .respondentNumber(6).hasCertificate("No").isExempt("Yes").build()
+                ))
+                .et1VettingEra("Yes")
+                .substantiveDefects(Et1AiVettingResult.SubstantiveDefectsAssessment.builder()
+                        .defectsList(List.of("rule121a", "rule121b", "rule121c", "rule121d",
+                                "rule121da", "rule121e", "rule121f"))
+                        .rule121aTextArea("No jurisdiction note")
+                        .rule121bTextArea("Abuse of process note")
+                        .rule121cTextArea("No EC number note")
+                        .rule121dTextArea("Exemption may not apply")
+                        .rule121daTextArea("Rule 12(1)(da) EC mismatch")
+                        .rule121eTextArea("Rule 12(1)(e) claimant mismatch")
+                        .rule121fTextArea("Rule 12(1)(f) respondent mismatch")
+                        .generalNotes("Substantive defects summary")
+                        .build())
+                .jurisdictionAssessment(Et1AiVettingResult.JurisdictionAssessment.builder()
+                        .areCodesCorrect("No")
+                        .suggestedJurisdictionCodes(List.of("UDL", "ADT(ST)", "INVALID_CODE"))
+                        .details("Add UDL and ADT(ST)")
+                        .generalNotes("Jurisdiction notes")
+                        .build())
+                .trackAllocation(Et1AiVettingResult.TrackAllocationAssessment.builder()
+                        .isTrackCorrect("No")
+                        .suggestedTrack("Open")
+                        .whyChangeTrackAllocation("Discrimination claim requires Open track")
+                        .generalNotes("Track notes")
+                        .build())
+                .locationAndVenue(Et1AiVettingResult.LocationAndVenueAssessment.builder()
+                        .isLocationCorrect("No")
+                        .suggestedOffice("Leeds")
+                        .whyChangeOffice("Closer to claimant")
+                        .generalNotes("Location notes")
+                        .suggestHearingVenue("Yes")
+                        .suggestedHearingVenue("Leeds")
+                        .hearingVenueGeneralNotes("Venue notes")
+                        .build())
+                .furtherQuestions(Et1AiVettingResult.FurtherQuestionsAssessment.builder()
+                        .isGovOrMajorEmployer("Yes")
+                        .hasReasonableAdjustments("Yes")
+                        .reasonableAdjustmentsDetails("Hearing loop")
+                        .videoHearingPreference("No")
+                        .videoHearingDetails("Prefers in-person")
+                        .generalNotes("Further questions notes")
+                        .build())
+                .judicialReferrals(Et1AiVettingResult.JudicialReferralAssessment.builder()
+                        .referralsToJudge(List.of("aClaimOfInterimRelief", "aStatutoryAppeal",
+                                "anAllegationOfCommissionOfSexualOffence", "insolvency",
+                                "jurisdictionsUnclear", "lengthOfService",
+                                "potentiallyLinkedCasesInTheEcm", "rule50Issues",
+                                "anotherReasonForJudicialReferral"))
+                        .claimOfInterimReliefNotes("Interim relief")
+                        .statutoryAppealNotes("Statutory appeal")
+                        .sexualOffenceNotes("Sexual offence")
+                        .insolvencyNotes("Insolvency")
+                        .jurisdictionsUnclearNotes("Unclear")
+                        .lengthOfServiceNotes("Under 2 years")
+                        .potentiallyLinkedCasesNotes("Linked")
+                        .rule50IssuesNotes("Rule 50")
+                        .anotherReasonNotes("Another")
+                        .generalNotes("Judge notes")
+                        .build())
+                .rejOrVpReferrals(Et1AiVettingResult.RejOrVpReferralAssessment.builder()
+                        .referralsToRejOrVp(List.of("vexatiousLitigantOrder", "aNationalSecurityIssue",
+                                "nationalMultipleOrPresidentialOrder", "transferToOtherRegion",
+                                "serviceAbroad", "aSensitiveIssue", "anyPotentialConflict",
+                                "anotherReasonREJOrVP"))
+                        .vexatiousLitigantOrderNotes("Vexatious")
+                        .nationalSecurityNotes("Security")
+                        .nationalMultipleNotes("Multiple")
+                        .transferToOtherRegionNotes("Transfer")
+                        .serviceAbroadNotes("Abroad")
+                        .sensitiveIssueNotes("Sensitive")
+                        .potentialConflictNotes("Conflict")
+                        .anotherReasonNotes("Another REJ")
+                        .generalNotes("REJ notes")
+                        .build())
+                .otherReferrals(Et1AiVettingResult.OtherReferralAssessment.builder()
+                        .otherReferrals(List.of("claimOutOfTime", "multipleClaim",
+                                "employmentStatusIssues", "pidJurisdictionRegulator",
+                                "videoHearingPreference", "rule50IssuesOtherFactors",
+                                "otherRelevantFactors"))
+                        .claimOutOfTimeNotes("Out of time")
+                        .multipleClaimNotes("Multiple claim")
+                        .employmentStatusIssuesNotes("Worker status")
+                        .pidRegulatorNotes("PID")
+                        .videoHearingNotes("Video")
+                        .rule50Notes("Rule 50")
+                        .anotherReasonNotes("Other")
+                        .generalNotes("Other referral notes")
+                        .build())
+                .confidence("HIGH")
+                .executiveSummaryMarkdown("### ET1 Vetting Summary\n"
+                        + "- **Claimant**: Jane Doe with `UDL`\n"
+                        + "**Key Issues:**\n"
+                        + "* Check Rule 12\n\n"
+                        + "Paragraph text.")
+                .itemsRequiringReview(List.of("Verify **ACAS** certificate manually"))
+                .build();
+
+        when(pendingResultRepository.findById(CASE_REFERENCE)).thenReturn(Optional.empty());
+        when(documentReaderService.findClaimDocumentAttachments(any(CaseData.class), any()))
+                .thenReturn(List.of());
+        when(aiGatewayClient.generateContent(anyString(), anyString(), anyList()))
+                .thenReturn("[" + objectMapper.writeValueAsString(fullResult) + "]");
+
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+                .withEthosCaseReference("6000004/2026")
+                .withManagingOffice("Leeds")
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseId(CASE_ID);
+        caseDetails.getCaseData().setEt1VettingBeforeYouStart("<p>Existing banner</p>");
+
+        aiVettingService.vetClaimAndPrepopulate(caseDetails, "Bearer user-token");
+
+        CaseData data = caseDetails.getCaseData();
+        assertThat(data.getEt1VettingCanServeClaimYesOrNo()).isEqualTo("No");
+        assertThat(data.getEt1VettingAcasCertIsYesOrNo1()).isEqualTo("Yes");
+        assertThat(data.getEt1VettingAcasCertExemptYesOrNo2()).isEqualTo("Yes");
+        assertThat(data.getEt1VettingAcasCertIsYesOrNo6()).isEqualTo("No");
+        assertThat(data.getSubstantiveDefectsList()).contains("rule121a", "rule121 da");
+        assertThat(data.getRule121daTextArea()).contains("Rule 13(1)(e)");
+        assertThat(data.getSuggestAnotherTrack()).isEqualTo("Open");
+        assertThat(data.getEt1VettingBeforeYouStart())
+                .contains("ET1 Vetting Summary</h4>")
+                .contains("<strong>Claimant</strong>")
+                .contains("<code>UDL</code>")
+                .contains("<p>Existing banner</p>");
+        assertThat(data.getEt1VettingAdditionalInformationTextArea())
+                .contains("Items Requiring Double-Checking / Unable to Answer:")
+                .contains("Verify ACAS certificate manually");
+    }
+
+    @Test
+    void vetClaimAndPrepopulate_handlesBlankArrayAndMalformedJsonGracefully() {
+        when(pendingResultRepository.findById(CASE_REFERENCE)).thenReturn(Optional.empty());
+        when(documentReaderService.findClaimDocumentAttachments(any(CaseData.class), any()))
+                .thenReturn(List.of());
+        when(aiGatewayClient.generateContent(anyString(), anyString(), anyList()))
+                .thenReturn("[]")
+                .thenReturn("\"not-an-object\"")
+                .thenReturn("{invalid-json");
+
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+                .withEthosCaseReference("6000005/2026")
+                .withManagingOffice("Leeds")
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseId(CASE_ID);
+
+        aiVettingService.vetClaimAndPrepopulate(caseDetails, "Bearer user-token");
+        aiVettingService.vetClaimAndPrepopulate(caseDetails, "Bearer user-token");
+        aiVettingService.vetClaimAndPrepopulate(caseDetails, "Bearer user-token");
+
+        assertThat(caseDetails.getCaseData().getEt1VettingCanServeClaimYesOrNo()).isNull();
+    }
+
+    @Test
+    void vetClaimInBackground_skipsUnassignedOffice() {
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+                .withEthosCaseReference("6000006/2026")
+                .withManagingOffice("Unassigned")
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseId(CASE_ID);
+
+        aiVettingService.vetClaimInBackground(caseDetails, "Bearer user-token");
+
+        verify(aiGatewayClient, never()).generateContent(anyString(), anyString(), anyList());
+    }
 }

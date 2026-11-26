@@ -32,6 +32,7 @@ import java.util.Map;
 public class AiGatewayClient {
 
     private static final String SUBSCRIPTION_KEY_HEADER = "Ocp-Apim-Subscription-Key";
+    private static final String CONTENT_KEY = "content";
     private static final String JSON_CODE_BLOCK_PREFIX = "```json";
     private static final String CODE_BLOCK_PREFIX = "```";
     private static final long INITIAL_BACKOFF_MS = 1_000L;
@@ -128,9 +129,9 @@ public class AiGatewayClient {
                                                  List<AiDocumentAttachment> attachments) {
         List<Map<String, Object>> messages = new ArrayList<>();
         if (StringUtils.isNotBlank(systemInstruction)) {
-            messages.add(Map.of("role", "system", "content", systemInstruction));
+            messages.add(Map.of("role", "system", CONTENT_KEY, systemInstruction));
         }
-        messages.add(Map.of("role", "user", "content", attachmentExtractor.buildUserParts(prompt, attachments)));
+        messages.add(Map.of("role", "user", CONTENT_KEY, attachmentExtractor.buildUserParts(prompt, attachments)));
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", properties.getModel());

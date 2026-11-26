@@ -41,6 +41,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.jpaservice.
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,6 +89,8 @@ public class Et1AiVettingService {
     );
 
     private static final Duration PENDING_RESULT_TTL = Duration.ofMinutes(10);
+    private static final String UL_CLOSE = "</ul>";
+    private static final ZoneId LONDON_ZONE = ZoneId.of("Europe/London");
 
     private final AiGatewayProperties aiGatewayProperties;
     private final AiGatewayClient aiGatewayClient;
@@ -548,7 +551,9 @@ public class Et1AiVettingService {
             case 4 -> caseData.setEt1VettingAcasCertIsYesOrNo4(value);
             case 5 -> caseData.setEt1VettingAcasCertIsYesOrNo5(value);
             case 6 -> caseData.setEt1VettingAcasCertIsYesOrNo6(value);
-            default -> { }
+            default -> {
+                // No action for invalid respondent number
+            }
         }
     }
 
@@ -1255,6 +1260,9 @@ public class Et1AiVettingService {
 
     private String formatAiNote(String aiNote) {
         String normalized = normalizeAiText(aiNote.trim());
+        if (StringUtils.isBlank(normalized)) {
+            return AI_NOTE_PREFIX;
+        }
         return normalized.startsWith(AI_NOTE_PREFIX) ? normalized : AI_NOTE_PREFIX + normalized;
     }
 
@@ -1281,7 +1289,7 @@ public class Et1AiVettingService {
     }
 
     private void populateAdditionalInformationAndBanner(CaseData caseData, Et1AiVettingResult result) {
-        String today = LocalDate.now().format(DateTimeFormatter.ofPattern(DD_MM_YYYY_DATE_FORMAT));
+        String today = LocalDate.now(LONDON_ZONE).format(DateTimeFormatter.ofPattern(DD_MM_YYYY_DATE_FORMAT));
         String normalizedSummary = normalizeAiText(
                 StringUtils.defaultIfBlank(result.getExecutiveSummaryMarkdown(), "No summary supplied"));
         List<String> reviewItems = buildItemsRequiringReview(caseData, result);
@@ -1316,7 +1324,7 @@ public class Et1AiVettingService {
             for (String item : reviewItems) {
                 reviewHtml.append("<li>").append(formatInlineMarkdownToHtml(escapeHtml(item))).append("</li>");
             }
-            reviewHtml.append("</ul>");
+            reviewHtml.append(UL_CLOSE);
         }
 
         String bannerHtml = String.format("""
@@ -1352,52 +1360,69 @@ public class Et1AiVettingService {
         boolean inList = false;
 
         for (String line : lines) {
-            String trimmed = line.trim();
-            if (trimmed.isEmpty()) {
-                if (inList) {
-                    html.append("</ul>");
-                    inList = false;
-                }
-            } else if (trimmed.matches("^#{1,6}\\s+.+")) {
-                if (inList) {
-                    html.append("</ul>");
-                    inList = false;
-                }
-                String heading = trimmed.replaceFirst("^#{1,6}\\s+", "");
-                html.append("<h4 style=\"margin: 8px 0 4px;\">")
-                        .append(formatInlineMarkdownToHtml(heading))
-                        .append("</h4>");
-            } else if (isStandaloneSubheadingLine(trimmed)) {
-                if (inList) {
-                    html.append("</ul>");
-                    inList = false;
-                }
-                String heading = extractStandaloneSubheading(trimmed);
-                html.append("<h4 style=\"margin: 8px 0 4px;\">")
-                        .append(formatInlineMarkdownToHtml(heading))
-                        .append("</h4>");
-            } else if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
-                if (!inList) {
-                    html.append("<ul style=\"margin: 4px 0 8px;\">");
-                    inList = true;
-                }
-                html.append("<li>")
-                        .append(formatInlineMarkdownToHtml(trimmed.substring(2).trim()))
-                        .append("</li>");
-            } else {
-                if (inList) {
-                    html.append("</ul>");
-                    inList = false;
-                }
-                html.append("<p style=\"margin: 4px 0;\">")
-                        .append(formatInlineMarkdownToHtml(trimmed))
-                        .append("</p>");
-            }
+            inList = appendMarkdownLine(html, line.trim(), inList);
         }
-        if (inList) {
-            html.append("</ul>");
-        }
+        closeListIfOpen(html, inList);
         return html.toString();
+    }
+
+    private boolean appendMarkdownLine(StringBuilder html, String trimmed, boolean inList) {
+        if (trimmed.isEmpty()) {
+            return closeListIfOpen(html, inList);
+        }
+        if (hasMarkdownHeadingPrefix(trimmed)) {
+            closeListIfOpen(html, inList);
+            String heading = stripMarkdownHeadingPrefix(trimmed);
+            html.append("<h4 style=\"margin: 8px 0 4px;\">")
+                    .append(formatInlineMarkdownToHtml(heading))
+                    .append("</h4>");
+            return false;
+        }
+        if (isStandaloneSubheadingLine(trimmed)) {
+            closeListIfOpen(html, inList);
+            String heading = extractStandaloneSubheading(trimmed);
+            html.append("<h4 style=\"margin: 8px 0 4px;\">")
+                    .append(formatInlineMarkdownToHtml(heading))
+                    .append("</h4>");
+            return false;
+        }
+        if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+            if (!inList) {
+                html.append("<ul style=\"margin: 4px 0 8px;\">");
+            }
+            html.append("<li>")
+                    .append(formatInlineMarkdownToHtml(trimmed.substring(2).trim()))
+                    .append("</li>");
+            return true;
+        }
+        closeListIfOpen(html, inList);
+        html.append("<p style=\"margin: 4px 0;\">")
+                .append(formatInlineMarkdownToHtml(trimmed))
+                .append("</p>");
+        return false;
+    }
+
+    private boolean closeListIfOpen(StringBuilder html, boolean inList) {
+        if (inList) {
+            html.append(UL_CLOSE);
+        }
+        return false;
+    }
+
+    private boolean hasMarkdownHeadingPrefix(String trimmed) {
+        int hashes = 0;
+        while (hashes < trimmed.length() && hashes < 6 && trimmed.charAt(hashes) == '#') {
+            hashes++;
+        }
+        return hashes > 0 && trimmed.length() > hashes + 1 && Character.isWhitespace(trimmed.charAt(hashes));
+    }
+
+    private String stripMarkdownHeadingPrefix(String trimmed) {
+        int idx = 0;
+        while (idx < trimmed.length() && idx < 6 && trimmed.charAt(idx) == '#') {
+            idx++;
+        }
+        return trimmed.substring(idx).trim();
     }
 
     private boolean isStandaloneSubheadingLine(String trimmed) {
@@ -1405,11 +1430,11 @@ public class Et1AiVettingService {
     }
 
     private String extractStandaloneSubheading(String trimmed) {
-        return trimmed
-                .replaceFirst("^[-*]\\s+", "")
-                .replaceAll("^\\*+|\\*+$", "")
-                .replaceFirst(":$", "")
-                .trim();
+        String withoutBullet = trimmed.startsWith("- ") || trimmed.startsWith("* ")
+                ? trimmed.substring(2).trim()
+                : trimmed;
+        String stripped = StringUtils.strip(withoutBullet, "*");
+        return StringUtils.removeEnd(stripped, ":").trim();
     }
 
     private String formatMarkdownForPlainText(String markdown) {
@@ -1426,9 +1451,9 @@ public class Et1AiVettingService {
 
     private String normalizeMarkdownLineBreaks(String text) {
         return text
-                .replaceAll("(###+\\s+[^\\r\\n-]+?)\\s+-\\s+", "$1\n- ")
-                .replaceAll("\\s+-\\s+(\\*\\*)", "\n- $1")
-                .replaceAll("\\s+(\\d+\\.\\s+\\*\\*)", "\n$1");
+                .replaceAll("(###{1,3}[ \\t]+[^\\r\\n-]{1,120})[ \\t]+-[ \\t]+", "$1\n- ")
+                .replaceAll("[ \\t]+-[ \\t]+(\\*\\*)", "\n- $1")
+                .replaceAll("[ \\t]+(\\d{1,3}\\.[ \\t]+\\*\\*)", "\n$1");
     }
 
     private String formatInlineMarkdownToHtml(String text) {

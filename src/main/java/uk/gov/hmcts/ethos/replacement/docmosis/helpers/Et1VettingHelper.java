@@ -13,6 +13,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et1VettingData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et1VettingDocument;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -224,7 +225,7 @@ public final class Et1VettingHelper {
      */
     public static String formatCompletedDateDdMmYyyy(String value) {
         if (StringUtils.isBlank(value)) {
-            return LocalDate.now().format(DD_MM_YYYY_FORMATTER);
+            return LocalDate.now(ZoneId.of("Europe/London")).format(DD_MM_YYYY_FORMATTER);
         }
         return formatDateDdMmYyyy(value);
     }

@@ -55,6 +55,25 @@ class Et1DocumentReaderServiceTest {
     }
 
     @Test
+    void downloadDocumentAttachment_extractsDocumentUuidAndResolvesMimeTypes() {
+        UploadedDocumentType xlsxDoc = uploadedDoc(
+                "http://dm-store/documents/11111111-2222-3333-4444-555555555555/binary", "schedule.xlsx");
+        when(documentManagementService.downloadFile(AUTH_TOKEN, xlsxDoc.getDocumentBinaryUrl()))
+                .thenReturn(UploadedDocument.builder()
+                        .content(new ByteArrayResource(new byte[4]))
+                        .name("schedule.xlsx")
+                        .contentType("application/octet-stream")
+                        .build());
+
+        AiDocumentAttachment attachment = documentReaderService.downloadDocumentAttachment(AUTH_TOKEN, xlsxDoc);
+
+        assertThat(attachment).isNotNull();
+        assertThat(attachment.getDocumentId()).isEqualTo("11111111-2222-3333-4444-555555555555");
+        assertThat(attachment.getMimeType())
+                .isEqualTo("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    }
+
+    @Test
     void findClaimDocumentAttachments_respectsConfiguredTotalBytesAndMaxCount() {
         aiGatewayProperties.setMaxAttachmentBytes(10);
         aiGatewayProperties.setMaxTotalAttachmentBytes(12);

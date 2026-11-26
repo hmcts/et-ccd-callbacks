@@ -16,6 +16,10 @@ import java.util.List;
 public class DraftAndSignJudgement {
     @JsonProperty("isJudgement")
     private String isJudgement;
+    @JsonProperty("shouldForPublication")
+    private String shouldForPublication;
+    @JsonProperty("shouldForPublicationReason")
+    private String shouldForPublicationReason;
     @JsonProperty("draftAndSignJudgementDocuments")
     private List<DocumentTypeItem> draftAndSignJudgementDocuments;
     @JsonProperty("furtherDirections")

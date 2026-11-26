@@ -3,6 +3,9 @@ package uk.gov.hmcts.et.common.model.ccd.types;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
@@ -41,4 +44,6 @@ public class HearingDetailType {
     private String hearingDetailsTimingDuration;
     @JsonProperty("hearingDetailsHearingNotes2")
     private String hearingDetailsHearingNotes2;
+    @JsonProperty("hearingDetailsRecordings")
+    private List<GenericTypeItem<HearingRecordingType>> hearingDetailsRecordings;
 }

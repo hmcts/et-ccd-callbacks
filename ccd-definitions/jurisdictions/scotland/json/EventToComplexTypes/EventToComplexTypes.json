@@ -3998,6 +3998,47 @@
     "Publish": "Y"
   },
   {
+    "ID": "HearingDetails",
+    "CaseEventID": "updateHearing",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsRecordings",
+    "EventElementLabel": "Hearing recordings",
+    "FieldDisplayOrder": 18,
+    "DisplayContext": "OPTIONAL",
+    "EventHintText": "Upload the recordings for this day. You can add more than one, for example morning and afternoon sessions.",
+    "Publish": "Y"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "updateHearing",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsRecordings.hearingRecordingDocument",
+    "EventElementLabel": "Recording",
+    "FieldDisplayOrder": 19,
+    "DisplayContext": "MANDATORY",
+    "Publish": "Y"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "updateHearing",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsRecordings.hearingRecordingDescription",
+    "EventElementLabel": "Description",
+    "FieldDisplayOrder": 20,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "updateHearing",
+    "CaseFieldID": "hearingDetailsCollection",
+    "ListElementCode": "hearingDetailsRecordings.hearingRecordingStartTime",
+    "EventElementLabel": "Recording start time",
+    "FieldDisplayOrder": 21,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
     "ID": "Judgement",
     "CaseEventID": "addAmendJudgment",
     "CaseFieldID": "judgementCollection",

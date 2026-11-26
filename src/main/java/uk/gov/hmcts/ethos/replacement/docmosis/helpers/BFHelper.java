@@ -17,9 +17,12 @@ import java.util.UUID;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 public final class BFHelper {
+
+    private static final String CLAIM_SERVED = "Claim served";
 
     private BFHelper() {
     }
@@ -115,7 +118,8 @@ public final class BFHelper {
         return bfDate.isAfter(LocalDate.parse(yesterday).minusDays(1))
             && bfDate.isBefore(LocalDate.now())
             && isNullOrEmpty(item.getCleared())
-            && isNullOrEmpty(item.getLetters());
+            && !YES.equals(item.getLetters())
+            && !CLAIM_SERVED.equals(item.getAllActions());
     }
 
     /**

@@ -13,7 +13,7 @@ import uk.gov.hmcts.ecm.common.client.CcdSubmitEventParams;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.ai.GeminiProperties;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.ai.AiGatewayProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ai.AiVettingPendingResult;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ai.Et1AiVettingResult;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.ai.AiVettingPendingResultRepository;
@@ -45,7 +45,7 @@ class Et1AiVettingServiceTest {
     private static final String ADMIN_TOKEN = "Bearer admin-token";
 
     @Mock
-    private GeminiClient geminiClient;
+    private AiGatewayClient aiGatewayClient;
     @Mock
     private Et1DocumentReaderService documentReaderService;
     @Mock
@@ -64,9 +64,9 @@ class Et1AiVettingServiceTest {
 
     @BeforeEach
     void setUp() {
-        GeminiProperties geminiProperties = new GeminiProperties();
-        geminiProperties.setEnabled(true);
-        geminiProperties.setApiKey("test-key");
+        AiGatewayProperties aiGatewayProperties = new AiGatewayProperties();
+        aiGatewayProperties.setEnabled(true);
+        aiGatewayProperties.setSubscriptionKey("test-key");
 
         objectMapper = new ObjectMapper();
         Et1VettingPromptBuilder promptBuilder = new Et1VettingPromptBuilder();
@@ -74,8 +74,8 @@ class Et1AiVettingServiceTest {
         when(featureToggleService.isEt1VettingAiEnabled(any())).thenReturn(true);
 
         aiVettingService = new Et1AiVettingService(
-                geminiProperties,
-                geminiClient,
+                aiGatewayProperties,
+                aiGatewayClient,
                 promptBuilder,
                 documentReaderService,
                 objectMapper,
@@ -106,7 +106,7 @@ class Et1AiVettingServiceTest {
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
         when(documentReaderService.findClaimDocumentAttachments(any(CaseData.class), anyString()))
                 .thenReturn(List.of());
-        when(geminiClient.generateContent(anyString(), anyString(), anyList())).thenReturn(aiJson);
+        when(aiGatewayClient.generateContent(anyString(), anyString(), anyList())).thenReturn(aiJson);
 
         CaseDetails eventCaseDetails = CaseDataBuilder.builder()
                 .withEthosCaseReference("6000001/2026")
@@ -136,13 +136,13 @@ class Et1AiVettingServiceTest {
         aiVettingService.vetClaimInBackground(submittedCase, "Bearer user-token");
 
         verify(pendingResultRepository).deleteByExpiresAtBefore(any(Instant.class));
-        verify(geminiClient, times(1)).generateContent(anyString(), anyString(), anyList());
+        verify(aiGatewayClient, times(1)).generateContent(anyString(), anyString(), anyList());
         verify(ccdClient).submitEventForCase(any(CcdSubmitEventParams.class));
         assertThat(eventCaseDetails.getCaseData().getEt1VettingCanServeClaimYesOrNo()).isEqualTo("Yes");
     }
 
     @Test
-    void vetClaimAndPrepopulate_ignoresExpiredDbResultAndCallsGemini() throws Exception {
+    void vetClaimAndPrepopulate_ignoresExpiredDbResultAndCallsAiGateway() throws Exception {
         Et1AiVettingResult stale = new Et1AiVettingResult();
         stale.setConfidence("LOW");
         AiVettingPendingResult expiredRow = AiVettingPendingResult.create(
@@ -153,7 +153,7 @@ class Et1AiVettingServiceTest {
         when(pendingResultRepository.findById(CASE_REFERENCE)).thenReturn(Optional.of(expiredRow));
         when(documentReaderService.findClaimDocumentAttachments(any(CaseData.class), any()))
                 .thenReturn(List.of());
-        when(geminiClient.generateContent(anyString(), anyString(), anyList())).thenReturn("""
+        when(aiGatewayClient.generateContent(anyString(), anyString(), anyList())).thenReturn("""
                 {
                   "canServeClaim": {"canServe": "Yes"},
                   "confidence": "HIGH",
@@ -170,7 +170,7 @@ class Et1AiVettingServiceTest {
         aiVettingService.vetClaimAndPrepopulate(caseDetails, "Bearer user-token");
 
         verify(pendingResultRepository).delete(expiredRow);
-        verify(geminiClient, times(1)).generateContent(anyString(), anyString(), anyList());
+        verify(aiGatewayClient, times(1)).generateContent(anyString(), anyString(), anyList());
         assertThat(caseDetails.getCaseData().getEt1VettingCanServeClaimYesOrNo()).isEqualTo("Yes");
         assertThat(caseDetails.getCaseData().getEt1VettingAdditionalInformationTextArea())
                 .contains("Confidence: HIGH");
@@ -189,7 +189,7 @@ class Et1AiVettingServiceTest {
         aiVettingService.vetClaimInBackground(caseDetails, "Bearer user-token");
         aiVettingService.vetClaimAndPrepopulate(caseDetails, "Bearer user-token");
 
-        verify(geminiClient, never()).generateContent(anyString(), anyString(), anyList());
+        verify(aiGatewayClient, never()).generateContent(anyString(), anyString(), anyList());
         verify(ccdClient, never()).startEventForCase(any(), any(), any(), any(), any());
     }
 }

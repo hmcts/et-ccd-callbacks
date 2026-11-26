@@ -16,7 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantRequestType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.ai.GeminiProperties;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.ai.AiGatewayProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ai.AiDocumentAttachment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 
@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -44,12 +45,39 @@ public class Et1DocumentReaderService {
             ET1_ATTACHMENT,
             ACAS_CERTIFICATE
     );
+    private static final Map<String, String> EXTENSION_MIME_TYPES = Map.ofEntries(
+            Map.entry(".pdf", APPLICATION_PDF),
+            Map.entry(".png", "image/png"),
+            Map.entry(".jpg", "image/jpeg"),
+            Map.entry(".jpeg", "image/jpeg"),
+            Map.entry(".bmp", "image/bmp"),
+            Map.entry(".tif", "image/tiff"),
+            Map.entry(".tiff", "image/tiff"),
+            Map.entry(".txt", "text/plain"),
+            Map.entry(".csv", "text/csv"),
+            Map.entry(".rtf", "application/rtf"),
+            Map.entry(".doc", "application/msword"),
+            Map.entry(".dot", "application/msword"),
+            Map.entry(".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
+            Map.entry(".xls", "application/vnd.ms-excel"),
+            Map.entry(".xlt", "application/vnd.ms-excel"),
+            Map.entry(".xla", "application/vnd.ms-excel"),
+            Map.entry(".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+            Map.entry(".xltx", "application/vnd.openxmlformats-officedocument.spreadsheetml.template"),
+            Map.entry(".ppt", "application/vnd.ms-powerpoint"),
+            Map.entry(".pot", "application/vnd.ms-powerpoint"),
+            Map.entry(".pps", "application/vnd.ms-powerpoint"),
+            Map.entry(".ppa", "application/vnd.ms-powerpoint"),
+            Map.entry(".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"),
+            Map.entry(".potx", "application/vnd.openxmlformats-officedocument.presentationml.template"),
+            Map.entry(".ppsx", "application/vnd.openxmlformats-officedocument.presentationml.slideshow")
+    );
 
     private final DocumentManagementService documentManagementService;
-    private final GeminiProperties geminiProperties;
+    private final AiGatewayProperties aiGatewayProperties;
 
     /**
-     * Downloads an uploaded document from DM Store / CDAM as a raw binary attachment for Gemini multimodal input.
+     * Downloads an uploaded document from DM Store / CDAM as a raw binary attachment for AI multimodal input.
      *
      * @param userToken auth token for DM Store (optional, falls back to RequestContextHolder)
      * @param document uploaded document reference
@@ -63,7 +91,7 @@ public class Et1DocumentReaderService {
         }
 
         try {
-            log.info("Downloading file {} from DM Store for Gemini multimodal vetting",
+            log.info("Downloading file {} from DM Store for AI multimodal vetting",
                     document.getDocumentFilename());
             UploadedDocument uploadedDoc = documentManagementService.downloadFile(
                     token, document.getDocumentBinaryUrl());
@@ -78,9 +106,9 @@ public class Et1DocumentReaderService {
                 bytes = in.readAllBytes();
             }
 
-            if (bytes.length == 0 || bytes.length > geminiProperties.getMaxAttachmentBytes()) {
+            if (bytes.length == 0 || bytes.length > aiGatewayProperties.getMaxAttachmentBytes()) {
                 log.warn("Document {} size ({} bytes) outside acceptable limits (max {} bytes)",
-                        document.getDocumentFilename(), bytes.length, geminiProperties.getMaxAttachmentBytes());
+                        document.getDocumentFilename(), bytes.length, aiGatewayProperties.getMaxAttachmentBytes());
                 return null;
             }
 
@@ -91,7 +119,7 @@ public class Et1DocumentReaderService {
                     .data(bytes)
                     .build();
         } catch (Exception ex) {
-            log.warn("Could not download file {} for Gemini multimodal vetting: {}",
+            log.warn("Could not download file {} for AI multimodal vetting: {}",
                     document.getDocumentFilename(), ex.getMessage());
             return null;
         }
@@ -99,7 +127,7 @@ public class Et1DocumentReaderService {
 
     /**
      * Discovers and downloads all relevant claim documents (Particulars of Claim, ET1 form,
-     * ET1 attachments, and ACAS Early Conciliation certificates) for Gemini analysis.
+     * ET1 attachments, and ACAS Early Conciliation certificates) for AI analysis.
      *
      * @param caseData CCD CaseData
      * @param userToken auth token for DM Store
@@ -122,7 +150,7 @@ public class Et1DocumentReaderService {
         totalBytes = tryAddAttachment(
                 caseData.getEt1SectionThreeDocumentUpload(), userToken, attachments, seenBinaryUrls, totalBytes);
 
-        int maxCount = geminiProperties.getMaxAttachmentCount();
+        int maxCount = aiGatewayProperties.getMaxAttachmentCount();
         if (CollectionUtils.isNotEmpty(caseData.getDocumentCollection())) {
             for (DocumentTypeItem docItem : caseData.getDocumentCollection()) {
                 if (attachments.size() >= maxCount) {
@@ -146,7 +174,7 @@ public class Et1DocumentReaderService {
                                   Set<String> seenBinaryUrls,
                                   long currentTotalBytes) {
         if (document == null || StringUtils.isBlank(document.getDocumentBinaryUrl())
-                || attachments.size() >= geminiProperties.getMaxAttachmentCount()) {
+                || attachments.size() >= aiGatewayProperties.getMaxAttachmentCount()) {
             return currentTotalBytes;
         }
         String normalizedUrl = document.getDocumentBinaryUrl().trim();
@@ -157,7 +185,7 @@ public class Et1DocumentReaderService {
         if (downloaded == null || downloaded.getData() == null) {
             return currentTotalBytes;
         }
-        long maxTotalBytes = geminiProperties.getMaxTotalAttachmentBytes();
+        long maxTotalBytes = aiGatewayProperties.getMaxTotalAttachmentBytes();
         if (currentTotalBytes + downloaded.getData().length > maxTotalBytes) {
             log.warn("Skipping attachment {} because aggregate payload would exceed {} bytes limit",
                     downloaded.getFilename(), maxTotalBytes);
@@ -172,17 +200,14 @@ public class Et1DocumentReaderService {
             return contentType;
         }
         String lower = Objects.toString(filename, "").toLowerCase(Locale.ROOT);
-        if (lower.endsWith(".pdf")) {
-            return APPLICATION_PDF;
-        } else if (lower.endsWith(".png")) {
-            return "image/png";
-        } else if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) {
-            return "image/jpeg";
-        } else if (lower.endsWith(".csv")) {
-            return "text/csv";
-        } else {
-            return "text/plain";
+        int dotIdx = lower.lastIndexOf('.');
+        if (dotIdx >= 0) {
+            String mapped = EXTENSION_MIME_TYPES.get(lower.substring(dotIdx));
+            if (mapped != null) {
+                return mapped;
+            }
         }
+        return "application/octet-stream";
     }
 
     private boolean isRelevantVettingDocument(DocumentType docType) {

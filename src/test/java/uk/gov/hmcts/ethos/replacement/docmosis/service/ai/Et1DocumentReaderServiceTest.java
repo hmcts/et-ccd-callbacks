@@ -11,7 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.ai.GeminiProperties;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.ai.AiGatewayProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ai.AiDocumentAttachment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 
@@ -29,18 +29,18 @@ class Et1DocumentReaderServiceTest {
     @Mock
     private DocumentManagementService documentManagementService;
 
-    private GeminiProperties geminiProperties;
+    private AiGatewayProperties aiGatewayProperties;
     private Et1DocumentReaderService documentReaderService;
 
     @BeforeEach
     void setUp() {
-        geminiProperties = new GeminiProperties();
-        documentReaderService = new Et1DocumentReaderService(documentManagementService, geminiProperties);
+        aiGatewayProperties = new AiGatewayProperties();
+        documentReaderService = new Et1DocumentReaderService(documentManagementService, aiGatewayProperties);
     }
 
     @Test
     void downloadDocumentAttachment_respectsConfiguredMaxAttachmentBytes() {
-        geminiProperties.setMaxAttachmentBytes(5);
+        aiGatewayProperties.setMaxAttachmentBytes(5);
 
         UploadedDocumentType doc = uploadedDoc("http://dm/1/binary", "et1.pdf");
         when(documentManagementService.downloadFile(AUTH_TOKEN, "http://dm/1/binary"))
@@ -48,7 +48,7 @@ class Et1DocumentReaderServiceTest {
 
         assertThat(documentReaderService.downloadDocumentAttachment(AUTH_TOKEN, doc)).isNull();
 
-        geminiProperties.setMaxAttachmentBytes(6);
+        aiGatewayProperties.setMaxAttachmentBytes(6);
         AiDocumentAttachment attachment = documentReaderService.downloadDocumentAttachment(AUTH_TOKEN, doc);
         assertThat(attachment).isNotNull();
         assertThat(attachment.getData()).hasSize(6);
@@ -56,9 +56,9 @@ class Et1DocumentReaderServiceTest {
 
     @Test
     void findClaimDocumentAttachments_respectsConfiguredTotalBytesAndMaxCount() {
-        geminiProperties.setMaxAttachmentBytes(10);
-        geminiProperties.setMaxTotalAttachmentBytes(12);
-        geminiProperties.setMaxAttachmentCount(2);
+        aiGatewayProperties.setMaxAttachmentBytes(10);
+        aiGatewayProperties.setMaxTotalAttachmentBytes(12);
+        aiGatewayProperties.setMaxAttachmentCount(2);
 
         when(documentManagementService.downloadFile(AUTH_TOKEN, "http://dm/1/binary"))
                 .thenReturn(uploadedDocContent("ET1_1.pdf", 8));

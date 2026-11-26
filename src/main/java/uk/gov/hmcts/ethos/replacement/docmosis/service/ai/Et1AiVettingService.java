@@ -29,7 +29,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.VettingJurisdictionCodesType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.ai.GeminiProperties;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.ai.AiGatewayProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ai.AiDocumentAttachment;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ai.AiVettingPendingResult;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ai.Et1AiVettingResult;
@@ -89,8 +89,8 @@ public class Et1AiVettingService {
 
     private static final Duration PENDING_RESULT_TTL = Duration.ofMinutes(10);
 
-    private final GeminiProperties geminiProperties;
-    private final GeminiClient geminiClient;
+    private final AiGatewayProperties aiGatewayProperties;
+    private final AiGatewayClient aiGatewayClient;
     private final Et1VettingPromptBuilder promptBuilder;
     private final Et1DocumentReaderService documentReaderService;
     private final ObjectMapper objectMapper;
@@ -103,18 +103,18 @@ public class Et1AiVettingService {
     private final Set<String> inFlightAutoVets = ConcurrentHashMap.newKeySet();
     private final ConcurrentMap<String, Et1AiVettingResult> pendingAutoVetResults = new ConcurrentHashMap<>();
 
-    public Et1AiVettingService(GeminiProperties geminiProperties,
-                               GeminiClient geminiClient,
+    public Et1AiVettingService(AiGatewayProperties aiGatewayProperties,
+                               AiGatewayClient aiGatewayClient,
                                Et1VettingPromptBuilder promptBuilder,
                                Et1DocumentReaderService documentReaderService,
                                ObjectMapper objectMapper) {
-        this(geminiProperties, geminiClient, promptBuilder, documentReaderService, objectMapper,
+        this(aiGatewayProperties, aiGatewayClient, promptBuilder, documentReaderService, objectMapper,
                 null, null, null, null, null, null);
     }
 
     public Et1AiVettingService(
-            GeminiProperties geminiProperties,
-            GeminiClient geminiClient,
+            AiGatewayProperties aiGatewayProperties,
+            AiGatewayClient aiGatewayClient,
             Et1VettingPromptBuilder promptBuilder,
             Et1DocumentReaderService documentReaderService,
             ObjectMapper objectMapper,
@@ -122,13 +122,13 @@ public class Et1AiVettingService {
             AdminUserService adminUserService,
             JpaVenueService jpaVenueService,
             TaskExecutor taskExecutor) {
-        this(geminiProperties, geminiClient, promptBuilder, documentReaderService, objectMapper,
+        this(aiGatewayProperties, aiGatewayClient, promptBuilder, documentReaderService, objectMapper,
                 ccdClient, adminUserService, jpaVenueService, taskExecutor, null, null);
     }
 
     public Et1AiVettingService(
-            GeminiProperties geminiProperties,
-            GeminiClient geminiClient,
+            AiGatewayProperties aiGatewayProperties,
+            AiGatewayClient aiGatewayClient,
             Et1VettingPromptBuilder promptBuilder,
             Et1DocumentReaderService documentReaderService,
             ObjectMapper objectMapper,
@@ -137,14 +137,14 @@ public class Et1AiVettingService {
             JpaVenueService jpaVenueService,
             TaskExecutor taskExecutor,
             AiVettingPendingResultRepository pendingResultRepository) {
-        this(geminiProperties, geminiClient, promptBuilder, documentReaderService, objectMapper,
+        this(aiGatewayProperties, aiGatewayClient, promptBuilder, documentReaderService, objectMapper,
                 ccdClient, adminUserService, jpaVenueService, taskExecutor, pendingResultRepository, null);
     }
 
     @Autowired
     public Et1AiVettingService(
-            GeminiProperties geminiProperties,
-            GeminiClient geminiClient,
+            AiGatewayProperties aiGatewayProperties,
+            AiGatewayClient aiGatewayClient,
             Et1VettingPromptBuilder promptBuilder,
             Et1DocumentReaderService documentReaderService,
             ObjectMapper objectMapper,
@@ -154,8 +154,8 @@ public class Et1AiVettingService {
             @Autowired(required = false) @Qualifier("applicationTaskExecutor") TaskExecutor taskExecutor,
             @Autowired(required = false) AiVettingPendingResultRepository pendingResultRepository,
             @Autowired(required = false) FeatureToggleService featureToggleService) {
-        this.geminiProperties = geminiProperties;
-        this.geminiClient = geminiClient;
+        this.aiGatewayProperties = aiGatewayProperties;
+        this.aiGatewayClient = aiGatewayClient;
         this.promptBuilder = promptBuilder;
         this.documentReaderService = documentReaderService;
         this.objectMapper = objectMapper;
@@ -180,9 +180,10 @@ public class Et1AiVettingService {
             return;
         }
         String managingOffice = caseDetails.getCaseData().getManagingOffice();
-        if (!isAiVettingEnabledForOffice(managingOffice) || StringUtils.isBlank(geminiProperties.getApiKey())) {
-            log.info("AI vetting is disabled (or LaunchDarkly et1VettingAi off for office '{}') or API key missing; "
-                    + "skipping background vetting.", managingOffice);
+        if (!isAiVettingEnabledForOffice(managingOffice)
+                || StringUtils.isBlank(aiGatewayProperties.getSubscriptionKey())) {
+            log.info("AI vetting is disabled (or LaunchDarkly et1VettingAi off for office '{}') "
+                    + "or subscription key missing; skipping background vetting.", managingOffice);
             return;
         }
         if (UNASSIGNED_OFFICE.equalsIgnoreCase(managingOffice)) {
@@ -236,14 +237,14 @@ public class Et1AiVettingService {
             }
         }
 
-        runGeminiAiVetting(caseDetails, userToken).ifPresent(result -> {
+        runAiVetting(caseDetails, userToken).ifPresent(result -> {
             applyVettingResult(caseDetails.getCaseData(), result);
             log.info("Successfully applied AI vetting suggestions to case {}", caseId);
         });
     }
 
     private boolean isAiVettingEnabledForOffice(String managingOffice) {
-        if (!geminiProperties.isEnabled()) {
+        if (!aiGatewayProperties.isEnabled()) {
             return false;
         }
         return featureToggleService == null || featureToggleService.isEt1VettingAiEnabled(managingOffice);
@@ -261,7 +262,7 @@ public class Et1AiVettingService {
             String adminToken = adminUserService.getAdminUserToken();
             String docToken = StringUtils.isNotBlank(submissionUserToken) ? submissionUserToken : adminToken;
 
-            Optional<Et1AiVettingResult> maybeResult = runGeminiAiVetting(submittedCaseDetails, docToken);
+            Optional<Et1AiVettingResult> maybeResult = runAiVetting(submittedCaseDetails, docToken);
             if (maybeResult.isEmpty()) {
                 log.warn("AI vetting produced no result for case {}; skipping automatic ET1 vetting submission.",
                         caseId);
@@ -366,9 +367,10 @@ public class Et1AiVettingService {
         }
     }
 
-    private Optional<Et1AiVettingResult> runGeminiAiVetting(CaseDetails caseDetails, String userToken) {
-        if (StringUtils.isBlank(geminiProperties.getApiKey())) {
-            log.info("API key is not configured; cannot run AI vetting for case {}", caseDetails.getCaseId());
+    private Optional<Et1AiVettingResult> runAiVetting(CaseDetails caseDetails, String userToken) {
+        if (StringUtils.isBlank(aiGatewayProperties.getSubscriptionKey())) {
+            log.info("AI Gateway subscription key is not configured; cannot run AI vetting for case {}",
+                    caseDetails.getCaseId());
             return Optional.empty();
         }
         try {
@@ -378,7 +380,7 @@ public class Et1AiVettingService {
             List<String> availableVenues = resolveAvailableVenueNames(caseDetails.getCaseData());
             String systemInstruction = promptBuilder.buildSystemInstruction();
             String casePrompt = promptBuilder.buildCasePrompt(caseDetails, attachments, availableVenues);
-            String rawJson = geminiClient.generateContent(systemInstruction, casePrompt, attachments);
+            String rawJson = aiGatewayClient.generateContent(systemInstruction, casePrompt, attachments);
 
             if (StringUtils.isBlank(rawJson)) {
                 log.warn("AI returned empty response for case {}", caseDetails.getCaseId());
@@ -1290,7 +1292,7 @@ public class Et1AiVettingService {
                 Model: %s | Confidence: %s
 
                 Summary:
-                %s""", today, geminiProperties.getModel(),
+                %s""", today, aiGatewayProperties.getModel(),
                 StringUtils.defaultIfBlank(result.getConfidence(), "MEDIUM"),
                 formatMarkdownForPlainText(normalizedSummary)));
 
@@ -1328,7 +1330,7 @@ public class Et1AiVettingService {
                 Please review and verify all details before submitting.</em></p>
                 </div>
                 """, StringUtils.defaultIfBlank(result.getConfidence(), "MEDIUM"),
-                geminiProperties.getModel(),
+                aiGatewayProperties.getModel(),
                 bannerSummaryHtml,
                 reviewHtml);
 

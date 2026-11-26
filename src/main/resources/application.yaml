@@ -420,13 +420,19 @@ notifications:
   dataQualityReportTemplateId: ${DATA_QUALITY_REPORT_TEMPLATE_ID:57a8cba5-9885-4772-876b-09a3fe0abe94}
 
 ai:
-  gemini:
-    enabled: ${GEMINI_AI_ENABLED:false}
-    apiKey: ${GEMINI_API_KEY:${ANTIGRAVITY_API_KEY:}}
-    baseUrl: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com/v1beta}
-    model: ${GEMINI_MODEL:gemini-3.6-flash}
-    temperature: ${GEMINI_TEMPERATURE:0.1}
-    maxAttachmentBytes: ${GEMINI_MAX_ATTACHMENT_BYTES:15728640}
-    maxTotalAttachmentBytes: ${GEMINI_MAX_TOTAL_ATTACHMENT_BYTES:26214400}
-    maxAttachmentCount: ${GEMINI_MAX_ATTACHMENT_COUNT:10}
+  gateway:
+    enabled: ${AI_GATEWAY_ENABLED:false}
+    baseUrl: ${AI_GATEWAY_BASE_URL:}
+    apiVersion: ${AI_GATEWAY_API_VERSION:2024-10-21}
+    model: ${AI_GATEWAY_MODEL:gpt-6.2-sol}
+    gatewayClientId: ${AI_GATEWAY_CLIENT_ID:}
+    subscriptionKey: ${AI_GATEWAY_SUBSCRIPTION_KEY:}
+    temperature: ${AI_GATEWAY_TEMPERATURE:}
+    connectTimeoutMs: ${AI_GATEWAY_CONNECT_TIMEOUT_MS:10000}
+    readTimeoutMs: ${AI_GATEWAY_READ_TIMEOUT_MS:90000}
+    maxRetries: ${AI_GATEWAY_MAX_RETRIES:2}
+    maxAttachmentBytes: ${AI_GATEWAY_MAX_ATTACHMENT_BYTES:15728640}
+    maxTotalAttachmentBytes: ${AI_GATEWAY_MAX_TOTAL_ATTACHMENT_BYTES:26214400}
+    maxAttachmentCount: ${AI_GATEWAY_MAX_ATTACHMENT_COUNT:10}
+    maxExtractedCharsPerDocument: ${AI_GATEWAY_MAX_EXTRACTED_CHARS:60000}
 

@@ -74,6 +74,43 @@ class Et1DocumentReaderServiceTest {
     }
 
     @Test
+    void downloadDocumentAttachment_handlesMissingTokenEmptyContentAndErrors() {
+        assertThat(documentReaderService.downloadDocumentAttachment(null, uploadedDoc("http://dm/1", "a.pdf")))
+                .isNull();
+        assertThat(documentReaderService.downloadDocumentAttachment(AUTH_TOKEN, null)).isNull();
+
+        UploadedDocumentType doc = uploadedDoc("http://dm/documents/abc-123/binary", "a.pdf");
+        when(documentManagementService.downloadFile(AUTH_TOKEN, doc.getDocumentBinaryUrl())).thenReturn(null);
+        assertThat(documentReaderService.downloadDocumentAttachment(AUTH_TOKEN, doc)).isNull();
+
+        when(documentManagementService.downloadFile(AUTH_TOKEN, doc.getDocumentBinaryUrl()))
+                .thenThrow(new RuntimeException("DM Store down"));
+        assertThat(documentReaderService.downloadDocumentAttachment(AUTH_TOKEN, doc)).isNull();
+    }
+
+    @Test
+    void findClaimDocumentAttachments_handlesNullCaseDeduplicatesAndFiltersEt1Vetting() {
+        assertThat(documentReaderService.findClaimDocumentAttachments(null, AUTH_TOKEN)).isEmpty();
+
+        when(documentManagementService.downloadFile(AUTH_TOKEN, "http://dm/documents/u1/binary"))
+                .thenReturn(uploadedDocContent("ACAS_cert.pdf", 4));
+
+        CaseData caseData = new CaseData();
+        caseData.setDocumentCollection(List.of(
+                docItem("1", "Other", uploadedDoc("http://dm/documents/u1/binary", "ACAS_cert.pdf")),
+                docItem("2", "Other", uploadedDoc("http://dm/documents/u1/binary", "ACAS_cert.pdf")),
+                docItem("3", "ET1 Vetting", uploadedDoc("http://dm/documents/u2/binary", "ET1 Vetting.pdf")),
+                docItem("4", "Other", uploadedDoc("http://dm/documents/u3/binary", "unrelated.pdf"))
+        ));
+
+        List<AiDocumentAttachment> attachments = documentReaderService.findClaimDocumentAttachments(
+                caseData, AUTH_TOKEN);
+
+        assertThat(attachments).hasSize(1);
+        assertThat(attachments.getFirst().getDocumentId()).isEqualTo("u1");
+    }
+
+    @Test
     void findClaimDocumentAttachments_respectsConfiguredTotalBytesAndMaxCount() {
         aiGatewayProperties.setMaxAttachmentBytes(10);
         aiGatewayProperties.setMaxTotalAttachmentBytes(12);

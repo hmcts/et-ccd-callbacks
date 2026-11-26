@@ -380,4 +380,83 @@ class Et1AiVettingServiceTest {
 
         verify(aiGatewayClient, never()).generateContent(anyString(), anyString(), anyList());
     }
+
+    @Test
+    void vetClaimInBackground_handlesFailurePathsAndInMemoryCacheFallback() throws Exception {
+        Et1AiVettingService noDbService = new Et1AiVettingService(
+                new uk.gov.hmcts.ethos.replacement.docmosis.config.ai.AiGatewayProperties(),
+                aiGatewayClient,
+                new Et1VettingPromptBuilder(),
+                documentReaderService,
+                objectMapper
+        );
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+                .withEthosCaseReference("6000007/2026")
+                .withManagingOffice("Leeds")
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseId(CASE_ID);
+        noDbService.vetClaimInBackground(null, "Bearer user-token");
+        noDbService.vetClaimInBackground(caseDetails, "Bearer user-token");
+        noDbService.vetClaimAndPrepopulate(null, "Bearer user-token");
+        noDbService.vetClaimAndPrepopulate(caseDetails, "Bearer user-token");
+
+        CaseDetails noTypeCase = CaseDataBuilder.builder()
+                .withEthosCaseReference("6000008/2026")
+                .withManagingOffice("Leeds")
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        noTypeCase.setCaseId(CASE_ID);
+        noTypeCase.setCaseTypeId("");
+        aiVettingService.vetClaimInBackground(noTypeCase, "Bearer user-token");
+
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
+        when(documentReaderService.findClaimDocumentAttachments(any(CaseData.class), anyString()))
+                .thenReturn(List.of());
+        when(aiGatewayClient.generateContent(anyString(), anyString(), anyList())).thenReturn(null);
+        aiVettingService.vetClaimInBackground(caseDetails, "Bearer user-token");
+
+        verify(ccdClient, never()).submitEventForCase(any(CcdSubmitEventParams.class));
+    }
+
+    @Test
+    void vetClaimAndPrepopulate_handlesYesPathsAndBlankOptionalSections() throws Exception {
+        Et1AiVettingResult yesResult = Et1AiVettingResult.builder()
+                .canServeClaim(Et1AiVettingResult.CanServeClaimAssessment.builder().canServe("Yes").build())
+                .et1VettingEra("No")
+                .jurisdictionAssessment(Et1AiVettingResult.JurisdictionAssessment.builder()
+                        .areCodesCorrect("Yes").build())
+                .trackAllocation(Et1AiVettingResult.TrackAllocationAssessment.builder()
+                        .isTrackCorrect("Yes").build())
+                .locationAndVenue(Et1AiVettingResult.LocationAndVenueAssessment.builder()
+                        .isLocationCorrect("Yes").suggestHearingVenue("No").build())
+                .furtherQuestions(Et1AiVettingResult.FurtherQuestionsAssessment.builder()
+                        .isGovOrMajorEmployer("No")
+                        .hasReasonableAdjustments("No")
+                        .videoHearingPreference("Yes")
+                        .build())
+                .confidence("MEDIUM")
+                .build();
+
+        when(pendingResultRepository.findById(CASE_REFERENCE))
+                .thenThrow(new RuntimeException("DB read error"));
+        when(documentReaderService.findClaimDocumentAttachments(any(CaseData.class), any()))
+                .thenReturn(List.of());
+        when(aiGatewayClient.generateContent(anyString(), anyString(), anyList()))
+                .thenReturn(objectMapper.writeValueAsString(yesResult));
+
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+                .withEthosCaseReference("6000009/2026")
+                .withManagingOffice("Leeds")
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseId(CASE_ID);
+
+        aiVettingService.vetClaimAndPrepopulate(caseDetails, "Bearer user-token");
+
+        CaseData data = caseDetails.getCaseData();
+        assertThat(data.getEt1VettingCanServeClaimYesOrNo()).isEqualTo("Yes");
+        assertThat(data.getAreTheseCodesCorrect()).isEqualTo("Yes");
+        assertThat(data.getIsTrackAllocationCorrect()).isEqualTo("Yes");
+        assertThat(data.getIsLocationCorrect()).isEqualTo("Yes");
+        assertThat(data.getEt1SuggestHearingVenue()).isEqualTo("No");
+        assertThat(data.getEt1VettingBeforeYouStart()).contains("Evaluation Confidence:");
+    }
 }

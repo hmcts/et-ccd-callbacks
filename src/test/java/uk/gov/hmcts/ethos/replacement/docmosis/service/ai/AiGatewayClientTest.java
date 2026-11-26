@@ -22,6 +22,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import reactor.core.publisher.Mono;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.ai.AiGatewayProperties;
@@ -360,6 +361,67 @@ class AiGatewayClientTest {
 
         assertThat(result).isNull();
         verify(restTemplate, never()).exchange(anyString(), any(), any(), eq(String.class));
+    }
+
+    @Test
+    void generateContent_returnsNullWhenGatewayClientIdBlankOrTokenEmpty() {
+        properties.setGatewayClientId("");
+        assertThat(aiGatewayClient.generateContent("System", "Prompt", List.of())).isNull();
+
+        properties.setGatewayClientId(CLIENT_ID);
+        AiGatewayClient emptyTokenClient = new AiGatewayClient(
+                properties,
+                restTemplate,
+                objectMapper,
+                request -> Mono.just(new AccessToken("", OffsetDateTime.now().plusHours(1))));
+        assertThat(emptyTokenClient.generateContent("System", "Prompt", List.of())).isNull();
+    }
+
+    @Test
+    void generateContent_returnsNullAfterExhaustingServerRetries() {
+        properties.setMaxRetries(1);
+        when(restTemplate.exchange(
+                eq(EXPECTED_URL),
+                eq(HttpMethod.POST),
+                any(HttpEntity.class),
+                eq(String.class)))
+                .thenThrow(HttpServerErrorException.create(
+                        HttpStatus.BAD_GATEWAY, "Bad Gateway", HttpHeaders.EMPTY, new byte[0], null));
+
+        String result = aiGatewayClient.generateContent("System", "Prompt", List.of());
+
+        assertThat(result).isNull();
+        verify(restTemplate, times(2)).exchange(
+                eq(EXPECTED_URL),
+                eq(HttpMethod.POST),
+                any(HttpEntity.class),
+                eq(String.class));
+    }
+
+    @Test
+    void generateContent_includesTemperatureWhenSetAndHandlesUnexpectedResponseJson() throws Exception {
+        properties.setTemperature(0.2);
+        when(restTemplate.exchange(
+                eq(EXPECTED_URL),
+                eq(HttpMethod.POST),
+                any(HttpEntity.class),
+                eq(String.class)))
+                .thenReturn(ResponseEntity.ok("{\"choices\":[]}"))
+                .thenReturn(ResponseEntity.ok("not-json"))
+                .thenReturn(ResponseEntity.status(HttpStatus.ACCEPTED).body(null));
+
+        assertThat(aiGatewayClient.generateContent("System", "Prompt", List.of())).isNull();
+        assertThat(aiGatewayClient.generateContent("System", "Prompt", List.of())).isNull();
+        assertThat(aiGatewayClient.generateContent("System", "Prompt", List.of())).isNull();
+
+        ArgumentCaptor<HttpEntity<Map<String, Object>>> entityCaptor = ArgumentCaptor.forClass(HttpEntity.class);
+        verify(restTemplate, times(3)).exchange(
+                eq(EXPECTED_URL),
+                eq(HttpMethod.POST),
+                entityCaptor.capture(),
+                eq(String.class));
+        JsonNode payload = objectMapper.valueToTree(entityCaptor.getValue().getBody());
+        assertThat(payload.path("temperature").asDouble()).isEqualTo(0.2);
     }
 
     private byte[] createPdfBytes(String text) throws IOException {

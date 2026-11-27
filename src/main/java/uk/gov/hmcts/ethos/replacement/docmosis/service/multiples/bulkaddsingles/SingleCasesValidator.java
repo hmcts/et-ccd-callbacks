@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 
@@ -60,11 +59,6 @@ class SingleCasesValidator {
         if (submitEventOptional.isPresent()) {
             SubmitEvent submitEvent = submitEventOptional.get();
 
-            if (!isAccepted(submitEvent)) {
-                return ValidatedSingleCase.createInvalidCase(ethosCaseReference,
-                        "Case is in state " + submitEvent.getState());
-            }
-
             if (!isScotland && managingOfficeCheck(submitEvent, multipleManagingOffice)) {
                 return ValidatedSingleCase.createInvalidCase(ethosCaseReference,
                         "Case is managed by " + submitEvent.getCaseData().getManagingOffice());
@@ -79,9 +73,5 @@ class SingleCasesValidator {
     private boolean managingOfficeCheck(SubmitEvent submitEvent, String managingOffice) {
         return !isNullOrEmpty(submitEvent.getCaseData().getManagingOffice())
                 && !managingOffice.equals(submitEvent.getCaseData().getManagingOffice());
-    }
-
-    private boolean isAccepted(SubmitEvent submitEvent) {
-        return ACCEPTED_STATE.equals(submitEvent.getState());
     }
 }

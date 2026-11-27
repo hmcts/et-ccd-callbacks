@@ -118,6 +118,7 @@ public class AddAmendClaimantRepresentativeController {
                 callbackRequest.getCaseDetails().getCaseTypeId());
         if (errors.isEmpty()) {
             ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData, caseFlagsV2Enabled);
+            nocClaimantRepresentativeService.setClaimantRepresentativeIdamId(caseData.getRepresentativeClaimantType());
             nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(
                     callbackRequest.getCaseDetails());
         }

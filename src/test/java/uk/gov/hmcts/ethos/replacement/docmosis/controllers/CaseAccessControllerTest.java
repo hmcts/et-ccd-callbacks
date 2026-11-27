@@ -62,7 +62,7 @@ class CaseAccessControllerTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         CaseData caseData = new CaseData();
-        caseData.setLinkedCaseCT("http://example.com/1234567890123456");
+        caseData.setLinkedCaseCT("https://example.com/1234567890123456");
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseData)
                 .withCaseId("1111222233334444")

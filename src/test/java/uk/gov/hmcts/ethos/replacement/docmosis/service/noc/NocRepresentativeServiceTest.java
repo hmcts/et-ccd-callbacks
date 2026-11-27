@@ -20,6 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 
@@ -118,6 +119,25 @@ class NocRepresentativeServiceTest {
         verify(nocRespondentRepresentativeService).updateRespondentRepresentation(caseDetails);
         verify(nocRespondentRepresentativeService).prepopulateOrgAddress(caseData, USER_TOKEN);
         verifyNoInteractions(nocClaimantRepresentativeService);
+    }
+
+    @Test
+    void updateRepresentation_shouldWrapServiceException_whenRemovingConflictingClaimantRepresentation()
+            throws IOException, GenericServiceException {
+        CaseData caseData = new CaseData();
+        caseData.setChangeOrganisationRequestField(buildChangeRequest(RESPONDENT_SOLICITOR_ROLE_A));
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        GenericServiceException serviceException = new GenericServiceException("Unable to revoke representation");
+        when(nocRespondentRepresentativeService.updateRespondentRepresentation(caseDetails)).thenReturn(caseData);
+        when(nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, USER_TOKEN)).thenReturn(caseData);
+        when(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails))
+                .thenThrow(serviceException);
+
+        GenericRuntimeException exception = assertThrows(GenericRuntimeException.class,
+                () -> nocRepresentativeService.updateRepresentation(caseDetails, USER_TOKEN));
+
+        assertThat(exception.getCause()).isSameAs(serviceException);
     }
 
     @Test
@@ -224,7 +244,7 @@ class NocRepresentativeServiceTest {
         when(ccdCaseAssignment.getCaseUserRoles(SUBMISSION_REFERENCE)).thenReturn(caseUserAssignmentData);
         UserDetails userDetails = new UserDetails();
         userDetails.setUid(REPRESENTATIVE_ID_2);
-        when(userService.getValidatedUserDetails(USER_TOKEN, SUBMISSION_REFERENCE)).thenReturn(userDetails);
+        when(userService.fetchAndValidateUserDetails(USER_TOKEN, SUBMISSION_REFERENCE)).thenReturn(userDetails);
         // when no role found should throw generic service exception
         GenericServiceException gse = assertThrows(GenericServiceException.class,
                 () -> nocRepresentativeService.getValidatedRepresentativeRolesByUserToken(USER_TOKEN,

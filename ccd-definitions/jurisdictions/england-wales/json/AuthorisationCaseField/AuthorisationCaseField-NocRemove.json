@@ -1,0 +1,158 @@
+[
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveLeadMultiRepsLandingPageLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveLeadSingleRepLandingPageLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveSharedRepLandingPageLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveSharedRepRemovalLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveOption",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocCaseSharingStatus",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRepresentativeType",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveRepSelfRemovalLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveRepSelfConfirm",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveRepOrgRemovalLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveRepRemoveOrgLabelClaimant",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveRepOrgConfirmation1",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "nocRemoveRepOrgConfirmation2",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  }
+]

@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import feign.FeignException;
 import feign.Request;
 import feign.RequestTemplate;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -137,5 +138,43 @@ class OrganisationServiceTest {
         when(organisationClient.getOrganisationById(ADMIN_USER_TOKEN, AUTHORISATION_TOKEN, ORGANISATION_ID))
                 .thenThrow(notFound);
         assertThat(organisationService.findSuperUserByOrganisationId(ORGANISATION_ID)).isNull();
+    }
+
+    @Test
+    void theFindAccountByEmail() {
+        // when email address is empty should return null
+        assertThat(organisationService.findAccountByEmail(StringUtils.EMPTY)).isNull();
+        // when organisation client returns empty user response should return null
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        when(authTokenGenerator.generate()).thenReturn(AUTHORISATION_TOKEN);
+        when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, AUTHORISATION_TOKEN, REPRESENTATIVE_EMAIL_1))
+                .thenReturn(null);
+        assertThat(organisationService.findAccountByEmail(REPRESENTATIVE_EMAIL_1)).isNull();
+        // when organisation client returns valid user account should return that user
+        AccountIdByEmailResponse accountIdByEmailResponse = new AccountIdByEmailResponse();
+        accountIdByEmailResponse.setUserIdentifier(REPRESENTATIVE_ID_1);
+        ResponseEntity<AccountIdByEmailResponse> userResponse = ResponseEntity.ok(accountIdByEmailResponse);
+        when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, AUTHORISATION_TOKEN, REPRESENTATIVE_EMAIL_1))
+                .thenReturn(userResponse);
+        assertThat(organisationService.findAccountByEmail(REPRESENTATIVE_EMAIL_1)).isEqualTo(accountIdByEmailResponse);
+        // when feign exception 404 is thrown should return null
+        Request request = Request.create(
+                Request.HttpMethod.GET,
+                URL_GET_ACCOUNT_ID_BY_EMAIL,
+                Collections.emptyMap(),
+                new byte[0],
+                StandardCharsets.UTF_8,
+                new RequestTemplate()
+        );
+
+        FeignException.NotFound notFound = new FeignException.NotFound(
+                FEIGN_EXCEPTION_USER_NOT_FOUND,
+                request,
+                new byte[0],
+                Collections.emptyMap()
+        );
+        when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, AUTHORISATION_TOKEN, REPRESENTATIVE_EMAIL_1))
+                .thenThrow(notFound);
+        assertThat(organisationService.findAccountByEmail(REPRESENTATIVE_EMAIL_1)).isNull();
     }
 }

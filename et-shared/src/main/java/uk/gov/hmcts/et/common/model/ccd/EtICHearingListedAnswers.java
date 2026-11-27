@@ -15,6 +15,12 @@ public class EtICHearingListedAnswers {
     private String etICExtendDurationGiveDetails;
     @JsonProperty("etICOtherGiveDetails")
     private String etICOtherGiveDetails;
+    @JsonProperty("etICPostponeGiveDetails")
+    private String etICPostponeGiveDetails;
+    @JsonProperty("etICConvertPreliminaryGiveDetails")
+    private String etICConvertPreliminaryGiveDetails;
+    @JsonProperty("etICConvertF2fGiveDetails")
+    private String etICConvertF2fGiveDetails;
 
     @JsonProperty("etICIsHearingWithJudgeOrMembers")
     private String etICIsHearingWithJudgeOrMembers;

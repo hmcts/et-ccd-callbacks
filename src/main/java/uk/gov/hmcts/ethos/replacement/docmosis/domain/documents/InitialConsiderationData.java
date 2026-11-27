@@ -58,6 +58,11 @@ public class InitialConsiderationData {
     @JsonProperty("otherDirections")
     private String otherDirections;
 
+    @JsonProperty("hearingListedReferVP")
+    private String hearingListedReferVP;
+    @JsonProperty("hearingListedReferVPDetails")
+    private String hearingListedReferVPDetails;
+
     //Hearing not listed
     @JsonProperty("hearingNotListed")
     private List<String> hearingNotListed;
@@ -83,6 +88,10 @@ public class InitialConsiderationData {
     private String preliminaryHearingLengthType;
     @JsonProperty("preliminaryHearingWithMembers")
     private String preliminaryHearingWithMembers;
+    @JsonProperty("preliminaryHearingWithMembersYes")
+    private List<String> preliminaryHearingWithMembersYes;
+    @JsonProperty("preliminaryHearingWithMembersYesOther")
+    private String preliminaryHearingWithMembersYesOther;
     @JsonProperty("preliminaryHearingWithMembersReason")
     private String preliminaryHearingWithMembersReason;
     @JsonProperty("hearingNotListedListAnyOtherDirections")
@@ -125,6 +134,12 @@ public class InitialConsiderationData {
     @JsonProperty("etICFinalHearingIsEJSitAloneFurtherDetails")
     private String etICFinalHearingIsEJSitAloneFurtherDetails;
 
+    @JsonProperty("hearingNotListedReferVP")
+    private String hearingNotListedReferVP;
+    @JsonProperty("hearingNotListedReferVPDetails")
+    private String hearingNotListedReferVPDetails;
+
+    //udl
     @JsonProperty("udlSitAlone")
     private String udlSitAlone;
     @JsonProperty("udlReasons")

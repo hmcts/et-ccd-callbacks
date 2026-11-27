@@ -21,6 +21,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskEventService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ai.Et1AiVettingService;
 
 import java.io.IOException;
 
@@ -42,6 +43,7 @@ public class Et1SubmissionController {
 
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private final Et1SubmissionService et1SubmissionService;
+    private final Et1AiVettingService et1AiVettingService;
     private final FeatureToggleService featureToggleService;
     private final SupportTaskService supportTaskService;
     private final SupportTaskEventService supportTaskEventService;
@@ -63,6 +65,7 @@ public class Et1SubmissionController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails);
         et1SubmissionService.sendEt1ConfirmationClaimant(caseDetails, userToken);
+        et1AiVettingService.vetClaimInBackground(caseDetails, userToken);
         if (featureToggleService.isCaseFlagsV2Enabled(caseDetails.getCaseTypeId())) {
             CaseDetails caseDetailsBefore = ccdRequest.getCaseDetailsBefore();
             supportTaskEventService.triggerArrangeSupportTaskEvents(caseDetails,

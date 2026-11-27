@@ -127,7 +127,10 @@ public enum JurisdictionCode {
         + "annual leave entitlement"),
     WTR("Failure to limit weekly or night working time, or to ensure rest breaks"),
     DRB("Discrimination, including indirect discrimination, discrimination based on association or perception or "
-            + "harassment on grounds of religion or belief");
+            + "harassment on grounds of religion or belief"),
+    EQP("Equal pay claim"),
+    TBA("Jurisdiction code to be confirmed / allocated"),
+    ZNON("No applicable jurisdiction code");
 
     @Getter
     public final String description;

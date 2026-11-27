@@ -1,0 +1,285 @@
+package uk.gov.hmcts.ethos.replacement.docmosis.service.ai;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantRequestType;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.ai.AiGatewayProperties;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ai.AiDocumentAttachment;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ACAS_CERTIFICATE;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_VETTING;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class Et1DocumentReaderService {
+
+    private static final String APPLICATION_PDF = "application/pdf";
+    private static final String MIME_MS_EXCEL = "application/vnd.ms-excel";
+    private static final String MIME_MS_POWERPOINT = "application/vnd.ms-powerpoint";
+    private static final Set<String> RELEVANT_DOCUMENT_TYPES = Set.of(
+            ET1,
+            ET1_ATTACHMENT,
+            ACAS_CERTIFICATE
+    );
+    private static final Map<String, String> EXTENSION_MIME_TYPES = Map.ofEntries(
+            Map.entry(".pdf", APPLICATION_PDF),
+            Map.entry(".png", "image/png"),
+            Map.entry(".jpg", "image/jpeg"),
+            Map.entry(".jpeg", "image/jpeg"),
+            Map.entry(".bmp", "image/bmp"),
+            Map.entry(".tif", "image/tiff"),
+            Map.entry(".tiff", "image/tiff"),
+            Map.entry(".txt", "text/plain"),
+            Map.entry(".csv", "text/csv"),
+            Map.entry(".rtf", "application/rtf"),
+            Map.entry(".doc", "application/msword"),
+            Map.entry(".dot", "application/msword"),
+            Map.entry(".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
+            Map.entry(".xls", MIME_MS_EXCEL),
+            Map.entry(".xlt", MIME_MS_EXCEL),
+            Map.entry(".xla", MIME_MS_EXCEL),
+            Map.entry(".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+            Map.entry(".xltx", "application/vnd.openxmlformats-officedocument.spreadsheetml.template"),
+            Map.entry(".ppt", MIME_MS_POWERPOINT),
+            Map.entry(".pot", MIME_MS_POWERPOINT),
+            Map.entry(".pps", MIME_MS_POWERPOINT),
+            Map.entry(".ppa", MIME_MS_POWERPOINT),
+            Map.entry(".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"),
+            Map.entry(".potx", "application/vnd.openxmlformats-officedocument.presentationml.template"),
+            Map.entry(".ppsx", "application/vnd.openxmlformats-officedocument.presentationml.slideshow")
+    );
+
+    private final DocumentManagementService documentManagementService;
+    private final AiGatewayProperties aiGatewayProperties;
+
+    /**
+     * Downloads an uploaded document from DM Store / CDAM as a raw binary attachment for AI multimodal input.
+     *
+     * @param userToken auth token for DM Store (optional, falls back to RequestContextHolder)
+     * @param document uploaded document reference
+     * @return AiDocumentAttachment with bytes and MIME type, or null if unavailable
+     */
+    public AiDocumentAttachment downloadDocumentAttachment(String userToken, UploadedDocumentType document) {
+        String token = resolveAuthToken(userToken);
+        if (StringUtils.isBlank(token) || document == null
+                || StringUtils.isBlank(document.getDocumentBinaryUrl())) {
+            return null;
+        }
+
+        String documentUuid = extractDocumentUuid(document.getDocumentBinaryUrl());
+        try {
+            log.info("Downloading document {} from DM Store for AI multimodal vetting", documentUuid);
+            UploadedDocument uploadedDoc = documentManagementService.downloadFile(
+                    token, document.getDocumentBinaryUrl());
+            if (uploadedDoc == null || uploadedDoc.getContent() == null) {
+                log.warn("Document {} downloaded but content is empty", documentUuid);
+                return null;
+            }
+
+            Resource resource = uploadedDoc.getContent();
+            byte[] bytes;
+            try (InputStream in = resource.getInputStream()) {
+                bytes = in.readAllBytes();
+            }
+
+            if (bytes.length == 0 || bytes.length > aiGatewayProperties.getMaxAttachmentBytes()) {
+                log.warn("Document {} size ({} bytes) outside acceptable limits (max {} bytes)",
+                        documentUuid, bytes.length, aiGatewayProperties.getMaxAttachmentBytes());
+                return null;
+            }
+
+            String mimeType = resolveMimeType(document.getDocumentFilename(), uploadedDoc.getContentType());
+            return AiDocumentAttachment.builder()
+                    .documentId(documentUuid)
+                    .filename(document.getDocumentFilename())
+                    .mimeType(mimeType)
+                    .data(bytes)
+                    .build();
+        } catch (Exception ex) {
+            log.warn("Could not download document {} for AI multimodal vetting: {}",
+                    documentUuid, ex.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Discovers and downloads all relevant claim documents (Particulars of Claim, ET1 form,
+     * ET1 attachments, and ACAS Early Conciliation certificates) for AI analysis.
+     *
+     * @param caseData CCD CaseData
+     * @param userToken auth token for DM Store
+     * @return List of deduplicated AiDocumentAttachment objects within payload caps
+     */
+    public List<AiDocumentAttachment> findClaimDocumentAttachments(CaseData caseData, String userToken) {
+        if (caseData == null) {
+            return List.of();
+        }
+        List<AiDocumentAttachment> attachments = new ArrayList<>();
+        Set<String> seenBinaryUrls = new HashSet<>();
+        long totalBytes = 0;
+
+        ClaimantRequestType requests = caseData.getClaimantRequests();
+        if (requests != null) {
+            totalBytes = tryAddAttachment(
+                    requests.getClaimDescriptionDocument(), userToken, attachments, seenBinaryUrls, totalBytes);
+        }
+
+        totalBytes = tryAddAttachment(
+                caseData.getEt1SectionThreeDocumentUpload(), userToken, attachments, seenBinaryUrls, totalBytes);
+
+        int maxCount = aiGatewayProperties.getMaxAttachmentCount();
+        if (CollectionUtils.isNotEmpty(caseData.getDocumentCollection())) {
+            for (DocumentTypeItem docItem : caseData.getDocumentCollection()) {
+                if (attachments.size() >= maxCount) {
+                    log.info("Reached max AI attachment count ({}); skipping remaining documents", maxCount);
+                    break;
+                }
+                if (docItem.getValue() != null && docItem.getValue().getUploadedDocument() != null
+                        && isRelevantVettingDocument(docItem.getValue())) {
+                    totalBytes = tryAddAttachment(docItem.getValue().getUploadedDocument(), userToken,
+                            attachments, seenBinaryUrls, totalBytes);
+                }
+            }
+        }
+
+        return attachments;
+    }
+
+    private long tryAddAttachment(UploadedDocumentType document,
+                                  String userToken,
+                                  List<AiDocumentAttachment> attachments,
+                                  Set<String> seenBinaryUrls,
+                                  long currentTotalBytes) {
+        if (document == null || StringUtils.isBlank(document.getDocumentBinaryUrl())
+                || attachments.size() >= aiGatewayProperties.getMaxAttachmentCount()) {
+            return currentTotalBytes;
+        }
+        String normalizedUrl = document.getDocumentBinaryUrl().trim();
+        if (!seenBinaryUrls.add(normalizedUrl)) {
+            return currentTotalBytes;
+        }
+        AiDocumentAttachment downloaded = downloadDocumentAttachment(userToken, document);
+        if (downloaded == null || downloaded.getData() == null) {
+            return currentTotalBytes;
+        }
+        long maxTotalBytes = aiGatewayProperties.getMaxTotalAttachmentBytes();
+        if (currentTotalBytes + downloaded.getData().length > maxTotalBytes) {
+            log.warn("Skipping attachment {} because aggregate payload would exceed {} bytes limit",
+                    downloaded.getDocumentId(), maxTotalBytes);
+            return currentTotalBytes;
+        }
+        attachments.add(downloaded);
+        return currentTotalBytes + downloaded.getData().length;
+    }
+
+    private String resolveMimeType(String filename, String contentType) {
+        if (StringUtils.isNotBlank(contentType) && !"application/octet-stream".equalsIgnoreCase(contentType)) {
+            return contentType;
+        }
+        String lower = Objects.toString(filename, "").toLowerCase(Locale.ROOT);
+        int dotIdx = lower.lastIndexOf('.');
+        if (dotIdx >= 0) {
+            String mapped = EXTENSION_MIME_TYPES.get(lower.substring(dotIdx));
+            if (mapped != null) {
+                return mapped;
+            }
+        }
+        return "application/octet-stream";
+    }
+
+    private String extractDocumentUuid(String binaryUrl) {
+        if (StringUtils.isBlank(binaryUrl)) {
+            return "unknown";
+        }
+        String trimmed = binaryUrl.trim();
+        int docsIdx = trimmed.indexOf("/documents/");
+        if (docsIdx >= 0) {
+            String rest = trimmed.substring(docsIdx + "/documents/".length());
+            int slashIdx = rest.indexOf('/');
+            String uuid = slashIdx >= 0 ? rest.substring(0, slashIdx) : rest;
+            if (StringUtils.isNotBlank(uuid)) {
+                return uuid;
+            }
+        }
+        return "unknown";
+    }
+
+    private boolean isRelevantVettingDocument(DocumentType docType) {
+        String filename = docType.getUploadedDocument() != null
+                ? Objects.toString(docType.getUploadedDocument().getDocumentFilename(), "")
+                : "";
+        if (isVettingDocument(docType, filename)) {
+            return false;
+        }
+        return matchesRelevantDocumentType(docType.getTypeOfDocument())
+                || matchesRelevantDocumentType(docType.getStartingClaimDocuments())
+                || matchesRelevantDocumentType(docType.getDocumentType())
+                || matchesRelevantFilename(filename);
+    }
+
+    private boolean isVettingDocument(DocumentType docType, String filename) {
+        return ET1_VETTING.equalsIgnoreCase(StringUtils.trimToEmpty(docType.getTypeOfDocument()))
+                || ET1_VETTING.equalsIgnoreCase(StringUtils.trimToEmpty(docType.getStartingClaimDocuments()))
+                || ET1_VETTING.equalsIgnoreCase(StringUtils.trimToEmpty(docType.getDocumentType()))
+                || filename.toLowerCase(Locale.ROOT).contains(ET1_VETTING.toLowerCase(Locale.ROOT));
+    }
+
+    private boolean matchesRelevantDocumentType(String value) {
+        if (StringUtils.isBlank(value)) {
+            return false;
+        }
+        String trimmed = value.trim();
+        return RELEVANT_DOCUMENT_TYPES.stream().anyMatch(trimmed::equalsIgnoreCase);
+    }
+
+    private boolean matchesRelevantFilename(String filename) {
+        if (StringUtils.isBlank(filename)) {
+            return false;
+        }
+        String lower = filename.toLowerCase(Locale.ROOT);
+        return lower.startsWith(ET1.toLowerCase(Locale.ROOT))
+                || lower.contains("acas");
+    }
+
+    private String resolveAuthToken(String userToken) {
+        if (StringUtils.isNotBlank(userToken)) {
+            return userToken;
+        }
+        try {
+            RequestAttributes attribs = RequestContextHolder.getRequestAttributes();
+            if (attribs instanceof ServletRequestAttributes servletAttribs) {
+                return servletAttribs.getRequest().getHeader(HttpHeaders.AUTHORIZATION);
+            }
+        } catch (Exception ex) {
+            log.debug("Unable to obtain request authorization header from RequestContextHolder: {}", ex.getMessage());
+        }
+        return null;
+    }
+
+}

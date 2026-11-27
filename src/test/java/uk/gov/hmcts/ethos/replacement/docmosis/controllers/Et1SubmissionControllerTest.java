@@ -17,6 +17,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskEventService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SupportTaskService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ai.Et1AiVettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
@@ -46,6 +47,8 @@ class Et1SubmissionControllerTest extends BaseControllerTest {
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     @MockitoBean
     private Et1SubmissionService et1SubmissionService;
+    @MockitoBean
+    private Et1AiVettingService et1AiVettingService;
     @MockitoBean
     private FeatureToggleService featureToggleService;
     @MockitoBean
@@ -90,6 +93,8 @@ class Et1SubmissionControllerTest extends BaseControllerTest {
                 .setHmctsServiceIdSupplementary(any(CaseDetails.class));
         verify(et1SubmissionService, times(1))
                 .sendEt1ConfirmationClaimant(any(CaseDetails.class), eq(AUTH_TOKEN));
+        verify(et1AiVettingService, times(1))
+                .vetClaimInBackground(any(CaseDetails.class), eq(AUTH_TOKEN));
     }
 
     @Test

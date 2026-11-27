@@ -194,4 +194,43 @@ class AcasServiceTest {
         assertEquals(0, actual.size());
     }
 
+    @Test
+    void getAcasCertificatesSkipsNotFoundDocument() throws JsonProcessingException {
+        AcasCertificate acasCertificate = new AcasCertificate();
+        acasCertificate.setCertificateNumber("R111111/11/11");
+        acasCertificate.setCertificateDocument(NOT_FOUND_CERTIFICATE);
+        acasCertificate.setDateOfNotification("2026-08-01");
+        acasCertificate.setDateCertificateIssued("2026-08-04");
+
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .setBody(objectMapper.writeValueAsString(List.of(acasCertificate))));
+
+        List<DocumentInfo> actual = acasService.getAcasCertificates(caseData, ACAS_CERT_LIST, AUTH_TOKEN,
+                ENGLANDWALES_CASE_TYPE_ID);
+        assertEquals(0, actual.size());
+        assertEquals("2026-08-01", caseData.getRespondentCollection().getFirst().getValue()
+                .getAcasCertificateReceiptDate());
+        assertEquals("2026-08-04", caseData.getRespondentCollection().getFirst().getValue()
+                .getAcasCertificateIssueDate());
+    }
+
+    @Test
+    void getAcasCertificatesDecodesWhitespaceInBase64() throws JsonProcessingException {
+        AcasCertificate acasCertificate = new AcasCertificate();
+        acasCertificate.setCertificateNumber("R111111/11/11");
+        acasCertificate.setCertificateDocument("dGVzdCBw\n ZGYg ZGF0YQ==");
+
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .setBody(objectMapper.writeValueAsString(List.of(acasCertificate))));
+
+        List<DocumentInfo> actual = acasService.getAcasCertificates(caseData, ACAS_CERT_LIST, AUTH_TOKEN,
+                ENGLANDWALES_CASE_TYPE_ID);
+        assertEquals(1, actual.size());
+        assertEquals(documentInfo.getDescription(), actual.getFirst().getDescription());
+    }
+
 }

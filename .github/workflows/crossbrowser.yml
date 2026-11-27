@@ -1,0 +1,103 @@
+name: Playwright Cross Browser Tests
+
+on:
+  push:
+
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  playwright-tests:
+    name: ${{ matrix.os }} - ${{ matrix.browser }}
+    runs-on:
+      group: ${{ matrix.runner-group }}
+  
+    strategy:
+      fail-fast: false
+      max-parallel: 1 
+      matrix:
+        os:
+          - linux
+          - windows
+        browser:
+          - chromium
+          - firefox
+          - webkit
+        include:
+          - os: linux
+            runner-group: azure-prod
+          - os: windows
+            runner-group: azure-prod-windows
+
+    timeout-minutes: 300
+    steps:
+      # Checkout source code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      # Setup Node.js
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      # Install npm dependencies
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: build shared library
+        run: yarn build:shared
+
+      # Install Playwright browsers
+
+      - name: Install Playwright browser - Linux
+        if: runner.os == 'Linux'
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Install Playwright browser - macOS / Windows
+        if: runner.os != 'Linux'
+        run: npx playwright install ${{ matrix.browser }}
+
+      # Run Playwright tests
+      - name: Run Playwright tests
+        run: npx playwright test -c src/test/e2e/playwright.config.ts --project=${{ matrix.browser }} --grep "@Smoke"
+
+        env:
+          CI: true
+          ET_CCD_API_USER_NAME: ${{ secrets.ET_CCD_API_USER_NAME }}
+          ET_CCD_API_PASSWORD: ${{ secrets.ET_CCD_API_PASSWORD }}
+          ET_CASEWORKER_USER_NAME: ${{ secrets.ET_CASEWORKER_USER_NAME }}
+          ET_CASEWORKER_PASSWORD: ${{ secrets.ET_CASEWORKER_PASSWORD }}
+          ET_LEGALREP_USER_NAME: ${{ secrets.ET_LEGALREP_USER_NAME }}
+          ET_LEGALREP_PASSWORD: ${{ secrets.ET_LEGALREP_PASSWORD }}
+          ET_LEGAL_OPS2_USER_NAME: ${{ secrets.ET_LEGAL_OPS2_USER_NAME }}
+          ET_LEGAL_OPS2_PASSWORD: ${{ secrets.ET_LEGAL_OPS2_PASSWORD }}
+          ET_JUDGE_USER_NAME_ENG: ${{ secrets.ET_JUDGE_USER_NAME_ENG }}
+          ET_JUDGE_USER_ENG_PASSWORD: ${{ secrets.ET_JUDGE_USER_ENG_PASSWORD}}
+          ET_JUDGE_USER_NAME_WORKALLOCATION: ${{ secrets.ET_JUDGE_USER_NAME_WORKALLOCATION }}
+          ET_JUDGE_USER_PASSWORD_WORKALLOCATION: ${{ secrets.ET_JUDGE_USER_PASSWORD_WORKALLOCATION }}
+          ET_REPSONDENT_USER_NAME: ${{ secrets.ET_REPSONDENT_USER_NAME }}
+          ET_REPSONDENT_PASSWORD : ${{ secrets.ET_REPSONDENT_PASSWORD }}
+
+      # Upload Playwright HTML report
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.browser }}
+          path: playwright-report/
+          retention-days: 7
+
+      # Upload screenshots / videos / traces
+      - name: Upload test artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results-${{ matrix.browser }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7

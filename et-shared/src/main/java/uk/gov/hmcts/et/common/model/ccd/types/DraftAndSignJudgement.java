@@ -20,6 +20,10 @@ public class DraftAndSignJudgement {
     private String shouldForPublication;
     @JsonProperty("shouldForPublicationReason")
     private String shouldForPublicationReason;
+    @JsonProperty("notForPublication")
+    private List<String> notForPublication;
+    @JsonProperty("nonPublicationReason")
+    private String nonPublicationReason;
     @JsonProperty("draftAndSignJudgementDocuments")
     private List<DocumentTypeItem> draftAndSignJudgementDocuments;
     @JsonProperty("furtherDirections")

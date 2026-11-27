@@ -5778,6 +5778,12 @@
     "DisplayOrder": 3
   },
   {
+    "ID": "msl_notForPublication",
+    "ListElementCode": "notForPublication",
+    "ListElement": "This judgment should not be published on Find Case Law",
+    "DisplayOrder": 1
+  },
+  {
     "ID": "fl_employer_type",
     "ListElement": "Individual",
     "ListElementCode": "Individual",

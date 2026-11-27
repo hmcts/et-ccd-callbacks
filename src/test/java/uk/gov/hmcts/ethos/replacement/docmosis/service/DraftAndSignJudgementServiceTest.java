@@ -42,6 +42,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.DraftAndSignJudgementService.ERROR_MSG_MISSING_NON_PUBLICATION_REASON;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.DraftAndSignJudgementService.NOT_FOR_PUBLICATION;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
@@ -85,11 +87,11 @@ class DraftAndSignJudgementServiceTest {
                 .build()
             )
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
-        caseDetails.getCaseData().setDraftAndSignJudgement(buildDraftAndSignJudgement(YES, YES));
+        caseDetails.getCaseData().setDraftAndSignJudgement(buildDraftAndSignJudgement(YES, List.of(), null));
     }
 
     @Test
-    void shouldSendEmailWhenJudgementAndPublicationAreYes() throws Exception {
+    void shouldSendEmailWhenJudgementAndNotForPublicationNotSelected() throws Exception {
         when(reportDataService.getUserFullName(USER_TOKEN))
             .thenReturn("Judge Jane Doe");
         when(documentManagementService.downloadFile(eq(USER_TOKEN), any()))
@@ -105,15 +107,15 @@ class DraftAndSignJudgementServiceTest {
         assertThat(personalisation).containsEntry("caseNumber", CASE_REF);
         assertThat(personalisation).containsEntry("claimant", "Claimant A");
         assertThat(personalisation).containsEntry("respondentNames", "Respondent A");
-        assertThat(personalisation).containsEntry("reasonForPublication", "Public interest");
         assertThat(personalisation).containsEntry("submittedDate", UtilHelper.formatCurrentDate(LocalDate.now()));
         assertThat(personalisation).containsEntry("userName", "Judge Jane Doe");
         assertThat(personalisation).containsKey("linkToDocument");
+        assertThat(personalisation).doesNotContainKey("reasonForPublication");
     }
 
     @Test
-    void shouldSendEmailWhenReasonForPublicationEmpty() throws Exception {
-        caseDetails.getCaseData().getDraftAndSignJudgement().setShouldForPublicationReason(null);
+    void shouldSendEmailWhenNotForPublicationIsNull() throws Exception {
+        caseDetails.getCaseData().getDraftAndSignJudgement().setNotForPublication(null);
 
         when(reportDataService.getUserFullName(USER_TOKEN))
             .thenReturn("Judge Jane Doe");
@@ -125,12 +127,13 @@ class DraftAndSignJudgementServiceTest {
         verify(emailService, times(1)).sendEmail(eq(TEMPLATE_ID), eq(EMAIL), personalisationCaptor.capture());
 
         Map<String, Object> personalisation = personalisationCaptor.getValue();
-        assertThat(personalisation).containsEntry("reasonForPublication", "Not provided");
+        assertThat(personalisation).containsEntry("caseNumber", CASE_REF);
+        assertThat(personalisation).doesNotContainKey("reasonForPublication");
     }
 
     @Test
-    void shouldNotSendEmailWhenConditionsNotMet() throws NotificationClientException {
-        caseDetails.getCaseData().setDraftAndSignJudgement(buildDraftAndSignJudgement(NO, YES));
+    void shouldNotSendEmailWhenIsJudgementIsNo() throws NotificationClientException {
+        caseDetails.getCaseData().setDraftAndSignJudgement(buildDraftAndSignJudgement(NO, List.of(), null));
 
         draftAndSignJudgementService.checkAndSendEmails(caseDetails, USER_TOKEN);
 
@@ -140,14 +143,76 @@ class DraftAndSignJudgementServiceTest {
     }
 
     @Test
-    void shouldNotSendEmailWhenRecommendationNo() throws NotificationClientException {
-        caseDetails.getCaseData().setDraftAndSignJudgement(buildDraftAndSignJudgement(YES, NO));
+    void shouldNotSendEmailWhenNotForPublicationSelected() throws NotificationClientException {
+        caseDetails.getCaseData().setDraftAndSignJudgement(
+            buildDraftAndSignJudgement(YES, List.of(NOT_FOR_PUBLICATION), "Anonymity order in place")
+        );
 
         draftAndSignJudgementService.checkAndSendEmails(caseDetails, USER_TOKEN);
 
         verify(emailService, never()).sendEmail(any(), any(), any());
         verify(documentManagementService, never()).downloadFile(any(), any());
         verify(reportDataService, never()).getUserFullName(any());
+    }
+
+    @Test
+    void shouldReturnErrorWhenNotForPublicationSelectedAndReasonMissing() {
+        caseDetails.getCaseData().setDraftAndSignJudgement(
+            buildDraftAndSignJudgement(YES, List.of(NOT_FOR_PUBLICATION), null)
+        );
+
+        List<String> errors = draftAndSignJudgementService.validateNonPublicationReason(caseDetails.getCaseData());
+
+        assertThat(errors).containsExactly(ERROR_MSG_MISSING_NON_PUBLICATION_REASON);
+    }
+
+    @Test
+    void shouldReturnErrorWhenNotForPublicationSelectedAndReasonBlank() {
+        caseDetails.getCaseData().setDraftAndSignJudgement(
+            buildDraftAndSignJudgement(YES, List.of(NOT_FOR_PUBLICATION), "   ")
+        );
+
+        List<String> errors = draftAndSignJudgementService.validateNonPublicationReason(caseDetails.getCaseData());
+
+        assertThat(errors).containsExactly(ERROR_MSG_MISSING_NON_PUBLICATION_REASON);
+    }
+
+    @Test
+    void shouldReturnNoErrorsWhenNotForPublicationSelectedAndReasonProvided() {
+        caseDetails.getCaseData().setDraftAndSignJudgement(
+            buildDraftAndSignJudgement(YES, List.of(NOT_FOR_PUBLICATION), "Anonymity order in place")
+        );
+
+        List<String> errors = draftAndSignJudgementService.validateNonPublicationReason(caseDetails.getCaseData());
+
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void shouldReturnNoErrorsWhenNotForPublicationNotSelected() {
+        caseDetails.getCaseData().setDraftAndSignJudgement(buildDraftAndSignJudgement(YES, List.of(), null));
+
+        List<String> errors = draftAndSignJudgementService.validateNonPublicationReason(caseDetails.getCaseData());
+
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void shouldReturnNoErrorsWhenNotJudgement() {
+        caseDetails.getCaseData().setDraftAndSignJudgement(
+            buildDraftAndSignJudgement(NO, List.of(NOT_FOR_PUBLICATION), null)
+        );
+
+        List<String> errors = draftAndSignJudgementService.validateNonPublicationReason(caseDetails.getCaseData());
+
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void shouldReturnNoErrorsWhenCaseDataOrJudgementIsNull() {
+        assertThat(draftAndSignJudgementService.validateNonPublicationReason(null)).isEmpty();
+        caseDetails.getCaseData().setDraftAndSignJudgement(null);
+        assertThat(draftAndSignJudgementService.validateNonPublicationReason(caseDetails.getCaseData())).isEmpty();
     }
 
     @Test
@@ -414,11 +479,15 @@ class DraftAndSignJudgementServiceTest {
         verify(emailService, never()).sendEmail(any(), any(), any());
     }
 
-    private DraftAndSignJudgement buildDraftAndSignJudgement(String isJudgement, String shouldForPublication) {
+    private DraftAndSignJudgement buildDraftAndSignJudgement(
+        String isJudgement,
+        List<String> notForPublication,
+        String nonPublicationReason
+    ) {
         DraftAndSignJudgement judgement = new DraftAndSignJudgement();
         judgement.setIsJudgement(isJudgement);
-        judgement.setShouldForPublication(shouldForPublication);
-        judgement.setShouldForPublicationReason("Public interest");
+        judgement.setNotForPublication(notForPublication);
+        judgement.setNonPublicationReason(nonPublicationReason);
         judgement.setDraftAndSignJudgementDocuments(buildDocuments());
         return judgement;
     }

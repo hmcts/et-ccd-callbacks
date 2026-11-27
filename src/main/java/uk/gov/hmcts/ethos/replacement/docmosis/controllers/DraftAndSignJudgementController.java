@@ -20,7 +20,10 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DraftAndSignJudgementService;
 import uk.gov.service.notify.NotificationClientException;
 
+import java.util.List;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @RestController
@@ -30,6 +33,31 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class DraftAndSignJudgementController {
 
     private final DraftAndSignJudgementService draftAndSignJudgementService;
+
+    /**
+     * Mid-event validation for Draft and Sign Judgement Event.
+     * @param ccdRequest The CCD request containing case details
+     * @return ResponseEntity with CCDCallbackResponse
+     */
+    @PostMapping(value = "midEvent", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Validates non-publication reason when judgment is not for Find Case Law publication.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> midEvent(@RequestBody CCDRequest ccdRequest) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = draftAndSignJudgementService.validateNonPublicationReason(caseData);
+        if (!errors.isEmpty()) {
+            return getCallbackRespEntityErrors(errors, caseData);
+        }
+        return getCallbackRespEntityNoErrors(caseData);
+    }
 
     /**
      * About to submit for Draft and Sign Judgement Event.
@@ -55,6 +83,11 @@ public class DraftAndSignJudgementController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
+
+        List<String> errors = draftAndSignJudgementService.validateNonPublicationReason(caseData);
+        if (!errors.isEmpty()) {
+            return getCallbackRespEntityErrors(errors, caseData);
+        }
 
         draftAndSignJudgementService.checkAndSendEmails(caseDetails, userToken);
 

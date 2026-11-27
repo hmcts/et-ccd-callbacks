@@ -137,7 +137,7 @@ rd_commondata-api-url: ${RD_COMMONDATA_API_URL:http://localhost:4507}
 
 feature:
   secure-doc-store:
-    enabled: ${SECURE_DOC_STORE_FEATURE:false}
+    enabled: true
 
 queue:
   create-updates:

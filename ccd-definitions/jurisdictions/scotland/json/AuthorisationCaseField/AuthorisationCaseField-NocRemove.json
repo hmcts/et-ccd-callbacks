@@ -1,19 +1,7 @@
 [
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRemoveLeadMultiRepsLandingPageLabel",
-    "AccessControl": [
-      {
-        "UserRoles": [
-          "[CLAIMANTSOLICITOR]"
-        ],
-        "CRUD": "R"
-      }
-    ]
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRemoveLeadSingleRepLandingPageLabel",
+    "CaseFieldID": "nocRemoveLeadRepLandingPageLabel",
     "AccessControl": [
       {
         "UserRoles": [
@@ -85,7 +73,7 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRemoveRepSelfRemovalLabel",
+    "CaseFieldID": "nocRemoveSharedLeadRepSelfRemovalLabel",
     "AccessControl": [
       {
         "UserRoles": [

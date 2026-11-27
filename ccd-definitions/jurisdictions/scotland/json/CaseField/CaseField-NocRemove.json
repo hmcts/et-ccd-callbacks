@@ -17,7 +17,7 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "ID": "nocRemoveLeadMultiRepsLandingPageLabel",
+    "ID": "nocRemoveLeadRepLandingPageLabel",
     "Label": "This will remove you or your organisation from the case. You will no longer represent the client.",
     "FieldType": "Label",
     "SecurityClassification": "Public",
@@ -27,14 +27,6 @@
     "CaseTypeID": "ET_Scotland",
     "ID": "nocRemoveSharedRepRemovalLabel",
     "Label": "When you submit this page, you will be removed from this case and it will no longer appear on your case list.<br><br>This is a new online process - you don't need to file any further documents in relation to this notice of change with the tribunal.",
-    "FieldType": "Label",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
-    "ID": "nocRemoveLeadSingleRepLandingPageLabel",
-    "Label": "This will remove you and your organisation from the case. You will no longer represent the client.",
     "FieldType": "Label",
     "SecurityClassification": "Public",
     "Searchable": "N"
@@ -58,7 +50,7 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "ID": "nocRemoveRepSelfRemovalLabel",
+    "ID": "nocRemoveSharedLeadRepSelfRemovalLabel",
     "Label": "When you submit this page, you will be removed from this case and it will no longer appear on your case list.<br><br>A notification will be sent to all parties on this case.<br><br>This is a new online process - you don't need to file any further documents in relation to this notice of change with the tribunal.",
     "FieldType": "Label",
     "SecurityClassification": "Public",
